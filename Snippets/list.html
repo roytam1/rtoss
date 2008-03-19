@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-tw">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script type="text/javascript">
+// <![CDATA[
+/* 建立XMLHttpRequest物件 */
+function CreateXMLHttp(){
+	var objxml = false;
+	/*@cc_on @*/
+	/*@if (@_jscript_version >= 5)
+	try{
+		objxml = new ActiveXObject("Msxml2.XMLHTTP");
+	}catch(e){
+		try{
+			objxml = new ActiveXObject("Microsoft.XMLHTTP");
+		}catch(e2){ objxml = false; }
+	}
+	@end @*/
+	if(!objxml && typeof XMLHttpRequest!='undefined') {
+		objxml = new XMLHttpRequest();
+		if(objxml.overrideMimeType) objxml.overrideMimeType('text/xml');
+	}
+	return objxml;
+}
+</script></head><body onload="getXML()">
+<div id="ajContent"></div>
+<script type="text/javascript">
+// <![CDATA[
+var tt = document.getElementById("tooltip"); // 進階資訊
+var ajc = document.getElementById("ajContent"); // 主要介面
+var pg = document.getElementById("pages"); // 換頁列
+var runtime = document.getElementById("ajTimer"); // 執行時間
+var ie=document.all;
+var xhttp = CreateXMLHttp();
+
+/* 取得列表 */
+function getXML(){
+	if(xhttp){
+		xhttp.open('GET','sitemap.xml', true);
+		xhttp.onreadystatechange = readXML;
+		xhttp.send(null);
+	}
+}
+function readXML(){
+	if(xhttp.readyState==4){ // 讀取完成
+		var returnXML = xhttp.responseXML;
+
+		var item_list = returnXML.getElementsByTagName('loc');
+		var arycount = item_list.length;
+		var result='<h2>Index of '+location.hostname+'</h2>';
+		for(i = 0; i < arycount; i++){
+			var url = item_list[i].firstChild.nodeValue;
+			var filename = url.replace("http://"+location.host+"/",'');
+			if(filename.indexOf(".")>-1 && filename.indexOf(".htm")==-1)
+				result+="<a href='"+url+"'>"+filename+"</a><br>"
+		}
+		ajc.innerHTML = result;
+
+	}
+}
+
+// ]]>
+</script>
+</body></html>
