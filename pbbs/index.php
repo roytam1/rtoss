@@ -1,0 +1,1 @@
+<?php $go = file_exists('pbbs.html')?'pbbs.html':'p-bbs.php';header("Location: $go"); ?>
