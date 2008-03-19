@@ -1,0 +1,41 @@
+Web Favorities System Change Log
+================================
+Version 0.05:
+* Simplify some codes
+* Correct some variables
+* Move determination script out of fav_settings.php to fav_common.php
+* Add login process to fav_action.php instead of showing "Access Denied"
+* Allow Category has URL
++ Add cookie-based submenu show/hide memory
++ Add [Bookmark This!] bookmarklet (fixed '&' problem in 20070814)
+- Remove images and "NI=Y" Query string
+
+Version 0.04:
+* Rewritten in PHP + SQLite
++ Add Custom Ordering
+* Fix not found case in delete/edit
+* Fix Toggle All javascript error
+--------------------------------
+Version 0.03
++ Added Category filter in the feeds
++ Disable Shrinking for Old Netscape
++ Added RSS 1.0/2.0 Feed and Atom 0.3 Feed
++ Added QueryString "F=Y" to force using Shrink/Expand function
++ Added QueryString "NI=Y" to disable loading "Valid" images
++ Added -preliminary- support of placing in Mozilla/Firefox/Netscape6+ sidebar
++ Added QueryString "Navi=N" to hide the navigation bar
++ Added QueryString "sidebar=Y" for Mozilla/Firefox/Netscape6+ sidebar
++ Change font size to 9pt in Sidebar mode
+* Changed navigation bar's style to fixed position (but still floating in IE/Old Mozilla)
+* Removed navigation bar's transparency
+* Change the line height of navigation bar
+* Fix session bug
+* Fixed a bug of editing entries if "No Category" Category is selected
+* Fix a bug with BOF issue
+
+Version 0.02
++ Added navigation bar.
+* Increased the textbox width.
+
+Version 0.01
+  First release.
