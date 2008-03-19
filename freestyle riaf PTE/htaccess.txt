@@ -1,0 +1,7 @@
+LayoutIgnoreURI *
+RewriteEngine on
+# RewriteBase‚Ì/2ch ‚Í©•ª‚ÌŠÂ‹«‚ÌƒpƒX‚É•ÏX
+RewriteBase /f_style/
+RewriteRule bbs.cgi bbs.php
+RewriteRule read.cgi(.*) read.php$1
+SetEnvIf Request_URI "bbs.php$" CONTENT_TYPE=application/x-www-form-urlencoded

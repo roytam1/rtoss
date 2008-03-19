@@ -1,0 +1,235 @@
+<?php
+require_once "./conf.php";
+// extract($_POST);
+// extract($_GET);
+function CleanStr($u_str)
+{
+	if (get_magic_quotes_gpc()) {
+		$u_str = stripslashes($u_str);
+	}
+	$u_str = htmlspecialchars($u_str);
+	return str_replace(array(",",'$'), array("&#44;","&#36;"), $u_str);
+}
+
+$subject = CleanStr($_REQUEST['subject']);
+$FROM1 = $_REQUEST['nick'];
+$FROM = CleanStr($_REQUEST['nick']);
+$FROM = ereg_replace("[\r\n]", "", $FROM);
+$MESSAGE = CleanStr($_REQUEST['content']);
+$mail = Cleanstr($_REQUEST['mail']);
+$c_pass = $_REQUEST['delk'];
+$delk = substr(md5($_REQUEST['delk']), 2, 8);
+$key = $_REQUEST['key'];
+
+if (ereg("^( |　|\t)*$", $MESSAGE)) {
+	error("本文がありません！", $FROM, $mail, $host, $MESSAGE);
+}
+if ($key == "" && (ereg("^( |　|\t)*$", $subject))) {
+	error("サブジェクトが存在しません！", $FROM, $mail, $host, $MESSAGE);
+}
+if (!isset($_REQUEST['url']) || (isset($_REQUEST['url']) && $_REQUEST['url']!="")) {
+	error("投稿が禁止されています", $FROM, $mail, $host, $MESSAGE);
+}
+// ホスト、禁止ホスト
+$host = gethostbyaddr($_SERVER["REMOTE_ADDR"]);
+$killip = file("killip.cgi");
+foreach ($killip as $kill) {
+	$kill = rtrim($kill);
+	if ($kill != "" && stristr($host, $kill)) {
+		error("投稿が禁止されています", $FROM, $mail, $host, $MESSAGE);
+	}
+}
+
+if(count($ngfiles)) {
+	foreach($ngfiles as $ngfile) {
+		if(is_file($ngfile)) {
+			$ngwords=explode(',',rtrim(implode('',file($ngfile))));
+			foreach($ngwords as $value){
+				if($value!="" && (strpos($MESSAGE, $value)!==false || strpos($subject ,$value)!==false || strpos($FROM, $value)!==false || strpos($mail,$value)!==false)){
+					error("投稿が禁止されています", $FROM, $mail, $host, $MESSAGE);
+				}
+			}
+		}
+	}
+}
+
+if (!empty($mail)) {
+	$id = " ID:???";
+} else {
+	$idnum = substr(strtr($_SERVER["REMOTE_ADDR"], ".", ""), 8);
+	$bbscrypt = ord($_SERVER["PHP_SELF"][3]) + ord($_SERVER["PHP_SELF"][4]);
+	$idcrypt = substr(crypt(($bbscrypt + $idnum), gmdate("Ymd", time() + $TZ * 3600)), -8);
+	$id = " ID:" . $idcrypt;
+}
+
+$FROM = str_replace("fusianasan", "</b>" . $host . "<b>", $FROM); //fusianasan？
+
+$MESSAGE = str_replace("\r\n", "\r", $MESSAGE); //改行文字の統一。
+$MESSAGE = str_replace("\r", "\n", $MESSAGE);
+/* 投稿制限 */
+if (substr_count($MESSAGE, "\n") > $postline) error("改行が多すぎます！", $FROM, $mail, $host, $MESSAGE);
+// $temp = str_replace("\n", "\n"."a",$MESSAGE);
+// if(strlen($temp)-strlen($MESSAGE) > $postline){ error("投稿行数が長すぎます!"); }
+if (strlen($MESSAGE) > $postbyte) {
+	error("本文が長すぎます！", $FROM, $mail, $host, $MESSAGE);
+}
+
+$MESSAGE = str_replace("\n", "<br>", $MESSAGE); //改行文字の前に<br>を代入する。
+$now = gmdate("Y/m/d(D) H:i", time() + $TZ * 3600);
+$now .= $id;
+
+if ($subject) $key = time();
+
+/* レスポンスアンカー */
+$MESSAGE = preg_replace("/(^|r>)(&gt;){1,2}(\d+)-(\d+)/si", "\\1<a href=\"{$dir_path}read.php/$key/\\3-\\4\" target=_blank>&gt;&gt;\\3-\\4</a>", $MESSAGE);
+$MESSAGE = preg_replace("/(^|r>)(&gt;){1,2}(\d+)/si", "\\1<a href=\"{$dir_path}read.php/$key/\\3n\" target=_blank>&gt;&gt;\\3</a>", $MESSAGE);
+
+/* 多重カキコチェック */
+$last = fopen($last_file, "r+");
+$lsize = fread($last, filesize($last_file));
+list($lname, $lcom) = explode("\t", $lsize);
+if ($FROM == $lname && $MESSAGE == $lcom) {
+	error("二重かきこですか？？", $FROM, $mail, $host, $MESSAGE);
+}
+rewind($last);
+fputs($last, "$FROM\t$MESSAGE\t");
+fclose($last);
+
+$mail1 = $mail;
+$FROM = str_replace("★", "☆", $FROM);
+$FROM = str_replace("◆", "◇", $FROM);
+/* トリップ */
+if (strstr($FROM, "#")) {
+	$pass = substr($FROM, strpos($FROM, "#") + 1);
+	$pass = str_replace('&#44;', ',', $pass);
+	$salt = substr($pass . "H.", 1, 2);
+	$salt = ereg_replace("[^\.-z]", ".", $salt);
+	$salt = strtr($salt, ":;<=>?@[\\]^_`", "ABCDEFGabcdef");
+	$FROM2 = substr($FROM, 0, strpos($FROM, "#"));
+	$FROM = $FROM2 . " ◆" . substr(crypt($pass, $salt), -10);
+}
+/* キャップ */
+if (file_exists("cap.php") && strstr($mail, "#")) {
+	$caparr = file("cap.php");
+	for($c = 0; $c < count($caparr); $c++) {
+		list($he, $cname, $cpass, $fo) = explode("<>", $caparr[$c]);
+		$cap = substr($mail, strpos($mail, "#"));
+		if ($cap == "#$cpass") {
+			if ($FROM) $FROM .= " ＠";
+			$FROM .= "$cname ★";
+			break;
+		}
+	}
+	$mail = substr($mail, 0, strpos($mail, "#"));
+}
+if (ereg("^( |　|\t)*$", $FROM)) {
+	$FROM = $nanasi;
+}
+// 記事フォーマット
+$newlog = "$FROM,$mail,$now,$MESSAGE,$subject\n";
+$newcgi = "$FROM,$mail,$now,$MESSAGE,$subject,$host,$delk,\n";
+// スレ一覧読み込む
+$subj_arr = file($sub_back);
+// 親スレ投稿の場合、ファイル作成
+if ($subject) {
+	// 既にある場合（time()）は1増やす（意味無いかも
+	if (file_exists("$ddir$key$ext")) $key++;
+	$fp = fopen("$ddir$key$ext", "w");
+	fputs($fp, $newlog);
+	fclose($fp);
+	// 読み込み不可ファイル生成
+	$fc = fopen("$ddir$key$ext_cgi", "w");
+	fputs($fc, $newcgi);
+	fclose($fc);
+	// ﾊﾟｰﾐｯｼｮﾝ666にする
+	chmod("$ddir$key$ext", 0666);
+	chmod("$ddir$key$ext_cgi", 0666);
+	// スレ一覧の先頭に加える
+	$new_subj = "$key$ext,$subject(1)\n";
+	array_unshift($subj_arr, $new_subj);
+	// レス投稿の場合
+} else {
+	// レスファイル名
+	$resfile = $ddir . $key . $ext;
+	$cgifile = $ddir . $key . $ext_cgi;
+	if (!file_exists($resfile)) error("書き込もうとしているスレッドは存在しないか、削除されています。。。", $FROM, $mail, $host, $MESSAGE);
+	// 該当レス読み込む
+	$res_arr = file($resfile);
+	// レス数取得
+	$resline = count($res_arr);
+	// ｶｳﾝﾄアップ
+	$resline += 1;
+	// レス数制限オーバー
+	if ($resline > $numlimit) {
+		chmod($resfile, 0444);
+		// chmod($cgifile, 0444);
+	}
+
+	if ($resline == $numlimit) {
+		$nextnum = $numlimit + 1;
+		$MESSAGE = "[color=red]このスレッドは $numlimit を超えました<br />もう書けないので新しいスレッドを立てて下さい[/color]";
+		$newlog .= "$nextnum,,Over $numlimit Thread,$MESSAGE,\n";
+		$resline = $nextnum;
+	}
+	// レス書き込み
+	if (!is_writable($resfile)) error("現在この掲示板は読取専用です。ここは待つしかない。。。", $FROM, $mail, $host, $MESSAGE);
+
+	$re = fopen($resfile, "a") or error("このスレッドは停止されてます。もう書けない。。。", $FROM, $mail, $host, $MESSAGE);
+	fputs($re, $newlog);
+	fclose($re);
+
+	$recgi = fopen($cgifile, "a") or error("このスレッドは停止されてます。もう書けない。。。", $FROM, $mail, $host, $MESSAGE);
+	fputs($recgi, $newcgi);
+	fclose($recgi);
+	// レスｶｳﾝﾄアップ
+	for ($r = 0; $r < count($subj_arr); $r++) {
+		list($kdate, $t_r) = explode(",", $subj_arr[$r]);
+		$t_r = str_replace(")", "", $t_r);
+		list($title, $rescnt) = explode("(", $t_r);
+		list($dkey,) = explode(".", $kdate);
+		if ($dkey == $key) {
+			if (strstr($mail, "sage")) {
+				$subj_arr[$r] = "$kdate,$title($resline)\n";
+			} else {
+				array_unshift($subj_arr, "$kdate,$title($resline)\n");
+				array_splice($subj_arr, $r + 1, 1);
+			}
+		}
+	}
+}
+// subback.html更新、全部
+$bf = fopen($sub_back, "w");
+flock($bf, 2);
+reset($subj_arr);
+fputs($bf, implode('', $subj_arr));
+fclose($bf);
+// subject.txt更新、一定数に収める
+$sf = fopen($subj_file, "w");
+flock($sf, 2);
+for($i = 0; $i < $thre_def; $i++) {
+	fputs($sf, $subj_arr[$i]);
+}
+fclose($sf);
+// $cookval = implode(",", array($FROM1,$mail1));
+/*if (function_exists("mb_convert_encoding")) {
+	$FROM1 = mb_convert_encoding($FROM1, "UTF-8", "SJIS");
+	$mail1 = mb_convert_encoding($mail1, "UTF-8", "SJIS");
+} else {
+	require_once('jcode.php');
+	include_once('code_table.jis2ucs');
+	$FROM1 = JcodeConvert($FROM1, 0, 4);
+	$mail1 = JcodeConvert($mail1, 0, 4);
+}*/
+
+setcookie("NAME", $FROM1, time() + 30 * 24 * 3600);
+setcookie("MAIL", $mail1, time() + 30 * 24 * 3600);
+setcookie("PASS", $c_pass, time() + 30 * 24 * 3600);
+
+include("index.inc");
+// header("Location: bbs.php?mode=remake");
+echo '<html><head><title>書きこみました。</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<META http-equiv="refresh" content="1;URL=./?"></head>
+<body>書きこみが終わりました。<br><br>画面を切り替えるまでしばらくお待ち下さい。<br><br><br><br><br><hr></body></html>';
+
+?>

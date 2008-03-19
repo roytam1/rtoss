@@ -1,0 +1,39 @@
+<title>{$fsub}</title><body>
+
+[if main]
+<a href="{$dir_path}i/">戻</a><a href="{$dir_path}read.php?key={$key}">全</a><a href="{$dir_path}read.php?key={$key}&ls={$read_def}">新</a><a href="#saigo">↓</a><br>
+<font size=+1 color="#FF0000">●{$fsub}</font>
+<hr>
+[if first]
+[1] <font color="#006600">[if femail]<a href="mailto:{$femail}">[/if]{$fname}[if femail]</a>[/if]</font> ({$fdate})<br>
+{$fcom}
+[/if]
+
+[loop res][if res/show]
+<hr>[{$res/num}] <font color="#006600">[if res/email]<a href=mailto:{$res/email}>[/if]{$res/name}[if res/email]</a>[/if]</font> ({$res/date})<br>
+{$res/com}[/if]
+[/loop]
+
+<a name=saigo></a><hr>
+[if prev]<a href="{$dir_path}read.php?key={$key}&st={$prev_st}&to={$prev}">前</a>[/if]
+[if next]<a href="{$dir_path}read.php?key={$key}&st={$num}&to={$next}">次</a>[/if]
+<br><a href="{$dir_path}i/">戻</a> <a href="{$dir_path}read.php?key={$key}&mode=post">レス</a><br>
+[/if]
+
+[if post]
+<form method=post action="{$dir_path}bbs.php">
+<input type=hidden name=key value="{$key}">
+名前<br>
+<input type=text value="{$cname}" name=nick size=20 maxlength=40><br>
+E-Mail<br>
+<input type=text value="{$cmail}" name=mail size=15><br>
+<textarea name=content cols=75 rows=3 class=input></textarea><br>
+<input type=password value="{$cpass}" name=delk size=8 maxlength=8><br>
+験証<br>
+以下の入力ﾌｨｰﾙﾄﾞをｸﾘｱしてください｡<br>
+<input type=text value="x" name=url size=8><br>
+<input type=submit value="投稿"><input type=reset value="ﾘｾｯﾄ">
+</form>
+[/if]
+
+</body>
