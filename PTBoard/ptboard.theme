@@ -1,0 +1,127 @@
+<!--&THREAD-->
+<!--&IF($REPLYBTN,'<div class="grid">','<div class="container">')-->
+<div class="threadpost">
+<input type="checkbox" name="{$NO}" value="delete" /><span class="title">{$SUB}</span>
+名稱: <span class="name">{$NAME}</span> [{$NOW}] No.{$NO}&nbsp;<!--&IF($REPLYBTN,'{$REPLYBTN}','')-->
+<div class="quote">{$COM}</div>
+{$ALERT}</div>
+<!--&FOREACH($RES,'REPLY')-->
+<!--&IF($REPLYBTN,'</div>','</div><hr/>')-->
+<!--/&THREAD-->
+
+<!--&REPLY-->
+<div class="reply" id="r{$NO}">
+<input type="checkbox" name="{$NO}" value="delete" /><span class="title">{$SUB}</span> 名稱: <span class="name">{$NAME}</span> [{$NOW}] No.{$NO}
+<div class="quote">{$COM}</div>
+</div>
+<!--/&REPLY-->
+
+<!--&HEADER-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html><head>
+<META HTTP-EQUIV="Content-type" CONTENT="text/html; charset=utf-8">
+<META HTTP-EQUIV="pragma" CONTENT="no-cache">
+<META HTTP-EQUIV="last-modified" CONTENT="Thu, 1 Jan 1970 00:00:00 GMT">
+<META HTTP-EQUIV="expires" CONTENT="Thu, 1 Jan 1970 00:00:00 GMT">
+<STYLE TYPE="text/css">
+<!--
+body,tr,td,th { font-size:12pt }
+table {margin: 0}
+body { background:#cca;}
+a:hover { color:#88f; }
+a.quote { text-decoration: none; }
+small,.small { font-size:10pt }
+
+.grid {border: 2px #bb9 solid; width:99.2%; height:auto; overflow:auto; margin:2px 0.1% 2px 0.1%;}
+.container { }
+.spacer { clear: both; }
+
+.name { color:#a00; font-weight:bold; }
+.Cname_admin { color:#fb0; }
+.title { color:#484; }
+.reply { display: table; margin: 0.5ex 1em 2px 1em; background:#bb9; }
+.Form_hdr { background:#bb9; color:#000;}
+.Ptitle { color:#aa8; }
+.navi {border: 2px #bb9 solid;}
+.nor {text-decoration: none;font-weight:normal;}
+form {padding:0px;margin:0px;}
+.footer {text-align:center; font-size: small;}
+.quoteMsg {color: #777;}
+.quote {padding: 1em;}
+.hide {display:none;}
+-->
+</STYLE>
+<!--[if IE]>
+<STYLE>
+.reply {
+	display: inline-block;
+	width: auto;
+	float: left;
+	clear: both;
+	zoom: 1;
+}
+/* Hides from IE-mac \*/
+* html .container {height: 1%;}
+/* End hide from IE-mac */
+</STYLE>
+<![endif]-->
+<title>{$TITLE}</title>
+</head>
+<body>
+<H1 style="text-align:center;">{$TITLE}</H1>
+<!--/&HEADER-->
+
+<!--&FORM-->
+<!--&IF($RESTO,'[<a href="{$SELF}">返回</a>]<div class="Form_hdr" style="text-align:center;font-weight:bold;">回應模式</div>','')-->
+<div class="grid">
+<form action="{$SELF}" method="POST" name="postform">
+<!--&IF($HIDDEN,'{$HIDDEN}','')-->
+<!--&IF($RESTO,'<input type="hidden" name="res" value="{$RESTO}">','')-->
+<input type="hidden" name="action" value="post">
+<table cellpadding="1" cellspacing="1" style="text-align:left;">
+<tr><td class="Form_hdr"><b>名 稱</b></td><td>{$FORM_NAME_FIELD}</td></tr>
+<tr><td class="Form_hdr"><b>E-mail</b></td><td>{$FORM_EMAIL_FIELD}</td></tr>
+<tr><td class="Form_hdr"><b>標 題</b></td><td>{$FORM_TOPIC_FIELD}
+<input type="submit" name="sendbtn" value="送 出"></td></tr>
+<tr><td class="Form_hdr"><b>內 文</b></td><td>{$FORM_COMMENT_FIELD}</td></tr>
+<tr><td class="Form_hdr"><b>刪除用密碼</b></td><td><input type=password name=pwd size=8 maxlength=8 value=""><small>(刪除文章用。英數字8字元以内)</small></td></tr>
+</table></form></div>
+<!--/&FORM-->
+
+<!--&FOOTER-->
+<div class="footer">
+<!-- GazouBBS v3.0 --><!-- ふたば改0.8 --><!-- Pixmicat! --><!-- PT-Board -->
+- <a href="http://php.s3.to" rel="_top">GazouBBS</a> + <a href="http://www.2chan.net/" rel="_top">futaba</a> + <a href="http://pixmicat.openfoundry.org/" rel="_blank">Pixmicat!</a> + <a href="http://scrappedblog.blogspot.com/" target="_blank">PT-Board</a> -
+{$FOOTER}
+</div>
+</body></html>
+<!--/&FOOTER-->
+
+<!--&DELFORM-->
+<div class="navi" style="float:right;padding:2px;">
+【文章刪除】　密碼: <input type=password name=pwd size=8 maxlength=8 value=""/>
+<input type="submit" name="sendbtn" value="送 出"/>
+</div>
+<!--/&DELFORM-->
+
+<!--&main-->
+<!--&HEADER/-->
+<!--&FORM/-->
+<form action="{$SELF}" method="POST" name="postform">
+<input type="hidden" name="action" value="delete">
+<!--&FOREACH($POSTS,'THREAD')-->
+<!--&DELFORM/-->
+</form>
+{$PAGENAV}
+<!--&FOOTER/-->
+<!--/&main-->
+
+<!--&error-->
+<!--&HEADER/-->
+<div style="text-align:center;padding:1.5em;font-size:125%">
+{$mes}<br/>
+<br/>
+<a href="javascript:history.go(-1)">回上一頁</a> <a href="{$SELF}">返回版面</a><br/>
+</div>
+<!--&FOOTER/-->
+<!--/&error-->
