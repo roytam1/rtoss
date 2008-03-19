@@ -1,0 +1,22 @@
+﻿html, body {
+	background-color: #fff;
+}
+
+body {
+	font-family: "新細明體", "PMingLiU", "MS UI Pothic", "MS PPothic", "Arial Unicode MS", "Arial", "Helvetica", sans-serif;
+	margin: 2px;
+}
+a {
+	text-decoration: none;
+}
+
+a:visited {
+	color: #9900ff;
+}
+a:link {
+	color: #0000ff;
+}
+
+a.admtool {
+	color:green;
+}
