@@ -68,6 +68,8 @@ $kanban = ''; //看板のタグ
 $TZ='+8'; //Timezone
 
 $ngfiles=array('./spamdata.cgi','./ngwords.cgi');
+$rengfile='./rengwords.cgi';
+$extipq=7;
 
 if(isset($_SERVER['ORIG_PATH_INFO'])) $_SERVER['PATH_INFO']=$_SERVER['ORIG_PATH_INFO']; //PHP5 workaround
 
