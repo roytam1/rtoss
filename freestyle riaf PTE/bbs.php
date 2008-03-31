@@ -45,14 +45,26 @@ if(count($ngfiles)) {
 		if(is_file($ngfile)) {
 			$ngwords=explode(',',rtrim(implode('',file($ngfile))));
 			foreach($ngwords as $value){
-				if($value!="" && (strpos($MESSAGE, $value)!==false || strpos($subject ,$value)!==false || strpos($FROM, $value)!==false || strpos($mail,$value)!==false)){
+				if($value!="" && (strpos($MESSAGE, $value)!==false || strpos($subject ,$value)!==false || strpos($FROM, $value)!==false || strpos($mail,$value)!==false))
 					error("投稿が禁止されています", $FROM, $mail, $host, $MESSAGE);
-				}
 			}
 		}
 	}
 }
+if(is_file($rengfile)) {
+	$ngwords=file($rengfile);
+	foreach($ngwords as $value){
+		$value = trim($value);
+		if($value){
+			$value="/$value/";
+			if((preg_match($value,$MESSAGE) || preg_match($value,$subject) || preg_match($value,$FROM) || preg_match($value,$mail)))
+				error("投稿が禁止されています", $FROM, $mail, $host, $MESSAGE);
+		}
+	}
+}
 
+// ID 処理
+/*
 if (!empty($mail)) {
 	$id = " ID:???";
 } else {
@@ -61,6 +73,24 @@ if (!empty($mail)) {
 	$idcrypt = substr(crypt(($bbscrypt + $idnum), gmdate("Ymd", time() + $TZ * 3600)), -8);
 	$id = " ID:" . $idcrypt;
 }
+*/
+// IP
+$id = " IP:".preg_replace('/\d+$/','*',$_SERVER['REMOTE_ADDR']);
+
+$addr=$_SERVER["REMOTE_ADDR"];
+$qcnt=$exflg=0;
+if($extipq && $addr != "127.0.0.1" && strpos($FROM,"fusianasan")===false) {
+	$rev = implode('.', array_reverse(explode('.', $addr)));
+	$queries = array( 'list.dsbl.org','bbx.2ch.net','dnsbl.ahbl.org','niku.2ch.net','virus.rbl.jp','ircbl.ahbl.org','tor.ahbl.org' );
+	foreach ( $queries as $query ) {
+		$qres=gethostbyname($rev.'.'.$query);
+		if($rev.'.'.$query!=$qres){ $exflg=1; break; }
+		$qcnt++;
+		if($qcnt>=$extipq) break;
+	}
+}
+if($exflg) error("投稿が禁止されています (#".$qcnt.')', $FROM, $mail, $host, $MESSAGE);
+
 
 $FROM = str_replace("fusianasan", "</b>" . $host . "<b>", $FROM); //fusianasan？
 
