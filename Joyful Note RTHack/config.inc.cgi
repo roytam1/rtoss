@@ -172,15 +172,14 @@ $deny = '';
 # Block on posting event only? (0=no 1=yes)
 $onlyblockonpost=1;
 
-# Query bad IP from external IP database (0=disabled, 1-8=levels, larger=query more but slower)
+# Query bad IP from external IP database (0=disabled, 1-7=levels, larger=query more but slower)
 # Level 1: DSBL チェック（オープンプロクシなどのホストが、登録されています。）
 # Level 2: BBX チェック（２ちゃんねるで広告爆撃したホストなどが、登録されています。）
 # Level 3: DNSbl チェック（オープンプロクシなどのホストが、登録されています。）
 # Level 4: BBQ チェック（２ちゃんねるで悪用されたホストなどが、登録されています。）
 # Level 5: RBL チェック（ウイルスメールを発信したホストが、登録されています。）
-# Level 6: ORDB チェック（メールの不正中継したホストが、登録されています。）
-# Level 7: IRCbl チェック（IRCで爆撃したホストが、登録されています。）
-# Level 8: ToR チェック（ SSL オープンプロクシみたいなの。）
+# Level 6: IRCbl チェック（IRCで爆撃したホストが、登録されています。）
+# Level 7: ToR チェック（ SSL オープンプロクシみたいなの。）
 $extIPQ=4;
 
 # NGワード（半角コンマで区切る）

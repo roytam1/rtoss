@@ -121,7 +121,7 @@ sub axscheck {
 	$bypressIPQ=1 if($in{'name'} =~ /fusianasan/ || $in{'name'} =~ /mokorikomo/ );
 
 	if($extIPQ && !$bypressIPQ && $addr ne "127.0.0.1") {
-		my @queries = ( 'list.dsbl.org','bbx.2ch.net','dnsbl.ahbl.org','niku.2ch.net','virus.rbl.jp','relays.ordb.org','ircbl.ahbl.org','tor.ahbl.org' );
+		my @queries = ( 'list.dsbl.org','bbx.2ch.net','dnsbl.ahbl.org','niku.2ch.net','virus.rbl.jp','ircbl.ahbl.org','tor.ahbl.org' );
 		foreach ( @queries ) {
 			$ip0 = join '.', unpack 'C4', gethostbyname(sprintf "%s.".$_, join '.', reverse split /\./, $addr);
 			if($ip0 =~ /^127/){  $flg=1; last; }
