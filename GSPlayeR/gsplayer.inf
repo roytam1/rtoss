@@ -1,0 +1,79 @@
+; GPlayer for Pocket PC AppInstall CabWiz INF file
+; Copyright(C) 2004 Y.Nagamidori
+
+[Version]
+Signature   = "$Windows NT$"
+Provider    = "GreenSoftware"
+CESignature = "$Windows CE$"
+
+;Install Path Macro String for Palm-size PC
+;%CE1% \Program Files 
+;%CE2% \Windows 
+;%CE4% \Windows\StartUp 
+;%CE5% \My Documents 
+;%CE6% \Program Files\Accessories 
+;%CE7% \Program Files\Communication 
+;%CE8% \Program Files\Games 
+;%CE11% \Windows\Start Menu\Programs 
+;%CE12% \Windows\Start Menu\Programs\Accessories 
+;%CE13% \Windows\Start Menu\Programs\Communications 
+;%CE14% \Windows\Start Menu\Programs\Games 
+;%CE15% \Windows\Fonts 
+;%CE17% \Windows\Start Menu 
+
+[CEStrings]
+AppName     = "GSPlayer"
+InstallDir  = %CE1%\GreenSoftware
+
+[CEDevice.PPC3_SH3]                              ; Pocket PC on SH3
+ProcessorType           = 10003
+UnsupportedPlatforms    = "HPC","Jupiter","PPC"
+
+[CEDevice.PPC3_MIPS]                             ; Pocket PC on MIPS
+ProcessorType           = 4000
+UnsupportedPlatforms    = "HPC","Jupiter","PPC"
+
+[CEDevice.PPC3_ARM]                             ; Pocket PC on ARM
+ProcessorType           = 2577
+UnsupportedPlatforms    = "HPC","Jupiter","PPC"
+
+[CEDevice.PPC3_CEF]                             ; Pocket PC on CEF
+ProcessorType           = 0
+UnsupportedPlatforms    = "HPC","Jupiter","PPC"
+
+[SourceDisksNames.PPC3_SH3]
+1 = ,"SH3",,SH3Rel
+
+[SourceDisksNames.PPC3_MIPS]
+1 = ,"MIPS",,MIPSRel
+
+[SourceDisksNames.PPC3_ARM]
+1 = ,"ARM",,ARMRel
+
+[SourceDisksFiles.PPC3_SH3]
+GSPlayer2.exe = 1
+gsgetfile.dll = 1
+
+[SourceDisksFiles.PPC3_MIPS]
+GSPlayer2.exe = 1
+gsgetfile.dll = 1
+
+[SourceDisksFiles.PPC3_ARM]
+GSPlayer2.exe = 1
+gsgetfile.dll = 1
+
+[DefaultInstall]
+CopyFiles   = CopyToInstallDir
+CEShortcuts = CreateShortcuts
+
+[DestinationDirs]
+CopyToInstallDir = ,%InstallDir%
+DefaultDestDir   = ,%InstallDir%
+
+
+[CopyToInstallDir]
+GSPlayer2.exe, GSPlayer2.exe,,0x40000000
+gsgetfile.dll, gsgetfile.dll,,0x40000000
+
+[CreateShortcuts]
+GSPlayer,0,GSPlayer2.exe,%CE11%
