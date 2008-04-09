@@ -1,0 +1,709 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// 24
+//
+
+1                       24      MOVEABLE PURE   "XPStyle.xml"
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_MAIN                ICON    DISCARDABLE     "..\\res\\main.ico"
+IDI_FILE_S              ICON    DISCARDABLE     "..\\res\\file_s.ico"
+IDI_PLAY_S              ICON    DISCARDABLE     "..\\res\\play_s.ico"
+IDI_FILE                ICON    DISCARDABLE     "..\\res\\file.ico"
+IDI_PLAYLIST            ICON    DISCARDABLE     "..\\res\\playlist.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BACK                BITMAP  DISCARDABLE     "..\\res\\back256.bmp"
+IDB_TRACK               BITMAP  DISCARDABLE     "..\\res\\trackhpc.bmp"
+IDB_NUMBER              BITMAP  DISCARDABLE     "..\\res\\number.bmp"
+IDB_STATUS              BITMAP  DISCARDABLE     "..\\res\\status.bmp"
+IDB_BUTTON              BITMAP  DISCARDABLE     "..\\res\\button.bmp"
+IDB_PLAYOPTION          BITMAP  DISCARDABLE     "..\\res\\playopt.bmp"
+IDB_VOLSLIDER           BITMAP  DISCARDABLE     "..\\res\\vol_slider.bmp"
+IDB_VOLTRACK            BITMAP  DISCARDABLE     "..\\res\\vol_track.bmp"
+IDB_BUTTON_PUSH         BITMAP  DISCARDABLE     "..\\res\\button_push.bmp"
+IDB_BUTTON_NORMAL       BITMAP  DISCARDABLE     "..\\res\\button_normal.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_POPUP MENU DISCARDABLE 
+BEGIN
+    POPUP "Main"
+    BEGIN
+        MENUITEM "開く(&O)...\tO",              IDM_FILE_OPEN
+        MENUITEM "URLを開く(&U)...\tU",         IDM_FILE_OPEN_LOCATION
+        MENUITEM "追加(&A)...\tA",              IDM_FILE_ADD
+        MENUITEM "検索(&F)...\tF",              IDM_FILE_FIND
+        MENUITEM "プレイリスト保存(&S)...\tS",  IDM_FILE_SAVE_LIST
+        MENUITEM SEPARATOR
+        POPUP "再生(&P)"
+        BEGIN
+            MENUITEM "再生/一時停止(&P)\tZ",        IDM_PLAY_PLAYPAUSE
+            MENUITEM "停止(&S)\tX",                 IDM_PLAY_STOP
+            MENUITEM SEPARATOR
+            MENUITEM "前へ(&P)\tC",                 IDM_PLAY_PREV
+            MENUITEM "次へ(&N)\tN",                 IDM_PLAY_NEXT
+            MENUITEM "巻き戻し(&R)\tV",             IDM_PLAY_REW
+            MENUITEM "早送り(&F)\tB",               IDM_PLAY_FF
+        END
+        POPUP "再生モード(&M)"
+        BEGIN
+            MENUITEM "リピートなし(&N)",            IDM_PLAY_REPEAT_NONE
+            MENUITEM "全曲リピート(&A)",            IDM_PLAY_REPEAT_ALL
+            MENUITEM "1曲リピート(&O)",             IDM_PLAY_REPEAT_ONE
+            MENUITEM SEPARATOR
+            MENUITEM "シャッフル(&S)\tH",           IDM_PLAY_SHUFFLE
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "プレイリスト(&L)...\tL",      IDM_FILE_LIST
+        MENUITEM "エフェクト(&E)...\tE",        IDM_TOOL_EFFECT
+        MENUITEM SEPARATOR
+        POPUP "オプション(&O)"
+        BEGIN
+            MENUITEM "常に手前に表示(&T)",          IDM_TOOL_TOPMOST
+            MENUITEM "音量を上げる(&U)\t↑",        IDM_TOOL_VOLUP
+            MENUITEM "音量を下げる(&D)\t↓",        IDM_TOOL_VOLDOWN
+            MENUITEM SEPARATOR
+            MENUITEM "スリープタイマ(&S)...",       IDM_TOOL_SLEEPTIMER
+            MENUITEM "設定(&O)...",                 IDM_TOOL_OPTION
+            MENUITEM SEPARATOR
+            MENUITEM "バージョン情報(&A)...",       IDM_HELP_ABOUT
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "終了(&X)",                    IDM_APP_EXIT
+    END
+    POPUP "Tray"
+    BEGIN
+        MENUITEM "元のサイズに戻す(&R)",        IDM_APP_SHOWHIDE
+        MENUITEM SEPARATOR
+        MENUITEM "開く(&O)...",                 IDM_FILE_OPEN
+        MENUITEM "URLを開く(&U)...",            IDM_FILE_OPEN_LOCATION
+        MENUITEM "追加(&A)...",                 IDM_FILE_ADD
+        MENUITEM "検索(&F)...",                 IDM_FILE_FIND
+        MENUITEM "プレイリスト保存(&S)...",     IDM_FILE_SAVE_LIST
+        MENUITEM SEPARATOR
+        POPUP "再生(&P)"
+        BEGIN
+            MENUITEM "再生/一時停止(&P)",           IDM_PLAY_PLAYPAUSE
+            MENUITEM "停止(&S)",                    IDM_PLAY_STOP
+            MENUITEM SEPARATOR
+            MENUITEM "前へ(&P)",                    IDM_PLAY_PREV
+            MENUITEM "次へ(&N)",                    IDM_PLAY_NEXT
+            MENUITEM "巻き戻し(&R)",                IDM_PLAY_REW
+            MENUITEM "早送り(&F)",                  IDM_PLAY_FF
+        END
+        POPUP "再生モード(&M)"
+        BEGIN
+            MENUITEM "リピートなし(&N)",            IDM_PLAY_REPEAT_NONE
+            MENUITEM "全曲リピート(&A)",            IDM_PLAY_REPEAT_ALL
+            MENUITEM "1曲リピート(&O)",             IDM_PLAY_REPEAT_ONE
+            MENUITEM SEPARATOR
+            MENUITEM "シャッフル(&S)",              IDM_PLAY_SHUFFLE
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "プレイリスト(&L)...",         IDM_FILE_LIST
+        MENUITEM "エフェクト(&E)...",           IDM_TOOL_EFFECT
+        MENUITEM SEPARATOR
+        POPUP "オプション(&O)"
+        BEGIN
+            MENUITEM "常に手前に表示(&T)",          IDM_TOOL_TOPMOST
+            MENUITEM "音量を上げる(&U)",            IDM_TOOL_VOLUP
+            MENUITEM "音量を下げる(&D)",            IDM_TOOL_VOLDOWN
+            MENUITEM SEPARATOR
+            MENUITEM "スリープタイマ(&S)...",       IDM_TOOL_SLEEPTIMER
+            MENUITEM "設定(&O)...",                 IDM_TOOL_OPTION
+            MENUITEM SEPARATOR
+            MENUITEM "バージョン情報(&A)...",       IDM_HELP_ABOUT
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "終了(&X)",                    IDM_APP_EXIT
+    END
+    POPUP "Playlist1"
+    BEGIN
+        MENUITEM "再生(&P)",                    IDM_PLAY_SELECTED
+        MENUITEM SEPARATOR
+        MENUITEM "上へ(&U)",                    IDM_FILE_UP
+        MENUITEM "下へ(&D)",                    IDM_FILE_DOWN
+        MENUITEM "削除(&L)",                    IDM_FILE_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "ファイル名でソート(&N)",      IDM_FILE_SORT_BYNAME
+        MENUITEM "フルパス名でソート(&H)",      IDM_FILE_SORT_BYPATH
+    END
+    POPUP "Playlist2"
+    BEGIN
+        MENUITEM "上へ(&U)",                    IDM_FILE_UP
+        MENUITEM "下へ(&D)",                    IDM_FILE_DOWN
+        MENUITEM "削除(&L)",                    IDM_FILE_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "ファイル名でソート(&N)",      IDM_FILE_SORT_BYNAME
+        MENUITEM "フルパス名でソート(&H)",      IDM_FILE_SORT_BYPATH
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_PAGE_EFFECT DIALOG DISCARDABLE  0, 0, 243, 85
+STYLE WS_CHILD | WS_CAPTION
+CAPTION "エフェクト"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    CONTROL         "サラウンド(&S)",IDC_CHECK_SURROUND,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,8,11,52,9
+    CONTROL         "Slider1",IDC_SLIDER_SURROUND,"msctls_trackbar32",
+                    WS_TABSTOP,8,41,105,17
+    GROUPBOX        "",IDC_STATIC,3,0,117,96
+    CONTROL         "3D効果(&C)",IDC_CHECK_3DCHORUS,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,128,11,52,9
+    CONTROL         "Slider1",IDC_SLIDER_3DCHORUS,"msctls_trackbar32",
+                    WS_TABSTOP,128,41,105,17
+    GROUPBOX        "",IDC_STATIC,123,0,117,96
+END
+
+IDD_PAGE_EQUALIZER DIALOG DISCARDABLE  0, 0, 243, 85
+STYLE WS_CHILD | WS_CAPTION
+CAPTION "イコライザ"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    CONTROL         "イコライザ(&E)",IDC_CHECK_EQUALIZER,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,9,10,54,10
+    PUSHBUTTON      "フラット(&F)",IDC_BUTTON_FLAT,130,10,44,12
+    CONTROL         "Slider1",IDC_SLIDER_EQ1,"SmallSlider",WS_TABSTOP,12,25,
+                    10,58
+    CONTROL         "Slider1",IDC_SLIDER_EQ2,"SmallSlider",WS_TABSTOP,25,25,
+                    10,58
+    CONTROL         "Slider1",IDC_SLIDER_EQ3,"SmallSlider",WS_TABSTOP,38,25,
+                    10,58
+    CONTROL         "Slider1",IDC_SLIDER_EQ4,"SmallSlider",WS_TABSTOP,51,25,
+                    10,58
+    CONTROL         "Slider1",IDC_SLIDER_EQ5,"SmallSlider",WS_TABSTOP,64,25,
+                    10,58
+    CONTROL         "Slider1",IDC_SLIDER_EQ6,"SmallSlider",WS_TABSTOP,77,25,
+                    10,58
+    CONTROL         "Slider1",IDC_SLIDER_EQ7,"SmallSlider",WS_TABSTOP,90,25,
+                    10,58
+    CONTROL         "Slider1",IDC_SLIDER_EQ8,"SmallSlider",WS_TABSTOP,103,25,
+                    10,58
+    CONTROL         "Slider1",IDC_SLIDER_EQ9,"SmallSlider",WS_TABSTOP,116,25,
+                    10,58
+    CONTROL         "Slider1",IDC_SLIDER_EQ10,"SmallSlider",WS_TABSTOP,129,
+                    25,10,58
+    CONTROL         "Slider1",IDC_SLIDER_PREAMP,"SmallSlider",WS_TABSTOP,157,
+                    25,10,58
+    LTEXT           "低音域",IDC_STATIC,10,86,22,8
+    LTEXT           "高音域",IDC_STATIC,118,86,22,8
+    LTEXT           "プリアンプ",IDC_STATIC,146,86,31,8
+    GROUPBOX        "",IDC_STATIC,3,0,177,97
+    LTEXT           "バスブースト(&B)",IDC_STATIC,186,10,49,10
+    CONTROL         "Slider1",IDC_SLIDER_BASSBOOST,"SmallSlider",WS_TABSTOP,
+                    205,25,10,58
+    GROUPBOX        "",IDC_STATIC,183,0,56,97
+END
+
+IDD_ABOUT_DLG DIALOGEX 0, 0, 209, 83
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "バージョン情報"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    LTEXT           "GSPlayer v2.25a\nCopyright (C) 2005-2006 Y.Nagamidori",
+                    IDC_STATIC,40,10,120,18,SS_NOPREFIX
+    ICON            IDI_MAIN,IDC_STATIC,11,9,20,20
+    DEFPUSHBUTTON   "OK",IDOK,165,10,36,14
+    LTEXT           "Buffer information\nStreaming:\t0 bytes / 0 bytes (0 %)\nAudio :\t\t0 bytes / 0 bytes (0 %)",
+                    IDC_STATIC_BUFINFO,10,40,190,35,0,WS_EX_STATICEDGE
+END
+
+IDD_PAGE_PLAYER DIALOG DISCARDABLE  0, 0, 234, 119
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "全般"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    CONTROL         "ピークメータを表示する(&P)",IDC_CHECK_PEEK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,15,20,125,10
+    CONTROL         "前回起動時のリストを読み込む(&L)",
+                    IDC_CHECK_SAVE_DEFLIST,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,15,35,125,10
+    CONTROL         "既に登録されているファイルも追加(&A)",
+                    IDC_CHECK_ADD_EXISTING,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,15,50,125,10
+    CONTROL         "レジューム機能を使用する(&R)",IDC_CHECK_RESUME,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,15,65,125,10
+    CONTROL         "起動時に再生開始(&S)",IDC_CHECK_PLAYONSTART,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,15,80,80,10
+    CONTROL         "タイトルをスクロールする(&C)",IDC_CHECK_SCROLLTITLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,110,80,110,10
+    CONTROL         "最小化時にトレイアイコンを追加(&T)",IDC_CHECK_TRAYICON,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,95,125,10
+    GROUPBOX        "動作",IDC_STATIC,5,5,220,105
+END
+
+IDD_PLAYLIST_DLG DIALOG DISCARDABLE  0, 0, 219, 99
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "プレイリスト"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    CONTROL         "List1",IDC_PLAY_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | 
+                    LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,4,4,166,91
+    PUSHBUTTON      "追加(&A)...",IDC_ADD,175,5,40,14
+    PUSHBUTTON      "上へ(&U)",IDC_UP,175,23,40,14
+    PUSHBUTTON      "下へ(&D)",IDC_DOWN,175,41,40,14
+    PUSHBUTTON      "削除(&E)",IDC_DELETE,175,59,40,14
+    PUSHBUTTON      "保存(&S)...",IDC_SAVE,175,77,40,14
+END
+
+IDD_LOCATION_DLG DIALOG DISCARDABLE  0, 0, 179, 85
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "URLを開く..."
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    LTEXT           "接続するインターネットアドレスを入力してください。 ",
+                    IDC_STATIC,10,10,160,10
+    LTEXT           "開く(&O) : ",IDC_STATIC,10,27,27,8
+    COMBOBOX        IDC_CMB_LOCATION,10,40,160,65,CBS_DROPDOWN | 
+                    CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,75,65,45,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,125,65,45,14
+END
+
+IDD_PAGE_STREAMING DIALOG DISCARDABLE  0, 0, 234, 119
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "ストリーミング"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    LTEXT           "バッファサイズ(&B) : ",IDC_STATIC,10,21,60,8
+    EDITTEXT        IDC_EDIT_BUFF,85,21,35,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Spin1",IDC_SPIN_BUFF,"msctls_updown32",UDS_ALIGNRIGHT | 
+                    UDS_AUTOBUDDY | UDS_ARROWKEYS,140,21,9,14
+    LTEXT           "KB",IDC_STATIC,125,24,15,8
+    LTEXT           "プレバッファリング(&P) : ",IDC_STATIC,10,41,70,8
+    EDITTEXT        IDC_EDIT_PREBUFF,85,41,35,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Spin2",IDC_SPIN_PREBUFF,"msctls_updown32",
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,140,41,9,
+                    14
+    LTEXT           "KB",IDC_STATIC,125,44,15,8
+    GROUPBOX        "バッファ設定",IDC_STATIC,5,5,220,55
+    CONTROL         "プロキシサーバーを使用する(&S)",IDC_CHECK_PROXY,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,15,80,115,10
+    LTEXT           "アドレス(&A) : ",IDC_STATIC,15,98,39,8
+    EDITTEXT        IDC_EDIT_PROXY,60,95,160,14,ES_AUTOHSCROLL
+    GROUPBOX        "プロキシ サーバー",IDC_STATIC,5,65,220,50
+END
+
+IDD_PAGE_ASSOCIATE DIALOG DISCARDABLE  0, 0, 234, 119
+STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "関連付け"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    CONTROL         "List1",IDC_LIST_EXT,"SysListView32",LVS_REPORT | 
+                    LVS_SORTASCENDING | LVS_NOCOLUMNHEADER | WS_BORDER | 
+                    WS_TABSTOP,15,20,105,80
+    PUSHBUTTON      "すべて選択(&A)",IDC_CHECK_ALL,130,20,60,15
+    PUSHBUTTON      "すべて解除(&C)",IDC_CLEAR_ALL,130,45,60,15
+    GROUPBOX        "関連付け",IDC_STATIC,5,5,220,105
+END
+
+IDD_PAGE_DECODER DIALOG DISCARDABLE  0, 0, 235, 139
+STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "デコーダ"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    LTEXT           "出力バッファ長(&B) : ",IDC_STATIC,15,22,65,8
+    EDITTEXT        IDC_EDIT_OUT_BUFF_LEN,85,20,42,12,ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    CONTROL         "Spin1",IDC_SPIN_OUT_BUFF_LEN,"msctls_updown32",
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,115,20,10,
+                    14
+    LTEXT           "ミリ秒",IDC_STATIC,130,22,18,8
+    LTEXT           "出力プレバッファ(&P) : ",IDC_STATIC,15,42,65,8
+    EDITTEXT        IDC_EDIT_OUT_PREBUFF,85,40,42,12,ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    CONTROL         "Spin1",IDC_SPIN_OUT_PREBUFF,"msctls_updown32",
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,115,40,10,
+                    14
+    LTEXT           "%",IDC_STATIC,130,42,8,8
+    CONTROL         "フェード効果(&F)",IDC_CHECK_OUTPUT_FADE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,15,60,95,10
+    CONTROL         "ファイルを完全にスキャン(&S)",IDC_CHECK_SCANCOMPLETELY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,80,95,10
+    CONTROL         "ファイル先頭と末端の無音を抑制(&U)",IDC_CHECK_SUPZERO,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,100,135,12
+    CONTROL         "出力デバイスを常に開く(&D)",IDC_CHECK_ALWAYSOPENDEV,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,60,94,10
+    GROUPBOX        "動作",IDC_STATIC,5,5,215,120
+END
+
+IDD_PAGE_WNDALPHA DIALOG DISCARDABLE  0, 0, 234, 119
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "透明度"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    LTEXT           "透明度(&A) : ",IDC_STATIC,20,25,50,8
+    CONTROL         "Slider1",IDC_SLIDER_ALPHA,"msctls_trackbar32",TBS_BOTH | 
+                    WS_TABSTOP,80,20,130,25
+    GROUPBOX        "透明度",IDC_STATIC,5,5,220,50
+END
+
+IDD_PAGE_SKIN DIALOG DISCARDABLE  0, 0, 234, 119
+STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "スキン"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    LTEXT           "ファイル名(&F) : ",IDC_STATIC,15,20,46,8
+    EDITTEXT        IDC_EDIT_FILE,66,20,149,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "参照(&B)...",IDC_BROWSE,170,40,45,15
+    GROUPBOX        "スキン",IDC_STATIC,5,5,220,60
+END
+
+IDD_PAGE_PRESET DIALOG DISCARDABLE  0, 0, 243, 85
+STYLE WS_CHILD | WS_CAPTION
+CAPTION "プリセット"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    CONTROL         "List1",IDC_LIST_PRESET,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
+                    LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,10,10,175,75
+    PUSHBUTTON      "読み込み(&L)",IDC_LOAD,190,10,45,14
+    PUSHBUTTON      "保存(&S)...",IDC_SAVE,190,30,45,14
+    PUSHBUTTON      "削除(&D)",IDC_DEL,190,50,45,14
+    GROUPBOX        "",-1,3,0,237,97
+END
+
+IDD_PRESETNAME_DLG DIALOG DISCARDABLE  0, 0, 179, 115
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "プリセット保存"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    LTEXT           "プリセット名(&N) : ",-1,10,10,50,8
+    EDITTEXT        IDC_EDIT_NAME,10,23,160,12,ES_AUTOHSCROLL
+    CONTROL         "イコライザ(&E)",IDC_CHECK_EQUALIZER,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,45,70,10
+    CONTROL         "バスブースト(&B)",IDC_CHECK_BASSBOOST,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,95,45,70,10
+    CONTROL         "サラウンド(&S)",IDC_CHECK_SURROUND,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,60,70,10
+    CONTROL         "3D効果(&3)",IDC_CHECK_3DCHORUS,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,95,60,70,10
+    CONTROL         "リバーブ(&R)",IDC_CHECK_REVERB,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,75,70,10
+    CONTROL         "エコー(&C)",IDC_CHECK_ECHO,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,95,75,70,10
+    DEFPUSHBUTTON   "OK",IDOK,75,95,45,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,125,95,45,14
+END
+
+IDD_PAGE_REVERB DIALOG DISCARDABLE  0, 0, 243, 85
+STYLE WS_CHILD | WS_CAPTION
+CAPTION "リバーブ"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    CONTROL         "リバーブ(&R)",IDC_CHECK_REVERB,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,8,11,52,9
+    CONTROL         "Slider1",IDC_SLIDER_REVERB,"msctls_trackbar32",
+                    WS_TABSTOP,8,41,105,17
+    GROUPBOX        "",IDC_STATIC,3,0,117,96
+    CONTROL         "エコー(&E)",IDC_CHECK_ECHO,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,128,11,52,9
+    CONTROL         "Slider1",IDC_SLIDER_ECHO,"msctls_trackbar32",WS_TABSTOP,
+                    128,41,105,17
+    GROUPBOX        "",IDC_STATIC,123,0,117,96
+END
+
+IDD_SLEEPTIMER_DLG DIALOG DISCARDABLE  0, 0, 154, 83
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "スリープタイマ"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    CONTROL         "スリープタイマを使用する(&S)",IDC_CHECK_TIMER,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,15,128,10
+    EDITTEXT        IDC_EDIT_TIMER,55,35,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Spin1",IDC_SPIN_TIMER,"msctls_updown32",UDS_ALIGNRIGHT | 
+                    UDS_AUTOBUDDY | UDS_ARROWKEYS,93,38,10,14
+    LTEXT           "分後に実行",IDC_STATIC,100,40,35,8
+    DEFPUSHBUTTON   "OK",IDOK,50,60,45,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,100,60,45,14
+END
+
+IDD_PAGE_PLUGIN DIALOG DISCARDABLE  0, 0, 234, 119
+STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "プラグイン"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    CONTROL         "List1",IDC_LIST_PLUGIN,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | 
+                    WS_BORDER | WS_TABSTOP,15,20,200,65
+    PUSHBUTTON      "設定(&S)...",IDC_CONFIG,155,90,60,15
+    GROUPBOX        "プラグイン",IDC_STATIC,5,5,220,105
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_PAGE_EFFECT, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 240
+    END
+
+    IDD_PAGE_EQUALIZER, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 240
+    END
+
+    IDD_ABOUT_DLG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 208
+    END
+
+    IDD_PAGE_PLAYER, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 230
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 115
+    END
+
+    IDD_PLAYLIST_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 215
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 95
+    END
+
+    IDD_LOCATION_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 175
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 81
+    END
+
+    IDD_PAGE_STREAMING, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 230
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 115
+    END
+
+    IDD_PAGE_DECODER, DIALOG
+    BEGIN
+        RIGHTMARGIN, 234
+    END
+
+    IDD_PAGE_WNDALPHA, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 230
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 115
+    END
+
+    IDD_PAGE_SKIN, DIALOG
+    BEGIN
+        RIGHTMARGIN, 195
+    END
+
+    IDD_PAGE_PRESET, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 240
+    END
+
+    IDD_PRESETNAME_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 175
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 111
+    END
+
+    IDD_PAGE_REVERB, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 240
+    END
+
+    IDD_SLEEPTIMER_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 147
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 76
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 2,2,5,1
+ PRODUCTVERSION 2,2,5,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041104b0"
+        BEGIN
+            VALUE "Comments", "\0"
+            VALUE "CompanyName", " \0"
+            VALUE "FileDescription", "GSPlayer2\0"
+            VALUE "FileVersion", "2, 2, 5, 1\0"
+            VALUE "InternalName", "GSPlayer2\0"
+            VALUE "LegalCopyright", "Copyright (C) 2005-2006 Y.Nagamidori\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "GSPlayer2.exe\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "GSPlayer Win32\0"
+            VALUE "ProductVersion", "2, 2, 5, 1\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_FILTER_OPEN_FILE    "演奏可能なファイル|*.mp3;*.rmp;*.mp2;*.mpa;*.ogg;*.wav;*.m3u;*.pls|MP3ファイル (*.MP3)|*.mp3|RMPファイル (*.RMP)|*.rmp|MP2ファイル (*.mp2)|*.mp2|MPAファイル (*.mpa)|*.mpa|Ogg Vorbisファイル(*.ogg)|*.ogg|Waveファイル (*.wav)|*.wav|プレイリスト (*.m3u;*.pls)|*.m3u;*pls|すべてのファイル (*.*)|*.*||"
+    IDS_TITLE_OPEN_FILE     "開く..."
+    IDS_TITLE_ADD_FILE      "追加..."
+    IDS_TITLE_FIND_FILE     "ファイルの検索フォルダを指定"
+    IDS_TITLE_SAVE_LIST     "プレイリストの保存..."
+    IDS_FILTER_SAVE_LIST    "M3U プレイリスト (*.M3U)|*.m3u||"
+    IDS_TITLE_EQ            "イコライザ"
+    IDS_TITLE_EFFECT        "エフェクト"
+    IDS_TITLE_BASSBOOST     "バスブースト"
+    IDS_TITLE_OPTION        "設定"
+    IDS_FMT_DISP_INFO       "%d kbps %d kHz %s"
+    IDS_FMT_DISP_VOLUME     "音量　%d"
+    IDS_TITLE_SKIN_FILE     "スキンファイルの読み込み"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_FILTER_SKIN_FILE    "スキンファイル(*.gps)|*.gps|すべてのファイル(*.*)|*.*||"
+    IDS_MSG_CONNECTING      "Connecting..."
+    IDS_FMT_BUFFERING       "Buffering...   %d%%"
+    IDS_FMT_BUFINFO         "Buffer information\nStreaming:\t%d KB / %d KB (%d %%)\nAudio :\t\t%d KB / %d KB (%d %%)"
+    IDS_FILTER_OPEN_ALL     "|すべてのファイル (*.*)|*.*||"
+    IDS_FILTER_OPEN_SUPPORTED 
+                            "演奏可能なファイル|*.mp3;*.rmp;*.mp2;*.mpa;*.ogg;*.wav;*.m3u;*.pls"
+    IDS_FILTER_OPEN_INTERNAL 
+                            "|MP3ファイル (*.MP3)|*.mp3|RMPファイル (*.RMP)|*.rmp|MP2ファイル (*.mp2)|*.mp2|MPAファイル (*.mpa)|*.mpa|Ogg Vorbisファイル(*.ogg)|*.ogg|Waveファイル (*.wav)|*.wav|プレイリスト (*.m3u;*.pls)|*.m3u;*pls"
+    IDS_FMT_NULL_FILE_TYPE  "%sファイル (*.%s)"
+    IDS_FMT_DEL_PRESET      "'%s'を削除しますか？"
+    IDS_TITLE_DEL_PRESET    "確認"
+END
+
+#endif    // 日本語 resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,5510 @@
+# eMbedded Visual C++ Dependency File, included by GSPlayer2.vcn
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"notify.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"notify.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+.\EffectDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"notify.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"notify.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+..\EffectDlgSave.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"notify.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"notify.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+..\FolderDlg.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+..\GSPlayer2.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+..\GSPlayer2.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+..\GSPlayer2.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"notify.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+..\GSPlayer2.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+..\GSPlayer2.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+..\GSPlayer2.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+..\GSPlayer2.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+..\GSPlayer2.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+..\GSPlayer2.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+..\GSPlayer2.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+..\GSPlayer2.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+..\GSPlayer2.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+..\GSPlayer2.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+..\GSPlayer2.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+..\GSPlayer2.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+..\GSPlayer2.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+..\GSPlayer2.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+..\GSPlayer2.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+..\GSPlayer2.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"notify.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+..\GSPlayer2.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+.\GSPlayer2.rc : \
+	"..\res\button_normal.bmp"\
+	"..\res\button_push.bmp"\
+	"..\res\device_s.ico"\
+	"..\res\file.ico"\
+	"..\res\file_s.ico"\
+	"..\res\main.ico"\
+	"..\res\number.bmp"\
+	"..\res\play_s.ico"\
+	"..\res\playlist.bmp"\
+	"..\res\playlist.ico"\
+	"..\res\playopt.bmp"\
+	"..\res\status.bmp"\
+	"..\res\trackhpc.bmp"\
+	"..\res\vol_slider.bmp"\
+	"..\res\vol_track.bmp"\
+	".\newres.h"\
+	".\res\button.bmp"\
+	".\res\main2.bmp"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+.\GSPlayer2.rc : \
+	"..\res\button_normal.bmp"\
+	"..\res\button_push.bmp"\
+	"..\res\device_s.ico"\
+	"..\res\file.ico"\
+	"..\res\file_s.ico"\
+	"..\res\main.ico"\
+	"..\res\number.bmp"\
+	"..\res\play_s.ico"\
+	"..\res\playlist.bmp"\
+	"..\res\playlist.ico"\
+	"..\res\playopt.bmp"\
+	"..\res\status.bmp"\
+	"..\res\trackhpc.bmp"\
+	"..\res\vol_slider.bmp"\
+	"..\res\vol_track.bmp"\
+	".\newres.h"\
+	".\res\button.bmp"\
+	".\res\main2.bmp"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+.\GSPlayer2.rc : \
+	"..\res\button_normal.bmp"\
+	"..\res\button_push.bmp"\
+	"..\res\device_s.ico"\
+	"..\res\file.ico"\
+	"..\res\file_s.ico"\
+	"..\res\main.ico"\
+	"..\res\number.bmp"\
+	"..\res\play_s.ico"\
+	"..\res\playlist.bmp"\
+	"..\res\playlist.ico"\
+	"..\res\playopt.bmp"\
+	"..\res\status.bmp"\
+	"..\res\trackhpc.bmp"\
+	"..\res\vol_slider.bmp"\
+	"..\res\vol_track.bmp"\
+	".\newres.h"\
+	".\res\button.bmp"\
+	".\res\main2.bmp"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+.\GSPlayer2.rc : \
+	"..\res\button_normal.bmp"\
+	"..\res\button_push.bmp"\
+	"..\res\device_s.ico"\
+	"..\res\file.ico"\
+	"..\res\file_s.ico"\
+	"..\res\main.ico"\
+	"..\res\number.bmp"\
+	"..\res\play_s.ico"\
+	"..\res\playlist.bmp"\
+	"..\res\playlist.ico"\
+	"..\res\playopt.bmp"\
+	"..\res\status.bmp"\
+	"..\res\trackhpc.bmp"\
+	"..\res\vol_slider.bmp"\
+	"..\res\vol_track.bmp"\
+	".\newres.h"\
+	".\res\button.bmp"\
+	".\res\main2.bmp"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+.\GSPlayer2.rc : \
+	"..\res\button_normal.bmp"\
+	"..\res\button_push.bmp"\
+	"..\res\device_s.ico"\
+	"..\res\file.ico"\
+	"..\res\file_s.ico"\
+	"..\res\main.ico"\
+	"..\res\number.bmp"\
+	"..\res\play_s.ico"\
+	"..\res\playlist.bmp"\
+	"..\res\playlist.ico"\
+	"..\res\playopt.bmp"\
+	"..\res\status.bmp"\
+	"..\res\trackhpc.bmp"\
+	"..\res\vol_slider.bmp"\
+	"..\res\vol_track.bmp"\
+	".\newres.h"\
+	".\res\button.bmp"\
+	".\res\main2.bmp"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+.\GSPlayer2.rc : \
+	"..\res\button_normal.bmp"\
+	"..\res\button_push.bmp"\
+	"..\res\device_s.ico"\
+	"..\res\file.ico"\
+	"..\res\file_s.ico"\
+	"..\res\main.ico"\
+	"..\res\number.bmp"\
+	"..\res\play_s.ico"\
+	"..\res\playlist.bmp"\
+	"..\res\playlist.ico"\
+	"..\res\playopt.bmp"\
+	"..\res\status.bmp"\
+	"..\res\trackhpc.bmp"\
+	"..\res\vol_slider.bmp"\
+	"..\res\vol_track.bmp"\
+	".\newres.h"\
+	".\res\button.bmp"\
+	".\res\main2.bmp"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+.\GSPlayer2.rc : \
+	"..\res\button_normal.bmp"\
+	"..\res\button_push.bmp"\
+	"..\res\device_s.ico"\
+	"..\res\file.ico"\
+	"..\res\file_s.ico"\
+	"..\res\main.ico"\
+	"..\res\number.bmp"\
+	"..\res\play_s.ico"\
+	"..\res\playlist.bmp"\
+	"..\res\playlist.ico"\
+	"..\res\playopt.bmp"\
+	"..\res\status.bmp"\
+	"..\res\trackhpc.bmp"\
+	"..\res\vol_slider.bmp"\
+	"..\res\vol_track.bmp"\
+	".\newres.h"\
+	".\res\button.bmp"\
+	".\res\main2.bmp"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+.\GSPlayer2.rc : \
+	"..\res\button_normal.bmp"\
+	"..\res\button_push.bmp"\
+	"..\res\device_s.ico"\
+	"..\res\file.ico"\
+	"..\res\file_s.ico"\
+	"..\res\main.ico"\
+	"..\res\number.bmp"\
+	"..\res\play_s.ico"\
+	"..\res\playlist.bmp"\
+	"..\res\playlist.ico"\
+	"..\res\playopt.bmp"\
+	"..\res\status.bmp"\
+	"..\res\trackhpc.bmp"\
+	"..\res\vol_slider.bmp"\
+	"..\res\vol_track.bmp"\
+	".\newres.h"\
+	".\res\button.bmp"\
+	".\res\main2.bmp"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+.\GSPlayer2.rc : \
+	"..\res\button_normal.bmp"\
+	"..\res\button_push.bmp"\
+	"..\res\device_s.ico"\
+	"..\res\file.ico"\
+	"..\res\file_s.ico"\
+	"..\res\main.ico"\
+	"..\res\number.bmp"\
+	"..\res\play_s.ico"\
+	"..\res\playlist.bmp"\
+	"..\res\playlist.ico"\
+	"..\res\playopt.bmp"\
+	"..\res\status.bmp"\
+	"..\res\trackhpc.bmp"\
+	"..\res\vol_slider.bmp"\
+	"..\res\vol_track.bmp"\
+	".\newres.h"\
+	".\res\button.bmp"\
+	".\res\main2.bmp"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+.\GSPlayer2.rc : \
+	"..\res\button_normal.bmp"\
+	"..\res\button_push.bmp"\
+	"..\res\device_s.ico"\
+	"..\res\file.ico"\
+	"..\res\file_s.ico"\
+	"..\res\main.ico"\
+	"..\res\number.bmp"\
+	"..\res\play_s.ico"\
+	"..\res\playlist.bmp"\
+	"..\res\playlist.ico"\
+	"..\res\playopt.bmp"\
+	"..\res\status.bmp"\
+	"..\res\trackhpc.bmp"\
+	"..\res\vol_slider.bmp"\
+	"..\res\vol_track.bmp"\
+	".\newres.h"\
+	".\res\button.bmp"\
+	".\res\main2.bmp"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\GSPlayer2.rc : \
+	"..\res\button_normal.bmp"\
+	"..\res\button_push.bmp"\
+	"..\res\device_s.ico"\
+	"..\res\file.ico"\
+	"..\res\file_s.ico"\
+	"..\res\main.ico"\
+	"..\res\number.bmp"\
+	"..\res\play_s.ico"\
+	"..\res\playlist.bmp"\
+	"..\res\playlist.ico"\
+	"..\res\playopt.bmp"\
+	"..\res\status.bmp"\
+	"..\res\trackhpc.bmp"\
+	"..\res\vol_slider.bmp"\
+	"..\res\vol_track.bmp"\
+	".\newres.h"\
+	".\res\button.bmp"\
+	".\res\main2.bmp"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+.\GSPlayer2.rc : \
+	"..\res\button_normal.bmp"\
+	"..\res\button_push.bmp"\
+	"..\res\device_s.ico"\
+	"..\res\file.ico"\
+	"..\res\file_s.ico"\
+	"..\res\main.ico"\
+	"..\res\number.bmp"\
+	"..\res\play_s.ico"\
+	"..\res\playlist.bmp"\
+	"..\res\playlist.ico"\
+	"..\res\playopt.bmp"\
+	"..\res\status.bmp"\
+	"..\res\trackhpc.bmp"\
+	"..\res\vol_slider.bmp"\
+	"..\res\vol_track.bmp"\
+	".\newres.h"\
+	".\res\button.bmp"\
+	".\res\main2.bmp"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+..\MainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+..\MainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+..\MainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"notify.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+..\MainWnd.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+..\MainWnd.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+..\MainWnd.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+..\MainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+..\MainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+..\MainWnd.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+..\MainWnd.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+..\MainWnd.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+..\MainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+..\MainWnd.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+..\MainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+..\MainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+..\MainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+..\MainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+..\MainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+..\MainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"notify.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+..\MainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+..\MainWndCmd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+..\MainWndCmd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\EffectDlg.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+..\MainWndCmd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"notify.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+..\MainWndCmd.cpp : \
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+..\MainWndCmd.cpp : \
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+..\MainWndCmd.cpp : \
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+..\MainWndCmd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+..\MainWndCmd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\EffectDlg.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+..\MainWndCmd.cpp : \
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+..\MainWndCmd.cpp : \
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+..\MainWndCmd.cpp : \
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+..\MainWndCmd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\EffectDlg.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+..\MainWndCmd.cpp : \
+	"..\EffectDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+..\MainWndCmd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\EffectDlg.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+..\MainWndCmd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+..\MainWndCmd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+..\MainWndCmd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+..\MainWndCmd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+..\MainWndCmd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"notify.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+..\MainWndCmd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\EffectDlg.h"\
+	"..\FolderDlg.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\EffectDlgPPC.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+..\MainWndCtrl.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+..\MainWndCtrl.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+..\MainWndCtrl.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"notify.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+..\MainWndCtrl.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+..\MainWndCtrl.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+..\MainWndCtrl.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+..\MainWndCtrl.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+..\MainWndCtrl.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+..\MainWndCtrl.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+..\MainWndCtrl.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+..\MainWndCtrl.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+..\MainWndCtrl.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+..\MainWndCtrl.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayListDlg.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+..\MainWndCtrl.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+..\MainWndCtrl.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+..\MainWndCtrl.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+..\MainWndCtrl.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+..\MainWndCtrl.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+..\MainWndCtrl.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"notify.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+..\MainWndCtrl.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"notify.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"notify.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+..\MainWndPls.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+..\MultiBuff.cpp : \
+	"..\MultiBuff.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+..\Options.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+..\Options.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+..\Options.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"notify.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+..\Options.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+..\Options.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+..\Options.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+..\Options.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+..\Options.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+..\Options.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+..\Options.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+..\Options.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+..\Options.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+..\Options.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+..\Options.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+..\Options.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+..\Options.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+..\Options.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+..\Options.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+..\Options.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"notify.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+..\Options.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+..\PlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+..\PlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+..\PlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"notify.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+..\PlayerApp.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+..\PlayerApp.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+..\PlayerApp.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+..\PlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+..\PlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+..\PlayerApp.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+..\PlayerApp.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+..\PlayerApp.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+..\PlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+..\PlayerApp.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+..\PlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+..\PlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+..\PlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+..\PlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+..\PlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+..\PlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"notify.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+..\PlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"notify.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"notify.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+.\PlayListDlgPPC.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+.\PpcDisplay.cpp : \
+	".\PpcDisplay.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcDisplay.h"\
+	".\PpcMainWnd.h"\
+	".\PpcOptions.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	".\PpcMainWnd.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcDisplay.h"\
+	".\PpcMainWnd.h"\
+	".\PpcOptions.h"\
+	".\PpcSkin.h"\
+	{$(INCLUDE)}"notify.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	".\PpcMainWnd.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	".\PpcMainWnd.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	".\PpcMainWnd.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcDisplay.h"\
+	".\PpcMainWnd.h"\
+	".\PpcOptions.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcDisplay.h"\
+	".\PpcMainWnd.h"\
+	".\PpcOptions.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	".\PpcMainWnd.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	".\PpcMainWnd.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	".\PpcMainWnd.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcDisplay.h"\
+	".\PpcMainWnd.h"\
+	".\PpcOptions.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	".\PpcMainWnd.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcDisplay.h"\
+	".\PpcMainWnd.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcDisplay.h"\
+	".\PpcMainWnd.h"\
+	".\PpcOptions.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcDisplay.h"\
+	".\PpcMainWnd.h"\
+	".\PpcOptions.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcDisplay.h"\
+	".\PpcMainWnd.h"\
+	".\PpcOptions.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcDisplay.h"\
+	".\PpcMainWnd.h"\
+	".\PpcOptions.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcDisplay.h"\
+	".\PpcMainWnd.h"\
+	".\PpcOptions.h"\
+	".\PpcSkin.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"notify.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+.\PpcMainWnd.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcDisplay.h"\
+	".\PpcMainWnd.h"\
+	".\PpcOptions.h"\
+	".\PpcSkin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	{$(INCLUDE)}"notify.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"notify.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+.\PpcOptions.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcOptions.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcMainWnd.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcMainWnd.h"\
+	".\PpcPlayerApp.h"\
+	{$(INCLUDE)}"notify.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcMainWnd.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcMainWnd.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcMainWnd.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcMainWnd.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcMainWnd.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcMainWnd.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcMainWnd.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcMainWnd.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcMainWnd.h"\
+	".\PpcPlayerApp.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"notify.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+.\PpcPlayerApp.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcMainWnd.h"\
+	".\PpcPlayerApp.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	{$(INCLUDE)}"notify.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"notify.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+.\PpcSkin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	".\PpcSkin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\Skin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"notify.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\Skin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\Skin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\Skin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\Skin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\Skin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\Skin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\Skin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"notify.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+..\Skin.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Release"
+
+..\SmallSlider.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE MIPS) Debug"
+
+..\SmallSlider.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\SmallSlider.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Release"
+
+..\SmallSlider.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"notify.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH4) Debug"
+
+..\SmallSlider.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\SmallSlider.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Release"
+
+..\SmallSlider.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\SmallSlider.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE SH3) Debug"
+
+..\SmallSlider.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\SmallSlider.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Release"
+
+..\SmallSlider.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARM) Debug"
+
+..\SmallSlider.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Release"
+
+..\SmallSlider.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\SmallSlider.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE CEF) Debug"
+
+..\SmallSlider.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\SmallSlider.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Release"
+
+..\SmallSlider.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\SmallSlider.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86) Debug"
+
+..\SmallSlider.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Release"
+
+..\SmallSlider.cpp : \
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\SmallSlider.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE x86em) Debug"
+
+..\SmallSlider.cpp : \
+	"..\..\include\maplay.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release"
+
+..\SmallSlider.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Debug"
+
+..\SmallSlider.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Release"
+
+..\SmallSlider.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE emulator) Debug"
+
+..\SmallSlider.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) ReleaseXScale"
+
+..\SmallSlider.cpp : \
+	"..\..\include\maplay.h"\
+	"..\..\include\mapplugin.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\PlayListDlgPPC.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"notify.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
+	
+
+!ELSEIF  "$(CFG)" == "GSPlayer2 - Win32 (WCE ARMV4) Release64"
+
+..\SmallSlider.cpp : \
+	"..\..\include\maplay.h"\
+	"..\checksys.h"\
+	"..\GSPlayer2.h"\
+	"..\MainWnd.h"\
+	"..\MultiBuff.h"\
+	"..\Options.h"\
+	"..\PlayerApp.h"\
+	"..\PlayListDlg.h"\
+	"..\Skin.h"\
+	"..\SmallSlider.h"\
+	".\PlayListDlgPPC.h"\
+	
+
+!ENDIF 
+

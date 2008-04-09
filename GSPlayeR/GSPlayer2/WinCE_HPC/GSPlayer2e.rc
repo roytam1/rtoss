@@ -1,0 +1,756 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 2,2,5,1
+ PRODUCTVERSION 2,2,5,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080904b0"
+        BEGIN
+            VALUE "Comments", "\0"
+            VALUE "CompanyName", " \0"
+            VALUE "FileDescription", "GSPlayer2\0"
+            VALUE "FileVersion", "2, 2, 5, 1\0"
+            VALUE "InternalName", "GSPlayer2\0"
+            VALUE "LegalCopyright", "Copyright (C) 2005-2006 Y.Nagamidori\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "GSPlayer2.exe\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "GSPlayer WinCE\0"
+            VALUE "ProductVersion", "2, 2, 5, 1\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x809, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BACK                BITMAP  DISCARDABLE     "..\\res\\back256.bmp"
+IDB_TRACK               BITMAP  DISCARDABLE     "..\\res\\trackhpc.bmp"
+IDB_NUMBER              BITMAP  DISCARDABLE     "..\\res\\number.bmp"
+IDB_STATUS              BITMAP  DISCARDABLE     "..\\res\\status.bmp"
+IDB_BUTTON              BITMAP  DISCARDABLE     "..\\res\\button.bmp"
+IDB_PLAYOPTION          BITMAP  DISCARDABLE     "..\\res\\playopt.bmp"
+IDB_VOLSLIDER           BITMAP  DISCARDABLE     "..\\res\\vol_slider.bmp"
+IDB_VOLTRACK            BITMAP  DISCARDABLE     "..\\res\\vol_track.bmp"
+IDB_BUTTON_PUSH         BITMAP  DISCARDABLE     "..\\res\\button_push.bmp"
+IDB_BUTTON_NORMAL       BITMAP  DISCARDABLE     "..\\res\\button_normal.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUT_DLG DIALOG DISCARDABLE  0, 0, 227, 79
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About..."
+FONT 8, "System"
+BEGIN
+    LTEXT           "GSPlayer v2.25a\nCopyright (C) 2005-2006 Y.Nagamidori",
+                    IDC_STATIC,40,10,130,18,SS_NOPREFIX
+    ICON            IDI_MAIN,IDC_STATIC,11,9,20,20
+    DEFPUSHBUTTON   "OK",IDOK,175,10,41,14
+    LTEXT           "Buffer information\nStreaming:\t0 bytes / 0 bytes (0 %)\nAudio :\t\t0 bytes / 0 bytes (0 %)",
+                    IDC_STATIC_BUFINFO,10,40,205,33,0,WS_EX_STATICEDGE
+END
+
+IDD_FOLDER_DLG DIALOG DISCARDABLE  0, 0, 203, 95
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE 0x80000000L
+CAPTION "Find..."
+FONT 8, "System"
+BEGIN
+    LTEXT           "Select directory to find files.",IDC_TITLE,4,4,103,10
+    CONTROL         "Tree1",IDC_TREE_FOLDER,"SysTreeView32",
+                    TVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,1,16,202,79
+    CONTROL         "include &Sub Folders",IDC_CHECK_SUBFOLDER,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,124,4,77,10
+END
+
+IDD_PAGE_REVERB DIALOG DISCARDABLE  0, 0, 243, 86
+STYLE WS_CHILD | WS_CAPTION
+CAPTION "Reverb"
+FONT 8, "System"
+BEGIN
+    CONTROL         "&Reverb",IDC_CHECK_REVERB,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,8,11,47,10
+    CONTROL         "Slider1",IDC_SLIDER_REVERB,"msctls_trackbar32",
+                    WS_TABSTOP,8,41,105,17
+    GROUPBOX        "",IDC_STATIC,3,0,117,80
+    CONTROL         "&Echo",IDC_CHECK_ECHO,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,128,11,47,10
+    CONTROL         "Slider1",IDC_SLIDER_ECHO,"msctls_trackbar32",WS_TABSTOP,
+                    128,41,105,17
+    GROUPBOX        "",IDC_STATIC,123,0,117,80
+END
+
+IDD_PAGE_EQUALIZER DIALOG DISCARDABLE  0, 0, 242, 85
+STYLE WS_CHILD | WS_CAPTION
+CAPTION "Equalizer"
+FONT 8, "System"
+BEGIN
+    CONTROL         "&Equalizer",IDC_CHECK_EQUALIZER,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,9,10,42,10
+    PUSHBUTTON      "&Flat",IDC_BUTTON_FLAT,137,9,38,12
+    CONTROL         "Slider1",IDC_SLIDER_EQ1,"SmallSlider",WS_TABSTOP,12,25,
+                    10,45
+    CONTROL         "Slider1",IDC_SLIDER_EQ2,"SmallSlider",WS_TABSTOP,25,25,
+                    10,45
+    CONTROL         "Slider1",IDC_SLIDER_EQ3,"SmallSlider",WS_TABSTOP,38,25,
+                    10,45
+    CONTROL         "Slider1",IDC_SLIDER_EQ4,"SmallSlider",WS_TABSTOP,51,25,
+                    10,45
+    CONTROL         "Slider1",IDC_SLIDER_EQ5,"SmallSlider",WS_TABSTOP,64,25,
+                    10,45
+    CONTROL         "Slider1",IDC_SLIDER_EQ6,"SmallSlider",WS_TABSTOP,77,25,
+                    10,45
+    CONTROL         "Slider1",IDC_SLIDER_EQ7,"SmallSlider",WS_TABSTOP,90,25,
+                    10,45
+    CONTROL         "Slider1",IDC_SLIDER_EQ8,"SmallSlider",WS_TABSTOP,103,25,
+                    10,45
+    CONTROL         "Slider1",IDC_SLIDER_EQ9,"SmallSlider",WS_TABSTOP,116,25,
+                    10,45
+    CONTROL         "Slider1",IDC_SLIDER_EQ10,"SmallSlider",WS_TABSTOP,129,
+                    25,10,45
+    CONTROL         "Slider1",IDC_SLIDER_PREAMP,"SmallSlider",WS_TABSTOP,157,
+                    25,10,45
+    LTEXT           "Low",IDC_STATIC,10,70,22,8
+    LTEXT           "High",IDC_STATIC,118,70,22,8
+    LTEXT           "Preamp",IDC_STATIC,153,70,24,8
+    GROUPBOX        "",IDC_STATIC,3,0,177,80
+    LTEXT           "&BassBoost",IDC_STATIC,195,10,37,10
+    CONTROL         "Slider1",IDC_SLIDER_BASSBOOST,"SmallSlider",WS_TABSTOP,
+                    205,25,10,45
+    GROUPBOX        "",IDC_STATIC,184,0,56,80
+END
+
+IDD_LOCATION_DLG DIALOG DISCARDABLE  0, 0, 179, 65
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE 0x80000000L
+CAPTION "Open URL..."
+FONT 8, "System"
+BEGIN
+    LTEXT           "Enter an internet location to open.",IDC_STATIC,10,10,
+                    160,10
+    LTEXT           "&URL",IDC_STATIC,10,27,14,8
+    COMBOBOX        IDC_CMB_LOCATION,10,40,160,65,CBS_DROPDOWN | 
+                    CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_PAGE_PLAYER DIALOG DISCARDABLE  0, 0, 259, 79
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Preferences"
+FONT 8, "System"
+BEGIN
+    CONTROL         "Draw &Peek meter",IDC_CHECK_PEEK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,10,115,10
+    CONTROL         "&Load previous Playlist",IDC_CHECK_SAVE_DEFLIST,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,25,115,10
+    CONTROL         "&Add to playlist existing files",IDC_CHECK_ADD_EXISTING,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,40,115,10
+    CONTROL         "&Resume (save position and track)",IDC_CHECK_RESUME,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,55,125,10
+    CONTROL         "Play at &startup",IDC_CHECK_PLAYONSTART,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,135,10,115,10
+    CONTROL         "Add &tray icon",IDC_CHECK_TRAYICON,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,135,25,115,10
+    CONTROL         "S&croll title",IDC_CHECK_SCROLLTITLE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,135,40,115,10
+END
+
+IDD_PAGE_STREAMING DIALOG DISCARDABLE  0, 0, 259, 79
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Streaming"
+FONT 8, "System"
+BEGIN
+    LTEXT           "&Buffer size : ",IDC_STATIC,10,15,56,8
+    EDITTEXT        IDC_EDIT_BUFF,75,15,35,14,ES_AUTOHSCROLL
+    CONTROL         "Spin1",IDC_SPIN_BUFF,"msctls_updown32",UDS_ALIGNRIGHT | 
+                    UDS_AUTOBUDDY | UDS_ARROWKEYS,105,20,11,14
+    LTEXT           "KB",IDC_STATIC,115,19,15,8
+    LTEXT           "&Prebuffer : ",IDC_STATIC,135,15,56,8
+    EDITTEXT        IDC_EDIT_PREBUFF,201,15,35,14,ES_AUTOHSCROLL
+    CONTROL         "Spin2",IDC_SPIN_PREBUFF,"msctls_updown32",
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,230,20,11,
+                    14
+    LTEXT           "KB",IDC_STATIC,241,18,15,8
+    CONTROL         "Use Proxy &server",IDC_CHECK_PROXY,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,40,90,10
+    LTEXT           "&Address : ",IDC_STATIC,10,57,45,8
+    EDITTEXT        IDC_EDIT_PROXY,60,55,190,14,ES_AUTOHSCROLL
+END
+
+IDD_PAGE_DECODER DIALOG DISCARDABLE  0, 0, 259, 79
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Decoder"
+FONT 8, "System"
+BEGIN
+    LTEXT           "Output &Buffer length : ",IDC_STATIC,10,10,75,8
+    EDITTEXT        IDC_EDIT_OUT_BUFF_LEN,85,10,32,12,ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    CONTROL         "Spin1",IDC_SPIN_OUT_BUFF_LEN,"msctls_updown32",
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,110,10,11,
+                    14
+    LTEXT           "ms",IDC_STATIC,120,13,10,8
+    LTEXT           "Output &Prebuffer : ",IDC_STATIC,135,10,65,8
+    EDITTEXT        IDC_EDIT_OUT_PREBUFF,201,10,32,12,ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    CONTROL         "Spin1",IDC_SPIN_OUT_PREBUFF,"msctls_updown32",
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,234,10,11,
+                    14
+    LTEXT           "%",IDC_STATIC,244,13,10,8
+    CONTROL         "&Fade in",IDC_CHECK_OUTPUT_FADE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,30,115,10
+    CONTROL         "&Scan file completely",IDC_CHECK_SCANCOMPLETELY,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,45,115,10
+    CONTROL         "S&uppress zero samples",IDC_CHECK_SUPZERO,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,60,115,10
+    CONTROL         "Always open output &device (noiseless)",
+                    IDC_CHECK_ALWAYSOPENDEV,"Button",BS_AUTOCHECKBOX | 
+                    BS_MULTILINE | WS_TABSTOP,135,30,115,17
+END
+
+IDD_PAGE_PLUGIN DIALOG DISCARDABLE  0, 0, 259, 79
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Plug-ins"
+FONT 8, "System"
+BEGIN
+    CONTROL         "List1",IDC_LIST_PLUGIN,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | 
+                    WS_BORDER | WS_TABSTOP,4,4,251,51
+    PUSHBUTTON      "&Configure...",IDC_CONFIG,185,60,70,14
+END
+
+IDD_PAGE_SKIN DIALOG DISCARDABLE  0, 0, 259, 79
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Skin"
+FONT 8, "System"
+BEGIN
+    LTEXT           "&File : ",IDC_STATIC,10,10,38,8
+    EDITTEXT        IDC_EDIT_FILE,55,10,155,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "&Browse...",IDC_BROWSE,166,30,45,15
+END
+
+IDD_PLAYLIST_DLG DIALOG DISCARDABLE  0, 0, 219, 99
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Playlist"
+FONT 8, "System"
+BEGIN
+    CONTROL         "List1",IDC_PLAY_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | 
+                    LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,2,2,168,96
+    PUSHBUTTON      "&Add...",IDC_ADD,175,5,40,14
+    PUSHBUTTON      "&Up",IDC_UP,175,23,40,14
+    PUSHBUTTON      "&Down",IDC_DOWN,175,41,40,14
+    PUSHBUTTON      "D&elete",IDC_DELETE,175,59,40,14
+    PUSHBUTTON      "&Save...",IDC_SAVE,175,77,40,14
+END
+
+IDD_PAGE_PRESET DIALOG DISCARDABLE  0, 0, 242, 85
+STYLE WS_CHILD | WS_CAPTION
+CAPTION "Presets"
+FONT 8, "System"
+BEGIN
+    CONTROL         "List1",IDC_LIST_PRESET,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
+                    LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,10,10,165,65
+    PUSHBUTTON      "&Load",IDC_LOAD,180,10,55,14
+    PUSHBUTTON      "&Save...",IDC_SAVE,180,30,55,14
+    PUSHBUTTON      "&Delete",IDC_DEL,180,50,55,14
+    GROUPBOX        "",-1,3,0,236,80
+END
+
+IDD_PRESETNAME_DLG DIALOG DISCARDABLE  0, 0, 179, 90
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Save Presets"
+FONT 8, "System"
+BEGIN
+    LTEXT           "&New Name : ",-1,10,10,42,8
+    EDITTEXT        IDC_EDIT_NAME,10,23,160,12,ES_AUTOHSCROLL
+    CONTROL         "&Equalizer",IDC_CHECK_EQUALIZER,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,40,50,10
+    CONTROL         "&Bass Boost",IDC_CHECK_BASSBOOST,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,60,40,50,10
+    CONTROL         "&Surround",IDC_CHECK_SURROUND,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,115,40,50,10
+    CONTROL         "&3D Effect",IDC_CHECK_3DCHORUS,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,55,50,10
+    CONTROL         "&Reverb",IDC_CHECK_REVERB,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,60,55,50,10
+    CONTROL         "&Echo",IDC_CHECK_ECHO,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,115,55,50,10
+    DEFPUSHBUTTON   "OK",IDOK,65,70,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,120,70,50,14
+END
+
+IDD_SLEEPTIMER_DLG DIALOG DISCARDABLE  0, 0, 123, 97
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Sleep timer"
+FONT 8, "System"
+BEGIN
+    CONTROL         "&Sleep timer",IDC_CHECK_TIMER,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,10,105,10
+    LTEXT           "Sleep after",IDC_STATIC,10,35,40,8
+    EDITTEXT        IDC_EDIT_TIMER,50,30,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Spin1",IDC_SPIN_TIMER,"msctls_updown32",UDS_ALIGNRIGHT | 
+                    UDS_AUTOBUDDY | UDS_ARROWKEYS,88,33,10,14
+    LTEXT           "minutes",IDC_STATIC,94,35,26,8
+    CONTROL         "&Power off",IDC_CHECK_POWEROFF,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,55,105,10
+    DEFPUSHBUTTON   "OK",IDOK,15,75,45,14
+    PUSHBUTTON      "Cancel",IDCANCEL,65,75,45,14
+END
+
+IDD_PAGE_ASSOCIATE DIALOG DISCARDABLE  0, 0, 259, 79
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Associations"
+FONT 8, "System"
+BEGIN
+    CONTROL         "List1",IDC_LIST_EXT,"SysListView32",LVS_REPORT | 
+                    LVS_SORTASCENDING | LVS_NOCOLUMNHEADER | WS_BORDER | 
+                    WS_TABSTOP,10,5,134,71
+    PUSHBUTTON      "Check &All",IDC_CHECK_ALL,155,5,70,14
+    PUSHBUTTON      "&Clear All",IDC_CLEAR_ALL,155,25,70,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_MAIN                ICON    DISCARDABLE     "..\\res\\main.ico"
+IDI_FILE                ICON    DISCARDABLE     "..\\res\\file.ico"
+IDI_FILE_S              ICON    DISCARDABLE     "..\\res\\file_s.ico"
+IDI_PLAY_S              ICON    DISCARDABLE     "..\\res\\play_s.ico"
+IDI_ROOT                ICON    DISCARDABLE     "..\\res\\device_s.ico"
+IDI_PLAYLIST            ICON    DISCARDABLE     "..\\res\\playlist.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_POPUP MENU DISCARDABLE 
+BEGIN
+    POPUP "Main"
+    BEGIN
+        MENUITEM "&Open...\tO",                 IDM_FILE_OPEN
+        MENUITEM "Open &URL...\tU",             IDM_FILE_OPEN_LOCATION
+        MENUITEM "&Add...\tA",                  IDM_FILE_ADD
+        MENUITEM "&Find...\tF",                 IDM_FILE_FIND
+        MENUITEM "&Save Playlist as...\tS",     IDM_FILE_SAVE_LIST
+        MENUITEM SEPARATOR
+        POPUP "&Playback"
+        BEGIN
+            MENUITEM "&Play/Pause\tZ",              IDM_PLAY_PLAYPAUSE
+            MENUITEM "&Stop\tX",                    IDM_PLAY_STOP
+            MENUITEM SEPARATOR
+            MENUITEM "Pr&evious\tC",                IDM_PLAY_PREV
+            MENUITEM "&Next\tN",                    IDM_PLAY_NEXT
+            MENUITEM "Re&w\tV",                     IDM_PLAY_REW
+            MENUITEM "&FF\tB",                      IDM_PLAY_FF
+        END
+        POPUP "Playback &Mode"
+        BEGIN
+            MENUITEM "Repeat &None",                IDM_PLAY_REPEAT_NONE
+            MENUITEM "Repeat &All",                 IDM_PLAY_REPEAT_ALL
+            MENUITEM "Repeat &One",                 IDM_PLAY_REPEAT_ONE
+            MENUITEM SEPARATOR
+            MENUITEM "S&huffle\tH",                 IDM_PLAY_SHUFFLE
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Play&list...\tL",             IDM_FILE_LIST
+        MENUITEM "&Effects...\tE",              IDM_TOOL_EFFECT
+        MENUITEM SEPARATOR
+        POPUP "&Options"
+        BEGIN
+            MENUITEM "Always on &top",              IDM_TOOL_TOPMOST
+            MENUITEM "Volume &up",                  IDM_TOOL_VOLUP
+            MENUITEM "Volume &down",                IDM_TOOL_VOLDOWN
+            MENUITEM SEPARATOR
+            MENUITEM "&Sleep timer...",             IDM_TOOL_SLEEPTIMER
+            MENUITEM "&Options...",                 IDM_TOOL_OPTION
+            MENUITEM SEPARATOR
+            MENUITEM "&About...",                   IDM_HELP_ABOUT
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       IDM_APP_EXIT
+    END
+    POPUP "Tray"
+    BEGIN
+        MENUITEM "&Restore",                    IDM_APP_SHOWHIDE
+        MENUITEM SEPARATOR
+        POPUP "&File"
+        BEGIN
+            MENUITEM "&Open...",                    IDM_FILE_OPEN
+            MENUITEM "Open &URL...",                IDM_FILE_OPEN_LOCATION
+            MENUITEM "&Add...",                     IDM_FILE_ADD
+            MENUITEM "&Find...",                    IDM_FILE_FIND
+            MENUITEM "&Save Playlist...",           IDM_FILE_SAVE_LIST
+        END
+        MENUITEM SEPARATOR
+        POPUP "&Playback"
+        BEGIN
+            MENUITEM "&Play/Pause",                 IDM_PLAY_PLAYPAUSE
+            MENUITEM "&Stop",                       IDM_PLAY_STOP
+            MENUITEM SEPARATOR
+            MENUITEM "Pr&evious",                   IDM_PLAY_PREV
+            MENUITEM "&Next",                       IDM_PLAY_NEXT
+            MENUITEM "Re&w",                        IDM_PLAY_REW
+            MENUITEM "&FF",                         IDM_PLAY_FF
+        END
+        POPUP "Playback &Mode"
+        BEGIN
+            MENUITEM "Repeat &None",                IDM_PLAY_REPEAT_NONE
+            MENUITEM "Repeat &All",                 IDM_PLAY_REPEAT_ALL
+            MENUITEM "Repeat &One",                 IDM_PLAY_REPEAT_ONE
+            MENUITEM SEPARATOR
+            MENUITEM "S&huffle",                    IDM_PLAY_SHUFFLE
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Play&list...",                IDM_FILE_LIST
+        MENUITEM "&Effects...",                 IDM_TOOL_EFFECT
+        MENUITEM SEPARATOR
+        POPUP "&Options"
+        BEGIN
+            MENUITEM "Always on &top",              IDM_TOOL_TOPMOST
+            MENUITEM "Volume &up",                  IDM_TOOL_VOLUP
+            MENUITEM "Volume &down",                IDM_TOOL_VOLDOWN
+            MENUITEM SEPARATOR
+            MENUITEM "&Sleep timer...",             IDM_TOOL_SLEEPTIMER
+            MENUITEM "&Options...",                 IDM_TOOL_OPTION
+            MENUITEM SEPARATOR
+            MENUITEM "&About...",                   IDM_HELP_ABOUT
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       IDM_APP_EXIT
+    END
+    POPUP "Playlist1"
+    BEGIN
+        MENUITEM "&Play",                       IDM_PLAY_SELECTED
+        MENUITEM SEPARATOR
+        MENUITEM "&Up",                         IDM_FILE_UP
+        MENUITEM "&Down",                       IDM_FILE_DOWN
+        MENUITEM "De&lete",                     IDM_FILE_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "Sort by File &Name",          IDM_FILE_SORT_BYNAME
+        MENUITEM "Sort by Pat&h",               IDM_FILE_SORT_BYPATH
+    END
+    POPUP "Playlist2"
+    BEGIN
+        MENUITEM "&Up",                         IDM_FILE_UP
+        MENUITEM "&Down",                       IDM_FILE_DOWN
+        MENUITEM "De&lete",                     IDM_FILE_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "Sort by File &Name",          IDM_FILE_SORT_BYNAME
+        MENUITEM "Sort by Pat&h",               IDM_FILE_SORT_BYPATH
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_ABOUT_DLG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 226
+    END
+
+    IDD_FOLDER_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 1
+    END
+
+    IDD_PAGE_REVERB, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 240
+    END
+
+    IDD_PAGE_EQUALIZER, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 239
+    END
+
+    IDD_LOCATION_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 175
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 61
+    END
+
+    IDD_PAGE_PLAYER, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 255
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 75
+    END
+
+    IDD_PAGE_STREAMING, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 255
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 75
+    END
+
+    IDD_PAGE_DECODER, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 255
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 75
+    END
+
+    IDD_PAGE_PLUGIN, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 255
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 75
+    END
+
+    IDD_PAGE_SKIN, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 255
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 75
+    END
+
+    IDD_PLAYLIST_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 217
+        TOPMARGIN, 2
+        BOTTOMMARGIN, 97
+    END
+
+    IDD_PAGE_PRESET, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 239
+    END
+
+    IDD_PRESETNAME_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 175
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 86
+    END
+
+    IDD_SLEEPTIMER_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 119
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 93
+    END
+
+    IDD_PAGE_ASSOCIATE, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 255
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 75
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_FILTER_OPEN_FILE    "All supported types|*.mp3;*.rmp;*.mp2;*.mpa;*.ogg;*.wav;*.m3u;*.pls|MP3 Files (*.MP3)|*.mp3|RMP Files (*.RMP)|*.rmp|MP2 Files (*.mp2)|*.mp2|MPA Files (*.mpa)|*.mpa|Ogg Vorbis Files (*.ogg)|*.ogg|Wave Files (*.wav)|*.wav|Playlist Files (*.m3u;*.pls)|*.m3u;*pls|All Files (*.*)|*.*||"
+    IDS_FILTER_OPEN_FILE2   "MP3 Files (*.MP3)|*.mp3|RMP Files (*.RMP)|*.rmp|MP2 Files (*.mp2)|*.mp2|MPA Files (*.mpa)|*.mpa|Ogg Vorbis Files (*.ogg)|*.ogg|Wave Files (*.wav)|*.wav|Playlist Files (*.m3u;*.pls)|*.m3u;*.pls|All Files (*.*)|*.*||"
+    IDS_TITLE_OPEN_FILE     "Open File..."
+    IDS_TITLE_ADD_FILE      "Add File.."
+    IDS_TITLE_FIND_FILE     "Find File..."
+    IDS_TITLE_SAVE_LIST     "Save Playlist..."
+    IDS_FILTER_SAVE_LIST    "M3U Playlist (*.M3U)|*.m3u||"
+    IDS_TITLE_EQ            "Equalizer"
+    IDS_TITLE_EFFECT        "Effects"
+    IDS_TITLE_BASSBOOST     "Bassboost"
+    IDS_TITLE_OPTION        "Options"
+    IDS_FMT_DISP_INFO       "%d kbps %d kHz %s"
+    IDS_FMT_DISP_VOLUME     "Volume %d"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_TITLE_SKIN_FILE     "Load Skin..."
+    IDS_FILTER_SKIN_FILE    "Skin Files(*.gps)|*.gps|All Files(*.*)|*.*||"
+    IDS_MSG_CONNECTING      "Connecting..."
+    IDS_FMT_BUFFERING       "Buffering...   %d%%"
+    IDS_FMT_BUFINFO         "Buffer information\nStreaming:\t%d KB / %d KB (%d %%)\nAudio :\t\t%d KB / %d KB (%d %%)"
+    IDS_FMT_DEL_PRESET      "Do you really want to delete '%s' ?"
+    IDS_TITLE_DEL_PRESET    "Confirm"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_ROOT_FOLDER_NAME    "My device"
+    IDS_FILTER_OPEN_ALL     "|All Files (*.*)|*.*||"
+    IDS_FILTER_OPEN_SUPPORTED 
+                            "All supported types|*.mp3;*.rmp;*.mp2;*.mpa;*.ogg;*.wav;*.m3u;*.pls"
+    IDS_FILTER_OPEN_INTERNAL 
+                            "|MP3 Files (*.MP3)|*.mp3|RMP Files (*.RMP)|*.rmp|MP2 Files (*.mp2)|*.mp2|MPA Files (*.mpa)|*.mpa|Ogg Vorbis Files(*.ogg)|*.ogg|Wave Files (*.wav)|*.wav|Playlist Files (*.m3u;*.pls)|*.m3u;*pls"
+    IDS_FMT_NULL_FILE_TYPE  "%s Files(*.%s)"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.K.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_PAGE_EFFECT DIALOG DISCARDABLE  0, 0, 243, 86
+STYLE WS_CHILD | WS_CAPTION
+CAPTION "Effects"
+FONT 8, "System"
+BEGIN
+    CONTROL         "&Surround",IDC_CHECK_SURROUND,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,8,11,47,10
+    CONTROL         "Slider1",IDC_SLIDER_SURROUND,"msctls_trackbar32",
+                    WS_TABSTOP,8,41,105,17
+    GROUPBOX        "",IDC_STATIC,3,0,117,80
+    CONTROL         "3D Effe&ct",IDC_CHECK_3DCHORUS,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,128,11,47,10
+    CONTROL         "Slider1",IDC_SLIDER_3DCHORUS,"msctls_trackbar32",
+                    WS_TABSTOP,128,41,105,17
+    GROUPBOX        "",IDC_STATIC,123,0,117,80
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_PAGE_EFFECT, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 240
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.K.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
