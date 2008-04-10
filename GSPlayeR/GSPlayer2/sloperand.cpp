@@ -9,5 +9,5 @@ int frand(int (*p)(int,int,int,int),int max,int m,int base) {
 }
 
 int slopeP(int max,int m,int base,int x) {
-	return (int)(((10/(double)m)*(x-base)+50)/100*max);
+	return (int)(((10/(double)m)*(x-50)+base)/100*max);
 }
