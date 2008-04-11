@@ -19,7 +19,7 @@ $ext = ".txt"; //データファイルの拡張子
 $sub_back = './subback.txt'; //過去用ヘッドラインファイル
 $last_file = "./lastsize.cgi"; //二重カキコチェック用
 
-$dir_path = 'http://'.$_SERVER['HTTP_HOST'].preg_replace('/'.basename($_SERVER['PHP_SELF']).'$/', '', $_SERVER['PHP_SELF']); //設置ディレクトリの絶対ﾊﾟｽ (ｵｰﾄ設置)
+$dir_path = 'http://'.$_SERVER['HTTP_HOST'].preg_replace('|[^/]*?\.php.*$|U', '', $_SERVER['PHP_SELF']); //設置ディレクトリの絶対ﾊﾟｽ (ｵｰﾄ設置)
 
 $page_def = 10; //１ページに何スレッド？
 $res_def = 7; //１スレッドに何個レス？
