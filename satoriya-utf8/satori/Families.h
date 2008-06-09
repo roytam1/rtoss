@@ -25,7 +25,7 @@ public:
 	// 要素の登録
 	const T& add_element(const string& i_name, const T& i_t, const Condition& i_condition = Condition())
 	{
-		std::pair<iterator,bool> found = m_elements.insert(typename map< string, Family<T> >::value_type(i_name,Family<T>()));
+		std::pair<iterator,bool> found = m_elements.insert(map< string, Family<T> >::value_type(i_name,Family<T>()));
 		if ( found.second ) {
 			found.first->second.set_namevec(i_name);
 		}
@@ -216,7 +216,7 @@ public:
 		
 		vector<const Talk*>	result;
 		int	max_hit_point=0;
-		for ( typename vector<const_iterator>::const_iterator it = elem_vector.begin() ; it != elem_vector.end() ; ++it )
+		for ( vector<const_iterator>::const_iterator it = elem_vector.begin() ; it != elem_vector.end() ; ++it )
 		{
 			// 語群を全角スペースで区切る
 			const strvec &words = (**it).second.get_namevec();

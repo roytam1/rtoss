@@ -1,9 +1,9 @@
 #include	"satori.h"
-//#ifdef POSIX
+#ifdef POSIX
 #  include "Utilities.h"
-/*#else
+#else
 #  include	<mbctype.h>
-#endif*/
+#endif
 
 //////////DEBUG/////////////////////////
 #ifdef _WINDOWS
@@ -51,7 +51,7 @@ bool	Satori::Translate(string& ioScript) {
 				while (*p!=']') {
 					if (p[0]=='\\' && p[1]==']')	// エスケープされた]
 						++p;
-					p += _mbbc(*p);
+					p += _ismbblead(*p) ? 2 : 1;
 				}
 				opt.assign(opt_start, p++ -opt_start);
 			}
