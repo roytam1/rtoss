@@ -71,7 +71,8 @@ SRV	ssu::request(deque<string>& iArguments, deque<string>& oValues) {
 #  include <sys/types.h>
 #else
 #  include	<windows.h>
-#  include	<mbctype.h>
+#  include      "../_/Utilities.h"
+//#  include	<mbctype.h>
 #endif
 #include	"../_/stltool.h"
 

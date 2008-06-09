@@ -1,5 +1,6 @@
 #include "SakuraScript.h"
-#include <mbctype.h> // for _ismbblead
+//#include <mbctype.h> // for _ismbblead
+#include "../_/Utilities.h"
 
 string sakura_script_parts::serialize() const
 {
