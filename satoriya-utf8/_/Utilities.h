@@ -6,29 +6,34 @@
 #include	<assert.h>
 #include	<string.h>
 
-#ifdef POSIX
+//#ifdef POSIX
 inline bool _ismbblead(char c) {
-    // 多分、Shift_JIS固定で良いのだろう。
     unsigned char _c = c;
-    return (_c >= 0x81 && _c <= 0x9f) || (_c >= 0xe0 && _c <= 0xfc);
+    return (_c >= 0xc2 && _c <= 0xdf) || (_c >= 0xe0 && _c <= 0xef) || (_c >= 0xf0 && _c <= 0xf4);
 }
+inline int _mbbc(char c) {
+    unsigned char _c = c;
+    if (_c >= 0xc2 && _c <= 0xdf)
+    	return 2;
+    else if (_c >= 0xe0 && _c <= 0xef)
+    	return 3;
+    else if (_c >= 0xf0 && _c <= 0xf4)
+    	return 4;
+    else return 1;
+}
+
 inline bool _ismbbtrail(char c) {
     unsigned char _c = c;
-    return (_c >= 0x40 && _c <= 0x7e) || (_c >= 0x80 && _c <= 0xec);
+    return (_c >= 0x80 && _c <= 0xbf);
 }
-#else
+/*#else
 #  include	<mbctype.h>	// for _ismbblead,_ismbbtrail
-#endif
+#endif*/
 
 // ポインタの指す位置を１文字インクリメント。全角・半角両対応
 inline void	mbinc(const char*& p) {
 	//p += _ismbblead(*p) ? 2 : 1; 
-	if ( _ismbblead(p[0]) ) { 
-		assert(_ismbbtrail(p[1]));
-		p+=2;
-	} 
-	else
-		p++;
+	p += _mbbc(p[0]);
 }
 
 // 文字列中から指定の1byte文字が最後に出現する位置を返す。
