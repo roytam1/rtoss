@@ -1,12 +1,12 @@
 #include	"stltool.h"
 #include	<sstream>
 #include	<cassert>
-#ifdef POSIX
+/*#ifdef POSIX
 #  include      "Utilities.h"
-#else
+#else*/
 #  include      "Utilities.h"
 //#  include	<mbctype.h>	// for _ismbblead,_ismbbtrail
-#endif
+//#endif
 
 //////////DEBUG/////////////////////////
 #ifdef _WINDOWS

@@ -46,12 +46,12 @@ SRV	cn::request(deque<string>& iArguments, deque<string>& oValues) {
 
 // ここから実装
 
-#ifdef POSIX
+//#ifdef POSIX
 #  include      "../_/Utilities.h"
-#else
+//#else
 #  include	<windows.h>
-#  include	<mbctype.h>
-#endif
+/*#  include	<mbctype.h>
+#endif*/
 #include	"../_/stltool.h"
 
 SRV _at(deque<string>& iArguments, deque<string>& oValues) {
