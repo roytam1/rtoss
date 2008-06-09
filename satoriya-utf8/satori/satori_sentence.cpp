@@ -2,11 +2,11 @@
 
 #include	<fstream>
 #include	<cassert>
-//#ifdef POSIX
+#ifdef POSIX
 #  include      "Utilities.h"
-/*#else
+#else
 #  include	<mbctype.h>
-#endif*/
+#endif
 
 #include "random.h"
 
@@ -229,8 +229,8 @@ int Satori::SentenceToSakuraScriptInternal(const strvec &vec,string &result,stri
 		const char*	p = it->c_str();
 		//DBG(sender << nest_count << " '" << p << "'" << endl);
 
-		if ( it==vec.begin() && strncmp(p, "→", 3)==0 ) {
-			p+=3;
+		if ( it==vec.begin() && strncmp(p, "→", 2)==0 ) {
+			p+=2;
 			updateGhostsInfo();	// ゴースト情報を更新
 
 			if ( ghosts_info.size()>=2 ) {	// そもそも自分以外にゴーストはいるのか。
@@ -257,11 +257,11 @@ int Satori::SentenceToSakuraScriptInternal(const strvec &vec,string &result,stri
 		}
 
 		// 選択肢	\q?[id,string]
-		if ( strncmp(p, "＿", 3)==0 ) {
+		if ( strncmp(p, "＿", 2)==0 ) {
 			if ( strlen(p)>1023 )
 				continue;
 			char	buf[1024];
-			strncpy(buf, p+3, sizeof(buf) / sizeof(buf[0]));
+			strncpy(buf, p+2, sizeof(buf) / sizeof(buf[0]));
 
 			char*	choiced = buf;
 			char*	id = (char*)strstr_hz(buf, "\t"); // 選択肢ラベルとジャンプ先の区切り
@@ -283,7 +283,7 @@ int Satori::SentenceToSakuraScriptInternal(const strvec &vec,string &result,stri
 		}
 
 		// ちょっと微妙な存在意義。
-		if ( strncmp(p, "\\s", 3)==0 ) {	
+		if ( strncmp(p, "\\s", 2)==0 ) {	
 			if ( !is_speaked(speaker) ) {
 				if ( surface_changed_before_speak.find(speaker) == surface_changed_before_speak.end() ) {
 					surface_changed_before_speak.insert(map<int,bool>::value_type(speaker,is_speaked_anybody()) );
@@ -292,9 +292,9 @@ int Satori::SentenceToSakuraScriptInternal(const strvec &vec,string &result,stri
 		}
 
 		// ジャンプ
-		if ( strncmp(p, "＞", 3)==0 || strncmp(p, "≫", 3)==0 ) {
+		if ( strncmp(p, "＞", 2)==0 || strncmp(p, "≫", 2)==0 ) {
 			strvec	words;
-			split(p+3, "\t", words, 3); // ジャンプ先とジャンプ条件の区切り
+			split(p+2, "\t", words, 2); // ジャンプ先とジャンプ条件の区切り
 
 			if ( words.size()>=2 ) {
 				string	r;
@@ -313,7 +313,7 @@ int Satori::SentenceToSakuraScriptInternal(const strvec &vec,string &result,stri
 				jump_to.erase();
 			}
 
-			if ( strncmp(p, "≫", 3)==0 ) {
+			if ( strncmp(p, "≫", 2)==0 ) {
 				ip = std::distance(vec.begin(),it) + 1;
 				--nest_count;
 				return 2;
@@ -326,11 +326,11 @@ int Satori::SentenceToSakuraScriptInternal(const strvec &vec,string &result,stri
 		}
 
 		// 変数を設定
-		if ( strncmp(p, "＄", 3)==0 ) {
+		if ( strncmp(p, "＄", 2)==0 ) {
 			const char* v;
 			string	value;
 			bool	do_calc=false;
-			p+=3;
+			p+=2;
 			if ( (v=strstr_hz(p, "\t"))!=NULL ) { // 変数名と変数に設定する内容の区切り
 				value = UnKakko(v+1,false,true);
 			}
@@ -443,7 +443,7 @@ int Satori::SentenceToSakuraScriptInternal(const strvec &vec,string &result,stri
 					while (*p!=']') {
 						if (p[0]=='\\' && p[1]==']')	// エスケープされた]
 							++p;
-						p += _mbbc(*p);
+						p += _ismbblead(*p) ? 2 : 1;
 					}
 					opt.assign(opt_start, p++ -opt_start);
 					opt=UnKakko(opt.c_str());

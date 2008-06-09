@@ -46,7 +46,7 @@ int	SaoriHost::request(
 	SRV	srv = request(arguments, values);
 
 	// 戻り値を解析＆格納
-	o_data.push_back( strpair("Charset", "UTF-8") );
+	o_data.push_back( strpair("Charset", "Shift_JIS") );
 	o_data.push_back( strpair("Result", srv.mResultString) );
 	int n=0;
 	for ( deque<string>::const_iterator it=values.begin() ; it!=values.end() ; ++it)

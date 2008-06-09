@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="shift_jis"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8.00"
 	Name="satori_test"
 	ProjectGUID="{77E3697B-4CD6-41D1-B179-181A8EA4F43F}"
 	>
