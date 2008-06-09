@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="shift_jis"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="7.10"
 	Name="satorite"
 	ProjectGUID="{A552801F-7A58-4102-BBF2-F9A2D6088C50}"
 	RootNamespace="satorite"

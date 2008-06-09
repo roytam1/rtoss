@@ -86,9 +86,20 @@ bool	aredigits(const char* p) {
 		++p;
 	if ( *p=='\0' )
 		return false;
-	while ( *p!='\0' )
+	while ( *p!='\0' ) {
 		if ( !isdigit(*p++) )
 			return	false;
+/*		int	c = *p++;
+		if ( c==(-17) ) {
+			c = *p++;
+			if ( c==(-68)) {
+				c = *p++;
+				if ( c>=(-112) && c<=(-103)) continue; // ０-９
+			}
+		} else if (c>=48 && c<=57) continue; // 0-9
+		else return false;*/
+
+	}
 	return	true;
 }
 
@@ -99,12 +110,20 @@ bool	arealphabets(const char* p) {
 			continue;
 		if ( c>='A' && c<='Z' )
 			continue;
-		if ( c==(-126) ) {	// sjisにおけるＡ-Ｚ,ａ-ｚを含む１バイト目
+		if ( c==(-17) ) {
 			c = *p++;
-			if ( c>=("Ａ")[1] && c<=("Ｚ")[1] )
+			if ( c==(-67)) {
+				c = *p++;
+				if ( c>=(-127) && c<=(-102)) continue; // ａ-ｚ
+			}
+			if ( c==(-68)) {
+				c = *p++;
+				if ( c>=(-95) && c<=(-70)) continue; // Ａ-Ｚ
+			}
+/*			if ( c>=("Ａ")[1] && c<=("Ｚ")[1] )
 				continue;
 			if ( c>=("ａ")[1] && c<=("ｚ")[1] )
-				continue;
+				continue;*/
 		}
 		return	false;
 	}
@@ -353,19 +372,20 @@ bool	string_to_file(const string& i, const string& iFileName) {
 string	get_a_chr(const char*& p) {
 	if ( *p=='\0' )
 		return	"";
-	char	buf[3];
+	char	buf[7];
+	int		ci = 0;
+	int		us = 0;
+	int		uc = 0;
 	if ( p[0] == static_cast<char>(0xffU) ) { //内部で特殊な表現としている
 		buf[0]=*p++;
 		buf[1]='\0';
 	}
-	else if ( _ismbblead(p[0]) ) {
-		buf[0]=*p++;
-		buf[1]=*p++;
-		buf[2]='\0';
-	}
 	else {
-		buf[0]=*p++;
-		buf[1]='\0';
+		us = _mbbc(p[ci]);
+		for(uc=1;uc<=us;uc++) {
+			buf[ci++]=*p++;
+		}
+		buf[ci++]='\0';
 	}
 	return	buf;
 }
@@ -443,10 +463,11 @@ const char*	strstr_hz(const char* target, const char* find) {
 	while ( *p!='\0' ) {
 		if ( strncmp(p, find, len)==0 )
 			return	p;
-		if ( _ismbblead(*p) )
+/*		if ( _ismbblead(*p) )
 			p+=2; 
 		else
-			++p;
+			++p;*/
+		p+=_mbbc(*p);
 	}
 	return	NULL;
 }

@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="shift_jis"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="7.10"
 	Name="cn"
 	ProjectGUID="{0B6292A4-AB6B-47BE-9B9A-3AAA23CEE46D}"
 	>

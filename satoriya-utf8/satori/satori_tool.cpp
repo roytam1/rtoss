@@ -1,10 +1,10 @@
 #include	"satori.h"
-#ifdef POSIX
+//#ifdef POSIX
 #  include      "Utilities.h"
-#else
+/*#else
 #  include	<mbctype.h>	// for _ismbblead,_ismbbtrail
 #endif
-
+*/
 
 #include	<fstream>
 #include	<cassert>
@@ -145,10 +145,11 @@ string	zen2han(string str)
 {
 	static const char	before[] = "０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ－＋";
 	static const char	after[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-+";
-	char	buf1[3]="\0\0", buf2[2]="\0";
+	char	buf1[4]="\0\0\0", buf2[2]="\0";
 	for (int n=0 ; n<sizeof(after) ; ++n) {
-		buf1[0]=before[n*2];
-		buf1[1]=before[n*2+1];
+		buf1[0]=before[n*3];
+		buf1[1]=before[n*3+1];
+		buf1[2]=before[n*3+2];
 		buf2[0]=after[n];
 		replace(str, buf1, buf2);
 	}
@@ -359,7 +360,7 @@ void	Satori::erase_var(const string& key)
 bool	Satori::system_variable_operation(string key, string value, string* result)
 {
 	// mapにしようよ。
-	
+
 	if ( key == "喋り間隔" ) {
 		talk_interval = stoi( zen2han(value) );
 		if ( talk_interval<3 ) talk_interval=0; // 3未満は喋らない
@@ -383,7 +384,6 @@ bool	Satori::system_variable_operation(string key, string value, string* result)
 		
 		return true;
 	}
-	
 	if ( key =="見切れてても喋る" ) {
 		is_call_ontalk_at_mikire= (value=="有効");
 		return true;
@@ -453,7 +453,7 @@ bool	Satori::system_variable_operation(string key, string value, string* result)
 		}
 		return true;
 	}
-	
+
 	if ( compare_head(key,  "サーフェス加算値") && aredigits(key.c_str() + const_strlen("サーフェス加算値")) ) {
 		int n = atoi(key.c_str() + strlen("サーフェス加算値"));
 		surface_add_value[n]=stoi( zen2han(value) );
@@ -568,7 +568,7 @@ bool	Satori::system_variable_operation(string key, string value, string* result)
 		while ( reserved_talk.find(count) != reserved_talk.end() )
 			++count;
 		reserved_talk[count] = value;
-		sender << "次回のランダムトークが「" << value << "」に予\x96\xf1されました。" << endl;
+		sender << "次回のランダムトークが「" << value << "」に予約されました。" << endl;
 		return true;
 	}
 	
@@ -576,18 +576,18 @@ bool	Satori::system_variable_operation(string key, string value, string* result)
 		variables.erase(key);
 		int	count = stoi( zen2han( string(key.c_str()+6, key.length()-6-12) ) );
 		if ( count<=0 ) {
-			sender << "トーク予\x96\xf1、設定値がヘンです。" << endl;
+			sender << "トーク予約、設定値がヘンです。" << endl;
 		}
 		else {
 			while ( reserved_talk.find(count) != reserved_talk.end() )
 				++count;
 			reserved_talk[count] = value;
-			sender << count << "回後のランダムトークが「" << value << "」に予\x96\xf1されました。" << endl;
+			sender << count << "回後のランダムトークが「" << value << "」に予約されました。" << endl;
 		}
 		return true;
 	}
 
-	if ( key=="トーク予\x96\xf1のキャンセル" ) {
+	if ( key=="トーク予約のキャンセル" ) {
 		if ( value=="＊" )
 			reserved_talk.clear();
 		else
@@ -661,12 +661,12 @@ bool	Satori::system_variable_operation(string key, string value, string* result)
 			variables.erase(key);
 			if ( timer.find(name)!=timer.end() ) {
 				timer.erase(name);
-				sender << "タイマ「"  << name << "」の予\x96\xf1がキャンセルされました。" << endl;
+				sender << "タイマ「"  << name << "」の予約がキャンセルされました。" << endl;
 			} else
-				sender << "タイマ「"  << name << "」は元から予\x96\xf1されていません。" << endl;
+				sender << "タイマ「"  << name << "」は元から予約されていません。" << endl;
 		} else {
 			timer[name] = sec;
-			sender << "タイマ「"  << name << "」が" << sec << "秒後に予\x96\xf1されました。" << endl;
+			sender << "タイマ「"  << name << "」が" << sec << "秒後に予約されました。" << endl;
 		}
 		}
 		return true;

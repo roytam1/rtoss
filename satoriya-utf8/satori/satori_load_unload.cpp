@@ -4,6 +4,9 @@
 	//#define WINVER 0x0500
 	#include	<windows.h>
 	#include	<multimon.h>
+		#ifndef MONITORINFOF_PRIMARY
+		#define MONITORINFOF_PRIMARY 1
+		#endif
 	#define SM_CXVIRTUALSCREEN      78
 	#define SM_CYVIRTUALSCREEN      79
 
