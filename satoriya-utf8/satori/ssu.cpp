@@ -6,6 +6,7 @@
 #include    "random.h"
 #include	<map>
 #include	<algorithm>
+#include <locale>
 #include	<time.h>
 
 class ssu : public SaoriHost {
@@ -77,13 +78,13 @@ SRV	ssu::request(deque<string>& iArguments, deque<string>& oValues) {
 /* 「ソ」の2バイト目は「\」であるので、エスケープする必要がある。 */
 //static const char	zen[] = 
 //	"　ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ"
-//	"０１２３４５６７８９！”＃＄％＆’（）＝～｜‘｛＋＊｝＜＞？＿ー＾￥＠「；：」、。・÷×－，．［］"
-//	"アイウエオカキクケコサシスセ\x83\x5cタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンァィゥェォャュョッ゛゜、。";
+//	"０１２３４５６７８９！”＃＄％＆’（）＝～｜‘｛＋＊｝＜＞？＿ー^￥＠「；：」、。・÷×－，．［］"
+//	"アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンァィゥェォャュョッ゛゜、。";
 //static const char	han[] = 
 //	" ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 //	"0123456789!\"#$%&'()=~|`{+*}<>?_-^\\@[;:],.・/*-,.[]"
 //	"アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンァィゥェォャュョッ゛゜、。";
-static const char	kata[] = "アイウエオカキクケコサシスセ\x83\x5cタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヰヱヲンァィゥェォャュョヮッガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポ";
+static const char	kata[] = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヰヱヲンァィゥェォャュョヮッガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポ";
 static const char	hira[] = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわゐゑをんぁぃぅぇぉゃゅょゎっがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ";
 
 //半角全角変換テーブル
@@ -93,10 +94,10 @@ static const char	han_alpha[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstu
 static const char	zen_digit[] = "０１２３４５６７８９";
 static const char	han_digit[] = "0123456789";
 
-static const char   zen_symbol[] = "　！”＃＄％＆’（）＝～｜‘｛＋＊｝＜＞？＿ー＾￥＠「；：」、。・÷×－，．［］";
+static const char   zen_symbol[] = "　！”＃＄％＆’（）＝～｜‘｛＋＊｝＜＞？＿ー^￥＠「；：」、。・÷×－，．［］";
 static const char   han_symbol[] = " !\"#$%&'()=~|`{+*}<>?_-^\\@[;:],.・/*-,.[]";
 
-static const char   zen_kana_1[] = "アイウエオカキクケコサシスセ\x83\x5cタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンァィゥェォャュョッ、。";
+static const char   zen_kana_1[] = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンァィゥェォャュョッ、。";
 static const char   han_kana_1[] = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンァィゥェォャュョッ、。";
 
 static const char   zen_kana_2[] = "ガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポ";
@@ -298,7 +299,7 @@ SRV _calc(deque<string>& iArguments, deque<string>& oValues) {
 		return	SRV(400, "引数の個数が正しくありません。");
 	string	exp = iArguments[0];
 	if ( !calc(exp) )
-		return	SRV(400, string()+"'"+iArguments[0]+"' 式が計算不\x94\x5cです。"); // 「能」の2バイト目は「\」
+		return	SRV(400, string()+"'"+iArguments[0]+"' 式が計算不能です。"); // 「能」の2バイト目は「\」
 	return	exp;
 }
 
@@ -307,7 +308,7 @@ SRV _calc_float(deque<string>& iArguments, deque<string>& oValues) {
 		return	SRV(400, "引数の個数が正しくありません。");
 	string	exp = iArguments[0];
 	if ( !calc_float(exp) )
-	    return	SRV(400, string()+"'"+iArguments[0]+"' 式が計算不\x94\x5cです。");
+	    return	SRV(400, string()+"'"+iArguments[0]+"' 式が計算不能です。");
 	return	exp;
 }
 
@@ -316,7 +317,7 @@ SRV _if(deque<string>& iArguments, deque<string>& oValues) {
 		return	SRV(400, "引数の個数が正しくありません。");
 	string	exp = iArguments[0];
 	if ( !calc(exp) )
-		return	SRV(400, string()+"'"+iArguments[0]+"' 式が計算不\x94\x5cです。");
+		return	SRV(400, string()+"'"+iArguments[0]+"' 式が計算不能です。");
 	if ( exp!="0" )
 		return	iArguments[1];	// 真
 	else
@@ -331,7 +332,7 @@ SRV _unless(deque<string>& iArguments, deque<string>& oValues) {
 		return	SRV(400, "引数の個数が正しくありません。");
 	string	exp = iArguments[0];
 	if ( !calc(exp) )
-		return	SRV(400, string()+"'"+iArguments[0]+"' 式が計算不\x94\x5cです。");
+		return	SRV(400, string()+"'"+iArguments[0]+"' 式が計算不能です。");
 	if ( exp=="0" )
 		return	iArguments[1];	// 偽
 	else
@@ -345,7 +346,7 @@ SRV _nswitch(deque<string>& iArguments, deque<string>& oValues) {
 	if ( iArguments.size()<2 )
 		return	SRV(400, "引数が足りません。");
 	if ( !calc(iArguments[0]) )
-		return	SRV(400, string()+"'"+iArguments[0]+"' 式が計算不\x94\x5cです。");
+		return	SRV(400, string()+"'"+iArguments[0]+"' 式が計算不能です。");
 
 	int	n = stoi(iArguments[0]);
 	//iArguments.pop_front();
@@ -367,7 +368,7 @@ SRV _switch(deque<string>& iArguments, deque<string>& oValues) {
 			return	SRV(200, iArguments[i]);
 		string	exp = string("(") + lhs + ")==(" + iArguments[i] + ")";
 		if ( !calc(exp) )
-			return	SRV(400, string()+"switchの"+itos((i-1)/2+1)+"個目、式 '"+exp+"' は計算不\x94\x5cでした。");
+			return	SRV(400, string()+"switchの"+itos((i-1)/2+1)+"個目、式 '"+exp+"' は計算不能でした。");
 		if ( exp!="0" )
 			return	SRV(200, iArguments[i+1]);
 	}
@@ -385,7 +386,7 @@ SRV _iflist(deque<string>& iArguments, deque<string>& oValues) {
 			return	SRV(200, iArguments[i]);
 		string	exp = lhs + iArguments[i];
 		if ( !calc(exp) )
-			return	SRV(400, string()+"iflistの"+itos((i-1)/2+1)+"個目、式 '"+exp+"' は計算不\x94\x5cでした。");
+			return	SRV(400, string()+"iflistの"+itos((i-1)/2+1)+"個目、式 '"+exp+"' は計算不能でした。");
 		if ( exp!="0" )
 			return	SRV(200, iArguments[i+1]);
 	}
@@ -606,7 +607,7 @@ SRV _zen2han(deque<string>& iArguments, deque<string>& oValues) {
 
 string zen2han_internal(string &str,unsigned int flag)
 {
-	char	before[3]="　", after[2]=" ";
+	char	before[4]="　", after[2]=" ";
 
 	if ( flag & 0x1 ) { //アルファベット
 		for (int n=0 ; n<sizeof(han_alpha) ; ++n) {
@@ -817,7 +818,7 @@ SRV _lsimg(deque<string>& iArguments, deque<string>& oValues)
 		return "0";
 	do {
 		string lo(wfd.cFileName);
-		transform(lo.begin(), lo.end(), lo.begin(), tolower);
+		transform(lo.begin(), lo.end(), lo.begin(), (int (*)(int)) tolower);
 		if (compare_tail(lo, ".png") ||
 			compare_tail(lo, ".jpg") ||
 			compare_tail(lo, ".jpe") ||
