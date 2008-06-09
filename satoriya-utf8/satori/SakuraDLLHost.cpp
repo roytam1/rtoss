@@ -191,7 +191,7 @@ string SakuraDLLHost::request(const string& i_request_string)
 	    }
 	}
 	if (!charset_exists) {
-	    r_data.push_back(strpair("Charset", "Shift_JIS"));
+	    r_data.push_back(strpair("Charset", "UTF-8"));
 	}
 	
 	for ( strpairvec::const_iterator i = r_data.begin() ; i != r_data.end() ; ++i )

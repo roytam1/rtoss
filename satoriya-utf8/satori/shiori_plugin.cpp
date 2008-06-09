@@ -7,7 +7,7 @@
 #  include      <dlfcn.h>
 #else
 #  include	<windows.h>
-#  include	<mbctype.h>
+#  include      "Utilities.h"
 #endif
 #include	<assert.h>
 #include	"../_/stltool.h"
@@ -160,7 +160,7 @@ bool ShioriPlugins::load_a_plugin(const string& iPluginLine)
 				lastyen=p;
 			else if (*p == '.')
 				lastdot=p;
-			p += _ismbblead(*p) ? 2 : 1; 
+			p += _mbbc(*p); 
 		}
 		if ( lastyen==NULL || lastdot==NULL )
 		{

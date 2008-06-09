@@ -71,7 +71,7 @@ class escaper
 	// エスケープ後文字。
 	// 置き換え機能を持たないカッコは、一旦これ+id+半角空白に置き換える。
 	// 文字コード上はsjisの一文字として扱われるが、該当する文字は無い。ダメな案。
-	static const char sm_escape_sjis_code[3];
+	static const char sm_escape_utf8_code[4];
 
 	//map<string, int> m_str2id;
 	vector<string> m_id2str;
@@ -304,7 +304,13 @@ private:
 		numDictionary, numDictionarySize;
 
 	// システム情報系 ----------
-
+#undef UNDEFINED
+#undef WIN95
+#undef WIN98
+#undef WINME
+#undef WINNT
+#undef WIN2K
+#undef WINXP
 	enum { UNDEFINED, WIN95, WIN98, WINME, WINNT, WIN2K, WINXP } mOSType;
 
 #ifndef POSIX
