@@ -3,11 +3,11 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
 <link rel="alternate" type="application/xml" title="RSS 2.0 Feed" href="rss.php" />
-<title>Firefox Musume Release builds</title>
+<title>File Releases</title>
 <style type="text/css">
 html {
   color: #ceeaf9;
-  background: #008ad0 url("../bg.png") repeat-x;
+  background: #008ad0;
   font-family:sans-serif;
 }
 kbd,samp {font-family:sans-serif;}
@@ -15,13 +15,6 @@ div samp {position:absolute; left:40%;}
 div kbd {position:absolute; right:0.5em;}
 .bold {font-weight:bold;}
 </style>
-<!--[if IE]>
-<style type="text/css">
-html {
-  background: #0080CB url("../bg.png") repeat-x;
-}
-</style>
-<![endif]-->
 <script type="text/javascript">
 function hoverThis(obj) {obj.style.background="#0077CC";}
 function unhoverThis(obj) {obj.style.background="transparent";}
