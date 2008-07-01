@@ -50,8 +50,7 @@ if(!$totalsize) echo "<div style='text-align:center'>Currently no file is availa
 exec("df|grep data",$df);
 $df=preg_split("/\s+/",$df[0]);
 
-echo "<div style='border-top:1px solid'> <samp>Total Size: ".properSize($totalsize,2)."</samp> <kbd>Free: <a href='../df.php'>".properSize($df[3]*1024,2)."</a></kbd></div>";
-echo "<div><a href='../'>Nightly Builds</a></div>";
+echo "<div style='border-top:1px solid'> <samp>Total Size: ".properSize($totalsize,2)."</samp></div>";
 
 if(file_exists('./footer.msg')) include('./footer.msg');
 
