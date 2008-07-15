@@ -210,6 +210,8 @@ BEGIN
     BEGIN
         MENUITEM "Play",                        IDM_PLAY_SELECTED
         MENUITEM SEPARATOR
+        MENUITEM "Info",                        IDM_FILE_INFO
+        MENUITEM SEPARATOR
         MENUITEM "Up",                          IDM_FILE_UP
         MENUITEM "Down",                        IDM_FILE_DOWN
         MENUITEM "Delete",                      IDM_FILE_DELETE

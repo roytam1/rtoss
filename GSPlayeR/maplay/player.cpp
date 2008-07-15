@@ -31,7 +31,7 @@ m_Echo(TRUE), m_Reverb(FALSE)
 	m_Output.GetOutputParam((LPDWORD)&m_Options.nOutputBufferLen,
 							&m_Options.fAlwaysOpenDevice, &m_Options.fFadeIn);
 	//m_Options.fAlwaysOpenDevice = TRUE;
-	m_Options.nOutputPrebuffer = 10;
+	m_Options.nOutputPrebuffer = 50;
 	m_Options.fScanMpegCompletely = FALSE;
 	m_Options.fFadeIn = FALSE;
 	m_Options.fSuppressZeroSamples = FALSE;
@@ -355,14 +355,18 @@ void CPlayer::GetFileInformation(MAP_INFORMATION* pInfo)
 
 BOOL CPlayer::GetId3Tag(ID3TAGV1* pTag)
 {
+	BOOL bRet;
 	if (m_fOpen == OPEN_MPG_FILE)
-		return MpgGetId3Tag(pTag);
+		bRet = MpgGetId3Tag(pTag);
 	else if (m_fOpen == OPEN_OV_FILE)
-		return OvGetId3Tag(pTag);
+		bRet = OvGetId3Tag(pTag);
 	else if (m_fOpen == OPEN_PLUGIN)
-		return PlugInGetId3Tag(pTag);
+		bRet = PlugInGetId3Tag(pTag);
 
-	return FALSE;
+	if (!bRet) 
+		bRet = ::GetId3Tag(m_szFile, pTag);
+
+	return bRet;
 }
 
 BOOL CPlayer::SetId3Tag(ID3TAGV1* pTag)
@@ -749,5 +753,27 @@ retry:
 	case RET_ERROR:
 		UnpreparePlayback(FALSE, TRUE);
 		break;
+	}
+}
+
+DWORD CPlayer::GetVolume(BOOL bSysVolume)
+{
+	DWORD dwVolume = 0;
+	if (bSysVolume) {
+		waveOutGetVolume(NULL, &dwVolume);
+		return dwVolume;
+	}
+	else {
+		return m_Output.GetVolume();
+	}
+}
+
+void CPlayer::SetVolume(DWORD dwVolume, BOOL bSysVolume)
+{
+	if (bSysVolume) {
+		waveOutSetVolume(NULL, dwVolume);
+	}
+	else {
+		m_Output.SetVolume(dwVolume);
 	}
 }

@@ -98,6 +98,13 @@ protected:
 	BOOL		m_HdrClear[SUBBUF_COUNT];
 	int			m_nHdrOut;
 	LPBYTE		m_pbSubBuf;
+
+public:
+	DWORD GetVolume();
+	void SetVolume(DWORD dwVolume);
+
+protected:
+	DWORD		m_dwVolume;
 };
 
 #endif //!__WAVEOUTPUT_H_INCLUDED

@@ -19,7 +19,7 @@ COutput::COutput()
 	m_pbBuf = NULL;
 	m_nCurrent = 0;
 
-	m_dwBufLen = 500;
+	m_dwBufLen = 1000;
 	m_cBuf = 8;
 	m_cbBuf = 16 * 1024;
 
@@ -40,6 +40,7 @@ COutput::COutput()
 	m_nHdrOut = 0;
 	m_nWriteCur = 0;
 	memset(m_HdrOut, 0, sizeof(m_HdrOut));
+	m_dwVolume = MAX_WAVEOUTVOLUME;
 }
 
 COutput::~COutput()
@@ -101,7 +102,6 @@ BOOL COutput::Open(int nChannels, int nSamplingRate, int nBitsPerSample)
 	m_pcm.wf.nBlockAlign = nBitsPerSample * nChannels / 8;
 	m_pcm.wBitsPerSample = nBitsPerSample;
 
-	// デバイスがオープンできるまで再試行する
 	for (i = 0; i < 10; i++) {
 		if (m_fDoubleBuf)
 			mmr = waveOutOpen(&m_hwo, WAVE_MAPPER, (LPWAVEFORMATEX)&m_pcm, (DWORD)WaveOutCallback2, 0, CALLBACK_FUNCTION);
@@ -116,6 +116,8 @@ BOOL COutput::Open(int nChannels, int nSamplingRate, int nBitsPerSample)
 	}
 	m_fPaused = FALSE;
 	m_dwWritten = 0;
+
+	waveOutSetVolume(m_hwo, m_dwVolume);
 
 	if (!PrepareBuffer())
 		goto fail;
@@ -704,3 +706,15 @@ DWORD COutput::GetBufferingSamples()
 	return m_dwWritten - dwCurrent;
 }
 
+DWORD COutput::GetVolume()
+{
+	return m_dwVolume;
+}
+
+void COutput::SetVolume(DWORD dwVolume)
+{
+	m_dwVolume = dwVolume;
+	if (m_hwo) {
+		waveOutSetVolume(m_hwo, m_dwVolume);
+	}
+}

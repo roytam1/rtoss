@@ -101,6 +101,8 @@ typedef struct tID3Tag
 #define MAXLONGLONG                      (0x7fffffffffffffff)
 #endif
 
+#define MAX_WAVEOUTVOLUME	0xFFFFFFFF
+
 #define MAP_MSG_BASE		(WM_USER + 10000)
 #define MAP_MSG_STATUS		(MAP_MSG_BASE + 1) // wParam == MAP_STATUS, lParam = error (stop only)
 #define MAP_MSG_PEEK		(MAP_MSG_BASE + 2) // wParam == l lParam == r
@@ -171,6 +173,10 @@ MAPLIBEXPORT(int) MAP_GetStreamingBufferingCount(HANDLE hLib);
 // plug-in
 MAPLIBEXPORT(int) MAP_GetDecoderPlugInCount(HANDLE hLib);
 MAPLIBEXPORT(MAP_DEC_PLUGIN*) MAP_GetDecoderPlugIn(HANDLE hLib, int nIndex);
+
+// volume
+MAPLIBEXPORT(DWORD) MAP_GetVolume(HANDLE hLib, BOOL bSysVolume);
+MAPLIBEXPORT(void) MAP_SetVolume(HANDLE hLib, DWORD dwVolume, BOOL bSysVolume);
 
 #ifdef __cplusplus
 };

@@ -4,6 +4,10 @@
 #include "reader.h"
 #include "mahelper.h"
 
+#ifndef _WIN32_WCE
+#include "stdio.h"
+#endif // _WIN32_WCE
+
 const int tabbitrate[3][3][16] = 
 {
    {{0,32,64,96,128,160,192,224,256,288,320,352,384,416,448,},		//V1L1
@@ -197,55 +201,404 @@ void ConvertFromTagStr(BYTE buff[30], LPTSTR pszBuff, int nLen)
 #endif
 }
 
-BOOL GetId3Tag(LPCTSTR pszFile, ID3TAGV1* pTag)
+int UTF8toUTF16(char* pszSrc, WCHAR* pszDst, DWORD dwDstLen)
 {
-	memset(pTag, 0, sizeof(ID3_TAG_V1));
-	BOOL fRet = FALSE;
-
-	// this supports ID3TAG v1 only !!
-	CReader* pReader = new CReader();
-	if (!pReader->Open(pszFile))
-		return FALSE;
-
-	LONGLONG llSize = pReader->GetSize();
-	llSize -= sizeof(ID3_TAG_V1);
-	pReader->SetPointer(llSize, FILE_BEGIN);
-
-	DWORD dwRead;
-	ID3_TAG_V1 id3tag;
-	if (pReader->Read((LPBYTE)&id3tag, sizeof(id3tag), &dwRead) &&
-		dwRead == sizeof(id3tag)) {
-		if (id3tag.tag[0] == 'T' && id3tag.tag[1] == 'A' && id3tag.tag[2] == 'G') {
-			// it's ID3TAG v1 !!
-			fRet = TRUE;
-			pTag->nTrackNum = 0;
-
-			char buff[5];
-			memset(buff, 0, sizeof(buff));
-			memcpy(buff, id3tag.year, sizeof(id3tag.year));
-			pTag->nYear = atoi(buff);
-
-			ConvertFromTagStr(id3tag.albumName, pTag->szAlbum);
-			ConvertFromTagStr(id3tag.artistName, pTag->szArtist);
-			ConvertFromTagStr(id3tag.trackName, pTag->szTrack);
-
-			//ID3TAG v1.1
-			if (id3tag.comment[28] == NULL) {
-				pTag->nTrackNum = id3tag.comment[29];
-				ConvertFromTagStr(id3tag.comment, pTag->szComment, 28);
-			}
-			else
-				ConvertFromTagStr(id3tag.comment, pTag->szComment);
-
-			if (id3tag.genre < 148)
-				_tcscpy(pTag->szGenre, genre_strings[id3tag.genre]);
-			else
-				memset(pTag->szGenre, 0, sizeof(pTag->szGenre));
+	DWORD dwLen = 0;
+	while (*pszSrc) {
+		if (++dwLen == dwDstLen)
+			break;
+		if ((*pszSrc & 0x80) == 0x0) {
+			// 1 byte
+			*pszDst++ = *pszSrc++;
+		}
+		else if ((*pszSrc & 0xE0) == 0xC0) {
+			// 2 bytes
+			*pszDst++ = (((WORD)*pszSrc & 0x1F) << 6) | ((WORD)*(pszSrc + 1) & 0x3F);
+			pszSrc += 2;
+		}
+		else if ((*pszSrc & 0xE0) == 0xE0) {
+			// 3 bytes
+			*pszDst++ = (((WORD)*pszSrc & 0x0F) << 12) | (((WORD)*(pszSrc + 1) & 0x3F) << 6) | ((WORD)*(pszSrc + 2) & 0x3F);
+			pszSrc += 3;
 		}
 	}
-	pReader->Close();
-	delete pReader;
-	return fRet;
+
+	*pszDst = NULL;
+	return dwLen;
+}
+
+BOOL CopyTagStringW(BYTE *buf, int buflen, LPWSTR str, int strlen)
+{
+	int len, i;
+	BOOL ret = FALSE;
+	BYTE tmp;
+	LPBYTE ptr;
+	char* psz = NULL;
+
+	if (buf[0] == 0) {
+		// ANSI
+		len = buflen - 1;
+		psz = new char[len + 1];
+		if (!psz)
+			return FALSE;
+		
+		memset(psz, 0, len + 1);
+		memcpy(psz, (char*)&buf[1], len);
+		
+		MultiByteToWideChar(CP_ACP, 0, psz, -1, str, strlen);
+		str [strlen - 1] = NULL;
+		ret = TRUE;
+	}
+	else if (buf[1] == 0xFF && buf[2] == 0xFE) {
+		// UCS2LE with BOM
+		len = buflen - 3;
+		len = len < (strlen - 1) * sizeof(WCHAR) ? len : (strlen - 1) * sizeof(WCHAR);
+		memcpy(str, &buf[3], len);
+		str[len / 2] = NULL;
+		ret = TRUE;
+	}
+	else if (buf[1] == 0xFE && buf[2] == 0xFF) {
+		// UCS2BE with BOM
+		len = buflen - 3;
+		len = len < (strlen - 1) * sizeof(WCHAR) ? len : (strlen - 1) * sizeof(WCHAR);
+		memcpy(str, &buf[3], len);
+		str[len / 2] = NULL;
+
+		ptr = (LPBYTE)str;
+		for (i = 0; i < len / 2; i++) {
+			tmp = ptr[i * 2 + 1];
+			ptr[i * 2] = ptr[i * 2 + 1];
+			ptr[i * 2 + 1] = tmp;
+		}
+		ret = TRUE;
+	}
+	else if (buf[0] == 2) {
+		// UCS2BE
+		len = buflen - 1;
+		len = len < (strlen - 1) * sizeof(WCHAR) ? len : (strlen - 1) * sizeof(WCHAR);
+		memcpy(str, &buf[1], len);
+		str[len / 2] = NULL;
+
+		ptr = (LPBYTE)str;
+		for (i = 0; i < len / 2; i++) {
+			tmp = ptr[i * 2 + 1];
+			ptr[i * 2] = ptr[i * 2 + 1];
+			ptr[i * 2 + 1] = tmp;
+		}
+		ret = TRUE;
+	}
+	else if (buf[0] == 3) {
+		// UTF-8
+		len = buflen - 1;
+		psz = new char[len + 1];
+		if (!psz)
+			return FALSE;
+
+		memset(psz, 0, len + 1);
+		memcpy(psz, (char*)&buf[1], len);
+		UTF8toUTF16(psz, str, strlen);
+		ret = TRUE;
+	}
+
+	if (psz) delete [] psz;
+	return ret;
+}
+
+BOOL CopyTagString(BYTE *buf, int buflen, LPTSTR str, int strlen)
+{
+#ifdef _UNICODE
+	return CopyTagStringW(buf, buflen, str, strlen);
+#else
+	WCHAR szTemp[MAX_PLUGIN_TAG_STR];
+	if (!CopyTagStringW(buf, buflen, szTemp, MAX_PLUGIN_TAG_STR))
+		return FALSE;
+
+	WideCharToMultiByte(CP_ACP, 0, szTemp, -1, str, strlen, NULL, NULL);
+	str[strlen - 1] = NULL;
+	return TRUE;
+#endif
+}
+
+BOOL ParseGenre(LPTSTR src, LPTSTR str, int strlen)
+{
+	LPTSTR psz;
+	int nGenre;
+
+	if (src[0] == _T('(')) {
+		psz = _tcschr(&src[1], _T(')'));
+		if (psz) {
+			*psz = NULL;
+			nGenre = _tcstol(&src[1], 0, 10);
+
+			if (nGenre < sizeof(genre_strings) / sizeof(LPTSTR)) {
+				_tcsncpy(str, genre_strings[nGenre], strlen);
+				str[strlen - 1] = NULL;
+				return TRUE;
+			}
+		}
+	}
+	
+	_tcsncpy(str, src, strlen);
+	str[strlen - 1] = NULL;
+	
+	return TRUE;
+}
+
+BOOL ParseFrameV20(BYTE *buf, int len, ID3TAGV1* pTag)
+{
+	LPTSTR psz;
+	TCHAR szTemp[MAX_PLUGIN_TAG_STR];
+	LPBYTE data = buf + ID3TAG20_FRAME_LEN;
+	int datalen = len - ID3TAG20_FRAME_LEN;
+	
+	if (memcmp(buf, "TT2", 3) == 0) { 
+		return CopyTagString(data, datalen, pTag->szTrack, MAX_PLUGIN_TAG_STR);
+	}
+	else if (memcmp(buf, "TAL", 3) == 0) {
+		return CopyTagString(data, datalen, pTag->szAlbum, MAX_PLUGIN_TAG_STR);
+	}
+	else if (memcmp(buf, "TP1", 3) == 0) {
+		return CopyTagString(data, datalen, pTag->szArtist, MAX_PLUGIN_TAG_STR);
+	}
+	else if (memcmp(buf, "TCO", 3) == 0) {
+		if (CopyTagString(data, datalen, szTemp, MAX_PLUGIN_TAG_STR)) {
+			return ParseGenre(szTemp, pTag->szGenre, MAX_PLUGIN_TAG_STR);
+		}
+	}
+	else if (memcmp(buf, "TRK", 3) == 0) {
+		if (CopyTagString(data, datalen, szTemp, MAX_PLUGIN_TAG_STR)) {
+			psz = _tcschr(szTemp, _T('/'));
+			if (psz)
+				*psz = NULL;
+			pTag->nTrackNum = _tcstol(szTemp, 0, 10);
+			return TRUE;
+		}
+	}
+	else if (memcmp(buf, "TYE", 3) == 0) {
+		if (CopyTagString(data, datalen, szTemp, MAX_PLUGIN_TAG_STR)) {
+			pTag->nYear = _tcstol(szTemp, 0, 10);
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
+BOOL ParseFrameV23(BYTE *buf, int len, ID3TAGV1* pTag)
+{
+	LPTSTR psz;
+	TCHAR szTemp[MAX_PLUGIN_TAG_STR];
+	LPBYTE data = buf + ID3TAG23_FRAME_LEN;
+	int datalen = len - ID3TAG23_FRAME_LEN;
+	
+	if (memcmp(buf, "TIT2", 4) == 0) { 
+		return CopyTagString(data, datalen, pTag->szTrack, MAX_PLUGIN_TAG_STR);
+	}
+	else if (memcmp(buf, "TALB", 4) == 0) {
+		return CopyTagString(data, datalen, pTag->szAlbum, MAX_PLUGIN_TAG_STR);
+	}
+	else if (memcmp(buf, "TPE1", 4) == 0) {
+		return CopyTagString(data, datalen, pTag->szArtist, MAX_PLUGIN_TAG_STR);
+	}
+	else if (memcmp(buf, "TCON", 4) == 0) {
+		if (CopyTagString(data, datalen, szTemp, MAX_PLUGIN_TAG_STR)) {
+			return ParseGenre(szTemp, pTag->szGenre, MAX_PLUGIN_TAG_STR);
+		}
+	}
+	else if (memcmp(buf, "TRCK", 4) == 0) {
+		if (CopyTagString(data, datalen, szTemp, MAX_PLUGIN_TAG_STR)) {
+			psz = _tcschr(szTemp, _T('/'));
+			if (psz)
+				*psz = NULL;
+			pTag->nTrackNum = _tcstol(szTemp, 0, 10);
+			return TRUE;
+		}
+	}
+	else if (memcmp(buf, "TDRC", 4) == 0) {
+		if (CopyTagString(data, datalen, szTemp, MAX_PLUGIN_TAG_STR)) {
+			if (_tcslen(szTemp) > 4)
+				szTemp[4] = NULL;
+			pTag->nYear = _tcstol(szTemp, 0, 10);
+			return TRUE;
+		}
+	}
+	else if (memcmp(buf, "TYER", 4) == 0) {
+		if (CopyTagString(data, datalen, szTemp, MAX_PLUGIN_TAG_STR)) {
+			pTag->nYear = _tcstol(szTemp, 0, 10);
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
+BOOL ParseId3TagV20(LPBYTE buf, int buflen, ID3TAGV1* pTag)
+{
+	int tagsize, framesize;
+
+	if (buflen < ID3TAG_HEADER_LEN + ID3TAG20_FRAME_LEN)
+		return FALSE;
+
+	tagsize = (buf[6] << 21) | (buf[7] << 14) | (buf[8] << 7) | (buf[9] << 0);
+	if (buflen < tagsize + ID3TAG_HEADER_LEN)
+		tagsize = buflen - ID3TAG_HEADER_LEN;
+
+	buf += ID3TAG_HEADER_LEN;
+	while (tagsize > ID3TAG20_FRAME_LEN) {
+		framesize = (buf[3] << 16 | buf[4] << 8 | buf[5] << 0);
+		if (framesize == 0)
+			break;
+
+		if (framesize > tagsize)
+			break;
+
+		ParseFrameV20(buf, framesize + ID3TAG20_FRAME_LEN, pTag);
+		tagsize -= framesize + ID3TAG20_FRAME_LEN;
+		buf += framesize + ID3TAG20_FRAME_LEN;
+	}
+	return TRUE;
+}
+
+BOOL ParseId3TagV23(LPBYTE buf, int buflen, ID3TAGV1* pTag)
+{
+	int tagsize, framesize;
+
+	if (buflen < ID3TAG_HEADER_LEN + ID3TAG23_FRAME_LEN)
+		return FALSE;
+
+	tagsize = (buf[6] << 21) | (buf[7] << 14) | (buf[8] << 7) | (buf[9] << 0);
+	if (buflen < tagsize + ID3TAG_HEADER_LEN)
+		tagsize = buflen - ID3TAG_HEADER_LEN;
+
+	buf += ID3TAG_HEADER_LEN;
+	while (tagsize > ID3TAG23_FRAME_LEN) {
+		framesize = (buf[4] << 24 | buf[5] << 16 | buf[6] << 8 | buf[7] << 0) & 0x7FFFFFFF;
+		if (framesize == 0)
+			break;
+
+		if (framesize > tagsize)
+			break;
+
+		ParseFrameV23(buf, framesize + ID3TAG23_FRAME_LEN, pTag);
+		tagsize -= framesize + ID3TAG23_FRAME_LEN;
+		buf += framesize + ID3TAG23_FRAME_LEN;
+	}
+	return TRUE;
+}
+
+BOOL ParseId3TagV2(LPBYTE buf, int buflen, ID3TAGV1* pTag)
+{
+	if (buflen < ID3TAG_HEADER_LEN)
+		return FALSE;
+
+	if (memcmp(buf, "ID3", 3) != 0)
+		return FALSE;
+
+	if (buf[3] > 4)
+		return FALSE;
+
+	else if (buf[3] < 3)
+		return ParseId3TagV20(buf, buflen, pTag);
+	else
+		return ParseId3TagV23(buf, buflen, pTag);
+}
+
+BOOL GetId3TagV2(FILE* fp, ID3TAGV1* pTag)
+{
+	BYTE header[10];
+	BYTE *buf = NULL; 
+	BYTE *ptr = NULL; 
+	BOOL ret = FALSE;
+	long curoffset = ftell(fp);
+	int tagsize;
+	fseek(fp, 0, SEEK_SET);
+	int version;
+
+	if (fread(header, 1, ID3TAG_HEADER_LEN, fp) != ID3TAG_HEADER_LEN) {
+		goto done;
+	}
+
+	if (memcmp(header, "ID3", 3) != 0) {
+		goto done;
+	}
+
+	version = header[3];
+	if (version > 4)
+		goto done;
+
+	tagsize = (header[6] << 21) | (header[7] << 14) | (header[8] << 7) | (header[9] << 0);
+	buf = new BYTE[tagsize + ID3TAG_HEADER_LEN];
+	if (!buf) {
+		goto done;
+	}
+	memcpy(buf, header, ID3TAG_HEADER_LEN);
+	if (fread(buf + ID3TAG_HEADER_LEN, 1, tagsize, fp) != tagsize) {
+		goto done;
+	}
+
+	ret = ParseId3TagV2(buf, tagsize + ID3TAG_HEADER_LEN, pTag);
+	
+done:
+	if (buf) delete [] buf;
+	fseek(fp, curoffset, SEEK_SET);
+	return ret;
+}
+
+BOOL GetId3TagV1(FILE* fp, ID3TAGV1* pTag)
+{
+	char buff[5];
+	ID3_TAG_V1 id3tag;
+	BOOL bRet = FALSE;
+
+	long curoffset = ftell(fp);
+	fseek(fp, -sizeof(ID3_TAG_V1), SEEK_END);
+	
+	if (!fread(&id3tag, sizeof(ID3_TAG_V1), 1, fp))
+		goto done;
+
+	if (id3tag.tag[0] != 'T' || id3tag.tag[1] != 'A' || id3tag.tag[2] != 'G')
+		goto done;
+
+	bRet = TRUE;
+	memset(buff, 0, sizeof(buff));
+	memcpy(buff, id3tag.year, sizeof(id3tag.year));
+	pTag->nYear = atoi(buff);
+
+	ConvertFromTagStr(id3tag.albumName, pTag->szAlbum, 30);
+	ConvertFromTagStr(id3tag.artistName, pTag->szArtist, 30);
+	ConvertFromTagStr(id3tag.trackName, pTag->szTrack, 30);
+
+	//ID3TAG v1.1
+	if (id3tag.comment[28] == NULL) {
+		pTag->nTrackNum = id3tag.comment[29];
+		ConvertFromTagStr(id3tag.comment, pTag->szComment, 28);
+	}
+	else
+		ConvertFromTagStr(id3tag.comment, pTag->szComment, 30);
+
+	if (id3tag.genre < 148)
+		_tcscpy(pTag->szGenre, genre_strings[id3tag.genre]);
+	else
+		memset(pTag->szGenre, 0, sizeof(pTag->szGenre));
+	
+done:
+	fseek(fp, curoffset, SEEK_SET);
+	return bRet;
+}
+
+BOOL GetId3Tag(LPCTSTR pszFile, ID3TAGV1* pTag)
+{
+	BOOL bRet;
+	FILE* fp = _tfopen(pszFile, _T("rb"));
+	if (!fp)
+		return FALSE;
+
+	bRet = GetId3TagV2(fp, pTag);
+	if (!bRet)
+		bRet = GetId3TagV1(fp, pTag);
+
+	fclose(fp);
+	return bRet;
 }
 
 BOOL SetId3Tag(LPCTSTR pszFile, ID3TAGV1* pTag)

@@ -93,6 +93,9 @@ public:
 	BOOL SetStreamingOptions(MAP_STREAMING_OPTIONS* pOptions);
 	MAP_STREAMING_STATUS GetStreamingStatus();
 	int GetStreamingBufferingCount();
+
+	DWORD GetVolume(BOOL bSysVolume);
+	void SetVolume(DWORD dwVolume, BOOL bSysVolume);
 	
 protected:
 	CReader			m_Reader;
@@ -132,7 +135,7 @@ protected:
 	BOOL		m_fSeek;
 	BOOL		m_fPlay;
 	BOOL		m_fFileBegin;
-	BOOL		m_fStop;	
+	BOOL		m_fStop;
 
 	enum {OPEN_NONE = 0, OPEN_MPG_FILE, OPEN_OV_FILE, OPEN_WAV_FILE, OPEN_PLUGIN, OPEN_URL} m_fOpen;
 
@@ -220,6 +223,7 @@ protected:
 	BOOL NetParseOvStream(LPBYTE pbBuf, DWORD cbBuf);
 	void NetMpegStreaming(LPBYTE pbBuf, DWORD cbBuf);
 	void NetOvStreaming(LPBYTE pbBuf, DWORD cbBuf);
+	void NetCheckStreamId3Tag(LPBYTE pbBuf, DWORD cbBuf);
 
 // for plug-in
 public:

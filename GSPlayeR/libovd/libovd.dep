@@ -1,0 +1,3942 @@
+# eMbedded Visual C++ Dependency File, included by libovd.vcn
+
+!IF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Release"
+
+.\Tremor\bitwise.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Debug"
+
+.\Tremor\bitwise.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Release"
+
+.\Tremor\bitwise.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Debug"
+
+.\Tremor\bitwise.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Release"
+
+.\Tremor\bitwise.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Debug"
+
+.\Tremor\bitwise.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Release"
+
+.\Tremor\bitwise.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Debug"
+
+.\Tremor\bitwise.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Release"
+
+.\Tremor\bitwise.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Debug"
+
+.\Tremor\bitwise.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Release"
+
+.\Tremor\bitwise.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Debug"
+
+.\Tremor\bitwise.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Release"
+
+.\Tremor\bitwise.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Debug"
+
+.\Tremor\bitwise.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Release"
+
+.\Tremor\bitwise.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Debug"
+
+.\Tremor\bitwise.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\Tremor\bitwise.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Release"
+
+.\Tremor\block.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Debug"
+
+.\Tremor\block.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Release"
+
+.\Tremor\block.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Debug"
+
+.\Tremor\block.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Release"
+
+.\Tremor\block.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Debug"
+
+.\Tremor\block.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Release"
+
+.\Tremor\block.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Debug"
+
+.\Tremor\block.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Release"
+
+.\Tremor\block.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Debug"
+
+.\Tremor\block.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Release"
+
+.\Tremor\block.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Debug"
+
+.\Tremor\block.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Release"
+
+.\Tremor\block.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Debug"
+
+.\Tremor\block.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Release"
+
+.\Tremor\block.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Debug"
+
+.\Tremor\block.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\Tremor\block.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Release"
+
+.\Tremor\codebook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Debug"
+
+.\Tremor\codebook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Release"
+
+.\Tremor\codebook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Debug"
+
+.\Tremor\codebook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Release"
+
+.\Tremor\codebook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Debug"
+
+.\Tremor\codebook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Release"
+
+.\Tremor\codebook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Debug"
+
+.\Tremor\codebook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Release"
+
+.\Tremor\codebook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Debug"
+
+.\Tremor\codebook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Release"
+
+.\Tremor\codebook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Debug"
+
+.\Tremor\codebook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Release"
+
+.\Tremor\codebook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Debug"
+
+.\Tremor\codebook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Release"
+
+.\Tremor\codebook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Debug"
+
+.\Tremor\codebook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\Tremor\codebook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Release"
+
+.\Tremor\floor0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\lsp_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Debug"
+
+.\Tremor\floor0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\lsp_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Release"
+
+.\Tremor\floor0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\block.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\lsp_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Debug"
+
+.\Tremor\floor0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\lsp_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Release"
+
+.\Tremor\floor0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\lsp_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Debug"
+
+.\Tremor\floor0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\lsp_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Release"
+
+.\Tremor\floor0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\lsp_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Debug"
+
+.\Tremor\floor0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\lsp_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Release"
+
+.\Tremor\floor0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\lsp_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Debug"
+
+.\Tremor\floor0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\lsp_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Release"
+
+.\Tremor\floor0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\lsp_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Debug"
+
+.\Tremor\floor0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\lsp_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Release"
+
+.\Tremor\floor0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\lsp_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Debug"
+
+.\Tremor\floor0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\lsp_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Release"
+
+.\Tremor\floor0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\lsp_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Debug"
+
+.\Tremor\floor0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\lsp_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\Tremor\floor0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\block.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\lsp_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Release"
+
+.\Tremor\floor1.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Debug"
+
+.\Tremor\floor1.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Release"
+
+.\Tremor\floor1.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\block.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Debug"
+
+.\Tremor\floor1.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Release"
+
+.\Tremor\floor1.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Debug"
+
+.\Tremor\floor1.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Release"
+
+.\Tremor\floor1.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Debug"
+
+.\Tremor\floor1.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Release"
+
+.\Tremor\floor1.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Debug"
+
+.\Tremor\floor1.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Release"
+
+.\Tremor\floor1.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Debug"
+
+.\Tremor\floor1.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Release"
+
+.\Tremor\floor1.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Debug"
+
+.\Tremor\floor1.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Release"
+
+.\Tremor\floor1.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Debug"
+
+.\Tremor\floor1.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\Tremor\floor1.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\block.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Release"
+
+.\Tremor\framing.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Debug"
+
+.\Tremor\framing.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Release"
+
+.\Tremor\framing.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Debug"
+
+.\Tremor\framing.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Release"
+
+.\Tremor\framing.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Debug"
+
+.\Tremor\framing.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Release"
+
+.\Tremor\framing.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Debug"
+
+.\Tremor\framing.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Release"
+
+.\Tremor\framing.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Debug"
+
+.\Tremor\framing.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Release"
+
+.\Tremor\framing.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Debug"
+
+.\Tremor\framing.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Release"
+
+.\Tremor\framing.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Debug"
+
+.\Tremor\framing.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Release"
+
+.\Tremor\framing.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Debug"
+
+.\Tremor\framing.c : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\Tremor\framing.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Release"
+
+.\Tremor\info.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Debug"
+
+.\Tremor\info.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Release"
+
+.\Tremor\info.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Debug"
+
+.\Tremor\info.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Release"
+
+.\Tremor\info.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Debug"
+
+.\Tremor\info.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Release"
+
+.\Tremor\info.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Debug"
+
+.\Tremor\info.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Release"
+
+.\Tremor\info.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Debug"
+
+.\Tremor\info.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Release"
+
+.\Tremor\info.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Debug"
+
+.\Tremor\info.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Release"
+
+.\Tremor\info.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Debug"
+
+.\Tremor\info.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Release"
+
+.\Tremor\info.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Debug"
+
+.\Tremor\info.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\Tremor\info.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Release"
+
+.\libovd.cpp : \
+	"..\include\libovd.h"\
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Debug"
+
+.\libovd.cpp : \
+	"..\include\libovd.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Release"
+
+.\libovd.cpp : \
+	"..\include\libovd.h"\
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Debug"
+
+.\libovd.cpp : \
+	"..\include\libovd.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Release"
+
+.\libovd.cpp : \
+	"..\include\libovd.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Debug"
+
+.\libovd.cpp : \
+	"..\include\libovd.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Release"
+
+.\libovd.cpp : \
+	"..\include\libovd.h"\
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Debug"
+
+.\libovd.cpp : \
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Release"
+
+.\libovd.cpp : \
+	"..\include\libovd.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Debug"
+
+.\libovd.cpp : \
+	"..\include\libovd.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Release"
+
+.\libovd.cpp : \
+	"..\include\libovd.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Debug"
+
+.\libovd.cpp : \
+	"..\include\libovd.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Release"
+
+.\libovd.cpp : \
+	"..\include\libovd.h"\
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Debug"
+
+.\libovd.cpp : \
+	"..\include\libovd.h"\
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Release"
+
+.\libovd.cpp : \
+	"..\include\libovd.h"\
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Debug"
+
+.\libovd.cpp : \
+	"..\include\libovd.h"\
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\libovd.cpp : \
+	"..\include\libovd.h"\
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Release"
+
+.\Tremor\mapping0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Debug"
+
+.\Tremor\mapping0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Release"
+
+.\Tremor\mapping0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Debug"
+
+.\Tremor\mapping0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Release"
+
+.\Tremor\mapping0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Debug"
+
+.\Tremor\mapping0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Release"
+
+.\Tremor\mapping0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Debug"
+
+.\Tremor\mapping0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Release"
+
+.\Tremor\mapping0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Debug"
+
+.\Tremor\mapping0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Release"
+
+.\Tremor\mapping0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Debug"
+
+.\Tremor\mapping0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Release"
+
+.\Tremor\mapping0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Debug"
+
+.\Tremor\mapping0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Release"
+
+.\Tremor\mapping0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Debug"
+
+.\Tremor\mapping0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\Tremor\mapping0.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	".\Tremor\window.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Release"
+
+.\Tremor\mdct.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\mdct_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Debug"
+
+.\Tremor\mdct.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\mdct_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Release"
+
+.\Tremor\mdct.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\mdct_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Debug"
+
+.\Tremor\mdct.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\mdct_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Release"
+
+.\Tremor\mdct.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\mdct_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Debug"
+
+.\Tremor\mdct.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\mdct_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Release"
+
+.\Tremor\mdct.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\mdct_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Debug"
+
+.\Tremor\mdct.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\mdct_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Release"
+
+.\Tremor\mdct.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\mdct_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Debug"
+
+.\Tremor\mdct.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\mdct_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Release"
+
+.\Tremor\mdct.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\mdct_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Debug"
+
+.\Tremor\mdct.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\mdct_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Release"
+
+.\Tremor\mdct.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\mdct_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Debug"
+
+.\Tremor\mdct.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\mdct_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Release"
+
+.\Tremor\mdct.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\mdct_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Debug"
+
+.\Tremor\mdct.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\mdct_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\Tremor\mdct.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\mdct.h"\
+	".\Tremor\mdct_lookup.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Release"
+
+.\Tremor\registry.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Debug"
+
+.\Tremor\registry.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Release"
+
+.\Tremor\registry.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Debug"
+
+.\Tremor\registry.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Release"
+
+.\Tremor\registry.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Debug"
+
+.\Tremor\registry.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Release"
+
+.\Tremor\registry.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Debug"
+
+.\Tremor\registry.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Release"
+
+.\Tremor\registry.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Debug"
+
+.\Tremor\registry.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Release"
+
+.\Tremor\registry.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Debug"
+
+.\Tremor\registry.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Release"
+
+.\Tremor\registry.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Debug"
+
+.\Tremor\registry.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Release"
+
+.\Tremor\registry.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Debug"
+
+.\Tremor\registry.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\Tremor\registry.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Release"
+
+.\Tremor\res012.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Debug"
+
+.\Tremor\res012.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Release"
+
+.\Tremor\res012.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\block.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Debug"
+
+.\Tremor\res012.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Release"
+
+.\Tremor\res012.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Debug"
+
+.\Tremor\res012.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Release"
+
+.\Tremor\res012.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Debug"
+
+.\Tremor\res012.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Release"
+
+.\Tremor\res012.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Debug"
+
+.\Tremor\res012.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Release"
+
+.\Tremor\res012.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Debug"
+
+.\Tremor\res012.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Release"
+
+.\Tremor\res012.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Debug"
+
+.\Tremor\res012.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Release"
+
+.\Tremor\res012.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Debug"
+
+.\Tremor\res012.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\Tremor\res012.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\block.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Release"
+
+.\Tremor\sharedbook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Debug"
+
+.\Tremor\sharedbook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Release"
+
+.\Tremor\sharedbook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Debug"
+
+.\Tremor\sharedbook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Release"
+
+.\Tremor\sharedbook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Debug"
+
+.\Tremor\sharedbook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Release"
+
+.\Tremor\sharedbook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Debug"
+
+.\Tremor\sharedbook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Release"
+
+.\Tremor\sharedbook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Debug"
+
+.\Tremor\sharedbook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Release"
+
+.\Tremor\sharedbook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Debug"
+
+.\Tremor\sharedbook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Release"
+
+.\Tremor\sharedbook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Debug"
+
+.\Tremor\sharedbook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Release"
+
+.\Tremor\sharedbook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Debug"
+
+.\Tremor\sharedbook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\Tremor\sharedbook.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Release"
+
+.\Tremor\synthesis.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Debug"
+
+.\Tremor\synthesis.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Release"
+
+.\Tremor\synthesis.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\block.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Debug"
+
+.\Tremor\synthesis.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Release"
+
+.\Tremor\synthesis.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Debug"
+
+.\Tremor\synthesis.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Release"
+
+.\Tremor\synthesis.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Debug"
+
+.\Tremor\synthesis.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Release"
+
+.\Tremor\synthesis.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Debug"
+
+.\Tremor\synthesis.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Release"
+
+.\Tremor\synthesis.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Debug"
+
+.\Tremor\synthesis.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Release"
+
+.\Tremor\synthesis.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Debug"
+
+.\Tremor\synthesis.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Release"
+
+.\Tremor\synthesis.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Debug"
+
+.\Tremor\synthesis.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\Tremor\synthesis.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\backends.h"\
+	".\Tremor\block.h"\
+	".\Tremor\codebook.h"\
+	".\Tremor\codec_internal.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\registry.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Release"
+
+.\Tremor\vorbisfile.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Debug"
+
+.\Tremor\vorbisfile.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Release"
+
+.\Tremor\vorbisfile.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Debug"
+
+.\Tremor\vorbisfile.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Release"
+
+.\Tremor\vorbisfile.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Debug"
+
+.\Tremor\vorbisfile.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Release"
+
+.\Tremor\vorbisfile.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Debug"
+
+.\Tremor\vorbisfile.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Release"
+
+.\Tremor\vorbisfile.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Debug"
+
+.\Tremor\vorbisfile.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Release"
+
+.\Tremor\vorbisfile.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Debug"
+
+.\Tremor\vorbisfile.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Release"
+
+.\Tremor\vorbisfile.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Debug"
+
+.\Tremor\vorbisfile.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Release"
+
+.\Tremor\vorbisfile.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Debug"
+
+.\Tremor\vorbisfile.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\Tremor\vorbisfile.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\ivorbisfile.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Release"
+
+.\Tremor\window.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\window.h"\
+	".\Tremor\window_lookup.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE MIPS) Debug"
+
+.\Tremor\window.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\window.h"\
+	".\Tremor\window_lookup.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Release"
+
+.\Tremor\window.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\window.h"\
+	".\Tremor\window_lookup.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH4) Debug"
+
+.\Tremor\window.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\window.h"\
+	".\Tremor\window_lookup.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Release"
+
+.\Tremor\window.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\window.h"\
+	".\Tremor\window_lookup.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE SH3) Debug"
+
+.\Tremor\window.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\window.h"\
+	".\Tremor\window_lookup.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Release"
+
+.\Tremor\window.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\window.h"\
+	".\Tremor\window_lookup.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARM) Debug"
+
+.\Tremor\window.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\window.h"\
+	".\Tremor\window_lookup.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Release"
+
+.\Tremor\window.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\window.h"\
+	".\Tremor\window_lookup.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86) Debug"
+
+.\Tremor\window.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\window.h"\
+	".\Tremor\window_lookup.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Release"
+
+.\Tremor\window.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\window.h"\
+	".\Tremor\window_lookup.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE x86em) Debug"
+
+.\Tremor\window.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\window.h"\
+	".\Tremor\window_lookup.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Release"
+
+.\Tremor\window.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\window.h"\
+	".\Tremor\window_lookup.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) Debug"
+
+.\Tremor\window.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\window.h"\
+	".\Tremor\window_lookup.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Release"
+
+.\Tremor\window.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\window.h"\
+	".\Tremor\window_lookup.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE emulator) Debug"
+
+.\Tremor\window.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\window.h"\
+	".\Tremor\window_lookup.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libovd - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\Tremor\window.c : \
+	".\Tremor\asm_arm.h"\
+	".\Tremor\config_types.h"\
+	".\Tremor\ivorbiscodec.h"\
+	".\Tremor\misc.h"\
+	".\Tremor\ogg.h"\
+	".\Tremor\os.h"\
+	".\Tremor\os_types.h"\
+	".\Tremor\window.h"\
+	".\Tremor\window_lookup.h"\
+	
+
+!ENDIF 
+

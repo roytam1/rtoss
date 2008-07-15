@@ -59,6 +59,7 @@ public:
 	BOOL Read(LPBYTE pbBuffer, DWORD cbBuffer, LPDWORD pcbRead);
 	BOOL GetStreamInfo(LPTSTR pszName, LPTSTR pszGenre, LPTSTR pszURL);
 	BOOL GetStreamTitle(LPTSTR pszTitle);
+	void SetStreamName(LPTSTR pszName);
 
 protected:
 	DWORD ReceiverThread();
