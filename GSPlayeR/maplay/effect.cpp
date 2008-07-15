@@ -395,7 +395,7 @@ void CBassBoost::SetLevel(int nLevel)
 C3DChorus::C3DChorus()
 {
 	m_fEnable = FALSE;
-	m_nRate = 50;
+	m_nRate = 20;
 
 	m_nSampleRate = 0;
 	m_pBuf[0] = m_pBuf[1] = NULL;

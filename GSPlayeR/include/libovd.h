@@ -51,7 +51,7 @@ typedef struct {
 
 
 typedef struct {
-	char* buf;
+	unsigned char* buf;
 	unsigned long len;
 	HANDLE handle;
 } ovd_stream_buf;

@@ -301,6 +301,9 @@ LRESULT CPpcMainWnd::OnCommand(WPARAM wParam, LPARAM lParam)
 		ToggleDisplay();
 		OnTimer(ID_TIMER_DISPSTATE);
 		return 0;
+	case IDM_FILE_INFO:
+		OnFileInfo();
+		return 0;
 	case IDM_FILE_UP:
 		OnFileUp();
 		return 0;
@@ -1083,6 +1086,24 @@ void CPpcMainWnd::OnFileDown()
 		if (ListView_GetItemState(m_hwndLV, i, LVIS_SELECTED))
 			DownFile(i);
 	}
+}
+
+void CPpcMainWnd::OnFileInfo()
+{
+	TCHAR szMsg[MAX_PATH*10];
+
+	if (!ListView_GetSelectedCount(m_hwndLV))
+		return;
+
+	int nCount = ListView_GetItemCount(m_hwndLV);
+	for (int i = 0; i < nCount; i++) {
+		if (ListView_GetItemState(m_hwndLV, i, LVIS_SELECTED)) {
+			FILEINFO* pInfo = (FILEINFO*)m_pListFile->GetAt(i);
+			wsprintf(szMsg,_T("File: %s\nTrack name: %s\nArtist: %s\nAlbum: %s\nComment: %s\nGenre: %s\nYear: %d\nTrack Number: %d"),pInfo->szPath,pInfo->tag.szTrack,pInfo->tag.szArtist,pInfo->tag.szAlbum,pInfo->tag.szComment,pInfo->tag.szGenre,pInfo->tag.nYear,pInfo->tag.nTrackNum);
+			MessageBox(m_hWnd, szMsg, _T("File Info"), MB_ICONINFORMATION);
+		}
+	}
+
 }
 
 void CPpcMainWnd::OnFileDelete()

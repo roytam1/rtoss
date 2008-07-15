@@ -29,8 +29,8 @@ m_eventStart(FALSE), m_eventBuf(TRUE), m_eventBufFree(TRUE)
 	m_fShoutcast = FALSE;
 	m_fStop = FALSE;
 	m_fEos = FALSE;
-	m_cBuf = 32;
-	m_cPreBuf = 16;
+	m_cBuf = 64;
+	m_cPreBuf = 32;
 	
 	// WinsockÇÃèâä˙âª
 	WSADATA WsaData;
@@ -789,5 +789,12 @@ void CReceiver::NotifyMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (m_hwndMessage) {
 		PostMessage(m_hwndMessage, uMsg, wParam, lParam);
+	}
+}
+
+void CReceiver::SetStreamName(LPTSTR pszName)
+{
+	if (_tcslen(m_szIcyName) == 0) {
+		_tcscpy(m_szIcyName, pszName);
 	}
 }

@@ -6,13 +6,13 @@
 --------------------Configuration: GSPlayer2e - Win32 (WCE ARMV4) ReleaseXScale--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\Roy\LOCALS~1\Temp\RSP10A.tmp" with contents
+Creating temporary file "C:\DOCUME~1\Roy\LOCALS~1\Temp\RSP103.tmp" with contents
 [
 /nologo /W3 /Oxt /Ob2 /I "./" /I "../" /I "../../include" /D _WIN32_WCE=420 /D "WIN32_PLATFORM_PSPC=400" /D "ARM" /D "_ARM_" /D "ARMV4" /D UNDER_CE=420 /D "UNICODE" /D "_UNICODE" /D "NDEBUG" /D "_WIN32_WCE_PPC" /FR"ARMV4ReleaseXScale/" /Fp"ARMV4ReleaseXScale/GSPlayer2e.pch" /YX /Fo"ARMV4ReleaseXScale/" /MC /QRxscale /QRxscalesched /c 
-"F:\jatf\gsp225src\GSPlayer2\MainWndCtrl.cpp"
+"F:\jatf\RTOSS\GSPlayeR\GSPlayer2\WinCE_PPC2\PpcMainWnd.cpp"
 ]
-Creating command line "clarm.exe @C:\DOCUME~1\Roy\LOCALS~1\Temp\RSP10A.tmp" 
-Creating temporary file "C:\DOCUME~1\Roy\LOCALS~1\Temp\RSP10B.tmp" with contents
+Creating command line "clarm.exe @C:\DOCUME~1\Roy\LOCALS~1\Temp\RSP103.tmp" 
+Creating temporary file "C:\DOCUME~1\Roy\LOCALS~1\Temp\RSP104.tmp" with contents
 [
 commctrl.lib coredll.lib aygshell.lib winsock.lib ../../lib/ARMV4Relx/libmad.lib ../../lib/ARMV4Relx/libovd.lib ../../lib/ARMV4Relx/maplay.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /incremental:no /pdb:"ARMV4ReleaseXScale/GSPlayer2.pdb" /nodefaultlib:"libc.lib /nodefaultlib:libcd.lib /nodefaultlib:libcmt.lib /nodefaultlib:libcmtd.lib /nodefaultlib:msvcrt.lib /nodefaultlib:msvcrtd.lib" /out:"../../bin/eng/WinCE_PPC2/ARMV4Relx/GSPlayer2.exe" /subsystem:windowsce,4.20 /align:"4096" /MACHINE:ARM 
 .\ARMV4ReleaseXScale\EffectDlgPPC.obj
@@ -34,16 +34,16 @@ commctrl.lib coredll.lib aygshell.lib winsock.lib ../../lib/ARMV4Relx/libmad.lib
 .\ARMV4ReleaseXScale\PpcPlayerApp.obj
 .\ARMV4ReleaseXScale\PpcSkin.obj
 .\ARMV4ReleaseXScale\Skin.obj
+.\ARMV4ReleaseXScale\sloperand.obj
 .\ARMV4ReleaseXScale\SmallSlider.obj
 .\ARMV4ReleaseXScale\GSPlayer2e.res
-.\ARMV4ReleaseXScale\sloperand.obj
 ]
-Creating command line "link.exe @C:\DOCUME~1\Roy\LOCALS~1\Temp\RSP10B.tmp"
+Creating command line "link.exe @C:\DOCUME~1\Roy\LOCALS~1\Temp\RSP104.tmp"
 <h3>Output Window</h3>
 Compiling...
-MainWndCtrl.cpp
+PpcMainWnd.cpp
 Linking...
-Creating temporary file "C:\DOCUME~1\Roy\LOCALS~1\Temp\RSP10E.tmp" with contents
+Creating temporary file "C:\DOCUME~1\Roy\LOCALS~1\Temp\RSP107.tmp" with contents
 [
 /nologo /o"ARMV4ReleaseXScale/GSPlayer2e.bsc" 
 .\ARMV4ReleaseXScale\EffectDlgPPC.sbr
@@ -65,9 +65,9 @@ Creating temporary file "C:\DOCUME~1\Roy\LOCALS~1\Temp\RSP10E.tmp" with contents
 .\ARMV4ReleaseXScale\PpcPlayerApp.sbr
 .\ARMV4ReleaseXScale\PpcSkin.sbr
 .\ARMV4ReleaseXScale\Skin.sbr
-.\ARMV4ReleaseXScale\SmallSlider.sbr
-.\ARMV4ReleaseXScale\sloperand.sbr]
-Creating command line "bscmake.exe @C:\DOCUME~1\Roy\LOCALS~1\Temp\RSP10E.tmp"
+.\ARMV4ReleaseXScale\sloperand.sbr
+.\ARMV4ReleaseXScale\SmallSlider.sbr]
+Creating command line "bscmake.exe @C:\DOCUME~1\Roy\LOCALS~1\Temp\RSP107.tmp"
 Creating browse info file...
 <h3>Output Window</h3>
 

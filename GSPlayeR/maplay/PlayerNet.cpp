@@ -5,6 +5,7 @@
 
 void CPlayer::NetStreamingThread()
 {
+	int i;
 	BYTE bRead[NET_READ_BUFF_LEN];
 	DWORD cbInBuf;
 
@@ -18,28 +19,34 @@ void CPlayer::NetStreamingThread()
 
 	m_StreamingStatus = MAP_STREAMING_BUFFERING;
 
-	if (!m_Receiver.Read(bRead, NET_READ_BUFF_LEN, &cbInBuf)) {
+	if (!WaitForPrebuffering(m_Receiver.GetPrebufferingCount())) {
 		UnpreparePlayback(FALSE, TRUE);
 		return;
 	}
 
-	if (NetParseMpegStream(bRead, cbInBuf))
-		m_fNet = NET_OPEN_MPEG;
-	else if (NetParseOvStream(bRead, cbInBuf))
-		m_fNet = NET_OPEN_OV;
-	else if (PlugInParseStream(bRead, cbInBuf))
-		m_fNet = NET_OPEN_PLUGIN;
-	else {
-		UnpreparePlayback(FALSE, TRUE);
-		return;
+	for (i = 0; i < m_Receiver.GetPrebufferingCount(); i++) {
+		if (!m_Receiver.Read(bRead, NET_READ_BUFF_LEN, &cbInBuf)) {
+			UnpreparePlayback(FALSE, TRUE);
+			return;
+		}
+
+		NetCheckStreamId3Tag(bRead, cbInBuf);
+
+		if (NetParseMpegStream(bRead, cbInBuf)) {
+			m_fNet = NET_OPEN_MPEG;
+			break;
+		}
+		else if (NetParseOvStream(bRead, cbInBuf)) {
+			m_fNet = NET_OPEN_OV;
+			break;
+		}
+		else if (PlugInParseStream(bRead, cbInBuf)) {
+			m_fNet = NET_OPEN_PLUGIN;
+			break;
+		}
 	}
 
 	if (!PreparePlayback()) {
-		UnpreparePlayback(FALSE, TRUE);
-		return;
-	}
-
-	if (!WaitForPrebuffering(m_Receiver.GetPrebufferingCount())) {
 		UnpreparePlayback(FALSE, TRUE);
 		return;
 	}
@@ -296,6 +303,32 @@ read:
 			OutputBuffer(m_pOutHdr, m_cbOutBuf - m_cbOutBufLeft);
 			m_pOutHdr = NULL;
 			break;
+		}
+	}
+}
+
+void CPlayer::NetCheckStreamId3Tag(LPBYTE pbBuf, DWORD cbBuf)
+{
+	ID3TAGV1 tag = {0};
+	TCHAR szName[MAX_URL] = {0};
+
+	if (ParseId3TagV2(pbBuf, cbBuf, &tag)) {
+		if (_tcslen(tag.szArtist) && _tcslen(tag.szTrack)) {
+			if (_tcslen(tag.szArtist) + _tcslen(tag.szTrack) + _tcslen(_T(" - ")) < sizeof(szName) / sizeof(WCHAR)) {
+				wsprintf(szName, _T("%s - %s"), tag.szArtist, tag.szTrack);
+			}
+			else {
+				_tcsncpy(szName, tag.szTrack, sizeof(szName) / sizeof(TCHAR));
+				szName[MAX_URL - 1] = NULL;
+			}
+		}
+		else if (_tcslen(tag.szTrack)) {
+			_tcsncpy(szName, tag.szTrack, sizeof(szName) / sizeof(TCHAR));
+			szName[MAX_URL - 1] = NULL;
+		}
+
+		if (_tcslen(szName)) {
+			m_Receiver.SetStreamName(szName);
 		}
 	}
 }

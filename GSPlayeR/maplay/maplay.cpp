@@ -284,3 +284,15 @@ MAP_DEC_PLUGIN* WINAPI MAP_GetDecoderPlugIn(HANDLE hLib, int nIndex)
 	CPlayer* pPlayer = (CPlayer*) hLib;
 	return pPlayer->PlugInGetInterface(nIndex);
 }
+
+DWORD WINAPI MAP_GetVolume(HANDLE hLib, BOOL bSysVolume)
+{
+	CPlayer* pPlayer = (CPlayer*) hLib;
+	return pPlayer->GetVolume(bSysVolume);
+}
+
+void WINAPI MAP_SetVolume(HANDLE hLib, DWORD dwVolume, BOOL bSysVolume)
+{
+	CPlayer* pPlayer = (CPlayer*) hLib;
+	pPlayer->SetVolume(dwVolume, bSysVolume);
+}

@@ -253,13 +253,14 @@ void CPlayer::PlugInClose()
 
 void CPlayer::PlugInSetEqualizer()
 {
+	int i;
 	PLUGIN_INFO* pInfo;
 
 	MAP_PLUGIN_EQ eq;
 	eq.bEnable = m_Equalizer.fEnable;
 	eq.nPreamp = m_Equalizer.preamp;
 
-	for (int i = 0; i < 10; i++)
+	for (i = 0; i < 10; i++)
 		eq.nEq[i] = m_Equalizer.data[i];
 
 	int nCount = m_PlugInInfo.GetCount();

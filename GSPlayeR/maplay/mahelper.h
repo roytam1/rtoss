@@ -77,5 +77,11 @@ int GetFrameSize(LPBYTE pbHeader);
 BOOL GetId3Tag(LPCTSTR pszFile, ID3TAGV1* pTag);
 BOOL SetId3Tag(LPCTSTR pszFile, ID3TAGV1* pTag);
 void ConvertFromTagStr(BYTE buff[30], LPTSTR pszBuff, int nLen = 30);
+BOOL ParseId3TagV2(LPBYTE buf, int buflen, ID3TAGV1* pTag);
+
+#define ID3TAG_HEADER_LEN	10
+#define ID3TAG23_FRAME_LEN	10
+#define ID3TAG20_FRAME_LEN	6
+
 
 #endif // __MAHELPER_H__

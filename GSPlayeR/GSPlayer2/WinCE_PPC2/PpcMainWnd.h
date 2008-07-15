@@ -75,6 +75,7 @@ protected:
 	virtual void OnEnqueue();
 	virtual void OnDequeue();
 	virtual void OnClearQueue();
+	virtual void OnFileInfo();
 
 	virtual void OnFileUp();
 	virtual void OnFileDown();

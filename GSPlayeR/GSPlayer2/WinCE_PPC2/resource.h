@@ -326,13 +326,14 @@
 #define IDM_PLAY_STOPAFTERCURR          40096
 #define IDM_DEQUEUE                     40097
 #define IDM_CLEARQUEUE                  40098
+#define IDM_FILE_INFO					40099
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        150
-#define _APS_NEXT_COMMAND_VALUE         40099
+#define _APS_NEXT_COMMAND_VALUE         40100
 #define _APS_NEXT_CONTROL_VALUE         1054
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
