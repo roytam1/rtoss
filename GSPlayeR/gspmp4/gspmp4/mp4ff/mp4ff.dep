@@ -1,0 +1,764 @@
+# eMbedded Visual C++ Dependency File, included by mp4ff.vcn
+
+!IF  "$(CFG)" == "mp4ff - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH4) Release"
+
+.\drms.c : \
+	".\drms.h"\
+	".\drmstables.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH4) Debug"
+
+.\drms.c : \
+	".\drms.h"\
+	".\drmstables.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH3) Release"
+
+.\drms.c : \
+	".\drms.h"\
+	".\drmstables.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH3) Debug"
+
+.\drms.c : \
+	".\drms.h"\
+	".\drmstables.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86) Release"
+
+.\drms.c : \
+	".\drms.h"\
+	".\drmstables.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86) Debug"
+
+.\drms.c : \
+	".\drms.h"\
+	".\drmstables.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Release"
+
+.\drms.c : \
+	".\drms.h"\
+	".\drmstables.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Debug"
+
+.\drms.c : \
+	".\drms.h"\
+	".\drmstables.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE emulator) Release"
+
+.\drms.c : \
+	".\drms.h"\
+	".\drmstables.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE emulator) Debug"
+
+.\drms.c : \
+	".\drms.h"\
+	".\drmstables.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\drms.c : \
+	".\drms.h"\
+	".\drmstables.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Release64"
+
+.\drms.c : \
+	".\drms.h"\
+	".\drmstables.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "mp4ff - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH4) Release"
+
+.\mp4atom.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH4) Debug"
+
+.\mp4atom.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH3) Release"
+
+.\mp4atom.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH3) Debug"
+
+.\mp4atom.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86) Release"
+
+.\mp4atom.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86) Debug"
+
+.\mp4atom.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Release"
+
+.\mp4atom.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Debug"
+
+.\mp4atom.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE emulator) Release"
+
+.\mp4atom.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE emulator) Debug"
+
+.\mp4atom.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\mp4atom.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Release64"
+
+.\mp4atom.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "mp4ff - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH4) Release"
+
+.\mp4ff.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH4) Debug"
+
+.\mp4ff.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH3) Release"
+
+.\mp4ff.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH3) Debug"
+
+.\mp4ff.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86) Release"
+
+.\mp4ff.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86) Debug"
+
+.\mp4ff.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Release"
+
+.\mp4ff.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Debug"
+
+.\mp4ff.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE emulator) Release"
+
+.\mp4ff.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE emulator) Debug"
+
+.\mp4ff.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\mp4ff.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Release64"
+
+.\mp4ff.c : \
+	".\drms.h"\
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "mp4ff - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH4) Release"
+
+.\mp4meta.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH4) Debug"
+
+.\mp4meta.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH3) Release"
+
+.\mp4meta.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH3) Debug"
+
+.\mp4meta.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86) Release"
+
+.\mp4meta.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86) Debug"
+
+.\mp4meta.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Release"
+
+.\mp4meta.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Debug"
+
+.\mp4meta.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE emulator) Release"
+
+.\mp4meta.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE emulator) Debug"
+
+.\mp4meta.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\mp4meta.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Release64"
+
+.\mp4meta.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "mp4ff - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH4) Release"
+
+.\mp4sample.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH4) Debug"
+
+.\mp4sample.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH3) Release"
+
+.\mp4sample.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH3) Debug"
+
+.\mp4sample.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86) Release"
+
+.\mp4sample.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86) Debug"
+
+.\mp4sample.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Release"
+
+.\mp4sample.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Debug"
+
+.\mp4sample.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE emulator) Release"
+
+.\mp4sample.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE emulator) Debug"
+
+.\mp4sample.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\mp4sample.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Release64"
+
+.\mp4sample.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "mp4ff - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH4) Release"
+
+.\mp4tagupdate.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH4) Debug"
+
+.\mp4tagupdate.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH3) Release"
+
+.\mp4tagupdate.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH3) Debug"
+
+.\mp4tagupdate.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86) Release"
+
+.\mp4tagupdate.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86) Debug"
+
+.\mp4tagupdate.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Release"
+
+.\mp4tagupdate.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Debug"
+
+.\mp4tagupdate.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE emulator) Release"
+
+.\mp4tagupdate.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE emulator) Debug"
+
+.\mp4tagupdate.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\mp4tagupdate.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Release64"
+
+.\mp4tagupdate.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "mp4ff - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH4) Release"
+
+.\mp4util.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH4) Debug"
+
+.\mp4util.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH3) Release"
+
+.\mp4util.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE SH3) Debug"
+
+.\mp4util.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86) Release"
+
+.\mp4util.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86) Debug"
+
+.\mp4util.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Release"
+
+.\mp4util.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Debug"
+
+.\mp4util.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE emulator) Release"
+
+.\mp4util.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE emulator) Debug"
+
+.\mp4util.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\mp4util.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ELSEIF  "$(CFG)" == "mp4ff - Win32 (WCE ARMV4) Release64"
+
+.\mp4util.c : \
+	".\mp4ff_int_types.h"\
+	".\mp4ffint.h"\
+	
+
+!ENDIF 
+

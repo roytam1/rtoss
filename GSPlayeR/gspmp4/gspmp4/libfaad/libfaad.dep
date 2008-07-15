@@ -1,0 +1,8978 @@
+# eMbedded Visual C++ Dependency File, included by libfaad.vcn
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\bits.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\bits.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\bits.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\bits.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\bits.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\bits.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\bits.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\bits.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\bits.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\bits.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\bits.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\bits.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\cfft.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\cfft_tab.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\cfft.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\cfft_tab.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\cfft.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\cfft_tab.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\cfft.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\cfft_tab.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\cfft.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\cfft_tab.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\cfft.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\cfft_tab.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\cfft.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\cfft_tab.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\cfft.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\cfft_tab.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\cfft.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\cfft_tab.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\cfft.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\cfft_tab.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\cfft.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\cfft_tab.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\cfft.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\cfft_tab.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\common.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\common.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\common.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\common.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\common.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\common.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\common.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\common.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\common.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\common.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\common.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\common.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\decoder.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\error.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\ssr.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\decoder.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\error.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\ssr.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\decoder.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\error.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\ssr.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\decoder.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\error.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\ssr.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\decoder.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\error.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\ssr.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\decoder.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\error.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\ssr.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\decoder.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\error.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\ssr.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\decoder.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\error.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\ssr.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\decoder.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\error.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\ssr.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\decoder.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\error.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\ssr.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\decoder.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\error.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\ssr.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\decoder.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\error.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\ssr.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\drc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\drc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\drc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\drc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\drc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\drc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\drc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\drc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\drc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\drc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\drc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\drc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\drm_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\drm_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\drm_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\drm_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\drm_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\drm_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\drm_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\drm_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\drm_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\drm_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\drm_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\drm_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\error.c : \
+	".\common.h"\
+	".\error.h"\
+	".\fixed.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\error.c : \
+	".\common.h"\
+	".\error.h"\
+	".\fixed.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\error.c : \
+	".\common.h"\
+	".\error.h"\
+	".\fixed.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\error.c : \
+	".\common.h"\
+	".\error.h"\
+	".\fixed.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\error.c : \
+	".\common.h"\
+	".\error.h"\
+	".\fixed.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\error.c : \
+	".\common.h"\
+	".\error.h"\
+	".\fixed.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\error.c : \
+	".\common.h"\
+	".\error.h"\
+	".\fixed.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\error.c : \
+	".\common.h"\
+	".\error.h"\
+	".\fixed.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\error.c : \
+	".\common.h"\
+	".\error.h"\
+	".\fixed.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\error.c : \
+	".\common.h"\
+	".\error.h"\
+	".\fixed.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\error.c : \
+	".\common.h"\
+	".\error.h"\
+	".\fixed.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\error.c : \
+	".\common.h"\
+	".\error.h"\
+	".\fixed.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\filtbank.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\kbd_win.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sine_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\filtbank.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\kbd_win.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sine_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\filtbank.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\kbd_win.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sine_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\filtbank.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\kbd_win.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sine_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\filtbank.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\kbd_win.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sine_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\filtbank.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\kbd_win.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sine_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\filtbank.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\kbd_win.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sine_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\filtbank.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\kbd_win.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sine_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\filtbank.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\kbd_win.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sine_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\filtbank.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\kbd_win.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sine_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\filtbank.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\kbd_win.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sine_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\filtbank.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\kbd_win.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sine_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\hcr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\hcr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\hcr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\hcr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\hcr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\hcr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\hcr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\hcr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\hcr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\hcr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\hcr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\hcr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\huffman.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\codebook\hcb.h"\
+	".\codebook\hcb_1.h"\
+	".\codebook\hcb_10.h"\
+	".\codebook\hcb_11.h"\
+	".\codebook\hcb_2.h"\
+	".\codebook\hcb_3.h"\
+	".\codebook\hcb_4.h"\
+	".\codebook\hcb_5.h"\
+	".\codebook\hcb_6.h"\
+	".\codebook\hcb_7.h"\
+	".\codebook\hcb_8.h"\
+	".\codebook\hcb_9.h"\
+	".\codebook\hcb_sf.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\huffman.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\codebook\hcb.h"\
+	".\codebook\hcb_1.h"\
+	".\codebook\hcb_10.h"\
+	".\codebook\hcb_11.h"\
+	".\codebook\hcb_2.h"\
+	".\codebook\hcb_3.h"\
+	".\codebook\hcb_4.h"\
+	".\codebook\hcb_5.h"\
+	".\codebook\hcb_6.h"\
+	".\codebook\hcb_7.h"\
+	".\codebook\hcb_8.h"\
+	".\codebook\hcb_9.h"\
+	".\codebook\hcb_sf.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\huffman.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\codebook\hcb.h"\
+	".\codebook\hcb_1.h"\
+	".\codebook\hcb_10.h"\
+	".\codebook\hcb_11.h"\
+	".\codebook\hcb_2.h"\
+	".\codebook\hcb_3.h"\
+	".\codebook\hcb_4.h"\
+	".\codebook\hcb_5.h"\
+	".\codebook\hcb_6.h"\
+	".\codebook\hcb_7.h"\
+	".\codebook\hcb_8.h"\
+	".\codebook\hcb_9.h"\
+	".\codebook\hcb_sf.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\huffman.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\codebook\hcb.h"\
+	".\codebook\hcb_1.h"\
+	".\codebook\hcb_10.h"\
+	".\codebook\hcb_11.h"\
+	".\codebook\hcb_2.h"\
+	".\codebook\hcb_3.h"\
+	".\codebook\hcb_4.h"\
+	".\codebook\hcb_5.h"\
+	".\codebook\hcb_6.h"\
+	".\codebook\hcb_7.h"\
+	".\codebook\hcb_8.h"\
+	".\codebook\hcb_9.h"\
+	".\codebook\hcb_sf.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\huffman.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\codebook\hcb.h"\
+	".\codebook\hcb_1.h"\
+	".\codebook\hcb_10.h"\
+	".\codebook\hcb_11.h"\
+	".\codebook\hcb_2.h"\
+	".\codebook\hcb_3.h"\
+	".\codebook\hcb_4.h"\
+	".\codebook\hcb_5.h"\
+	".\codebook\hcb_6.h"\
+	".\codebook\hcb_7.h"\
+	".\codebook\hcb_8.h"\
+	".\codebook\hcb_9.h"\
+	".\codebook\hcb_sf.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\huffman.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\codebook\hcb.h"\
+	".\codebook\hcb_1.h"\
+	".\codebook\hcb_10.h"\
+	".\codebook\hcb_11.h"\
+	".\codebook\hcb_2.h"\
+	".\codebook\hcb_3.h"\
+	".\codebook\hcb_4.h"\
+	".\codebook\hcb_5.h"\
+	".\codebook\hcb_6.h"\
+	".\codebook\hcb_7.h"\
+	".\codebook\hcb_8.h"\
+	".\codebook\hcb_9.h"\
+	".\codebook\hcb_sf.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\huffman.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\codebook\hcb.h"\
+	".\codebook\hcb_1.h"\
+	".\codebook\hcb_10.h"\
+	".\codebook\hcb_11.h"\
+	".\codebook\hcb_2.h"\
+	".\codebook\hcb_3.h"\
+	".\codebook\hcb_4.h"\
+	".\codebook\hcb_5.h"\
+	".\codebook\hcb_6.h"\
+	".\codebook\hcb_7.h"\
+	".\codebook\hcb_8.h"\
+	".\codebook\hcb_9.h"\
+	".\codebook\hcb_sf.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\huffman.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\codebook\hcb.h"\
+	".\codebook\hcb_1.h"\
+	".\codebook\hcb_10.h"\
+	".\codebook\hcb_11.h"\
+	".\codebook\hcb_2.h"\
+	".\codebook\hcb_3.h"\
+	".\codebook\hcb_4.h"\
+	".\codebook\hcb_5.h"\
+	".\codebook\hcb_6.h"\
+	".\codebook\hcb_7.h"\
+	".\codebook\hcb_8.h"\
+	".\codebook\hcb_9.h"\
+	".\codebook\hcb_sf.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\huffman.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\codebook\hcb.h"\
+	".\codebook\hcb_1.h"\
+	".\codebook\hcb_10.h"\
+	".\codebook\hcb_11.h"\
+	".\codebook\hcb_2.h"\
+	".\codebook\hcb_3.h"\
+	".\codebook\hcb_4.h"\
+	".\codebook\hcb_5.h"\
+	".\codebook\hcb_6.h"\
+	".\codebook\hcb_7.h"\
+	".\codebook\hcb_8.h"\
+	".\codebook\hcb_9.h"\
+	".\codebook\hcb_sf.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\huffman.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\codebook\hcb.h"\
+	".\codebook\hcb_1.h"\
+	".\codebook\hcb_10.h"\
+	".\codebook\hcb_11.h"\
+	".\codebook\hcb_2.h"\
+	".\codebook\hcb_3.h"\
+	".\codebook\hcb_4.h"\
+	".\codebook\hcb_5.h"\
+	".\codebook\hcb_6.h"\
+	".\codebook\hcb_7.h"\
+	".\codebook\hcb_8.h"\
+	".\codebook\hcb_9.h"\
+	".\codebook\hcb_sf.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\huffman.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\codebook\hcb.h"\
+	".\codebook\hcb_1.h"\
+	".\codebook\hcb_10.h"\
+	".\codebook\hcb_11.h"\
+	".\codebook\hcb_2.h"\
+	".\codebook\hcb_3.h"\
+	".\codebook\hcb_4.h"\
+	".\codebook\hcb_5.h"\
+	".\codebook\hcb_6.h"\
+	".\codebook\hcb_7.h"\
+	".\codebook\hcb_8.h"\
+	".\codebook\hcb_9.h"\
+	".\codebook\hcb_sf.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\huffman.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\codebook\hcb.h"\
+	".\codebook\hcb_1.h"\
+	".\codebook\hcb_10.h"\
+	".\codebook\hcb_11.h"\
+	".\codebook\hcb_2.h"\
+	".\codebook\hcb_3.h"\
+	".\codebook\hcb_4.h"\
+	".\codebook\hcb_5.h"\
+	".\codebook\hcb_6.h"\
+	".\codebook\hcb_7.h"\
+	".\codebook\hcb_8.h"\
+	".\codebook\hcb_9.h"\
+	".\codebook\hcb_sf.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\ic_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\ic_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\ic_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\ic_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\ic_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\ic_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\ic_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\ic_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\ic_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\ic_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\ic_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\ic_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\is.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\is.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\is.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\is.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\is.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\is.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\is.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\is.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\is.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\is.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\is.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\is.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\lt_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\lt_predict.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\lt_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\lt_predict.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\lt_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\lt_predict.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\lt_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\lt_predict.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\lt_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\lt_predict.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\lt_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\lt_predict.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\lt_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\lt_predict.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\lt_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\lt_predict.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\lt_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\lt_predict.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\lt_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\lt_predict.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\lt_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\lt_predict.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\lt_predict.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\lt_predict.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\mdct.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\mdct_tab.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\mdct.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\mdct_tab.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\mdct.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\mdct_tab.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\mdct.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\mdct_tab.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\mdct.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\mdct_tab.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\mdct.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\mdct_tab.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\mdct.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\mdct_tab.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\mdct.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\mdct_tab.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\mdct.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\mdct_tab.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\mdct.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\mdct_tab.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\mdct.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\mdct_tab.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\mdct.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\mdct_tab.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\mp4.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\mp4.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\mp4.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\mp4.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\mp4.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\mp4.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\mp4.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\mp4.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\mp4.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\mp4.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\mp4.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\mp4.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\mp4.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\ms.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\ms.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\ms.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\ms.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\ms.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\ms.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\ms.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\ms.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\ms.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\ms.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\ms.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\ms.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\is.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\output.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\output.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\output.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\output.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\output.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\output.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\output.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\output.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\output.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\output.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\output.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\output.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\output.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\pns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\pns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\pns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\pns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\pns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\pns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\pns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\pns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\pns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\pns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\pns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\pns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\ps_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\ps_tables.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\ps_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\ps_tables.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\ps_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\ps_tables.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\ps_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\ps_tables.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\ps_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\ps_tables.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\ps_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\ps_tables.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\ps_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\ps_tables.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\ps_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\ps_tables.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\ps_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\ps_tables.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\ps_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\ps_tables.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\ps_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\ps_tables.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\ps_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\ps_tables.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\ps_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\ps_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\ps_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\ps_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\ps_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\ps_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\ps_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\ps_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\ps_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\ps_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\ps_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\ps_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\common.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\pulse.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\pulse.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\pulse.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\pulse.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\pulse.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\pulse.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\pulse.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\pulse.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\pulse.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\pulse.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\pulse.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\pulse.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\rvlc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\rvlc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\rvlc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\rvlc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\rvlc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\rvlc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\rvlc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\rvlc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\rvlc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\rvlc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\rvlc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\rvlc.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\sbr_dct.c : \
+	".\common.h"\
+	".\fixed.h"\
+	".\sbr_dct.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\sbr_dct.c : \
+	".\common.h"\
+	".\fixed.h"\
+	".\sbr_dct.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\sbr_dct.c : \
+	".\common.h"\
+	".\fixed.h"\
+	".\sbr_dct.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\sbr_dct.c : \
+	".\common.h"\
+	".\fixed.h"\
+	".\sbr_dct.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\sbr_dct.c : \
+	".\common.h"\
+	".\fixed.h"\
+	".\sbr_dct.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\sbr_dct.c : \
+	".\common.h"\
+	".\fixed.h"\
+	".\sbr_dct.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\sbr_dct.c : \
+	".\common.h"\
+	".\fixed.h"\
+	".\sbr_dct.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\sbr_dct.c : \
+	".\common.h"\
+	".\fixed.h"\
+	".\sbr_dct.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\sbr_dct.c : \
+	".\common.h"\
+	".\fixed.h"\
+	".\sbr_dct.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\sbr_dct.c : \
+	".\common.h"\
+	".\fixed.h"\
+	".\sbr_dct.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\sbr_dct.c : \
+	".\common.h"\
+	".\fixed.h"\
+	".\sbr_dct.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\sbr_dct.c : \
+	".\common.h"\
+	".\fixed.h"\
+	".\sbr_dct.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\sbr_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_qmf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\sbr_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_qmf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\sbr_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_qmf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\sbr_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_qmf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\sbr_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_qmf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\sbr_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_qmf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\sbr_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_qmf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\sbr_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_qmf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\sbr_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_qmf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\sbr_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_qmf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\sbr_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_qmf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\sbr_dec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_qmf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\sbr_e_nf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\sbr_e_nf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\sbr_e_nf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\sbr_e_nf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\sbr_e_nf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\sbr_e_nf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\sbr_e_nf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\sbr_e_nf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\sbr_e_nf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\sbr_e_nf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\sbr_e_nf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\sbr_e_nf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\sbr_fbt.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\sbr_fbt.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\sbr_fbt.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\sbr_fbt.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\sbr_fbt.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\sbr_fbt.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\sbr_fbt.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\sbr_fbt.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\sbr_fbt.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\sbr_fbt.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\sbr_fbt.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\sbr_fbt.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\sbr_hfadj.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_noise.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\sbr_hfadj.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_noise.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\sbr_hfadj.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_noise.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\sbr_hfadj.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_noise.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\sbr_hfadj.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_noise.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\sbr_hfadj.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_noise.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\sbr_hfadj.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_noise.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\sbr_hfadj.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_noise.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\sbr_hfadj.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_noise.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\sbr_hfadj.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_noise.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\sbr_hfadj.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_noise.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\sbr_hfadj.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_hfadj.h"\
+	".\sbr_noise.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\sbr_hfgen.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\sbr_hfgen.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\sbr_hfgen.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\sbr_hfgen.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\sbr_hfgen.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\sbr_hfgen.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\sbr_hfgen.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\sbr_hfgen.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\sbr_hfgen.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\sbr_hfgen.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\sbr_hfgen.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\sbr_hfgen.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_fbt.h"\
+	".\sbr_hfgen.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\sbr_huff.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\sbr_huff.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\sbr_huff.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\sbr_huff.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\sbr_huff.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\sbr_huff.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\sbr_huff.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\sbr_huff.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\sbr_huff.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\sbr_huff.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\sbr_huff.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\sbr_huff.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\sbr_qmf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dct.h"\
+	".\sbr_dec.h"\
+	".\sbr_qmf.h"\
+	".\sbr_qmf_c.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\sbr_qmf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dct.h"\
+	".\sbr_dec.h"\
+	".\sbr_qmf.h"\
+	".\sbr_qmf_c.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\sbr_qmf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dct.h"\
+	".\sbr_dec.h"\
+	".\sbr_qmf.h"\
+	".\sbr_qmf_c.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\sbr_qmf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dct.h"\
+	".\sbr_dec.h"\
+	".\sbr_qmf.h"\
+	".\sbr_qmf_c.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\sbr_qmf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dct.h"\
+	".\sbr_dec.h"\
+	".\sbr_qmf.h"\
+	".\sbr_qmf_c.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\sbr_qmf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dct.h"\
+	".\sbr_dec.h"\
+	".\sbr_qmf.h"\
+	".\sbr_qmf_c.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\sbr_qmf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dct.h"\
+	".\sbr_dec.h"\
+	".\sbr_qmf.h"\
+	".\sbr_qmf_c.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\sbr_qmf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dct.h"\
+	".\sbr_dec.h"\
+	".\sbr_qmf.h"\
+	".\sbr_qmf_c.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\sbr_qmf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dct.h"\
+	".\sbr_dec.h"\
+	".\sbr_qmf.h"\
+	".\sbr_qmf_c.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\sbr_qmf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dct.h"\
+	".\sbr_dec.h"\
+	".\sbr_qmf.h"\
+	".\sbr_qmf_c.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\sbr_qmf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dct.h"\
+	".\sbr_dec.h"\
+	".\sbr_qmf.h"\
+	".\sbr_qmf_c.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\sbr_qmf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dct.h"\
+	".\sbr_dec.h"\
+	".\sbr_qmf.h"\
+	".\sbr_qmf_c.h"\
+	".\sbr_syntax.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\sbr_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_fbt.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\sbr_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_fbt.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\sbr_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_fbt.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\sbr_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_fbt.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\sbr_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_fbt.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\sbr_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_fbt.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\sbr_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_fbt.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\sbr_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_fbt.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\sbr_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_fbt.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\sbr_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_fbt.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\sbr_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_fbt.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\sbr_syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_e_nf.h"\
+	".\sbr_fbt.h"\
+	".\sbr_huff.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\sbr_tf_grid.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\sbr_tf_grid.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\sbr_tf_grid.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\sbr_tf_grid.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\sbr_tf_grid.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\sbr_tf_grid.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\sbr_tf_grid.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\sbr_tf_grid.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\sbr_tf_grid.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\sbr_tf_grid.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\sbr_tf_grid.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\sbr_tf_grid.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\sbr_tf_grid.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\specrec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\iq_table.h"\
+	".\is.h"\
+	".\lt_predict.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\specrec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\iq_table.h"\
+	".\is.h"\
+	".\lt_predict.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\specrec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\iq_table.h"\
+	".\is.h"\
+	".\lt_predict.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\specrec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\iq_table.h"\
+	".\is.h"\
+	".\lt_predict.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\specrec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\iq_table.h"\
+	".\is.h"\
+	".\lt_predict.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\specrec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\iq_table.h"\
+	".\is.h"\
+	".\lt_predict.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\specrec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\iq_table.h"\
+	".\is.h"\
+	".\lt_predict.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\specrec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\iq_table.h"\
+	".\is.h"\
+	".\lt_predict.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\specrec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\iq_table.h"\
+	".\is.h"\
+	".\lt_predict.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\specrec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\iq_table.h"\
+	".\is.h"\
+	".\lt_predict.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\specrec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\iq_table.h"\
+	".\is.h"\
+	".\lt_predict.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\specrec.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ic_predict.h"\
+	".\iq_table.h"\
+	".\is.h"\
+	".\lt_predict.h"\
+	".\ms.h"\
+	".\pns.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\specrec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\ssr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\ssr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\ssr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\ssr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\ssr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\ssr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\ssr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\ssr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\ssr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\ssr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\ssr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\ssr.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_fb.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\ssr_fb.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr_fb.h"\
+	".\ssr_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\ssr_fb.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr_fb.h"\
+	".\ssr_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\ssr_fb.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr_fb.h"\
+	".\ssr_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\ssr_fb.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr_fb.h"\
+	".\ssr_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\ssr_fb.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr_fb.h"\
+	".\ssr_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\ssr_fb.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr_fb.h"\
+	".\ssr_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\ssr_fb.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr_fb.h"\
+	".\ssr_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\ssr_fb.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr_fb.h"\
+	".\ssr_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\ssr_fb.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr_fb.h"\
+	".\ssr_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\ssr_fb.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr_fb.h"\
+	".\ssr_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\ssr_fb.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr_fb.h"\
+	".\ssr_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\ssr_fb.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\filtbank.h"\
+	".\fixed.h"\
+	".\mdct.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr_fb.h"\
+	".\ssr_win.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\ssr_ipqf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_ipqf.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\ssr_ipqf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_ipqf.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\ssr_ipqf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_ipqf.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\ssr_ipqf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_ipqf.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\ssr_ipqf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_ipqf.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\ssr_ipqf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_ipqf.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\ssr_ipqf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_ipqf.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\ssr_ipqf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_ipqf.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\ssr_ipqf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_ipqf.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\ssr_ipqf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_ipqf.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\ssr_ipqf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_ipqf.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\ssr_ipqf.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\ssr.h"\
+	".\ssr_ipqf.h"\
+	".\structs.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\syntax.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drc.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\huffman.h"\
+	".\ps_dec.h"\
+	".\pulse.h"\
+	".\rvlc.h"\
+	".\sbr_dec.h"\
+	".\sbr_syntax.h"\
+	".\specrec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Release"
+
+.\tns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH4) Debug"
+
+.\tns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Release"
+
+.\tns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE SH3) Debug"
+
+.\tns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE CEF) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Release"
+
+.\tns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86) Debug"
+
+.\tns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release"
+
+.\tns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Debug"
+
+.\tns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Release"
+
+.\tns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE emulator) Debug"
+
+.\tns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) ReleaseXScale"
+
+.\tns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libfaad - Win32 (WCE ARMV4) Release64"
+
+.\tns.c : \
+	".\analysis.h"\
+	".\bits.h"\
+	".\cfft.h"\
+	".\common.h"\
+	".\decoder.h"\
+	".\drm_dec.h"\
+	".\fixed.h"\
+	".\ps_dec.h"\
+	".\sbr_dec.h"\
+	".\structs.h"\
+	".\syntax.h"\
+	".\tns.h"\
+	{$(INCLUDE)}"cmnintrin.h"\
+	
+
+!ENDIF 
+

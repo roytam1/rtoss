@@ -1,0 +1,3 @@
+LIBRARY	gspmp4
+EXPORTS mapGetDecoder
+
