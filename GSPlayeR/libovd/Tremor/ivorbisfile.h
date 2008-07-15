@@ -26,8 +26,7 @@ extern "C"
 #include <stdio.h>
 #include "ivorbiscodec.h"
 
-#define CHUNKSIZE 8192
-
+#define CHUNKSIZE 1024
 /* The function prototypes for the callbacks are basically the same as for
  * the stdio functions fread, fseek, fclose, ftell. 
  * The one difference is that the FILE * arguments have been replaced with
@@ -56,14 +55,14 @@ typedef struct OggVorbis_File {
   int              seekable;
   ogg_int64_t      offset;
   ogg_int64_t      end;
-  ogg_sync_state   oy; 
+  ogg_sync_state   *oy; 
 
   /* If the FILE handle isn't seekable (eg, a pipe), only the current
      stream appears */
   int              links;
   ogg_int64_t     *offsets;
   ogg_int64_t     *dataoffsets;
-  long            *serialnos;
+  ogg_uint32_t    *serialnos;
   ogg_int64_t     *pcmlengths;
   vorbis_info     *vi;
   vorbis_comment  *vc;
@@ -71,13 +70,13 @@ typedef struct OggVorbis_File {
   /* Decoding working state local storage */
   ogg_int64_t      pcm_offset;
   int              ready_state;
-  long             current_serialno;
+  ogg_uint32_t     current_serialno;
   int              current_link;
 
   ogg_int64_t      bittrack;
   ogg_int64_t      samptrack;
 
-  ogg_stream_state os; /* take physical pages, weld into a logical
+  ogg_stream_state *os; /* take physical pages, weld into a logical
                           stream of packets */
   vorbis_dsp_state vd; /* central working state for the packet->PCM decoder */
   vorbis_block     vb; /* local working space for packet->PCM decode */
@@ -106,7 +105,7 @@ extern ogg_int64_t ov_raw_total(OggVorbis_File *vf,int i);
 extern ogg_int64_t ov_pcm_total(OggVorbis_File *vf,int i);
 extern ogg_int64_t ov_time_total(OggVorbis_File *vf,int i);
 
-extern int ov_raw_seek(OggVorbis_File *vf,long pos);
+extern int ov_raw_seek(OggVorbis_File *vf,ogg_int64_t pos);
 extern int ov_pcm_seek(OggVorbis_File *vf,ogg_int64_t pos);
 extern int ov_pcm_seek_page(OggVorbis_File *vf,ogg_int64_t pos);
 extern int ov_time_seek(OggVorbis_File *vf,ogg_int64_t pos);

@@ -24,7 +24,7 @@
 #include "registry.h"
 #include "codebook.h"
 #include "misc.h"
-#include "os.h"
+#include "block.h"
 
 #define LSP_FRACBITS 14
 
@@ -343,7 +343,6 @@ static vorbis_info_floor *floor0_unpack (vorbis_info *vi,oggpack_buffer *opb){
 static vorbis_look_floor *floor0_look (vorbis_dsp_state *vd,vorbis_info_mode *mi,
                               vorbis_info_floor *i){
   int j;
-  ogg_int32_t scale; 
   vorbis_info        *vi=vd->vi;
   codec_setup_info   *ci=(codec_setup_info *)vi->codec_setup;
   vorbis_info_floor0 *info=(vorbis_info_floor0 *)i;

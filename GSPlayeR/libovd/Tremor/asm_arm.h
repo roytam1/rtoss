@@ -20,7 +20,7 @@
 #if !defined(_V_WIDE_MATH) && !defined(_LOW_ACCURACY_)
 #define _V_WIDE_MATH
 
-STIN ogg_int32_t MULT32(ogg_int32_t x, ogg_int32_t y) {
+static inline ogg_int32_t MULT32(ogg_int32_t x, ogg_int32_t y) {
   int lo,hi;
   asm volatile("smull\t%0, %1, %2, %3"
                : "=&r"(lo),"=&r"(hi)
@@ -29,11 +29,11 @@ STIN ogg_int32_t MULT32(ogg_int32_t x, ogg_int32_t y) {
   return(hi);
 }
 
-STIN ogg_int32_t MULT31(ogg_int32_t x, ogg_int32_t y) {
+static inline ogg_int32_t MULT31(ogg_int32_t x, ogg_int32_t y) {
   return MULT32(x,y)<<1;
 }
 
-STIN ogg_int32_t MULT31_SHIFT15(ogg_int32_t x, ogg_int32_t y) {
+static inline ogg_int32_t MULT31_SHIFT15(ogg_int32_t x, ogg_int32_t y) {
   int lo,hi;
   asm volatile("smull	%0, %1, %2, %3\n\t"
 	       "movs	%0, %0, lsr #15\n\t"
@@ -46,7 +46,7 @@ STIN ogg_int32_t MULT31_SHIFT15(ogg_int32_t x, ogg_int32_t y) {
 
 #define MB() asm volatile ("" : : : "memory")
 
-STIN void XPROD32(ogg_int32_t  a, ogg_int32_t  b,
+static inline void XPROD32(ogg_int32_t  a, ogg_int32_t  b,
 			   ogg_int32_t  t, ogg_int32_t  v,
 			   ogg_int32_t *x, ogg_int32_t *y)
 {
@@ -64,7 +64,7 @@ STIN void XPROD32(ogg_int32_t  a, ogg_int32_t  b,
   *y = y1;
 }
 
-STIN void XPROD31(ogg_int32_t  a, ogg_int32_t  b,
+static inline void XPROD31(ogg_int32_t  a, ogg_int32_t  b,
 			   ogg_int32_t  t, ogg_int32_t  v,
 			   ogg_int32_t *x, ogg_int32_t *y)
 {
@@ -82,7 +82,7 @@ STIN void XPROD31(ogg_int32_t  a, ogg_int32_t  b,
   *y = y1 << 1;
 }
 
-STIN void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
+static inline void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
 			    ogg_int32_t  t, ogg_int32_t  v,
 			    ogg_int32_t *x, ogg_int32_t *y)
 {
@@ -105,7 +105,7 @@ STIN void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
 #ifndef _V_CLIP_MATH
 #define _V_CLIP_MATH
 
-STIN ogg_int32_t CLIP_TO_15(ogg_int32_t x) {
+static inline ogg_int32_t CLIP_TO_15(ogg_int32_t x) {
   int tmp;
   asm volatile("subs	%1, %0, #32768\n\t"
 	       "movpl	%0, #0x7f00\n\t"
@@ -123,7 +123,7 @@ STIN ogg_int32_t CLIP_TO_15(ogg_int32_t x) {
 #ifndef _V_LSP_MATH_ASM
 #define _V_LSP_MATH_ASM
 
-STIN void lsp_loop_asm(ogg_uint32_t *qip,ogg_uint32_t *pip,
+static inline void lsp_loop_asm(ogg_uint32_t *qip,ogg_uint32_t *pip,
 				ogg_int32_t *qexpp,
 				ogg_int32_t *ilsp,ogg_int32_t wi,
 				ogg_int32_t m){
@@ -214,7 +214,7 @@ STIN void lsp_loop_asm(ogg_uint32_t *qip,ogg_uint32_t *pip,
   *qexpp=qexp;
 }
 
-STIN void lsp_norm_asm(ogg_uint32_t *qip,ogg_int32_t *qexpp){
+static inline void lsp_norm_asm(ogg_uint32_t *qip,ogg_int32_t *qexpp){
 
   ogg_uint32_t qi=*qip;
   ogg_int32_t qexp=*qexpp;

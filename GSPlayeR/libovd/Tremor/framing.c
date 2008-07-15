@@ -6,13 +6,12 @@
  * GOVERNED BY A BSD-STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE *
  * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
  *                                                                  *
- * THE OggVorbis 'TREMOR' SOURCE CODE IS (C) COPYRIGHT 1994-2002    *
+ * THE OggVorbis 'TREMOR' SOURCE CODE IS (C) COPYRIGHT 1994-2003    *
  * BY THE Xiph.Org FOUNDATION http://www.xiph.org/                  *
  *                                                                  *
  ********************************************************************
 
- function: code raw [Vorbis] packets into framed OggSquish stream and
-           decode Ogg streams back into raw packets
+ function: decode Ogg streams back into raw packets
 
  note: The CRC code is directly derived from public domain code by
  Ross Williams (ross@guest.adelaide.edu.au).  See docs/framing.html
@@ -23,53 +22,450 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ogg.h"
+#include "misc.h"
+
 
 /* A complete description of Ogg framing exists in docs/framing.html */
 
+/* basic, centralized Ogg memory management based on linked lists of
+   references to refcounted memory buffers.  References and buffers
+   are both recycled.  Buffers are passed around and consumed in
+   reference form. */
+
+static ogg_buffer_state *ogg_buffer_create(void){
+  ogg_buffer_state *bs=_ogg_calloc(1,sizeof(*bs));
+  return bs;
+}
+
+/* destruction is 'lazy'; there may be memory references outstanding,
+   and yanking the buffer state out from underneath would be
+   antisocial.  Dealloc what is currently unused and have
+   _release_one watch for the stragglers to come in.  When they do,
+   finish destruction. */
+
+/* call the helper while holding lock */
+static void _ogg_buffer_destroy(ogg_buffer_state *bs){
+  ogg_buffer *bt;
+  ogg_reference *rt;
+
+  if(bs->shutdown){
+
+    bt=bs->unused_buffers;
+    rt=bs->unused_references;
+
+    while(bt){
+      ogg_buffer *b=bt;
+      bt=b->ptr.next;
+      if(b->data)_ogg_free(b->data);
+      _ogg_free(b);
+    }
+    bs->unused_buffers=0;
+    while(rt){
+      ogg_reference *r=rt;
+      rt=r->next;
+      _ogg_free(r);
+    }
+    bs->unused_references=0;
+
+    if(!bs->outstanding)
+      _ogg_free(bs);
+
+  }
+}
+
+static void ogg_buffer_destroy(ogg_buffer_state *bs){
+  bs->shutdown=1;
+  _ogg_buffer_destroy(bs);
+}
+
+static ogg_buffer *_fetch_buffer(ogg_buffer_state *bs,long bytes){
+  ogg_buffer    *ob;
+  bs->outstanding++;
+
+  /* do we have an unused buffer sitting in the pool? */
+  if(bs->unused_buffers){
+    ob=bs->unused_buffers;
+    bs->unused_buffers=ob->ptr.next;
+
+    /* if the unused buffer is too small, grow it */
+    if(ob->size<bytes){
+      ob->data=_ogg_realloc(ob->data,bytes);
+      ob->size=bytes;
+    }
+  }else{
+    /* allocate a new buffer */
+    ob=_ogg_malloc(sizeof(*ob));
+    ob->data=_ogg_malloc(bytes<16?16:bytes);
+    ob->size=bytes;
+  }
+
+  ob->refcount=1;
+  ob->ptr.owner=bs;
+  return ob;
+}
+
+static ogg_reference *_fetch_ref(ogg_buffer_state *bs){
+  ogg_reference *or;
+  bs->outstanding++;
+
+  /* do we have an unused reference sitting in the pool? */
+  if(bs->unused_references){
+    or=bs->unused_references;
+    bs->unused_references=or->next;
+  }else{
+    /* allocate a new reference */
+    or=_ogg_malloc(sizeof(*or));
+  }
+
+  or->begin=0;
+  or->length=0;
+  or->next=0;
+  return or;
+}
+
+/* fetch a reference pointing to a fresh, initially continguous buffer
+   of at least [bytes] length */
+static ogg_reference *ogg_buffer_alloc(ogg_buffer_state *bs,long bytes){
+  ogg_buffer    *ob=_fetch_buffer(bs,bytes);
+  ogg_reference *or=_fetch_ref(bs);
+  or->buffer=ob;
+  return or;
+}
+
+/* enlarge the data buffer in the current link */
+static void ogg_buffer_realloc(ogg_reference *or,long bytes){
+  ogg_buffer    *ob=or->buffer;
+  
+  /* if the unused buffer is too small, grow it */
+  if(ob->size<bytes){
+    ob->data=_ogg_realloc(ob->data,bytes);
+    ob->size=bytes;
+  }
+}
+
+static void _ogg_buffer_mark_one(ogg_reference *or){
+  or->buffer->refcount++;
+}
+
+/* increase the refcount of the buffers to which the reference points */
+static void ogg_buffer_mark(ogg_reference *or){
+  while(or){
+    _ogg_buffer_mark_one(or);
+    or=or->next;
+  }
+}
+
+/* duplicate a reference (pointing to the same actual buffer memory)
+   and increment buffer refcount.  If the desired segment begins out
+   of range, NULL is returned; if the desired segment is simply zero
+   length, a zero length ref is returned.  Partial range overlap
+   returns the overlap of the ranges */
+static ogg_reference *ogg_buffer_sub(ogg_reference *or,long begin,long length){
+  ogg_reference *ret=0,*head=0;
+
+  /* walk past any preceeding fragments we don't want */
+  while(or && begin>=or->length){
+    begin-=or->length;
+    or=or->next;
+  }
+
+  /* duplicate the reference chain; increment refcounts */
+  while(or && length){
+    ogg_reference *temp=_fetch_ref(or->buffer->ptr.owner);
+    if(head)
+      head->next=temp;
+    else
+      ret=temp;
+    head=temp;
+    head->buffer=or->buffer;    
+    head->begin=or->begin+begin;
+    head->length=length;
+    if(head->length>or->length-begin)
+      head->length=or->length-begin;
+    
+    begin=0;
+    length-=head->length;
+    or=or->next;
+  }
+
+  ogg_buffer_mark(ret);
+  return ret;
+}
+
+ogg_reference *ogg_buffer_dup(ogg_reference *or){
+  ogg_reference *ret=0,*head=0;
+  /* duplicate the reference chain; increment refcounts */
+  while(or){
+    ogg_reference *temp=_fetch_ref(or->buffer->ptr.owner);
+    if(head)
+      head->next=temp;
+    else
+      ret=temp;
+    head=temp;
+    head->buffer=or->buffer;    
+    head->begin=or->begin;
+    head->length=or->length;
+    or=or->next;
+  }
+
+  ogg_buffer_mark(ret);
+  return ret;
+}
+
+/* split a reference into two references; 'return' is a reference to
+   the buffer preceeding pos and 'head'/'tail' are the buffer past the
+   split.  If pos is at or past the end of the passed in segment,
+   'head/tail' are NULL */
+static ogg_reference *ogg_buffer_split(ogg_reference **tail,
+                                ogg_reference **head,long pos){
+
+  /* walk past any preceeding fragments to one of:
+     a) the exact boundary that seps two fragments
+     b) the fragment that needs split somewhere in the middle */
+  ogg_reference *ret=*tail;
+  ogg_reference *or=*tail;
+
+  while(or && pos>or->length){
+    pos-=or->length;
+    or=or->next;
+  }
+
+  if(!or || pos==0){
+
+    return 0;
+    
+  }else{
+    
+    if(pos>=or->length){
+      /* exact split, or off the end? */
+      if(or->next){
+        
+        /* a split */
+        *tail=or->next;
+        or->next=0;
+        
+      }else{
+        
+        /* off or at the end */
+        *tail=*head=0;
+        
+      }
+    }else{
+      
+      /* split within a fragment */
+      long lengthA=pos;
+      long beginB=or->begin+pos;
+      long lengthB=or->length-pos;
+      
+      /* make a new reference to tail the second piece */
+      *tail=_fetch_ref(or->buffer->ptr.owner);
+      
+      (*tail)->buffer=or->buffer;
+      (*tail)->begin=beginB;
+      (*tail)->length=lengthB;
+      (*tail)->next=or->next;
+      _ogg_buffer_mark_one(*tail);
+      if(head && or==*head)*head=*tail;    
+      
+      /* update the first piece */
+      or->next=0;
+      or->length=lengthA;
+      
+    }
+  }
+  return ret;
+}
+
+static void ogg_buffer_release_one(ogg_reference *or){
+  ogg_buffer *ob=or->buffer;
+  ogg_buffer_state *bs=ob->ptr.owner;
+
+  ob->refcount--;
+  if(ob->refcount==0){
+    bs->outstanding--; /* for the returned buffer */
+    ob->ptr.next=bs->unused_buffers;
+    bs->unused_buffers=ob;
+  }
+  
+  bs->outstanding--; /* for the returned reference */
+  or->next=bs->unused_references;
+  bs->unused_references=or;
+
+  _ogg_buffer_destroy(bs); /* lazy cleanup (if needed) */
+
+}
+
+/* release the references, decrease the refcounts of buffers to which
+   they point, release any buffers with a refcount that drops to zero */
+static void ogg_buffer_release(ogg_reference *or){
+  while(or){
+    ogg_reference *next=or->next;
+    ogg_buffer_release_one(or);
+    or=next;
+  }
+}
+
+static ogg_reference *ogg_buffer_pretruncate(ogg_reference *or,long pos){
+  /* release preceeding fragments we don't want */
+  while(or && pos>=or->length){
+    ogg_reference *next=or->next;
+    pos-=or->length;
+    ogg_buffer_release_one(or);
+    or=next;
+  }
+  if (or) {
+    or->begin+=pos;
+    or->length-=pos;
+  }
+  return or;
+}
+
+static ogg_reference *ogg_buffer_walk(ogg_reference *or){
+  if(!or)return NULL;
+  while(or->next){
+    or=or->next;
+  }
+  return(or);
+}
+
+/* *head is appended to the front end (head) of *tail; both continue to
+   be valid pointers, with *tail at the tail and *head at the head */
+static ogg_reference *ogg_buffer_cat(ogg_reference *tail, ogg_reference *head){
+  if(!tail)return head;
+
+  while(tail->next){
+    tail=tail->next;
+  }
+  tail->next=head;
+  return ogg_buffer_walk(head);
+}
+
+static void _positionB(oggbyte_buffer *b,int pos){
+  if(pos<b->pos){
+    /* start at beginning, scan forward */
+    b->ref=b->baseref;
+    b->pos=0;
+    b->end=b->pos+b->ref->length;
+    b->ptr=b->ref->buffer->data+b->ref->begin;
+  }
+}
+
+static void _positionF(oggbyte_buffer *b,int pos){
+  /* scan forward for position */
+  while(pos>=b->end){
+    /* just seek forward */
+    b->pos+=b->ref->length;
+    b->ref=b->ref->next;
+    b->end=b->ref->length+b->pos;
+    b->ptr=b->ref->buffer->data+b->ref->begin;
+  }
+}
+
+static int oggbyte_init(oggbyte_buffer *b,ogg_reference *or){
+  memset(b,0,sizeof(*b));
+  if(or){
+    b->ref=b->baseref=or;
+    b->pos=0;
+    b->end=b->ref->length;
+    b->ptr=b->ref->buffer->data+b->ref->begin;  
+    return 0;
+  }else
+    return -1;
+}
+
+static void oggbyte_set4(oggbyte_buffer *b,ogg_uint32_t val,int pos){
+  int i;
+  _positionB(b,pos);
+  for(i=0;i<4;i++){
+    _positionF(b,pos);
+    b->ptr[pos-b->pos]=val;
+    val>>=8;
+    ++pos;
+  }
+}
+ 
+static unsigned char oggbyte_read1(oggbyte_buffer *b,int pos){
+  _positionB(b,pos);
+  _positionF(b,pos);
+  return b->ptr[pos-b->pos];
+}
+
+static ogg_uint32_t oggbyte_read4(oggbyte_buffer *b,int pos){
+  ogg_uint32_t ret;
+  _positionB(b,pos);
+  _positionF(b,pos);
+  ret=b->ptr[pos-b->pos];
+  _positionF(b,++pos);
+  ret|=b->ptr[pos-b->pos]<<8;
+  _positionF(b,++pos);
+  ret|=b->ptr[pos-b->pos]<<16;
+  _positionF(b,++pos);
+  ret|=b->ptr[pos-b->pos]<<24;
+  return ret;
+}
+
+static ogg_int64_t oggbyte_read8(oggbyte_buffer *b,int pos){
+  ogg_int64_t ret;
+  unsigned char t[7];
+  int i;
+  _positionB(b,pos);
+  for(i=0;i<7;i++){
+    _positionF(b,pos);
+    t[i]=b->ptr[pos++ -b->pos];
+  }
+
+  _positionF(b,pos);
+  ret=b->ptr[pos-b->pos];
+
+  for(i=6;i>=0;--i)
+    ret= ret<<8 | t[i];
+
+  return ret;
+}
+
+/* Now we get to the actual framing code */
+
 int ogg_page_version(ogg_page *og){
-  return((int)(og->header[4]));
+  oggbyte_buffer ob;
+  oggbyte_init(&ob,og->header);
+  return oggbyte_read1(&ob,4);
 }
 
 int ogg_page_continued(ogg_page *og){
-  return((int)(og->header[5]&0x01));
+  oggbyte_buffer ob;
+  oggbyte_init(&ob,og->header);
+  return oggbyte_read1(&ob,5)&0x01;
 }
 
 int ogg_page_bos(ogg_page *og){
-  return((int)(og->header[5]&0x02));
+  oggbyte_buffer ob;
+  oggbyte_init(&ob,og->header);
+  return oggbyte_read1(&ob,5)&0x02;
 }
 
 int ogg_page_eos(ogg_page *og){
-  return((int)(og->header[5]&0x04));
+  oggbyte_buffer ob;
+  oggbyte_init(&ob,og->header);
+  return oggbyte_read1(&ob,5)&0x04;
 }
 
 ogg_int64_t ogg_page_granulepos(ogg_page *og){
-  unsigned char *page=og->header;
-  ogg_int64_t granulepos=page[13]&(0xff);
-  granulepos= (granulepos<<8)|(page[12]&0xff);
-  granulepos= (granulepos<<8)|(page[11]&0xff);
-  granulepos= (granulepos<<8)|(page[10]&0xff);
-  granulepos= (granulepos<<8)|(page[9]&0xff);
-  granulepos= (granulepos<<8)|(page[8]&0xff);
-  granulepos= (granulepos<<8)|(page[7]&0xff);
-  granulepos= (granulepos<<8)|(page[6]&0xff);
-  return(granulepos);
+  oggbyte_buffer ob;
+  oggbyte_init(&ob,og->header);
+  return oggbyte_read8(&ob,6);
 }
 
-int ogg_page_serialno(ogg_page *og){
-  return(og->header[14] |
-	 (og->header[15]<<8) |
-	 (og->header[16]<<16) |
-	 (og->header[17]<<24));
+ogg_uint32_t ogg_page_serialno(ogg_page *og){
+  oggbyte_buffer ob;
+  oggbyte_init(&ob,og->header);
+  return oggbyte_read4(&ob,14);
 }
  
-long ogg_page_pageno(ogg_page *og){
-  return(og->header[18] |
-	 (og->header[19]<<8) |
-	 (og->header[20]<<16) |
-	 (og->header[21]<<24));
+ogg_uint32_t ogg_page_pageno(ogg_page *og){
+  oggbyte_buffer ob;
+  oggbyte_init(&ob,og->header);
+  return oggbyte_read4(&ob,18);
 }
-
-
 
 /* returns the number of packets that are completed on this page (if
    the leading packet is begun on a previous page, but ends on this
@@ -89,13 +485,22 @@ more page packet), the return will be:
 */
 
 int ogg_page_packets(ogg_page *og){
-  int i,n=og->header[26],count=0;
+  int i;
+  int n;
+  int count=0;
+  oggbyte_buffer ob;
+  oggbyte_init(&ob,og->header);
+
+  n=oggbyte_read1(&ob,26);
   for(i=0;i<n;i++)
-    if(og->header[27+i]<255)count++;
+    if(oggbyte_read1(&ob,27+i)<255)count++;
   return(count);
 }
 
-static const ogg_uint32_t crc_lookup[256]={
+/* Static CRC calculation table.  See older code in CVS for dead
+   run-time initialization code. */
+
+static ogg_uint32_t crc_lookup[256]={
   0x00000000,0x04c11db7,0x09823b6e,0x0d4326d9,
   0x130476dc,0x17c56b6b,0x1a864db2,0x1e475005,
   0x2608edb8,0x22c9f00f,0x2f8ad6d6,0x2b4bcb61,
@@ -161,190 +566,92 @@ static const ogg_uint32_t crc_lookup[256]={
   0xafb010b1,0xab710d06,0xa6322bdf,0xa2f33668,
   0xbcb4666d,0xb8757bda,0xb5365d03,0xb1f740b4};
 
-/* init the encode/decode logical stream state */
-
-int ogg_stream_init(ogg_stream_state *os,int serialno){
-  if(os){
-    memset(os,0,sizeof(*os));
-    os->body_storage=6*1024;
-    os->body_data=(unsigned char *)_ogg_malloc(os->body_storage*sizeof(*os->body_data));
-
-    os->lacing_storage=128;
-    os->lacing_vals=(int *)_ogg_malloc(os->lacing_storage*sizeof(*os->lacing_vals));
-    os->granule_vals=(ogg_int64_t *)_ogg_malloc(os->lacing_storage*sizeof(*os->granule_vals));
-
-    os->serialno=serialno;
-
-    return(0);
-  }
-  return(-1);
-} 
-
-/* _clear does not free os, only the non-flat storage within */
-int ogg_stream_clear(ogg_stream_state *os){
-  if(os){
-    if(os->body_data)_ogg_free(os->body_data);
-    if(os->lacing_vals)_ogg_free(os->lacing_vals);
-    if(os->granule_vals)_ogg_free(os->granule_vals);
-
-    memset(os,0,sizeof(*os));    
-  }
-  return(0);
-} 
-
-int ogg_stream_destroy(ogg_stream_state *os){
-  if(os){
-    ogg_stream_clear(os);
-    _ogg_free(os);
-  }
-  return(0);
-} 
-
-/* Helpers for ogg_stream_encode; this keeps the structure and
-   what's happening fairly clear */
-
-static void _os_body_expand(ogg_stream_state *os,int needed){
-  /* can we shift first? */
-  if(os->body_storage<=os->body_fill+needed){
-    long br=os->body_returned;
-    
-    os->body_fill-=br;
-    if(os->body_fill)
-      memmove(os->body_data,os->body_data+br,os->body_fill);
-    os->body_returned=0;
-  }
-
-  /* still need more? */
-  if(os->body_storage<=os->body_fill+needed){
-    os->body_storage+=(needed+1024);
-    os->body_data=(unsigned char *)_ogg_realloc(os->body_data,os->body_storage*sizeof(*os->body_data));
-  }
-}
-
-static void _os_lacing_expand(ogg_stream_state *os,int needed){
-
-  /* first check for a shift */
-  if(os->lacing_storage<=os->lacing_fill+needed){
-    long lr=os->lacing_returned;
-
-    /* segment table */
-    if(os->lacing_fill-lr){
-      memmove(os->lacing_vals,os->lacing_vals+lr,
-	      (os->lacing_fill-lr)*sizeof(*os->lacing_vals));
-      memmove(os->granule_vals,os->granule_vals+lr,
-	      (os->lacing_fill-lr)*sizeof(*os->granule_vals));
-    }
-    os->lacing_fill-=lr;
-    os->lacing_packet-=lr;
-    os->lacing_returned=0;
-  }
-  
-  /* not enough?  *now* realloc */
-  if(os->lacing_storage<=os->lacing_fill+needed){
-    os->lacing_storage+=(needed+32);
-    os->lacing_vals=(int *)_ogg_realloc(os->lacing_vals,os->lacing_storage*sizeof(*os->lacing_vals));
-    os->granule_vals=(ogg_int64_t *)_ogg_realloc(os->granule_vals,os->lacing_storage*sizeof(*os->granule_vals));
-  }
-}
-
-/* checksum the page */
-/* Direct table CRC; note that this will be faster in the future if we
-   perform the checksum silmultaneously with other copies */
-
-void ogg_page_checksum_set(ogg_page *og){
-  if(og){
-    ogg_uint32_t crc_reg=0;
-    int i;
-
-    /* safety; needed for API behavior, but not framing code */
-    og->header[22]=0;
-    og->header[23]=0;
-    og->header[24]=0;
-    og->header[25]=0;
-    
-    for(i=0;i<og->header_len;i++)
-      crc_reg=(crc_reg<<8)^crc_lookup[((crc_reg >> 24)&0xff)^og->header[i]];
-    for(i=0;i<og->body_len;i++)
-      crc_reg=(crc_reg<<8)^crc_lookup[((crc_reg >> 24)&0xff)^og->body[i]];
-    
-    og->header[22]=crc_reg&0xff;
-    og->header[23]=(crc_reg>>8)&0xff;
-    og->header[24]=(crc_reg>>16)&0xff;
-    og->header[25]=(crc_reg>>24)&0xff;
-  }
-}
-
-/* DECODING PRIMITIVES: packet streaming layer **********************/
-
-/* This has two layers to place more of the multi-serialno and paging
-   control in the application's hands.  First, we expose a data buffer
-   using ogg_sync_buffer().  The app either copies into the
-   buffer, or passes it directly to read(), etc.  We then call
-   ogg_sync_wrote() to tell how many bytes we just added.
-
-   Pages are returned (pointers into the buffer in ogg_sync_state)
-   by ogg_sync_pageout().  The page is then submitted to
-   ogg_stream_pagein() along with the appropriate
-   ogg_stream_state* (ie, matching serialno).  We then get raw
-   packets out calling ogg_stream_packetout() with a
-   ogg_stream_state.  See the 'frame-prog.txt' docs for details and
-   example code. */
-
-/* initialize the struct to a known state */
-int ogg_sync_init(ogg_sync_state *oy){
-  if(oy){
-    memset(oy,0,sizeof(*oy));
-  }
-  return(0);
-}
-
-/* clear non-flat storage within */
-int ogg_sync_clear(ogg_sync_state *oy){
-  if(oy){
-    if(oy->data)_ogg_free(oy->data);
-    ogg_sync_init(oy);
-  }
-  return(0);
+ogg_sync_state *ogg_sync_create(void){
+  ogg_sync_state *oy=_ogg_calloc(1,sizeof(*oy));
+  memset(oy,0,sizeof(*oy));
+  oy->bufferpool=ogg_buffer_create();
+  return oy;
 }
 
 int ogg_sync_destroy(ogg_sync_state *oy){
   if(oy){
-    ogg_sync_clear(oy);
+    ogg_sync_reset(oy);
+    ogg_buffer_destroy(oy->bufferpool);
+    memset(oy,0,sizeof(*oy));
     _ogg_free(oy);
   }
-  return(0);
+  return OGG_SUCCESS;
 }
 
-char *ogg_sync_buffer(ogg_sync_state *oy, long size){
+unsigned char *ogg_sync_bufferin(ogg_sync_state *oy, long bytes){
 
-  /* first, clear out any space that has been previously returned */
-  if(oy->returned>8192){
-    oy->fill-=oy->returned;
-    if(oy->fill>0)
-      memmove(oy->data,oy->data+oy->returned,oy->fill);
-    oy->returned=0;
+  /* [allocate and] expose a buffer for data submission.
+
+     If there is no head fragment
+       allocate one and expose it
+     else
+       if the current head fragment has sufficient unused space
+         expose it
+       else
+         if the current head fragment is unused
+           resize and expose it
+         else
+           allocate new fragment and expose it
+  */
+
+  /* base case; fifo uninitialized */
+  if(!oy->fifo_head){
+    oy->fifo_head=oy->fifo_tail=ogg_buffer_alloc(oy->bufferpool,bytes);
+    return oy->fifo_head->buffer->data;
+  }
+  
+  /* space left in current fragment case */
+  if(oy->fifo_head->buffer->size-
+     oy->fifo_head->length-
+     oy->fifo_head->begin >= bytes)
+    return oy->fifo_head->buffer->data+
+      oy->fifo_head->length+oy->fifo_head->begin;
+
+  /* current fragment is unused, but too small */
+  if(!oy->fifo_head->length){
+    ogg_buffer_realloc(oy->fifo_head,bytes);
+    return oy->fifo_head->buffer->data+oy->fifo_head->begin;
+  }
+  
+  /* current fragment used/full; get new fragment */
+  {
+    ogg_reference *new=ogg_buffer_alloc(oy->bufferpool,bytes);
+    oy->fifo_head->next=new;
+    oy->fifo_head=new;
+  }
+  return oy->fifo_head->buffer->data;
+}
+
+int ogg_sync_wrote(ogg_sync_state *oy, long bytes){ 
+  if(!oy->fifo_head)return OGG_EINVAL;
+  if(oy->fifo_head->buffer->size-oy->fifo_head->length-oy->fifo_head->begin < 
+     bytes)return OGG_EINVAL;
+  oy->fifo_head->length+=bytes;
+  oy->fifo_fill+=bytes;
+  return OGG_SUCCESS;
+}
+
+static ogg_uint32_t _checksum(ogg_reference *or, int bytes){
+  ogg_uint32_t crc_reg=0;
+  int j,post;
+
+  while(or){
+    unsigned char *data=or->buffer->data+or->begin;
+    post=(bytes<or->length?bytes:or->length);
+    for(j=0;j<post;++j)
+      crc_reg=(crc_reg<<8)^crc_lookup[((crc_reg >> 24)&0xff)^data[j]];
+    bytes-=j;
+    or=or->next;
   }
 
-  if(size>oy->storage-oy->fill){
-    /* We need to extend the internal buffer */
-    long newsize=size+oy->fill+4096; /* an extra page to be nice */
-
-    if(oy->data)
-      oy->data=(unsigned char *)_ogg_realloc(oy->data,newsize);
-    else
-      oy->data=(unsigned char *)_ogg_malloc(newsize);
-    oy->storage=newsize;
-  }
-
-  /* expose a segment at least as large as requested at the fill mark */
-  return((char *)oy->data+oy->fill);
+  return crc_reg;
 }
 
-int ogg_sync_wrote(ogg_sync_state *oy, long bytes){
-  if(oy->fill+bytes>oy->storage)return(-1);
-  oy->fill+=bytes;
-  return(0);
-}
 
 /* sync the stream.  This is meant to be useful for finding page
    boundaries.
@@ -357,97 +664,117 @@ int ogg_sync_wrote(ogg_sync_state *oy, long bytes){
 */
 
 long ogg_sync_pageseek(ogg_sync_state *oy,ogg_page *og){
-  unsigned char *page=oy->data+oy->returned;
-  unsigned char *next;
-  long bytes=oy->fill-oy->returned;
-  
+  oggbyte_buffer page;
+  long           bytes,ret=0;
+
+  ogg_page_release(og);
+
+  bytes=oy->fifo_fill;
+  oggbyte_init(&page,oy->fifo_tail);
+
   if(oy->headerbytes==0){
-    int headerbytes,i;
-    if(bytes<27)return(0); /* not enough for a header */
+    if(bytes<27)goto sync_out; /* not enough for even a minimal header */
     
     /* verify capture pattern */
-    if(memcmp(page,"OggS",4))goto sync_fail;
-    
-    headerbytes=page[26]+27;
-    if(bytes<headerbytes)return(0); /* not enough for header + seg table */
-    
+    if(oggbyte_read1(&page,0)!=(int)'O' ||
+       oggbyte_read1(&page,1)!=(int)'g' ||
+       oggbyte_read1(&page,2)!=(int)'g' ||
+       oggbyte_read1(&page,3)!=(int)'S'    ) goto sync_fail;
+
+    oy->headerbytes=oggbyte_read1(&page,26)+27;
+  }
+  if(bytes<oy->headerbytes)goto sync_out; /* not enough for header +
+                                             seg table */
+  if(oy->bodybytes==0){
+    int i;
     /* count up body length in the segment table */
-    
-    for(i=0;i<page[26];i++)
-      oy->bodybytes+=page[27+i];
-    oy->headerbytes=headerbytes;
+    for(i=0;i<oy->headerbytes-27;i++)
+      oy->bodybytes+=oggbyte_read1(&page,27+i);
   }
   
-  if(oy->bodybytes+oy->headerbytes>bytes)return(0);
-  
-  /* The whole test page is buffered.  Verify the checksum */
+  if(oy->bodybytes+oy->headerbytes>bytes)goto sync_out;
+
+  /* we have what appears to be a complete page; last test: verify
+     checksum */
   {
-    /* Grab the checksum bytes, set the header field to zero */
-    char chksum[4];
-    ogg_page log;
-    
-    memcpy(chksum,page+22,4);
-    memset(page+22,0,4);
-    
-    /* set up a temp page struct and recompute the checksum */
-    log.header=page;
-    log.header_len=oy->headerbytes;
-    log.body=page+oy->headerbytes;
-    log.body_len=oy->bodybytes;
-    ogg_page_checksum_set(&log);
-    
-    /* Compare */
-    if(memcmp(chksum,page+22,4)){
-      /* D'oh.  Mismatch! Corrupt page (or miscapture and not a page
-	 at all) */
-      /* replace the computed checksum with the one actually read in */
-      memcpy(page+22,chksum,4);
+    ogg_uint32_t chksum=oggbyte_read4(&page,22);
+    oggbyte_set4(&page,0,22);
+
+    /* Compare checksums; memory continues to be common access */
+    if(chksum!=_checksum(oy->fifo_tail,oy->bodybytes+oy->headerbytes)){
       
-      /* Bad checksum. Lose sync */
+      /* D'oh.  Mismatch! Corrupt page (or miscapture and not a page
+         at all). replace the computed checksum with the one actually
+         read in; remember all the memory is common access */
+      
+      oggbyte_set4(&page,chksum,22);
       goto sync_fail;
     }
+    oggbyte_set4(&page,chksum,22);
+  }
+
+  /* We have a page.  Set up page return. */
+  if(og){
+    /* set up page output */
+    og->header=ogg_buffer_split(&oy->fifo_tail,&oy->fifo_head,oy->headerbytes);
+    og->header_len=oy->headerbytes;
+    og->body=ogg_buffer_split(&oy->fifo_tail,&oy->fifo_head,oy->bodybytes);
+    og->body_len=oy->bodybytes;
+  }else{
+    /* simply advance */
+    oy->fifo_tail=
+      ogg_buffer_pretruncate(oy->fifo_tail,oy->headerbytes+oy->bodybytes);
+    if(!oy->fifo_tail)oy->fifo_head=0;
   }
   
-  /* yes, have a whole page all ready to go */
-  {
-    unsigned char *page=oy->data+oy->returned;
-    long bytes;
-
-    if(og){
-      og->header=page;
-      og->header_len=oy->headerbytes;
-      og->body=page+oy->headerbytes;
-      og->body_len=oy->bodybytes;
-    }
-
-    oy->unsynced=0;
-    oy->returned+=(bytes=oy->headerbytes+oy->bodybytes);
-    oy->headerbytes=0;
-    oy->bodybytes=0;
-    return(bytes);
-  }
-  
- sync_fail:
-  
+  ret=oy->headerbytes+oy->bodybytes;
+  oy->unsynced=0;
   oy->headerbytes=0;
   oy->bodybytes=0;
-  
-  /* search for possible capture */
-  next=(unsigned char *)memchr(page+1,'O',bytes-1);
-  if(!next)
-    next=oy->data+oy->fill;
+  oy->fifo_fill-=ret;
 
-  oy->returned=next-oy->data;
-  return(-(next-page));
+  return ret;
+  
+ sync_fail:
+
+  oy->headerbytes=0;
+  oy->bodybytes=0;
+  oy->fifo_tail=ogg_buffer_pretruncate(oy->fifo_tail,1);
+  ret--;
+  
+  /* search forward through fragments for possible capture */
+  while(oy->fifo_tail){
+    /* invariant: fifo_cursor points to a position in fifo_tail */
+    unsigned char *now=oy->fifo_tail->buffer->data+oy->fifo_tail->begin;
+    unsigned char *next=memchr(now, 'O', oy->fifo_tail->length);
+      
+    if(next){
+      /* possible capture in this segment */
+      long bytes=next-now;
+      oy->fifo_tail=ogg_buffer_pretruncate(oy->fifo_tail,bytes);
+      ret-=bytes;
+      break;
+    }else{
+      /* no capture.  advance to next segment */
+      long bytes=oy->fifo_tail->length;
+      ret-=bytes;
+      oy->fifo_tail=ogg_buffer_pretruncate(oy->fifo_tail,bytes);
+    }
+  }
+  if(!oy->fifo_tail)oy->fifo_head=0;
+  oy->fifo_fill+=ret;
+
+ sync_out:
+  return ret;
 }
 
 /* sync the stream and get a page.  Keep trying until we find a page.
    Supress 'sync errors' after reporting the first.
 
    return values:
-   -1) recapture (hole in data)
-    0) need more data
-    1) page returned
+   OGG_HOLE) recapture (hole in data)
+          0) need more data
+          1) page returned
 
    Returns pointers into buffered data; invalidated by next call to
    _stream, _clear, _init, or _buffer */
@@ -462,17 +789,17 @@ int ogg_sync_pageout(ogg_sync_state *oy, ogg_page *og){
     long ret=ogg_sync_pageseek(oy,og);
     if(ret>0){
       /* have a page */
-      return(1);
+      return 1;
     }
     if(ret==0){
       /* need more data */
-      return(0);
+      return 0;
     }
     
     /* head did not start a synced page... skipped some bytes */
     if(!oy->unsynced){
       oy->unsynced=1;
-      return(-1);
+      return OGG_HOLE;
     }
 
     /* loop. keep looking */
@@ -480,123 +807,188 @@ int ogg_sync_pageout(ogg_sync_state *oy, ogg_page *og){
   }
 }
 
-/* add the incoming page to the stream state; we decompose the page
-   into packet segments here as well. */
-int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
-  unsigned char *header=og->header;
-  unsigned char *body=og->body;
-  long           bodysize=og->body_len;
-  int            segptr=0;
-
-  int version=ogg_page_version(og);
-  int continued=ogg_page_continued(og);
-  int bos=ogg_page_bos(og);
-  int eos=ogg_page_eos(og);
-  ogg_int64_t granulepos=ogg_page_granulepos(og);
-  int serialno=ogg_page_serialno(og);
-  long pageno=ogg_page_pageno(og);
-  int segments=header[26];
-  
-  /* check the serial number */
-  if(serialno!=os->serialno)return(-1);
-  if(version>0)return(-1);
-
-  _os_lacing_expand(os,segments+1);
-
-  /* are we in sequence? */
-  if(pageno!=os->pageno){
-    int i;
-
-    /* unroll previous partial packet (if any) */
-    for(i=os->lacing_packet;i<os->lacing_fill;i++)
-      os->body_fill-=os->lacing_vals[i]&0xff;
-    os->lacing_fill=os->lacing_packet;
-
-    /* make a note of dropped data in segment table */
-    if(os->pageno!=-1){
-      os->lacing_vals[os->lacing_fill++]=0x400;
-      os->lacing_packet++;
-    }
-
-    /* are we a 'continued packet' page?  If so, we'll need to skip
-       some segments */
-    if(continued){
-      bos=0;
-      for(;segptr<segments;segptr++){
-	int val=header[27+segptr];
-	body+=val;
-	bodysize-=val;
-	if(val<255){
-	  segptr++;
-	  break;
-	}
-      }
-    }
-  }
-  
-  if(bodysize){
-    _os_body_expand(os,bodysize);
-    memcpy(os->body_data+os->body_fill,body,bodysize);
-    os->body_fill+=bodysize;
-  }
-
-  {
-    int saved=-1;
-    while(segptr<segments){
-      int val=header[27+segptr];
-      os->lacing_vals[os->lacing_fill]=val;
-      os->granule_vals[os->lacing_fill]=-1;
-      
-      if(bos){
-	os->lacing_vals[os->lacing_fill]|=0x100;
-	bos=0;
-      }
-      
-      if(val<255)saved=os->lacing_fill;
-      
-      os->lacing_fill++;
-      segptr++;
-      
-      if(val<255)os->lacing_packet=os->lacing_fill;
-    }
-  
-    /* set the granulepos on the last granuleval of the last full packet */
-    if(saved!=-1){
-      os->granule_vals[saved]=granulepos;
-    }
-
-  }
-
-  if(eos){
-    os->e_o_s=1;
-    if(os->lacing_fill>0)
-      os->lacing_vals[os->lacing_fill-1]|=0x200;
-  }
-
-  os->pageno=pageno+1;
-
-  return(0);
-}
-
 /* clear things to an initial state.  Good to call, eg, before seeking */
 int ogg_sync_reset(ogg_sync_state *oy){
-  oy->fill=0;
-  oy->returned=0;
+
+  ogg_buffer_release(oy->fifo_tail);
+  oy->fifo_tail=0;
+  oy->fifo_head=0;
+  oy->fifo_fill=0;
+
   oy->unsynced=0;
   oy->headerbytes=0;
   oy->bodybytes=0;
-  return(0);
+  return OGG_SUCCESS;
+}
+
+ogg_stream_state *ogg_stream_create(int serialno){
+  ogg_stream_state *os=_ogg_calloc(1,sizeof(*os));
+  os->serialno=serialno;
+  os->pageno=-1;
+  return os;
+} 
+
+int ogg_stream_destroy(ogg_stream_state *os){
+  if(os){
+    ogg_buffer_release(os->header_tail);
+    ogg_buffer_release(os->body_tail);
+    memset(os,0,sizeof(*os));    
+    _ogg_free(os);
+  }
+  return OGG_SUCCESS;
+} 
+
+
+#define FINFLAG 0x80000000UL
+#define FINMASK 0x7fffffffUL
+
+static void _next_lace(oggbyte_buffer *ob,ogg_stream_state *os){
+  /* search ahead one lace */
+  os->body_fill_next=0;
+  while(os->laceptr<os->lacing_fill){
+    int val=oggbyte_read1(ob,27+os->laceptr++);
+    os->body_fill_next+=val;
+    if(val<255){
+      os->body_fill_next|=FINFLAG;
+      os->clearflag=1;
+      break;
+    }
+  }
+}
+
+static void _span_queued_page(ogg_stream_state *os){ 
+  while( !(os->body_fill&FINFLAG) ){
+    
+    if(!os->header_tail)break;
+
+    /* first flush out preceeding page header (if any).  Body is
+       flushed as it's consumed, so that's not done here. */
+
+    if(os->lacing_fill>=0)
+      os->header_tail=ogg_buffer_pretruncate(os->header_tail,
+                                             os->lacing_fill+27);
+    os->lacing_fill=0;
+    os->laceptr=0;
+    os->clearflag=0;
+
+    if(!os->header_tail){
+      os->header_head=0;
+      break;
+    }else{
+      
+      /* process/prepare next page, if any */
+
+      long pageno;
+      oggbyte_buffer ob;
+      ogg_page og;               /* only for parsing header values */
+      og.header=os->header_tail; /* only for parsing header values */
+      pageno=ogg_page_pageno(&og);
+
+      oggbyte_init(&ob,os->header_tail);
+      os->lacing_fill=oggbyte_read1(&ob,26);
+      
+      /* are we in sequence? */
+      if(pageno!=os->pageno){
+        if(os->pageno==-1) /* indicates seek or reset */
+          os->holeflag=1;  /* set for internal use */
+        else
+          os->holeflag=2;  /* set for external reporting */
+
+        os->body_tail=ogg_buffer_pretruncate(os->body_tail,
+                                             os->body_fill);
+        if(os->body_tail==0)os->body_head=0;
+        os->body_fill=0;
+
+      }
+    
+      if(ogg_page_continued(&og)){
+        if(os->body_fill==0){
+          /* continued packet, but no preceeding data to continue */
+          /* dump the first partial packet on the page */
+          _next_lace(&ob,os);   
+          os->body_tail=
+            ogg_buffer_pretruncate(os->body_tail,os->body_fill_next&FINMASK);
+          if(os->body_tail==0)os->body_head=0;
+          /* set span flag */
+          if(!os->spanflag && !os->holeflag)os->spanflag=2;
+        }
+      }else{
+        if(os->body_fill>0){
+          /* preceeding data to continue, but not a continued page */
+          /* dump body_fill */
+          os->body_tail=ogg_buffer_pretruncate(os->body_tail,
+                                               os->body_fill);
+          if(os->body_tail==0)os->body_head=0;
+          os->body_fill=0;
+
+          /* set espan flag */
+          if(!os->spanflag && !os->holeflag)os->spanflag=2;
+        }
+      }
+
+      if(os->laceptr<os->lacing_fill){
+        os->granulepos=ogg_page_granulepos(&og);
+
+        /* get current packet size & flag */
+        _next_lace(&ob,os);
+        os->body_fill+=os->body_fill_next; /* addition handles the flag fine;
+                                             unsigned on purpose */
+        /* ...and next packet size & flag */
+        _next_lace(&ob,os);
+
+      }
+      
+      os->pageno=pageno+1;
+      os->e_o_s=ogg_page_eos(&og);
+      os->b_o_s=ogg_page_bos(&og);
+    
+    }
+  }
+}
+
+/* add the incoming page to the stream state; we decompose the page
+   into packet segments here as well. */
+
+int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
+
+  int serialno=ogg_page_serialno(og);
+  int version=ogg_page_version(og);
+
+  /* check the serial number */
+  if(serialno!=os->serialno){
+    ogg_page_release(og);
+    return OGG_ESERIAL;
+  }
+  if(version>0){
+    ogg_page_release(og);
+    return OGG_EVERSION;
+  }
+
+  /* add to fifos */
+  if(!os->body_tail){
+    os->body_tail=og->body;
+    os->body_head=ogg_buffer_walk(og->body);
+  }else{
+    os->body_head=ogg_buffer_cat(os->body_head,og->body);
+  }
+  if(!os->header_tail){
+    os->header_tail=og->header;
+    os->header_head=ogg_buffer_walk(og->header);
+    os->lacing_fill=-27;
+  }else{
+    os->header_head=ogg_buffer_cat(os->header_head,og->header);
+  }
+
+  memset(og,0,sizeof(*og));
+  return OGG_SUCCESS;
 }
 
 int ogg_stream_reset(ogg_stream_state *os){
-  os->body_fill=0;
-  os->body_returned=0;
 
-  os->lacing_fill=0;
-  os->lacing_packet=0;
-  os->lacing_returned=0;
-
-  os->header_fill=0;
+  ogg_buffer_release(os->header_tail);
+  ogg_buffer_release(os->body_tail);
+  os->header_tail=os->header_head=0;
+  os->body_tail=os->body_head=0;
 
   os->e_o_s=0;
   os->b_o_s=0;
@@ -604,61 +996,100 @@ int ogg_stream_reset(ogg_stream_state *os){
   os->packetno=0;
   os->granulepos=0;
 
-  return(0);
+  os->body_fill=0;
+  os->lacing_fill=0;
+
+  os->holeflag=0;
+  os->spanflag=0;
+  os->clearflag=0;
+  os->laceptr=0;
+  os->body_fill_next=0;
+
+  return OGG_SUCCESS;
+}
+
+int ogg_stream_reset_serialno(ogg_stream_state *os,int serialno){
+  ogg_stream_reset(os);
+  os->serialno=serialno;
+  return OGG_SUCCESS;
 }
 
 static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
 
-  /* The last part of decode. We have the stream broken into packet
-     segments.  Now we need to group them into packets (or return the
-     out of sync markers) */
+  ogg_packet_release(op);
+  _span_queued_page(os);
 
-  int ptr=os->lacing_returned;
-
-  if(os->lacing_packet<=ptr)return(0);
-
-  if(os->lacing_vals[ptr]&0x400){
-    /* we need to tell the codec there's a gap; it might need to
-       handle previous packet dependencies. */
-    os->lacing_returned++;
-    os->packetno++;
-    return(-1);
+  if(os->holeflag){
+    int temp=os->holeflag;
+    if(os->clearflag)
+      os->holeflag=0;
+    else
+      os->holeflag=1;
+    if(temp==2){
+      os->packetno++;
+      return OGG_HOLE;
+    }
+  }
+  if(os->spanflag){
+    int temp=os->spanflag;
+    if(os->clearflag)
+      os->spanflag=0;
+    else
+      os->spanflag=1;
+    if(temp==2){
+      os->packetno++;
+      return OGG_SPAN;
+    }
   }
 
-  if(!op && !adv)return(1); /* just using peek as an inexpensive way
+  if(!(os->body_fill&FINFLAG)) return 0;
+  if(!op && !adv)return 1; /* just using peek as an inexpensive way
                                to ask if there's a whole packet
                                waiting */
+  if(op){
+    op->b_o_s=os->b_o_s;
+    if(os->e_o_s && os->body_fill_next==0)
+      op->e_o_s=os->e_o_s;
+    else
+      op->e_o_s=0;
+    if( (os->body_fill&FINFLAG) && !(os->body_fill_next&FINFLAG) )
+      op->granulepos=os->granulepos;
+    else
+      op->granulepos=-1;
+    op->packetno=os->packetno;
+  }
 
-  /* Gather the whole packet. We'll have no holes or a partial packet */
-  {
-    int size=os->lacing_vals[ptr]&0xff;
-    int bytes=size;
-    int eos=os->lacing_vals[ptr]&0x200; /* last packet of the stream? */
-    int bos=os->lacing_vals[ptr]&0x100; /* first packet of the stream? */
+  if(adv){
+    oggbyte_buffer ob;
+    oggbyte_init(&ob,os->header_tail);
 
-    while(size==255){
-      int val=os->lacing_vals[++ptr];
-      size=val&0xff;
-      if(val&0x200)eos=0x200;
-      bytes+=size;
-    }
-
+    /* split the body contents off */
     if(op){
-      op->e_o_s=eos;
-      op->b_o_s=bos;
-      op->packet=os->body_data+os->body_returned;
-      op->packetno=os->packetno;
-      op->granulepos=os->granule_vals[ptr];
-      op->bytes=bytes;
+      op->packet=ogg_buffer_split(&os->body_tail,&os->body_head,
+				  os->body_fill&FINMASK);
+      op->bytes=os->body_fill&FINMASK;
+    }else{
+      os->body_tail=ogg_buffer_pretruncate(os->body_tail,
+					   os->body_fill&FINMASK);
+      if(os->body_tail==0)os->body_head=0;
     }
 
-    if(adv){
-      os->body_returned+=bytes;
-      os->lacing_returned=ptr+1;
-      os->packetno++;
+    /* update lacing pointers */
+    os->body_fill=os->body_fill_next;
+    _next_lace(&ob,os);
+  }else{
+    if(op){
+      op->packet=ogg_buffer_sub(os->body_tail,0,os->body_fill&FINMASK);
+      op->bytes=os->body_fill&FINMASK;
     }
   }
-  return(1);
+  
+  if(adv){
+    os->packetno++;
+    os->b_o_s=0;
+  }
+
+  return 1;
 }
 
 int ogg_stream_packetout(ogg_stream_state *os,ogg_packet *op){
@@ -669,8 +1100,27 @@ int ogg_stream_packetpeek(ogg_stream_state *os,ogg_packet *op){
   return _packetout(os,op,0);
 }
 
-void ogg_packet_clear(ogg_packet *op) {
-  _ogg_free(op->packet);
-  memset(op, 0, sizeof(*op));
+int ogg_packet_release(ogg_packet *op) {
+  if(op){
+    ogg_buffer_release(op->packet);
+    memset(op, 0, sizeof(*op));
+  }
+  return OGG_SUCCESS;
+}
+
+int ogg_page_release(ogg_page *og) {
+  if(og){
+    ogg_buffer_release(og->header);
+    ogg_buffer_release(og->body);
+    memset(og, 0, sizeof(*og));
+  }
+  return OGG_SUCCESS;
+}
+
+void ogg_page_dup(ogg_page *dup,ogg_page *orig){
+  dup->header_len=orig->header_len;
+  dup->body_len=orig->body_len;
+  dup->header=ogg_buffer_dup(orig->header);
+  dup->body=ogg_buffer_dup(orig->body);
 }
 

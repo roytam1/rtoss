@@ -279,8 +279,8 @@ BOOL ovd_get_comment_from_file(LPCTSTR pszFile, ovd_comment* comment)
 // for streaming
 typedef struct {
 	int init;
-	ogg_sync_state oy;
-	ogg_stream_state os;
+	ogg_sync_state* oy;
+	ogg_stream_state* os;
 	ogg_page og;
 	ogg_packet op;
 	vorbis_info vi;
@@ -298,11 +298,12 @@ ovd_stream_buf* ovd_init_stream()
 	ovd_handle* handle = new ovd_handle;
 	memset(handle, 0, sizeof(ovd_handle));
 
-	ogg_sync_init(&handle->oy);
+//	ogg_sync_init(&handle->oy);
+	handle->oy = ogg_sync_create();
 
 	ovd_stream_buf* ret = new ovd_stream_buf;
 	ret->handle = (HANDLE)handle;
-	ret->buf = ogg_sync_buffer(&handle->oy, OVD_STREAM_BUF_LEN);
+	ret->buf = ogg_sync_bufferin(handle->oy, OVD_STREAM_BUF_LEN);
 	ret->len = OVD_STREAM_BUF_LEN;
 
 	return ret;
@@ -315,13 +316,13 @@ int ovd_header_init(ovd_handle* handle)
 			return -1;
 
 		while (handle->init < 2) {
-			int result = ogg_sync_pageout(&handle->oy, &handle->og);
+			int result = ogg_sync_pageout(handle->oy, &handle->og);
 			if (result == 0) 
 				return FALSE; // need more data
 			if (result == 1) {
-				ogg_stream_pagein(&handle->os, &handle->og);
+				ogg_stream_pagein(handle->os, &handle->og);
 				while(handle->init < 2){
-					result = ogg_stream_packetout(&handle->os, &handle->op);
+					result = ogg_stream_packetout(handle->os, &handle->op);
 					if (result == 0)
 						return 0; // need more data
 					if (result < 0) {
@@ -347,17 +348,18 @@ BOOL ovd_parse_stream(ovd_stream_buf* buf)
 {
 	ovd_handle* handle = (ovd_handle*)buf->handle;
 
-	ogg_sync_wrote(&handle->oy, buf->len);
-	if (ogg_sync_pageout(&handle->oy, &handle->og) != 1)
+	ogg_sync_wrote(handle->oy, buf->len);
+	if (ogg_sync_pageout(handle->oy, &handle->og) != 1)
 		goto fail;
 
-	ogg_stream_init(&handle->os, ogg_page_serialno(&handle->og));
+//	ogg_stream_init(&handle->os, ogg_page_serialno(&handle->og));
+	handle->os = ogg_stream_create(ogg_page_serialno(&handle->og));
 	vorbis_info_init(&handle->vi);
     vorbis_comment_init(&handle->vc);
-	if (ogg_stream_pagein(&handle->os, &handle->og) < 0)
+	if (ogg_stream_pagein(handle->os, &handle->og) < 0)
 		goto fail;
 
-	if (ogg_stream_packetout(&handle->os,&handle->op) != 1)
+	if (ogg_stream_packetout(handle->os,&handle->op) != 1)
 		goto fail;
 
 	if (vorbis_synthesis_headerin(&handle->vi, &handle->vc, &handle->op) < 0)
@@ -367,12 +369,13 @@ BOOL ovd_parse_stream(ovd_stream_buf* buf)
 	handle->eof = 0;
 	ovd_header_init(handle);
 
-	buf->buf = ogg_sync_buffer(&handle->oy, OVD_STREAM_BUF_LEN);
+	buf->buf = ogg_sync_bufferin(handle->oy, OVD_STREAM_BUF_LEN);
 	buf->len = OVD_STREAM_BUF_LEN;
 	return TRUE;
 fail:
-	ogg_sync_init(&handle->oy);
-	buf->buf = ogg_sync_buffer(&handle->oy, OVD_STREAM_BUF_LEN);
+//	ogg_sync_init(&handle->oy);
+	handle->oy = ogg_sync_create();
+	buf->buf = ogg_sync_bufferin(handle->oy, OVD_STREAM_BUF_LEN);
 	buf->len = OVD_STREAM_BUF_LEN;
 	return FALSE;
 }
@@ -440,8 +443,8 @@ BOOL ovd_reparse_stream(ovd_stream_buf* buf)
 	ovd_handle* handle = (ovd_handle*)buf->handle;
 
 	if (buf->len) {
-		ogg_sync_wrote(&handle->oy, buf->len);
-		int result = ogg_sync_pageout(&handle->oy, &handle->og);
+		ogg_sync_wrote(handle->oy, buf->len);
+		int result = ogg_sync_pageout(handle->oy, &handle->og);
 		if (result == 0) {
 			buf->len = OVD_STREAM_BUF_LEN;
 			return TRUE;
@@ -450,13 +453,14 @@ BOOL ovd_reparse_stream(ovd_stream_buf* buf)
 			return FALSE;
 	}
 
-	ogg_stream_init(&handle->os, ogg_page_serialno(&handle->og));
+//	ogg_stream_init(&handle->os, ogg_page_serialno(&handle->og));
+	handle->os = ogg_stream_create(ogg_page_serialno(&handle->og));
 	vorbis_info_init(&handle->vi);
     vorbis_comment_init(&handle->vc);
-	if (ogg_stream_pagein(&handle->os, &handle->og) < 0)
+	if (ogg_stream_pagein(handle->os, &handle->og) < 0)
 		return FALSE;
 
-	if (ogg_stream_packetout(&handle->os,&handle->op) != 1)
+	if (ogg_stream_packetout(handle->os,&handle->op) != 1)
 		return FALSE;
 
 	if (vorbis_synthesis_headerin(&handle->vi, &handle->vc, &handle->op) < 0)
@@ -466,7 +470,7 @@ BOOL ovd_reparse_stream(ovd_stream_buf* buf)
 	handle->eof = 0;
 	ovd_header_init(handle);
 
-	buf->buf = ogg_sync_buffer(&handle->oy, OVD_STREAM_BUF_LEN);
+	buf->buf = ogg_sync_bufferin(handle->oy, OVD_STREAM_BUF_LEN);
 	buf->len = OVD_STREAM_BUF_LEN;
 	return TRUE;
 }
@@ -505,7 +509,7 @@ int ovd_decode_stream(ovd_stream_buf* buf, LPBYTE pcmbuf, int pcmbuf_len, int* p
 	}
 
 	if (buf->len) {
-		ogg_sync_wrote(&handle->oy, buf->len);
+		ogg_sync_wrote(handle->oy, buf->len);
 		buf->len = OVD_STREAM_BUF_LEN;
 
 		result = ovd_header_init(handle);
@@ -515,7 +519,7 @@ int ovd_decode_stream(ovd_stream_buf* buf, LPBYTE pcmbuf, int pcmbuf_len, int* p
 			goto done;
 		}
 
-		result = ogg_sync_pageout(&handle->oy, &handle->og);
+		result = ogg_sync_pageout(handle->oy, &handle->og);
 		if (result == 0)
 			goto done; // need more
 		if (result < 0) {
@@ -524,15 +528,15 @@ int ovd_decode_stream(ovd_stream_buf* buf, LPBYTE pcmbuf, int pcmbuf_len, int* p
 			goto done;
 		}
 
-		ogg_stream_pagein(&handle->os, &handle->og);
+		ogg_stream_pagein(handle->os, &handle->og);
 
 		while (1) {
-			result = ogg_stream_packetout(&handle->os, &handle->op);
+			result = ogg_stream_packetout(handle->os, &handle->op);
 
 			if (result == 0)
 				break;
 			if (result > 0) {
-				if (vorbis_synthesis(&handle->vb, &handle->op) == 0)
+				if (vorbis_synthesis(&handle->vb, &handle->op, 1) == 0)
 					vorbis_synthesis_blockin(&handle->vd, &handle->vb);
 
 				vorbis_synthesis_headerin(&handle->vi, &handle->vc, &handle->op);
@@ -589,11 +593,11 @@ int ovd_decode_stream(ovd_stream_buf* buf, LPBYTE pcmbuf, int pcmbuf_len, int* p
 				}
 			}
 
-			result = ogg_stream_packetout(&handle->os, &handle->op);
+			result = ogg_stream_packetout(handle->os, &handle->op);
 			if (result == 0)
 				break;
 			if (result > 0) {
-				if (vorbis_synthesis(&handle->vb, &handle->op) == 0)
+				if (vorbis_synthesis(&handle->vb, &handle->op, 1) == 0)
 					vorbis_synthesis_blockin(&handle->vd, &handle->vb);
 
 				vorbis_synthesis_headerin(&handle->vi, &handle->vc, &handle->op);
@@ -604,7 +608,8 @@ int ovd_decode_stream(ovd_stream_buf* buf, LPBYTE pcmbuf, int pcmbuf_len, int* p
 	if (ogg_page_eos(&handle->og)) {
 		handle->samples = 0;
 		handle->init = 0;
-		ogg_stream_clear(&handle->os);
+//		ogg_stream_clear(&handle->os);
+		ogg_stream_destroy(handle->os);
 		vorbis_block_clear(&handle->vb);
 		vorbis_dsp_clear(&handle->vd);
 		vorbis_comment_clear(&handle->vc);
@@ -615,7 +620,7 @@ int ovd_decode_stream(ovd_stream_buf* buf, LPBYTE pcmbuf, int pcmbuf_len, int* p
 	}
 
 done:
-	if (buf->len) buf->buf = ogg_sync_buffer(&handle->oy, OVD_STREAM_BUF_LEN);
+	if (buf->len) buf->buf = ogg_sync_bufferin(handle->oy, OVD_STREAM_BUF_LEN);
 	return ret;
 }
 
@@ -627,7 +632,8 @@ void ovd_uninit_stream(ovd_stream_buf* buf)
     vorbis_dsp_clear(&handle->vd);
 	vorbis_comment_clear(&handle->vc);
     vorbis_info_clear(&handle->vi);
-	ogg_sync_clear(&handle->oy);
+//	ogg_sync_clear(&handle->oy);
+	ogg_sync_destroy(handle->oy);
 	delete handle;
 	delete buf;
 }
