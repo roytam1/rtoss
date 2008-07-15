@@ -18,15 +18,10 @@
 #ifndef _V_RANDOM_H_
 #define _V_RANDOM_H_
 #include "ivorbiscodec.h"
-#include "os_types.h"
-
-extern void *_vorbis_block_alloc(vorbis_block *vb,long bytes);
-extern void _vorbis_block_ripcord(vorbis_block *vb);
-extern void _analysis_output(char *base,int i,ogg_int32_t *v,int point,
-			     int n,int bark,int dB);
+#include "os.h"
 
 #include "asm_arm.h"
-#include "os.h"
+#include <stdlib.h> /* for abs() */
   
 #ifndef _V_WIDE_MATH
 #define _V_WIDE_MATH
@@ -189,6 +184,8 @@ STIN ogg_int32_t VFLOAT_MULT(ogg_int32_t a,ogg_int32_t ap,
   }else
     return 0;
 }
+
+int _ilog(unsigned int);
 
 STIN ogg_int32_t VFLOAT_MULTI(ogg_int32_t a,ogg_int32_t ap,
 				      ogg_int32_t i,

@@ -6,7 +6,7 @@
  * GOVERNED BY A BSD-STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE *
  * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
  *                                                                  *
- * THE OggVorbis 'TREMOR' SOURCE CODE IS (C) COPYRIGHT 1994-2002    *
+ * THE OggVorbis 'TREMOR' SOURCE CODE IS (C) COPYRIGHT 1994-2003    *
  * BY THE Xiph.Org FOUNDATION http://www.xiph.org/                  *
  *                                                                  *
  ********************************************************************
@@ -28,7 +28,6 @@
 #include "registry.h"
 #include "window.h"
 #include "misc.h"
-#include "os.h"
 
 /* helpers */
 static void _v_readstring(oggpack_buffer *o,char *buf,int bytes){
@@ -97,8 +96,8 @@ void vorbis_comment_clear(vorbis_comment *vc){
     if(vc->user_comments)_ogg_free(vc->user_comments);
 	if(vc->comment_lengths)_ogg_free(vc->comment_lengths);
     if(vc->vendor)_ogg_free(vc->vendor);
+    memset(vc,0,sizeof(*vc));
   }
-  memset(vc,0,sizeof(*vc));
 }
 
 /* blocksize 0 is guaranteed to be short, 1 is guarantted to be long.
@@ -124,13 +123,16 @@ void vorbis_info_clear(vorbis_info *vi){
       if(ci->mode_param[i])_ogg_free(ci->mode_param[i]);
 
     for(i=0;i<ci->maps;i++) /* unpack does the range checking */
-      _mapping_P[ci->map_type[i]]->free_info(ci->map_param[i]);
+      if(ci->map_param[i])
+	_mapping_P[ci->map_type[i]]->free_info(ci->map_param[i]);
 
     for(i=0;i<ci->floors;i++) /* unpack does the range checking */
-      _floor_P[ci->floor_type[i]]->free_info(ci->floor_param[i]);
+      if(ci->floor_param[i])
+	_floor_P[ci->floor_type[i]]->free_info(ci->floor_param[i]);
     
     for(i=0;i<ci->residues;i++) /* unpack does the range checking */
-      _residue_P[ci->residue_type[i]]->free_info(ci->residue_param[i]);
+      if(ci->residue_param[i])
+	_residue_P[ci->residue_type[i]]->free_info(ci->residue_param[i]);
 
     for(i=0;i<ci->books;i++){
       if(ci->book_param[i]){
@@ -300,7 +302,7 @@ int vorbis_synthesis_headerin(vorbis_info *vi,vorbis_comment *vc,ogg_packet *op)
   oggpack_buffer opb;
   
   if(op){
-    oggpack_readinit(&opb,op->packet,op->bytes);
+    oggpack_readinit(&opb,op->packet);
 
     /* Which of the three types of header is this? */
     /* Also verify header-ness, vorbis */

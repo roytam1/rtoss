@@ -6,13 +6,13 @@
  * GOVERNED BY A BSD-STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE *
  * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
  *                                                                  *
- * THE OggVorbis 'TREMOR' SOURCE CODE IS (C) COPYRIGHT 1994-2002    *
+ * THE OggVorbis 'TREMOR' SOURCE CODE IS (C) COPYRIGHT 1994-2003    *
  * BY THE Xiph.Org FOUNDATION http://www.xiph.org/                  *
  *                                                                  *
  ********************************************************************
 
  function: single-block PCM synthesis
- last mod: $Id: synthesis.c,v 1.3 2002/10/16 07:39:56 xiphmont Exp $
+ last mod: $Id: synthesis.c,v 1.4 2003/03/29 03:07:21 xiphmont Exp $
 
  ********************************************************************/
 
@@ -22,9 +22,9 @@
 #include "codec_internal.h"
 #include "registry.h"
 #include "misc.h"
-#include "os.h"
+#include "block.h"
 
-int vorbis_synthesis(vorbis_block *vb,ogg_packet *op){
+int vorbis_synthesis(vorbis_block *vb,ogg_packet *op,int decodep){
   vorbis_dsp_state     *vd=vb->vd;
   private_state        *b=(private_state *)vd->backend_state;
   vorbis_info          *vi=vd->vi;
@@ -34,7 +34,7 @@ int vorbis_synthesis(vorbis_block *vb,ogg_packet *op){
  
   /* first things first.  Make sure decode is ready */
   _vorbis_block_ripcord(vb);
-  oggpack_readinit(opb,op->packet,op->bytes);
+  oggpack_readinit(opb,op->packet);
 
   /* Check the packet type */
   if(oggpack_read(opb,1)!=0){
@@ -62,16 +62,24 @@ int vorbis_synthesis(vorbis_block *vb,ogg_packet *op){
   vb->sequence=op->packetno-3; /* first block is third packet */
   vb->eofflag=op->e_o_s;
 
-  /* alloc pcm passback storage */
-  vb->pcmend=ci->blocksizes[vb->W];
-  vb->pcm=(ogg_int32_t **)_vorbis_block_alloc(vb,sizeof(*vb->pcm)*vi->channels);
-  for(i=0;i<vi->channels;i++)
-    vb->pcm[i]=(ogg_int32_t *)_vorbis_block_alloc(vb,vb->pcmend*sizeof(*vb->pcm[i]));
-
-  /* unpack_header enforces range checking */
-  type=ci->map_type[ci->mode_param[mode]->mapping];
-
-  return(_mapping_P[type]->inverse(vb,b->mode[mode]));
+  if(decodep){
+    /* alloc pcm passback storage */
+    vb->pcmend=ci->blocksizes[vb->W];
+    vb->pcm=(ogg_int32_t **)_vorbis_block_alloc(vb,sizeof(*vb->pcm)*vi->channels);
+    for(i=0;i<vi->channels;i++)
+      vb->pcm[i]=(ogg_int32_t *)_vorbis_block_alloc(vb,vb->pcmend*sizeof(*vb->pcm[i]));
+    
+    /* unpack_header enforces range checking */
+    type=ci->map_type[ci->mode_param[mode]->mapping];
+    
+    return(_mapping_P[type]->inverse(vb,b->mode[mode]));
+  }else{
+    /* no pcm */
+    vb->pcmend=0;
+    vb->pcm=NULL;
+    
+    return(0);
+  }
 }
 
 long vorbis_packet_blocksize(vorbis_info *vi,ogg_packet *op){
@@ -79,7 +87,7 @@ long vorbis_packet_blocksize(vorbis_info *vi,ogg_packet *op){
   oggpack_buffer       opb;
   int                  mode;
  
-  oggpack_readinit(&opb,op->packet,op->bytes);
+  oggpack_readinit(&opb,op->packet);
 
   /* Check the packet type */
   if(oggpack_read(&opb,1)!=0){
