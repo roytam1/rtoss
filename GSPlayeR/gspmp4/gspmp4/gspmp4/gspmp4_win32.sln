@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gspmp4_win32", "gspmp4_win32.vcproj", "{F5B80DC0-F428-4469-AD27-B8398FAB5793}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9D9A9935-A9D9-4C36-9B8B-A6DD7F91340E} = {9D9A9935-A9D9-4C36-9B8B-A6DD7F91340E}
+		{75C0AD9E-F382-440A-A5F2-1D45B0F0FEC9} = {75C0AD9E-F382-440A-A5F2-1D45B0F0FEC9}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfaad_win32", "..\libfaad\libfaad_win32.vcproj", "{75C0AD9E-F382-440A-A5F2-1D45B0F0FEC9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mp4ff_win32", "..\mp4ff\mp4ff_win32.vcproj", "{9D9A9935-A9D9-4C36-9B8B-A6DD7F91340E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F5B80DC0-F428-4469-AD27-B8398FAB5793}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F5B80DC0-F428-4469-AD27-B8398FAB5793}.Debug|Win32.Build.0 = Debug|Win32
+		{F5B80DC0-F428-4469-AD27-B8398FAB5793}.Release|Win32.ActiveCfg = Release|Win32
+		{F5B80DC0-F428-4469-AD27-B8398FAB5793}.Release|Win32.Build.0 = Release|Win32
+		{75C0AD9E-F382-440A-A5F2-1D45B0F0FEC9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{75C0AD9E-F382-440A-A5F2-1D45B0F0FEC9}.Debug|Win32.Build.0 = Debug|Win32
+		{75C0AD9E-F382-440A-A5F2-1D45B0F0FEC9}.Release|Win32.ActiveCfg = Release|Win32
+		{75C0AD9E-F382-440A-A5F2-1D45B0F0FEC9}.Release|Win32.Build.0 = Release|Win32
+		{9D9A9935-A9D9-4C36-9B8B-A6DD7F91340E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9D9A9935-A9D9-4C36-9B8B-A6DD7F91340E}.Debug|Win32.Build.0 = Debug|Win32
+		{9D9A9935-A9D9-4C36-9B8B-A6DD7F91340E}.Release|Win32.ActiveCfg = Release|Win32
+		{9D9A9935-A9D9-4C36-9B8B-A6DD7F91340E}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

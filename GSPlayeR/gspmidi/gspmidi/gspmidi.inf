@@ -1,0 +1,71 @@
+; GPlayer for Pocket PC AppInstall CabWiz INF file
+; Copyright(C) 2005 Y.Nagamidori
+
+[Version]
+Signature   = "$Windows NT$"
+Provider    = "GreenSoftware"
+CESignature = "$Windows CE$"
+
+;Install Path Macro String for Palm-size PC
+;%CE1% \Program Files 
+;%CE2% \Windows 
+;%CE4% \Windows\StartUp 
+;%CE5% \My Documents 
+;%CE6% \Program Files\Accessories 
+;%CE7% \Program Files\Communication 
+;%CE8% \Program Files\Games 
+;%CE11% \Windows\Start Menu\Programs 
+;%CE12% \Windows\Start Menu\Programs\Accessories 
+;%CE13% \Windows\Start Menu\Programs\Communications 
+;%CE14% \Windows\Start Menu\Programs\Games 
+;%CE15% \Windows\Fonts 
+;%CE17% \Windows\Start Menu 
+
+[CEStrings]
+AppName     = "GSPlayer MIDI Plug-in"
+InstallDir  = %CE1%\GreenSoftware
+
+[CEDevice.SH3]
+ProcessorType           = 10003
+UnsupportedPlatforms    = "HPC"
+
+[CEDevice.MIPS]
+ProcessorType           = 4000
+UnsupportedPlatforms    = "HPC"
+
+[CEDevice.ARM]
+ProcessorType           = 2577
+UnsupportedPlatforms    = "HPC"
+
+[CEDevice.PPC3_CEF]                             ; Pocket PC on CEF
+ProcessorType           = 0
+UnsupportedPlatforms    = "HPC","Jupiter","PPC"
+
+[SourceDisksNames.SH3]
+1 = ,"SH3",,SH3Rel
+
+[SourceDisksNames.MIPS]
+1 = ,"MIPS",,MIPSRel
+
+[SourceDisksNames.ARM]
+1 = ,"ARM",,ARMRel
+
+[SourceDisksFiles.SH3]
+gspmidi.dll = 1
+
+[SourceDisksFiles.MIPS]
+gspmidi.dll = 1
+
+[SourceDisksFiles.ARM]
+gspmidi.dll = 1
+
+[DefaultInstall]
+CopyFiles   = CopyToInstallDir
+
+[DestinationDirs]
+CopyToInstallDir = ,%InstallDir%
+DefaultDestDir   = ,%InstallDir%
+
+[CopyToInstallDir]
+gspmidi.dll, gspmidi.dll,,0x40000000
+

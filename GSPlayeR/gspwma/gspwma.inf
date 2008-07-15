@@ -1,0 +1,31 @@
+[Version]
+Signature="$Windows NT$"
+Provider="GreenSoftware"
+CESignature="$Windows CE$"
+
+[CEStrings]
+AppName="WMA Plug-in for GSPlayer"
+InstallDir=%CE1%\GreenSoftware
+
+[Platform]
+PlatformString=PocketPC
+PlatformMin=3.1
+
+[CEDevice.ARM]
+ProcessorType=2577
+
+[SourceDisksNames]
+1=,"gspwma",,Release
+
+[SourceDisksFiles]
+gspwma.dll=1
+
+[DefaultInstall]
+CopyFiles=CopyToInstallDir
+
+[DestinationDirs]
+CopyToInstallDir=,%InstallDir%
+DefaultDestDir=,%InstallDir%
+
+[CopyToInstallDir]
+gspwma.dll, gspwma.dll,,0x40000000

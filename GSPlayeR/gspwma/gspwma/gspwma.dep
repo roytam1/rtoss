@@ -1,0 +1,528 @@
+# eMbedded Visual C++ Dependency File, included by gspwma.vcn
+
+!IF  "$(CFG)" == "gspwma - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH4) Release"
+
+.\asfparser.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	".\wmadmo.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH4) Debug"
+
+.\asfparser.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	".\wmadmo.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH3) Release"
+
+.\asfparser.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	".\wmadmo.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH3) Debug"
+
+.\asfparser.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	".\wmadmo.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARMV4) Release"
+
+.\asfparser.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	".\wmadmo.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARMV4) Debug"
+
+.\asfparser.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	".\wmadmo.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE emulator) Release"
+
+.\asfparser.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	".\wmadmo.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE emulator) Debug"
+
+.\asfparser.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	".\wmadmo.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "gspwma - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH4) Release"
+
+.\gspwma.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH4) Debug"
+
+.\gspwma.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH3) Release"
+
+.\gspwma.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH3) Debug"
+
+.\gspwma.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARMV4) Release"
+
+.\gspwma.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARMV4) Debug"
+
+.\gspwma.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE emulator) Release"
+
+.\gspwma.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE emulator) Debug"
+
+.\gspwma.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "gspwma - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH4) Release"
+
+.\mediabuf.cpp : \
+	".\mediabuf.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH4) Debug"
+
+.\mediabuf.cpp : \
+	".\mediabuf.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH3) Release"
+
+.\mediabuf.cpp : \
+	".\mediabuf.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH3) Debug"
+
+.\mediabuf.cpp : \
+	".\mediabuf.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARMV4) Release"
+
+.\mediabuf.cpp : \
+	".\mediabuf.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARMV4) Debug"
+
+.\mediabuf.cpp : \
+	".\mediabuf.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE emulator) Release"
+
+.\mediabuf.cpp : \
+	".\mediabuf.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE emulator) Debug"
+
+.\mediabuf.cpp : \
+	".\mediabuf.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "gspwma - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH4) Release"
+
+.\wmadmo.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	".\wmadmo.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH4) Debug"
+
+.\wmadmo.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	".\wmadmo.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH3) Release"
+
+.\wmadmo.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	".\wmadmo.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH3) Debug"
+
+.\wmadmo.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	".\wmadmo.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARMV4) Release"
+
+.\wmadmo.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	".\wmadmo.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARMV4) Debug"
+
+.\wmadmo.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	".\wmadmo.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE emulator) Release"
+
+.\wmadmo.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	".\wmadmo.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE emulator) Debug"
+
+.\wmadmo.cpp : \
+	".\asfdef.h"\
+	".\asfparser.h"\
+	".\mapplugin.h"\
+	".\mediabuf.h"\
+	".\wmadmo.h"\
+	{$(INCLUDE)}"dmo.h"\
+	{$(INCLUDE)}"dmoreg.h"\
+	{$(INCLUDE)}"dmort.h"\
+	{$(INCLUDE)}"mediaerr.h"\
+	{$(INCLUDE)}"mediaobj.h"\
+	
+
+!ENDIF 
+
+!IF  "$(CFG)" == "gspwma - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH4) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH4) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH3) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE SH3) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARM) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE x86em) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE x86em) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARMV4) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE ARMV4) Debug"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE emulator) Release"
+
+!ELSEIF  "$(CFG)" == "gspwma - Win32 (WCE emulator) Debug"
+
+!ENDIF 
+
