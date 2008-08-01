@@ -1,0 +1,29 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="style.css" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script>
+function jpCallback(code,str) {
+document.getElementById('info').innerHTML+='['+code+'] '+str+'<br>';
+}
+function l() {
+	title=location.search.substring(1, location.search.length-4);
+	document.title="Web Player: "+title.substring(1,title.length-4);
+	document.getElementById('applet').innerHTML = '<applet code="JOrbisPlayer.class"'+
+        ' archive="JOrbisPlayer.jar"'+
+        ' width="0" height="0" name="JOrbisPlayer" id="JOrbisPlayer" MAYSCRIPT>'+
+        '<PARAM NAME="jorbis.player.play.0" VALUE="'+title+'">'+
+        '<PARAM NAME="jorbis.player.icestats" VALUE="yes">'+
+        '<PARAM NAME="jorbis.player.playonstartup" VALUE="yes">'+
+        '<PARAM NAME="jorbis.player.callback" VALUE="jpCallback">'+
+'</applet>';
+}
+onload=l;
+</script>
+</head>
+<body class="newscontent"><br/>
+<a href="javascript:document.JOrbisPlayer.play_sound();">Play</a> <a href="javascript:document.JOrbisPlayer.stop_sound();">Stop</a>
+<div id='info' style='color:#fff'></div>
+<div id='applet'>Javascript and Java is required.</div>
+</body>
+</html>
