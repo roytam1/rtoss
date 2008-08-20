@@ -400,13 +400,9 @@ public:
 };
 
 //---------------------------------------------------------------------------
-string	int2zen(int i);
-string	zen2han(string str);
-bool	calc(string&);
+
+bool	calc(string&,bool isStrict = false);
 void	diet_script(string&);
-
-
-
 
 //---------------------------------------------------------------------------
 #endif

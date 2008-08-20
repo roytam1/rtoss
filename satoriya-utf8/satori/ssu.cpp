@@ -104,7 +104,7 @@ static const char   han_kana_1[] = "アイウエオカキクケコサシスセ�
 static const char   zen_kana_2[] = "ガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポ";
 static const char   han_kana_2[] = "ガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポ";
 
-extern	bool calc(string& ioString);
+extern	bool calc(string& ioString,bool isStrict = false);
 extern	bool calc_float(string& ioString);
 
 static string zen2han_internal(string &str,unsigned int flag = 0xffffU);
@@ -206,62 +206,62 @@ bool	printf_format(const char*& p, deque<string>& iArguments, stringstream& os)
 	case 'c':
 	case 'C':
 		{
-			os << (char)atoi(str.c_str());
+			os << (char)zen2int(str);
 			break;
 		}
 	case 'd':
 		{
-			os << atoi(str.c_str());
+			os << zen2int(str);
 			break;
 		}
 	case 'i':
 		{
-			os << oct << atoi(str.c_str());
+			os << oct << zen2int(str);
 			break;
 		}
 	case 'o':
 		{
-			os << oct << strtoul(str.c_str(),NULL,10);
+			os << oct << strtoul(zen2han_internal(str).c_str(),NULL,10);
 			break;
 		}
 	case 'u':
 		{
-			os << strtoul(str.c_str(),NULL,10);
+			os << strtoul(zen2han_internal(str).c_str(),NULL,10);
 			break;
 		}
 	case 'x':
 		{
-			os << hex << nouppercase << strtoul(str.c_str(),NULL,10);
+			os << hex << nouppercase << strtoul(zen2han_internal(str).c_str(),NULL,10);
 			break;
 		}
 	case 'X':
 		{
-			os << hex << uppercase << strtoul(str.c_str(),NULL,10);
+			os << hex << uppercase << strtoul(zen2han_internal(str).c_str(),NULL,10);
 			break;
 		}
 	case 'e':
 		{
-			os << scientific << nouppercase << strtod(str.c_str(),NULL);
+			os << scientific << nouppercase << strtod(zen2han_internal(str).c_str(),NULL);
 			break;
 		}
 	case 'E':
 		{
-			os << scientific << uppercase << strtod(str.c_str(),NULL);
+			os << scientific << uppercase << strtod(zen2han_internal(str).c_str(),NULL);
 			break;
 		}
 	case 'g':
 		{
-			os << scientific << fixed << nouppercase << strtod(str.c_str(),NULL);
+			os << scientific << fixed << nouppercase << strtod(zen2han_internal(str).c_str(),NULL);
 			break;
 		}
 	case 'G':
 		{
-			os << scientific << fixed << uppercase << strtod(str.c_str(),NULL);
+			os << scientific << fixed << uppercase << strtod(zen2han_internal(str).c_str(),NULL);
 			break;
 		}
 	case 'f':
 		{
-			os << fixed << strtod(str.c_str(),NULL);
+			os << fixed << strtod(zen2han_internal(str).c_str(),NULL);
 			break;
 		}
 	case 'n': break;
@@ -319,7 +319,7 @@ SRV _if(deque<string>& iArguments, deque<string>& oValues) {
 	string	exp = iArguments[0];
 	if ( !calc(exp) )
 		return	SRV(400, string()+"'"+iArguments[0]+"' 式が計算不能です。");
-	if ( exp!="0" )
+	if ( zen2int(exp) != 0 )
 		return	iArguments[1];	// 真
 	else
 		if ( iArguments.size()==3 )
@@ -346,10 +346,8 @@ SRV _unless(deque<string>& iArguments, deque<string>& oValues) {
 SRV _nswitch(deque<string>& iArguments, deque<string>& oValues) {
 	if ( iArguments.size()<2 )
 		return	SRV(400, "引数が足りません。");
-	if ( !calc(iArguments[0]) )
-		return	SRV(400, string()+"'"+iArguments[0]+"' 式が計算不能です。");
 
-	int	n = stoi(iArguments[0]);
+	int	n = zen2int(iArguments[0]);
 	//iArguments.pop_front();
 	//if ( iArguments.size()>n )
 	if ( n>0 && iArguments.size()>n )
@@ -370,7 +368,7 @@ SRV _switch(deque<string>& iArguments, deque<string>& oValues) {
 		string	exp = string("(") + lhs + ")==(" + iArguments[i] + ")";
 		if ( !calc(exp) )
 			return	SRV(400, string()+"switchの"+itos((i-1)/2+1)+"個目、式 '"+exp+"' は計算不能でした。");
-		if ( exp!="0" )
+		if ( zen2int(exp) != 0 )
 			return	SRV(200, iArguments[i+1]);
 	}
 	return	SRV(204);
@@ -388,7 +386,7 @@ SRV _iflist(deque<string>& iArguments, deque<string>& oValues) {
 		string	exp = lhs + iArguments[i];
 		if ( !calc(exp) )
 			return	SRV(400, string()+"iflistの"+itos((i-1)/2+1)+"個目、式 '"+exp+"' は計算不能でした。");
-		if ( exp!="0" )
+		if ( zen2int(exp) != 0 )
 			return	SRV(200, iArguments[i+1]);
 	}
 	return	SRV(204);
@@ -408,12 +406,12 @@ SRV _substr(deque<string>& iArguments, deque<string>& oValues) {
 	const int	len = sjis_strlen(p);
 
 	// 始点
-	int	start = atoi(iArguments[1].c_str());
+	int	start = zen2int(iArguments[1]);
 	if ( start < 0 )
 		start = len + start;
 
 	// 始点からのオフセット値
-	int offset = (iArguments.size()<=2) ? len : atoi(iArguments[2].c_str());
+	int offset = (iArguments.size()<=2) ? len : zen2int(iArguments[2]);
 	if ( offset==0 || offset==INT_MIN ) // INT_MINの時は符号反転が効かないので0扱い。
 		return	SRV(204);
 	if ( offset<0 ) {
@@ -446,9 +444,7 @@ SRV _split(deque<string>& iArguments, deque<string>& oValues) {
 		split(iArguments[0],iArguments[1],vec);
 	}
 	else {
-		if ( !calc(iArguments[2]) )
-			return	SRV(400, "splitの第３引数は式または数値である必要があります。");
-		split(iArguments[0],iArguments[1],vec,stoi(iArguments[2]));
+		split(iArguments[0],iArguments[1],vec,zen2int(iArguments[2]));
 	}
 
 	for ( strvec::iterator i=vec.begin() ; i!=vec.end() ; ++i )
@@ -503,19 +499,19 @@ SRV _count(deque<string>& iArguments, deque<string>& oValues) {
 SRV _compare(deque<string>& iArguments, deque<string>& oValues) {
 	if ( iArguments.size()!=2 )
 		return	SRV(400, "引数の個数が正しくありません。");
-	return	(strcmp(iArguments[0].c_str(), iArguments[1].c_str())==0) ? "1" : "0";
+	return	(stricmp(zen2han_internal(iArguments[0]).c_str(), zen2han_internal(iArguments[1]).c_str())==0) ? "1" : "0";
 }
 
 SRV _compare_head(deque<string>& iArguments, deque<string>& oValues) {
 	if ( iArguments.size()!=2 )
 		return	SRV(400, "引数の個数が正しくありません。");
-	return	compare_head(iArguments[0], iArguments[1]) ? "1" : "0";
+	return	compare_head(zen2han_internal(iArguments[0]), zen2han_internal(iArguments[1])) ? "1" : "0";
 }
 
 SRV _compare_tail(deque<string>& iArguments, deque<string>& oValues) {
 	if ( iArguments.size()!=2 )
 		return	SRV(400, "引数の個数が正しくありません。");
-	return	compare_tail(iArguments[0], iArguments[1]) ? "1" : "0";
+	return	compare_tail(zen2han_internal(iArguments[0]), zen2han_internal(iArguments[1])) ? "1" : "0";
 }
 
 SRV _length(deque<string>& iArguments, deque<string>& oValues) {
@@ -779,7 +775,7 @@ SRV _reverse(deque<string>& iArguments, deque<string>& oValues) {
 SRV _at(deque<string>& iArguments, deque<string>& oValues) {
 
 	if ( iArguments.size()==2 ) {
-		const char* p = sjis_at(iArguments.at(0).c_str(), stoi(iArguments.at(1)));
+		const char* p = sjis_at(iArguments.at(0).c_str(), zen2int(iArguments.at(1)));
 		return	(p==NULL || *p=='\0') ? "" : string(p, _ismbblead(*p)?2:1);
 	}
 	//else if ( iArguments.size()==3 ) {

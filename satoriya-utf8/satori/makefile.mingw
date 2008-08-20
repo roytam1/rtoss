@@ -58,7 +58,7 @@ LIBSSU_OBJ = \
 	SakuraDLLHost.o \
 	SaoriHost.o \
 	ssu.o \
-	TimeCommands.o \
+	TimeCommands.o
 
 DYLIB_NAME = $(DYLIB_NAME_PREFIX)satori$(DYLIB_NAME_POSTFIX)
 

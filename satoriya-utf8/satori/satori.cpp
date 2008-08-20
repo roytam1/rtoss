@@ -13,7 +13,7 @@ const char* gSatoriName = "Satori";
 const char* gSatoriNameW = "里々";
 const char* gSatoriCraftman = "Yagi Kushigahama/The Maintenance Shop";
 const char* gSatoriCraftmanW = "櫛ヶ浜やぎ/整備班";
-const char* gSatoriVersion = "phase Mc143-3";
+const char* gSatoriVersion = "phase Mc143-10";
 const char* gShioriVersion = "3.0";
 const char* gSaoriVersion = "1.0";
 
@@ -76,5 +76,5 @@ bool Satori::evalcate_to_bool(const Condition& i_cond)
 		// 計算失敗
 		return false;
 	}
-	return  ( r!="0" && r!="０" );
+	return  ( zen2int(r) != 0 );
 }

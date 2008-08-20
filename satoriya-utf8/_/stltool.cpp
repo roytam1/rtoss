@@ -755,4 +755,47 @@ string	stringf(const char* iFormat, ...) {
 	return	buf;
 }
 
+string	zen2han(const char *s)
+{
+	string str(s);
+
+	static const char	before[] = "０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ－＋";
+	static const char	after[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-+";
+	char	buf1[4]="\0\0\0", buf2[2]="\0";
+	for (int n=0 ; n<sizeof(after) ; ++n) {
+		buf1[0]=before[n*3];
+		buf1[1]=before[n*3+1];
+		buf1[2]=before[n*3+2];
+		buf2[0]=after[n];
+		replace(str, buf1, buf2);
+	}
+	return	str;
+}
+
+string int2zen(int i) {
+	static const char*	ary[] = {"０","１","２","３","４","５","６","７","８","９"};
+	
+	string	zen;
+	if ( i<0 ) {
+		zen += "－";
+		i = -i; // INT_MINの時は符号が反転しない
+	}
+	string	han=itos(i);
+	const char* p=han.c_str();
+	if ( i==INT_MIN )
+		++p;
+	for (  ; *p != '\0' ; ++p ) {
+		assert(*p>='0' && *p<='9');
+		zen += ary[*p-'0'];
+	}
+	return	zen;
+}
+
+int zen2int(const char *str)
+{
+	return stoi(zen2han(str));
+}
+
+
+
 
