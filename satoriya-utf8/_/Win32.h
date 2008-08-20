@@ -12,7 +12,7 @@
 // 文字列を設定する。hWndはNULLでも構わない。
 bool	SetClipBoard(HWND iWnd, const char* iFormat, ...);
 #ifdef	_STRING_
-string	GetClipBoard();
+std::string	GetClipBoard();
 #endif
 
 //----------------------------------------------------------

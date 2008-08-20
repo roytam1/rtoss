@@ -2,6 +2,9 @@
 #include <list>
 #include <exception>
 #include <stdexcept>
+#ifndef __MINGW32__
+#	include <typeinfo.h>
+#endif
 using namespace std;
 
 #include "OverlapController.h"
