@@ -538,7 +538,7 @@ void	xor_filter(byte* ioArray, int iLength, byte iXorValue) {
 
 const char*	find_final_char(const char* str, char c) {
 	const char*	last=NULL, *p=str;
-	for (;*p; p+=_ismbblead(*p)?2:1)
+	for (;*p; p+=_mbbc(*p))
 		if ( *p==c )
 			last=p;
 	return	last;

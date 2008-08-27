@@ -6,30 +6,35 @@
 using namespace std;
 
 #include	<windows.h>
-#include	<mbctype.h>		// for _ismbblead()
+//#include	<mbctype.h>		// for _ismbblead()
+#include	"Utilities.h"	// for _ismbblead()
 
 
 class vc_debugstring_buf : public streambuf {
-	int	knj;	// 2byte文字の保持
+	char	utf8[4];	// UTF-8文字の保持
+	int utflen,utfpos;
 public:
 	vc_debugstring_buf() : knj(0) {}
 	virtual int overflow(int c=EOF) {
-		char	buf[3];
-		if (knj != 0) {
-			// 2byte文字の2byte目
-			buf[0] = (char)knj;
-			buf[1] = (char)c;
-			buf[2] = '\0';
-			::OutputDebugString(buf);
-			knj = 0;
+		if (utflen == 1 && utfpos) {
+			// UTF-8文字の最後
+			utf8[++utfpos] = c;
+			::OutputDebugString(utf8);
+			utflen = utfpos = 0;
 		}
 		else if ( _ismbblead(c) ) {
-			knj = c;
+			utflen = _mbbc(c) - 1;
+			utfpos = 0;
+			utf8[utfpos] = c;
+		}
+		else if ( _ismbbtail(c) ) {
+			--utflen;
+			utf8[++utfpos] = c;
 		}
 		else {
-			buf[0] = (char)c;
-			buf[1] = '\0';
-			::OutputDebugString(buf);
+			utf8[0] = (char)c;
+			utf8[1] = '\0';
+			::OutputDebugString(utf8);
 		}
 		return	c;
 	}

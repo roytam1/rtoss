@@ -30,11 +30,11 @@ void	add_characters(const char* p, int& chars_spoken) {
 					if (p[0]=='\\' && p[1]==']')	// エスケープされた]
 						++p;
 					else
-						p += _ismbblead(*p) ? 2 : 1;
+						p += _mbbc(*p);
 			}
 		}
 		else {
-			int len = _ismbblead(*p) ? 2 : 1;
+			int len = _mbbc(*p);
 			p += len;
 			chars_spoken += len;
 		}

@@ -1,10 +1,10 @@
 #include	"stltool.h"
 #include	"simple_stack.h"
-#ifdef POSIX
+//#ifdef POSIX
 #  include      "Utilities.h"
-#else
+/*#else
 #  include	<mbctype.h>
-#endif
+#endif*/
 
 //////////DEBUG/////////////////////////
 #ifdef _WINDOWS
@@ -120,7 +120,7 @@ static bool	make_deque(const char*& p, deque<calc_element>& oDeque) {
 					break;
 				if ( check_operator(p) )
 					break;
-				p += _ismbblead(*p) ? 2 : 1;
+				p += _mbbc(*p);
 			}
 			if (p==start)
 				return	false;	// 被演算子が必要なのに、ない。

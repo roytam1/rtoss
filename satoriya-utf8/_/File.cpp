@@ -188,11 +188,12 @@ BOOL	GetFileSize( LPCSTR szFileName, DWORD* pdwSize ) {
 }
 
 // 文字列中から指定の1byte文字が最後に出現する位置を返す。
-#include	<mbctype.h>	// for _ismbblead()
+//#include	<mbctype.h>	// for _ismbblead()
+#include "Utilities.h" // for _mbbc()
 template<class T>
 inline T*	FindFinalChar(T* start, T c) {
 	T* last=NULL;
-	for (T* p=start; *p ; p+=_ismbblead(*p)?2:1)
+	for (T* p=start; *p ; p+=_mbbc(*p))
 		if (*p==c)
 			last=p;
 	return	last;

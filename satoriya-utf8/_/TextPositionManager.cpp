@@ -34,15 +34,15 @@ void	TextPositionManager::Home() {
 
 // 行末と禁則を考慮して、改行処理。
 void	TextPositionManager::Before(const char* p) {
-	int	len = _ismbblead(*p) ? 2 : 1;
+	int	len = _mbbc(*p);
 
 	const char kinsoku[] = "！？。、";
-	if ( len == 2 )
-		for ( const char* pk=kinsoku ; *pk!='\0' ; pk+=2 )
-			if ( strncmp(p, pk, 2) == 0 )
+	if ( len > 1 )
+		for ( const char* pk=kinsoku ; *pk!='\0' ; pk+=3 )
+			if ( strncmp(p, pk, 3) == 0 )
 				return;
 
-	if ( mPosition.x >= mFormat.w-2 )	// -2 は禁則予定部分
+	if ( mPosition.x >= mFormat.w-3 )	// -3 は禁則予定部分
 		Return();
 }
 
@@ -66,7 +66,7 @@ CPoint	TextPositionManager::Position(CSize iFontSize) {
 
 // 文字位置をインクリメント。
 int		TextPositionManager::After(const char* p) {
-	int	len = _ismbblead(*p) ? 2 : 1;
+	int	len = _mbbc(*p);
 	mPosition.x += len;
 	return	len;
 }
