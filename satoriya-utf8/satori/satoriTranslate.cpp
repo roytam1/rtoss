@@ -166,8 +166,8 @@ bool	Satori::Translate(string& ioScript) {
 							}
 						}
 					}
-					if ( c < n && _ismbblead(i->at(c)) ) {
-						++c;
+					if ( c < n ) {
+						c += _mbbc(i->at(c));
 					}
 				}
 			}

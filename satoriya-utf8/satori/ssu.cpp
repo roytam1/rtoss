@@ -114,7 +114,7 @@ static string zen2han_internal(string &str,unsigned int flag = 0xffffU);
 // 半角/全角を同等に扱った上で文字長を返す
 int	sjis_strlen(const char* p) {
 	int	n=0;
-	for (int i=0 ; p[i] != '\0' ; i += _ismbblead(p[i]) ? 2 : 1 )
+	for (int i=0 ; p[i] != '\0' ; i += _mbbc(p[i]))
 		++n;
 	return	n;
 }
@@ -124,7 +124,7 @@ const char*	sjis_at(const char* p, int n) {
 	for (int i=0 ; i<n ; ++i) {
 		if ( *p == '\0' )
 			return	NULL;
-		p += _ismbblead(*p) ? 2 : 1;
+		p += _mbbc(*p);
 	}
 	return	p;
 }
@@ -285,11 +285,9 @@ string	sprintf(deque<string>& iArguments) {
 				continue;
 			}
 		}
-		if ( _ismbblead(*p) ) {
-			s << *p++; s << *p++;
-		} else {
+		int lenp = 0; lenp = _mbbc(*p);
+		for(int q = 0;q < lenp; q++)
 			s << *p++;
-		}
 	}
 	return	s.str();
 }
@@ -724,7 +722,7 @@ SRV _hira2kata(deque<string>& iArguments, deque<string>& oValues) {
 		return	SRV(400, "引数の個数が正しくありません。");
 
 	string&	str=iArguments[0];
-	for (int i=0 ; str[i]!='\0' ; i+=_ismbblead(str[i])?2:1) {
+	for (int i=0 ; str[i]!='\0' ; i+=_mbbc(str[i])) {
 		for (int j=0 ; j<sizeof(hira) ; j+=2) {
 			if ( str[i]==hira[j] && str[i+1]==hira[j+1] ) {
 				str[i]=kata[j];
@@ -740,7 +738,7 @@ SRV _kata2hira(deque<string>& iArguments, deque<string>& oValues) {
 		return	SRV(400, "引数の個数が正しくありません。");
 
 	string&	str=iArguments[0];
-	for (int i=0 ; str[i]!='\0' ; i+=_ismbblead(str[i])?2:1) {
+	for (int i=0 ; str[i]!='\0' ; i+=_mbbc(str[i])) {
 		for (int j=0 ; j<sizeof(hira) ; j+=2) {
 			if ( str[i]==kata[j] && str[i+1]==kata[j+1] ) {
 				str[i]=hira[j];
@@ -764,7 +762,7 @@ SRV _reverse(deque<string>& iArguments, deque<string>& oValues) {
 	string	r;
 	const char* p = iArguments[0].c_str();
 	while (*p != '\0') {
-		const int len = _ismbblead(*p)?2:1;
+		const int len = _mbbc(*p);
 		r = string(p, len) + r;
 		p += len;
 	}
@@ -776,7 +774,7 @@ SRV _at(deque<string>& iArguments, deque<string>& oValues) {
 
 	if ( iArguments.size()==2 ) {
 		const char* p = sjis_at(iArguments.at(0).c_str(), zen2int(iArguments.at(1)));
-		return	(p==NULL || *p=='\0') ? "" : string(p, _ismbblead(*p)?2:1);
+		return	(p==NULL || *p=='\0') ? "" : string(p, _mbbc(*p));
 	}
 	//else if ( iArguments.size()==3 ) {
 	//}

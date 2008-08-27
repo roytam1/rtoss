@@ -55,7 +55,7 @@ void sakura_script_parts::unserialize(string i_script)
 					{	
 						++p; // エスケープされた]
 					}
-					p += _ismbblead(*p) ? 2 : 1;
+					p += _mbbc(*p);
 				}
 				option.assign(start, p++ - start);
 			}
