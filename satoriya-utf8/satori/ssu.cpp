@@ -79,12 +79,12 @@ SRV	ssu::request(deque<string>& iArguments, deque<string>& oValues) {
 /* 「ソ」の2バイト目は「\」であるので、エスケープする必要がある。 */
 //static const char	zen[] = 
 //	"　ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ"
-//	"０１２３４５６７８９！”＃＄％＆’（）＝～｜‘｛＋＊｝＜＞？＿ー^￥＠「；：」、。・÷×－，．［］"
+//	"０１２３４５６７８９！”＃＄％＆’（）＝～｜‘｛＋＊｝＜＞？＿ー＾￥＠「；：」、。・÷×－，．［］"
 //	"アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンァィゥェォャュョッ゛゜、。";
 //static const char	han[] = 
 //	" ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-//	"0123456789!\"#$%&'()=~|`{+*}<>?_-^\\@[;:],.・/*-,.[]"
-//	"アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンァィゥェォャュョッ゛゜、。";
+//	"0123456789!\"#$%&'()=~|`{+*}<>?_-^\\@[;:],.･/*-,.[]"
+//	"ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜｦﾝｧｨｩｪｫｬｭｮｯﾞﾟ､｡";
 static const char	kata[] = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヰヱヲンァィゥェォャュョヮッガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポ";
 static const char	hira[] = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわゐゑをんぁぃぅぇぉゃゅょゎっがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ";
 
@@ -95,14 +95,14 @@ static const char	han_alpha[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstu
 static const char	zen_digit[] = "０１２３４５６７８９";
 static const char	han_digit[] = "0123456789";
 
-static const char   zen_symbol[] = "　！”＃＄％＆’（）＝～｜‘｛＋＊｝＜＞？＿ー^￥＠「；：」、。・÷×－，．［］";
-static const char   han_symbol[] = " !\"#$%&'()=~|`{+*}<>?_-^\\@[;:],.・/*-,.[]";
+static const char   zen_symbol[] = "　！”＃＄％＆’（）＝～｜‘｛＋＊｝＜＞？＿ー＾￥＠「；：」、。－，．［］÷×・";
+static const char   han_symbol[] = " !\"#$%&'()=~|`{+*}<>?_-^\\@[;:],.-,.[]/*･";
 
 static const char   zen_kana_1[] = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンァィゥェォャュョッ、。";
-static const char   han_kana_1[] = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンァィゥェォャュョッ、。";
+static const char   han_kana_1[] = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜｦﾝｧｨｩｪｫｬｭｮｯ､｡";
 
 static const char   zen_kana_2[] = "ガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポ";
-static const char   han_kana_2[] = "ガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポ";
+static const char   han_kana_2[] = "ｶﾞｷﾞｸﾞｹﾞｺﾞｻﾞｼﾞｽﾞｾﾞｿﾞﾀﾞﾁﾞﾂﾞﾃﾞﾄﾞﾊﾞﾋﾞﾌﾞﾍﾞﾎﾞﾊﾟﾋﾟﾌﾟﾍﾟﾎﾟ";
 
 extern	bool calc(string& ioString,bool isStrict = false);
 extern	bool calc_float(string& ioString);
@@ -539,20 +539,20 @@ SRV _is_digit(deque<string>& iArguments, deque<string>& oValues) {
 	if ( p[0] == '-' || p[0] == '+' ) {
 		p += 1;
 	}
-	else if ( (p[0] == zen_pm[0] && p[1] == zen_pm[1]) || (p[0] == zen_pm[2] && p[1] == zen_pm[3]) ) {
-		p += 2;
+	else if ( (p[0] == zen_pm[0] && p[1] == zen_pm[1] && p[2] == zen_pm[2]) || (p[0] == zen_pm[3] && p[1] == zen_pm[4] && p[2] == zen_pm[5]) ) {
+		p += 3;
 	}
 
 	if ( *p == 0 ) { return "0"; }
 
 	for ( ; *p ; p += step ) {
-		for ( i=0 ; i<20 ; i+=2) {
-			if ( p[0]==zen_digit[i] && p[1]==zen_digit[i+1] ) {
+		for ( i=0 ; i<30 ; i+=3) {
+			if ( p[0]==zen_digit[i] && p[1]==zen_digit[i+1]  && p[2]==zen_digit[i+2] ) {
 				break;
 			}
 		}
-		if ( i<20 ) {
-			step = 2;
+		if ( i<30 ) {
+			step = 3;
 			continue;
 		}
 
@@ -602,49 +602,80 @@ SRV _zen2han(deque<string>& iArguments, deque<string>& oValues) {
 
 string zen2han_internal(string &str,unsigned int flag)
 {
-	char	before[4]="　", after[2]=" ";
+	char	before[4]="　", after[4]=" ", after2[7] = "      ";
 
 	if ( flag & 0x1 ) { //アルファベット
-		for (int n=0 ; n<sizeof(han_alpha) ; ++n) {
-			before[0]=zen_alpha[n*2];
-			before[1]=zen_alpha[n*2+1];
+		for (int n=0 ; n<sizeof(han_alpha)-1 ; ++n) {
+			before[0]=zen_alpha[n*3];
+			before[1]=zen_alpha[n*3+1];
+			before[2]=zen_alpha[n*3+2];
 			after[0]=han_alpha[n];
 			replace(str, before, after);
 		}
 	}
 	if ( flag & 0x2 ) { //数字
-		for (int n=0 ; n<sizeof(han_digit) ; ++n) {
-			before[0]=zen_digit[n*2];
-			before[1]=zen_digit[n*2+1];
+		for (int n=0 ; n<sizeof(han_digit)-1 ; ++n) {
+			before[0]=zen_digit[n*3];
+			before[1]=zen_digit[n*3+1];
+			before[2]=zen_digit[n*3+2];
 			after[0]=han_digit[n];
 			replace(str, before, after);
 		}
 	}
 	if ( flag & 0x4 ) { //記号
-		for (int n=0 ; n<sizeof(han_symbol) ; ++n) {
-			before[0]=zen_symbol[n*2];
-			before[1]=zen_symbol[n*2+1];
+		int n;
+		for ( n=0 ; n<(sizeof(zen_symbol)-8)/3 ; ++n) {
+			before[0]=zen_symbol[n*3];
+			before[1]=zen_symbol[n*3+1];
+			before[2]=zen_symbol[n*3+2];
 			after[0]=han_symbol[n];
 			replace(str, before, after);
 		}
+		// ÷ (2 bytes UTF-8)
+		before[0]=zen_symbol[n*3];
+		before[1]=zen_symbol[n*3+1];
+		before[2]='\0';
+		after[0]=han_symbol[n];
+		replace(str, before, after);
+		// × (2 bytes UTF-8)
+		before[0]=zen_symbol[n*3+2];
+		before[1]=zen_symbol[n*3+3];
+		after[0]=han_symbol[n+1];
+		replace(str, before, after);
+		//「・」→「･」は特別  (3 bytes UTF-8→3 bytes UTF-8)
+		before[0]=zen_symbol[n*3+4];
+		before[1]=zen_symbol[n*3+5];
+		before[2]=zen_symbol[n*3+6];
+		after[0]=han_symbol[n+2];
+		after[1]=han_symbol[n+3];
+		after[2]=han_symbol[n+4];
+		replace(str, before, after);
 	}
 	if ( flag & 0x8 ) { //カナ
 		int n;
-		char after2[3] = "  ";
-		for (n=0 ; n< (sizeof(han_kana_2)/2) ; ++n) {
-			before[0]=zen_kana_2[n*2];
-			before[1]=zen_kana_2[n*2+1];
-			after2[0]=han_kana_2[n*2];
-			after2[1]=han_kana_2[n*2+1];
+		for (n=0 ; n<(sizeof(zen_kana_2)-1)/3 ; ++n) {
+			before[0]=zen_kana_2[n*3];
+			before[1]=zen_kana_2[n*3+1];
+			before[2]=zen_kana_2[n*3+2];
+			after2[0]=han_kana_2[n*6];
+			after2[1]=han_kana_2[n*6+1];
+			after2[2]=han_kana_2[n*6+2];
+			after2[3]=han_kana_2[n*6+3];
+			after2[4]=han_kana_2[n*6+4];
+			after2[5]=han_kana_2[n*6+5];
 			replace(str, before, after2);
 		}
-		for (n=0 ; n<sizeof(han_kana_1) ; ++n) {
-			before[0]=zen_kana_1[n*2];
-			before[1]=zen_kana_1[n*2+1];
-			after[0]=han_kana_1[n];
+		for (n=0 ; n<(sizeof(zen_kana_1)-1)/3 ; ++n) {
+			before[0]=zen_kana_1[n*3];
+			before[1]=zen_kana_1[n*3+1];
+			before[2]=zen_kana_1[n*3+2];
+			after[0]=han_kana_1[n*3];
+			after[1]=han_kana_1[n*3+1];
+			after[2]=han_kana_1[n*3+2];
 			replace(str, before, after);
 		}
 	}
+
 	return	str;
 }
 
@@ -669,47 +700,78 @@ SRV _han2zen(deque<string>& iArguments, deque<string>& oValues) {
 		}
 	}
 
-	char	before[2]=" ", after[3]="  ";
+	char	before[4]=" ", after[6]="  ";
 	string&	str=iArguments[0];
 
 	if ( flag & 0x1 ) { //アルファベット
-		for (int n=0 ; n<sizeof(han_alpha) ; ++n) {
+		for (int n=0 ; n<sizeof(han_alpha)-1 ; ++n) {
 			before[0]=han_alpha[n];
-			after[0]=zen_alpha[n*2];
-			after[1]=zen_alpha[n*2+1];
+			after[0]=zen_alpha[n*3];
+			after[1]=zen_alpha[n*3+1];
+			after[2]=zen_alpha[n*3+2];
 			replace(str, before, after);
 		}
 	}
 	if ( flag & 0x2 ) { //数字
-		for (int n=0 ; n<sizeof(han_digit) ; ++n) {
+		for (int n=0 ; n<sizeof(han_digit)-1 ; ++n) {
 			before[0]=han_digit[n];
-			after[0]=zen_digit[n*2];
-			after[1]=zen_digit[n*2+1];
+			after[0]=zen_digit[n*3];
+			after[1]=zen_digit[n*3+1];
+			after[2]=zen_digit[n*3+2];
 			replace(str, before, after);
 		}
 	}
 	if ( flag & 0x4 ) { //記号
-		for (int n=0 ; n<sizeof(han_symbol) ; ++n) {
+		int n;
+		for ( n=0 ; n<(sizeof(zen_symbol)-8)/3 ; ++n) {
 			before[0]=han_symbol[n];
-			after[0]=zen_symbol[n*2];
-			after[1]=zen_symbol[n*2+1];
+			after[0]=zen_symbol[n*3];
+			after[1]=zen_symbol[n*3+1];
+			after[2]=zen_symbol[n*3+2];
 			replace(str, before, after);
 		}
+		// ÷ (2 bytes UTF-8)
+		before[0]=han_symbol[n];
+		after[0]=zen_symbol[n*3];
+		after[1]=zen_symbol[n*3+1];
+		after[2]='\0';
+		replace(str, before, after);
+		// × (2 bytes UTF-8)
+		before[0]=han_symbol[n+1];
+		after[0]=zen_symbol[n*3+2];
+		after[1]=zen_symbol[n*3+3];
+		replace(str, before, after);
+		//「・」→「･」は特別  (3 bytes UTF-8→3 bytes UTF-8)
+		before[0]=han_symbol[n+2];
+		before[1]=han_symbol[n+3];
+		before[2]=han_symbol[n+4];
+		after[0]=zen_symbol[n*3+4];
+		after[1]=zen_symbol[n*3+5];
+		after[2]=zen_symbol[n*3+6];
+		replace(str, before, after);
 	}
-	if ( flag & 0x8) { //カナ
+	if ( flag & 0x8 ) { //カナ
 		int n;
-		char before2[3] = "  ";
-		for (n=0 ; n<(sizeof(han_kana_2)/2) ; ++n) {
-			before2[0]=han_kana_2[n*2];
-			before2[1]=han_kana_2[n*2+1];
-			after[0]=zen_kana_2[n*2];
-			after[1]=zen_kana_2[n*2+1];
+		char before2[7] = "      ";
+		for (n=0 ; n<(sizeof(zen_kana_2)-1)/3 ; ++n) {
+			before2[0]=han_kana_2[n*6];
+			before2[1]=han_kana_2[n*6+1];
+			before2[2]=han_kana_2[n*6+2];
+			before2[3]=han_kana_2[n*6+3];
+			before2[4]=han_kana_2[n*6+4];
+			before2[5]=han_kana_2[n*6+5];
+			after[0]=zen_kana_2[n*3];
+			after[1]=zen_kana_2[n*3+1];
+			after[2]=zen_kana_2[n*3+2];
 			replace(str, before2, after);
 		}
-		for (n=0 ; n<sizeof(han_kana_1) ; ++n) {
+		for (n=0 ; n<sizeof(zen_kana_1) ; n+=3) {
 			before[0]=han_kana_1[n];
-			after[0]=zen_kana_1[n*2];
-			after[1]=zen_kana_1[n*2+1];
+			before[1]=han_kana_1[n+1];
+			before[2]=han_kana_1[n+2];
+			after[0]=zen_kana_1[n];
+			after[1]=zen_kana_1[n+1];
+			after[2]=zen_kana_1[n+2];
 			replace(str, before, after);
 		}
 	}
@@ -723,10 +785,11 @@ SRV _hira2kata(deque<string>& iArguments, deque<string>& oValues) {
 
 	string&	str=iArguments[0];
 	for (int i=0 ; str[i]!='\0' ; i+=_mbbc(str[i])) {
-		for (int j=0 ; j<sizeof(hira) ; j+=2) {
-			if ( str[i]==hira[j] && str[i+1]==hira[j+1] ) {
+		for (int j=0 ; j<sizeof(hira) ; j+=3) {
+			if ( str[i]==hira[j] && str[i+1]==hira[j+1]  && str[i+2]==hira[j+2] ) {
 				str[i]=kata[j];
 				str[i+1]=kata[j+1];
+				str[i+2]=kata[j+2];
 			}
 		}
 	}
@@ -739,10 +802,11 @@ SRV _kata2hira(deque<string>& iArguments, deque<string>& oValues) {
 
 	string&	str=iArguments[0];
 	for (int i=0 ; str[i]!='\0' ; i+=_mbbc(str[i])) {
-		for (int j=0 ; j<sizeof(hira) ; j+=2) {
-			if ( str[i]==kata[j] && str[i+1]==kata[j+1] ) {
+		for (int j=0 ; j<sizeof(hira) ; j+=3) {
+			if ( str[i]==kata[j] && str[i+1]==kata[j+1]  && str[i+2]==kata[j+2] ) {
 				str[i]=hira[j];
 				str[i+1]=hira[j+1];
+				str[i+2]=hira[j+2];
 			}
 		}
 	}
