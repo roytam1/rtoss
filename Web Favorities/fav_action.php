@@ -20,8 +20,9 @@ echo '</head>';
 
 require("./fav_header.htm");
 
-if (!isset($_SESSION['isLogined'])) {
+if (!isset($_SESSION['isLogined']) && !viewAuth()) {
 	if (($iAction=="go") && ($iPass) && isset($_POST["h_id"]) && (($iPass==$FavPasswd) || ($iPass==$ViewPassword))) {
+		viewAuth('login',$iPass);
     	$qry="SELECT * FROM Fav WHERE id = ".$_POST["h_id"];
 		$rs=sqlite_query($conn,$qry);
 		$row = sqlite_fetch_array($rs);
@@ -47,7 +48,7 @@ if (!isset($_SESSION['isLogined'])) {
 		}
 	}
 }
-if (isset($_SESSION['isLogined'])) {
+if (isset($_SESSION['isLogined']) || viewAuth()) {
    switch ($iAction) {
     case "add":
       $_GET['url']=urlencode($_GET['url']); // encodes url again

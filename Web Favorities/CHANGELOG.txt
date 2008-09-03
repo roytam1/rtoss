@@ -6,8 +6,12 @@ Version 0.05:
 * Move determination script out of fav_settings.php to fav_common.php
 * Add login process to fav_action.php instead of showing "Access Denied"
 * Allow Category has URL
+* Make navigation bar hidable and visiable in sidebar mode
+* Fixed navigation bar hiding when not in sidebar mode
+* Fixed navigation bar in WebKit engines
 + Add cookie-based submenu show/hide memory
-+ Add [Bookmark This!] bookmarklet (fixed '&' problem in 20070814)
++ Add [Bookmark This!] bookmarklet (fixed '&' problem in 20070814, and '#' problem later)
++ Add view protected site password short time memorization. (1 hour)
 - Remove images and "NI=Y" Query string
 
 Version 0.04:
