@@ -34,14 +34,31 @@ a.navi {
 .dh {display:none;}
 .dv {display:block;}
 .divNavi {
-	border: 0px;
-	border-style: none;
+	border: 1px dotted #999;
+	background-color:#fff;
 	top: 20px;
 	right: 0px;
 	position: absolute;
-	text-align: center;
+	text-align: right;
 	line-height: 1em;
-	padding: 2px;}
+	padding: 2px;
+	width:auto;
+	height:auto;
+	overflow:auto;
+}
+.divNavi-hide {
+	border: 1px dotted #999;
+	background-color:#fff;
+	top: 20px;
+	right: 0px;
+	position: absolute;
+	text-align: right;
+	line-height: 1em;
+	padding: 2px;
+	width:1em;
+	height:1em;
+	overflow:hidden;
+}
 ul,li,dt,dl,dd { margin-left: 0px;text-indent: 0px;list-style-position:inside;padding-left:0px;}
 dl dd div ul li {margin-left:0.35em;}';
 if (!($oldNetscape || $noXML)) echo ']]>';
@@ -53,7 +70,10 @@ var ns4=document.layers?1:0
 var ns6=document.getElementById&&!document.all?1:0
 var opera=window.opera?1:0
 var geckoCSS2=(navigator.userAgent.indexOf("Gecko/")!=-1?navigator.userAgent.substr(navigator.userAgent.indexOf("Gecko/")+6,8):0)>=20011011?1:0;
+var webkit=navigator.userAgent.indexOf("AppleWebKit/")!=-1?1:0;
 var cookieName = "WebFavShow";
+var inSidebar = '.(int)$InSidebar.';
+var TimeoutTimer,TimerFlag;
 
 function gID(s) { return document.getElementById(s); }
 
@@ -124,7 +144,7 @@ function moveNavi() {
 		divNavi.style.pixelLeft = document.body.clientWidth + document.body.scrollLeft - divNavi.offsetWidth - offsetTop;
 	} else if (ns6||opera) {
 		var obj = document.getElementById("divNavi");
-		if (!(geckoCSS2||opera)) 
+		if (!(geckoCSS2||opera||webkit)) 
 			obj.style.top=window.pageYOffset+offsetTop;
 		else {
 			obj.style.right="12px";
@@ -136,6 +156,21 @@ function moveNavi() {
 	}
 	setTimeout("moveNavi()",100); //IEでスレが大きい場合CPUを食うようなので変更。
 }
+function minNavi() { document.getElementById("divNavi").className = "divNavi-hide";TimerFlag=0; }
+function NaviTimout() {
+	if(inSidebar && !TimerFlag) {
+		TimeoutTimer=setTimeout("minNavi()",1000);
+		TimerFlag=1;
+	}
+}
+function restoreNavi() {
+	if(TimerFlag) {
+		clearTimeout(TimeoutTimer);
+		TimerFlag=0;
+	}
+	document.getElementById("divNavi").className = "divNavi";
+}
+
 function add_submenu(id) {
 	var submenus = get_submenu();
 	for (var i = 0; i<submenus.length; i++) if (submenus[i] == id) return;
@@ -182,14 +217,14 @@ echo '</script>
 <a name="top"></a>';
 if (isset($_SESSION['isLogined'])) echo '<a href="'.text2xml("fav_action.php?action=order&id=-1".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_CatOrder.'</a> ';
 if (!$oldNetscape) echo '<a id="aToggle" href="'.text2xml("javascript:toggleAllDiv('aToggle','force');").'" class="admtool">'.($shrinkFirst?$MyFav_ExpandAll:$MyFav_ShrinkAll).'</a> <a id="aToggle2" href="'.text2xml("javascript:toggleAllDiv('aToggle2','invert');").'" class="admtool">'.$MyFav_InvertAll.'</a>';
-echo '<div class="divNavi" id="divNavi">';
-if ($DispNavi) {
-	echo '<a href="#bottom" style="font-size:x-small;">'.$MyFav_GotoBottom."</a><br />\n";
+echo '<div class="divNavi'.($DispNavi?'':'-hide').'" id="divNavi" onmouseover="restoreNavi()" onmouseout="NaviTimout()">';
+//if ($DispNavi) {
+	echo '<a href="#bottom" style="font-size:x-small;" onmouseover="restoreNavi()">'.$MyFav_GotoBottom."</a><br />\n";
 	while($row = sqlite_fetch_array($rs))
-		echo '<a href="#'.$row['id'].'" class="navi" '.((!$oldNetscape)?'onclick="'.text2xml("ExpandDiv('d".$row['id']."','a".$row['id']."');").'"':'').'>'.text2xml($row['name'])."</a><br />\n";
+		echo '<a href="#'.$row['id'].'" class="navi" onmouseover="restoreNavi()" '.((!$oldNetscape)?'onclick="'.text2xml("ExpandDiv('d".$row['id']."','a".$row['id']."');").'"':'').'>'.text2xml($row['name'])."</a><br />\n";
 echo '<a href="#top" style="font-size:x-small;">'.$MyFav_GotoTop."</a><br />\n";
 sqlite_rewind($rs);
-}
+//}
 echo '</div>
 <dl>';
 while($row = sqlite_fetch_array($rs)) {
@@ -235,7 +270,7 @@ echo '</script>
 <a name="bottom"></a>';
 sqlite_close($conn);
 sqlite_close($conn2);
-if (isset($_SESSION['isLogined'])) echo '<a href="'.text2xml("fav_action.php?action=add".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Add.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=order&id=0".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Order.'</a> <a href="'.text2xml("fav_action.php?action=opt".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Optimize.'</a> <a href="'.text2xml("javascript:location.href='".$BaseURL."fav_action.php?action=add&name='+document.title+'&url='+document.location.href.replace('&','%2526');").'" class="admtool" '.$admAppend.'>'.$MyFav_Bookmarklet.'</a>';
+if (isset($_SESSION['isLogined'])) echo '<a href="'.text2xml("fav_action.php?action=add".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Add.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=order&id=0".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Order.'</a> <a href="'.text2xml("fav_action.php?action=opt".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Optimize.'</a> <a href="'.text2xml("javascript:location.href='".$BaseURL."fav_action.php?action=add&name='+document.title.replace(/&/g,'%2526').replace(/#/g,'%252523')+'&url='+document.location.href.replace(/&/g,'%2526').replace(/#/g,'%2523');").'" class="admtool" '.$admAppend.'>'.$MyFav_Bookmarklet.'</a>';
 $uriSuffix=isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING']!=""?"?".$_SERVER['QUERY_STRING']:'';
 
 echo '<form action="'.text2xml($_SERVER['PHP_SELF'].$uriSuffix).'" method="post">';

@@ -79,4 +79,24 @@ function logInOut($pass,$logout=false) {
 	  return true;
 	} else return false;
 }
+
+function viewAuth($action='auth',$pass='') {
+	global $FavPasswd,$ViewPassword;
+	switch($action) {
+		case 'auth':
+			if(isset($_COOKIE['favsess'])) {
+				@list($hash,$exptime,$type) = @explode('.',$_COOKIE['favsess']);
+				if($type == 2 && md5('favsess'.$FavPasswd.$exptime) == $hash && time() <= $exptime) return true;
+				if($type == 1 && md5('favsess'.$ViewPassword.$exptime) == $hash && time() <= $exptime) return true;
+				viewAuth('logout');
+			}
+			return false;
+		case 'login':
+			$exptime = time()+3600;
+			setcookie("favsess", md5('favsess'.$pass.$exptime).'.'.$exptime.'.'.(($pass==$FavPasswd)?2:1), time()+3600);
+			break;
+		case 'logout':
+			setcookie("favsess", '', time()-3600);
+	}
+}
 ?>
