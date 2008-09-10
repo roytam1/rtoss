@@ -2216,21 +2216,21 @@ sub form {
 	my($type,$no,$reno,$date,$name,$mail,$sub,$com,$url,$host,$pw,$color) = @_;
 	my($cnam,$ceml,$curl,$cpwd,$cico,$ccol);
 
-	my %args=('{$jnstr_name}'=>$jnstr_name,'{$jnstr_email}'=>$jnstr_email,'{$jnstr_title}'=>$jnstr_title,'{$jn_notes}'=>'',
+	my %args=('{$jnstr_name}'=>$jnstr_name,'{$jnstr_email}'=>$jnstr_email,'{$jnstr_title}'=>$jnstr_title,'{$jn_notes}'=>'','{$clip}'=>'',
 		'{$jnstr_commets}'=>$jnstr_commets,'{$script}'=>$script,'{$langstr}'=>$langstr,'{$'.(!$type?'new':$type).'mode}'=>1);
 
 	%args = (%args, ('{$form_title}'=>${'jnstr_'.(!$type?'new':$type).'_mode'})) if(${'jnstr_'.(!$type?'new':$type).'_mode'});
 	## フォーム種別を判別
 	# 修正
 	if ($type eq "edit") {
-		%args = (%args, ('{$clip}'=>'','{$hiddens}'=>"<input type=hidden name=mode value=\"usr_edt\"><input type=hidden name=action value=\"edit\"><input type=hidden name=pwd value=\"$in{'pwd'}\"><input type=hidden name=no value=\"$in{'no'}\">"));
+		%args = (%args, ('{$hiddens}'=>"<input type=hidden name=mode value=\"usr_edt\"><input type=hidden name=action value=\"edit\"><input type=hidden name=pwd value=\"$in{'pwd'}\"><input type=hidden name=no value=\"$in{'no'}\">"));
 		$cnam = $name;
 		$ceml = $mail;
 		$curl = $url;
 		$ccol = $color;
 	# 新規 / 返信
 	} else {
-		%args = (%args, ('{$clip}'=>($res_clip)?'enctype="multipart/form-data"':'','{$hiddens}'=>'<input type=hidden name=mode value="regist">'.(($type eq "res")?"<input type=hidden name=reno value=\"$in{'no'}\">":'')));
+		%args = (%args, ('{$hiddens}'=>'<input type=hidden name=mode value="regist">'.(($type eq "res")?"<input type=hidden name=reno value=\"$in{'no'}\">":'')));
 	}
 
 	%args = (%args, ('{$jn_name_field}'=>"<input type=text name=$traps[0] size=1 class='h'><input type=text name=$fields{name} size=28 value='$cnam'>",
@@ -2243,8 +2243,8 @@ sub form {
 
 
 	# 添付フォーム
-	if ($type eq "" || ($type eq "res" && $res_clip)) {
-		%args = (%args, ('{$jnstr_attachment}'=>$jnstr_attachment,'{$jnstr_attachment_field}'=>'<input type=file name=upfile size=40>'));
+	if ($clip && ($type eq "" || ($type eq "res" && $res_clip))) {
+		%args = (%args, ('{$clip}'=>'enctype="multipart/form-data"','{$jnstr_attachment}'=>$jnstr_attachment,'{$jnstr_attachment_field}'=>'<input type=file name=upfile size=40>'));
 	}
 	# パスワード欄
 	if ($type ne "edit") {

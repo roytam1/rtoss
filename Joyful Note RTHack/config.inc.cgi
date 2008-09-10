@@ -28,6 +28,9 @@ $topsort = 1;
 # 強制sageスレ数 (n=0)
 $maxage = 10;
 
+# 添付機能を許可する (0=no 1=yes)
+$clip = 1;
+
 # 返信にも添付機能を許可する (0=no 1=yes)
 $res_clip = 1;
 
