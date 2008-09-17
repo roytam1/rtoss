@@ -1,14 +1,26 @@
 <?php
-$oldNetscape=false;$noXML=false;$SidebarSuffix1='';$admAppend='';$aAppend='';
+$NoNavi=$oldNetscape=$noXML=false;$mozver=$iever=$SidebarSuffix1=$admAppend=$aAppend='';
 
-if (isset($_GET["F"]) && !$_GET["F"]=="Y") {
-  if (strpos(strtolower($_SERVER["HTTP_USER_AGENT"]),"mozilla/4.0")===false && strpos(strtolower($_SERVER["HTTP_USER_AGENT"]),"mozilla/5.0")===false && strpos(strtolower($_SERVER["HTTP_USER_AGENT"]),"opera/")===false)
-    $oldNetscape=true;
-  if (strpos(strtolower($_SERVER["HTTP_USER_AGENT"]),"mozilla/5.0") && strpos(strtolower($_SERVER["HTTP_USER_AGENT"]),"opera")===false && strpos(strtolower($_SERVER["HTTP_USER_AGENT"]),"gecko")===false)
-    $oldNetscape=true;
+$ua=strtolower($_SERVER["HTTP_USER_AGENT"]);
+if(strpos($ua,'mozilla/')!==false) {
+  preg_match('#mozilla/(\d+\.*\d+)#',$ua,$m);
+  $mozver=$m[1];
+}
+if(strpos($ua,'msie ')!==false) {
+  preg_match('#msie (\d+\.*\d+)#',$ua,$m);
+  $iever=$m[1];
 }
 
-if (isset($_GET["F"]) && $_GET["F"]=="N") $oldNetscape=true;
+if ((strpos($ua,"mozilla/4.0")===false && strpos($ua,"mozilla/5.0")===false && strpos($ua,"opera/")===false) ||
+	(strpos($ua,"mozilla/5.0")!==false && strpos($ua,"opera")===false && strpos($ua,"gecko")===false && strpos($ua,"webkit")===false && strpos($ua,"khtml")===false) ||
+	($mozver && $mozver < '4.0') || ($iever && $iever < '5.5'))
+    $oldNetscape=true;
+
+if (isset($_GET["F"])) {
+  if ($_GET["F"]=="Y") $oldNetscape=false;
+  if ($_GET["F"]=="N") $oldNetscape=true;
+}
+if ($oldNetscape) $NoNavi=true;
 
 if (!isset($_GET["noxml"]))
   if ((strpos(strtoupper($_SERVER["HTTP_USER_AGENT"]),"MSIE") ? strpos(strtoupper($_SERVER["HTTP_USER_AGENT"]),"MSIE")+1 : 0)>0)
