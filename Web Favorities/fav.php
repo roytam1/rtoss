@@ -137,24 +137,25 @@ else
  alert("Your browser does not support this particular feature.");
 }
 function moveNavi() {
-	var offsetTop = 20;
+	var offsetTop = 20; needRepeat = true;
 
-	if (ie) {
+	if (ie && !window.XMLHttpRequest) { //<IE7
 		divNavi.style.pixelTop = document.body.scrollTop + offsetTop;
 		divNavi.style.pixelLeft = document.body.clientWidth + document.body.scrollLeft - divNavi.offsetWidth - offsetTop;
-	} else if (ns6||opera) {
+	} else if (ns6||opera||ie) {
 		var obj = document.getElementById("divNavi");
-		if (!(geckoCSS2||opera||webkit)) 
+		if (!(geckoCSS2||opera||webkit||ie)) 
 			obj.style.top=window.pageYOffset+offsetTop;
 		else {
 			obj.style.right="12px";
 			obj.style.position="fixed";
+			needRepeat = false;
 		}
 	} else if (ns4) {
 		// it causes error in netscape
 //		eval(document.divNavi.top=eval(window.pageYOffset+offsetTop));
 	}
-	setTimeout("moveNavi()",100); //IEでスレが大きい場合CPUを食うようなので変更。
+	if(needRepeat) setTimeout("moveNavi()",100); //IEでスレが大きい場合CPUを食うようなので変更。
 }
 function minNavi() { document.getElementById("divNavi").className = "divNavi-hide";TimerFlag=0; }
 function NaviTimout() {
