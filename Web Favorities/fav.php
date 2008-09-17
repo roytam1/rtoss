@@ -141,7 +141,8 @@ function moveNavi() {
 
 	if (ie && !window.XMLHttpRequest) { //<IE7
 		divNavi.style.pixelTop = document.body.scrollTop + offsetTop;
-		divNavi.style.pixelLeft = document.body.clientWidth + document.body.scrollLeft - divNavi.offsetWidth - offsetTop;
+//		divNavi.style.pixelLeft = document.body.clientWidth + document.body.scrollLeft - divNavi.offsetWidth - offsetTop;
+		divNavi.style.pixelRight = offsetTop;
 	} else if (ns6||opera||ie) {
 		var obj = document.getElementById("divNavi");
 		if (!(geckoCSS2||opera||webkit||ie)) 
@@ -218,14 +219,14 @@ echo '</script>
 <a name="top"></a>';
 if (isset($_SESSION['isLogined'])) echo '<a href="'.text2xml("fav_action.php?action=order&id=-1".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_CatOrder.'</a> ';
 if (!$oldNetscape) echo '<a id="aToggle" href="'.text2xml("javascript:toggleAllDiv('aToggle','force');").'" class="admtool">'.($shrinkFirst?$MyFav_ExpandAll:$MyFav_ShrinkAll).'</a> <a id="aToggle2" href="'.text2xml("javascript:toggleAllDiv('aToggle2','invert');").'" class="admtool">'.$MyFav_InvertAll.'</a>';
-echo '<div class="divNavi'.($DispNavi?'':'-hide').'" id="divNavi" onmouseover="restoreNavi()" onmouseout="NaviTimout()">';
-//if ($DispNavi) {
+echo '<div class="'.($NoNavi?'dh':($DispNavi?'divNavi':'divNavi-hide')).'" id="divNavi" onmouseover="restoreNavi()" onmouseout="NaviTimout()">';
+if (!$NoNavi) {
 	echo '<a href="#bottom" style="font-size:x-small;" onmouseover="restoreNavi()">'.$MyFav_GotoBottom."</a><br />\n";
 	while($row = sqlite_fetch_array($rs))
 		echo '<a href="#'.$row['id'].'" class="navi" onmouseover="restoreNavi()" '.((!$oldNetscape)?'onclick="'.text2xml("ExpandDiv('d".$row['id']."','a".$row['id']."');").'"':'').'>'.text2xml($row['name'])."</a><br />\n";
 echo '<a href="#top" style="font-size:x-small;">'.$MyFav_GotoTop."</a><br />\n";
 sqlite_rewind($rs);
-//}
+}
 echo '</div>
 <dl>';
 while($row = sqlite_fetch_array($rs)) {

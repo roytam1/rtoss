@@ -10,6 +10,8 @@ Version 0.05:
 * Fixed navigation bar hiding when not in sidebar mode
 * Fixed navigation bar in WebKit engines
 * Fixed navigation bar in IE >= 7.0
+* Made IE < 5.5 working in OldNetscape mode
+* OldNetscape mode will not show navigation bar
 + Add cookie-based submenu show/hide memory
 + Add [Bookmark This!] bookmarklet (fixed '&' problem in 20070814, and '#' problem later)
 + Add view protected site password short time memorization. (1 hour)
