@@ -11,6 +11,19 @@ function CleanStr($u_str)
 	return str_replace(array(",",'$'), array("&#44;","&#36;"), $u_str);
 }
 
+function matchCIDR($addr, $cidr) {
+	list($ip, $mask) = explode('/', $cidr);
+	return (ip2long($addr) >> (32 - $mask) == ip2long($ip.str_repeat('.0', 3 - substr_count($ip, '.'))) >> (32 - $mask));
+}
+/* 取得 (Transparent) Proxy 提供之 IP 參數 */
+function getREMOTE_ADDR(){
+	if(isset($_SERVER['HTTP_X_FORWARDED_FOR'])){
+		$tmp = preg_split('/[ ,]+/', $_SERVER['HTTP_X_FORWARDED_FOR']);
+		return $tmp[0];
+	}
+	return $_SERVER['REMOTE_ADDR'];
+}
+
 $subject = CleanStr($_REQUEST['subject']);
 $FROM1 = $_REQUEST['nick'];
 $FROM = CleanStr($_REQUEST['nick']);
@@ -20,6 +33,7 @@ $mail = Cleanstr($_REQUEST['mail']);
 $c_pass = $_REQUEST['delk'];
 $delk = substr(md5($_REQUEST['delk']), 2, 8);
 $key = $_REQUEST['key'];
+$host = gethostbyaddr($IP=getREMOTE_ADDR());
 
 if (ereg("^( |　|\t)*$", $MESSAGE)) {
 	error("本文がありません！", $FROM, $mail, $host, $MESSAGE);
@@ -31,14 +45,28 @@ if (!isset($_REQUEST['url']) || (isset($_REQUEST['url']) && $_REQUEST['url']!=""
 	error("投稿が禁止されています", $FROM, $mail, $host, $MESSAGE);
 }
 // ホスト、禁止ホスト
-$host = gethostbyaddr($_SERVER["REMOTE_ADDR"]);
 $killip = file("killip.cgi");
+$checkTwice = ($IP != $HOST); // 是否需檢查第二次
 foreach ($killip as $kill) {
 	$kill = rtrim($kill);
-	if ($kill != "" && stristr($host, $kill)) {
-		error("投稿が禁止されています", $FROM, $mail, $host, $MESSAGE);
+	if ($kill) {
+		$slash = substr_count($kill, '/');
+		if($slash==2){ // RegExp
+			$kill .= 'i';
+		}elseif($slash==1){ // CIDR Notation
+			if(matchCIDR($IP, $kill)){ $IsBanned = true; break; }
+			continue;
+		}elseif(strpos($kill, '*')!==false || strpos($kill, '?')!==false){ // Wildcard
+			$kill = '/^'.str_replace(array('.', '*', '?'), array('\.', '.*', '.?'), $kill).'$/i';
+		}else{ // Full-text
+			if($IP==$kill || ($checkTwice && $HOST==strtolower($kill))){ $IsBanned = true; break; }
+			$kill = '/'.str_replace('.','\.',$kill).'/i'; // Go for regmatch
+//			continue;
+		}
+		if(preg_match($kill, $HOST) || ($checkTwice && preg_match($kill, $IP))){ $IsBanned = true; break; }
 	}
 }
+if($IsBanned) error("投稿が禁止されています", $FROM, $mail, $host, $MESSAGE);
 
 if(count($ngfiles)) {
 	foreach($ngfiles as $ngfile) {
@@ -75,12 +103,11 @@ if (!empty($mail)) {
 }
 */
 // IP
-$id = " IP:".preg_replace('/\d+$/','*',$_SERVER['REMOTE_ADDR']);
+$id = " IP:".preg_replace('/\d+$/','*',$IP);
 
-$addr=$_SERVER["REMOTE_ADDR"];
 $qcnt=$exflg=0;
-if($extipq && $addr != "127.0.0.1" && strpos($FROM,"fusianasan")===false) {
-	$rev = implode('.', array_reverse(explode('.', $addr)));
+if($extipq && $IP != "127.0.0.1" && strpos($FROM,"fusianasan")===false && strpos($FROM,"mokorikomo")===false) {
+	$rev = implode('.', array_reverse(explode('.', $IP)));
 	$queries = array( 'list.dsbl.org','bbx.2ch.net','dnsbl.ahbl.org','niku.2ch.net','virus.rbl.jp','ircbl.ahbl.org','tor.ahbl.org' );
 	foreach ( $queries as $query ) {
 		$qres=gethostbyname($rev.'.'.$query);
@@ -93,6 +120,7 @@ if($exflg) error("投稿が禁止されています (#".$qcnt.')', $FROM, $mail,
 
 
 $FROM = str_replace("fusianasan", "</b>" . $host . "<b>", $FROM); //fusianasan？
+$FROM = str_replace("mokorikomo", "</b>" . $IP . "<b>", $FROM); //mokorikomo？
 
 $MESSAGE = str_replace("\r\n", "\r", $MESSAGE); //改行文字の統一。
 $MESSAGE = str_replace("\r", "\n", $MESSAGE);
