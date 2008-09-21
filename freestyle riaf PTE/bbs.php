@@ -33,18 +33,20 @@ $mail = Cleanstr($_REQUEST['mail']);
 $c_pass = $_REQUEST['delk'];
 $delk = substr(md5($_REQUEST['delk']), 2, 8);
 $key = $_REQUEST['key'];
-$host = gethostbyaddr($IP=getREMOTE_ADDR());
+$HOST = gethostbyaddr($IP=getREMOTE_ADDR());
 
 if (ereg("^( |　|\t)*$", $MESSAGE)) {
-	error("本文がありません！", $FROM, $mail, $host, $MESSAGE);
+	error("本文がありません！", $FROM, $mail, $HOST, $MESSAGE);
 }
 if ($key == "" && (ereg("^( |　|\t)*$", $subject))) {
-	error("サブジェクトが存在しません！", $FROM, $mail, $host, $MESSAGE);
+	error("サブジェクトが存在しません！", $FROM, $mail, $HOST, $MESSAGE);
 }
 if (!isset($_REQUEST['url']) || (isset($_REQUEST['url']) && $_REQUEST['url']!="")) {
-	error("投稿が禁止されています", $FROM, $mail, $host, $MESSAGE);
+	error("投稿が禁止されています", $FROM, $mail, $HOST, $MESSAGE);
 }
+
 // ホスト、禁止ホスト
+$IsBanned=false;
 $killip = file("killip.cgi");
 $checkTwice = ($IP != $HOST); // 是否需檢查第二次
 foreach ($killip as $kill) {
@@ -66,7 +68,7 @@ foreach ($killip as $kill) {
 		if(preg_match($kill, $HOST) || ($checkTwice && preg_match($kill, $IP))){ $IsBanned = true; break; }
 	}
 }
-if($IsBanned) error("投稿が禁止されています", $FROM, $mail, $host, $MESSAGE);
+if($IsBanned) error("投稿が禁止されています", $FROM, $mail, $HOST, $MESSAGE);
 
 if(count($ngfiles)) {
 	foreach($ngfiles as $ngfile) {
@@ -74,7 +76,7 @@ if(count($ngfiles)) {
 			$ngwords=explode(',',rtrim(implode('',file($ngfile))));
 			foreach($ngwords as $value){
 				if($value!="" && (strpos($MESSAGE, $value)!==false || strpos($subject ,$value)!==false || strpos($FROM, $value)!==false || strpos($mail,$value)!==false))
-					error("投稿が禁止されています", $FROM, $mail, $host, $MESSAGE);
+					error("投稿が禁止されています", $FROM, $mail, $HOST, $MESSAGE);
 			}
 		}
 	}
@@ -86,7 +88,7 @@ if(is_file($rengfile)) {
 		if($value){
 			$value="/$value/";
 			if((preg_match($value,$MESSAGE) || preg_match($value,$subject) || preg_match($value,$FROM) || preg_match($value,$mail)))
-				error("投稿が禁止されています", $FROM, $mail, $host, $MESSAGE);
+				error("投稿が禁止されています", $FROM, $mail, $HOST, $MESSAGE);
 		}
 	}
 }
@@ -116,20 +118,20 @@ if($extipq && $IP != "127.0.0.1" && strpos($FROM,"fusianasan")===false && strpos
 		if($qcnt>=$extipq) break;
 	}
 }
-if($exflg) error("投稿が禁止されています (#".$qcnt.')', $FROM, $mail, $host, $MESSAGE);
+if($exflg) error("投稿が禁止されています (#".$qcnt.')', $FROM, $mail, $HOST, $MESSAGE);
 
 
-$FROM = str_replace("fusianasan", "</b>" . $host . "<b>", $FROM); //fusianasan？
+$FROM = str_replace("fusianasan", "</b>" . $HOST . "<b>", $FROM); //fusianasan？
 $FROM = str_replace("mokorikomo", "</b>" . $IP . "<b>", $FROM); //mokorikomo？
 
 $MESSAGE = str_replace("\r\n", "\r", $MESSAGE); //改行文字の統一。
 $MESSAGE = str_replace("\r", "\n", $MESSAGE);
 /* 投稿制限 */
-if (substr_count($MESSAGE, "\n") > $postline) error("改行が多すぎます！", $FROM, $mail, $host, $MESSAGE);
+if (substr_count($MESSAGE, "\n") > $postline) error("改行が多すぎます！", $FROM, $mail, $HOST, $MESSAGE);
 // $temp = str_replace("\n", "\n"."a",$MESSAGE);
 // if(strlen($temp)-strlen($MESSAGE) > $postline){ error("投稿行数が長すぎます!"); }
 if (strlen($MESSAGE) > $postbyte) {
-	error("本文が長すぎます！", $FROM, $mail, $host, $MESSAGE);
+	error("本文が長すぎます！", $FROM, $mail, $HOST, $MESSAGE);
 }
 
 $MESSAGE = str_replace("\n", "<br>", $MESSAGE); //改行文字の前に<br>を代入する。
@@ -147,7 +149,7 @@ $last = fopen($last_file, "r+");
 $lsize = fread($last, filesize($last_file));
 list($lname, $lcom) = explode("\t", $lsize);
 if ($FROM == $lname && $MESSAGE == $lcom) {
-	error("二重かきこですか？？", $FROM, $mail, $host, $MESSAGE);
+	error("二重かきこですか？？", $FROM, $mail, $HOST, $MESSAGE);
 }
 rewind($last);
 fputs($last, "$FROM\t$MESSAGE\t");
@@ -185,7 +187,7 @@ if (ereg("^( |　|\t)*$", $FROM)) {
 }
 // 記事フォーマット
 $newlog = "$FROM,$mail,$now,$MESSAGE,$subject\n";
-$newcgi = "$FROM,$mail,$now,$MESSAGE,$subject,$host,$delk,\n";
+$newcgi = "$FROM,$mail,$now,$MESSAGE,$subject,$HOST,$delk,\n";
 // スレ一覧読み込む
 $subj_arr = file($sub_back);
 // 親スレ投稿の場合、ファイル作成
@@ -210,7 +212,7 @@ if ($subject) {
 	// レスファイル名
 	$resfile = $ddir . $key . $ext;
 	$cgifile = $ddir . $key . $ext_cgi;
-	if (!file_exists($resfile)) error("書き込もうとしているスレッドは存在しないか、削除されています。。。", $FROM, $mail, $host, $MESSAGE);
+	if (!file_exists($resfile)) error("書き込もうとしているスレッドは存在しないか、削除されています。。。", $FROM, $mail, $HOST, $MESSAGE);
 	// 該当レス読み込む
 	$res_arr = file($resfile);
 	// レス数取得
@@ -230,13 +232,13 @@ if ($subject) {
 		$resline = $nextnum;
 	}
 	// レス書き込み
-	if (!is_writable($resfile)) error("現在この掲示板は読取専用です。ここは待つしかない。。。", $FROM, $mail, $host, $MESSAGE);
+	if (!is_writable($resfile)) error("現在この掲示板は読取専用です。ここは待つしかない。。。", $FROM, $mail, $HOST, $MESSAGE);
 
-	$re = fopen($resfile, "a") or error("このスレッドは停止されてます。もう書けない。。。", $FROM, $mail, $host, $MESSAGE);
+	$re = fopen($resfile, "a") or error("このスレッドは停止されてます。もう書けない。。。", $FROM, $mail, $HOST, $MESSAGE);
 	fputs($re, $newlog);
 	fclose($re);
 
-	$recgi = fopen($cgifile, "a") or error("このスレッドは停止されてます。もう書けない。。。", $FROM, $mail, $host, $MESSAGE);
+	$recgi = fopen($cgifile, "a") or error("このスレッドは停止されてます。もう書けない。。。", $FROM, $mail, $HOST, $MESSAGE);
 	fputs($recgi, $newcgi);
 	fclose($recgi);
 	// レスｶｳﾝﾄアップ
