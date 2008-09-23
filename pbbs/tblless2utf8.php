@@ -2,7 +2,7 @@
 include_once("./u2utf8.php");
 
 # Russian
-    function ru2utf8 ($ru,$RefCode=1){
+    function ru2utf8($ru,$RefCode=1){
         for ($i=0; $i < strlen($ru); $i++){
             $thischar=substr($ru,$i,1);
             $charcode=ord($thischar);
@@ -36,7 +36,7 @@ include_once("./u2utf8.php");
 	}
 
 #Windows Symbol
-	function ws2utf8 ($ws,$RefCode=1){
+	function ws2utf8($ws,$RefCode=1){
 		for ($i=0; $i < strlen($ws); $i++){
 			$thischar=substr($ws,$i,1);
 			$charcode=ord($thischar);
@@ -75,7 +75,7 @@ include_once("./u2utf8.php");
         	return $entities;
 		} else {
 			$wchars = '';
-        	foreach( $unicode as $value ) $wchars .= chr($value);
+        	foreach( $unicode as $value ) $wchars .= u2utf8($value);
         	return $wchars;
 		}
 	}

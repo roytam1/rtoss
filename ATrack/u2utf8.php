@@ -1,6 +1,6 @@
-<?
+<?php
 function u2utf8($c) {
-	$str = "";
+	$ret = $str = '';
 	if ($c < 0x80) {
 		$str .= $c;
 	} else if ($c < 0x800) {
@@ -20,29 +20,29 @@ function u2utf8($c) {
 	return $ret;
 }
 
-function utf8Encode ($source) {
-	$utf8Str = '';$utf8val='';
-	$entityArray = explode ("&#", $source);
-	$size = count ($entityArray);
-	for ($i = 0; $i < $size; $i++) {
+function utf8Encode($source) {
+	$utf8Str = $utf8val='';
+	$entityArray = explode('&#', $source);
+	$size = count($entityArray);
+	for($i = 0; $i < $size; $i++) {
 		$utf8Substring='';
 		$subStr = $entityArray[$i];
-		$nonEntity = strstr ($subStr, ';');
-		if ($nonEntity !== false) {
-			$unicode = intval (substr ($subStr, 0, (strpos ($subStr, ';') + 1)));
+		$nonEntity = strstr($subStr, ';');
+		if($nonEntity !== false) {
+			$unicode = intval(substr($subStr, 0, strpos($subStr, ';') + 1));
 			// determine how many chars are needed to reprsent this unicode char
 			$utf8Substring .=u2utf8($unicode);
 #			for ($y = 0;$y < strlen($utf8val);$y += 3)
 #				$utf8Substring .= chr(substr($utf8val, $y, 3));
 
-			if (strlen ($nonEntity) > 1)
+			if(strlen ($nonEntity) > 1)
 				$nonEntity = substr ($nonEntity, 1); // chop the first char (';')
 			else
 				$nonEntity = '';
 
-			$utf8Str  .= $utf8Substring . $nonEntity;
+			$utf8Str .= $utf8Substring . $nonEntity;
 		} else {
-			$utf8Str  .= $subStr;
+			$utf8Str .= $subStr;
 		}
 	}
 

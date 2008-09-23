@@ -1,8 +1,8 @@
-<?
-include_once("u2utf8.php");
+<?php
+include_once("./u2utf8.php");
 
 # Russian
-    function ru2utf8 ($ru,$RefCode=1){
+    function ru2utf8($ru,$RefCode=1){
         for ($i=0; $i < strlen($ru); $i++){
             $thischar=substr($ru,$i,1);
             $charcode=ord($thischar);
@@ -36,7 +36,7 @@ include_once("u2utf8.php");
 	}
 
 #Windows Symbol
-	function ws2utf8 ($ws,$RefCode=1){
+	function ws2utf8($ws,$RefCode=1){
 		for ($i=0; $i < strlen($ws); $i++){
 			$thischar=substr($ws,$i,1);
 			$charcode=ord($thischar);
@@ -53,30 +53,20 @@ include_once("u2utf8.php");
         $lookingFor = 1;
         
         for ($i = 0; $i < strlen( $str ); $i++ ) {
-
             $thisValue = ord( $str[ $i ] );
-            
             if ( $thisValue < 128 ) $unicode[] = $thisValue;
             else {
-            
                 if ( count( $values ) == 0 ) $lookingFor = ( $thisValue < 224 ) ? 2 : 3;
-                
                 $values[] = $thisValue;
-                
                 if ( count( $values ) == $lookingFor ) {
-            
                     $number = ( $lookingFor == 3 ) ?
                         ( ( $values[0] % 16 ) * 4096 ) + ( ( $values[1] % 64 ) * 64 ) + ( $values[2] % 64 ):
                     	( ( $values[0] % 32 ) * 64 ) + ( $values[1] % 64 );
-                        
                     $unicode[] = $number;
                     $values = array();
                     $lookingFor = 1;
-            
                 } // if
-            
             } // if
-            
         } // for
 
 		if ($RefCode) {
@@ -85,7 +75,7 @@ include_once("u2utf8.php");
         	return $entities;
 		} else {
 			$wchars = '';
-        	foreach( $unicode as $value ) $wchars .= chr($value);
+        	foreach( $unicode as $value ) $wchars .= u2utf8($value);
         	return $wchars;
 		}
 	}
