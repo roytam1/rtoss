@@ -92,8 +92,7 @@ A foo(A i_a)
 
 	//cout << ghost.request("get") << endl;
 	//cout << ghost.request("うんこ") << endl;
-/*	cout << typeid(Ghost).name() << endl;
-	
+/*	
 	cout << ghost.request("たんご") << ghost.request("たんご") << ghost.request("たんご") << ghost.request("たんご") << endl;
 	cout << ghost.request("たんご") << ghost.request("たんご") << ghost.request("たんご") << ghost.request("たんご") << endl;
 	cout << ghost.request("たんご") << ghost.request("たんご") << ghost.request("たんご") << ghost.request("たんご") << endl;

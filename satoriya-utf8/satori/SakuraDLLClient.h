@@ -54,6 +54,3 @@ private:
 	BOOL	(*mUnload)();
 #endif
 };
-
-// とりあえず
-extern void	PluginError(const string& str);
