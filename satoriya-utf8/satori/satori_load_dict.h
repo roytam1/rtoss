@@ -94,7 +94,7 @@ void	Satori::InitMembers() {
 	on_loaded_script = "";
 	on_unloading_script = "";
 
-	//@ mShioriPlugins.clear(); // 特殊。
+	//@ mShioriPlugins->clear(); // 特殊。
 
 	secure_flag = false;
 
