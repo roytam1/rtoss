@@ -19,7 +19,7 @@ LDFLAGS = -shared
 
 
 ################## これより下は弄らなくてもコンパイル出来ます ##################
-CXXFLAGS_ADD = -DWIN32 -DSATORI_DLL -D_MSC_VER -I. -I../_
+CXXFLAGS_ADD = -DWIN32 -DSATORI_DLL -D_MSC_VER -D_WINDOWS -DSTRICT -D_MBCS -I. -I../_
 LIBSATORI_OBJ = \
 	../_/Sender.o \
 	../_/Utilities.o \
