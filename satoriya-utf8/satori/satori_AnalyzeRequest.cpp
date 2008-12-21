@@ -183,7 +183,22 @@ int	Satori::request(
 	// メイン処理
 	Sender::validate( fOperationLog && logmode );
 	sender << "--- Operation ---" << endl;
-	int	status_code = CreateResponse(mResponseMap);
+
+	int status_code;
+	if ( mRequestID=="ShioriEcho" ) {
+		string result = SentenceToSakuraScriptExec_with_PreProcess(mReferences);
+		if ( result.length() ) {
+			//Translate(result); - Translateは後でかかる
+			mResponseMap["Value"] = result;
+			status_code = 200;
+		}
+		else {
+			status_code = 204;
+		}
+	}
+	else {
+		status_code = CreateResponse(mResponseMap);
+	}
 
 	// 後処理１
 	default_surface = next_default_surface;
