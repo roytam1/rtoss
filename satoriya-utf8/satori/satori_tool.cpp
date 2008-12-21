@@ -517,13 +517,13 @@ bool	Satori::system_variable_operation(string key, string value, string* result)
 	
 	if ( compare_head(key,"単語群「") && compare_tail(key,"」の重複回避") ) {
 		variables.erase(key);
-		words.setOC( string(key.c_str()+12, key.length()-12-18), value );
+		words.setOC( string(key.c_str()+const_strlen("単語群「"), key.length()-const_strlen("単語群「")-const_strlen("」の重複回避")), value );
 		return true;
 	}
 
 	if ( compare_head(key,"文「") && compare_tail(key,"」の重複回避") ) {
 		variables.erase(key);
-		talks.setOC( string(key.c_str()+6, key.length()-6-18), value );
+		talks.setOC( string(key.c_str()+const_strlen("文「"), key.length()-const_strlen("文「")-const_strlen("」の重複回避")), value );
 		return true;
 	}
 	
@@ -539,7 +539,7 @@ bool	Satori::system_variable_operation(string key, string value, string* result)
 	
 	if ( compare_head(key,"次から") && compare_tail(key,"回目のトーク") ) {
 		variables.erase(key);
-		int	count = zen2int( string(key.c_str()+9, key.length()-9-18) );
+		int	count = zen2int( string(key.c_str()+const_strlen("次から"), key.length()-const_strlen("次から")-const_strlen("回目のトーク")) );
 		if ( count<=0 ) {
 			sender << "トーク予約、設定値がヘンです。" << endl;
 		}
@@ -615,7 +615,7 @@ bool	Satori::system_variable_operation(string key, string value, string* result)
 	}
 	
 	if ( key.size()>9 && compare_tail(key, "タイマ") ) {
-		string	name(key.c_str(), strlen(key.c_str())-9);
+		string	name(key.c_str(), strlen(key.c_str())-const_strlen("タイマ"));
 		/*if ( sentences.find(name) == sentences.end() ) {
 		result = string("※　タイマ終了時のジャンプ先 ＊")+name+" がありません　※";
 		// セーブデータ復帰時を考慮
@@ -649,7 +649,7 @@ bool	Satori::system_variable_operation(string key, string value, string* result)
 		return true;
 	}
 	
-	if ( compare_head(key, "Value") && aredigits(key.c_str() + 5) )
+	if ( compare_head(key, "Value") && aredigits(key.c_str() + 5) ) // 5 = const_strlen("Value")
 	{
 		variables.erase(key);
 		if(value!=""){

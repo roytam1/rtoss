@@ -496,8 +496,14 @@ bool	Satori::CallReal(const string& iName, string& oResult, bool for_calc, bool 
 						}
 
 						string	exp = *i;
-						if ( calc(exp,true) )
-							*i=exp;
+						if ( calc(exp,true) ) {
+							if ( state==SAORI_CALL && aredigits(zen2han(exp)) ) {
+								*i = zen2han(exp);
+							}
+							else {
+								*i=exp;
+							}
+						}
 					}
 				}
 			}
@@ -760,11 +766,11 @@ bool	Satori::CallReal(const string& iName, string& oResult, bool for_calc, bool 
 
 	else if ( compare_head(iName, "文「") ) {
 		if ( compare_tail(iName, "」の存在") ) {
-			string	str(iName, 6, iName.length()-6-12);
+			string	str(iName, const_strlen("文「"), iName.length()-const_strlen("文「")-const_strlen("」の存在"));
 			oResult = talks.is_exist(str) ? "1" : "0";
 		}
 		else if ( compare_tail(iName, "」の数") ) {
-			string	str(iName, 6, iName.length()-6-9);
+			string	str(iName, const_strlen("文「"), iName.length()-const_strlen("文「")-const_strlen("」の数"));
 
 			Family<Talk>* f = talks.get_family(str);
 
@@ -778,11 +784,11 @@ bool	Satori::CallReal(const string& iName, string& oResult, bool for_calc, bool 
 	}
 	else if ( compare_head(iName, "単語群「") ) {
 		if ( compare_tail(iName, "」の存在") ) {
-			string	str(iName, 12, iName.length()-12-12);
+			string	str(iName, const_strlen("単語群「"), iName.length()-const_strlen("単語群「")-const_strlen("」の存在"));
 			oResult = words.is_exist(str) ? "1" : "0";
 		}
 		else if ( compare_tail(iName, "」の数") ) {
-			string	str(iName, 12, iName.length()-12-9);
+			string	str(iName, const_strlen("単語群「"), iName.length()-const_strlen("単語群「")-const_strlen("」の数"));
 
 			int count = 0;
 
@@ -797,7 +803,7 @@ bool	Satori::CallReal(const string& iName, string& oResult, bool for_calc, bool 
 
 
 	else if ( compare_head(iName, "変数「") && compare_tail(iName, "」の存在") ) {
-		string	str(iName, 9, iName.length()-9-12);
+		string	str(iName, const_strlen("変数「"), iName.length()-const_strlen("変数「")-const_strlen("」の存在"));
 		bool isSysValue;
 		string *v = GetValue(str,isSysValue); //こっちはシステム変数かどうかどっちでもいい
 		oResult = v ? "1" : "0";
@@ -925,14 +931,14 @@ bool	Satori::CallReal(const string& iName, string& oResult, bool for_calc, bool 
 			oResult = it->second;
 	}
 	else if ( compare_head(iName,"次から") && compare_tail(iName,"回目のトーク") ) {
-		int	count = zen2int( string(iName.c_str()+9, iName.length()-9-18) );
+		int	count = zen2int( string(iName.c_str()+const_strlen("次から"), iName.length()-const_strlen("次から")-const_strlen("回目のトーク")) );
 		map<int,string>::iterator it = reserved_talk.find(count);
 		if ( it != reserved_talk.end() ) {
 			oResult = it->second;
 		}
 	}
-	else if ( compare_head(iName, "トーク「") && compare_tail(iName, "」の予約有無") ) { // 「約」には\が含まれる。
-		string	str(iName, 12, iName.length()-12-18);
+	else if ( compare_head(iName, "トーク「") && compare_tail(iName, "」の予約有無") ) {
+		string	str(iName, const_strlen("トーク「"), iName.length()-const_strlen("トーク「")-const_strlen("」の予約有無"));
 		oResult = "0";
 		for (map<int, string>::iterator it=reserved_talk.begin(); it!=reserved_talk.end() ; ++it) {
 			if ( str == it->second ) {
@@ -941,7 +947,7 @@ bool	Satori::CallReal(const string& iName, string& oResult, bool for_calc, bool 
 			}
 		}
 	}
-	else if ( iName == "予約トーク数" ) { // 「約」には\が含まれる。
+	else if ( iName == "予約トーク数" ) {
 		oResult = int2zen( reserved_talk.size() );
 	}
 	else if ( iName == "イベント名" ) { oResult=mRequestID; }
