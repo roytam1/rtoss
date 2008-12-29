@@ -14,7 +14,7 @@
 
 /* Config section */
 
-$thisurl_absolute = "http://".$_SERVER["HTTP_HOST"].preg_replace("/".preg_replace('/.*\/+/',"",$_SERVER['PHP_SELF'])."$/","",$_SERVER['PHP_SELF']); //Auto Setting
+$thisurl_absolute = 'http://'.$_SERVER['HTTP_HOST'].preg_replace('/'.preg_replace('/.*\/+/','',$_SERVER['PHP_SELF']).'$/','',$_SERVER['PHP_SELF']); //Auto Setting
 $site_name = 'Tropy';
 $dir_html = 'html'; # Directory for Cached HTML files.
 $dir_files = 'files'; # Directory for user-written text files and the index file.
@@ -25,7 +25,7 @@ $sendmail = 0;
 $adminmail = "";
 # $adminmail = 'somebody@example.com';
 $maxidlen = 8;
-$id_pattern = "[0-9]{".$maxidlen."}";
+$id_pattern = '[0-9]{'.$maxidlen.'}';
 $maxlength = 1000;
 $maxlines = 20;
 $maxcols = 80;
@@ -35,16 +35,16 @@ $maxpages = 10000;
 $session_digest = md5(microtime().uniqid('Tropy',true));
 $random_seed = hexdec(substr($session_digest, 0, 8));
 $create_id = substr(sprintf("%0${maxidlen}u", $random_seed), 0, $maxidlen);
-$time_visible_msec = "3000";
-$time_jumpto_sec = "3";
-$content_type = "Content-type: text/html; charset=utf-8\n\n";
+$time_visible_msec = '3000';
+$time_jumpto_sec = '3';
+$content_type = 'Content-type: text/html; charset=utf-8\n\n';
 $allow_rebuild = 1;
 $allow_toc = 1;
 $allow_html = 0;
 $show_plink = 1;
 $auto_link = 1;
 $allow_edit = 1;
-$return_url="../";
+$return_url='../';
 $form=array_merge($_GET,$_POST);
 $allid=array();
 
@@ -60,29 +60,29 @@ function main() {
 	TIEHASH();
 
 	foreach ($form as $key => $val) {
-		if (preg_match("/^c$/",$key)) {
+		if (preg_match('/^c$/',$key)) {
 			$main_command = 'create';
 			do_create();
 			break;
-		} elseif (preg_match("/^e(".$id_pattern.")$/",$key,$matches)) {
+		} elseif (preg_match('/^e('.$id_pattern.')$/',$key,$matches)) {
 			$main_command = 'edit';
 			do_edit($matches[1]);
 			break;
-		} elseif (preg_match("/^w(".$id_pattern.")$/",$key,$matches)) {
+		} elseif (preg_match('/^w('.$id_pattern.')$/',$key,$matches)) {
 			$main_command = 'write';
 			do_write($matches[1]);
 			break;
-		} elseif (preg_match("/^toc$/",$key)) {
+		} elseif (preg_match('/^toc$/',$key)) {
 			if ($allow_toc) {
 				$main_command = 'toc';
 				$show_plink=0;
 				show_toc();
 			}
 			break;
-		} elseif (preg_match("/^rebuild$/",$key)) {
+		} elseif (preg_match('/^rebuild$/',$key)) {
 			if ($allow_rebuild) {
 				foreach ($allid as $id => $val) {
-					if (preg_match("/^".$id_pattern."$/",$id)) {
+					if (preg_match('/^'.$id_pattern.'$/',$id)) {
 						unlink_html($id);
 						build_html($id);
 					}
@@ -100,12 +100,12 @@ function do_edit($id) {
 	global $main_command,$allid,$show_plink;
 	if ($main_command == 'create' || isset($allid[$id])) {
 		$show_plink=0;
-		$title = isset($allid[$id]) ? get_subject($id) : "New Page";
+		$title = isset($allid[$id]) ? get_subject($id) : 'New Page';
 		print_header($id, $title);
 		print_editform($id, @implode('',FETCH($id)));
 		echo get_footer();
 	} else {
-		print_error("edit non id");
+		print_error('edit non id');
 	}
 }
 
@@ -123,7 +123,7 @@ EOD;
 function do_write($id) {
 	global $form,$maxlength,$maxlines,$maxpages,$allid;
 	$msg = $form['mymsg'];
-	$msg = preg_replace("/\n+$/","\n",$msg);
+	$msg = preg_replace('/\n+$/',"\n",$msg);
 	$msglen = strlen($msg);
 	$cr = $msglen -  strlen(str_replace("\n","",$msg));
 
@@ -163,10 +163,10 @@ function delete_random_page() {
 
 function print_jumpto($id) {
 	global $content_type,$time_jumpto_sec,$thisurl_absolute,$dir_html,$site_name;
-	$meta = "<meta http-equiv=\"refresh\" content=\"$time_jumpto_sec; url=${thisurl_absolute}${dir_html}/${id}.html\">\n";
-	$navi = "<div id=\"navi\"></div>";
+	$meta = "<meta http-equiv='refresh' content='$time_jumpto_sec; url=${thisurl_absolute}${dir_html}/${id}.html'>\n";
+	$navi = '<div id="navi"></div>';
 	header($content_type);
-	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+	header('Cache-Control: no-cache, must-revalidate'); // HTTP/1.1
 	echo get_header("$site_name...", "", 'black', 'white', $navi, $meta);
 	echo get_footer();
 }
@@ -213,7 +213,7 @@ function get_navi($id, $editable) {
 function do_random() {
 	global $id_pattern,$main_command,$id_pattern;
 	$random_id = get_random_id();
-	if (preg_match("/^".$id_pattern."$/",$random_id)) {
+	if (preg_match('/^'.$id_pattern.'$/',$random_id)) {
 		build_html($random_id);
 		print_jumpto($random_id);
 	} else {
@@ -249,13 +249,22 @@ function build_html($id) {
 	$caption=array_shift($fil);
 	$caption=rtrim(htmlspecialchars($caption));
 	$content = implode('',$fil);
+	
 	if (!$allow_html) {
 		$content = htmlspecialchars($content);
-		$content = preg_replace("/(\n\n+)/","\n\n",$content);
-		$content = preg_replace("/(\n\n)/","</p><p>",$content);
-		$content = preg_replace("/(\n)/","<br />",$content);
+
+		if (strpos(strtolower($content),'=nbsp\n') !== -1) {
+			$content = preg_replace('/=nbsp\n/i','',$content);
+			$content = str_replace(' ','&nbsp;',$content);
+		}
+		
+		$content = preg_replace('/(\n\n+)/',"\n\n",$content);
+		$content = str_replace('\n\n','</p><p>',$content);
+		$content = str_replace('\n','<br />',$content);
+		$content = preg_replace('/=pre\n/i','<pre>',$content);
+		$content = preg_replace('/=\/pre\n/i','</pre>',$content);
 	}
-	if ($auto_link) $content = preg_replace("/(https?|ftp|news)(\:\/\/[[:alnum:]\+\$\;\?\.%,!#~*\/\:@&=_-]+)/i","<a href=\"$1$2\" target=\"_blank\">$1$2</a>",$content);
+	if ($auto_link) $content = preg_replace('/(https?|ftp|news)(\:\/\/[[:alnum:]\+\$\;\?\.%,!#~*\/\:@&=_-]+)/i','<a href="$1$2" target="_blank">$1$2</a>',$content);
 
 	# Write.
 	if (!$wfil=fopen("$dir_html/$id.html","wb")) {
@@ -279,7 +288,7 @@ function show_toc() {
 		$content.="<a href='$dir_html/$id.html'>$id - $caption</a><br />";
 	}
 
-	echo get_header("TOC - $site_name", "Table Of Contents", 'black', 'white', get_navi(null,0), '');
+	echo get_header("TOC - $site_name", 'Table Of Contents', 'black', 'white', get_navi(null,0), '');
 	echo "<p>$content</p>";
 	echo get_footer();
 }
@@ -363,7 +372,7 @@ function get_style($id) {
 		$g = 255 - (hexdec(substr($digest, 2, 2)) % $range);
 		$b = 255 - (hexdec(substr($digest, 4, 2)) % $range);
 		$color = 'black';
-		$bgcolor = sprintf("#%02X%02X%02X", $r, $g, $b);
+		$bgcolor = sprintf('#%02X%02X%02X', $r, $g, $b);
 	}
 	return array($color, $bgcolor);
 }
@@ -376,10 +385,10 @@ function do_create() {
 function get_subject($id) {
 	global $maxtitle;
 	$item=FETCH($id);
-	if (preg_match("/^(.*)/",$item[0],$matches)) {
+	if (preg_match('/^(.*)/',$item[0],$matches)) {
 		$caption = $matches[1];
 		if (strlen($caption) > $maxtitle) {
-			$caption = preg_replace("/^(.{".$maxtitle."}).*/","$1...",$caption);
+			$caption = preg_replace('/^(.{'.$maxtitle.'}).*/','$1...',$caption);
 		}
 		return htmlspecialchars($caption);
 	} else {
@@ -396,7 +405,7 @@ function TIEHASH() {
 
 function STORE($id, $value) {
 	global $file_index,$dir_files,$id_pattern,$allid;
-	if (!preg_match("/^(".$id_pattern.")$/",$id)) {
+	if (!preg_match('/^('.$id_pattern.')$/',$id)) {
 		die("store nonid");
 	}
 
@@ -411,7 +420,7 @@ function STORE($id, $value) {
 	# Append $id.
 	if (!isset($allid[$id])) {
 		if (!$idx= fopen("$file_index","a")) {
-			die("store index");
+			die('store index');
 		}
 		fwrite($idx,"$id\n");
 		fclose($idx);
@@ -435,7 +444,7 @@ function DELETE($key) {
 
 	# Write index.
 	$id = array_keys($allid);
-		if (!$idx= fopen("$file_index","wb")) {
+		if (!$idx= fopen("$file_index",'wb')) {
 		die("delete index");
 	}
 	fwrite($idx,implode("\n", $id)."\n");
@@ -448,12 +457,12 @@ function _make_index() {
 		return;
 	}
 	if (!$di=opendir($dir_files)) {
-		print_error("build index dir");
+		print_error('build index dir');
 	}
 	$index=array();
 	$entry='';
 	while ($entry = readdir($di)) {
-		if (preg_match("/^(".$id_pattern.")\.txt$/",$entry,$matches)) {
+		if (preg_match('/^('.$id_pattern.')\.txt$/',$entry,$matches)) {
 			$id = $matches[1];
 			if (-s("$dir_files/$id.txt") > 0) {
 				$index[]=$id;
@@ -462,7 +471,7 @@ function _make_index() {
 	}
 	closedir($di);
 	if (!$idx=fopen("$file_index","wb")) {
-		print_error("build index open");
+		print_error('build index open');
 	}
 	fwrite($idx,implode("\n", $index)."\n");
 	fclose($idx);
