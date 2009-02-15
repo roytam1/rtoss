@@ -141,6 +141,10 @@ function do_write($id) {
 		echo get_footer();
 	} else {
 		if ($form['mymsg']) {
+
+			// =date -> real date
+			$msg = preg_replace('/=date/i',date('r'),$msg);
+
 			STORE($id,$msg);
 			send_mail($id, get_subject($id), 'edit', $msg);
 			unlink_html($id);
@@ -257,12 +261,12 @@ function build_html($id) {
 			$content = preg_replace('/=nbsp\n/i','',$content);
 			$content = str_replace(' ','&nbsp;',$content);
 		}
+		$content = preg_replace("/=pre\n?/i",'<pre>',$content);
+		$content = preg_replace('/=\/pre\n?/i','</pre>',$content);
 		
 		$content = preg_replace('/(\n\n+)/',"\n\n",$content);
-		$content = str_replace('\n\n','</p><p>',$content);
-		$content = str_replace('\n','<br />',$content);
-		$content = preg_replace('/=pre\n/i','<pre>',$content);
-		$content = preg_replace('/=\/pre\n/i','</pre>',$content);
+		$content = str_replace("\n\n",'</p><p>',$content);
+		$content = str_replace("\n",'<br />',$content);
 	}
 	if ($auto_link) $content = preg_replace('/(https?|ftp|news)(\:\/\/[[:alnum:]\+\$\;\?\.%,!#~*\/\:@&=_-]+)/i','<a href="$1$2" target="_blank">$1$2</a>',$content);
 
