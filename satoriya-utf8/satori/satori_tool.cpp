@@ -249,6 +249,176 @@ strmap*	Satori::find_ghost_info(string name) {
 }
 
 
+bool Satori::calc_argument(const string &iExpression, int &oResult, bool for_non_talk)
+{
+	string exp = UnKakko(iExpression.c_str(), true, for_non_talk);
+	if ( !calc(exp) ){
+		return false;
+	}
+	oResult = zen2int(exp);
+	return true;
+}
+
+string	Satori::special_call(
+	const string& iCallName,
+	const strvec& iArgv,
+	bool for_calc,
+	bool for_non_talk,
+	bool iIsSecure)
+{
+	if ( iCallName == "when" ) {
+		int result;
+		if ( iArgv.size() < 2 || 3 < iArgv.size() ) {
+			return "引数の個数が正しくありません。";
+		}
+		if ( !calc_argument(iArgv[0], result, for_non_talk) ) return "' 式が計算不能です。";
+		if ( result != 0 ) {
+			return	UnKakko(iArgv[1].c_str(), for_calc, for_non_talk);	// 真
+		}
+		else if ( iArgv.size()==3 ) {
+			return	UnKakko(iArgv[2].c_str(), for_calc, for_non_talk);	// 偽
+		}
+		else {
+			return	"";	// 偽でelseなし
+		}
+	}
+
+	if ( iCallName == "times" ) {
+		int count;
+		int max;
+		int body;
+		string ret="";
+		char buf[21]; //64bit
+		mLoopCounters.push("0");
+		try{
+			if ( iArgv.size() == 2 ){
+				if ( !calc_argument(iArgv[0], max, for_non_talk) ) throw("' 式が計算不能です。");
+				count = 0;
+				sprintf(buf, "%d", count);
+				mLoopCounters.top() = buf;
+				body = 1;
+			}
+			else if( iArgv.size() == 3 ){
+				if ( !calc_argument(iArgv[1], count, for_non_talk) ) throw("' 式が計算不能です。");
+				sprintf(buf, "%d", count);
+				mLoopCounters.top() = buf;
+				if ( !calc_argument(iArgv[0], max, for_non_talk) ) throw("' 式が計算不能です。");
+				max += count;
+				body = 2;
+			}
+			else{
+				throw("引数の個数が正しくありません。");
+			}
+			for(int i=count; i<max; i++){
+				sprintf(buf, "%d", i);
+				mLoopCounters.top() = buf;
+				ret += UnKakko(iArgv[body].c_str(), for_calc, for_non_talk);
+			}
+		}
+		catch( const char *str ){
+			ret = str;
+		}
+		mLoopCounters.pop();
+		return ret;
+	}
+
+	if ( iCallName == "while" ) {
+		int count;
+		int result;
+		int expression;
+		int body;
+		string ret="";
+		char buf[21]; //64bit
+		mLoopCounters.push("0");
+		try {
+			if ( iArgv.size() == 2 ){
+				expression = 0;
+				count = 0;
+				body = 1;
+			}
+			else if( iArgv.size() == 3 ){
+				expression = 0;
+				if ( !calc_argument(iArgv[1], count, for_non_talk) ) throw("' 式が計算不能です。");
+				body = 2;
+			}
+			else{
+				throw("引数の個数が正しくありません。");
+			}
+			for(int i=count; i<INT_MAX; i++){
+				sprintf(buf, "%d", i);
+				mLoopCounters.top() = buf;
+				if ( !calc_argument(iArgv[expression], result, for_non_talk) ) throw("' 式が計算不能です。");
+				if ( result == 0 ) {
+					break;
+				}
+				ret += UnKakko(iArgv[body].c_str(), for_calc, for_non_talk);
+			}
+		}
+		catch(const char * str){
+			ret = str;
+		}
+		mLoopCounters.pop();
+		return ret;
+	}
+
+	if ( iCallName == "for" ) {
+		int start;
+		int end;
+		int step;
+		int body;
+		char buf[21]; //64bit
+		string ret="";
+		mLoopCounters.push("0");
+		try{
+			if ( iArgv.size() == 3 ){
+				if ( !calc_argument(iArgv[0], start, for_non_talk) ) throw("' 式が計算不能です。");
+				sprintf(buf, "%d", start);
+				mLoopCounters.top() = buf;
+				if ( !calc_argument(iArgv[1], end, for_non_talk) ) throw("' 式が計算不能です。");
+				step = 1;
+				body = 2;
+			}
+			else if ( iArgv.size() == 4 ) {
+				if ( !calc_argument(iArgv[0], start, for_non_talk) ) throw("' 式が計算不能です。");
+				sprintf(buf, "%d", start);
+				mLoopCounters.top() = buf;
+				if ( !calc_argument(iArgv[1], end, for_non_talk) ) throw("' 式が計算不能です。");
+				if ( !calc_argument(iArgv[2], step, for_non_talk) ) throw("' 式が計算不能です。");
+				body = 3;
+			}
+			else {
+				throw("引数の個数が正しくありません。");
+			}
+			if ( step == 0 ) {
+				throw("forの増分に0が指定されました。");
+			}
+			step = abs(step);
+			if ( start <= end ) {
+				for(int i=start; i<=end; i+=step) {
+					sprintf(buf, "%d", i);
+					mLoopCounters.top() = buf;
+					ret += UnKakko(iArgv[body].c_str(), for_calc, for_non_talk);
+				}
+			}
+			else {
+				for(int i=start; end<=i; i-=step) {
+					sprintf(buf, "%d", i);
+					mLoopCounters.top() = buf;
+					ret += UnKakko(iArgv[body].c_str(), for_calc, for_non_talk);
+				}
+			}
+		}
+		catch(const char *str){
+			ret = str;
+		}
+		mLoopCounters.pop();
+		return ret;
+	}
+
+	assert(0);
+	return "";
+}
+
 
 
 // 文章の中で （ を見つけた場合、pが （ の次の位置まで進められた上でこれが実行される。
@@ -256,32 +426,81 @@ strmap*	Satori::find_ghost_info(string name) {
 // 返値はカッコの解釈結果。
 string	Satori::KakkoSection(const char*& p,bool for_calc,bool for_non_talk)
 {
+	string	thePluginName = "";
+	string  theDelimiter = "";
+	bool specialFlag = false;
+	const char *pp=0;
+	strvec	theArguments;
+	string	kakko_str;
+
 	if ( for_calc ) {
 		for_non_talk = true;
 	}
 
-	string	kakko_str;
-	while (true) {
-		if ( p[0] == '\0' )
-			return	string("（") + kakko_str;	// 閉じカッコが無かった
-		
-		string c = get_a_chr(p);
-		if ( c=="）" )
-			break;
-		else if ( c=="（" ) {
-			kakko_str += KakkoSection(p,false,for_non_talk); //内側の括弧は0に置き換えしない
+	for ( set<string>::iterator it = special_commands.begin(); it != special_commands.end(); ++it) {
+		if ( strncmp(it->c_str(), p, it->size()) == 0 ) {
+			pp = p + it->size();
+			string c = get_a_chr(pp);
+			//引数がない場合はスペシャルフォームにする必要はない。
+			if ( mDelimiters.find(c) != mDelimiters.end() ){
+				specialFlag = true;
+				theDelimiter = c;
+				thePluginName = it->c_str();
+				break;
+			}
 		}
-		else
-			kakko_str += c;
 	}
-	
-	string	result;
-	if ( Call(kakko_str, result, for_calc, for_non_talk) )
-		return	result;
-	if ( for_calc )
-		return	string("０");
-	else
-		return	string("（") + kakko_str + "）";
+	if( specialFlag ) {
+		assert(pp);
+		int level = 0;
+		const char *p_start = pp;
+		while( true ){
+			if ( *pp == '\0' ){
+				return string("（"); // 閉じカッコが無かった
+			}
+			string c = get_a_chr(pp);
+			if ( c == "（" ) {
+				level++;
+			}
+			if ( c == "）" ) {
+				level--;
+			}
+			if ( level < 0 ) {
+				theArguments.push_back( string(p_start, pp-p_start-2) );
+				break;
+			}
+			if ( level == 0 ) {
+				if ( c == theDelimiter ) {
+					theArguments.push_back( string(p_start, pp-p_start-c.size()) );
+					p_start = (char *)pp;
+				}
+			}
+		}
+		p = pp;
+		return special_call(thePluginName, theArguments, for_calc, for_non_talk, secure_flag);
+	}
+	else {
+		while (true) {
+			if ( p[0] == '\0' )
+				return	string("（") + kakko_str;	// 閉じカッコが無かった
+			
+			string c = get_a_chr(p);
+			if ( c=="）" )
+				break;
+			else if ( c=="（" ) {
+				kakko_str += KakkoSection(p,false,for_non_talk); //内側の括弧は0に置き換えしない
+			}
+			else
+				kakko_str += c;
+		}	
+		string	result;
+		if ( Call(kakko_str, result, for_calc, for_non_talk) )
+			return	result;
+		if ( for_calc )
+			return	string("０");
+		else
+			return	string("（") + kakko_str + "）";
+	}
 }
 
 string	Satori::UnKakko(const char* p,bool for_calc,bool for_non_talk)

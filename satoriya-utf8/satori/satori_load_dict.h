@@ -119,7 +119,14 @@ void	Satori::InitMembers() {
 
 	mReferences.clear();
 	mKakkoCallResults.clear();
-	
+
+	special_commands.insert("when");
+	special_commands.insert("times");
+	special_commands.insert("while");
+	special_commands.insert("for");
+
+	mLoopCounters.clear();
+
 #ifndef POSIX
 	is_single_monitor = true;
 	::ZeroMemory(&desktop_rect, sizeof(RECT));
