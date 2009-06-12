@@ -1,6 +1,6 @@
 <?php
-require_once "./conf.php";
-require_once "./bb2html.php";
+require_once './conf.php';
+require_once './bb2html.php';
 echo '
 <html><head><title>' . $tit . '</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -11,24 +11,24 @@ echo '
 echo "<a href='$PHP_SELF'>戻る</a> <a href=\"./\">【掲示板に戻る】</a><br>";
 
 $word = $_GET['word'];
-if (trim($word) != "") {
-	$words = preg_split("/(　| )+/", stripslashes($word));
+if (trim($word) != '') {
+	$words = preg_split('/(　| )+/', stripslashes($word));
 
 	$d = dir($ddir);
 	while ($ent = $d->read()) {
-		if (ereg("^[0-9]", $ent)) {
+		if (preg_match('/^[0-9]+\\'.$ext.'$/', $ent)) {
 			$lines = file($ddir . $ent);
-			list($oname, $oemail, $odate, $ocom, $sub) = explode(",", $lines[0]);
-			$key = substr($ent, 0, strpos($ent, "."));
+			list($oname, $oemail, $odate, $ocom, $sub) = explode(',', $lines[0]);
+			$key = substr($ent, 0, strpos($ent, '.'));
 			$st = true;
 			foreach($lines as $num => $line) {
 				$find = false; //フラグ
 				for($i = 0; $i < count($words); $i++) {
-					if ($words[$i] == "") continue; //空は都バス
+					if ($words[$i] == '') continue; //空は都バス
 					if (stristr($line, $words[$i])) { // マッチです
 						$find = true; //やった
 						$line = str_replace($words[$i], "<b style='color:green;background-color:#ffff66'>$words[$i]</b>", $line);
-					} elseif ($andor == "and") { // ANDの場合マッチしないなら次のログへ
+					} elseif ($andor == 'and') { // ANDの場合マッチしないなら次のログへ
 						$find = false;
 						break;
 					} 
@@ -40,8 +40,8 @@ if (trim($word) != "") {
 					} 
 
 					$num = $num + 1;
-					list($name, $email, $date, $com) = explode(",", $line);
-					if ($email != "") {
+					list($name, $email, $date, $com) = explode(',', $line);
+					if ($email != '') {
 						$name = "<a href=\"mailto:$email\">$name</a>";
 					} 
 					$com = bb2html($com);
@@ -62,20 +62,20 @@ echo "<form action=\"$PHP_SELF\" method=GET></h3><ul>
 
 $d = dir($ddir);
 while ($ent = $d->read()) {
-	if (ereg("^[0-9]", $ent)&&ereg($ext."$", $ent))
-		$tmp[] = substr($ent, 0, strpos($ent, "."));
+	if (preg_match('/^[0-9]+\\'.$ext.'$/', $ent))
+		$tmp[] = substr($ent, 0, strpos($ent, '.'));
 } 
 $d->close();
 rsort($tmp);
 
-$suball = file("subback.txt");
+$suball = file('subback.txt');
 foreach($suball as $sub) {
-	list($key, $subject) = explode(",", $sub);
-	list($key,) = explode(".", $key);
+	list($key, $subject) = explode(',', $sub);
+	list($key,) = explode('.', $key);
 	$up[$key] = $subject;
 } 
 foreach($tmp as $line) {
 	echo " <a href=read.php?key=$line&ls=50>$line</a>";
 	echo "　　$up[$line]<br>\n";
 }
-echo "</form></body></html>";
+echo '</form></body></html>';
