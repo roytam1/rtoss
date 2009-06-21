@@ -13,19 +13,19 @@ const char* gSatoriName = "Satori";
 const char* gSatoriNameW = "里々";
 const char* gSatoriCraftman = "Yagi Kushigahama/The Maintenance Shop";
 const char* gSatoriCraftmanW = "櫛ヶ浜やぎ/整備班";
-const char* gSatoriVersion = "phase Mc146-2";
+const char* gSatoriVersion = "phase Mc146-3";
 const char* gShioriVersion = "3.0";
 const char* gSaoriVersion = "1.0";
 
 
 
-#ifdef SATORI_DLL
+//#ifdef SATORI_DLL
 	// Satoriの唯一の実体
 	Satori gSatori;
 	SakuraDLLHost* SakuraDLLHost::m_dll = &gSatori;
-#else
-	SakuraDLLHost* SakuraDLLHost::m_dll = NULL;
-#endif // SATORI_DLL
+//#else
+//	SakuraDLLHost* SakuraDLLHost::m_dll = NULL;
+//#endif // SATORI_DLL
 
 
 // エスケープ文字列
