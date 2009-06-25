@@ -2,27 +2,28 @@
 /*********************************************
   Wastepaper Uploader v1.5
   http://utu.under.jp/
-  PHP¤¢¤×¤í¤À¤ò¸µ¤ËW3C¤Ë½àµò¤·¤¿XHTML¤òÌÜ»Ø¤¹¤Ù¤¯
-  ¥¹¥¯¥ê¥×¥ÈµÚ¤ÓHTMLÊ¸½ñ¤ò²şÂ¤¤¤¤¿¤·¤Ş¤·¤¿¡£
-  ·ë¹½Å¬Åö¤ÊXHTML¤«¤â¤·¤ì¤Ş¤»¤ó¤¬W3C¿®¼ÔÍÍ¤ªµö¤·¤ò¡Ä¡£
-  ------------------ÀßÃÖË¡-------------------
-  ÀßÃÖ¥Ç¥£¥ì¥¯¥È¥ê¤Ï755
-  img¡¢imgs¥Ç¥£¥ì¥¯¥È¥ê¤Ï777
-  upload.php¡¢sum.php¤Ï755
-  up.log¡¢last.cgi¡¢count.txt¤Ï666  
+  PHPã‚ã·ã‚ã ã‚’å…ƒã«W3Cã«æº–æ‹ ã—ãŸXHTMLã‚’ç›®æŒ‡ã™ã¹ã
+  ã‚¹ã‚¯ãƒªãƒ—ãƒˆåŠã³HTMLæ–‡æ›¸ã‚’æ”¹é€ ã„ãŸã—ã¾ã—ãŸã€‚
+  çµæ§‹é©å½“ãªXHTMLã‹ã‚‚ã—ã‚Œã¾ã›ã‚“ãŒW3Cä¿¡è€…æ§˜ãŠè¨±ã—ã‚’â€¦ã€‚
+  ------------------è¨­ç½®æ³•-------------------
+  è¨­ç½®ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã¯755
+  imgã€imgsãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã¯777
+  upload.phpã€sum.phpã¯755
+  up.logã€last.cgiã€count.txtã¯666  
   ------------------Based--------------------
-  source by PHP¤¢¤×¤í¤À v2.2
+  source by PHPã‚ã·ã‚ã  v2.2
   http://php.s3.to
   
-  source by ¤º¤ë¤İ¤ó
+  source by ãšã‚‹ã½ã‚“
   http://zurubon.virtualave.net/
 
-  ¤â¤·¤â¤Î°Ù¤Î.htaccess ¡ÊCGI¶Ø»ßSSI¶Ø»ßIndexÉ½¼¨¶Ø»ß¡Ë
+  ã‚‚ã—ã‚‚ã®ç‚ºã®.htaccess ï¼ˆCGIç¦æ­¢SSIç¦æ­¢Indexè¡¨ç¤ºç¦æ­¢ï¼‰
   Options -ExecCGI -Includes -Indexes
-  .txt¤Ç¤â¡¢Ãæ¿È¤¬HTML¤À¤ÈÉ½¼¨¤µ¤ì¤Á¤ã¤¦¤Î¤ÇÃí°Õ
+  .txtã§ã‚‚ã€ä¸­èº«ãŒHTMLã ã¨è¡¨ç¤ºã•ã‚Œã¡ã‚ƒã†ã®ã§æ³¨æ„
   -------------------------------------------
  *********************************************/
-if(phpversion()>="4.1.0"){//PHP4.1.0°Ê¹ßÂĞ±ş
+error_reporting(0);
+if(phpversion()>="4.1.0"){//PHP4.1.0ä»¥é™å¯¾å¿œ
   $_GET = array_map("_clean", $_GET);
   $_POST = array_map("_clean", $_POST);
   //$_POST = array_map("_clean", $_GET);
@@ -30,43 +31,45 @@ if(phpversion()>="4.1.0"){//PHP4.1.0°Ê¹ßÂĞ±ş
   extract($_POST);
   extract($_COOKIE);
   extract($_SERVER);
-  $upfile_type=_clean($_FILES['up']['type']);
-  $upfile_size=$_FILES["upfile"]["size"];//Ë¿½ê¤Çµ¤¤Å¤¯¡¦¡¦¡¦
+  $upfile_type=_clean($_FILES['upfile']['type']);
+  $upfile_size=$_FILES["upfile"]["size"];//æŸæ‰€ã§æ°—ã¥ããƒ»ãƒ»ãƒ»
   $upfile_name=_clean($_FILES["upfile"]["name"]);
   $upfile=$_FILES["upfile"]["tmp_name"];
 }
 
-  $title	= 'Wastepaper Uploader';	//¥¿¥¤¥È¥ë
-  $home		= 'http://utu.under.jp/';	//¥Û¡¼¥à
-  $logfile	= "up.log";	//¥í¥°¥Õ¥¡¥¤¥ëÌ¾¡ÊÊÑ¹¹¤¹¤ë»ö¡Ë
-  $updir 	= "./img/";	//¥¢¥Ã¥×ÍÑ¥Ç¥£¥ì¥¯¥È¥ê
-  $upsdir	= "./imgs/";	//¥µ¥à¥Í¥¤¥ëÊİÂ¸¥Ç¥£¥ì¥¯¥È¥ê
-  $prefix	= '';		//ÀÜÆ¬¸ì¡Êup001.txt,up002.jpg¤Ê¤éup¡Ë
-  $logmax	= 50;		//logÊİÂ¸¹Ô¡Ê¤³¤ì°Ê¾å¤Ï¸Å¤¤¤Î¤«¤éºï½ü¡Ë
-  $commax	= 250;		//¥³¥á¥ó¥ÈÅê¹ÆÎÌÀ©¸Â¡Ê¥Ğ¥¤¥È¡£Á´³Ñ¤Ï¤³¤ÎÈ¾Ê¬¡Ë
-  $limitk	= 100;	//¥¢¥Ã¥×¥í¡¼¥ÉÀ©¸Â¡ÊKB ¥­¥í¥Ğ¥¤¥È¡Ë
-  $page_def	= 10;		//°ì¥Ú¡¼¥¸¤ÎÉ½¼¨¹Ô¿ô
-  $admin	= "12345";	//ºï½ü´ÉÍı¥Ñ¥¹
-  $auto_link	= 1;		//¥³¥á¥ó¥È¤Î¼«Æ°¥ê¥ó¥¯¡ÊYes=1;No=0);
-  $denylist	= array('192.168.0.1','sex.com','annony');	//¥¢¥¯¥»¥¹µñÈİ¥Û¥¹¥È
-  $arrowext	= array('zip','lzh','rar','avi','mpg','wmv','mp3','wma','swf','txt','bmp','jpg','png','gif');	//µö²Ä³ÈÄ¥»Ò ¾®Ê¸»ú¡Ê¤½¤ì°Ê³°¤Ï¥¨¥é¡¼
+  $title	= 'ä¸Šå‚³å€';	//ã‚¿ã‚¤ãƒˆãƒ«
+  $home		= 'http://www.cn-dos.net/';	//ãƒ›ãƒ¼ãƒ 
+  $logfile	= "up.log";	//ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«åï¼ˆå¤‰æ›´ã™ã‚‹äº‹ï¼‰
+  $updir 	= "./img/";	//ã‚¢ãƒƒãƒ—ç”¨ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
+  $upsdir	= "./imgs/";	//ã‚µãƒ ãƒã‚¤ãƒ«ä¿å­˜ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
+  $prefix	= '';		//æ¥é ­èªï¼ˆup001.txt,up002.jpgãªã‚‰upï¼‰
+  $logmax	= 5000;		//logä¿å­˜è¡Œï¼ˆã“ã‚Œä»¥ä¸Šã¯å¤ã„ã®ã‹ã‚‰å‰Šé™¤ï¼‰
+  $usrmax	= 25;		//UseræŠ•ç¨¿é‡åˆ¶é™ï¼ˆãƒã‚¤ãƒˆã€‚å…¨è§’ã¯ã“ã®åŠåˆ†ï¼‰
+  $commax	= 250;		//ã‚³ãƒ¡ãƒ³ãƒˆæŠ•ç¨¿é‡åˆ¶é™ï¼ˆãƒã‚¤ãƒˆã€‚å…¨è§’ã¯ã“ã®åŠåˆ†ï¼‰
+  $limitk	= 100000;	//ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰åˆ¶é™ï¼ˆKB ã‚­ãƒ­ãƒã‚¤ãƒˆï¼‰
+  $page_def	= 15;		//ä¸€ãƒšãƒ¼ã‚¸ã®è¡¨ç¤ºè¡Œæ•°
+  $admin	= "del";	//å‰Šé™¤ç®¡ç†ãƒ‘ã‚¹
+  $auto_link	= 1;		//ã‚³ãƒ¡ãƒ³ãƒˆã®è‡ªå‹•ãƒªãƒ³ã‚¯ï¼ˆYes=1;No=0);
+  $denylist	= array('192.168.0.1','sex.com','annony');	//ã‚¢ã‚¯ã‚»ã‚¹æ‹’å¦ãƒ›ã‚¹ãƒˆ
+  $arrowext	= array('7z','zip','lzh','rar','avi','mpg','wmv','mp3','wma','swf','txt','bmp','jpg','png','gif');	//è¨±å¯æ‹¡å¼µå­ å°æ–‡å­—ï¼ˆãã‚Œä»¥å¤–ã¯ã‚¨ãƒ©ãƒ¼
 
-  $count_start	= "2004/10/24";	//¥«¥¦¥ó¥¿³«»ÏÆü
-  $count_file	= "count.txt";  //¥«¥¦¥ó¥¿¥Õ¥¡¥¤¥ë¡Ê¶õ¥Õ¥¡¥¤¥ë¤Ç666¡Ë
+  $count_start	= "2008/02/11";	//ã‚«ã‚¦ãƒ³ã‚¿é–‹å§‹æ—¥
+  $count_file	= "count.txt";  //ã‚«ã‚¦ãƒ³ã‚¿ãƒ•ã‚¡ã‚¤ãƒ«ï¼ˆç©ºãƒ•ã‚¡ã‚¤ãƒ«ã§666ï¼‰
 
-  $last_file	= "last.cgi";	//Ï¢Â³Åê¹ÆÀ©¸ÂÍÑ¥Õ¥¡¥¤¥ë¡Ê¶õ¥Õ¥¡¥¤¥ë¤Ç666¡Ë
-  $last_time	= 0;		//Æ±°ìIP¤«¤é¤ÎÏ¢Â³Åê¹Æµö²Ä¤¹¤ë´Ö³Ö¡ÊÊ¬¡Ë¡Ê0¤ÇÌµÀ©¸Â¡Ë
+  $last_file	= "last.cgi";	//é€£ç¶šæŠ•ç¨¿åˆ¶é™ç”¨ãƒ•ã‚¡ã‚¤ãƒ«ï¼ˆç©ºãƒ•ã‚¡ã‚¤ãƒ«ã§666ï¼‰
+  $last_time	= 0;		//åŒä¸€IPã‹ã‚‰ã®é€£ç¶šæŠ•ç¨¿è¨±å¯ã™ã‚‹é–“éš”ï¼ˆåˆ†ï¼‰ï¼ˆ0ã§ç„¡åˆ¶é™ï¼‰
 
-  /* ¹àÌÜÉ½¼¨¡Ê´Ä¶­ÀßÄê¡Ë¤Î½é´ü¾õÂÖ (É½¼¨¤Ê¤éChecked É½¼¨¤·¤Ê¤¤¤Ê¤é¶õ) */
-  $f_act  = 'checked="checked"';	//ACT¡Êºï½ü¥ê¥ó¥¯¡Ë
-  $f_com  = 'checked="checked"';	//¥³¥á¥ó¥È
-  $f_size = 'checked="checked"';	//¥Õ¥¡¥¤¥ë¥µ¥¤¥º
-  $f_mime = '';				//MIME¥¿¥¤¥×
-  $f_date = 'checked="checked"';	//ÆüÉÕ¤±
-  $f_orig = 'checked="checked"';	//¸µ¥Õ¥¡¥¤¥ëÌ¾
+  /* é …ç›®è¡¨ç¤ºï¼ˆç’°å¢ƒè¨­å®šï¼‰ã®åˆæœŸçŠ¶æ…‹ (è¡¨ç¤ºãªã‚‰Checked è¡¨ç¤ºã—ãªã„ãªã‚‰ç©º) */
+  $f_act  = 'checked="checked"';	//ACTï¼ˆå‰Šé™¤ãƒªãƒ³ã‚¯ï¼‰
+  $f_usr  = 'checked="checked"';	//ã‚³ãƒ¡ãƒ³ãƒˆ
+  $f_com  = 'checked="checked"';	//ã‚³ãƒ¡ãƒ³ãƒˆ
+  $f_size = 'checked="checked"';	//ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚º
+  $f_mime = '';				//MIMEã‚¿ã‚¤ãƒ—
+  $f_date = 'checked="checked"';	//æ—¥ä»˜ã‘
+  $f_orig = 'checked="checked"';	//å…ƒãƒ•ã‚¡ã‚¤ãƒ«å
 
 if($act=="envset"){
-  $cookval = @implode(",", array($acte,$come,$sizee,$mimee,$datee,$orige)); 
+  $cookval = @implode(",", array($acte,$user,$come,$sizee,$mimee,$datee,$orige)); 
   setcookie ("upcook", $cookval,time()+365*24*3600);
 }
 function _clean($str) {
@@ -74,57 +77,129 @@ function _clean($str) {
   if (get_magic_quotes_gpc()) $str = stripslashes($str);
   return $str;
 }
-/* ¤³¤³¤«¤é¥Ø¥Ã¥À¡¼ */
+$unique_id = uniqid("");
+/* ã“ã“ã‹ã‚‰ãƒ˜ãƒƒãƒ€ãƒ¼ */
 ?>
-<?php echo '<?xml version="1.0" encoding="euc-jp"?>'."\n" ?>
+<?php echo '<?xml version="1.0" encoding="utf-8"?>'."\n" ?>
 <!DOCTYPE html
    PUBLIC "-//W3C//DTD XHTML 1.1//EN"
    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=euc-jp" media="all" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" media="all" />
 <title><?php echo "$title" ?></title>
+<script type="text/javascript"><!--//--><![CDATA[//><!--
+function gID(s) { return document.getElementById(s); }
+/* å»ºç«‹XMLHttpRequestç‰©ä»¶ */
+function JSONXMLHttpReq(){
+	var objxml = false;
+	/*@cc_on @*/
+	/*@if (@_jscript_version >= 5)
+	try{
+		objxml = new ActiveXObject("Msxml2.XMLHTTP");
+	}catch(e){
+		try{
+			objxml = new ActiveXObject("Microsoft.XMLHTTP");
+		}catch(e2){ objxml = false; }
+	}
+	@end @*/
+	if(!objxml && typeof XMLHttpRequest!='undefined') {
+		objxml = new XMLHttpRequest();
+		if(objxml.overrideMimeType) objxml.overrideMimeType('text/plain');
+	}
+	return objxml;
+}
+var xhttpjson=JSONXMLHttpReq();
+
+function ParseProgress(){
+	if(xhttpjson.readyState==4){ // è®€å–å®Œæˆ
+		percent = xhttpjson.responseText;
+		if(percent > 0) {
+			gID("progressbarborder").style.display="block";
+			gID("progressbartext").innerHTML = percent+"%";
+			gID("progressbar").style.width = percent+"%";
+		}
+		if(percent < 100){
+			setTimeout("getProgress()", 200);
+		}
+	}
+}
+function getProgress(){
+	if(xhttpjson){
+		xhttpjson.open('GET','progress.php?progress_key=<?php echo($unique_id)?>', true);
+		xhttpjson.onreadystatechange = ParseProgress;
+		xhttpjson.send(null);
+	}
+}
+ 
+function startProgress(){
+    gID("up_progress").style.display="block";
+    setTimeout("getProgress()", 1000);
+}
+//--><!]]></script>
 <link href="style.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
 
 <h1><?php echo "$title" ?></h1>
-<p>µ¤¤Ë¤Ê¤ë¥Í¥¿¤Ê¤É¡³(¡­¡¼¡®)¥Î</p>
-
+<p>è«‹å‹¿åœ¨è«–å£‡å¤–è½‰è¼‰æ­¤å€ä»»ä½•è³‡æ–™ã€‚</p>
+<center><script type="text/javascript"><!--//--><![CDATA[//><!--
+google_ad_client = "pub-8016619041936615";
+//728x90, å·²å»ºç«‹ 2007/12/26
+google_ad_slot = "8811687463";
+google_ad_width = 728;
+google_ad_height = 90;
+//--><!]]></script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></center>
 <?php
-/* ¥Ø¥Ã¥À¡¼¤³¤³¤Ş¤Ç */
+/* ãƒ˜ãƒƒãƒ€ãƒ¼ã“ã“ã¾ã§ */
 $foot = <<<FOOT
 
-<h2>Ãøºî¸¢É½¼¨</h2>
-<p id="link"><a href="http://php.s3.to/">¥ì¥Ã¥ÄPHP!</a> + <a href="http://utu.under.jp">Wastepaper Basket</a></p>
+<center><script type="text/javascript"><!--//--><![CDATA[//><!--
+google_ad_client = "pub-8016619041936615";
+//468x60, å·²å»ºç«‹ 2007/12/17
+google_ad_slot = "0207867936";
+google_ad_width = 468;
+google_ad_height = 60;
+google_language = "zh-TW";
+//--><!]]></script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></center>
+
+<h2>è‘—ä½œæ¨©è¡¨ç¤º</h2>
+<p id="link"><a href="http://php.s3.to/">ãƒ¬ãƒƒãƒ„PHP!</a> + <a href="http://utu.under.jp">Wastepaper Basket</a> + <a href="http://scrappedblog.blogspot.com/">Roytam1</a></p>
 
 </body>
 </html>
 FOOT;
 
-function FormatByte($size){//¥Ğ¥¤¥È¤Î¥Õ¥©¡¼¥Ş¥Ã¥È¡ÊB¢ªkB¡Ë
+function FormatByte($size){//ãƒã‚¤ãƒˆã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆï¼ˆBâ†’kBï¼‰
   if($size == 0)			$format = "";
   else if($size <= 1024)		$format = $size."B";
   else if($size <= (1024*1024))		$format = sprintf ("%dkB",($size/1024));
-  else if($size <= (10*1024*1024))	$format = sprintf ("%.2fMB",($size/(1024*1024)));
+  else if($size <= (1024*1024*1024))	$format = sprintf ("%.2fMB",($size/(1024*1024)));
+  else if($size <= (1024*1024*1024*1024))	$format = sprintf ("%.2fGB",($size/(1024*1024*1024)));
   else					$format = $size."B";
 
   return $format;
 }
-function paging($page, $total){//¥Ú¡¼¥¸¥ê¥ó¥¯ºîÀ®
+function paging($page, $total){//ãƒšãƒ¼ã‚¸ãƒªãƒ³ã‚¯ä½œæˆ
   global $PHP_SELF,$page_def;
 
     for ($j = 1; $j * $page_def < $total+$page_def; $j++) {
-      if($page == $j){//º£É½¼¨¤·¤Æ¤¤¤ë¤Î¤ÏØİ¸¤·¤Ê¤¤
+      if($page == $j){//ä»Šè¡¨ç¤ºã—ã¦ã„ã‚‹ã®ã¯ï¾˜ï¾ï½¸ã—ãªã„
         $next .= "[<strong>$j</strong>]";
       }else{
-        $next .= sprintf("[<a href=\"%s?page=%d\">%d</a>]", $PHP_SELF,$j,$j);//Â¾¤ÏØİ¸
+        $next .= sprintf("[<a href=\"%s?page=%d\">%d</a>]", $PHP_SELF,$j,$j);//ä»–ã¯ï¾˜ï¾ï½¸
       }
     }
     if($page=="all") return sprintf ("Page: %s [ALL]",$next,$PHP_SELF);
     else return sprintf ("Page: %s [<a href=\"%s?page=all\">ALL</a>]",$next,$PHP_SELF);
 }
-function error($mes1=""){//¤¨¤Ã¤é¡¼Ò¯¾°¼Ş
+function error($mes1=""){//ãˆã£ã‚‰ãƒ¼ï¾’ï½¯ï½¾ï½°ï½¼ï¾
   global $foot;
 
   echo $mes1;
@@ -134,22 +209,22 @@ function error($mes1=""){//¤¨¤Ã¤é¡¼Ò¯¾°¼Ş
 /* start */
 $limitb = $limitk * 1024;
 $host = @gethostbyaddr($REMOTE_ADDR);
-if(!$upcook) $upcook=@implode(",",array($f_act,$f_com,$f_size,$f_mime,$f_date,$f_orig));
-list($c_act,$c_com,$c_size,$c_mime,$c_date,$c_orig)=explode(",",$upcook);
+if(!$upcook) $upcook=@implode(",",array($f_act,$f_usr,$f_com,$f_size,$f_mime,$f_date,$f_orig));
+list($c_act,$c_usr,$c_com,$c_size,$c_mime,$c_date,$c_orig)=explode(",",$upcook);
 
-/* ¥¢¥¯¥»¥¹À©¸Â */
+/* ã‚¢ã‚¯ã‚»ã‚¹åˆ¶é™ */
 if(is_array($denylist)){
-  while(list(,$line)=each($denylist)){
-    if(strstr($host, $line)) error('<h2>¥¨¥é¡¼¥á¥Ã¥»¡¼¥¸</h2>
-<p class="error">¥¢¥¯¥»¥¹À©¸Â:¥¢¥¯¥»¥¹¸¢¸Â¤¬¤¢¤ê¤Ş¤»¤ó</p>');
+  foreach($denylist as $line){
+    if(strstr($host, $line)) error('<h2>éŒ¯èª¤</h2>
+<p class="error">å­˜å–é™åˆ¶:æ‚¨æ²’æœ‰ä½¿ç”¨æ¬Šé™</p>');
   }
 }
-/* ºï½ü¼Â¹Ô */
+/* å‰Šé™¤å®Ÿè¡Œ */
 if($delid && $delpass!=""){
   $old = file($logfile);
   $find = false;
   for($i=0; $i<count($old); $i++){
-    list($did,$dext,,,,,,$dpwd,)=explode("\t",$old[$i]);
+    list($did,$dext,,,,,,,$dpwd,)=explode("\t",$old[$i]);
     if($delid==$did){
       $find = true;
       $del_ext = $dext;
@@ -158,8 +233,8 @@ if($delid && $delpass!=""){
       $new[] = $old[$i];
     }
   }
-  if(!$find) error('<h2>¥¨¥é¡¼¥á¥Ã¥»¡¼¥¸</h2>
-<p class="error">ºï½ü¥¨¥é¡¼:³ºÅö¥Õ¥¡¥¤¥ë¤¬¸«¤Ä¤«¤ê¤Ş¤»¤ó</p>');
+  if(!$find) error('<h2>éŒ¯èª¤</h2>
+<p class="error">åˆªé™¤éŒ¯èª¤:æ­¤æª”æ¡ˆæ‰¾ä¸åˆ°</p>');
   if($delpass == $admin || substr(md5($delpass), 2, 7) == $del_pwd){
     if(file_exists($updir.$prefix.$delid.".$del_ext")) unlink($updir.$prefix.$delid.".$del_ext");
     if(file_exists($upsdir.$prefix.$delid.".$del_ext")) unlink($upsdir.$prefix.$delid.".$del_ext");
@@ -168,102 +243,108 @@ if($delid && $delpass!=""){
     fputs($fp, @implode("",$new));  
     fclose($fp);
   }else{
-    error('<h2>¥¨¥é¡¼¥á¥Ã¥»¡¼¥¸</h2>
-<p class="error">ºï½ü¥¨¥é¡¼:¥Ñ¥¹¥ï¡¼¥É¤¬°ã¤¤¤Ş¤¹</p>');
+    error('<h2>éŒ¯èª¤</h2>
+<p class="error">åˆªé™¤éŒ¯èª¤:å¯†ç¢¼éŒ¯èª¤</p>');
   }
 }
-/* ºï½ü¥Õ¥©¡¼¥à */
+/* å‰Šé™¤ãƒ•ã‚©ãƒ¼ãƒ  */
 if($del){
-  error("<h2>ºï½ü¥Õ¥©¡¼¥à</h2>
+  error("<h2>åˆªé™¤æª”æ¡ˆ</h2>
 <form method=\"post\" enctype=\"multipart/form-data\" action=\"$PHP_SELF\">
-<p>ºï½ü¥Ñ¥¹ÆşÎÏ<br />
+<p>è«‹è¼¸å…¥å¯†ç¢¼<br />
 <input type=\"hidden\" name=\"delid\" value=\"".htmlspecialchars($del)."\" />
 <input type=\"password\" size=\"12\" name=\"delpass\" class=\"box\" tabindex=\"1\" accesskey=\"1\" />
-<input type=\"submit\" value=\"ºï½ü\" tabindex=\"2\" accesskey=\"2\" /></p>
+<input type=\"submit\" value=\"åˆªé™¤\" tabindex=\"2\" accesskey=\"2\" /></p>
 </form>
-<p class=\"tline\"><a href=\"$PHP_SELF?\">Ìá¤ë</a></p>
+<p class=\"tline\"><a href=\"$PHP_SELF?\">è¿”å›</a></p>
 ");
 }
-/* ´Ä¶­ÀßÄê¥Õ¥©¡¼¥à */
+/* ç’°å¢ƒè¨­å®šãƒ•ã‚©ãƒ¼ãƒ  */
 if($act=="env"){
-  echo "<h2>´Ä¶­ÀßÄê</h2>
+  echo "<h2>ç’°å¢ƒè¨­å®š</h2>
 <form method=\"get\" action=\"$PHP_SELF\">
 <p><input type=\"hidden\" name=\"act\" value=\"envset\" /></p>
-<h3>É½¼¨ÀßÄê</h3>
+<h3>é¡¯ç¤ºè¨­å®š</h3>
 <ul>
-<li><input type=\"checkbox\" name=\"acte\" value=\"checked\" tabindex=\"1\" accesskey=\"1\" $c_act />ACT</li>
-<li><input type=\"checkbox\" name=\"come\" value=\"checked\" tabindex=\"2\" accesskey=\"2\" $c_com />COMMENT</li>
-<li><input type=\"checkbox\" name=\"sizee\" value=\"checked\" tabindex=\"3\" accesskey=\"3\" $c_size />SIZE</li>
-<li><input type=\"checkbox\" name=\"mimee\" value=\"checked\" tabindex=\"4\" accesskey=\"4\" $c_mime />MIME</li>
-<li><input type=\"checkbox\" name=\"datee\" value=\"checked\" tabindex=\"5\" accesskey=\"5\" $c_date />DATE</li>
-<li><input type=\"checkbox\" name=\"orige\" value=\"checked\" tabindex=\"6\" accesskey=\"6\" $c_orig />ORIG</li>
+<li><input type=\"checkbox\" name=\"acte\" value=\"checked\" tabindex=\"1\" accesskey=\"1\" $c_act />åˆª</li>
+<li><input type=\"checkbox\" name=\"user\" value=\"checked\" tabindex=\"2\" accesskey=\"2\" $c_com />ç”¨æˆ¶</li>
+<li><input type=\"checkbox\" name=\"come\" value=\"checked\" tabindex=\"3\" accesskey=\"3\" $c_com />å‚™è¨»</li>
+<li><input type=\"checkbox\" name=\"sizee\" value=\"checked\" tabindex=\"4\" accesskey=\"4\" $c_size />å¤§å°</li>
+<li><input type=\"checkbox\" name=\"mimee\" value=\"checked\" tabindex=\"5\" accesskey=\"5\" $c_mime />MIME</li>
+<li><input type=\"checkbox\" name=\"datee\" value=\"checked\" tabindex=\"6\" accesskey=\"6\" $c_date />æ—¥æœŸ</li>
+<li><input type=\"checkbox\" name=\"orige\" value=\"checked\" tabindex=\"7\" accesskey=\"7\" $c_orig />åŸæª”å</li>
 </ul>
-<p>¾åµ­¤ÎÀßÄê¤Ë¤ÆË¬Ìä¤¹¤ë¤³¤È¤¬¤Ç¤­¤Ş¤¹¡Ê¢¨cookie¡Ë</p>
-<p><input type=\"submit\" value=\"ÅĞÏ¿\" tabindex=\"7\" accesskey=\"7\" /><input type=\"reset\" value=\"¸µ¤ËÌá¤¹\" tabindex=\"8\" accesskey=\"8\" /></p>
+<p>ä»¥ä¸Šè¨­å®šå°‡æœƒä»¥ cookie ä¿å­˜ä»¥ä¾¿å†æ¬¡ä½¿ç”¨ã€‚</p>
+<p><input type=\"submit\" value=\"å„²å­˜\" tabindex=\"8\" accesskey=\"8\" /><input type=\"reset\" value=\"é‚„åŸ\" tabindex=\"9\" accesskey=\"9\" /></p>
 </form>
-<p class=\"tline\"><a href=\"$PHP_SELF?\">Ìá¤ë</a></p>
+<p class=\"tline\"><a href=\"$PHP_SELF?\">è¿”å›</a></p>
 
 ";
 echo $foot;
 exit;
 }
 $lines = file($logfile);
-/* ¥¢¥×¥í¡¼¥É½ñ¤­¹ş¤ß½èÍı */
-if(file_exists($upfile) && $com && $upfile_size > 0){
-  if(strlen($com) > $commax) error('<h2>¥¨¥é¡¼¥á¥Ã¥»¡¼¥¸</h2>
-<p class="error">Åê¹Æ¥¨¥é¡¼:¥³¥á¥ó¥È¤¬Ä¹¤¹¤®¤Ş¤¹</p>
+/* ã‚¢ãƒ—ãƒ­ãƒ¼ãƒ‰æ›¸ãè¾¼ã¿å‡¦ç† */
+if(file_exists($upfile) && $com && $usr && $upfile_size > 0){
+  if(isset($usr{$usrmax+1})) error('<h2>éŒ¯èª¤</h2>
+<p class="error">ä¸Šå‚³éŒ¯èª¤:ç”¨æˆ¶åç¨±éé•·</p>
 ');
-  if($upfile_size > $limitb)        error('<h2>¥¨¥é¡¼¥á¥Ã¥»¡¼¥¸</h2>
-<p class="error">Åê¹Æ¥¨¥é¡¼:¥Õ¥¡¥¤¥ë¤¬¥Ç¥«¤¹¤®¤Ş¤¹</p>');
-  /* Ï¢Â³Åê¹ÆÀ©¸Â */
+  if(isset($com{$commax+1})) error('<h2>éŒ¯èª¤</h2>
+<p class="error">ä¸Šå‚³éŒ¯èª¤:å‚™è¨»éé•·</p>
+');
+  if($upfile_size > $limitb)        error('<h2>éŒ¯èª¤</h2>
+<p class="error">ä¸Šå‚³éŒ¯èª¤:æ­¤æª”æ¡ˆéå¤§</p>');
+  /* é€£ç¶šæŠ•ç¨¿åˆ¶é™ */
   if($last_time > 0){
     $now = time();
-    $last = @fopen($last_file, "r+") or die('<h2>¥¨¥é¡¼¥á¥Ã¥»¡¼¥¸</h2>
-<p class="error">Ï¢Â³Åê¹ÆÍÑ¥Õ¥¡¥¤¥ë $last_file ¤òºîÀ®¤·¤Æ¤¯¤À¤µ¤¤</p>');
+    $last = @fopen($last_file, "r+") or die('<h2>éŒ¯èª¤</h2>
+<p class="error">é€£ç¶šæŠ•ç¨¿ç”¨ãƒ•ã‚¡ã‚¤ãƒ« $last_file ã‚’ä½œæˆã—ã¦ãã ã•ã„</p>');
     $lsize = fgets($last, 1024);
     list($ltime, $lip) = explode("\t", $lsize);
     if($host == $lip && $last_time*60 > ($now-$ltime)){
-      error('<h2>¥¨¥é¡¼¥á¥Ã¥»¡¼¥¸</h2>
-<p class="error">Ï¢Â³Åê¹ÆÀ©¸ÂÃæ:»ş´Ö¤òÃÖ¤¤¤Æ¤ä¤êÄ¾¤·¤Æ¤¯¤À¤µ¤¤</p>');
+      error('<h2>éŒ¯èª¤</h2>
+<p class="error">é€£ç¶šæŠ•ç¨¿åˆ¶é™ä¸­:æ™‚é–“ã‚’ç½®ã„ã¦ã‚„ã‚Šç›´ã—ã¦ãã ã•ã„</p>');
     }
     rewind($last);
     fputs($last, "$now\t$host\t");
     fclose($last);
   }
-  /* ³ÈÄ¥»Ò¤È¿·¥Õ¥¡¥¤¥ëÌ¾ */
-  $pos = strrpos($upfile_name,".");	//³ÈÄ¥»Ò¼èÆÀ
+  /* æ‹¡å¼µå­ã¨æ–°ãƒ•ã‚¡ã‚¤ãƒ«å */
+  $pos = strrpos($upfile_name,".");	//æ‹¡å¼µå­å–å¾—
   $ext = substr($upfile_name,$pos+1,strlen($upfile_name)-$pos);
-  $ext = strtolower($ext);//¾®Ê¸»ú²½
+  $ext = strtolower($ext);//å°æ–‡å­—åŒ–
   if(!in_array($ext, $arrowext))
-    error('<h2>¥¨¥é¡¼¥á¥Ã¥»¡¼¥¸</h2>
-<p class="error">³ÈÄ¥»Ò¥¨¥é¡¼:¤½¤Î³ÈÄ¥»Ò¥Õ¥¡¥¤¥ë¤Ï¥¢¥Ã¥×¥í¡¼¥É¤Ç¤­¤Ş¤»¤ó</p>');
-  /* µñÈİ³ÈÄ¥»Ò¤Ïtxt¤ËÊÑ´¹
+    error('<h2>éŒ¯èª¤</h2>
+<p class="error">æª”å°¾éŒ¯èª¤:æ­¤æª”å°¾ç„¡æ³•ä¸Šå‚³</p>');
+  /* æ‹’å¦æ‹¡å¼µå­ã¯txtã«å¤‰æ›
   for($i=0; $i<count($denyext); $i++){
     if(strstr($ext,$denyext[$i])) $ext = 'txt';
   }
   */
-  list($id,) = explode("\t", $lines[0]);//No¼èÆÀ
-  $id = sprintf("%03d", ++$id);		//¥¤¥ó¥¯¥ê
+  list($id,) = explode("\t", $lines[0]);//Noå–å¾—
+  $id = sprintf("%03d", ++$id);		//ã‚¤ãƒ³ã‚¯ãƒª
   $newname = $prefix.$id.".".$ext;
 
-  /* ¼«»ªÅ¾Á÷ */
-  move_uploaded_file($upfile, $updir.$newname);//3.0.16¤è¤ê¸å¤Î¥Ğ¡¼¥¸¥ç¥ó¤ÎPHP 3¤Ş¤¿¤Ï 4.0.2 ¸å
+  /* è‡ªé¯–è»¢é€ */
+  move_uploaded_file($upfile, $updir.$newname);//3.0.16ã‚ˆã‚Šå¾Œã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã®PHP 3ã¾ãŸã¯ 4.0.2 å¾Œ
   //copy($upfile, $updir.$newname);
   chmod($updir.$newname, 0604);
 
-  /* MIME¥¿¥¤¥× */
-  if(!$upfile_type) $upfile_type = "text/plain";//¥Ç¥Õ¥©MIME¤Ïtext/plain
+  /* MIMEã‚¿ã‚¤ãƒ— */
+  if(!$upfile_type) $upfile_type = "text/plain";//ãƒ‡ãƒ•ã‚©MIMEã¯text/plain
 
-  /* ¥³¥á¥ó¥ÈÂ¾ */
-  $com = htmlspecialchars($com);	//¥¿¥°ÊÑ´¹
-  if(get_magic_quotes_gpc()) $com = stripslashes($com);	//¡ï½üµî
+  /* ã‚³ãƒ¡ãƒ³ãƒˆä»– */
+  $com = htmlspecialchars($com);	//ã‚¿ã‚°å¤‰æ›
+  if(get_magic_quotes_gpc()) $com = stripslashes($com);	//ï¿¥é™¤å»
+  $usr = htmlspecialchars($usr);	//ã‚¿ã‚°å¤‰æ›
+  if(get_magic_quotes_gpc()) $usr = stripslashes($usr);	//ï¿¥é™¤å»
 
-  $now = gmdate("Y/m/d(D)H:i", time()+9*60*60);	//ÆüÉÕ¤Î¥Õ¥©¡¼¥Ş¥Ã¥È
-  $pwd = ($pass) ? substr(md5($pass), 2, 7) : "*";	//¥Ñ¥¹¤ÃºîÀ®¡ÊÌµ¤¤¤Ê¤é*¡Ë
+  $now = gmdate("Y/m/d(D)H:i", time()+9*60*60);	//æ—¥ä»˜ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+  $pwd = ($pass) ? substr(md5($pass), 2, 7) : "*";	//ãƒ‘ã‚¹ã£ä½œæˆï¼ˆç„¡ã„ãªã‚‰*ï¼‰
 
-  $dat = @implode("\t", array($id,$ext,$com,$host,$now,$upfile_size,$upfile_type,$pwd,$upfile_name,));
+  $dat = @implode("\t", array($id,$ext,$usr,$com,$host,$now,$upfile_size,$upfile_type,$pwd,$upfile_name,));
 
-  if(count($lines) >= $logmax){		//¥í¥°¥ª¡¼¥Ğ¡¼¤Ê¤é¥Ç¡¼¥¿ºï½ü
+  if(count($lines) >= $logmax){		//ãƒ­ã‚°ã‚ªãƒ¼ãƒãƒ¼ãªã‚‰ãƒ‡ãƒ¼ã‚¿å‰Šé™¤
     for($d = count($lines)-1; $d >= $logmax-1; $d--){
       list($did,$dext,)=explode("\t", $lines[$d]);
       if(file_exists($updir.$prefix.$did.".".$dext)) {
@@ -272,72 +353,77 @@ if(file_exists($upfile) && $com && $upfile_size > 0){
     }
   }
 
-  $fp = fopen ($logfile , "w");		//½ñ¤­¹ş¤ß¥â¡¼¥É¤Ç¥ª¡¼¥×¥ó
+  $fp = fopen ($logfile , "w");		//æ›¸ãè¾¼ã¿ãƒ¢ãƒ¼ãƒ‰ã§ã‚ªãƒ¼ãƒ—ãƒ³
   flock($fp ,2);
-  fputs ($fp, "$dat\n");		//ÀèÆ¬¤Ë½ñ¤­¹ş¤à
-  for($i = 0; $i < $logmax-1; $i++)	//¤¤¤Ş¤Ş¤Ç¤ÎÊ¬¤òÄÉµ­
+  fputs ($fp, "$dat\n");		//å…ˆé ­ã«æ›¸ãè¾¼ã‚€
+  for($i = 0; $i < $logmax-1; $i++)	//ã„ã¾ã¾ã§ã®åˆ†ã‚’è¿½è¨˜
     fputs($fp, $lines[$i]);
   fclose ($fp);
   reset($lines);
-  $lines = file($logfile);		//Æş¤ì¤Ê¤ª¤·
+  $lines = file($logfile);		//å…¥ã‚ŒãªãŠã—
 }
 foreach($arrowext as $list) $arrow .= $list." ";
-/* Åê¹Æ¥Õ¥©¡¼¥à */
-echo '<h2>¥¢¥Ã¥×¥í¡¼¥É¥Õ¥©¡¼¥à</h2>
-<form method="post" enctype="multipart/form-data" action="'.$PHP_SELF.'" >
-<p>Up File<strong>¡Ê'.$limitk.' KB¤Ş¤Ç¡Ë</strong><br />
+/* æŠ•ç¨¿ãƒ•ã‚©ãƒ¼ãƒ  */
+echo '<h2>ä¸Šå‚³æª”æ¡ˆ</h2>
+<form method="post" enctype="multipart/form-data" action="'.$PHP_SELF.'" onsubmit="startProgress();return true;">
+<p>æª”æ¡ˆ<strong>ï¼ˆæœ€å¤§ '.$limitk.' KBï¼‰</strong><br />
 <input type="hidden" name="MAX_FILE_SIZE" value="'.$limitb.'" />
+<input type="hidden" name="APC_UPLOAD_PROGRESS" id="progress_key" value="'.$unique_id.'"/>
 <input type="file" size="40" name="upfile" class="box" tabindex="1" accesskey="1" />
- Del Pass : <input type="password" size="10" name="pass" maxlength="10" class="box" tabindex="2" accesskey="2" /></p>
-<p>Comment¡Ê¢¨¥³¥á¥ó¥ÈÌµµ­Æş¤Ï¥ê¥í¡¼¥É/URI¤Ï¥ª¡¼¥È¥ê¥ó¥¯¡Ë<br />
-<input type="text" size="45" name="com" value="" class="box" tabindex="3" accesskey="3" />
-<input type="submit" value="Up/Reload" tabindex="4" accesskey="4" />
-<input type="reset" value="Cancel" tabindex="5" accesskey="5" /></p>
-<p>UP²ÄÇ½³ÈÄ¥»Ò¡§'.$arrow.'</p>
+<p>ç”¨æˆ¶åç¨±ï¼ˆâ€»æ²’è¼¸å…¥çš„è©±æª”æ¡ˆå°‡ä¸æœƒè¢«å„²å­˜ã€‚ï¼‰<br />
+<input type="text" size="20" name="usr" value="" class="box" tabindex="1" accesskey="2" />
+ Del Pass : <input type="password" size="10" name="pass" maxlength="10" class="box" tabindex="3" accesskey="3" /></p>
+<p>å‚™è¨»ï¼ˆâ€»æ²’è¼¸å…¥çš„è©±æª”æ¡ˆå°‡ä¸æœƒè¢«å„²å­˜ã€‚ï¼‰<br />
+<input type="text" size="45" name="com" value="" class="box" tabindex="4" accesskey="4" />
+<input type="submit" value="ä¸Šå‚³" tabindex="5" accesskey="5" />
+<input type="reset" value="Cancel" tabindex="6" accesskey="6" /></p>
+<p>å¯ä»¥ä¸Šå‚³çš„æª”å°¾ï¼š'.$arrow.'</p>
+<div id="up_progress">ä¸Šå‚³ä¸­â€¦ <span id="progressbartext"></span><div id="progressbarborder"><div id="progressbar"></div></div></div>
 </form>
 ';
-/* ¥«¥¦¥ó¥¿ */
-echo "<p class=\"uline\">$count_start ¤«¤é ";
+/* ã‚«ã‚¦ãƒ³ã‚¿ */
+echo "<p class=\"uline\">$count_start é–‹å§‹å­˜å–æ•¸: ";
 if(file_exists($count_file)){
-  $fp = fopen($count_file,"r+");//ÆÉ¤ß½ñ¤­¥â¡¼¥É¤Ç¥ª¡¼¥×¥ó
-  $count = fgets($fp, 64);	//64¥Ğ¥¤¥ÈorEOF¤Ş¤Ç¼èÆÀ¡¢¥«¥¦¥ó¥È¥¢¥Ã¥×
+  $fp = fopen($count_file,"r+");//èª­ã¿æ›¸ããƒ¢ãƒ¼ãƒ‰ã§ã‚ªãƒ¼ãƒ—ãƒ³
+  $count = fgets($fp, 64);	//64ãƒã‚¤ãƒˆorEOFã¾ã§å–å¾—ã€ã‚«ã‚¦ãƒ³ãƒˆã‚¢ãƒƒãƒ—
   $count++;
-  fseek($fp, 0);			//¥İ¥¤¥ó¥¿¤òÀèÆ¬¤Ë¡¢¥í¥Ã¥¯¤·¤Æ½ñ¤­¹ş¤ß
+  fseek($fp, 0);			//ãƒã‚¤ãƒ³ã‚¿ã‚’å…ˆé ­ã«ã€ãƒ­ãƒƒã‚¯ã—ã¦æ›¸ãè¾¼ã¿
   flock($fp,2);
   fputs($fp, $count);
-  fclose($fp);			//¥Õ¥¡¥¤¥ë¤òÊÄ¤¸¤ë
-  echo $count;			//¥«¥¦¥ó¥¿É½¼¨
+  fclose($fp);			//ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‰ã˜ã‚‹
+  echo $count;			//ã‚«ã‚¦ãƒ³ã‚¿è¡¨ç¤º
 }
-/* ¥â¡¼¥É¥ê¥ó¥¯ */
+/* ãƒ¢ãƒ¼ãƒ‰ãƒªãƒ³ã‚¯ */
 echo '
-¡Ê¤³¤ï¤ì¤Ë¤¯¤µ¥ì¥Ù¥ë1¡ËD¡§Åê¹Æµ­»öºï½ü</p>
-<p class="uline"><a href="'.$home.'">HOME</a> | <a href="'.$PHP_SELF.'?act=env">´Ä¶­ÀßÄê</a> | <a href="'.$PHP_SELF.'?">¥ê¥í¡¼¥É</a> | <a href="sam.php">²èÁü°ìÍ÷</a></p>
+ã€€Dï¼šåˆªé™¤æª”æ¡ˆ</p>
+<p class="uline"><a href="'.$home.'">ä¸»é </a> | <a href="'.$PHP_SELF.'?act=env">ç’°å¢ƒè¨­å®š</a> | <a href="'.$PHP_SELF.'?">é‡æ–°æ•´ç†</a> | <a href="sam.php">åœ–åƒä¸€è¦§</a></p>
 
-<h2>¥Õ¥¡¥¤¥ë°ìÍ÷</h2>
+<h2>æª”æ¡ˆä¸€è¦§</h2>
 <p class="uline">';
-/* ¥í¥°³«»Ï°ÌÃÖ */
+/* ãƒ­ã‚°é–‹å§‹ä½ç½® */
 $st = ($page) ? ($page - 1) * $page_def : 0;
 if(!$page) $page = 1;
 if($page == "all"){
   $st = 0;
   $page_def = count($lines);
 }
-echo paging($page, count($lines));//¥Ú¡¼¥¸¥ê¥ó¥¯
-//¥á¥¤¥ó¥Ø¥Ã¥À
+echo paging($page, count($lines));//ãƒšãƒ¼ã‚¸ãƒªãƒ³ã‚¯
+//ãƒ¡ã‚¤ãƒ³ãƒ˜ãƒƒãƒ€
 echo "</p>\n";
 echo "<table summary=\"files\">\n<tr>";
-if($c_act) echo "<th abbr=\"delete\" scope=\"col\">DEL</th>";
-echo "<th abbr=\"name\" scope=\"col\">NAME</th>";
-if($c_com) echo "<th abbr=\"comment\" scope=\"col\">COMMENT</th>";
-if($c_size) echo "<th abbr=\"size\" scope=\"col\">SIZE</th>";
+if($c_act) echo "<th abbr=\"delete\" scope=\"col\">åˆª</th>";
+echo "<th abbr=\"name\" scope=\"col\">æª”å</th>";
+if($c_usr) echo "<th abbr=\"user\" scope=\"col\">ç”¨æˆ¶</th>";
+if($c_com) echo "<th abbr=\"comment\" scope=\"col\">å‚™è¨»</th>";
+if($c_size) echo "<th abbr=\"size\" scope=\"col\">å¤§å°</th>";
 if($c_mime) echo "<th abbr=\"mime\" scope=\"col\">MIME</th>";
-if($c_date) echo "<th abbr=\"date\" scope=\"col\">DATE</th>";
-if($c_orig) echo "<th abbr=\"original name\" scope=\"col\">ORIG</th>";
+if($c_date) echo "<th abbr=\"date\" scope=\"col\">æ—¥æœŸ</th>";
+if($c_orig) echo "<th abbr=\"original name\" scope=\"col\">åŸæª”å</th>";
 echo "</tr>\n";
-//¥á¥¤¥óÉ½¼¨
+//ãƒ¡ã‚¤ãƒ³è¡¨ç¤º
 for($i = $st; $i < $st+$page_def; $i++){
   if($lines[$i]=="") continue;
-  list($id,$ext,$com,$host,$now,$size,$mtype,$pas,$orig,)=explode("\t",$lines[$i]);
+  list($id,$ext,$usr,$com,$host,$now,$size,$mtype,$pas,$orig,)=explode("\t",$lines[$i]);
   $fsize = FormatByte($size);
   if($auto_link) $com = ereg_replace("(https?|ftp|news)(://[[:alnum:]\+\$\;\?\.%,!#~*/:@&=_-]+)","<a href=\"\\1\\2\">\\1\\2</a>",$com);
 
@@ -345,9 +431,10 @@ for($i = $st; $i < $st+$page_def; $i++){
   $target = $updir.$filename;
 
   
-  echo "<tr><!--$host-->\n";//¥Û¥¹¥ÈÉ½¼¨
+  echo "<tr><!--$host-->\n";//ãƒ›ã‚¹ãƒˆè¡¨ç¤º
   if($c_act) echo "<td class=\"del\"><a href=\"$PHP_SELF?del=$id\">D</a></td>";
   echo "<td>[<a href=\"$target\">$filename</a>]</td>";
+  if($c_usr) echo "<td>$usr</td>";
   if($c_com) echo "<td>$com</td>";
   if($c_size) echo "<td class=\"size\">$fsize</td>";
   if($c_mime) echo "<td>$mtype</td>";
