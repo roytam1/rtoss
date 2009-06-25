@@ -143,31 +143,9 @@ function startProgress(){
 
 <h1><?php echo "$title" ?></h1>
 <p>請勿在論壇外轉載此區任何資料。</p>
-<center><script type="text/javascript"><!--//--><![CDATA[//><!--
-google_ad_client = "pub-8016619041936615";
-//728x90, 已建立 2007/12/26
-google_ad_slot = "8811687463";
-google_ad_width = 728;
-google_ad_height = 90;
-//--><!]]></script>
-<script type="text/javascript"
-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-</script></center>
 <?php
 /* ヘッダーここまで */
 $foot = <<<FOOT
-
-<center><script type="text/javascript"><!--//--><![CDATA[//><!--
-google_ad_client = "pub-8016619041936615";
-//468x60, 已建立 2007/12/17
-google_ad_slot = "0207867936";
-google_ad_width = 468;
-google_ad_height = 60;
-google_language = "zh-TW";
-//--><!]]></script>
-<script type="text/javascript"
-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-</script></center>
 
 <h2>著作権表示</h2>
 <p id="link"><a href="http://php.s3.to/">レッツPHP!</a> + <a href="http://utu.under.jp">Wastepaper Basket</a> + <a href="http://scrappedblog.blogspot.com/">Roytam1</a></p>
