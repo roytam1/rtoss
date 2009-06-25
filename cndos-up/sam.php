@@ -1,104 +1,119 @@
-<?php echo '<?xml version="1.0" encoding="euc-jp"?>'."\n" ?>
 <?php
 /***
 * Reconstruction by Wastepaper Basket
-* ¥µ¥à¥Í¥¤¥ë¥«¥Ã¥¿¡¼¡¡¡Ê²èÁü°ìÍ÷¡Ëby ToR
+* ã‚µãƒ ãƒã‚¤ãƒ«ã‚«ãƒƒã‚¿ãƒ¼ã€€ï¼ˆç”»åƒä¸€è¦§ï¼‰by ToR
 
-* ¢¨PHP¥ª¥×¥·¥ç¥ó¤ËGD¤¬É¬Í×¤Ç¤¹¡ÊÌµÎÁ»ª¤Ç¤Ï¥À¥á¤Ê¤È¤³¤í¤¬Â¿¤¤
-* $_GETÅù»ÈÍÑ¤·¤Æ¤Ş¤¹¡£¸Å¤¤¥Ğ¡¼¥¸¥ç¥ó¤ÎPHP¤Ç¤Ï$_GET¢ª$HTTP_GET_VARS $_SERVER¢ª$HTTP_SERVER_VERS
+* â€»PHPã‚ªãƒ—ã‚·ãƒ§ãƒ³ã«GDãŒå¿…è¦ã§ã™ï¼ˆç„¡æ–™é¯–ã§ã¯ãƒ€ãƒ¡ãªã¨ã“ã‚ãŒå¤šã„
+* $_GETç­‰ä½¿ç”¨ã—ã¦ã¾ã™ã€‚å¤ã„ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã®PHPã§ã¯$_GETâ†’$HTTP_GET_VARS $_SERVERâ†’$HTTP_SERVER_VERS
 **/
 
-$title     = 'Wastepaper Basket';	//¥¿¥¤¥È¥ë
-$upphp     = 'upload.php';		//¥¢¥Ã¥×¥í¡¼¥À
-$img_dir   = "./img/";			//²èÁü°ìÍ÷¥Ç¥£¥ì¥¯¥È¥ê
-$thumb_dir = "./imgs/";			//¥µ¥à¥Í¥¤¥ëÊİÂ¸¥Ç¥£¥ì¥¯¥È¥ê
-$ext       = ".+\.png$|.+\.jpe?g$";	//³ÈÄ¥»Ò¡¤GIF¤ÏGD¤ÎÊŞ°¼Ş®İ¤Ë¤è¤Ã¤Æ¤ÏÌµÍı
-$W         = 120;			//½ĞÎÏ²èÁüÉı
-$H         = 120;			//½ĞÎÏ²èÁü¹â¤µ
-$cols      = 2;				//1¹Ô¤ËÉ½¼¨¤¹¤ë²èÁü¿ô
-$page_def  = 4;			//1¥Ú¡¼¥¸¤ËÉ½¼¨¤¹¤ë²èÁü¿ô
+$title	= 'ä¸­åœ‹DOSè¯ç›Ÿè«–å£‡å°ˆç”¨ä¸Šå‚³å€';	//ã‚¿ã‚¤ãƒˆãƒ«
+$upphp		 = 'upload.php';		//ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ€
+$img_dir	 = "./img/";			//ç”»åƒä¸€è¦§ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
+$thumb_dir = "./imgs/";			//ã‚µãƒ ãƒã‚¤ãƒ«ä¿å­˜ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
+$ext			 = ".+\.png$|.+\.jpe?g$";	//æ‹¡å¼µå­ï¼ŒGIFã¯GDã®ï¾Šï¾ï½°ï½¼ï¾ï½®ï¾ã«ã‚ˆã£ã¦ã¯ç„¡ç†
+$W				 = 120;			//å‡ºåŠ›ç”»åƒå¹…
+$H				 = 120;			//å‡ºåŠ›ç”»åƒé«˜ã•
+$cols			= 2;				//1è¡Œã«è¡¨ç¤ºã™ã‚‹ç”»åƒæ•°
+$page_def	= 4;			//1ãƒšãƒ¼ã‚¸ã«è¡¨ç¤ºã™ã‚‹ç”»åƒæ•°
 
 if ($_GET["cmd"]=="min" && isset($_GET["pic"])) {
-  $src = $img_dir.$_GET["pic"];
+	$src = $img_dir.$_GET["pic"];
 
-  // ²èÁü¤ÎÉı¤È¹â¤µ¤È¥¿¥¤¥×¤ò¼èÆÀ
-  $size = GetImageSize($src);
-  switch ($size[2]) {
-    case 1 : $im_in = ImageCreateFromGIF($src);  break;
-    case 2 : $im_in = ImageCreateFromJPEG($src); break;
-    case 3 : $im_in = ImageCreateFromPNG($src);  break;
-  }
-  // ÆÉ¤ß¹ş¤ß¥¨¥é¡¼»ş
-  if (!$im_in) {
-    $im_in = ImageCreate($W,$H);
-    $bgc = ImageColorAllocate($im_in, 0xff, 0xff, 0xff);
-    $tc  = ImageColorAllocate($im_in, 0,0x80,0xff);
-    ImageFilledRectangle($im_in, 0, 0, $W, $H, $bgc);
-    ImageString($im_in,1,5,30,"Error loading {$_GET["pic"]}",$tc);
-    ImagePNG($im_in);
-    exit;
-   }
-  // ¥ê¥µ¥¤¥º
-  if ($size[0] > $W || $size[1] > $H) {
-    $key_w = $W / $size[0];
-    $key_h = $H / $size[1];
-    ($key_w < $key_h) ? $keys = $key_w : $keys = $key_h;
+	// ç”»åƒã®å¹…ã¨é«˜ã•ã¨ã‚¿ã‚¤ãƒ—ã‚’å–å¾—
+	$thumbout = $thumb_dir.str_replace(strrchr($_GET["pic"],'.'),'.jpg',$_GET["pic"]);
+	if(!file_exists($thumbout)) {
+		$size = GetImageSize($src);
+		switch ($size[2]) {
+			case 1 : $im_in = ImageCreateFromGIF($src);	break;
+			case 2 : $im_in = ImageCreateFromJPEG($src); break;
+			case 3 : $im_in = ImageCreateFromPNG($src);	break;
+		}
+		// èª­ã¿è¾¼ã¿ã‚¨ãƒ©ãƒ¼æ™‚
+		if (!$im_in) {
+			$im_in = ImageCreate($W,$H);
+			$bgc = ImageColorAllocate($im_in, 0xff, 0xff, 0xff);
+			$tc	= ImageColorAllocate($im_in, 0,0x80,0xff);
+			ImageFilledRectangle($im_in, 0, 0, $W, $H, $bgc);
+			ImageString($im_in,1,5,30,"Error loading {$_GET["pic"]}",$tc);
+			header('Content-Type: image/png');
+			ImagePNG($im_in);
+			exit;
+		 }
+		// ãƒªã‚µã‚¤ã‚º
+		if ($size[0] > $W || $size[1] > $H) {
+			$key_w = $W / $size[0];
+			$key_h = $H / $size[1];
+			($key_w < $key_h) ? $keys = $key_w : $keys = $key_h;
 
-    $out_w = $size[0] * $keys;
-    $out_h = $size[1] * $keys;
-  } else {
-    $out_w = $size[0];
-    $out_h = $size[1];
-  }
-  // ½ĞÎÏ²èÁü¡Ê¥µ¥à¥Í¥¤¥ë¡Ë¤Î¥¤¥á¡¼¥¸¤òºîÀ®
-  $im_out = ImageCreateTrueColor($out_w, $out_h);
-  // ¸µ²èÁü¤ò½Ä²£¤È¤â ¥³¥Ô¡¼¤·¤Ş¤¹¡£
-  ImageCopyResampled($im_out, $im_in, 0, 0, 0, 0, $out_w, $out_h, $size[0], $size[1]);
+			$out_w = $size[0] * $keys;
+			$out_h = $size[1] * $keys;
+		} else {
+			$out_w = $size[0];
+			$out_h = $size[1];
+		}
+		// å‡ºåŠ›ç”»åƒï¼ˆã‚µãƒ ãƒã‚¤ãƒ«ï¼‰ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ä½œæˆ
+		$im_out = ImageCreateTrueColor($out_w, $out_h);
+		// å…ƒç”»åƒã‚’ç¸¦æ¨ªã¨ã‚‚ ã‚³ãƒ”ãƒ¼ã—ã¾ã™ã€‚
+		ImageCopyResampled($im_out, $im_in, 0, 0, 0, 0, $out_w, $out_h, $size[0], $size[1]);
 
-  // ¤³¤³¤Ç¥¨¥é¡¼¤¬½Ğ¤ëÊı¤Ï²¼£²¹Ô¤ÈÃÖ¤­´¹¤¨¤Æ¤¯¤À¤µ¤¤¡£(GD2.0°Ê²¼
-  //$im_out = ImageCreate($out_w, $out_h);
-  //ImageCopyResized($im_out, $im_in, 0, 0, 0, 0, $out_w, $out_h, $size[0], $size[1]);
+		// ã“ã“ã§ã‚¨ãƒ©ãƒ¼ãŒå‡ºã‚‹æ–¹ã¯ä¸‹ï¼’è¡Œã¨ç½®ãæ›ãˆã¦ãã ã•ã„ã€‚(GD2.0ä»¥ä¸‹
+		//$im_out = ImageCreate($out_w, $out_h);
+		//ImageCopyResized($im_out, $im_in, 0, 0, 0, 0, $out_w, $out_h, $size[0], $size[1]);
 
-  // ¥µ¥à¥Í¥¤¥ë²èÁü¤ò¥Ö¥é¥¦¥¶¤Ë½ĞÎÏ¡¢ÊİÂ¸
-  switch ($size[2]) {
-  case 1 : if (function_exists('ImageGIF')) { ImageGIF($im_out); ImageGIF($im_out, $thumb_dir.$_GET["pic"]); } break;
-  case 2 : ImageJPEG($im_out);ImageJPEG($im_out, $thumb_dir.$_GET["pic"]); break;
-  case 3 : ImagePNG($im_out); ImagePNG($im_out, $thumb_dir.$_GET["pic"]);  break;
-  }
-  // ºîÀ®¤·¤¿¥¤¥á¡¼¥¸¤òÇË´ş
-  ImageDestroy($im_in);
-  ImageDestroy($im_out);
-  exit;
+		// ã‚µãƒ ãƒã‚¤ãƒ«ç”»åƒã‚’ãƒ–ãƒ©ã‚¦ã‚¶ã«å‡ºåŠ›ã€ä¿å­˜
+		header('Content-Type: image/jpeg');
+		ImageJPEG($im_out);
+		ImageJPEG($im_out, $thumbout);
+		// ä½œæˆã—ãŸã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ç ´æ£„
+		ImageDestroy($im_out);
+		ImageDestroy($im_in);
+		exit;
+	} else {
+		header("Location: $thumbout");
+		exit;
+	}
 }
-// ¥Ç¥£¥ì¥¯¥È¥ê°ìÍ÷¼èÆÀ¡¢¥½¡¼¥È
+// ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªä¸€è¦§å–å¾—ã€ã‚½ãƒ¼ãƒˆ
 $d = dir($img_dir);
 while ($ent = $d->read()) {
-  if (eregi($ext, $ent)) {
-    $files[] = $ent;
-  }
+	if (eregi($ext, $ent)) {
+		$files[] = $ent;
+	}
 }
 $d->close();
-// ¥½¡¼¥È
+// ã‚½ãƒ¼ãƒˆ
 @natsort($files);
 $files2 = @array_reverse($files);
-//¥Ø¥Ã¥ÀHTML
+//ãƒ˜ãƒƒãƒ€HTML
+echo '<?xml version="1.0" encoding="utf-8"?>'."\n";
 echo <<<HEAD
 <!DOCTYPE html
-   PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-   "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	 PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+	 "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=euc-jp" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>$title</title>
 <link href="style.css" type="text/css" rel="stylesheet" media="all" />
 </head>
 <body>
 
 <h1>$title</h1>
-<p>µ¤¤Ë¤Ê¤ë¥Í¥¿¤Ê¤É¡³(¡­¡¼¡®)¥Î</p>
+<p>è«‹å‹¿åœ¨è«–å£‡å¤–è½‰è¼‰æ­¤å€ä»»ä½•è³‡æ–™ã€‚</p>
+<center><script type="text/javascript"><!--//--><![CDATA[//><!--
+google_ad_client = "pub-8016619041936615";
+//728x90, å·²å»ºç«‹ 2007/12/26
+google_ad_slot = "8811687463";
+google_ad_width = 728;
+google_ad_height = 90;
+//--><!]]></script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></center>
 
-<h2>²èÁü°ìÍ÷</h2>
-<table summary="¥µ¥à¥Í¥¤¥ë°ìÍ÷">
+<h2>åœ–åƒä¸€è¦§</h2>
+<table summary="ç¸®åœ–ä¸€è¦§">
 <tr>
 
 HEAD;
@@ -109,39 +124,50 @@ $start = $_GET['start'];
 $ends = $start+$page_def-1;
 $counter = 0;
 while (list($line, $filename) = @each($files2)) {
-  if (($line >= $start) && ($line <= $ends)) {
-    $image = rawurlencode($filename);
-    // ¥µ¥à¥Í¥¤¥ë¤¬¤¢¤ë»ş¤Ï»ÑÈ²Ù¤Ø¤ÎØİ¸¡¢¤½¤ì°Ê³°¤Ï»ÑÈ²ÙÉ½¼¨¡¢ºîÀ®
-    if (file_exists($thumb_dir.$image)) $piclink = $thumb_dir.$image;
-    else $piclink = $_SERVER["PHP_SELF"]."?cmd=min&pic=".$image;
-    $counter++;
-    if (((($counter) % $cols) == 1)&&(($counter) != 1)) {
+	if (($line >= $start) && ($line <= $ends)) {
+		$image = rawurlencode($filename);
+		// ã‚µãƒ ãƒã‚¤ãƒ«ãŒã‚ã‚‹æ™‚ã¯ï½»ï¾‘ï¾ˆï½²ï¾™ã¸ã®ï¾˜ï¾ï½¸ã€ãã‚Œä»¥å¤–ã¯ï½»ï¾‘ï¾ˆï½²ï¾™è¡¨ç¤ºã€ä½œæˆ
+		if (file_exists($thumb_dir.$image)) $piclink = $thumb_dir.$image;
+		else $piclink = $_SERVER["PHP_SELF"]."?cmd=min&pic=".$image;
+		$counter++;
+		if (((($counter) % $cols) == 1)&&(($counter) != 1)) {
 	echo "</tr>\n<tr>\n";
-    }//¥á¥¤¥óHTML
-    echo <<<EOD
+		}//ãƒ¡ã‚¤ãƒ³HTML
+		echo <<<EOD
 <td class="img"><a href="$img_dir$image"><img src="$piclink" alt="$filename" title="$filename" /><br />$filename</a></td>
 
 EOD;
-  }
+	}
 }
 echo "</tr>\n</table>\n";
 
-//Íß°¼Ş¥ê¥ó¥¯
-echo '<p class="tline"><a href="'.$upphp.'?">Ìá¤ë</a> Page:';
+//ï¾ï¾Ÿï½°ï½¼ï¾ãƒªãƒ³ã‚¯
+echo '<p class="tline"><a href="'.$upphp.'?">æˆ»ã‚‹</a> Page:';
 if ($_GET["start"] > 0) {
-  $prevstart = $_GET["start"] - $page_def;
-  echo " <a href=\"$_SERVER[PHP_SELF]?start=$prevstart\">&lt;&lt;Á°¤Ø</a>";
+	$prevstart = $_GET["start"] - $page_def;
+	echo " <a href=\"$_SERVER[PHP_SELF]?start=$prevstart\">&lt;&lt;å‰ã¸</a>";
 }
 if ($ends < $maxs) {
-  $nextstart = $ends+1;
-  echo " <a href=\"$_SERVER[PHP_SELF]?start=$nextstart\">¼¡¤Ø&gt;&gt;</a>";
+	$nextstart = $ends+1;
+	echo " <a href=\"$_SERVER[PHP_SELF]?start=$nextstart\">æ¬¡ã¸&gt;&gt;</a>";
 }
 echo '</p>';
 
 echo '
+<center><script type="text/javascript"><!--//--><![CDATA[//><!--
+google_ad_client = "pub-8016619041936615";
+//468x60, å·²å»ºç«‹ 2007/12/17
+google_ad_slot = "0207867936";
+google_ad_width = 468;
+google_ad_height = 60;
+google_language = "zh-TW";
+//--><!]]></script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></center>
 
-<h2>Ãøºî¸¢É½¼¨</h2>
-<p id="link"><a href="http://php.s3.to/">¥ì¥Ã¥ÄPHP!</a> + <a href="http://utu.under.jp">Wastepaper Basket</a></p>
+<h2>è‘—ä½œæ¨©è¡¨ç¤º</h2>
+<p id="link"><a href="http://php.s3.to/">ãƒ¬ãƒƒãƒ„PHP!</a> + <a href="http://utu.under.jp">Wastepaper Basket</a></p>
 
 </body>
 </html>
