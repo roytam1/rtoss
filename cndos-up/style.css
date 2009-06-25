@@ -1,0 +1,117 @@
+@charset "euc-jp";
+body {
+	font-family: "£Í£Ó £Ð¥´¥·¥Ã¥¯", "£Í£Ó ¥´¥·¥Ã¥¯", "¥Ò¥é¥®¥Î³Ñ¥´ Pro W3", Osaka, Osaka-ÅùÉý, Ê¿À®³Ñ¥´¥·¥Ã¥¯, sans-serif;
+	font-size: 100%;
+	color: #333322;
+	background-color: white;
+}
+h1 {
+	font-weight: bold;
+	font-size: 120%;
+	color: white;
+	background-color: #99CCCC;
+	margin: 0 0 10px;
+	padding: 5px 10px 5px 10px;
+	border-bottom: 2px #99CCFF solid;
+	border-left: 10px #99CCFF solid;
+	width: 100%;
+}
+h2 {
+	display: none;
+}
+h3 {
+	font-weight: normal;
+	font-size: 90%;
+	text-align: left;
+	margin: 0;
+	padding: 0;
+}
+p {
+	font-size: 90%;
+	text-align: left;
+	margin: 0;
+	padding: 0;
+}
+p.uline {
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border-bottom: 2px #99CCCC solid;
+	width: 100%;
+}
+p.tline {
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border-top: 2px #99CCCC solid;
+	width: 100%;
+}
+p.error {
+	margin: 10px 0 0;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border-top: 2px #99CCCC solid;
+	width: 100%;
+}
+p#link {
+	font-weight: bold;
+	color: #336699;
+	text-align: right;
+}
+a, a:link, a:visited {
+	color: #336699;
+	text-decoration: none;
+}
+a:hover {
+	color: #990000;
+	text-decoration: none;
+}
+img {
+	background-color: #99CCCC;
+	border-color: #99CCCC;
+}
+table {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	border: 0;
+	border-collapse: separate;
+	border-spacing: 4px;
+	empty-cells: show;
+}
+th {
+	color: #336699;
+	background-color: white;
+	margin: 0;
+}
+td {
+	font-size: 90%;
+	background-color: white;
+	margin: 0;
+}
+td.del { text-align: center; }
+td.size { font-weight: bold; text-align: right; }
+td.orig { color: gray }
+td.img {
+	text-align: center;
+	top: auto;
+	left: auto;
+	bottom: auto;
+	right: auto;
+}
+hr { background-color: #99CCFF; }
+form {
+	font-size: 90%;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	padding: 10px;
+	border: 2px #99CCCC solid;
+}
+input { font-size: 90%; }
+input.box {
+	color: #990000;
+	background-color: #99CCCC;
+	margin: 0;
+}
+ul,li {
+	font-size: 90%;
+	margin-top: 0;
+	margin-bottom: 0;
+}
