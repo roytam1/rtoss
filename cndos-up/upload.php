@@ -307,6 +307,13 @@ if(file_exists($upfile) && $com && $usr && $upfile_size > 0){
     if(strstr($ext,$denyext[$i])) $ext = 'txt';
   }
   */
+  foreach($denyupload as $noup) {
+    if($upfile_name==$noup) {
+      echo '<p class="tline"><script type="text/javascript">location.href="'.$PHP_SELF.'";</script></p>';
+      exit();
+    }
+  }
+  
   list($id,) = explode("\t", $lines[0]);//No取得
   $id = sprintf('%03d', ++$id);		//インクリ
   $newname = $prefix.$id.'.'.$ext;
