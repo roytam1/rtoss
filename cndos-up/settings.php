@@ -14,6 +14,7 @@
   $auto_link	= 1;		//コメントの自動リンク（Yes=1;No=0);
   $denylist	= array('192.168.0.1','sex.com','annony');	//アクセス拒否ホスト
   $arrowext	= array('7z','zip','lzh','rar','avi','mpg','wmv','mp3','wma','swf','txt','bmp','jpg','png','gif');	//許可拡張子 小文字（それ以外はエラー
+  $denyupload	= array('annony');	//拒否ファイル
 
   $count_start	= "2008/02/11";	//カウンタ開始日
   $count_file	= "count.txt";  //カウンタファイル（空ファイルで666）
