@@ -52,6 +52,7 @@ if (isset($_SESSION['isLogined']) || viewAuth()) {
    switch ($iAction) {
     case "add":
       $_GET['url']=urlencode($_GET['url']); // encodes url again
+      $_GET['name']=urlencode(jsUCEsc2utf8($_GET['name'])); // encodes name again
       header("Location: ".$BaseURL."fav_add.php?".toQueryString("catid",'name','url').$SidebarSuffix2);
       break;
     case "edit":

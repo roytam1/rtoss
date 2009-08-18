@@ -15,7 +15,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/2002/REC-xhtml1-20020801/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-tw" lang="zh-tw">
 <head>
-<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+<meta http-equiv="Content-Type" content="'.(($oldNetscape || $noXML)?'text/html':'application/xhtml+xml').'; charset=utf-8" />
 <title>'.$MyFav_Title.'</title>
 <link href="./style.css" rel="stylesheet" type="text/css" />
 <link rel="alternate" type="application/xml" title="RSS 1.0 Feed" href="rss.php" />
@@ -272,7 +272,7 @@ echo '</script>
 <a name="bottom"></a>';
 sqlite_close($conn);
 sqlite_close($conn2);
-if (isset($_SESSION['isLogined'])) echo '<a href="'.text2xml("fav_action.php?action=add".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Add.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=order&id=0".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Order.'</a> <a href="'.text2xml("fav_action.php?action=opt".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Optimize.'</a> <a href="'.text2xml("javascript:location.href='".$BaseURL."fav_action.php?action=add&name='+document.title.replace(/&/g,'%2526').replace(/#/g,'%252523')+'&url='+document.location.href.replace(/&/g,'%2526').replace(/#/g,'%2523');").'" class="admtool" '.$admAppend.'>'.$MyFav_Bookmarklet.'</a>';
+if (isset($_SESSION['isLogined'])) echo '<a href="'.text2xml("fav_action.php?action=add".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Add.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=order&id=0".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Order.'</a> <a href="'.text2xml("fav_action.php?action=opt".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Optimize.'</a> <a href="'.text2xml("javascript:location.href='".$BaseURL."fav_action.php?action=add&name='+escape(document.title)+'&url='+document.location.href.replace(/&/g,'%2526').replace(/#/g,'%2523');").'" class="admtool" '.$admAppend.'>'.$MyFav_Bookmarklet.'</a>';
 $uriSuffix=isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING']!=""?"?".$_SERVER['QUERY_STRING']:'';
 
 echo '<form action="'.text2xml($_SERVER['PHP_SELF'].$uriSuffix).'" method="post">';
