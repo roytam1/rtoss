@@ -107,7 +107,10 @@ void	Satori::InitMembers() {
 
 	second_from_last_talk=0;
 
+	//喋るごとに初期化する変数
 	return_empty = false;
+	is_quick_section = false;
+
 	is_dic_loaded = false;
 	is_call_ontalk_at_mikire = false;
 
