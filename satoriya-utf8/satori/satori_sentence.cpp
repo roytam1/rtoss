@@ -173,6 +173,8 @@ string Satori::SentenceToSakuraScriptExec(const Talk& vec)
 		//それ以外はどこかにジャンプを示す
 		if ( resp == 1 ) {
 			string jump = jump_to;
+			m_escaper.unescape(jump);
+
 			const Talk* pTR = GetSentenceInternal(jump);
 			if ( ! pTR ) {
 				sender << "＞" << jump_to << " not found." << endl;
@@ -185,6 +187,8 @@ string Satori::SentenceToSakuraScriptExec(const Talk& vec)
 		}
 		else if ( resp == 2 ) {
 			string jump = jump_to;
+			m_escaper.unescape(jump);
+
 			const Talk* pTR = talks.communicate_search(jump, comAndMode);
 			if ( ! pTR ) {
 				sender << "≫" << jump_to << " not found." << endl;
