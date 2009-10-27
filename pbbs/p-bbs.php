@@ -29,6 +29,8 @@
  Changelog:
  2005~2007   AA Hack, text-to-png, Trip, gzipped log, quick delete js, pastlog loading optimization
  2007/03/07  Simple Field Trap
+ 2009/09/23  Add non-transparent txt2png link, dnsbl
+ 2009/10/27  Add exclusive fopen file locking, remove list.dsbl.org from externalIPQuery list, simple double post dectector
 ****/
 $mode='';
 if (!isset($_SERVER)) {
@@ -41,6 +43,7 @@ if (!isset($_SERVER)) {
 }
 extract($_REQUEST);
 extract($_SERVER);
+if(@!isset($trans)) $trans = 1;
 
 // Javascript Simple Field Trap
 if($mode=="regist") {
@@ -99,8 +102,8 @@ define("GAIBU", 0);
 /* 名無し書き込み禁止にする?（no=1 yes=0）*/
 define("ANONY_POST", 1);
 
-/* 使用するファイルロックのタイプ（mkdir=1 flock=2 使わない=0）*/
-define("LOCKEY", 2); 		//通常は2でOK
+/* 使用するファイルロックのタイプ（mkdir=1 flock=2 fopen-x=3 使わない=0）*/
+define("LOCKEY", 3); 		//通常は2でOK
 /* mkdirロックを使う時はlockという名でディレクトリを作成して777にしてください */
 define("LOCK" , "lock/plock");	//lockの中に作るロックファイル名
 
@@ -134,15 +137,31 @@ if($gzlog) {
 include_once("./lib_gzip.php");
 }
 
+function externalIPQuery($addr) {
+	global $EXTIPQ;
+	if(!isset($GLOBALS['EXTIPQ'])) $EXTIPQ=7;
+	$flg=0;$cnt=0;
+	if($EXTIPQ && $addr != "127.0.0.1") {
+		$rev = implode('.', array_reverse(explode('.', $addr)));
+		$queries = array( 'bbx.2ch.net','dnsbl.ahbl.org','niku.2ch.net','sbl-xbl.spamhaus.org','bl.blbl.org','bl.spamcop.net','virus.rbl.jp','ircbl.ahbl.org','tor.ahbl.org' );
+		foreach ( $queries as $query ) {
+			$qres=gethostbyname($rev.'.'.$query);
+			if($rev.'.'.$query!=$qres){ $flg=1; break; }
+			$cnt++;
+			if($cnt>=$EXTIPQ) break;
+		}
+	}
+	return $flg;
+}
+
 // 禁止ホスト
 function hostblock() {
 	global $no_host;
 	if (is_array($no_host)) {
 		$host = gethostbyaddr(getenv("REMOTE_ADDR"));
 		foreach ($no_host as $user) {
-			if(preg_match("/$user/i", $host)){
-				header("Status: 204\n\n");//空白ページ
-				exit;
+			if(preg_match("/$user/i", $host) || externalIPQuery($_SERVER['REMOTE_ADDR'])){
+				die("403");
 			}
 		}
 	}
@@ -251,7 +270,7 @@ function Main(&$dat){	//記事表示部
 
 		$dat.='<hr size=1>[<a href="'.$PHP_SELF.'?mode=resmsg&no='.$no.'" name="'.$no.'">'.$no.'</a>] ';
 		$dat.='<font size="+1" color="#D01166"><b>'.$sub.'</b></font>';
-		$dat.='　Name：<font color="#007000"><b>'.$name.'</b></font><font size="-1">　Date： '.$now.'</font> [<a href="'.$PHP_SELF.'?mode=txt2png&no='.$no.'">画像化</a>]	[<a href="#form" onclick="document.userdel.no.value='.$no.';">処理</a>]';
+		$dat.='　Name：<font color="#007000"><b>'.$name.'</b></font><font size="-1">　Date： '.$now.'</font> <font size="-1">[<a href="'.$PHP_SELF.'?mode=txt2png&no='.$no.'">画像化</a> <a href="'.$PHP_SELF.'?mode=txt2png&no='.$no.'&trans=0">(非透過)</a>]	[<a href="#form" onclick="document.userdel.no.value='.$no.';">処理</a>]</font>';
 		$dat.='<p><blockquote><tt style="white-space: nowrap;">'.$com.'<br></tt>';
 		$dat.='</p>'.$url.'<br>'.$host.'</blockquote><br>';
 
@@ -359,6 +378,10 @@ function regist(){	//ログ書き込み
 	$new_msg="$no<>$now<>$name<>$email<>$sub<>$com<>$url<>$host<>$PW<>$times\n";
 
 	$old_log = $gzlog?ungzlog($logfile):file($logfile);
+
+	list($ono,$odat,$oname,$oemail,$osub,$ocom,$ourl,$ohost,$opas) = @explode("<>",@$old_log[0]);
+	if($com == $ocom) error("連続投稿はお止めください。");
+
 	$line = sizeof($old_log);
 	$new_log[0] = $new_msg;//先頭に新記事
 	if($past_key && $line >= $max){//はみ出した記事を過去ログへ
@@ -490,11 +513,62 @@ function unlock_dir($name=""){//ロック解除
 	if($name=="") $name="lock";
 	@rmdir($name);
 }
+function m_lock_file( $format = null ) {// get/set lock file name
+    static $file_format = './%s.lock';
+   
+    if ($format !== null) {
+        $file_format = $format;
+    }
+   
+    return $file_format;
+}
+function m_lock( $lockId, $acquire = null ) {// acquire/check/release lock
+    static $handlers = array();
+   
+    if (is_bool($acquire)) {
+        $file = sprintf(m_lock_file(), md5($lockId), $lockId);
+    }
+   
+    if ($acquire === false) {
+        if (isset($handlers[$lockId])) {
+            @fclose($handlers[$lockId]);
+            @unlink($file);
+            unset($handlers[$lockId]);
+        } else {
+//            trigger_error("Lock '$lockId' is already unlocked", E_USER_WARNING);
+        }
+    }
+   
+    if ($acquire === true) {
+        if (!isset($handlers[$lockId])) {
+            $handler = false;
+            $count = 100;
+            do {
+                if (!file_exists($file) || @unlink($file)) {
+                    $handler = @fopen($file, "x");
+                }
+                if (false === $handler) {
+                    usleep(10000);
+                } else {
+                    $handlers[$lockId] = $handler;
+                }
+            } while (false === $handler && $count-- > 0);
+        } else {
+//            trigger_error("Lock '$lockId' is already locked", E_USER_WARNING);
+        }
+    }
+   
+    return isset($handlers[$lockId]);
+}
+function lock_error() {
+	error("ロックエラー<br>しばらく待ってからにして下さい");
+}
+
 function renewlog($arrline){//ログ更新	入力:配列
 	global $logfile,$gzlog;
 
-	if(LOCKEY==1){ lock_dir(LOCK)
-	or error("ロックエラー<br>しばらく待ってからにして下さい"); }
+	if(LOCKEY==1){ lock_dir(LOCK) or lock_error(); }
+	if(LOCKEY==3){ m_lock($logfile, true); m_lock($logfile) or lock_error(); }
 	$rp = $gzlog?gzopen($logfile, "w"):fopen($logfile, "w");
 	if(LOCKEY==2){ @flock($rp, 2); }
 	set_file_buffer($rp, 0);
@@ -503,6 +577,7 @@ function renewlog($arrline){//ログ更新	入力:配列
 	if(!$gzlog) fclose($rp);
 	else gzclose($rp);
 	if(LOCKEY==1){ unlock_dir(LOCK); }
+	if(LOCKEY==3){ m_lock($logfile, false); }
 }
 function MakeHtml(){	//HTML生成
 	global $html_file;
@@ -528,7 +603,7 @@ function ShowHtml(){
 	} else {
 		if(!is_file($html_file)) MakeHtml();
 		if(file_exists("mod_gzip.php")) $html_file="mod_gzip.php?".$html_file;
-		echo "<META HTTP-EQUIV=\"refresh\" content=\"0;URL=$html_file?\">";
+		echo "<META HTTP-EQUIV=\"refresh\" content=\"0;URL=$html_file?".microtime()."\">";
 		#header("Location: $html_file?");
 	}
 }
@@ -664,14 +739,15 @@ switch($mode):
 		break;
 	case 'txt2png':
 		include_once('./txtrender.php');
-		text2etc(get_comment($no),'utf8');
+		text2etc(get_comment($no),'utf8','png',$trans);
 		break;
 	case 'admin':
 		admin();
 		break;
 	case 'remake':
 		if($htmlw) MakeHtml();
-		ShowHtml();
+		echo "<META HTTP-EQUIV=\"refresh\" content=\"0;URL=$PHP_SELF?\">";
+//		ShowHtml();
 		break;
 	case 'usrdel':
 		usrdel();

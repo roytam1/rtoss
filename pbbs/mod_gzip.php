@@ -57,8 +57,9 @@ ob_start(); // 開啟緩衝區
 ob_implicit_flush(0);
 
 $file_path = isset($_SERVER["QUERY_STRING"]) ? $_SERVER["QUERY_STRING"] : ""; // 進行即時壓縮之檔案名稱
-$file_path=str_replace("?","",$file_path);
-$file_path=str_replace("=","",$file_path);
+$file_path=preg_replace("/\?.*$/","",$file_path);
+//$file_path=str_replace("?","",$file_path);
+//$file_path=str_replace("=","",$file_path);
 #$file_path=substr($_SERVER['PATH_INFO'],1); // 進行即時壓縮之檔案名稱
 if($file_path && eregi(".htm", $file_path) && @filesize($file_path)){
 	readfile($file_path);
