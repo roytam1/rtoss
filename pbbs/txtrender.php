@@ -1,5 +1,5 @@
 <?
-$TTF_LOCATION="./mona.ttf";
+$TTF_LOCATION="./Mona-UMingTW-MSPG.ttf";
 $FONT_SIZE=12;
 include ("./big52utf8.php");
 include ("./gb2utf8.php");
@@ -8,7 +8,7 @@ include ("./tblless2utf8.php");
 
 //extract($_GET);
 
-function text2etc($text,$CP,$mode="png") {
+function text2etc($text,$CP,$mode="png",$trans=1) {
 	global $TTF_LOCATION,$FONT_SIZE;
 	//$outputtext = implode('',file($f));
     $outputtext=$text;
@@ -32,7 +32,7 @@ function text2etc($text,$CP,$mode="png") {
 
 		$img= imagecreate($width+1, $height+1);
 		$white = ImageColorAllocate($img, 255,255,255);
-		$twhite=imagecolortransparent($img,$white);
+		if($trans) $twhite=imagecolortransparent($img,$white);
 		$black = ImageColorAllocate($img, 0,0,0);
 #		ImageTTFText($img, $FONT_SIZE, 0, -$min_x+$dim[0],-$min_y, $black, $TTF_LOCATION, $outputtext);
 		ImageFTText($img, $FONT_SIZE, 0, -$min_x+$dim[0],-$min_y, $black, $TTF_LOCATION, $outputtext, Array("linespacing" => 1.0));
@@ -55,8 +55,10 @@ function unhtmlentities($string) {
 function Conv2UTF8($text,$RefCode=1,$Codepage="big5") {
 	switch ($Codepage) {
 		case "gb":
+		case "936":
 			return gb2utf8($text,$RefCode);
 		case "sjis":
+		case "932":
 			return sjis2utf8($text,$RefCode);
 		case "ws":
 			return ws2utf8($text,$RefCode);
@@ -67,6 +69,7 @@ function Conv2UTF8($text,$RefCode=1,$Codepage="big5") {
 		case "utf8":
 			return utf82u($text,$RefCode);
 		case "big5":
+		case "950":
 		default:
 			return big52utf8($text,$RefCode);
 	}
