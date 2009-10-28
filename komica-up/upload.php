@@ -51,6 +51,8 @@ function _clean($str) {
 }
 $unique_id = uniqid('');
 /* ここからヘッダー */
+function htmlheader() {
+  global $title;
 ?>
 <?php echo '<?xml version="1.0" encoding="utf-8"?>'."\n" ?>
 <!DOCTYPE html
@@ -59,7 +61,8 @@ $unique_id = uniqid('');
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" media="all" />
-<title><?php echo "$title" ?></title>
+<title><?php echo $title; ?></title>
+<?php if(!$act) { ?>
 <script type="text/javascript"><!--//--><![CDATA[//><!--
 function gID(s) { return document.getElementById(s); }
 /* 建立XMLHttpRequest物件 */
@@ -109,6 +112,7 @@ function startProgress(){
     setTimeout("getProgress()", 1000);
 }
 //--><!]]></script>
+<?php } ?>
 <link href="style.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -116,6 +120,9 @@ function startProgress(){
 <h1><?php echo $title; ?></h1>
 <p>請勿在論壇外轉載此區任何資料。</p>
 <?php
+}
+
+if(!($act=='get' && $_SERVER['REQUEST_METHOD'] == 'POST')) htmlheader();
 /* ヘッダーここまで */
 $foot = <<<FOOT
 
@@ -126,6 +133,53 @@ $foot = <<<FOOT
 </html>
 FOOT;
 
+function m_lock_file( $format = null ) {// get/set lock file name
+    static $file_format = './%s.lock';
+   
+    if ($format !== null) {
+        $file_format = $format;
+    }
+   
+    return $file_format;
+}
+function m_lock( $lockId, $acquire = null ) {// acquire/check/release lock
+    static $handlers = array();
+   
+    if (is_bool($acquire)) {
+        $file = sprintf(m_lock_file(), md5($lockId), $lockId);
+    }
+   
+    if ($acquire === false) {
+        if (isset($handlers[$lockId])) {
+            @fclose($handlers[$lockId]);
+            @unlink($file);
+            unset($handlers[$lockId]);
+        } else {
+//            trigger_error("Lock '$lockId' is already unlocked", E_USER_WARNING);
+        }
+    }
+   
+    if ($acquire === true) {
+        if (!isset($handlers[$lockId])) {
+            $handler = false;
+            $count = 100;
+            do {
+                if (!file_exists($file) || @unlink($file)) {
+                    $handler = @fopen($file, "x");
+                }
+                if (false === $handler) {
+                    usleep(10000);
+                } else {
+                    $handlers[$lockId] = $handler;
+                }
+            } while (false === $handler && $count-- > 0);
+        } else {
+//            trigger_error("Lock '$lockId' is already locked", E_USER_WARNING);
+        }
+    }
+   
+    return isset($handlers[$lockId]);
+}
 function FormatByte($size){//バイトのフォーマット（B→kB）
 	$suffix=''; $suxAry=array('KB','MB','GB','TB');
 	$ccnt=count($suxAry);
@@ -151,21 +205,26 @@ function paging($page, $total){//ページリンク作成
 function error($mes1=""){//えっらーﾒｯｾｰｼﾞ
   global $foot;
 
-  echo $mes1;
+  echo $mes1."<p class=\"tline\"><a href=\"$PHP_SELF?\">返回</a></p>";
   echo $foot;
   exit;
 }
+function lock_error() {
+	error('<h2>錯誤</h2>
+<p class="error">鎖定錯誤：請稍等一會再上傳。</p>');
+}
+
 /* start */
 $limitb = $limitk * 1024;
 $host = @gethostbyaddr($REMOTE_ADDR);
-if(!$upcook) $upcook=@implode(",",array($f_act,$f_usr,$f_com,$f_size,$f_mime,$f_date,$f_orig));
-list($c_act,$c_usr,$c_com,$c_size,$c_mime,$c_date,$c_orig)=explode(',',$upcook);
+if(!$upcook) $upcook=@implode(",",array($f_act,$f_com,$f_size,$f_mime,$f_date,$f_orig));
+list($c_act,$c_com,$c_size,$c_mime,$c_date,$c_orig)=explode(',',$upcook);
 
 /* アクセス制限 */
 if(is_array($denylist)){
   foreach($denylist as $line){
     if(strstr($host, $line)) error('<h2>錯誤</h2>
-<p class="error">存取限制:您沒有使用權限</p>');
+<p class="error">存取限制：您沒有使用權限</p>');
   }
 }
 /* 削除実行 */
@@ -173,7 +232,7 @@ if($delid && $delpass!=''){
   $old = file($logfile);
   $find = false;
   for($i=0; $i<count($old); $i++){
-    list($did,$dext,,,,,,,$dpwd,)=explode("\t",$old[$i]);
+    list($did,$dext,,,,,,$dpwd,)=explode("\t",$old[$i]);
     if($delid==$did){
       $find = true;
       $del_ext = $dext;
@@ -183,17 +242,18 @@ if($delid && $delpass!=''){
     }
   }
   if(!$find) error('<h2>錯誤</h2>
-<p class="error">刪除錯誤:此檔案找不到</p>');
+<p class="error">刪除錯誤：此檔案找不到</p>');
   if($delpass == $admin || substr(md5($delpass), 2, 7) == $del_pwd){
     if(file_exists($updir.$prefix.$delid.'.'.$del_ext)) unlink($updir.$prefix.$delid.'.'.$del_ext);
-    if(file_exists($upsdir.$prefix.$delid.'.'.$del_ext)) unlink($upsdir.$prefix.$delid.'.'.$del_ext);
+	m_lock($logfile, true); m_lock($logfile) or lock_error();
     $fp = fopen($logfile, 'w');
     flock($fp, 2);
     fputs($fp, @implode("",$new));  
     fclose($fp);
+	m_lock($logfile, false);
   }else{
     error('<h2>錯誤</h2>
-<p class="error">刪除錯誤:密碼錯誤</p>');
+<p class="error">刪除錯誤：密碼錯誤</p>');
   }
 }
 /* 削除フォーム */
@@ -205,7 +265,6 @@ if($del){
 <input type=\"password\" size=\"12\" name=\"delpass\" class=\"box\" tabindex=\"1\" accesskey=\"1\" />
 <input type=\"submit\" value=\"刪除\" tabindex=\"2\" accesskey=\"2\" /></p>
 </form>
-<p class=\"tline\"><a href=\"$PHP_SELF?\">返回</a></p>
 ");
 }
 /* 環境設定フォーム */
@@ -216,7 +275,6 @@ if($act=="env"){
 <h3>顯示設定</h3>
 <ul>
 <li><input type=\"checkbox\" name=\"acte\" value=\"checked\" tabindex=\"1\" accesskey=\"1\" $c_act />刪</li>
-<li><input type=\"checkbox\" name=\"user\" value=\"checked\" tabindex=\"2\" accesskey=\"2\" $c_com />用戶</li>
 <li><input type=\"checkbox\" name=\"come\" value=\"checked\" tabindex=\"3\" accesskey=\"3\" $c_com />備註</li>
 <li><input type=\"checkbox\" name=\"sizee\" value=\"checked\" tabindex=\"4\" accesskey=\"4\" $c_size />大小</li>
 <li><input type=\"checkbox\" name=\"mimee\" value=\"checked\" tabindex=\"5\" accesskey=\"5\" $c_mime />MIME</li>
@@ -226,7 +284,7 @@ if($act=="env"){
 <p>以上設定將會以 cookie 保存以便再次使用。</p>
 <p><input type=\"submit\" value=\"儲存\" tabindex=\"8\" accesskey=\"8\" /><input type=\"reset\" value=\"還原\" tabindex=\"9\" accesskey=\"9\" /></p>
 </form>
-<p class=\"tline\"><a href=\"$PHP_SELF?\">返回</a></p>");
+");
 }
 elseif($act=='mdel') {
 	if(!isset($_POST['mdid'])) error('<h2>錯誤</h2>
@@ -240,7 +298,6 @@ elseif($act=='mdel') {
 				if(array_search($did,$mdid)){
 					$find = true;
 					if(file_exists($updir.$prefix.$did.'.'.$dext)) unlink($updir.$prefix.$did.'.'.$dext);
-					if(file_exists($upsdir.$prefix.$did.'.'.$dext)) unlink($upsdir.$prefix.$did.'.'.$dext);
 				}else{
 					$new[] = $old[$i];
 				}
@@ -250,12 +307,11 @@ elseif($act=='mdel') {
 		$old = file($logfile);
 		$find = false;
 		for($i=0; $i<count($old); $i++){
-			list($did,$dext,,,,,,,$dpwd,)=explode("\t",$old[$i]);
+			list($did,$dext,,,,,,$dpwd,)=explode("\t",$old[$i]);
 				if(array_search($did,$mdid)){
 					if(substr(md5($delpass), 2, 7) == rtrim($dpwd)){
 						$find = true;
 						if(file_exists($updir.$prefix.$did.'.'.$dext)) unlink($updir.$prefix.$did.'.'.$dext);
-						if(file_exists($upsdir.$prefix.$did.'.'.$dext)) unlink($upsdir.$prefix.$did.'.'.$dext);
 					}
 				}else{
 					$new[] = $old[$i];
@@ -265,16 +321,67 @@ elseif($act=='mdel') {
 	if(!$find) error('<h2>錯誤</h2>
 <p class="error">刪除錯誤:密碼錯誤</p>');
     $fp = fopen($logfile, 'w');
+	m_lock($logfile, true); m_lock($logfile) or lock_error();
     flock($fp, 2);
     fputs($fp, @implode("",$new));  
     fclose($fp);
+	m_lock($logfile, false);
+}elseif($act=='down') {
+  $find = false;
+  if(preg_match("/^\\d{{$countnumbers}}$/",$id)) {
+    $logs = file($logfile);
+    foreach($logs as $log){
+      list($did,$ext,$com,,$now,$upfile_size,$upfile_type,,$upfile_name,$dpwd,,$tlim,)=explode("\t",$log);
+      if($id==$did){
+        $find = true;
+        break;
+      }
+    }
+  }
+  if(!$find) error('<h2>錯誤</h2>
+<p class="error">下載錯誤：此檔案找不到</p>');
+
+$txt="<h2>下載</h2>
+<form method=\"post\" action=\"$PHP_SELF\">
+<p><input type=\"hidden\" name=\"act\" value=\"get\" /><input type=\"hidden\" name=\"id\" value=\"$id\" /></p>
+<h3>下載檔案</h3>
+<p>您將要下載檔案 $prefix$did.$ext。</p>";
+if($dpwd != '*') $txt.='<p>請輸入下載密碼：<input type="password" size="10" name="downpass" maxlength="10" class="box" tabindex="3" accesskey="3" /></p>';
+$txt.="<p>檔案名稱：<label><input type='radio' name='name' value='gen' checked='checked'/>$prefix$did.$ext</label> <label><input type='radio' name='name' value='user'/>$upfile_name</label> </p>
+<p><input type=\"submit\" value=\"下載\" tabindex=\"8\" accesskey=\"8\" /></p>
+</form>
+";
+error($txt);
+}elseif($act=='get' && $_SERVER['REQUEST_METHOD'] == 'POST') {
+  $find = false;
+  if(preg_match("/^\\d{{$countnumbers}}$/",$id)) {
+    $logs = file($logfile);
+    foreach($logs as $log){
+      list($did,$ext,$com,,$now,$upfile_size,$upfile_type,,$upfile_name,$dpwd,,$tlim,)=explode("\t",$log);
+      if($id==$did){
+        $find = true;
+        break;
+      }
+    }
+  }
+  if(!$find) error('<h2>錯誤</h2>
+<p class="error">下載錯誤：此檔案找不到</p>');
+
+  if($dpwd == '*' || ($dpwd != '*' && $dpwd == substr(md5($downpass), 2, 7))) {
+  	$fname = $name == 'gen' ? "$prefix$did.$ext" : $upfile_name;
+    header("Content-Disposition: attachment; filename=$fname");
+    header("Content-type: $upfile_type; name=$fname");
+    readfile($updir.$prefix.$did.'.'.$ext);
+    exit;
+  } else {
+  	htmlheader();
+    error('<h2>錯誤</h2>
+<p class="error">下載錯誤：密碼錯誤</p>');
+  }
 }
 $lines = file($logfile);
 /* アプロード書き込み処理 */
-if(file_exists($upfile) && $com && $usr && $upfile_size > 0){
-  if(isset($usr{$usrmax+1})) error('<h2>錯誤</h2>
-<p class="error">上傳錯誤:用戶名稱過長</p>
-');
+if(file_exists($upfile) && $com && $upfile_size > 0){
   if(isset($com{$commax+1})) error('<h2>錯誤</h2>
 <p class="error">上傳錯誤:備註過長</p>
 ');
@@ -315,10 +422,11 @@ if(file_exists($upfile) && $com && $usr && $upfile_size > 0){
   }
   
   list($id,) = explode("\t", $lines[0]);//No取得
-  $id = sprintf('%03d', ++$id);		//インクリ
+  $id = sprintf("%0${countnumbers}d", ++$id);		//インクリ
   $newname = $prefix.$id.'.'.$ext;
 
   /* 自鯖転送 */
+  m_lock($logfile, true); m_lock($logfile) or lock_error();
   move_uploaded_file($upfile, $updir.$newname);//3.0.16より後のバージョンのPHP 3または 4.0.2 後
   //copy($upfile, $updir.$newname);
   chmod($updir.$newname, 0604);
@@ -329,13 +437,14 @@ if(file_exists($upfile) && $com && $usr && $upfile_size > 0){
   /* コメント他 */
   $com = htmlspecialchars($com);	//タグ変換
   if(get_magic_quotes_gpc()) $com = stripslashes($com);	//￥除去
-  $usr = htmlspecialchars($usr);	//タグ変換
-  if(get_magic_quotes_gpc()) $usr = stripslashes($usr);	//￥除去
 
-  $now = gmdate('Y/m/d(D)H:i', time()+9*60*60);	//日付のフォーマット
+  $utime = time()+$tz*60*60;
+  $now = gmdate('Y/m/d(D)H:i', $utime);	//日付のフォーマット
   $pwd = ($pass) ? substr(md5($pass), 2, 7) : '*';	//パスっ作成（無いなら*）
+  $dpwd = ($downpass) ? substr(md5($downpass), 2, 7) : '*';	//パスっ作成（無いなら*）
+  $tlim = 0; // time limit (未実裝)
 
-  $dat = @implode("\t", array($id,$ext,$usr,$com,$host,$now,$upfile_size,$upfile_type,$pwd,$upfile_name,));
+  $dat = @implode("\t", array($id,$ext,$com,$host,$now,$upfile_size,$upfile_type,$pwd,$upfile_name,$dpwd,$utime,$tlim,));
 
   if(count($lines) >= $logmax){		//ログオーバーならデータ削除
     for($d = count($lines)-1; $d >= $logmax-1; $d--){
@@ -352,6 +461,7 @@ if(file_exists($upfile) && $com && $usr && $upfile_size > 0){
   for($i = 0; $i < $logmax-1; $i++)	//いままでの分を追記
     fputs($fp, $lines[$i]);
   fclose ($fp);
+  m_lock($logfile, false);
   reset($lines);
   $lines = file($logfile);		//入れなおし
 }
@@ -362,10 +472,9 @@ echo '<h2>上傳檔案</h2>
 <p>檔案<strong>（最大 '.$limitk.' KB）</strong><br />
 <input type="hidden" name="MAX_FILE_SIZE" value="'.$limitb.'" />
 <input type="hidden" name="APC_UPLOAD_PROGRESS" id="progress_key" value="'.$unique_id.'"/>
-<input type="file" size="40" name="upfile" class="box" tabindex="1" accesskey="1" />
-<p>用戶名稱（※沒輸入的話檔案將不會被儲存。）<br />
-<input type="text" size="20" name="usr" value="" class="box" tabindex="1" accesskey="2" />
- Del Pass : <input type="password" size="10" name="pass" maxlength="10" class="box" tabindex="3" accesskey="3" /></p>
+<input type="file" size="40" name="upfile" class="box" tabindex="1" accesskey="1" /><br/>
+刪除密碼：<input type="password" size="10" name="pass" maxlength="10" class="box" tabindex="2" accesskey="2" />
+下載密碼(選填)：<input type="password" size="10" name="downpass" maxlength="10" class="box" tabindex="3" accesskey="3" /></p>
 <p>備註（※沒輸入的話檔案將不會被儲存。）<br />
 <input type="text" size="45" name="com" value="" class="box" tabindex="4" accesskey="4" />
 <input type="submit" value="上傳" tabindex="5" accesskey="5" />
@@ -389,7 +498,7 @@ if(file_exists($count_file)){
 /* モードリンク */
 echo '
 　D：刪除檔案</p>
-<p class="uline"><a href="'.$home.'">主頁</a> | <a href="'.$PHP_SELF.'?act=mult">多檔刪除</a> | <a href="'.$PHP_SELF.'?act=env">環境設定</a> | <a href="'.$PHP_SELF.'?">重新整理</a> | <a href="sam.php">圖像一覧</a></p>
+<p class="uline"><a href="'.$home.'">主頁</a> | <a href="'.$PHP_SELF.'?act=mult">多檔刪除</a> | <a href="'.$PHP_SELF.'?act=env">環境設定</a> | <a href="'.$PHP_SELF.'?">重新整理</a></p>
 
 <h2>檔案一覧</h2>
 <p class="uline">';
@@ -407,7 +516,6 @@ if($act=='mult')  echo "<form action=\"$PHP_SELF\" method=POST><input type='hidd
 echo "<table summary=\"files\">\n<tr>";
 if($c_act) echo '<th abbr="delete" scope="col">刪</th>';
 echo '<th abbr="name" scope="col">檔名</th>';
-if($c_usr) echo '<th abbr="user" scope="col">用戶</th>';
 if($c_com) echo '<th abbr="comment" scope="col">備註</th>';
 if($c_size) echo '<th abbr="size" scope="col">大小</th>';
 if($c_mime) echo '<th abbr="mime" scope="col">MIME</th>';
@@ -417,21 +525,20 @@ echo "</tr>\n";
 //メイン表示
 for($i = $st; $i < $st+$page_def; $i++){
   if($lines[$i]=='') continue;
-  list($id,$ext,$usr,$com,$host,$now,$size,$mtype,$pas,$orig,)=explode("\t",$lines[$i]);
+  list($id,$ext,$com,$host,$now,$size,$mtype,$pas,$orig,$dpwd,)=explode("\t",$lines[$i]);
   $fsize = FormatByte($size);
   if($auto_link) $com = preg_replace('/(https?|ftp|news)(:\/\/[\w\+\$\;\?\.\{\}%,!#~*\/:@&=_-]+)/u', '<a href="$1$2">$1$2</a>',$com);
 
+  $pmark = $dpwd != '*' ? '<span style="color:red;font-weight:bold;">*</span>' : '';
   $filename = $prefix.$id.'.'.$ext;
   $target = $updir.$filename;
 
-  
   echo "<tr><!--$host-->\n";//ホスト表示
   if($c_act) {
   	if($act=='mult') echo "<td class=\"del\"><input type=\"checkbox\" name=\"mdid[]\" value=\"$id\"/></td>";
   	else echo "<td class=\"del\"><a href=\"$PHP_SELF?del=$id\">D</a></td>";
   }
-  echo "<td>[<a href=\"$target\">$filename</a>]</td>";
-  if($c_usr) echo "<td>$usr</td>";
+  echo "<td>[<a href=\"$PHP_SELF?act=down&amp;id=$id\">$filename</a>]$pmark</td>";
   if($c_com) echo "<td>$com</td>";
   if($c_size) echo "<td class=\"size\">$fsize</td>";
   if($c_mime) echo "<td>$mtype</td>";

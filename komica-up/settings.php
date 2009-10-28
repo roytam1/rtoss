@@ -2,14 +2,14 @@
   $title	= '上傳區';	//タイトル
   $home		= 'http://mydomain.com/';	//ホーム
   $logfile	= "up.log";	//ログファイル名（変更する事）
-  $updir 	= "./img/";	//アップ用ディレクトリ
-  $upsdir	= "./imgs/";	//サムネイル保存ディレクトリ
+  $updir 	= "./file/";	//アップ用ディレクトリ
   $prefix	= '';		//接頭語（up001.txt,up002.jpgならup）
-  $logmax	= 5000;		//log保存行（これ以上は古いのから削除）
-  $usrmax	= 25;		//User投稿量制限（バイト。全角はこの半分）
+  $logmax	= 500;		//log保存行（これ以上は古いのから削除）
   $commax	= 250;		//コメント投稿量制限（バイト。全角はこの半分）
-  $limitk	= 100000;	//アップロード制限（KB キロバイト）
+  $limitk	= 5000;	//アップロード制限（KB キロバイト）
   $page_def	= 15;		//一ページの表示行数
+  $tz	= 8;		// time zone
+  $countnumbers	= 6;	// count format number
   $admin	= "del";	//削除管理パス
   $auto_link	= 1;		//コメントの自動リンク（Yes=1;No=0);
   $denylist	= array('192.168.0.1','sex.com','annony');	//アクセス拒否ホスト
@@ -24,7 +24,6 @@
 
   /* 項目表示（環境設定）の初期状態 (表示ならChecked 表示しないなら空) */
   $f_act  = 'checked="checked"';	//ACT（削除リンク）
-  $f_usr  = 'checked="checked"';	//コメント
   $f_com  = 'checked="checked"';	//コメント
   $f_size = 'checked="checked"';	//ファイルサイズ
   $f_mime = '';				//MIMEタイプ
