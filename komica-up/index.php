@@ -1,0 +1,1 @@
+<?php $go = 'upload.php';header("Location: $go"); ?>
