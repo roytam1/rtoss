@@ -23,6 +23,7 @@
   -------------------------------------------
  *********************************************/
 error_reporting(0);
+session_start();
 if(phpversion()>='4.1.0'){//PHP4.1.0以降対応
   $_GET = array_map('_clean', $_GET);
   $_POST = array_map('_clean', $_POST);
@@ -42,6 +43,11 @@ include_once('./settings.php');
 if($act=='envset'){
   $cookval = @implode(',', array($acte,$user,$come,$sizee,$mimee,$datee,$orige)); 
   setcookie('upcook', $cookval,time()+365*24*3600);
+  header("Location: $PHP_SELF?");
+}
+elseif($act=='logout') {
+  unset($_SESSION['upuser']);
+  header("Location: $PHP_SELF?");
 }
 function _clean($str) {
   if(is_array($str)) return $str;
@@ -155,6 +161,37 @@ function error($mes1=""){//えっらーﾒｯｾｰｼﾞ
   echo $foot;
   exit;
 }
+function _get($type,$host,$port='80',$path='/',$data='') {
+    $_err = 'lib sockets::'.__FUNCTION__.'(): ';
+    switch($type) {
+    	case 'http':
+    		$type = '';
+    		break;
+    	case 'https':
+    		$type = 'ssl';
+    		break;
+    	case 'ssl':
+    		break;
+    	default:
+    		die($_err.'bad type '.$type);
+    	}
+    if(!ctype_digit($port)) die($_err.'bad port '.$port);
+    if(!empty($data)) foreach($data AS $k => $v) $str .= urlencode($k).'='.urlencode($v).'&'; $str = substr($str,0,-1);
+   
+    $fp = fsockopen($host,$port,$errno,$errstr,$timeout=30);
+    if(!$fp) die($_err.$errstr.$errno); else {
+        fputs($fp, "POST $path HTTP/1.1\r\n");
+        fputs($fp, "Host: $host\r\n");
+        fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
+        fputs($fp, "Content-length: ".strlen($str)."\r\n");
+        fputs($fp, "Connection: close\r\n\r\n");
+        fputs($fp, $str."\r\n\r\n");
+       
+        while(!feof($fp)) $d .= fgets($fp,4096);
+        fclose($fp);
+    } return $d;
+} 
+
 /* start */
 $limitb = $limitk * 1024;
 $host = @gethostbyaddr($REMOTE_ADDR);
@@ -228,6 +265,30 @@ if($act=="env"){
 </form>
 <p class=\"tline\"><a href=\"$PHP_SELF?\">返回</a></p>");
 }
+elseif($act=='login') {
+  error("<h2>登入</h2>
+<form method=\"post\" enctype=\"multipart/form-data\" action=\"$PHP_SELF\">
+<p><input type=\"hidden\" name=\"act\" value=\"logging\" />
+請以論壇帳戶登入。<br/>
+用戶名稱：<input type=\"text\" size=\"12\" name=\"upuser\" class=\"box\" tabindex=\"1\" accesskey=\"1\" /><br />
+密碼：<input type=\"password\" size=\"12\" name=\"usrpass\" class=\"box\" tabindex=\"2\" accesskey=\"2\" />
+<input type=\"submit\" value=\"登入\" tabindex=\"3\" accesskey=\"3\" /></p>
+</form>
+<p class=\"tline\"><a href=\"$PHP_SELF?\">返回</a></p>");
+}
+elseif($act=='logging') {
+  $urlparts = parse_url($login_backend);
+  if(!isset($urlparts['port'])) {
+  	  if($urlparts['scheme'] == 'http') $urlparts['port'] = '80';
+  	  if($urlparts['scheme'] == 'https') $urlparts['port'] = '443';
+  }
+  $backend_raw = _get($urlparts['scheme'],$urlparts['host'],$urlparts['port'],$urlparts['path'],array('username'=>$upuser,'password'=>$usrpass));
+  $backend_res = substr(strstr($backend_raw,"\r\n\r\n"),4);
+  $backend_res = explode("\r\n",$backend_res); array_shift($backend_res); array_pop($backend_res); array_pop($backend_res); array_pop($backend_res); $backend_res = implode("\r\n",$backend_res);
+  
+  if(substr($backend_res,0,3)=='OK ') $_SESSION['upuser'] = rtrim(substr($backend_res,3));
+  else error($backend_res);
+}
 elseif($act=='mdel') {
 	if(!isset($_POST['mdid'])) error('<h2>錯誤</h2>
 <p class="error">刪除錯誤:未選擇檔案</p>');
@@ -271,14 +332,15 @@ elseif($act=='mdel') {
 }
 $lines = file($logfile);
 /* アプロード書き込み処理 */
-if(file_exists($upfile) && $com && $usr && $upfile_size > 0){
-  if(isset($usr{$usrmax+1})) error('<h2>錯誤</h2>
-<p class="error">上傳錯誤:用戶名稱過長</p>
+if(file_exists($upfile) && !isset($_SESSION['upuser'])) error('<h2>錯誤</h2>
+<p class="error">驗證錯誤:請先登入</p>
 ');
+if(file_exists($upfile) && $com && $_SESSION['upuser'] && $upfile_size > 0){
+  $usr = $_SESSION['upuser'];
   if(isset($com{$commax+1})) error('<h2>錯誤</h2>
 <p class="error">上傳錯誤:備註過長</p>
 ');
-  if($upfile_size > $limitb)        error('<h2>錯誤</h2>
+  if($upfile_size > $limitb) error('<h2>錯誤</h2>
 <p class="error">上傳錯誤:此檔案過大</p>');
   /* 連続投稿制限 */
   if($last_time > 0){
@@ -363,9 +425,7 @@ echo '<h2>上傳檔案</h2>
 <input type="hidden" name="MAX_FILE_SIZE" value="'.$limitb.'" />
 <input type="hidden" name="APC_UPLOAD_PROGRESS" id="progress_key" value="'.$unique_id.'"/>
 <input type="file" size="40" name="upfile" class="box" tabindex="1" accesskey="1" />
-<p>用戶名稱（※沒輸入的話檔案將不會被儲存。）<br />
-<input type="text" size="20" name="usr" value="" class="box" tabindex="1" accesskey="2" />
- Del Pass : <input type="password" size="10" name="pass" maxlength="10" class="box" tabindex="3" accesskey="3" /></p>
+<p>用戶名稱：['.(isset($_SESSION['upuser'])?'<a href="'.$PHP_SELF.'?act=logout">'.$_SESSION['upuser'].'</a>':'<a href="'.$PHP_SELF.'?act=login">登入</a>').'] Del Pass : <input type="password" size="10" name="pass" maxlength="10" class="box" tabindex="3" accesskey="3" /></p>
 <p>備註（※沒輸入的話檔案將不會被儲存。）<br />
 <input type="text" size="45" name="com" value="" class="box" tabindex="4" accesskey="4" />
 <input type="submit" value="上傳" tabindex="5" accesskey="5" />
