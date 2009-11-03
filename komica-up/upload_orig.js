@@ -1,4 +1,9 @@
 function gID(s) { return document.getElementById(s); }
+function toFixed(value, precision) {
+    var power = Math.pow(10, precision || 0);
+    return String(Math.round(value * power) / power);
+}
+
 /* 建立XMLHttpRequest物件 */
 function JSONXMLHttpReq(){
 	var objxml = false;
@@ -19,16 +24,25 @@ function JSONXMLHttpReq(){
 	return objxml;
 }
 var xhttpjson=JSONXMLHttpReq();
+var lasttime=0,lastcurrent=0;
 
 function ParseProgress(){
 	if(xhttpjson.readyState==4){ // 讀取完成
-		percent = xhttpjson.responseText;
-		if(percent > 0) {
+		var resp = eval('(' + xhttpjson.responseText + ')');
+		var upspeed = '',percent = 0;
+		if(resp.current > 0) {
+			if(!lasttime) {
+				lasttime = (new Date).getTime();
+				lastcurrent = resp.current;
+			} else {
+				upspeed = " ("+(toFixed(((resp.current-lastcurrent)/((new Date).getTime()-lasttime)),2))+" KB/s)";
+			}
+			percent = toFixed((resp.current*100/resp.total),2);
 			gID("progressbarborder").style.display="block";
-			gID("progressbartext").innerHTML = percent+"%";
+			gID("progressbartext").innerHTML = percent+"%"+upspeed;
 			gID("progressbar").style.width = percent+"%";
 		}
-		if(percent < 100){
+		if(resp.current < resp.total){
 			setTimeout("getProgress()", 200);
 		}
 	}
