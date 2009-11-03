@@ -53,7 +53,7 @@ $conn = sqlite_popen($sqlite_file);
 
 /* ここからヘッダー */
 function htmlheader() {
-	global $title,$banner,$act;
+	global $title,$banner,$unique_id,$act;
 ?>
 <?php echo '<?xml version="1.0" encoding="utf-8"?>'."\n" ?>
 <!DOCTYPE html
@@ -63,60 +63,13 @@ function htmlheader() {
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" media="all" />
 <title><?php echo $title; ?></title>
-<?php if(!$act) { ?>
+<script type="text/javascript" src="upload.js"></script>
 <script type="text/javascript"><!--//--><![CDATA[//><!--
-function gID(s) { return document.getElementById(s); }
-/* 建立XMLHttpRequest物件 */
-function JSONXMLHttpReq(){
-	var objxml = false;
-	/*@cc_on @*/
-	/*@if (@_jscript_version >= 5)
-	try{
-		objxml = new ActiveXObject("Msxml2.XMLHTTP");
-	}catch(e){
-		try{
-			objxml = new ActiveXObject("Microsoft.XMLHTTP");
-		}catch(e2){ objxml = false; }
-	}
-	@end @*/
-	if(!objxml && typeof XMLHttpRequest!='undefined') {
-		objxml = new XMLHttpRequest();
-		if(objxml.overrideMimeType) objxml.overrideMimeType('text/plain');
-	}
-	return objxml;
-}
-var xhttpjson=JSONXMLHttpReq();
-
-function ParseProgress(){
-	if(xhttpjson.readyState==4){ // 讀取完成
-		percent = xhttpjson.responseText;
-		if(percent > 0) {
-			gID("progressbarborder").style.display="block";
-			gID("progressbartext").innerHTML = percent+"%";
-			gID("progressbar").style.width = percent+"%";
-		}
-		if(percent < 100){
-			setTimeout("getProgress()", 200);
-		}
-	}
-}
-function getProgress(){
-	if(xhttpjson){
-		xhttpjson.open('GET','progress.php?progress_key=<?php echo($unique_id)?>', true);
-		xhttpjson.onreadystatechange = ParseProgress;
-		xhttpjson.send(null);
-	}
-}
- 
-function startProgress(){
-		gID("up_progress").style.display="block";
-		setTimeout("getProgress()", 1000);
-}
+var up_uid='<?php echo($unique_id)?>';
 //--><!]]></script>
-<?php } ?>
 <link href="style.css" type="text/css" rel="stylesheet" />
 </head>
-<body>
+<body onload="if(gID('pass'))gID('pass').value=getCookie('updelpass');if(gID('delpass'))gID('delpass').value=getCookie('updelpass');return true;">
 
 <h1><?php echo $title; ?></h1>
 <p><?php echo $banner; ?></p>
@@ -128,7 +81,7 @@ if(!($act=='get' && $_SERVER['REQUEST_METHOD'] == 'POST')) htmlheader();
 $foot = <<<FOOT
 
 <h2>著作権表示</h2>
-<p id="link"><a href="http://php.s3.to/">レッツPHP!</a> + <a href="http://utu.under.jp">Wastepaper Basket</a> + <a href="http://scrappedblog.blogspot.com/">Roytam1</a>(k-up SQL 20091030)</p>
+<p id="link"><a href="http://php.s3.to/">レッツPHP!</a> + <a href="http://utu.under.jp">Wastepaper Basket</a> + <a href="http://scrappedblog.blogspot.com/">Roytam1</a>(k-up SQL 20091103)</p>
 
 </body>
 </html>
@@ -230,7 +183,7 @@ if($del){
 <form method=\"post\" enctype=\"multipart/form-data\" action=\"$PHP_SELF\">
 <p>請輸入密碼<br />
 <input type=\"hidden\" name=\"delid\" value=\"".htmlspecialchars($del)."\" />
-<input type=\"password\" size=\"12\" name=\"delpass\" class=\"box\" tabindex=\"1\" accesskey=\"1\" />
+<input type=\"password\" size=\"12\" name=\"delpass\" id=\"delpass\" class=\"box\" tabindex=\"1\" accesskey=\"1\" />
 <input type=\"submit\" value=\"刪除\" tabindex=\"2\" accesskey=\"2\" /></p>
 </form>
 ");
@@ -430,12 +383,12 @@ if(file_exists($upfile) && $com && $upfile_size > 0){
 }
 /* 投稿フォーム */
 echo '<h2>上傳檔案</h2>
-<form method="post" enctype="multipart/form-data" action="'.$PHP_SELF.'" onsubmit="startProgress();return true;">
+<form method="post" enctype="multipart/form-data" action="'.$PHP_SELF.'" onsubmit="setCookie(\'updelpass\',gID(\'pass\').value);startProgress();return true;">
 <p>檔案<strong>（最大 '.$limitk.' KB，共 '.$logmax.' 個檔案）</strong><br />
 <input type="hidden" name="MAX_FILE_SIZE" value="'.$limitb.'" />
 <input type="hidden" name="APC_UPLOAD_PROGRESS" id="progress_key" value="'.$unique_id.'"/>
 <input type="file" size="40" name="upfile" class="box" tabindex="1" accesskey="1" />
-刪除密碼：<input type="password" size="10" name="pass" maxlength="10" class="box" tabindex="2" accesskey="2" />
+刪除密碼：<input type="password" size="10" name="pass" id="pass" maxlength="10" class="box" tabindex="2" accesskey="2" />
 下載密碼(選填)：<input type="password" size="10" name="downpass" maxlength="10" class="box" tabindex="3" accesskey="3" />
 時限(選填，單位：分)：<input type="text" size="10" maxlength="5" name="tlim" value="" class="box" tabindex="4" accesskey="4" />
 下載次數限制(選填)：<input type="text" size="10" maxlength="5" name="dlim" value="" class="box" tabindex="5" accesskey="5" /></p>
@@ -525,7 +478,7 @@ while($row = sqlite_fetch_array($rs)) {
 	}
 
 echo "</table>\n";
-if($act=='mult')	echo '<div align="right">密碼:<input type="password" name="delpass"/><input type="submit" name="submit" value="刪除"/></div></form>';
+if($act=='mult')	echo '<div align="right">密碼:<input type="password" name="delpass" id="delpass"/><input type="submit" name="submit" value="刪除"/></div></form>';
 echo '<p class="tline">'.paging($page,$rows)."</p>\n";
 echo $foot;
 ?>
