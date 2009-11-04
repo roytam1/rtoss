@@ -99,15 +99,15 @@ function paging($page, $total){//ページリンク作成
 
 	$acts=$act?'&act='.$act:'';
 
-		for ($j = 1; $j * $page_def < $total+$page_def; $j++) {
-			if($page == $j){//今表示しているのはﾘﾝｸしない
-				$next .= "[<strong>$j</strong>]";
-			}else{
-				$next .= sprintf('[<a href="%s?page=%d%s">%d</a>]', $PHP_SELF,$j,$acts,$j);//他はﾘﾝｸ
-			}
+	for ($j = 1; $j * $page_def < $total+$page_def; $j++) {
+		if($page == $j){//今表示しているのはﾘﾝｸしない
+			$next .= "[<strong>$j</strong>]";
+		}else{
+			$next .= sprintf('[<a href="%s?page=%d%s">%d</a>]', $PHP_SELF,$j,$acts,$j);//他はﾘﾝｸ
 		}
-		if($page=="all") return sprintf('Page: %s [ALL]',$next);
-		else return sprintf ('Page: %s [<a href="%s?page=all%s">ALL</a>]',$next,$PHP_SELF,$acts);
+	}
+	if($page=="all") return sprintf('Page: %s [ALL]',$next);
+	else return sprintf ('Page: %s [<a href="%s?page=all%s">ALL</a>]',$next,$PHP_SELF,$acts);
 }
 function error($mes1=""){//えっらーﾒｯｾｰｼﾞ
 	global $foot;
@@ -117,34 +117,34 @@ function error($mes1=""){//えっらーﾒｯｾｰｼﾞ
 	exit;
 }
 function _get($type,$host,$port='80',$path='/',$data='') {
-		$_err = 'lib sockets::'.__FUNCTION__.'(): ';
-		switch($type) {
-			case 'http':
-				$type = '';
-				break;
-			case 'https':
-				$type = 'ssl';
-				break;
-			case 'ssl':
-				break;
-			default:
-				die($_err.'bad type '.$type);
-			}
-		if(!ctype_digit($port)) die($_err.'bad port '.$port);
-		if(!empty($data)) foreach($data AS $k => $v) $str .= urlencode($k).'='.urlencode($v).'&'; $str = substr($str,0,-1);
+	$_err = 'lib sockets::'.__FUNCTION__.'(): ';
+	switch($type) {
+		case 'http':
+			$type = '';
+			break;
+		case 'https':
+			$type = 'ssl';
+			break;
+		case 'ssl':
+			break;
+		default:
+			die($_err.'bad type '.$type);
+	}
+	if(!ctype_digit($port)) die($_err.'bad port '.$port);
+	if(!empty($data)) foreach($data AS $k => $v) $str .= urlencode($k).'='.urlencode($v).'&'; $str = substr($str,0,-1);
 
-		$fp = fsockopen($host,$port,$errno,$errstr,$timeout=30);
-		if(!$fp) die($_err.$errstr.$errno); else {
-				fputs($fp, "POST $path HTTP/1.1\r\n");
-				fputs($fp, "Host: $host\r\n");
-				fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
-				fputs($fp, "Content-length: ".strlen($str)."\r\n");
-				fputs($fp, "Connection: close\r\n\r\n");
-				fputs($fp, $str."\r\n\r\n");
+	$fp = fsockopen($host,$port,$errno,$errstr,$timeout=30);
+	if(!$fp) die($_err.$errstr.$errno); else {
+			fputs($fp, "POST $path HTTP/1.1\r\n");
+			fputs($fp, "Host: $host\r\n");
+			fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
+			fputs($fp, "Content-length: ".strlen($str)."\r\n");
+			fputs($fp, "Connection: close\r\n\r\n");
+			fputs($fp, $str."\r\n\r\n");
 
-				while(!feof($fp)) $d .= fgets($fp,4096);
-				fclose($fp);
-		} return $d;
+			while(!feof($fp)) $d .= fgets($fp,4096);
+			fclose($fp);
+	} return $d;
 } 
 
 /* start */

@@ -47,6 +47,7 @@ include_once('./settings.php');
 if($act=='envset'){
 	$cookval = @implode(',', array($acte,$dlcnte,$come,$sizee,$mimee,$datee,$dlime,$orige)); 
 	setcookie('upcook', $cookval,time()+365*24*3600);
+	$act='';
 }
 $unique_id = uniqid('');
 $conn = sqlite_popen($sqlite_file);
@@ -112,19 +113,19 @@ function padNum($n) {
 	return str_pad($n,$countnumbers,'0',STR_PAD_LEFT);
 }
 function paging($page, $total){//ページリンク作成
-	global $PHP_SELF,$page_def;
+	global $PHP_SELF,$page_def,$act;
 
-	$act=isset($_GET['act'])?'&act='.$_GET['act']:'';
+	$acts=$act?'&act='.$act:'';
 
-		for ($j = 1; $j * $page_def < $total+$page_def; $j++) {
-			if($page == $j){//今表示しているのはﾘﾝｸしない
-				$next .= "[<strong>$j</strong>]";
-			}else{
-				$next .= sprintf('[<a href="%s?page=%d%s">%d</a>]', $PHP_SELF,$j,$act,$j);//他はﾘﾝｸ
-			}
+	for ($j = 1; $j * $page_def < $total+$page_def; $j++) {
+		if($page == $j){//今表示しているのはﾘﾝｸしない
+			$next .= "[<strong>$j</strong>]";
+		}else{
+			$next .= sprintf('[<a href="%s?page=%d%s">%d</a>]', $PHP_SELF,$j,$acts,$j);//他はﾘﾝｸ
 		}
-		if($page=="all") return sprintf('Page: %s [ALL]',$next);
-		else return sprintf ('Page: %s [<a href="%s?page=all%s">ALL</a>]',$next,$PHP_SELF,$act);
+	}
+	if($page=="all") return sprintf('Page: %s [ALL]',$next);
+	else return sprintf ('Page: %s [<a href="%s?page=all%s">ALL</a>]',$next,$PHP_SELF,$acts);
 }
 function error($mes1=""){//えっらーﾒｯｾｰｼﾞ
 	global $foot;
@@ -239,8 +240,9 @@ elseif($act=='mdel') {
 	}
 	if(!$find) error('<h2>錯誤</h2>
 <p class="error">刪除錯誤:密碼錯誤</p>');
+	$act='';
 }elseif($act=='down') {
-	$qry = 'SELECT * FROM upload WHERE id = '.$id;
+	$qry = 'SELECT * FROM upload WHERE id = '.intval($id);
 	$rs = sqlite_query($conn,$qry);
 	$row = sqlite_fetch_array($rs);
 
@@ -248,8 +250,7 @@ elseif($act=='mdel') {
 <p class="error">下載錯誤：此檔案找不到</p>');
 
 	if($row['tlim']||$row['dlim']) {
-		if($row['tlim'] && (time()+$tz*60*60>=($row['utime']+$row['tlim']*60))) expire($id);
-		if($row['dlim'] && ($row['dcnt']>=$row['dlim'])) expire($id);
+		if(($row['tlim'] && (time()+$tz*60*60>=($row['utime']+$row['tlim']*60))) || ($row['dlim'] && ($row['dcnt']>=$row['dlim']))) expire($id);
 	}
 
 	$qry = 'SELECT * FROM upload WHERE id = '.$id;
@@ -292,7 +293,7 @@ error($txt);
 
 		$fname = $name == 'gen' ? $prefix.padNum($id).'.'.$row['ext'] : $row['upfile_name'];
 		header("Content-Disposition: attachment; filename=$fname");
-		header("Content-type: $upfile_type; name=$fname");
+		header("Content-type: $row[upfile_type]; name=$fname");
 		readfile($updir.$prefix.padNum($id).'.'.$row['ext']);
 		exit;
 	} else {
