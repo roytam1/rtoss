@@ -266,7 +266,7 @@ elseif($act=='mdel') {
 <h3>下載檔案</h3>
 <p>您將要下載檔案 $prefix".padNum($id).".$row[ext]。</p>";
 	if($row['dpwd'] != '*') $txt.='<p>請輸入下載密碼：<input type="password" size="10" name="downpass" maxlength="10" class="box" tabindex="3" accesskey="3" /></p>';
-	$txt.="<p>檔案名稱：<label><input type='radio' name='name' value='gen' checked='checked'/>$prefix".padNum($id).".$row[ext]</label> ".($row['upfile_name']!='*'?"<label><input type='radio' name='name' value='user'/>$row[upfile_name]</label> </p>":'')."
+	$txt.="<p>檔案名稱：<label><input type='radio' name='name' value='gen' checked='checked'/>$prefix".padNum($id).".$row[ext]</label> ".($row['upfile_name']{0}!='*'?"<label><input type='radio' name='name' value='user'/>$row[upfile_name]</label> </p>":'')."
 <p><input type=\"submit\" value=\"下載\" tabindex=\"8\" accesskey=\"8\" /></p>
 </form>
 ";
@@ -353,7 +353,7 @@ if(file_exists($upfile) && $com && $upfile_size > 0){
 	$now = gmdate('Y/m/d(D)H:i', $utime);	//日付のフォーマット
 	$pwd = ($pass) ? substr(md5($pass), 2, 7) : '*';	//パスっ作成（無いなら*）
 	$dpwd = ($downpass) ? substr(md5($downpass), 2, 7) : '*';	//パスっ作成（無いなら*）
-	if($noorig) $upfile_name = '*';
+	if($noorig) $upfile_name = '*'.$upfile_name;
 	
 	$qry=sprintf("INSERT INTO upload (ext,com,host,now,upfile_size,upfile_type,pwd,upfile_name,dpwd,utime,tlim,dlim) VALUES ('%s','%s','%s','%s',%s,'%s','%s','%s','%s',%s,%s,%s)",sqlite_escape_string($ext),sqlite_escape_string($com),$host,$now,$upfile_size,sqlite_escape_string($upfile_type),$pwd,sqlite_escape_string($upfile_name),$dpwd,$utime,intval($tlim),intval($dlim));
 	sqlRun($qry,$qerr);
@@ -474,7 +474,7 @@ while($row = sqlite_fetch_array($rs)) {
 		if(!$dlimit) $dlimit='無';
 		echo "<td>$dlimit</td>";
 	}
-	if($c_orig) echo "<td class=\"orig\">\n$row[upfile_name]</td>\n";
+	if($c_orig) echo "<td class=\"orig\">\n".($row['upfile_name']{0}=='*'?'':$row['upfile_name'])."</td>\n";
 	echo "</tr>\n";
 	}
 
