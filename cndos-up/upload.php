@@ -443,7 +443,7 @@ for($i = $st; $i < $st+$page_def; $i++){
 	$target = $updir.$filename;
 
 	
-	echo "<tr><!--$host-->\n";//ホスト表示
+	echo '<tr><!--'.str_replace('--','- -',$host)."-->\n";//ホスト表示
 	if($c_act) {
 		if($act=='mult') echo "<td class=\"del\"><input type=\"checkbox\" name=\"mdid[]\" value=\"$id\"/></td>";
 		else echo "<td class=\"del\"><a href=\"$PHP_SELF?del=$id\">D</a></td>";
