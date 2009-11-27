@@ -455,7 +455,7 @@ while($row = sqlite_fetch_array($rs)) {
 	$pmark = $row['dpwd'] != '*' ? '<span class="rb">*</span>' : '';
 	$filename = $prefix.padNum($row['id']).'.'.$row['ext'];
 
-	echo "<tr><!--$row[host]-->\n";//ホスト表示
+	echo '<tr><!--'.str_replace('--','- -',$row['host'])."-->\n";//ホスト表示
 	if($c_act) {
 		if($act=='mult') echo "<td class=\"del\"><input type=\"checkbox\" name=\"mdid[]\" value=\"$row[id]\"/></td>";
 		else echo "<td class=\"del\"><a href=\"$PHP_SELF?del=$row[id]\">D</a></td>";
