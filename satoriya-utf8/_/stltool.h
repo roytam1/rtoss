@@ -131,11 +131,16 @@ int	erase(string& str, const string& before);
 // 対象語句の数を数える
 int	count(const string& str, const string& target);
 // 対象語句の存在確認
-inline bool find(const string& str, const string& target) { return	strstr_hz(str.c_str(), target.c_str())!=NULL; }
-inline bool find(const char* str, const string& target) { return	strstr_hz(str, target.c_str())!=NULL; }
-inline bool find(const string& str, const char* target) { return	strstr_hz(str.c_str(), target)!=NULL; }
-inline bool find(const char* str, const char* target) { return	strstr_hz(str, target)!=NULL; }
-
+std::string::size_type find_hz(const char* str, const char* target, std::string::size_type find_pos = 0);
+inline std::string::size_type find_hz(const string& str, const string& target,std::string::size_type find_pos = 0) {
+	return	find_hz(str.c_str(), target.c_str(), find_pos);
+}
+inline std::string::size_type find_hz(const char* str, const string& target,std::string::size_type find_pos = 0) {
+	return	find_hz(str, target.c_str(), find_pos);
+}
+inline std::string::size_type find_hz(const string& str, const char* target,std::string::size_type find_pos = 0)   {
+	return	find_hz(str.c_str(), target, find_pos);
+}
 
 // dequeの後ろから n 個目を参照する
 template<class T>

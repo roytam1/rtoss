@@ -472,6 +472,19 @@ const char*	strstr_hz(const char* target, const char* find) {
 	return	NULL;
 }
 
+//STLスタイルのstrstr_hz
+std::string::size_type find_hz(const char* str, const char* target, std::string::size_type find_pos)
+{
+	const char *p = strstr_hz(str+find_pos, target);
+	if ( p == NULL ) {
+		return string::npos;
+	}
+	else {
+		p -= find_pos;
+		return p - str;
+	}
+}
+
 bool	compare_tail(const string& str, const string& tail)
 {
 	const int diff = str.size()-tail.size();
