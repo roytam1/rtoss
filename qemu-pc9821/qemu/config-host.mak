@@ -13,7 +13,7 @@ CONFIG_AUDIO_DRIVERS=sdl
 CONFIG_SDL=y
 VERSION=0.11.50
 PKGVERSION=
-SRC_PATH=/usr/home/User/qemu-pc98_20091022-p4
+SRC_PATH=/usr/home/User/qemu-pc98_20091029-p5
 TARGET_DIRS=i386-softmmu
 CONFIG_SDL=y
 SDL_CFLAGS=-I/usr/local/include/SDL -D_GNU_SOURCE=1 -Dmain=SDL_main

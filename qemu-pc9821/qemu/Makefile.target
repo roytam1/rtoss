@@ -154,7 +154,7 @@ endif #CONFIG_BSD_USER
 # System emulator target
 ifdef CONFIG_SOFTMMU
 
-obj-y = vl.o monitor.o pci.o machine.o gdbstub.o
+obj-y = vl.o async.o monitor.o pci.o machine.o gdbstub.o
 # virtio has to be here due to weird dependency between PCI and virtio-net.
 # need to fix this properly
 obj-y += virtio-blk.o virtio-balloon.o virtio-net.o virtio-console.o virtio-pci.o
@@ -197,6 +197,7 @@ obj-i386-y += usb-uhci.o vmmouse.o vmport.o vmware_vga.o hpet.o
 obj-i386-y += device-hotplug.o pci-hotplug.o smbios.o wdt_ib700.o
 obj-i386-y += ne2000-isa.o
 obj-i386-y += ide/pc98.o pc98kbd.o pc98mouse.o pc98sys.o pc98vga.o pc98.o
+obj-i386-y += ay8910.o ymdeltat.o fm.o ym2608intf.o pc98sound.o
 
 # shared objects
 obj-ppc-y = ppc.o ide/core.o ide/qdev.o ide/isa.o ide/pci.o ide/macio.o
@@ -261,7 +262,7 @@ obj-sparc-y += vga.o vga-pci.o
 obj-sparc-y += fdc.o mc146818rtc.o serial.o
 obj-sparc-y += cirrus_vga.o parallel.o
 else
-obj-sparc-y = sun4m.o tcx.o iommu.o slavio_intctl.o
+obj-sparc-y = sun4m.o lance.o tcx.o iommu.o slavio_intctl.o
 obj-sparc-y += slavio_timer.o slavio_misc.o fdc.o sparc32_dma.o
 obj-sparc-y += cs4231.o eccmemctl.o sbi.o sun4c_intctl.o
 endif

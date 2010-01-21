@@ -1,8 +1,6 @@
 /*
  * QEMU NEC PC-9821 IDE Bus
  *
- * Copyright (c) 2003 Fabrice Bellard
- * Copyright (c) 2006 Openedhand Ltd.
  * Copyright (c) 2009 TAKEDA, toshiya
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -40,13 +38,14 @@ typedef struct PC98IDEState {
     ISADevice dev;
     IDEBus bus[2];
     IDEBus *cur_bus;
+    uint8_t bus1_selected_vmstate;
     uint32_t  isairq;
     qemu_irq  irq;
 } PC98IDEState;
 
 static void pc98_ide_cpu_shutdown(void *opaque, uint32_t addr, uint32_t val)
 {
-    qemu_cpu_reset_request();
+    pc98_cpu_shutdown();
 }
 
 static uint32_t pc98_ide_connection_read(void *opaque, uint32_t addr)
@@ -159,42 +158,58 @@ static uint32_t pc98_ide_digital_read(void *opaque, uint32_t addr)
     return ret;
 }
 
-static void pc98_ide_save(QEMUFile* f, void *opaque)
+static void pc98_ide_pre_save(void *opaque)
 {
     PC98IDEState *s = opaque;
-    int i;
-    uint8_t bus1_selected;
 
-    for (i = 0; i < 2; i++) {
-        idebus_save(f, &s->bus[i]);
-        ide_save(f, &s->bus[i].ifs[0]);
-        ide_save(f, &s->bus[i].ifs[1]);
-    }
-    bus1_selected = (s->cur_bus != &s->bus[0]);
-    qemu_put_8s(f, &bus1_selected);
+    s->bus1_selected_vmstate = (s->cur_bus != &s->bus[0]);
 }
 
-static int pc98_ide_load(QEMUFile* f, void *opaque, int version_id)
+static int pc98_ide_post_load(void *opaque, int version_id)
 {
     PC98IDEState *s = opaque;
-    int i;
-    uint8_t bus1_selected;
+
+    s->cur_bus = &s->bus[s->bus1_selected_vmstate != 0];
+    return 0;
+}
+
+static const VMStateDescription vmstate_pc98_ide = {
+    .name = "pc98-ide",
+    .version_id = 1,
+    .minimum_version_id = 0,
+    .minimum_version_id_old = 0,
+    .pre_save = pc98_ide_pre_save,
+    .post_load = pc98_ide_post_load,
+    .fields      = (VMStateField []) {
+        VMSTATE_IDE_BUS(bus[0], PC98IDEState),
+        VMSTATE_IDE_DRIVES(bus[0].ifs, PC98IDEState),
+        VMSTATE_IDE_BUS(bus[1], PC98IDEState),
+        VMSTATE_IDE_DRIVES(bus[1].ifs, PC98IDEState),
+        VMSTATE_UINT8(bus1_selected_vmstate, PC98IDEState),
+        VMSTATE_END_OF_LIST()
+    }
+};
+
+static void pc98_ide_reset(void *opaque)
+{
+    PC98IDEState *s = opaque;
+    int i, j;
 
     for (i = 0; i < 2; i++) {
-        idebus_load(f, &s->bus[i], version_id);
-        ide_load(f, &s->bus[i].ifs[0], version_id);
-        ide_load(f, &s->bus[i].ifs[1], version_id);
+        for (j = 0; j < 2; j++) {
+            ide_reset(&s->bus[i].ifs[j]);
+            s->bus[i].ifs[j].status = READY_STAT | SEEK_STAT;
+            s->bus[i].ifs[j].error = 0x01;
+        }
+        s->bus[i].unit = 0;
     }
-    qemu_get_8s(f, &bus1_selected);
-    s->cur_bus = &s->bus[bus1_selected != 0];
-
-    return 0;
+    s->cur_bus = &s->bus[0];
 }
 
 static int pc98_ide_initfn(ISADevice *dev)
 {
     PC98IDEState *s = DO_UPCAST(PC98IDEState, dev, dev);
-    int i, j;
+    int i;
 
     ide_bus_new(&s->bus[0], &s->dev.qdev);
     ide_bus_new(&s->bus[1], &s->dev.qdev);
@@ -203,18 +218,8 @@ static int pc98_ide_initfn(ISADevice *dev)
     ide_init2(&s->bus[0], NULL, NULL, s->irq);
     ide_init2(&s->bus[1], NULL, NULL, s->irq);
 
-    for (i = 0; i < 2; i++) {
-        for (j = 0; j < 2; j++) {
-            s->bus[i].ifs[j].status = BUSY_STAT | SEEK_STAT;
-            s->bus[i].ifs[j].error = 0x01;
-        }
-        s->bus[i].unit = 0;
-    }
-    s->cur_bus = &s->bus[0];
-
     register_ioport_write(0xf0, 1, 1, pc98_ide_cpu_shutdown, s);
     register_ioport_read(0xf0, 1, 1, pc98_ide_connection_read, s);
-
     register_ioport_write(0x430, 1, 1, pc98_ide_bank_write, s);
     register_ioport_read(0x430, 1, 1, pc98_ide_bank_read, s);
     register_ioport_write(0x432, 1, 1, pc98_ide_bank_write, s);
@@ -231,12 +236,14 @@ static int pc98_ide_initfn(ISADevice *dev)
     register_ioport_read(0x74c, 1, 1, pc98_ide_status_read, s);
     register_ioport_read(0x74e, 1, 1, pc98_ide_digital_read, s);
 
-    register_savevm("pc98-ide", 0, 1, pc98_ide_save, pc98_ide_load, s);
+    vmstate_register(0, &vmstate_pc98_ide, s);
+    pc98_ide_reset(s);
+    qemu_register_reset(pc98_ide_reset, s);
 
     return 0;
 };
 
-int pc98_ide_init(int isairq, DriveInfo **hd_table)
+int pc98_ide_init(DriveInfo **hd_table)
 {
     ISADevice *dev;
     PC98IDEState *s;
@@ -245,9 +252,9 @@ int pc98_ide_init(int isairq, DriveInfo **hd_table)
     int i;
 
     dev = isa_create("pc98-ide");
-    qdev_prop_set_uint32(&dev->qdev, "irq", isairq);
-    if (qdev_init(&dev->qdev) != 0)
+    if (qdev_init(&dev->qdev) != 0) {
         return -1;
+    }
 
     s = DO_UPCAST(PC98IDEState, dev, dev);
 
@@ -256,8 +263,7 @@ int pc98_ide_init(int isairq, DriveInfo **hd_table)
             continue;
         ide_create_drive(s->bus + bus[i], unit[i], hd_table[i]);
         if (!s->bus[bus[i]].ifs[unit[i]].is_cdrom &&
-            !s->bus[bus[i]].ifs[unit[i]].is_cf
-           ) {
+            !s->bus[bus[i]].ifs[unit[i]].is_cf) {
             s->bus[bus[i]].ifs[unit[i]].support_chs = 1;
         }
     }

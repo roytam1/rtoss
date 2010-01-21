@@ -38,13 +38,25 @@ typedef struct ISANE2000State {
 static void isa_ne2000_cleanup(VLANClientState *vc)
 {
     NE2000State *s = vc->opaque;
-    ISANE2000State *isa = container_of(s, ISANE2000State, ne2000);
 
-    unregister_savevm("ne2000", s);
+    s->vc = NULL;
+}
 
-    isa_unassign_ioport(isa->iobase, 16);
-    isa_unassign_ioport(isa->iobase + 0x10, 2);
-    isa_unassign_ioport(isa->iobase + 0x1f, 1);
+static void isa_ne2000_initfn_common(ISADevice *dev,
+                                     ISANE2000State *isa, NE2000State *s)
+{
+    isa_init_irq(dev, &s->irq, isa->isairq);
+
+    qemu_macaddr_default_if_unset(&s->c.macaddr);
+    ne2000_reset(s);
+
+    s->vc = qemu_new_vlan_client(NET_CLIENT_TYPE_NIC, s->c.vlan, s->c.peer,
+                                 dev->qdev.info->name, dev->qdev.id,
+                                 ne2000_can_receive, ne2000_receive, NULL,
+                                 NULL, isa_ne2000_cleanup, s);
+    qemu_format_nic_info_str(s->vc, s->c.macaddr.a);
+
+    vmstate_register(-1, &vmstate_ne2000, s);
 }
 
 static int isa_ne2000_initfn(ISADevice *dev)
@@ -63,17 +75,8 @@ static int isa_ne2000_initfn(ISADevice *dev)
     register_ioport_write(isa->iobase + 0x1f, 1, 1, ne2000_reset_ioport_write, s);
     register_ioport_read(isa->iobase + 0x1f, 1, 1, ne2000_reset_ioport_read, s);
 
-    isa_init_irq(dev, &s->irq, isa->isairq);
+    isa_ne2000_initfn_common(dev, isa, s);
 
-    qdev_get_macaddr(&dev->qdev, s->macaddr);
-    ne2000_reset(s);
-
-    s->vc = qdev_get_vlan_client(&dev->qdev,
-                                 ne2000_can_receive, ne2000_receive, NULL,
-                                 isa_ne2000_cleanup, s);
-    qemu_format_nic_info_str(s->vc, s->macaddr);
-
-    register_savevm("ne2000", -1, 2, ne2000_save, ne2000_load, s);
     return 0;
 }
 
@@ -84,9 +87,9 @@ void isa_ne2000_init(int base, int irq, NICInfo *nd)
     qemu_check_nic_model(nd, "ne2k_isa");
 
     dev = isa_create("ne2k_isa");
-    dev->qdev.nd = nd; /* hack alert */
     qdev_prop_set_uint32(&dev->qdev, "iobase", base);
     qdev_prop_set_uint32(&dev->qdev, "irq",    irq);
+    qdev_set_nic_properties(&dev->qdev, nd);
     qdev_init_nofail(&dev->qdev);
 }
 
@@ -97,6 +100,7 @@ static ISADeviceInfo ne2000_isa_info = {
     .qdev.props = (Property[]) {
         DEFINE_PROP_HEX32("iobase", ISANE2000State, iobase, 0x300),
         DEFINE_PROP_UINT32("irq",   ISANE2000State, isairq, 9),
+        DEFINE_NIC_PROPERTIES(ISANE2000State, ne2000.c),
         DEFINE_PROP_END_OF_LIST(),
     },
 };
@@ -119,17 +123,8 @@ static int pc98_ne2000_initfn(ISADevice *dev)
     register_ioport_write(isa->iobase + 0x18, 1, 1, ne2000_reset_ioport_write, s);
     register_ioport_read(isa->iobase + 0x18, 1, 1, ne2000_reset_ioport_read, s);
 
-    isa_init_irq(dev, &s->irq, isa->isairq);
+    isa_ne2000_initfn_common(dev, isa, s);
 
-    qdev_get_macaddr(&dev->qdev, s->macaddr);
-    ne2000_reset(s);
-
-    s->vc = qdev_get_vlan_client(&dev->qdev,
-                                 ne2000_can_receive, ne2000_receive, NULL,
-                                 isa_ne2000_cleanup, s);
-    qemu_format_nic_info_str(s->vc, s->macaddr);
-
-    register_savevm("ne2000", -1, 2, ne2000_save, ne2000_load, s);
     return 0;
 }
 
@@ -137,22 +132,23 @@ void pc98_ne2000_init(int base, int irq, NICInfo *nd)
 {
     ISADevice *dev;
 
-    qemu_check_nic_model(nd, "pc98_ne2000");
+    qemu_check_nic_model(nd, "ne2k_isa");
 
-    dev = isa_create("pc98_ne2000");
-    dev->qdev.nd = nd; /* hack alert */
+    dev = isa_create("pc98_ne2k");
     qdev_prop_set_uint32(&dev->qdev, "iobase", base);
     qdev_prop_set_uint32(&dev->qdev, "irq",    irq);
+    qdev_set_nic_properties(&dev->qdev, nd);
     qdev_init_nofail(&dev->qdev);
 }
 
 static ISADeviceInfo pc98_ne2000_info = {
-    .qdev.name  = "pc98_ne2000",
+    .qdev.name  = "pc98_ne2k",
     .qdev.size  = sizeof(ISANE2000State),
     .init       = pc98_ne2000_initfn,
     .qdev.props = (Property[]) {
         DEFINE_PROP_HEX32("iobase", ISANE2000State, iobase, 0xd0),
         DEFINE_PROP_UINT32("irq",   ISANE2000State, isairq, 3),
+        DEFINE_NIC_PROPERTIES(ISANE2000State, ne2000.c),
         DEFINE_PROP_END_OF_LIST(),
     },
 };

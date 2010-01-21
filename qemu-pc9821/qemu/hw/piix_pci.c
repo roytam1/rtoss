@@ -143,13 +143,14 @@ void i440fx_init_memory_mappings(PCII440FXState *d)
 }
 
 void i440fx_update_isa_page_descs(PCII440FXState *d,
-                                  uint32_t start_addr, uint32_t size)
+                                  target_phys_addr_t start_addr,
+                                  ram_addr_t size)
 {
-    int i = (start_addr - 0xa0000) >> 12;
-    uint32_t addr;
+    target_phys_addr_t addr;
 
-    for (addr = start_addr; addr < start_addr + size; addr += 0x1000, i++) {
+    for (addr = start_addr; addr < start_addr + size; addr += 0x1000) {
         if (addr >= 0xa0000 && addr < 0x100000) {
+            int i = (addr - 0xa0000) >> 12;
             d->isa_page_descs[i] = cpu_get_physical_page_desc(addr);
         }
     }
@@ -381,7 +382,7 @@ static int piix3_initfn(PCIDevice *dev)
 /* NEC PC-9821 */
 
 PCIBus *pc98_i440fx_init(PCII440FXState **pi440fx_state,
-                         int *piix3_devfn, qemu_irq *pic, uint32_t ram_size)
+                         int *piix3_devfn, qemu_irq *pic, ram_addr_t ram_size)
 {
     PCIBus *pci_bus;
     PCII440FXState *d;
