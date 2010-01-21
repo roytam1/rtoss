@@ -61,8 +61,8 @@ static void mouse_timer_handler(void *opaque)
     }
 
     /* set next timer */
-    qemu_mod_timer(s->mouse_timer, qemu_get_clock(vm_clock) +
-                   get_ticks_per_sec() / mouse_expire[s->freq & 3]);
+    qemu_mod_timer(s->mouse_timer, qemu_get_clock(rt_clock) +
+                   1000 / mouse_expire[s->freq & 3]);
 }
 
 static void mouse_event_handler(void *opaque,
@@ -190,8 +190,8 @@ static void pc98_mouse_reset(void *opaque)
     s->freq = 0;
     s->portc = 0xf0;
 
-    qemu_mod_timer(s->mouse_timer, qemu_get_clock(vm_clock) +
-                   get_ticks_per_sec() / mouse_expire[0]);
+    qemu_mod_timer(s->mouse_timer, qemu_get_clock(rt_clock) +
+                   1000 / mouse_expire[0]);
 }
 
 static int pc98_mouse_pre_load(void *opaque)
@@ -230,7 +230,7 @@ static int pc98_mouse_initfn(ISADevice *dev)
 
     isa_init_irq(dev, &s->irq, isa->isairq);
 
-    s->mouse_timer = qemu_new_timer(vm_clock, mouse_timer_handler, s);
+    s->mouse_timer = qemu_new_timer(rt_clock, mouse_timer_handler, s);
     qemu_add_mouse_event_handler(mouse_event_handler, s, 0, "pc98-mouse");
 
     vmstate_register(-1, &vmstate_mouse, s);
@@ -240,12 +240,11 @@ static int pc98_mouse_initfn(ISADevice *dev)
     return 0;
 }
 
-void pc98_mouse_init(int irq)
+void pc98_mouse_init(void)
 {
     ISADevice *dev;
 
     dev = isa_create("pc98-mouse");
-    qdev_prop_set_uint32(&dev->qdev, "irq", irq);
     qdev_init_nofail(&dev->qdev);
 }
 

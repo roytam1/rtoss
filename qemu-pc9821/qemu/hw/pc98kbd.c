@@ -29,7 +29,7 @@
 #include "qemu-timer.h"
 
 #define SIO_BUFFER_SIZE 256
-#define SIO_RECV_DELAY 1600
+#define SIO_RECV_DELAY 8
 
 enum {
     SIO_STAT_TXRDY  = 0x01,
@@ -122,8 +122,8 @@ static void kbd_recv(void *opaque, uint8_t value)
         s->recv_buf[(s->recv_write++) & (SIO_BUFFER_SIZE - 1)] = value;
         s->recv_count++;
         if (s->recv_count == 1) {
-            qemu_mod_timer(s->sio_timer, qemu_get_clock(vm_clock) +
-                           get_ticks_per_sec() / SIO_RECV_DELAY);
+            qemu_mod_timer(s->sio_timer, qemu_get_clock(rt_clock) +
+                           SIO_RECV_DELAY);
         }
     }
 }
@@ -301,8 +301,8 @@ static void sio_timer_handler(void *opaque)
             }
         }
         if (s->recv_count > 0) {
-            qemu_mod_timer(s->sio_timer, qemu_get_clock(vm_clock) + 
-                           get_ticks_per_sec() / SIO_RECV_DELAY);
+            qemu_mod_timer(s->sio_timer, qemu_get_clock(rt_clock) +
+                           SIO_RECV_DELAY);
         }
     }
 }
@@ -359,7 +359,7 @@ static int pc98_kbd_initfn(ISADevice *dev)
 
     isa_init_irq(dev, &s->irq, isa->isairq);
 
-    s->sio_timer = qemu_new_timer(vm_clock, sio_timer_handler, s);
+    s->sio_timer = qemu_new_timer(rt_clock, sio_timer_handler, s);
     qemu_add_kbd_event_handler(kbd_event_handler, s);
 
     vmstate_register(-1, &vmstate_kbd, s);
@@ -369,12 +369,11 @@ static int pc98_kbd_initfn(ISADevice *dev)
     return 0;
 }
 
-void pc98_kbd_init(int irq)
+void pc98_kbd_init(void)
 {
     ISADevice *dev;
 
     dev = isa_create("pc98-kbd");
-    qdev_prop_set_uint32(&dev->qdev, "irq", irq);
     qdev_init_nofail(&dev->qdev);
 }
 

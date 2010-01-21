@@ -23,6 +23,6 @@ void mmio_ide_init (target_phys_addr_t membase, target_phys_addr_t membase2,
                     DriveInfo *hd0, DriveInfo *hd1);
 
 /* ide-pc98.c */
-int pc98_ide_init (int isairq, DriveInfo **hd_table);
+int pc98_ide_init(DriveInfo **hd_table);
 
 #endif /* HW_IDE_H */

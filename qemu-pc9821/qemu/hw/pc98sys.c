@@ -61,7 +61,7 @@ struct sysport_t {
 
     QEMUTimer *rtc_timer;
     qemu_irq irq;
-    int64_t initial_clock;
+    int64_t tstmp_initial_clock;
 };
 
 typedef struct sysport_isabus_t {
@@ -73,6 +73,10 @@ typedef struct sysport_isabus_t {
 typedef struct sysport_t sysport_t;
 
 /* NEC uPD4993A RTC */
+
+// 1000/64 = 15.625
+static const int rtc_period[8] = { 15, 16, 16, 15, 16, 16, 15, 16 };
+static int rtc_period_ptr = 0;
 
 static void rtc_timer_handler(void *opaque)
 {
@@ -91,8 +95,8 @@ static void rtc_timer_handler(void *opaque)
     }
 
     /* set next timer */
-    qemu_mod_timer(s->rtc_timer, qemu_get_clock(vm_clock) +
-                   get_ticks_per_sec() / 64);
+    qemu_mod_timer(s->rtc_timer, qemu_get_clock(rt_clock) +
+                   rtc_period[(rtc_period_ptr++) & 7]);
 }
 
 static inline uint64_t to_bcd(int a)
@@ -193,6 +197,10 @@ static void sys_portc_write(void *opaque, uint32_t addr, uint32_t value)
 {
     sysport_t *s = opaque;
 
+    if ((s->sys_portc & 0xa0) != (value & 0xa0)) {
+        pc98_system_log("shut0=%d shut1=%d\n",
+                        (value & 0x80) != 0, (value & 0x20) != 0);
+    }
     s->sys_portc = value;
     pc98_pcspk_write(value);
 }
@@ -202,7 +210,7 @@ static uint32_t sys_portc_read(void *opaque, uint32_t addr)
     sysport_t *s = opaque;
 
     if (s->sys_portc_patch) {
-        /* patch for itf protect mode patch */
+        /* itf protect mode patch */
         s->sys_portc_patch--;
         if (s->sys_portc_patch == 0 || s->sys_portc_patch == 4) {
             s->sys_portc |= 0x20;
@@ -226,6 +234,13 @@ static void sys_ctrl_write(void *opaque, uint32_t addr, uint32_t value)
         }
         sys_portc_write(s, 0, portc);
     }
+}
+
+uint8_t pc98_sys_read_shut(void *opaque)
+{
+    sysport_t *s = opaque;
+
+    return ((s->sys_portc & 0xa0) == 0xa0);
 }
 
 /* printer port */
@@ -289,7 +304,7 @@ static void prn_ctrl_write(void *opaque, uint32_t addr, uint32_t value)
 static uint32_t tstmp_read(void *opaque, uint32_t addr)
 {
     sysport_t *s = opaque;
-    uint64_t d = muldiv64(qemu_get_clock(vm_clock) - s->initial_clock,
+    uint64_t d = muldiv64(qemu_get_clock(vm_clock) - s->tstmp_initial_clock,
                           TSTMP_FREQ, get_ticks_per_sec());
 
     switch(addr) {
@@ -366,10 +381,10 @@ static int pc98_sys_initfn(ISADevice *dev)
 
     isa_init_irq(dev, &s->irq, isa->isairq);
 
-    s->rtc_timer = qemu_new_timer(vm_clock, rtc_timer_handler, s);
-    qemu_mod_timer(s->rtc_timer, qemu_get_clock(vm_clock) +
-                   get_ticks_per_sec() / 64);
-    s->initial_clock = qemu_get_clock(vm_clock);
+    s->rtc_timer = qemu_new_timer(rt_clock, rtc_timer_handler, s);
+    qemu_mod_timer(s->rtc_timer, qemu_get_clock(rt_clock) +
+                   rtc_period[(rtc_period_ptr++) & 7]);
+    s->tstmp_initial_clock = qemu_get_clock(vm_clock);
 
     vmstate_register(-1, &vmstate_sysport, s);
     pc98_sys_reset(s);
@@ -378,13 +393,18 @@ static int pc98_sys_initfn(ISADevice *dev)
     return 0;
 }
 
-void pc98_sys_init(int irq)
+
+
+void *pc98_sys_init(void)
 {
     ISADevice *dev;
+    sysport_isabus_t *isa;
 
     dev = isa_create("pc98-sys");
-    qdev_prop_set_uint32(&dev->qdev, "irq", irq);
     qdev_init_nofail(&dev->qdev);
+
+    isa = DO_UPCAST(sysport_isabus_t, dev, dev);
+    return &isa->state;
 }
 
 static ISADeviceInfo pc98_sys_info = {

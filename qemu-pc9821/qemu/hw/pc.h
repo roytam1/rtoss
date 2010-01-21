@@ -83,8 +83,6 @@ void i8042_mm_init(qemu_irq kbd_irq, qemu_irq mouse_irq,
 typedef struct RTCState RTCState;
 
 RTCState *rtc_init(int base_year);
-RTCState *rtc_mm_init(target_phys_addr_t base, int it_shift, qemu_irq irq,
-                      int base_year);
 void rtc_set_memory(RTCState *s, int addr, int val);
 void rtc_set_date(RTCState *s, const struct tm *tm);
 void cmos_set_s3_resume(void);
@@ -125,7 +123,8 @@ PCIBus *i440fx_init(PCII440FXState **pi440fx_state, int *piix_devfn, qemu_irq *p
 void i440fx_set_smm(PCII440FXState *d, int val);
 void i440fx_init_memory_mappings(PCII440FXState *d);
 void i440fx_update_isa_page_descs(PCII440FXState *d,
-                                  uint32_t start_addr, uint32_t size);
+                                  target_phys_addr_t start_addr,
+                                  ram_addr_t size);
 
 /* piix4.c */
 extern PCIDevice *piix4_dev;
