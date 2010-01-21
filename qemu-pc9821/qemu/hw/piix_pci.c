@@ -36,18 +36,14 @@ typedef PCIHostState I440FXState;
 typedef struct PIIX3State {
     PCIDevice dev;
     int pci_irq_levels[4];
-} PIIX3State;
-
-typedef struct PIIX3IrqState {
-    PIIX3State *piix3;
     qemu_irq *pic;
-} PIIX3IrqState;
+} PIIX3State;
 
 struct PCII440FXState {
     PCIDevice dev;
     target_phys_addr_t isa_page_descs[384 / 4];
     uint8_t smm_enabled;
-    PIIX3IrqState *irq_state;
+    PIIX3State *piix3;
 };
 
 static void i440fx_addr_writel(void* opaque, uint32_t addr, uint32_t val)
@@ -167,7 +163,7 @@ static int i440fx_load_old(QEMUFile* f, void *opaque, int version_id)
 
     if (version_id == 2)
         for (i = 0; i < 4; i++)
-            d->irq_state->piix3->pci_irq_levels[i] = qemu_get_be32(f);
+            d->piix3->pci_irq_levels[i] = qemu_get_be32(f);
 
     return 0;
 }
@@ -228,36 +224,37 @@ static int i440fx_initfn(PCIDevice *dev)
 
 static PCIBus *i440fx_init_common(PCII440FXState **pi440fx_state,
                                   int *piix3_devfn, qemu_irq *pic,
-                                  const char *piix3_name)
+                                  const char *piix3_name, int devfn)
 {
     DeviceState *dev;
     PCIBus *b;
     PCIDevice *d;
     I440FXState *s;
-    PIIX3IrqState *irq_state = qemu_malloc(sizeof(*irq_state));
+    PIIX3State *piix3;
 
-    irq_state->pic = pic;
     dev = qdev_create(NULL, "i440FX-pcihost");
     s = FROM_SYSBUS(I440FXState, sysbus_from_qdev(dev));
-    b = pci_register_bus(&s->busdev.qdev, "pci.0",
-                         piix3_set_irq, pci_slot_get_pirq, irq_state, 0, 4);
+    b = pci_bus_new(&s->busdev.qdev, NULL, 0);
     s->bus = b;
-    qdev_init(dev);
+    qdev_init_nofail(dev);
 
     d = pci_create_simple(b, 0, "i440FX");
     *pi440fx_state = DO_UPCAST(PCII440FXState, dev, d);
-    (*pi440fx_state)->irq_state = irq_state;
 
-    irq_state->piix3 = DO_UPCAST(PIIX3State, dev,
-                                 pci_create_simple(b, -1, piix3_name));
-    *piix3_devfn = irq_state->piix3->dev.devfn;
+    piix3 = DO_UPCAST(PIIX3State, dev,
+                      pci_create_simple(b, devfn, piix3_name));
+    piix3->pic = pic;
+    pci_bus_irqs(b, piix3_set_irq, pci_slot_get_pirq, piix3, 4);
+    (*pi440fx_state)->piix3 = piix3;
+
+    *piix3_devfn = piix3->dev.devfn;
 
     return b;
 }
 
 PCIBus *i440fx_init(PCII440FXState **pi440fx_state, int *piix3_devfn, qemu_irq *pic)
 {
-    return i440fx_init_common(pi440fx_state, piix3_devfn, pic, "PIIX3");
+    return i440fx_init_common(pi440fx_state, piix3_devfn, pic, "PIIX3", -1);
 }
 
 /* PIIX3 PCI to ISA bridge */
@@ -265,22 +262,22 @@ PCIBus *i440fx_init(PCII440FXState **pi440fx_state, int *piix3_devfn, qemu_irq *
 static void piix3_set_irq(void *opaque, int irq_num, int level)
 {
     int i, pic_irq, pic_level;
-    PIIX3IrqState *irq_state = opaque;
+    PIIX3State *piix3 = opaque;
 
-    irq_state->piix3->pci_irq_levels[irq_num] = level;
+    piix3->pci_irq_levels[irq_num] = level;
 
     /* now we change the pic irq level according to the piix irq mappings */
     /* XXX: optimize */
-    pic_irq = irq_state->piix3->dev.config[0x60 + irq_num];
+    pic_irq = piix3->dev.config[0x60 + irq_num];
     if (pic_irq < 16) {
         /* The pic level is the logical OR of all the PCI irqs mapped
            to it */
         pic_level = 0;
         for (i = 0; i < 4; i++) {
-            if (pic_irq == irq_state->piix3->dev.config[0x60 + i])
-                pic_level |= irq_state->piix3->pci_irq_levels[i];
+            if (pic_irq == piix3->dev.config[0x60 + i])
+                pic_level |= piix3->pci_irq_levels[i];
         }
-        qemu_set_irq(irq_state->pic[pic_irq], pic_level);
+        qemu_set_irq(piix3->pic[pic_irq], pic_level);
     }
 }
 
@@ -336,44 +333,81 @@ static const VMStateDescription vmstate_piix3 = {
     }
 };
 
-static void piix3_initfn_common(PIIX3State *d)
-{
-    isa_bus_new(&d->dev.qdev);
-    vmstate_register(0, &vmstate_piix3, d);
-
-    piix3_reset(d);
-    qemu_register_reset(piix3_reset, d);
-}
-
 static int piix3_initfn(PCIDevice *dev)
 {
     PIIX3State *d = DO_UPCAST(PIIX3State, dev, dev);
-    uint8_t *pci_conf = d->dev.config;
+    uint8_t *pci_conf;
 
-    piix3_initfn_common(d);
+    isa_bus_new(&d->dev.qdev);
+    vmstate_register(0, &vmstate_piix3, d);
 
+    pci_conf = d->dev.config;
     pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_INTEL);
     pci_config_set_device_id(pci_conf, PCI_DEVICE_ID_INTEL_82371SB_0); // 82371SB PIIX3 PCI-to-ISA bridge (Step A1)
     pci_config_set_class(pci_conf, PCI_CLASS_BRIDGE_ISA);
     pci_conf[PCI_HEADER_TYPE] =
         PCI_HEADER_TYPE_NORMAL | PCI_HEADER_TYPE_MULTI_FUNCTION; // header_type = PCI_multifunction, generic
 
+    piix3_reset(d);
+    qemu_register_reset(piix3_reset, d);
     return 0;
 }
 
-/* NEC PC-98x1 */
+/* NEC PC-9821 */
 
 PCIBus *pc98_i440fx_init(PCII440FXState **pi440fx_state, int *piix3_devfn, qemu_irq *pic)
 {
-    return i440fx_init_common(pi440fx_state, piix3_devfn, pic, "STAR-ALPHA");
+    return i440fx_init_common(pi440fx_state, piix3_devfn, pic, "STAR-ALPHA", 0x30);
+}
+
+static void pc98_piix3_reset(void *opaque)
+{
+    static const struct {
+        uint8_t port;
+        uint32_t data;
+    } params[] = {
+        { 0x04, 0x3a000107 },
+        { 0x40, 0x00ef0010 },
+        { 0x44, 0xfffbfffa },
+        { 0x48, 0xfffefffe },
+        { 0x4c, 0x0000ffff },
+        { 0x50, 0x0f020100 },
+        { 0x54, 0x078a0504 },
+        { 0x58, 0x0b8a0908 },
+        { 0x5c, 0x8f0e0d8c },
+        { 0x60, 0x80808080 },
+        { 0x64, 0x18073f50 },
+        { 0x68, 0xac000000 },
+        { 0x6c, 0x00000000 },
+        { 0x70, 0x0000c00c },
+        { 0x78, 0x000fd9b2 },
+        /* end of params */
+        { 0xff, 0xffffffff },
+    };
+    PIIX3State *d = opaque;
+    uint8_t *pci_conf = d->dev.config;
+    int i;
+    
+    for (i = 0;; i++) {
+        if (params[i].port == 0xff && params[i].data == 0xffffffff) {
+            break;
+        }
+        pci_conf[params[i].port + 0] = (params[i].data >>  0) & 0xff;
+        pci_conf[params[i].port + 1] = (params[i].data >>  8) & 0xff;
+        pci_conf[params[i].port + 2] = (params[i].data >> 16) & 0xff;
+        pci_conf[params[i].port + 3] = (params[i].data >> 24) & 0xff;
+    }
+
+    memset(d->pci_irq_levels, 0, sizeof(d->pci_irq_levels));
 }
 
 static int pc98_piix3_initfn(PCIDevice *dev)
 {
     PIIX3State *d = DO_UPCAST(PIIX3State, dev, dev);
-    uint8_t *pci_conf = d->dev.config;
+    uint8_t *pci_conf;
 
-    piix3_initfn_common(d);
+    isa_bus_new(&d->dev.qdev);
+    vmstate_register(0, &vmstate_piix3, d);
 
     pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_NEC);
     pci_config_set_device_id(pci_conf, PCI_DEVICE_ID_NEC_CBUS_BRIDGE); // Star Alpha
@@ -381,6 +415,8 @@ static int pc98_piix3_initfn(PCIDevice *dev)
     pci_conf[PCI_HEADER_TYPE] =
         PCI_HEADER_TYPE_NORMAL | PCI_HEADER_TYPE_MULTI_FUNCTION; // header_type = PCI_multifunction, generic
 
+    pc98_piix3_reset(d);
+    qemu_register_reset(pc98_piix3_reset, d);
     return 0;
 }
 

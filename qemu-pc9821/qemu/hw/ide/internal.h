@@ -20,12 +20,6 @@ typedef struct IDEDeviceInfo IDEDeviceInfo;
 typedef struct IDEState IDEState;
 typedef struct BMDMAState BMDMAState;
 
-/* debug IDE devices */
-//#define DEBUG_IDE
-//#define DEBUG_IDE_ATAPI
-//#define DEBUG_AIO
-#define USE_DMA_CDROM
-
 /* Bits of HD_STATUS */
 #define ERR_STAT		0x01
 #define INDEX_STAT		0x02
@@ -402,6 +396,7 @@ struct IDEState {
 
     /* set for lba48 access */
     uint8_t lba48;
+    uint8_t chs;
     BlockDriverState *bs;
     /* ATAPI specific */
     uint8_t sense_key;
@@ -479,7 +474,6 @@ struct BMDMAState {
     uint8_t status;
     uint32_t addr;
 
-    struct PCIIDEState *pci_dev;
     IDEBus *bus;
     /* current transfer state */
     uint32_t cur_addr;
@@ -551,7 +545,7 @@ void ide_init2(IDEBus *bus, DriveInfo *hd0, DriveInfo *hd1,
 void ide_init_ioport(IDEBus *bus, int iobase, int iobase2);
 
 /* hw/ide/qdev.c */
-IDEBus *ide_bus_new(DeviceState *dev);
+void ide_bus_new(IDEBus *idebus, DeviceState *dev);
 IDEDevice *ide_create_drive(IDEBus *bus, int unit, DriveInfo *drive);
 
 #endif /* HW_IDE_INTERNAL_H */

@@ -31,9 +31,6 @@ static const int ide_iobase[2] = { 0x1f0, 0x170 };
 static const int ide_iobase2[2] = { 0x3f6, 0x376 };
 static const int ide_irq[2] = { 14, 15 };
 
-static int serial_io[MAX_SERIAL_PORTS] = { 0x3f8, 0x2f8, 0x3e8, 0x2e8 };
-static int serial_irq[MAX_SERIAL_PORTS] = { 4, 3, 4, 3 };
-
 static PITState *pit; /* PIT i8254 */
 
 /* i8254 PIT is attached to the IRQ0 at PIC i8259 */
@@ -133,7 +130,7 @@ static void load_kernel (CPUState *env)
     } else {
         ret = 0;
     }
-    pstrcpy_targphys((16 << 20) - 256 + ret, 256,
+    pstrcpy_targphys("cmdline", (16 << 20) - 256 + ret, 256,
                      loaderparams.kernel_cmdline);
 
     stl_phys((16 << 20) - 260, 0x12345678);
@@ -262,8 +259,7 @@ void mips_r4k_init (ram_addr_t ram_size,
 
     for(i = 0; i < MAX_SERIAL_PORTS; i++) {
         if (serial_hds[i]) {
-            serial_init(serial_io[i], i8259[serial_irq[i]], 115200,
-                        serial_hds[i]);
+            serial_isa_init(i, serial_hds[i]);
         }
     }
 

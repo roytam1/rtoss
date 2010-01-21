@@ -1,6 +1,7 @@
 #include "qemu-common.h"
 #include "qemu-option.h"
 #include "qemu-config.h"
+#include "sysemu.h"
 
 QemuOptsList qemu_drive_opts = {
     .name = "drive",
@@ -151,10 +152,57 @@ QemuOptsList qemu_device_opts = {
     },
 };
 
+QemuOptsList qemu_netdev_opts = {
+    .name = "netdev",
+    .head = QTAILQ_HEAD_INITIALIZER(qemu_netdev_opts.head),
+    .desc = {
+        /*
+         * no elements => accept any params
+         * validation will happen later
+         */
+        { /* end of list */ }
+    },
+};
+
+QemuOptsList qemu_net_opts = {
+    .name = "net",
+    .head = QTAILQ_HEAD_INITIALIZER(qemu_net_opts.head),
+    .desc = {
+        /*
+         * no elements => accept any params
+         * validation will happen later
+         */
+        { /* end of list */ }
+    },
+};
+
+QemuOptsList qemu_rtc_opts = {
+    .name = "rtc",
+    .head = QTAILQ_HEAD_INITIALIZER(qemu_rtc_opts.head),
+    .desc = {
+        {
+            .name = "base",
+            .type = QEMU_OPT_STRING,
+        },{
+            .name = "clock",
+            .type = QEMU_OPT_STRING,
+#ifdef TARGET_I386
+        },{
+            .name = "driftfix",
+            .type = QEMU_OPT_STRING,
+#endif
+        },
+        { /* end if list */ }
+    },
+};
+
 static QemuOptsList *lists[] = {
     &qemu_drive_opts,
     &qemu_chardev_opts,
     &qemu_device_opts,
+    &qemu_netdev_opts,
+    &qemu_net_opts,
+    &qemu_rtc_opts,
     NULL,
 };
 
@@ -166,7 +214,7 @@ int qemu_set_option(const char *str)
 
     rc = sscanf(str, "%63[^.].%63[^.].%63[^=]%n", group, id, arg, &offset);
     if (rc < 3 || str[offset] != '=') {
-        fprintf(stderr, "can't parse: \"%s\"\n", str);
+        qemu_error("can't parse: \"%s\"\n", str);
         return -1;
     }
 
@@ -175,20 +223,18 @@ int qemu_set_option(const char *str)
             break;
     }
     if (lists[i] == NULL) {
-        fprintf(stderr, "there is no option group \"%s\"\n", group);
+        qemu_error("there is no option group \"%s\"\n", group);
         return -1;
     }
 
     opts = qemu_opts_find(lists[i], id);
     if (!opts) {
-        fprintf(stderr, "there is no %s \"%s\" defined\n",
+        qemu_error("there is no %s \"%s\" defined\n",
                 lists[i]->name, id);
         return -1;
     }
 
     if (qemu_opt_set(opts, arg, str+offset+1) == -1) {
-        fprintf(stderr, "failed to set \"%s\" for %s \"%s\"\n",
-                arg, lists[i]->name, id);
         return -1;
     }
     return 0;

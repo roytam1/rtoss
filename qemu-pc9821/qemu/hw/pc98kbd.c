@@ -1,5 +1,5 @@
 /*
- * QEMU NEC PC-98x1 keyboard
+ * QEMU NEC PC-9821 keyboard
  *
  * Copyright (c) 2009 TAKEDA, toshiya
  *

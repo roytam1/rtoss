@@ -41,11 +41,12 @@ struct dma_regs {
     uint8_t mode;
     uint8_t page;
     uint8_t pageh;
-    uint8_t bound;
     uint8_t dack;
     uint8_t eop;
     DMA_transfer_handler transfer_handler;
     void *opaque;
+    /* NEC PC-9821 quirks? */
+    uint8_t bound;
 };
 
 #define ADDR 0
@@ -56,11 +57,11 @@ static struct dma_cont {
     uint8_t command;
     uint8_t mask;
     uint8_t flip_flop;
-    uint8_t access_ctrl;
     int dshift;
     struct dma_regs regs[4];
-    /* NEC PC-98x1 quirks? */
+    /* NEC PC-9821 quirks? */
     uint8_t pc98;
+    uint8_t access_ctrl;
 } dma_controllers[2];
 
 enum {
@@ -83,10 +84,8 @@ enum {
 };
 
 enum {
-    DISABLE_DMA_OVER_1MB = 0x04,
+    PC98_DISABLE_DMA_OVER_1MB = 0x04,
 };
-
-#define ACCESS_CTRL_INIVAL 0xb4
 
 static void DMA_run (void);
 
@@ -434,7 +433,7 @@ int DMA_read_memory (int nchan, void *buf, int pos, int len)
     struct dma_regs *r = &d->regs[nchan & 3];
     target_phys_addr_t addr = ((r->pageh & 0x7f) << 24) | (r->page << 16) | r->now[ADDR];
 
-    if (d->pc98 && (d->access_ctrl & DISABLE_DMA_OVER_1MB)) {
+    if (d->pc98 && (d->access_ctrl & PC98_DISABLE_DMA_OVER_1MB)) {
         addr &= 0xfffff;
     }
     if (r->mode & MODE_DIR) {
@@ -460,7 +459,7 @@ int DMA_write_memory (int nchan, void *buf, int pos, int len)
     struct dma_regs *r = &d->regs[nchan & 3];
     target_phys_addr_t addr = ((r->pageh & 0x7f) << 24) | (r->page << 16) | r->now[ADDR];
 
-    if (d->pc98 && (d->access_ctrl & DISABLE_DMA_OVER_1MB)) {
+    if (d->pc98 && (d->access_ctrl & PC98_DISABLE_DMA_OVER_1MB)) {
         addr &= 0xfffff;
     }
     if (r->mode & MODE_DIR) {
@@ -592,7 +591,7 @@ void DMA_init (int high_page_enable)
     dma_bh = qemu_bh_new(DMA_run_bh, NULL);
 }
 
-/* NEC PC-98x1 */
+/* NEC PC-9821 */
 
 static void pc98_write_port (void *opaque, uint32_t nport, uint32_t data)
 {
@@ -652,7 +651,7 @@ static void pc98_dma_reset(void *opaque)
     for (i = 0; i < ARRAY_SIZE (d->regs); ++i) {
         d->regs[i].bound = 0;
     }
-    d->access_ctrl = ACCESS_CTRL_INIVAL;
+    d->access_ctrl = 0xb4;
     dma_reset(d);
 }
 
@@ -667,9 +666,10 @@ static const VMStateDescription vmstate_pc98_dma_regs = {
         VMSTATE_UINT8(mode, struct dma_regs),
         VMSTATE_UINT8(page, struct dma_regs),
         VMSTATE_UINT8(pageh, struct dma_regs),
-        VMSTATE_UINT8(bound, struct dma_regs),
         VMSTATE_UINT8(dack, struct dma_regs),
         VMSTATE_UINT8(eop, struct dma_regs),
+        /* PC-9821 */
+        VMSTATE_UINT8(bound, struct dma_regs),
         VMSTATE_END_OF_LIST()
     }
 };
@@ -684,9 +684,10 @@ static const VMStateDescription vmstate_pc98_dma = {
         VMSTATE_UINT8(command, struct dma_cont),
         VMSTATE_UINT8(mask, struct dma_cont),
         VMSTATE_UINT8(flip_flop, struct dma_cont),
-        VMSTATE_UINT8(access_ctrl, struct dma_cont),
         VMSTATE_INT32(dshift, struct dma_cont),
         VMSTATE_STRUCT_ARRAY(regs, struct dma_cont, 4, 1, vmstate_pc98_dma_regs, struct dma_regs),
+        /* PC-9821 */
+        VMSTATE_UINT8(access_ctrl, struct dma_cont),
         VMSTATE_END_OF_LIST()
     }
 };

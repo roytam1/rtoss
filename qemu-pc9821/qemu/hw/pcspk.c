@@ -38,6 +38,7 @@ typedef struct {
     QEMUSoundCard card;
     SWVoiceOut *voice;
     PITState *pit;
+    int pit_ch;
     unsigned int pit_count;
     unsigned int samples;
     unsigned int play_pos;
@@ -72,10 +73,10 @@ static void pcspk_callback(void *opaque, int free)
     PCSpkState *s = opaque;
     unsigned int n;
 
-    if (pit_get_mode(s->pit, 2) != 3)
+    if (pit_get_mode(s->pit, s->pit_ch) != 3)
         return;
 
-    n = pit_get_initial_count(s->pit, 2);
+    n = pit_get_initial_count(s->pit, s->pit_ch);
     /* avoid frequencies that are not reproducible with sample rate */
     if (n < PCSPK_MIN_COUNT)
         n = 0;
@@ -118,9 +119,9 @@ static uint32_t pcspk_ioport_read(void *opaque, uint32_t addr)
     int out;
 
     s->dummy_refresh_clock ^= (1 << 4);
-    out = pit_get_out(s->pit, 2, qemu_get_clock(vm_clock)) << 5;
+    out = pit_get_out(s->pit, s->pit_ch, qemu_get_clock(vm_clock)) << 5;
 
-    return pit_get_gate(s->pit, 2) | (s->data_on << 1) | s->dummy_refresh_clock | out;
+    return pit_get_gate(s->pit, s->pit_ch) | (s->data_on << 1) | s->dummy_refresh_clock | out;
 }
 
 static void pcspk_ioport_write(void *opaque, uint32_t addr, uint32_t val)
@@ -129,7 +130,7 @@ static void pcspk_ioport_write(void *opaque, uint32_t addr, uint32_t val)
     const int gate = val & 1;
 
     s->data_on = (val >> 1) & 1;
-    pit_set_gate(s->pit, 2, gate);
+    pit_set_gate(s->pit, s->pit_ch, gate);
     if (s->voice) {
         if (gate) /* restart */
             s->play_pos = 0;
@@ -142,6 +143,27 @@ void pcspk_init(PITState *pit)
     PCSpkState *s = &pcspk_state;
 
     s->pit = pit;
+    s->pit_ch = 2;
     register_ioport_read(0x61, 1, 1, pcspk_ioport_read, s);
     register_ioport_write(0x61, 1, 1, pcspk_ioport_write, s);
+}
+
+/* NEC PC-9821 */
+
+void pc98_pcspk_write(uint32_t val)
+{
+    PCSpkState *s = &pcspk_state;
+
+    s->data_on = ((val & 0x08) == 0);
+    if (s->voice) {
+        AUD_set_active_out(s->voice, s->data_on);
+    }
+}
+
+void pc98_pcspk_init(PITState *pit)
+{
+    PCSpkState *s = &pcspk_state;
+
+    s->pit = pit;
+    s->pit_ch = 1;
 }

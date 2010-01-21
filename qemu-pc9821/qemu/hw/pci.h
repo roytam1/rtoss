@@ -117,6 +117,8 @@ typedef struct PCIIORegion {
 #define PCI_SEC_STATUS		0x1e	/* Secondary status register, only bit 14 used */
 #define PCI_SUBSYSTEM_VENDOR_ID 0x2c    /* 16 bits */
 #define PCI_SUBSYSTEM_ID        0x2e    /* 16 bits */
+#define PCI_ROM_ADDRESS		0x30	/* Bits 31..11 are address, 10..1 reserved */
+#define  PCI_ROM_ADDRESS_ENABLE	0x01
 #define PCI_CAPABILITY_LIST	0x34	/* Offset of first capability list entry */
 #define PCI_INTERRUPT_LINE	0x3c	/* 8 bits */
 #define PCI_INTERRUPT_PIN	0x3d	/* 8 bits */
@@ -185,7 +187,6 @@ struct PCIDevice {
     /* do not access the following fields */
     PCIConfigReadFunc *config_read;
     PCIConfigWriteFunc *config_write;
-    PCIUnregisterFunc *unregister;
 
     /* IRQ objects for the INTA-INTD pins.  */
     qemu_irq *irq;
@@ -212,19 +213,12 @@ struct PCIDevice {
     uint32_t msix_bar_size;
     /* Version id needed for VMState */
     int32_t version_id;
-    /* How much space does an MSIX table need. */
-    /* The spec requires giving the table structure
-     * a 4K aligned region all by itself. Align it to
-     * target pages so that drivers can do passthrough
-     * on the rest of the region. */
-    target_phys_addr_t msix_page_size;
 };
 
 PCIDevice *pci_register_device(PCIBus *bus, const char *name,
                                int instance_size, int devfn,
                                PCIConfigReadFunc *config_read,
                                PCIConfigWriteFunc *config_write);
-int pci_unregister_device(PCIDevice *pci_dev);
 
 void pci_register_bar(PCIDevice *pci_dev, int region_num,
                             uint32_t size, int type,
@@ -248,18 +242,28 @@ int pci_device_load(PCIDevice *s, QEMUFile *f);
 
 typedef void (*pci_set_irq_fn)(void *opaque, int irq_num, int level);
 typedef int (*pci_map_irq_fn)(PCIDevice *pci_dev, int irq_num);
+typedef int (*pci_hotplug_fn)(PCIDevice *pci_dev, int state);
+void pci_bus_new_inplace(PCIBus *bus, DeviceState *parent,
+                         const char *name, int devfn_min);
+PCIBus *pci_bus_new(DeviceState *parent, const char *name, int devfn_min);
+void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
+                  void *irq_opaque, int nirq);
+void pci_bus_hotplug(PCIBus *bus, pci_hotplug_fn hotplug);
 PCIBus *pci_register_bus(DeviceState *parent, const char *name,
                          pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
                          void *irq_opaque, int devfn_min, int nirq);
 
 PCIDevice *pci_nic_init(NICInfo *nd, const char *default_model,
                         const char *default_devaddr);
+PCIDevice *pci_nic_init_nofail(NICInfo *nd, const char *default_model,
+                               const char *default_devaddr);
 void pci_data_write(void *opaque, uint32_t addr, uint32_t val, int len);
 uint32_t pci_data_read(void *opaque, uint32_t addr, int len);
 int pci_bus_num(PCIBus *s);
 void pci_for_each_device(int bus_num, void (*fn)(PCIDevice *d));
 PCIBus *pci_find_bus(int bus_num);
 PCIDevice *pci_find_device(int bus_num, int slot, int function);
+PCIBus *pci_get_bus_devfn(int *devfnp, const char *devaddr);
 
 int pci_read_devaddr(Monitor *mon, const char *addr, int *domp, int *busp,
                      unsigned *slotp);
@@ -326,6 +330,7 @@ typedef int (*pci_qdev_initfn)(PCIDevice *dev);
 typedef struct {
     DeviceInfo qdev;
     pci_qdev_initfn init;
+    PCIUnregisterFunc *exit;
     PCIConfigReadFunc *config_read;
     PCIConfigWriteFunc *config_write;
 } PCIDeviceInfo;
@@ -333,8 +338,7 @@ typedef struct {
 void pci_qdev_register(PCIDeviceInfo *info);
 void pci_qdev_register_many(PCIDeviceInfo *info);
 
-PCIDevice *pci_create(const char *name, const char *devaddr);
-PCIDevice *pci_create_noinit(PCIBus *bus, int devfn, const char *name);
+PCIDevice *pci_create(PCIBus *bus, int devfn, const char *name);
 PCIDevice *pci_create_simple(PCIBus *bus, int devfn, const char *name);
 
 /* lsi53c895a.c */

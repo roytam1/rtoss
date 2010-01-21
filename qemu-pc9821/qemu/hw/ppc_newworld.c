@@ -320,7 +320,7 @@ static void ppc_core99_init (ram_addr_t ram_size,
                                serial_hds[0], serial_hds[1], ESCC_CLOCK, 4);
 
     for(i = 0; i < nb_nics; i++)
-        pci_nic_init(&nd_table[i], "ne2k_pci", NULL);
+        pci_nic_init_nofail(&nd_table[i], "ne2k_pci", NULL);
 
     if (drive_get_max_bus(IF_IDE) >= MAX_IDE_BUS) {
         fprintf(stderr, "qemu: too many IDE bus\n");
@@ -364,7 +364,7 @@ static void ppc_core99_init (ram_addr_t ram_size,
     fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, kernel_size);
     if (kernel_cmdline) {
         fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, CMDLINE_ADDR);
-        pstrcpy_targphys(CMDLINE_ADDR, TARGET_PAGE_SIZE, kernel_cmdline);
+        pstrcpy_targphys("cmdline", CMDLINE_ADDR, TARGET_PAGE_SIZE, kernel_cmdline);
     } else {
         fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, 0);
     }

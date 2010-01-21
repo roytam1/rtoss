@@ -605,7 +605,9 @@ int kvm_cpu_exec(CPUState *env)
         }
 
         kvm_arch_pre_run(env, run);
+        qemu_mutex_unlock_iothread();
         ret = kvm_vcpu_ioctl(env, KVM_RUN, 0);
+        qemu_mutex_lock_iothread();
         kvm_arch_post_run(env, run);
 
         if (ret == -EINTR || ret == -EAGAIN) {
@@ -905,11 +907,15 @@ void kvm_setup_guest_memory(void *start, size_t size)
 #ifdef KVM_CAP_SET_GUEST_DEBUG
 static void on_vcpu(CPUState *env, void (*func)(void *data), void *data)
 {
+#ifdef CONFIG_IOTHREAD
     if (env == cpu_single_env) {
         func(data);
         return;
     }
     abort();
+#else
+    func(data);
+#endif
 }
 
 struct kvm_sw_breakpoint *kvm_find_sw_breakpoint(CPUState *env,
@@ -938,7 +944,13 @@ struct kvm_set_guest_debug_data {
 static void kvm_invoke_set_guest_debug(void *data)
 {
     struct kvm_set_guest_debug_data *dbg_data = data;
-    dbg_data->err = kvm_vcpu_ioctl(dbg_data->env, KVM_SET_GUEST_DEBUG, &dbg_data->dbg);
+    CPUState *env = dbg_data->env;
+
+    if (env->kvm_state->regs_modified) {
+        kvm_arch_put_registers(env);
+        env->kvm_state->regs_modified = 0;
+    }
+    dbg_data->err = kvm_vcpu_ioctl(env, KVM_SET_GUEST_DEBUG, &dbg_data->dbg);
 }
 
 int kvm_update_guest_debug(CPUState *env, unsigned long reinject_trap)

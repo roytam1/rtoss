@@ -5,6 +5,7 @@
 #include "qemu-common.h"
 #include "qemu-option.h"
 #include "qemu-queue.h"
+#include "qemu-timer.h"
 #include "qdict.h"
 
 #ifdef _WIN32
@@ -128,6 +129,7 @@ extern const char *keyboard_layout;
 extern int win2k_install_hack;
 extern int rtc_td_hack;
 extern int alt_grab;
+extern int ctrl_grab;
 extern int usb_enabled;
 extern int smp_cpus;
 extern int max_cpus;
@@ -137,6 +139,7 @@ extern int no_quit;
 extern int semihosting_enabled;
 extern int old_param;
 extern int boot_menu;
+extern QEMUClock *rtc_clock;
 
 #define MAX_NODES 64
 extern int nb_numa_nodes;
@@ -191,7 +194,7 @@ extern QTAILQ_HEAD(driveoptlist, DriveOpt) driveopts;
 extern DriveInfo *drive_get(BlockInterfaceType type, int bus, int unit);
 extern DriveInfo *drive_get_by_id(const char *id);
 extern int drive_get_max_bus(BlockInterfaceType type);
-extern void drive_uninit(BlockDriverState *bdrv);
+extern void drive_uninit(DriveInfo *dinfo);
 extern const char *drive_get_serial(BlockDriverState *bdrv);
 extern BlockInterfaceErrorAction drive_get_onerror(BlockDriverState *bdrv);
 
@@ -200,25 +203,19 @@ BlockDriverState *qdev_init_bdrv(DeviceState *dev, BlockInterfaceType type);
 extern QemuOpts *drive_add(const char *file, const char *fmt, ...);
 extern DriveInfo *drive_init(QemuOpts *arg, void *machine, int *fatal_error);
 
-/* acpi */
-typedef void (*qemu_system_device_hot_add_t)(int pcibus, int slot, int state);
-void qemu_system_device_hot_add_register(qemu_system_device_hot_add_t callback);
-void qemu_system_device_hot_add(int pcibus, int slot, int state);
-
 /* device-hotplug */
 
 typedef int (dev_match_fn)(void *dev_private, void *arg);
 
 DriveInfo *add_init_drive(const char *opts);
 void destroy_nic(dev_match_fn *match_fn, void *arg);
-void destroy_bdrvs(dev_match_fn *match_fn, void *arg);
 
 /* pci-hotplug */
 void pci_device_hot_add(Monitor *mon, const QDict *qdict);
 void drive_hot_add(Monitor *mon, const QDict *qdict);
 void pci_device_hot_remove(Monitor *mon, const char *pci_addr);
 void do_pci_device_hot_remove(Monitor *mon, const QDict *qdict);
-void pci_device_hot_remove_success(int pcibus, int slot);
+void pci_device_hot_remove_success(PCIDevice *dev);
 
 /* serial ports */
 

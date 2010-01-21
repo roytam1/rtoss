@@ -69,7 +69,7 @@ struct PCNetState_st {
     uint16_t csr[128];
     uint16_t bcr[32];
     uint64_t timer;
-    int mmio_index, xmit_pos, recv_pos;
+    int mmio_index, xmit_pos;
     uint8_t buffer[4096];
     int tx_busy;
     qemu_irq irq;
@@ -935,6 +935,7 @@ static void pcnet_start(PCNetState *s)
 
     s->csr[0] &= ~0x0004;       /* clear STOP bit */
     s->csr[0] |= 0x0002;
+    pcnet_poll_timer(s);
 }
 
 static void pcnet_stop(PCNetState *s)
@@ -1065,9 +1066,6 @@ static int pcnet_can_receive(VLANClientState *vc)
 {
     PCNetState *s = vc->opaque;
     if (CSR_STOP(s) || CSR_SPND(s))
-        return 0;
-
-    if (s->recv_pos > 0)
         return 0;
 
     return sizeof(s->buffer)-16;
@@ -1626,6 +1624,8 @@ static void pcnet_h_reset(void *opaque)
     s->bcr[BCR_PLAT ] = 0xff06;
 
     pcnet_s_reset(s);
+    pcnet_update_irq(s);
+    pcnet_poll_timer(s);
 }
 
 static void pcnet_aprom_writeb(void *opaque, uint32_t addr, uint32_t val)
@@ -1896,7 +1896,6 @@ static void pcnet_save(QEMUFile *f, void *opaque)
         qemu_put_be16s(f, &s->bcr[i]);
     qemu_put_be64s(f, &s->timer);
     qemu_put_sbe32(f, s->xmit_pos);
-    qemu_put_sbe32(f, s->recv_pos);
     qemu_put_buffer(f, s->buffer, 4096);
     qemu_put_sbe32(f, s->tx_busy);
     qemu_put_timer(f, s->poll_timer);
@@ -1905,9 +1904,9 @@ static void pcnet_save(QEMUFile *f, void *opaque)
 static int pcnet_load(QEMUFile *f, void *opaque, int version_id)
 {
     PCNetState *s = opaque;
-    int i;
+    int i, dummy;
 
-    if (version_id != 2)
+    if (version_id < 2 || version_id > 3)
         return -EINVAL;
 
     qemu_get_sbe32s(f, &s->rap);
@@ -1922,7 +1921,9 @@ static int pcnet_load(QEMUFile *f, void *opaque, int version_id)
         qemu_get_be16s(f, &s->bcr[i]);
     qemu_get_be64s(f, &s->timer);
     qemu_get_sbe32s(f, &s->xmit_pos);
-    qemu_get_sbe32s(f, &s->recv_pos);
+    if (version_id == 2) {
+        qemu_get_sbe32s(f, &dummy);
+    }
     qemu_get_buffer(f, s->buffer, 4096);
     qemu_get_sbe32s(f, &s->tx_busy);
     qemu_get_timer(f, s->poll_timer);
@@ -1942,9 +1943,6 @@ static int pci_pcnet_load(QEMUFile *f, void *opaque, int version_id)
 {
     PCIPCNetState *s = opaque;
     int ret;
-
-    if (version_id != 2)
-        return -EINVAL;
 
     ret = pci_device_load(&s->pci_dev, f);
     if (ret < 0)
@@ -1970,6 +1968,7 @@ static int pcnet_common_init(DeviceState *dev, PCNetState *s,
     s->vc = qdev_get_vlan_client(dev,
                                  pcnet_can_receive, pcnet_receive, NULL,
                                  cleanup, s);
+    qemu_register_reset(pcnet_h_reset, s);
     pcnet_h_reset(s);
     return 0;
 }
@@ -2039,8 +2038,6 @@ static int pci_pcnet_init(PCIDevice *pci_dev)
         sizeof(struct pcnet_RMD), sizeof(struct pcnet_TMD));
 #endif
 
-    pci_dev->unregister = pci_pcnet_uninit;
-
     pci_conf = pci_dev->config;
 
     pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_AMD);
@@ -2073,7 +2070,7 @@ static int pci_pcnet_init(PCIDevice *pci_dev)
     s->phys_mem_read = pci_physical_memory_read;
     s->phys_mem_write = pci_physical_memory_write;
 
-    register_savevm("pcnet", -1, 2, pci_pcnet_save, pci_pcnet_load, d);
+    register_savevm("pcnet", -1, 3, pci_pcnet_save, pci_pcnet_load, d);
     return pcnet_common_init(&pci_dev->qdev, s, pci_pcnet_cleanup);
 }
 
@@ -2150,7 +2147,7 @@ static int lance_init(SysBusDevice *dev)
     s->phys_mem_read = ledma_memory_read;
     s->phys_mem_write = ledma_memory_write;
 
-    register_savevm("pcnet", -1, 2, pcnet_save, pcnet_load, s);
+    register_savevm("pcnet", -1, 3, pcnet_save, pcnet_load, s);
     return pcnet_common_init(&dev->qdev, s, lance_cleanup);
 }
 
@@ -2170,6 +2167,7 @@ static PCIDeviceInfo pcnet_info = {
     .qdev.name = "pcnet",
     .qdev.size = sizeof(PCIPCNetState),
     .init      = pci_pcnet_init,
+    .exit      = pci_pcnet_uninit,
 };
 
 static void pcnet_register_devices(void)

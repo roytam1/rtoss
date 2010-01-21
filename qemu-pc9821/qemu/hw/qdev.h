@@ -19,10 +19,18 @@ typedef struct BusState BusState;
 
 typedef struct BusInfo BusInfo;
 
+enum DevState {
+    DEV_STATE_CREATED = 1,
+    DEV_STATE_INITIALIZED,
+};
+
 /* This structure should not be accessed directly.  We declare it here
    so that it can be embedded in individual device state structures.  */
 struct DeviceState {
     const char *id;
+    enum DevState state;
+    QemuOpts *opts;
+    int hotplugged;
     DeviceInfo *info;
     BusState *parent_bus;
     int num_gpio_out;
@@ -47,6 +55,8 @@ struct BusState {
     DeviceState *parent;
     BusInfo *info;
     const char *name;
+    int allow_hotplug;
+    int qdev_allocated;
     QLIST_HEAD(, DeviceState) children;
     QLIST_ENTRY(BusState) sibling;
 };
@@ -90,8 +100,12 @@ struct CompatProperty {
 
 DeviceState *qdev_create(BusState *bus, const char *name);
 DeviceState *qdev_device_add(QemuOpts *opts);
-int qdev_init(DeviceState *dev);
+int qdev_init(DeviceState *dev) __attribute__((warn_unused_result));
+void qdev_init_nofail(DeviceState *dev);
+int qdev_unplug(DeviceState *dev);
 void qdev_free(DeviceState *dev);
+int qdev_simple_unplug_cb(DeviceState *dev);
+void qdev_machine_creation_done(void);
 
 qemu_irq qdev_get_gpio_in(DeviceState *dev, int n);
 void qdev_connect_gpio_out(DeviceState *dev, int n, qemu_irq pin);
@@ -101,6 +115,8 @@ BusState *qdev_get_child_bus(DeviceState *dev, const char *name);
 /*** Device API.  ***/
 
 typedef int (*qdev_initfn)(DeviceState *dev, DeviceInfo *info);
+typedef int (*qdev_event)(DeviceState *dev);
+typedef void (*qdev_resetfn)(DeviceState *dev);
 
 struct DeviceInfo {
     const char *name;
@@ -111,13 +127,15 @@ struct DeviceInfo {
     int no_user;
 
     /* callbacks */
-    QEMUResetHandler *reset;
+    qdev_resetfn reset;
 
     /* device state */
     const VMStateDescription *vmsd;
 
     /* Private to qdev / bus.  */
     qdev_initfn init;
+    qdev_event unplug;
+    qdev_event exit;
     BusInfo *bus_info;
     struct DeviceInfo *next;
 };
@@ -145,7 +163,10 @@ BusState *qdev_get_parent_bus(DeviceState *dev);
 
 /*** BUS API. ***/
 
+void qbus_create_inplace(BusState *bus, BusInfo *info,
+                         DeviceState *parent, const char *name);
 BusState *qbus_create(BusInfo *info, DeviceState *parent, const char *name);
+void qbus_free(BusState *bus);
 
 #define FROM_QBUS(type, dev) DO_UPCAST(type, qbus, dev)
 
@@ -153,6 +174,8 @@ BusState *qbus_create(BusInfo *info, DeviceState *parent, const char *name);
 
 void do_info_qtree(Monitor *mon);
 void do_info_qdm(Monitor *mon);
+void do_device_add(Monitor *mon, const QDict *qdict);
+void do_device_del(Monitor *mon, const QDict *qdict);
 
 /*** qdev-properties.c ***/
 

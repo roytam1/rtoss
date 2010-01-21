@@ -1,5 +1,5 @@
 /*
- * QEMU NEC PC-98x1 bus mouse
+ * QEMU NEC PC-9821 mouse
  *
  * Copyright (c) 2009 TAKEDA, toshiya
  *

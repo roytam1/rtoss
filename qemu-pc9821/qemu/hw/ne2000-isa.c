@@ -87,7 +87,7 @@ void isa_ne2000_init(int base, int irq, NICInfo *nd)
     dev->qdev.nd = nd; /* hack alert */
     qdev_prop_set_uint32(&dev->qdev, "iobase", base);
     qdev_prop_set_uint32(&dev->qdev, "irq",    irq);
-    qdev_init(&dev->qdev);
+    qdev_init_nofail(&dev->qdev);
 }
 
 static ISADeviceInfo ne2000_isa_info = {
@@ -101,9 +101,66 @@ static ISADeviceInfo ne2000_isa_info = {
     },
 };
 
+/* NEC PC-9821 (MELCO LGY-98) */
+
+static int pc98_ne2000_initfn(ISADevice *dev)
+{
+    ISANE2000State *isa = DO_UPCAST(ISANE2000State, dev, dev);
+    NE2000State *s = &isa->ne2000;
+
+    register_ioport_write(isa->iobase, 16, 1, ne2000_ioport_write, s);
+    register_ioport_read(isa->iobase, 16, 1, ne2000_ioport_read, s);
+
+    register_ioport_write(isa->iobase + 0x200, 1, 1, ne2000_asic_ioport_write, s);
+    register_ioport_read(isa->iobase + 0x200, 1, 1, ne2000_asic_ioport_read, s);
+    register_ioport_write(isa->iobase + 0x200, 2, 2, ne2000_asic_ioport_write, s);
+    register_ioport_read(isa->iobase + 0x200, 2, 2, ne2000_asic_ioport_read, s);
+
+    register_ioport_write(isa->iobase + 0x18, 1, 1, ne2000_reset_ioport_write, s);
+    register_ioport_read(isa->iobase + 0x18, 1, 1, ne2000_reset_ioport_read, s);
+
+    isa_init_irq(dev, &s->irq, isa->isairq);
+
+    qdev_get_macaddr(&dev->qdev, s->macaddr);
+    ne2000_reset(s);
+
+    s->vc = qdev_get_vlan_client(&dev->qdev,
+                                 ne2000_can_receive, ne2000_receive, NULL,
+                                 isa_ne2000_cleanup, s);
+    qemu_format_nic_info_str(s->vc, s->macaddr);
+
+    register_savevm("ne2000", -1, 2, ne2000_save, ne2000_load, s);
+    return 0;
+}
+
+void pc98_ne2000_init(int base, int irq, NICInfo *nd)
+{
+    ISADevice *dev;
+
+    qemu_check_nic_model(nd, "pc98_ne2000");
+
+    dev = isa_create("pc98_ne2000");
+    dev->qdev.nd = nd; /* hack alert */
+    qdev_prop_set_uint32(&dev->qdev, "iobase", base);
+    qdev_prop_set_uint32(&dev->qdev, "irq",    irq);
+    qdev_init_nofail(&dev->qdev);
+}
+
+static ISADeviceInfo pc98_ne2000_info = {
+    .qdev.name  = "pc98_ne2000",
+    .qdev.size  = sizeof(ISANE2000State),
+    .init       = pc98_ne2000_initfn,
+    .qdev.props = (Property[]) {
+        DEFINE_PROP_HEX32("iobase", ISANE2000State, iobase, 0xd0),
+        DEFINE_PROP_UINT32("irq",   ISANE2000State, isairq, 3),
+        DEFINE_PROP_END_OF_LIST(),
+    },
+};
+
 static void ne2000_isa_register_devices(void)
 {
     isa_qdev_register(&ne2000_isa_info);
+    isa_qdev_register(&pc98_ne2000_info);
 }
 
 device_init(ne2000_isa_register_devices)

@@ -174,7 +174,7 @@ void pic_update_irq(PicState2 *s)
     }
 #elif defined(TARGET_I386)
     else if (s->irq_cascade == 7) {
-        /* NEC PC-98x1 */
+        /* NEC PC-9821 */
         qemu_irq_lower(s->parent_irq);
     }
 #endif
@@ -543,7 +543,7 @@ qemu_irq *i8259_init(qemu_irq parent_irq)
     return qemu_allocate_irqs(i8259_set_irq, s, 16);
 }
 
-/* NEC PC-98x1 */
+/* NEC PC-9821 */
 
 static void pc98_pic_ioport_write(void *opaque, uint32_t addr, uint32_t val)
 {
