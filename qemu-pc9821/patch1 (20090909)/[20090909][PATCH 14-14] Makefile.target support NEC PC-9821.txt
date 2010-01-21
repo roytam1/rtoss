@@ -1,0 +1,18 @@
+This patch is to add pc98 source codes to Makefile.target.
+
+diff -ur a/Makefile.target b/Makefile.target
+--- a/Makefile.target	Tue Sep  8 21:26:50 2009
++++ b/Makefile.target	Wed Sep  9 21:50:13 2009
+@@ -183,8 +183,9 @@
+ obj-y += wdt_i6300esb.o
+ 
+ # Hardware support
+-obj-i386-y = ide/core.o ide/isa.o ide/pci.o pckbd.o vga.o $(sound-obj-y) dma.o isa-bus.o
++obj-i386-y = ide/core.o ide/isa.o ide/pci.o ide/pc98.o pckbd.o vga.o $(sound-obj-y) dma.o isa-bus.o
+ obj-i386-y += fdc.o mc146818rtc.o serial.o i8259.o i8254.o pcspk.o pc.o
++obj-i386-y += pc98kbd.o pc98mouse.o pc98sys.o pc98vga.o
+ obj-i386-y += cirrus_vga.o apic.o ioapic.o parallel.o acpi.o piix_pci.o
+ obj-i386-y += usb-uhci.o vmmouse.o vmport.o vmware_vga.o hpet.o
+ obj-i386-y += device-hotplug.o pci-hotplug.o smbios.o wdt_ib700.o
+
+

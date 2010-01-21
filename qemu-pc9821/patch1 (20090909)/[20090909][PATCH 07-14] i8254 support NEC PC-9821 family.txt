@@ -1,0 +1,111 @@
+This patch is to add NEC PC-9821 family i/o to i8254.
+
+diff -ur a/hw/i8254.c b/hw/i8254.c
+--- a/hw/i8254.c	Tue Sep  8 21:26:50 2009
++++ b/hw/i8254.c	Wed Sep  9 21:51:37 2009
+@@ -58,6 +58,7 @@
+ };
+ 
+ static PITState pit_state;
++static uint64_t pit_freq;
+ 
+ static void pit_irq_timer_update(PITChannelState *s, int64_t current_time);
+ 
+@@ -66,7 +67,7 @@
+     uint64_t d;
+     int counter;
+ 
+-    d = muldiv64(qemu_get_clock(vm_clock) - s->count_load_time, PIT_FREQ, ticks_per_sec);
++    d = muldiv64(qemu_get_clock(vm_clock) - s->count_load_time, pit_freq, ticks_per_sec);
+     switch(s->mode) {
+     case 0:
+     case 1:
+@@ -91,7 +92,7 @@
+     uint64_t d;
+     int out;
+ 
+-    d = muldiv64(current_time - s->count_load_time, PIT_FREQ, ticks_per_sec);
++    d = muldiv64(current_time - s->count_load_time, pit_freq, ticks_per_sec);
+     switch(s->mode) {
+     default:
+     case 0:
+@@ -130,7 +131,7 @@
+     uint64_t d, next_time, base;
+     int period2;
+ 
+-    d = muldiv64(current_time - s->count_load_time, PIT_FREQ, ticks_per_sec);
++    d = muldiv64(current_time - s->count_load_time, pit_freq, ticks_per_sec);
+     switch(s->mode) {
+     default:
+     case 0:
+@@ -166,9 +167,9 @@
+         break;
+     }
+     /* convert to timer units */
+-    next_time = s->count_load_time + muldiv64(next_time, ticks_per_sec, PIT_FREQ);
++    next_time = s->count_load_time + muldiv64(next_time, ticks_per_sec, pit_freq);
+     /* fix potential rounding problems */
+-    /* XXX: better solution: use a clock at PIT_FREQ Hz */
++    /* XXX: better solution: use a clock at pit_freq Hz */
+     if (next_time <= current_time)
+         next_time = current_time + 1;
+     return next_time;
+@@ -499,6 +500,8 @@
+     PITState *pit = &pit_state;
+     PITChannelState *s;
+ 
++    pit_freq = PIT_FREQ;
++
+     s = &pit->channels[0];
+     /* the timer 0 is connected to an IRQ */
+     s->irq_timer = qemu_new_timer(vm_clock, pit_irq_timer, s);
+@@ -508,6 +511,47 @@
+     qemu_register_reset(pit_reset, pit);
+     register_ioport_write(base, 4, 1, pit_ioport_write, pit);
+     register_ioport_read(base, 3, 1, pit_ioport_read, pit);
++
++    pit_reset(pit);
++
++    return pit;
++}
++
++/* NEC PC-98x1 */
++
++static void pc98_pit_ioport_write(void *opaque, uint32_t addr, uint32_t val)
++{
++    pit_ioport_write(opaque, addr >> 1, val);
++}
++
++static uint32_t pc98_pit_ioport_read(void *opaque, uint32_t addr)
++{
++    return pit_ioport_read(opaque, addr >> 1);
++}
++
++PITState *pc98_pit_init(int base, qemu_irq irq)
++{
++    PITState *pit = &pit_state;
++    PITChannelState *s;
++    int i;
++
++    pit_freq = PC98_PIT_FREQ;
++
++    s = &pit->channels[0];
++    /* the timer 0 is connected to an IRQ */
++    s->irq_timer = qemu_new_timer(vm_clock, pit_irq_timer, s);
++    s->irq = irq;
++
++    vmstate_register(base, &vmstate_pit, pit);
++    qemu_register_reset(pit_reset, pit);
++    for (i = 0; i < 4; i++) {
++        register_ioport_write(0x71 + (i << 1), 1, 1, pc98_pit_ioport_write, pit);
++        register_ioport_write(0x3fd9 + (i << 1), 1, 1, pc98_pit_ioport_write, pit);
++    }
++    for (i = 0; i < 3; i++) {
++        register_ioport_read(0x71 + (i << 1), 1, 1, pc98_pit_ioport_read, pit);
++        register_ioport_read(0x3fd9 + (i << 1), 1, 1, pc98_pit_ioport_read, pit);
++    }
+ 
+     pit_reset(pit);
+ 
+
+

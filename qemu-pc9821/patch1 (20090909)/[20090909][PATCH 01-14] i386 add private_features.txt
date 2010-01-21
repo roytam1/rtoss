@@ -1,0 +1,158 @@
+This patch is to add private_features to i386.
+It is like cpuid_ext*_features, but is used for any features
+not defined in CPUID.
+
+And "a20mask" feature is defined in private_features.
+It is for a20 adrdress mask of PC-98 family.
+
+diff -ur a/target-i386/cpu.h b/target-i386/cpu.h
+--- a/target-i386/cpu.h	Tue Sep  8 21:26:50 2009
++++ b/target-i386/cpu.h	Wed Sep  9 21:52:30 2009
+@@ -404,6 +404,8 @@
+ #define CPUID_EXT3_IBS     (1 << 10)
+ #define CPUID_EXT3_SKINIT  (1 << 12)
+ 
++#define PRIVATE_FEATURE_A20MASK (1 << 0)
++
+ #define CPUID_VENDOR_INTEL_1 0x756e6547 /* "Genu" */
+ #define CPUID_VENDOR_INTEL_2 0x49656e69 /* "ineI" */
+ #define CPUID_VENDOR_INTEL_3 0x6c65746e /* "ntel" */
+@@ -673,6 +675,9 @@
+     uint32_t cpuid_ext3_features;
+     uint32_t cpuid_apic_id;
+     int cpuid_vendor_override;
++
++    /* private features not defined in CPUID */
++    uint32_t private_features;
+ 
+     /* MTRRs */
+     uint64_t mtrr_fixed[11];
+diff -ur a/target-i386/helper.c b/target-i386/helper.c
+--- a/target-i386/helper.c	Tue Sep  8 21:26:51 2009
++++ b/target-i386/helper.c	Wed Sep  9 21:52:24 2009
+@@ -57,11 +57,18 @@
+     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+ };
++static const char *private_feature_name[] = {
++    "a20mask", NULL, NULL, NULL, NULL, NULL, NULL, NULL,
++    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
++    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
++    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
++};
+ 
+ static void add_flagname_to_bitmaps(const char *flagname, uint32_t *features,
+                                     uint32_t *ext_features,
+                                     uint32_t *ext2_features,
+-                                    uint32_t *ext3_features)
++                                    uint32_t *ext3_features,
++                                    uint32_t *private_features)
+ {
+     int i;
+     int found = 0;
+@@ -86,6 +93,11 @@
+             *ext3_features |= 1 << i;
+             found = 1;
+         }
++    for ( i = 0 ; i < 32 ; i++ )
++        if (private_feature_name[i] && !strcmp (flagname, private_feature_name[i])) {
++            *private_features |= 1 << i;
++            found = 1;
++        }
+     if (!found) {
+         fprintf(stderr, "CPU feature %s not found\n", flagname);
+     }
+@@ -99,6 +111,7 @@
+     int model;
+     int stepping;
+     uint32_t features, ext_features, ext2_features, ext3_features;
++    uint32_t private_features;
+     uint32_t xlevel;
+     char model_id[48];
+     int vendor_override;
+@@ -375,6 +388,7 @@
+     char *featurestr, *name = strtok(s, ",");
+     uint32_t plus_features = 0, plus_ext_features = 0, plus_ext2_features = 0, plus_ext3_features = 0;
+     uint32_t minus_features = 0, minus_ext_features = 0, minus_ext2_features = 0, minus_ext3_features = 0;
++    uint32_t plus_private_features = 0, minus_private_features = 0;
+     uint32_t numvalue;
+ 
+     def = NULL;
+@@ -393,16 +407,21 @@
+     }
+ 
+     add_flagname_to_bitmaps("hypervisor", &plus_features,
+-        &plus_ext_features, &plus_ext2_features, &plus_ext3_features);
++        &plus_ext_features, &plus_ext2_features, &plus_ext3_features,
++        &plus_private_features);
+ 
+     featurestr = strtok(NULL, ",");
+ 
+     while (featurestr) {
+         char *val;
+         if (featurestr[0] == '+') {
+-            add_flagname_to_bitmaps(featurestr + 1, &plus_features, &plus_ext_features, &plus_ext2_features, &plus_ext3_features);
++            add_flagname_to_bitmaps(featurestr + 1, &plus_features,
++                &plus_ext_features, &plus_ext2_features, &plus_ext3_features,
++                &plus_private_features);
+         } else if (featurestr[0] == '-') {
+-            add_flagname_to_bitmaps(featurestr + 1, &minus_features, &minus_ext_features, &minus_ext2_features, &minus_ext3_features);
++            add_flagname_to_bitmaps(featurestr + 1, &minus_features,
++                &minus_ext_features, &minus_ext2_features, &minus_ext3_features,
++                &minus_private_features);
+         } else if ((val = strchr(featurestr, '='))) {
+             *val = 0; val++;
+             if (!strcmp(featurestr, "family")) {
+@@ -479,10 +498,12 @@
+     x86_cpu_def->ext_features |= plus_ext_features;
+     x86_cpu_def->ext2_features |= plus_ext2_features;
+     x86_cpu_def->ext3_features |= plus_ext3_features;
++    x86_cpu_def->private_features |= plus_private_features;
+     x86_cpu_def->features &= ~minus_features;
+     x86_cpu_def->ext_features &= ~minus_ext_features;
+     x86_cpu_def->ext2_features &= ~minus_ext2_features;
+     x86_cpu_def->ext3_features &= ~minus_ext3_features;
++    x86_cpu_def->private_features &= ~minus_private_features;
+     free(s);
+     return 0;
+ 
+@@ -528,6 +549,7 @@
+     env->cpuid_ext2_features = def->ext2_features;
+     env->cpuid_xlevel = def->xlevel;
+     env->cpuid_ext3_features = def->ext3_features;
++    env->private_features = def->private_features;
+     {
+         const char *model_id = def->model_id;
+         int c, len, i;
+@@ -569,7 +591,11 @@
+     env->hflags2 |= HF2_GIF_MASK;
+ 
+     cpu_x86_update_cr0(env, 0x60000010);
+-    env->a20_mask = ~0x0;
++    if (env->private_features & PRIVATE_FEATURE_A20MASK) {
++        env->a20_mask = 0xfffff;
++    } else {
++        env->a20_mask = ~0x0;
++    }
+     env->smbase = 0x30000;
+ 
+     env->idt.limit = 0xffff;
+@@ -939,7 +965,15 @@
+         /* when a20 is changed, all the MMU mappings are invalid, so
+            we must flush everything */
+         tlb_flush(env, 1);
+-        env->a20_mask = (~0x100000) | (a20_state << 20);
++        if (env->private_features & PRIVATE_FEATURE_A20MASK) {
++            if (a20_state) {
++                env->a20_mask = ~0x0;
++            } else {
++                env->a20_mask = 0xfffff;
++            }
++        } else {
++            env->a20_mask = (~0x100000) | (a20_state << 20);
++        }
+     }
+ }
+ 
+
+
