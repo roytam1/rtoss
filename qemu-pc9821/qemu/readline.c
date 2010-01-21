@@ -21,8 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include "readline.h"
-#include "monitor.h"
+#include "qemu-common.h"
+#include "console.h"
+
+#define TERM_CMD_BUF_SIZE 4095
+#define TERM_MAX_CMDS 64
+#define NB_COMPLETIONS_MAX 256
 
 #define IS_NORM 0
 #define IS_ESC  1
@@ -30,112 +34,142 @@
 
 #define printf do_not_use_printf
 
-void readline_show_prompt(ReadLineState *rs)
+static char term_cmd_buf[TERM_CMD_BUF_SIZE + 1];
+static int term_cmd_buf_index;
+static int term_cmd_buf_size;
+
+static char term_last_cmd_buf[TERM_CMD_BUF_SIZE + 1];
+static int term_last_cmd_buf_index;
+static int term_last_cmd_buf_size;
+
+static int term_esc_state;
+static int term_esc_param;
+
+static char *term_history[TERM_MAX_CMDS];
+static int term_hist_entry = -1;
+
+static int nb_completions;
+int completion_index;
+static char *completions[NB_COMPLETIONS_MAX];
+
+static ReadLineFunc *term_readline_func;
+static int term_is_password;
+static char term_prompt[256];
+static void *term_readline_opaque;
+
+static void term_show_prompt2(void)
 {
-    monitor_printf(rs->mon, "%s", rs->prompt);
-    monitor_flush(rs->mon);
-    rs->last_cmd_buf_index = 0;
-    rs->last_cmd_buf_size = 0;
-    rs->esc_state = IS_NORM;
+    term_printf("%s", term_prompt);
+    term_flush();
+    term_last_cmd_buf_index = 0;
+    term_last_cmd_buf_size = 0;
+    term_esc_state = IS_NORM;
+}
+
+static void term_show_prompt(void)
+{
+    term_show_prompt2();
+    term_cmd_buf_index = 0;
+    term_cmd_buf_size = 0;
 }
 
 /* update the displayed command line */
-static void readline_update(ReadLineState *rs)
+static void term_update(void)
 {
     int i, delta, len;
 
-    if (rs->cmd_buf_size != rs->last_cmd_buf_size ||
-        memcmp(rs->cmd_buf, rs->last_cmd_buf, rs->cmd_buf_size) != 0) {
-        for(i = 0; i < rs->last_cmd_buf_index; i++) {
-            monitor_printf(rs->mon, "\033[D");
+    if (term_cmd_buf_size != term_last_cmd_buf_size ||
+        memcmp(term_cmd_buf, term_last_cmd_buf, term_cmd_buf_size) != 0) {
+        for(i = 0; i < term_last_cmd_buf_index; i++) {
+            term_printf("\033[D");
         }
-        rs->cmd_buf[rs->cmd_buf_size] = '\0';
-        if (rs->read_password) {
-            len = strlen(rs->cmd_buf);
+        term_cmd_buf[term_cmd_buf_size] = '\0';
+        if (term_is_password) {
+            len = strlen(term_cmd_buf);
             for(i = 0; i < len; i++)
-                monitor_printf(rs->mon, "*");
+                term_printf("*");
         } else {
-            monitor_printf(rs->mon, "%s", rs->cmd_buf);
+            term_printf("%s", term_cmd_buf);
         }
-        monitor_printf(rs->mon, "\033[K");
-        memcpy(rs->last_cmd_buf, rs->cmd_buf, rs->cmd_buf_size);
-        rs->last_cmd_buf_size = rs->cmd_buf_size;
-        rs->last_cmd_buf_index = rs->cmd_buf_size;
+        term_printf("\033[K");
+        memcpy(term_last_cmd_buf, term_cmd_buf, term_cmd_buf_size);
+        term_last_cmd_buf_size = term_cmd_buf_size;
+        term_last_cmd_buf_index = term_cmd_buf_size;
     }
-    if (rs->cmd_buf_index != rs->last_cmd_buf_index) {
-        delta = rs->cmd_buf_index - rs->last_cmd_buf_index;
+    if (term_cmd_buf_index != term_last_cmd_buf_index) {
+        delta = term_cmd_buf_index - term_last_cmd_buf_index;
         if (delta > 0) {
             for(i = 0;i < delta; i++) {
-                monitor_printf(rs->mon, "\033[C");
+                term_printf("\033[C");
             }
         } else {
             delta = -delta;
             for(i = 0;i < delta; i++) {
-                monitor_printf(rs->mon, "\033[D");
+                term_printf("\033[D");
             }
         }
-        rs->last_cmd_buf_index = rs->cmd_buf_index;
+        term_last_cmd_buf_index = term_cmd_buf_index;
     }
-    monitor_flush(rs->mon);
+    term_flush();
 }
 
-static void readline_insert_char(ReadLineState *rs, int ch)
+static void term_insert_char(int ch)
 {
-    if (rs->cmd_buf_index < READLINE_CMD_BUF_SIZE) {
-        memmove(rs->cmd_buf + rs->cmd_buf_index + 1,
-                rs->cmd_buf + rs->cmd_buf_index,
-                rs->cmd_buf_size - rs->cmd_buf_index);
-        rs->cmd_buf[rs->cmd_buf_index] = ch;
-        rs->cmd_buf_size++;
-        rs->cmd_buf_index++;
+    if (term_cmd_buf_index < TERM_CMD_BUF_SIZE) {
+        memmove(term_cmd_buf + term_cmd_buf_index + 1,
+                term_cmd_buf + term_cmd_buf_index,
+                term_cmd_buf_size - term_cmd_buf_index);
+        term_cmd_buf[term_cmd_buf_index] = ch;
+        term_cmd_buf_size++;
+        term_cmd_buf_index++;
     }
 }
 
-static void readline_backward_char(ReadLineState *rs)
+static void term_backward_char(void)
 {
-    if (rs->cmd_buf_index > 0) {
-        rs->cmd_buf_index--;
+    if (term_cmd_buf_index > 0) {
+        term_cmd_buf_index--;
     }
 }
 
-static void readline_forward_char(ReadLineState *rs)
+static void term_forward_char(void)
 {
-    if (rs->cmd_buf_index < rs->cmd_buf_size) {
-        rs->cmd_buf_index++;
+    if (term_cmd_buf_index < term_cmd_buf_size) {
+        term_cmd_buf_index++;
     }
 }
 
-static void readline_delete_char(ReadLineState *rs)
+static void term_delete_char(void)
 {
-    if (rs->cmd_buf_index < rs->cmd_buf_size) {
-        memmove(rs->cmd_buf + rs->cmd_buf_index,
-                rs->cmd_buf + rs->cmd_buf_index + 1,
-                rs->cmd_buf_size - rs->cmd_buf_index - 1);
-        rs->cmd_buf_size--;
+    if (term_cmd_buf_index < term_cmd_buf_size) {
+        memmove(term_cmd_buf + term_cmd_buf_index,
+                term_cmd_buf + term_cmd_buf_index + 1,
+                term_cmd_buf_size - term_cmd_buf_index - 1);
+        term_cmd_buf_size--;
     }
 }
 
-static void readline_backspace(ReadLineState *rs)
+static void term_backspace(void)
 {
-    if (rs->cmd_buf_index > 0) {
-        readline_backward_char(rs);
-        readline_delete_char(rs);
+    if (term_cmd_buf_index > 0) {
+        term_backward_char();
+        term_delete_char();
     }
 }
 
-static void readline_backword(ReadLineState *rs)
+static void term_backword(void)
 {
     int start;
 
-    if (rs->cmd_buf_index == 0 || rs->cmd_buf_index > rs->cmd_buf_size) {
+    if (term_cmd_buf_index == 0 || term_cmd_buf_index > term_cmd_buf_size) {
         return;
     }
 
-    start = rs->cmd_buf_index - 1;
+    start = term_cmd_buf_index - 1;
 
     /* find first word (backwards) */
     while (start > 0) {
-        if (!qemu_isspace(rs->cmd_buf[start])) {
+        if (!qemu_isspace(term_cmd_buf[start])) {
             break;
         }
 
@@ -144,7 +178,7 @@ static void readline_backword(ReadLineState *rs)
 
     /* find first space (backwards) */
     while (start > 0) {
-        if (qemu_isspace(rs->cmd_buf[start])) {
+        if (qemu_isspace(term_cmd_buf[start])) {
             ++start;
             break;
         }
@@ -153,63 +187,61 @@ static void readline_backword(ReadLineState *rs)
     }
 
     /* remove word */
-    if (start < rs->cmd_buf_index) {
-        memmove(rs->cmd_buf + start,
-                rs->cmd_buf + rs->cmd_buf_index,
-                rs->cmd_buf_size - rs->cmd_buf_index);
-        rs->cmd_buf_size -= rs->cmd_buf_index - start;
-        rs->cmd_buf_index = start;
+    if (start < term_cmd_buf_index) {
+        memmove(term_cmd_buf + start,
+                term_cmd_buf + term_cmd_buf_index,
+                term_cmd_buf_size - term_cmd_buf_index);
+        term_cmd_buf_size -= term_cmd_buf_index - start;
+        term_cmd_buf_index = start;
     }
 }
 
-static void readline_bol(ReadLineState *rs)
+static void term_bol(void)
 {
-    rs->cmd_buf_index = 0;
+    term_cmd_buf_index = 0;
 }
 
-static void readline_eol(ReadLineState *rs)
+static void term_eol(void)
 {
-    rs->cmd_buf_index = rs->cmd_buf_size;
+    term_cmd_buf_index = term_cmd_buf_size;
 }
 
-static void readline_up_char(ReadLineState *rs)
+static void term_up_char(void)
 {
     int idx;
 
-    if (rs->hist_entry == 0)
+    if (term_hist_entry == 0)
 	return;
-    if (rs->hist_entry == -1) {
+    if (term_hist_entry == -1) {
 	/* Find latest entry */
-	for (idx = 0; idx < READLINE_MAX_CMDS; idx++) {
-	    if (rs->history[idx] == NULL)
+	for (idx = 0; idx < TERM_MAX_CMDS; idx++) {
+	    if (term_history[idx] == NULL)
 		break;
 	}
-	rs->hist_entry = idx;
+	term_hist_entry = idx;
     }
-    rs->hist_entry--;
-    if (rs->hist_entry >= 0) {
-	pstrcpy(rs->cmd_buf, sizeof(rs->cmd_buf),
-                rs->history[rs->hist_entry]);
-	rs->cmd_buf_index = rs->cmd_buf_size = strlen(rs->cmd_buf);
+    term_hist_entry--;
+    if (term_hist_entry >= 0) {
+	pstrcpy(term_cmd_buf, sizeof(term_cmd_buf),
+                term_history[term_hist_entry]);
+	term_cmd_buf_index = term_cmd_buf_size = strlen(term_cmd_buf);
     }
 }
 
-static void readline_down_char(ReadLineState *rs)
+static void term_down_char(void)
 {
-    if (rs->hist_entry == -1)
-        return;
-    if (rs->hist_entry < READLINE_MAX_CMDS - 1 &&
-        rs->history[++rs->hist_entry] != NULL) {
-	pstrcpy(rs->cmd_buf, sizeof(rs->cmd_buf),
-                rs->history[rs->hist_entry]);
+    if (term_hist_entry == TERM_MAX_CMDS - 1 || term_hist_entry == -1)
+	return;
+    if (term_history[++term_hist_entry] != NULL) {
+	pstrcpy(term_cmd_buf, sizeof(term_cmd_buf),
+                term_history[term_hist_entry]);
     } else {
-        rs->cmd_buf[0] = 0;
-	rs->hist_entry = -1;
+	term_hist_entry = -1;
     }
-    rs->cmd_buf_index = rs->cmd_buf_size = strlen(rs->cmd_buf);
+    term_cmd_buf_index = term_cmd_buf_size = strlen(term_cmd_buf);
 }
 
-static void readline_hist_add(ReadLineState *rs, const char *cmdline)
+static void term_hist_add(const char *cmdline)
 {
     char *hist_entry, *new_entry;
     int idx;
@@ -217,99 +249,93 @@ static void readline_hist_add(ReadLineState *rs, const char *cmdline)
     if (cmdline[0] == '\0')
 	return;
     new_entry = NULL;
-    if (rs->hist_entry != -1) {
+    if (term_hist_entry != -1) {
 	/* We were editing an existing history entry: replace it */
-	hist_entry = rs->history[rs->hist_entry];
-	idx = rs->hist_entry;
+	hist_entry = term_history[term_hist_entry];
+	idx = term_hist_entry;
 	if (strcmp(hist_entry, cmdline) == 0) {
 	    goto same_entry;
 	}
     }
     /* Search cmdline in history buffers */
-    for (idx = 0; idx < READLINE_MAX_CMDS; idx++) {
-	hist_entry = rs->history[idx];
+    for (idx = 0; idx < TERM_MAX_CMDS; idx++) {
+	hist_entry = term_history[idx];
 	if (hist_entry == NULL)
 	    break;
 	if (strcmp(hist_entry, cmdline) == 0) {
 	same_entry:
 	    new_entry = hist_entry;
 	    /* Put this entry at the end of history */
-	    memmove(&rs->history[idx], &rs->history[idx + 1],
-		    (READLINE_MAX_CMDS - idx + 1) * sizeof(char *));
-	    rs->history[READLINE_MAX_CMDS - 1] = NULL;
-	    for (; idx < READLINE_MAX_CMDS; idx++) {
-		if (rs->history[idx] == NULL)
+	    memmove(&term_history[idx], &term_history[idx + 1],
+		    (TERM_MAX_CMDS - idx + 1) * sizeof(char *));
+	    term_history[TERM_MAX_CMDS - 1] = NULL;
+	    for (; idx < TERM_MAX_CMDS; idx++) {
+		if (term_history[idx] == NULL)
 		    break;
 	    }
 	    break;
 	}
     }
-    if (idx == READLINE_MAX_CMDS) {
+    if (idx == TERM_MAX_CMDS) {
 	/* Need to get one free slot */
-	free(rs->history[0]);
-	memcpy(rs->history, &rs->history[1],
-	       (READLINE_MAX_CMDS - 1) * sizeof(char *));
-	rs->history[READLINE_MAX_CMDS - 1] = NULL;
-	idx = READLINE_MAX_CMDS - 1;
+	free(term_history[0]);
+	memcpy(term_history, &term_history[1],
+	       (TERM_MAX_CMDS - 1) * sizeof(char *));
+	term_history[TERM_MAX_CMDS - 1] = NULL;
+	idx = TERM_MAX_CMDS - 1;
     }
     if (new_entry == NULL)
 	new_entry = strdup(cmdline);
-    rs->history[idx] = new_entry;
-    rs->hist_entry = -1;
+    term_history[idx] = new_entry;
+    term_hist_entry = -1;
 }
 
 /* completion support */
 
-void readline_add_completion(ReadLineState *rs, const char *str)
+void add_completion(const char *str)
 {
-    if (rs->nb_completions < READLINE_MAX_COMPLETIONS) {
-        rs->completions[rs->nb_completions++] = qemu_strdup(str);
+    if (nb_completions < NB_COMPLETIONS_MAX) {
+        completions[nb_completions++] = qemu_strdup(str);
     }
 }
 
-void readline_set_completion_index(ReadLineState *rs, int index)
+static void term_completion(void)
 {
-    rs->completion_index = index;
-}
-
-static void readline_completion(ReadLineState *rs)
-{
-    Monitor *mon = cur_mon;
     int len, i, j, max_width, nb_cols, max_prefix;
     char *cmdline;
 
-    rs->nb_completions = 0;
+    nb_completions = 0;
 
-    cmdline = qemu_malloc(rs->cmd_buf_index + 1);
-    memcpy(cmdline, rs->cmd_buf, rs->cmd_buf_index);
-    cmdline[rs->cmd_buf_index] = '\0';
-    rs->completion_finder(cmdline);
+    cmdline = qemu_malloc(term_cmd_buf_index + 1);
+    memcpy(cmdline, term_cmd_buf, term_cmd_buf_index);
+    cmdline[term_cmd_buf_index] = '\0';
+    readline_find_completion(cmdline);
     qemu_free(cmdline);
 
     /* no completion found */
-    if (rs->nb_completions <= 0)
+    if (nb_completions <= 0)
         return;
-    if (rs->nb_completions == 1) {
-        len = strlen(rs->completions[0]);
-        for(i = rs->completion_index; i < len; i++) {
-            readline_insert_char(rs, rs->completions[0][i]);
+    if (nb_completions == 1) {
+        len = strlen(completions[0]);
+        for(i = completion_index; i < len; i++) {
+            term_insert_char(completions[0][i]);
         }
         /* extra space for next argument. XXX: make it more generic */
-        if (len > 0 && rs->completions[0][len - 1] != '/')
-            readline_insert_char(rs, ' ');
+        if (len > 0 && completions[0][len - 1] != '/')
+            term_insert_char(' ');
     } else {
-        monitor_printf(mon, "\n");
+        term_printf("\n");
         max_width = 0;
         max_prefix = 0;	
-        for(i = 0; i < rs->nb_completions; i++) {
-            len = strlen(rs->completions[i]);
+        for(i = 0; i < nb_completions; i++) {
+            len = strlen(completions[i]);
             if (i==0) {
                 max_prefix = len;
             } else {
                 if (len < max_prefix)
                     max_prefix = len;
                 for(j=0; j<max_prefix; j++) {
-                    if (rs->completions[i][j] != rs->completions[0][j])
+                    if (completions[i][j] != completions[0][j])
                         max_prefix = j;
                 }
             }
@@ -317,8 +343,8 @@ static void readline_completion(ReadLineState *rs)
                 max_width = len;
         }
         if (max_prefix > 0) 
-            for(i = rs->completion_index; i < max_prefix; i++) {
-                readline_insert_char(rs, rs->completions[0][i]);
+            for(i = completion_index; i < max_prefix; i++) {
+                term_insert_char(completions[0][i]);
             }
         max_width += 2;
         if (max_width < 10)
@@ -327,149 +353,132 @@ static void readline_completion(ReadLineState *rs)
             max_width = 80;
         nb_cols = 80 / max_width;
         j = 0;
-        for(i = 0; i < rs->nb_completions; i++) {
-            monitor_printf(rs->mon, "%-*s", max_width, rs->completions[i]);
-            if (++j == nb_cols || i == (rs->nb_completions - 1)) {
-                monitor_printf(rs->mon, "\n");
+        for(i = 0; i < nb_completions; i++) {
+            term_printf("%-*s", max_width, completions[i]);
+            if (++j == nb_cols || i == (nb_completions - 1)) {
+                term_printf("\n");
                 j = 0;
             }
         }
-        readline_show_prompt(rs);
+        term_show_prompt2();
     }
 }
 
 /* return true if command handled */
-void readline_handle_byte(ReadLineState *rs, int ch)
+void readline_handle_byte(int ch)
 {
-    switch(rs->esc_state) {
+    switch(term_esc_state) {
     case IS_NORM:
         switch(ch) {
         case 1:
-            readline_bol(rs);
+            term_bol();
             break;
         case 4:
-            readline_delete_char(rs);
+            term_delete_char();
             break;
         case 5:
-            readline_eol(rs);
+            term_eol();
             break;
         case 9:
-            readline_completion(rs);
+            term_completion();
             break;
         case 10:
         case 13:
-            rs->cmd_buf[rs->cmd_buf_size] = '\0';
-            if (!rs->read_password)
-                readline_hist_add(rs, rs->cmd_buf);
-            monitor_printf(rs->mon, "\n");
-            rs->cmd_buf_index = 0;
-            rs->cmd_buf_size = 0;
-            rs->last_cmd_buf_index = 0;
-            rs->last_cmd_buf_size = 0;
-            rs->readline_func(rs->mon, rs->cmd_buf, rs->readline_opaque);
+            term_cmd_buf[term_cmd_buf_size] = '\0';
+            if (!term_is_password)
+                term_hist_add(term_cmd_buf);
+            term_printf("\n");
+            term_cmd_buf_index = 0;
+            term_cmd_buf_size = 0;
+            term_last_cmd_buf_index = 0;
+            term_last_cmd_buf_size = 0;
+            /* NOTE: readline_start can be called here */
+            term_readline_func(term_readline_opaque, term_cmd_buf);
             break;
         case 23:
             /* ^W */
-            readline_backword(rs);
+            term_backword();
             break;
         case 27:
-            rs->esc_state = IS_ESC;
+            term_esc_state = IS_ESC;
             break;
         case 127:
         case 8:
-            readline_backspace(rs);
+            term_backspace();
             break;
 	case 155:
-            rs->esc_state = IS_CSI;
+            term_esc_state = IS_CSI;
 	    break;
         default:
             if (ch >= 32) {
-                readline_insert_char(rs, ch);
+                term_insert_char(ch);
             }
             break;
         }
         break;
     case IS_ESC:
         if (ch == '[') {
-            rs->esc_state = IS_CSI;
-            rs->esc_param = 0;
+            term_esc_state = IS_CSI;
+            term_esc_param = 0;
         } else {
-            rs->esc_state = IS_NORM;
+            term_esc_state = IS_NORM;
         }
         break;
     case IS_CSI:
         switch(ch) {
 	case 'A':
 	case 'F':
-	    readline_up_char(rs);
+	    term_up_char();
 	    break;
 	case 'B':
 	case 'E':
-	    readline_down_char(rs);
+	    term_down_char();
 	    break;
         case 'D':
-            readline_backward_char(rs);
+            term_backward_char();
             break;
         case 'C':
-            readline_forward_char(rs);
+            term_forward_char();
             break;
         case '0' ... '9':
-            rs->esc_param = rs->esc_param * 10 + (ch - '0');
+            term_esc_param = term_esc_param * 10 + (ch - '0');
             goto the_end;
         case '~':
-            switch(rs->esc_param) {
+            switch(term_esc_param) {
             case 1:
-                readline_bol(rs);
+                term_bol();
                 break;
             case 3:
-                readline_delete_char(rs);
+                term_delete_char();
                 break;
             case 4:
-                readline_eol(rs);
+                term_eol();
                 break;
             }
             break;
         default:
             break;
         }
-        rs->esc_state = IS_NORM;
+        term_esc_state = IS_NORM;
     the_end:
         break;
     }
-    readline_update(rs);
+    term_update();
 }
 
-void readline_start(ReadLineState *rs, const char *prompt, int read_password,
+void readline_start(const char *prompt, int is_password,
                     ReadLineFunc *readline_func, void *opaque)
 {
-    pstrcpy(rs->prompt, sizeof(rs->prompt), prompt);
-    rs->readline_func = readline_func;
-    rs->readline_opaque = opaque;
-    rs->read_password = read_password;
-    readline_restart(rs);
+    pstrcpy(term_prompt, sizeof(term_prompt), prompt);
+    term_readline_func = readline_func;
+    term_readline_opaque = opaque;
+    term_is_password = is_password;
+    term_show_prompt();
 }
 
-void readline_restart(ReadLineState *rs)
+const char *readline_get_history(unsigned int index)
 {
-    rs->cmd_buf_index = 0;
-    rs->cmd_buf_size = 0;
-}
-
-const char *readline_get_history(ReadLineState *rs, unsigned int index)
-{
-    if (index >= READLINE_MAX_CMDS)
+    if (index >= TERM_MAX_CMDS)
         return NULL;
-    return rs->history[index];
-}
-
-ReadLineState *readline_init(Monitor *mon,
-                             ReadLineCompletionFunc *completion_finder)
-{
-    ReadLineState *rs = qemu_mallocz(sizeof(*rs));
-
-    rs->hist_entry = -1;
-    rs->mon = mon;
-    rs->completion_finder = completion_finder;
-
-    return rs;
+    return term_history[index];
 }

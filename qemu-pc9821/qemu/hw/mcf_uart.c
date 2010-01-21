@@ -284,13 +284,13 @@ void *mcf_uart_init(qemu_irq irq, CharDriverState *chr)
 }
 
 
-static CPUReadMemoryFunc * const mcf_uart_readfn[] = {
+static CPUReadMemoryFunc *mcf_uart_readfn[] = {
    mcf_uart_read,
    mcf_uart_read,
    mcf_uart_read
 };
 
-static CPUWriteMemoryFunc * const mcf_uart_writefn[] = {
+static CPUWriteMemoryFunc *mcf_uart_writefn[] = {
    mcf_uart_write,
    mcf_uart_write,
    mcf_uart_write
@@ -303,7 +303,7 @@ void mcf_uart_mm_init(target_phys_addr_t base, qemu_irq irq,
     int iomemtype;
 
     s = mcf_uart_init(irq, chr);
-    iomemtype = cpu_register_io_memory(mcf_uart_readfn,
+    iomemtype = cpu_register_io_memory(0, mcf_uart_readfn,
                                        mcf_uart_writefn, s);
     cpu_register_physical_memory(base, 0x40, iomemtype);
 }

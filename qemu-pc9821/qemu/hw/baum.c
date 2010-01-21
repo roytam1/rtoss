@@ -26,11 +26,12 @@
 #include "qemu-timer.h"
 #include "usb.h"
 #include "baum.h"
+#include <assert.h>
 #include <brlapi.h>
 #include <brlapi_constants.h>
 #include <brlapi_keycodes.h>
 #ifdef CONFIG_SDL
-#include <SDL_syswm.h>
+#include <SDL/SDL_syswm.h>
 #endif
 
 #if 0
@@ -90,7 +91,7 @@ typedef struct {
 
     brlapi_handle_t *brlapi;
     int brlapi_fd;
-    unsigned int x, y;
+    int x, y;
 
     uint8_t in_buf[BUF_SIZE];
     uint8_t in_buf_used;
@@ -335,8 +336,7 @@ static int baum_eat_packet(BaumDriverState *baum, const uint8_t *buf, int len)
         int i;
 
         /* Allow 100ms to complete the DisplayData packet */
-        qemu_mod_timer(baum->cellCount_timer, qemu_get_clock(vm_clock) +
-                       get_ticks_per_sec() / 10);
+        qemu_mod_timer(baum->cellCount_timer, qemu_get_clock(vm_clock) + ticks_per_sec / 10);
         for (i = 0; i < baum->x * baum->y ; i++) {
             EAT(c);
             cells[i] = c;
@@ -357,12 +357,12 @@ static int baum_eat_packet(BaumDriverState *baum, const uint8_t *buf, int len)
             .displayNumber = BRLAPI_DISPLAY_DEFAULT,
             .regionBegin = 1,
             .regionSize = baum->x * baum->y,
-            .text = (char *)text,
+            .text = text,
             .textSize = baum->x * baum->y,
             .andMask = zero,
             .orMask = cells,
             .cursor = cursor,
-            .charset = (char *)"ISO-8859-1",
+            .charset = "ISO-8859-1",
         };
 
         if (brlapi__write(baum->brlapi, &wa) == -1)
@@ -475,7 +475,7 @@ static void baum_send_event(CharDriverState *chr, int event)
     switch (event) {
     case CHR_EVENT_BREAK:
         break;
-    case CHR_EVENT_OPENED:
+    case CHR_EVENT_RESET:
         /* Reset state */
         baum->in_buf_used = 0;
         break;
@@ -564,7 +564,7 @@ static void baum_chr_read(void *opaque)
     }
 }
 
-CharDriverState *chr_baum_init(QemuOpts *opts)
+CharDriverState *chr_baum_init(void)
 {
     BaumDriverState *baum;
     CharDriverState *chr;

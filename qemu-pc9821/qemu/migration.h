@@ -14,9 +14,6 @@
 #ifndef QEMU_MIGRATION_H
 #define QEMU_MIGRATION_H
 
-#include "qdict.h"
-#include "qemu-common.h"
-
 #define MIG_STATE_ERROR		-1
 #define MIG_STATE_COMPLETED	0
 #define MIG_STATE_CANCELLED	1
@@ -40,7 +37,7 @@ struct FdMigrationState
     int64_t bandwidth_limit;
     QEMUFile *file;
     int fd;
-    Monitor *mon_resume;
+    int detach;
     int state;
     int (*get_error)(struct FdMigrationState*);
     int (*close)(struct FdMigrationState*);
@@ -50,17 +47,13 @@ struct FdMigrationState
 
 void qemu_start_incoming_migration(const char *uri);
 
-void do_migrate(Monitor *mon, const QDict *qdict, QObject **ret_data);
+void do_migrate(int detach, const char *uri);
 
-void do_migrate_cancel(Monitor *mon, const QDict *qdict, QObject **ret_data);
+void do_migrate_cancel(void);
 
-void do_migrate_set_speed(Monitor *mon, const QDict *qdict, QObject **ret_data);
+void do_migrate_set_speed(const char *value);
 
-uint64_t migrate_max_downtime(void);
-
-void do_migrate_set_downtime(Monitor *mon, const QDict *qdict);
-
-void do_info_migrate(Monitor *mon);
+void do_info_migrate(void);
 
 int exec_start_incoming_migration(const char *host_port);
 
@@ -73,21 +66,6 @@ int tcp_start_incoming_migration(const char *host_port);
 MigrationState *tcp_start_outgoing_migration(const char *host_port,
 					     int64_t bandwidth_limit,
 					     int detach);
-
-int unix_start_incoming_migration(const char *path);
-
-MigrationState *unix_start_outgoing_migration(const char *path,
-					      int64_t bandwidth_limit,
-					      int detach);
-
-int fd_start_incoming_migration(const char *path);
-
-MigrationState *fd_start_outgoing_migration(Monitor *mon,
-					    const char *fdname,
-					    int64_t bandwidth_limit,
-					    int detach);
-
-void migrate_fd_monitor_suspend(FdMigrationState *s);
 
 void migrate_fd_error(FdMigrationState *s);
 

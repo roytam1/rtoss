@@ -15,7 +15,8 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 
 #include <stdio.h>
@@ -52,15 +53,6 @@ static m68k_def_t m68k_cpu_defs[] = {
     {"any", M68K_CPUID_ANY},
     {NULL, 0},
 };
-
-void m68k_cpu_list(FILE *f, int (*cpu_fprintf)(FILE *f, const char *fmt, ...))
-{
-    unsigned int i;
-
-    for (i = 0; m68k_cpu_defs[i].name; i++) {
-        (*cpu_fprintf)(f, "%s\n", m68k_cpu_defs[i].name);
-    }
-}
 
 static int fpu_gdb_get_reg(CPUState *env, uint8_t *mem_buf, int n)
 {
@@ -188,7 +180,6 @@ CPUM68KState *cpu_m68k_init(const char *cpu_model)
     }
 
     cpu_reset(env);
-    qemu_init_vcpu(env);
     return env;
 }
 
@@ -461,6 +452,11 @@ uint32_t HELPER(addx_cc)(CPUState *env, uint32_t op1, uint32_t op2)
 uint32_t HELPER(xflag_lt)(uint32_t a, uint32_t b)
 {
     return a < b;
+}
+
+uint32_t HELPER(btest)(uint32_t x)
+{
+    return x != 0;
 }
 
 void HELPER(set_sr)(CPUState *env, uint32_t val)

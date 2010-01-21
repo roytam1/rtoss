@@ -23,9 +23,6 @@ test-cmov.o: test-cond.c
 test-cmov: test-cmov.o crt.o
 	$(LINK)
 
-test-ovf: test-ovf.o crt.o
-	$(LINK)
-
 check: $(TESTS)
 	for f in $(TESTS); do $(SIM) $$f || exit 1; done
 

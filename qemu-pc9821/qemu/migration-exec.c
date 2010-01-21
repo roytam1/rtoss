@@ -18,6 +18,7 @@
 #include "migration.h"
 #include "qemu-char.h"
 #include "sysemu.h"
+#include "console.h"
 #include "buffered_file.h"
 #include "block.h"
 
@@ -54,7 +55,7 @@ static int exec_close(FdMigrationState *s)
 
 MigrationState *exec_start_outgoing_migration(const char *command,
                                              int64_t bandwidth_limit,
-                                             int detach)
+                                             int async)
 {
     FdMigrationState *s;
     FILE *f;
@@ -73,7 +74,10 @@ MigrationState *exec_start_outgoing_migration(const char *command,
         goto err_after_open;
     }
 
-    socket_set_nonblock(s->fd);
+    if (fcntl(s->fd, F_SETFD, O_NONBLOCK) == -1) {
+        dprintf("Unable to set nonblocking mode on file descriptor\n");
+        goto err_after_open;
+    }
 
     s->opaque = qemu_popen(f, "w");
 
@@ -85,11 +89,14 @@ MigrationState *exec_start_outgoing_migration(const char *command,
     s->mig_state.release = migrate_fd_release;
 
     s->state = MIG_STATE_ACTIVE;
-    s->mon_resume = NULL;
+    s->detach = !async;
     s->bandwidth_limit = bandwidth_limit;
 
-    if (!detach)
-        migrate_fd_monitor_suspend(s);
+    if (s->detach == 1) {
+        dprintf("detaching from monitor\n");
+        monitor_suspend();
+        s->detach = 2;
+    }
 
     migrate_fd_connect(s);
     return &s->mig_state;
@@ -114,9 +121,7 @@ static void exec_accept_incoming_migration(void *opaque)
     qemu_announce_self();
     dprintf("successfully loaded vm state\n");
     /* we've successfully migrated, close the fd */
-    qemu_set_fd_handler2(qemu_stdio_fd(f), NULL, NULL, NULL, NULL);
-    if (autostart)
-        vm_start();
+    qemu_set_fd_handler2(qemu_popen_fd(f), NULL, NULL, NULL, NULL);
 
 err:
     qemu_fclose(f);
@@ -133,7 +138,7 @@ int exec_start_incoming_migration(const char *command)
         return -errno;
     }
 
-    qemu_set_fd_handler2(qemu_stdio_fd(f), NULL,
+    qemu_set_fd_handler2(qemu_popen_fd(f), NULL,
 			 exec_accept_incoming_migration, NULL,
 			 (void *)(unsigned long)f);
 

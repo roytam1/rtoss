@@ -7,7 +7,6 @@
 #include "gdbstub.h"
 #include "helpers.h"
 #include "qemu-common.h"
-#include "host-utils.h"
 
 static uint32_t cortexa8_cp15_c0_c1[8] =
 { 0x1031, 0x11, 0x400, 0, 0x31100003, 0x20000000, 0x01202000, 0x11 };
@@ -234,7 +233,7 @@ static int vfp_gdb_set_reg(CPUState *env, uint8_t *buf, int reg)
     switch (reg - nregs) {
     case 0: env->vfp.xregs[ARM_VFP_FPSID] = ldl_p(buf); return 4;
     case 1: env->vfp.xregs[ARM_VFP_FPSCR] = ldl_p(buf); return 4;
-    case 2: env->vfp.xregs[ARM_VFP_FPEXC] = ldl_p(buf) & (1 << 30); return 4;
+    case 2: env->vfp.xregs[ARM_VFP_FPEXC] = ldl_p(buf); return 4;
     }
     return 0;
 }
@@ -268,7 +267,6 @@ CPUARMState *cpu_arm_init(const char *cpu_model)
         gdb_register_coprocessor(env, vfp_gdb_get_reg, vfp_gdb_set_reg,
                                  19, "arm-vfp.xml", 0);
     }
-    qemu_init_vcpu(env);
     return env;
 }
 
@@ -395,15 +393,16 @@ uint32_t HELPER(uxtb16)(uint32_t x)
 
 uint32_t HELPER(clz)(uint32_t x)
 {
-    return clz32(x);
+    int count;
+    for (count = 32; x; count--)
+        x >>= 1;
+    return count;
 }
 
 int32_t HELPER(sdiv)(int32_t num, int32_t den)
 {
     if (den == 0)
       return 0;
-    if (num == INT_MIN && den == -1)
-      return INT_MIN;
     return num / den;
 }
 
@@ -691,7 +690,7 @@ static void do_v7m_exception_exit(CPUARMState *env)
        pointer.  */
 }
 
-static void do_interrupt_v7m(CPUARMState *env)
+void do_interrupt_v7m(CPUARMState *env)
 {
     uint32_t xpsr = xpsr_read(env);
     uint32_t lr;
@@ -1695,7 +1694,7 @@ uint32_t HELPER(get_cp15)(CPUState *env, uint32_t insn)
             case ARM_CPUID_ARM11MPCORE:
                 return 1;
             case ARM_CPUID_CORTEXA8:
-                return 2;
+                return 0;
             default:
                 goto bad_reg;
             }

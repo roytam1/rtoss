@@ -21,8 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-#include "sysbus.h"
+#include "hw.h"
+#include "sun4m.h"
 
 /* debug CS4231 */
 //#define DEBUG_CS
@@ -36,10 +36,9 @@
 #define CS_MAXDREG (CS_DREGS - 1)
 
 typedef struct CSState {
-    SysBusDevice busdev;
-    qemu_irq irq;
     uint32_t regs[CS_REGS];
     uint8_t dregs[CS_DREGS];
+    void *intctl;
 } CSState;
 
 #define CS_RAP(s) ((s)->regs[0] & CS_MAXDREG)
@@ -47,15 +46,15 @@ typedef struct CSState {
 #define CS_CDC_VER 0x8a
 
 #ifdef DEBUG_CS
-#define DPRINTF(fmt, ...)                                       \
-    do { printf("CS: " fmt , ## __VA_ARGS__); } while (0)
+#define DPRINTF(fmt, args...)                           \
+    do { printf("CS: " fmt , ##args); } while (0)
 #else
-#define DPRINTF(fmt, ...)
+#define DPRINTF(fmt, args...)
 #endif
 
-static void cs_reset(DeviceState *d)
+static void cs_reset(void *opaque)
 {
-    CSState *s = container_of(d, CSState, busdev.qdev);
+    CSState *s = opaque;
 
     memset(s->regs, 0, CS_REGS * 4);
     memset(s->dregs, 0, CS_DREGS);
@@ -117,9 +116,8 @@ static void cs_mem_writel(void *opaque, target_phys_addr_t addr, uint32_t val)
     case 2: // Read only
         break;
     case 4:
-        if (val & 1) {
-            cs_reset(&s->busdev.qdev);
-        }
+        if (val & 1)
+            cs_reset(s);
         val &= 0x7f;
         s->regs[saddr] = val;
         break;
@@ -129,57 +127,54 @@ static void cs_mem_writel(void *opaque, target_phys_addr_t addr, uint32_t val)
     }
 }
 
-static CPUReadMemoryFunc * const cs_mem_read[3] = {
+static CPUReadMemoryFunc *cs_mem_read[3] = {
     cs_mem_readl,
     cs_mem_readl,
     cs_mem_readl,
 };
 
-static CPUWriteMemoryFunc * const cs_mem_write[3] = {
+static CPUWriteMemoryFunc *cs_mem_write[3] = {
     cs_mem_writel,
     cs_mem_writel,
     cs_mem_writel,
 };
 
-static const VMStateDescription vmstate_cs4231 = {
-    .name ="cs4231",
-    .version_id = 1,
-    .minimum_version_id = 1,
-    .minimum_version_id_old = 1,
-    .fields      = (VMStateField []) {
-        VMSTATE_UINT32_ARRAY(regs, CSState, CS_REGS),
-        VMSTATE_UINT8_ARRAY(dregs, CSState, CS_DREGS),
-        VMSTATE_END_OF_LIST()
-    }
-};
-
-static int cs4231_init1(SysBusDevice *dev)
+static void cs_save(QEMUFile *f, void *opaque)
 {
-    int io;
-    CSState *s = FROM_SYSBUS(CSState, dev);
+    CSState *s = opaque;
+    unsigned int i;
 
-    io = cpu_register_io_memory(cs_mem_read, cs_mem_write, s);
-    sysbus_init_mmio(dev, CS_SIZE, io);
-    sysbus_init_irq(dev, &s->irq);
+    for (i = 0; i < CS_REGS; i++)
+        qemu_put_be32s(f, &s->regs[i]);
 
-    cs_reset(&s->busdev.qdev);
+    qemu_put_buffer(f, s->dregs, CS_DREGS);
+}
+
+static int cs_load(QEMUFile *f, void *opaque, int version_id)
+{
+    CSState *s = opaque;
+    unsigned int i;
+
+    if (version_id > 1)
+        return -EINVAL;
+
+    for (i = 0; i < CS_REGS; i++)
+        qemu_get_be32s(f, &s->regs[i]);
+
+    qemu_get_buffer(f, s->dregs, CS_DREGS);
     return 0;
 }
 
-static SysBusDeviceInfo cs4231_info = {
-    .init = cs4231_init1,
-    .qdev.name  = "SUNW,CS4231",
-    .qdev.size  = sizeof(CSState),
-    .qdev.vmsd  = &vmstate_cs4231,
-    .qdev.reset = cs_reset,
-    .qdev.props = (Property[]) {
-        {.name = NULL}
-    }
-};
-
-static void cs4231_register_devices(void)
+void cs_init(target_phys_addr_t base, int irq, void *intctl)
 {
-    sysbus_register_withprop(&cs4231_info);
-}
+    int cs_io_memory;
+    CSState *s;
 
-device_init(cs4231_register_devices)
+    s = qemu_mallocz(sizeof(CSState));
+
+    cs_io_memory = cpu_register_io_memory(0, cs_mem_read, cs_mem_write, s);
+    cpu_register_physical_memory(base, CS_SIZE, cs_io_memory);
+    register_savevm("cs4231", base, 1, cs_save, cs_load, s);
+    qemu_register_reset(cs_reset, s);
+    cs_reset(s);
+}

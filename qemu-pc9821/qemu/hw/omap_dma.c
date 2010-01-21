@@ -15,7 +15,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along
- * with this program; if not, see <http://www.gnu.org/licenses/>.
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 #include "qemu-common.h"
 #include "qemu-timer.h"
@@ -591,88 +592,84 @@ static void omap_dma_transfer_setup(struct soc_dma_ch_s *dma)
     if (dma->update) {
 #endif
 
-        /* If the channel is element synchronized, deactivate it */
-        if (min_elems == elements[omap_dma_intr_element_sync])
-            omap_dma_deactivate_channel(s, ch);
+    /* If the channel is element synchronized, deactivate it */
+    if (min_elems == elements[omap_dma_intr_element_sync])
+        omap_dma_deactivate_channel(s, ch);
 
-        /* If it is the last frame, set the LAST_FRAME interrupt */
-        if (min_elems == elements[omap_dma_intr_last_frame])
-            ch->status |= LAST_FRAME_INTR;
+    /* If it is the last frame, set the LAST_FRAME interrupt */
+    if (min_elems == elements[omap_dma_intr_last_frame])
+        ch->status |= LAST_FRAME_INTR;
 
-        /* If exactly half of the frame was reached, set the HALF_FRAME
-           interrupt */
-        if (min_elems == elements[omap_dma_intr_half_frame])
-            ch->status |= HALF_FRAME_INTR;
+    /* If exactly half of the frame was reached, set the HALF_FRAME
+       interrupt */
+    if (min_elems == elements[omap_dma_intr_half_frame])
+        ch->status |= HALF_FRAME_INTR;
 
-        /* If a full packet has been transferred, set the END_PKT interrupt */
-        if (min_elems == elements[omap_dma_intr_packet])
-            ch->status |= END_PKT_INTR;
+    /* If a full packet has been transferred, set the END_PKT interrupt */
+    if (min_elems == elements[omap_dma_intr_packet])
+        ch->status |= END_PKT_INTR;
 
-        /* If the channel is packet-synchronized, deactivate it */
-        if (min_elems == elements[omap_dma_intr_packet_sync])
-            omap_dma_deactivate_channel(s, ch);
+    /* If the channel is packet-synchronized, deactivate it */
+    if (min_elems == elements[omap_dma_intr_packet_sync])
+        omap_dma_deactivate_channel(s, ch);
 
-        /* If the channel is frame synchronized, deactivate it */
-        if (min_elems == elements[omap_dma_intr_frame_sync])
-            omap_dma_deactivate_channel(s, ch);
+    /* If the channel is frame synchronized, deactivate it */
+    if (min_elems == elements[omap_dma_intr_frame_sync])
+        omap_dma_deactivate_channel(s, ch);
 
-        /* Set the END_FRAME interrupt */
-        if (min_elems == elements[omap_dma_intr_frame])
-            ch->status |= END_FRAME_INTR;
+    /* Set the END_FRAME interrupt */
+    if (min_elems == elements[omap_dma_intr_frame])
+        ch->status |= END_FRAME_INTR;
 
-        if (min_elems == elements[omap_dma_intr_block]) {
-            /* End of Block */
-            /* Disable the channel */
+    if (min_elems == elements[omap_dma_intr_block]) {
+        /* End of Block */
+        /* Disable the channel */
 
-            if (ch->omap_3_1_compatible_disable) {
+        if (ch->omap_3_1_compatible_disable) {
+            omap_dma_disable_channel(s, ch);
+            if (ch->link_enabled)
+                omap_dma_enable_channel(s, &s->ch[ch->link_next_ch]);
+        } else {
+            if (!ch->auto_init)
                 omap_dma_disable_channel(s, ch);
-                if (ch->link_enabled)
-                    omap_dma_enable_channel(s, &s->ch[ch->link_next_ch]);
-            } else {
-                if (!ch->auto_init)
-                    omap_dma_disable_channel(s, ch);
-                else if (ch->repeat || ch->end_prog)
-                    omap_dma_channel_load(ch);
-                else {
-                    ch->waiting_end_prog = 1;
-                    omap_dma_deactivate_channel(s, ch);
-                }
+            else if (ch->repeat || ch->end_prog)
+                omap_dma_channel_load(ch);
+            else {
+                ch->waiting_end_prog = 1;
+                omap_dma_deactivate_channel(s, ch);
             }
-
-            if (ch->interrupts & END_BLOCK_INTR)
-                ch->status |= END_BLOCK_INTR;
         }
 
-        /* Update packet number */
-        if (ch->fs && ch->bs) {
-            a->pck_element += min_elems;
-            a->pck_element %= a->pck_elements;
-        }
-
-        /* TODO: check if we really need to update anything here or perhaps we
-         * can skip part of this.  */
-#ifndef MULTI_REQ
-        if (dma->update) {
-#endif
-            a->element += min_elems;
-
-            frames = a->element / a->elements;
-            a->element = a->element % a->elements;
-            a->frame += frames;
-            a->src += min_elems * a->elem_delta[0] + frames * a->frame_delta[0];
-            a->dest += min_elems * a->elem_delta[1] + frames * a->frame_delta[1];
-
-            /* If the channel is async, update cpc */
-            if (!ch->sync && frames)
-                ch->cpc = a->dest & 0xffff;
-
-            /* TODO: if the destination port is IMIF or EMIFF, set the dirty
-             * bits on it.  */
-#ifndef MULTI_REQ
-        }
-#else
+        if (ch->interrupts & END_BLOCK_INTR)
+            ch->status |= END_BLOCK_INTR;
     }
+
+    /* Update packet number */
+    if (ch->fs && ch->bs) {
+        a->pck_element += min_elems;
+        a->pck_element %= a->pck_elements;
+    }
+
+    /* TODO: check if we really need to update anything here or perhaps we
+     * can skip part of this.  */
+#ifndef MULTI_REQ
+    if (dma->update) {
 #endif
+        a->element += min_elems;
+
+        frames     = a->element / a->elements;
+        a->element = a->element % a->elements;
+        a->frame  += frames;
+        a->src    += min_elems * a->elem_delta[0] + frames * a->frame_delta[0];
+        a->dest   += min_elems * a->elem_delta[1] + frames * a->frame_delta[1];
+
+        /* If the channel is async, update cpc */
+        if (!ch->sync && frames)
+            ch->cpc = a->dest & 0xffff;
+
+        /* TODO: if the destination port is IMIF or EMIFF, set the dirty
+         * bits on it.  */
+    }
 
     omap_dma_interrupts_update(s);
 }
@@ -1530,13 +1527,13 @@ static void omap_dma_write(void *opaque, target_phys_addr_t addr,
     OMAP_BAD_REG(addr);
 }
 
-static CPUReadMemoryFunc * const omap_dma_readfn[] = {
+static CPUReadMemoryFunc *omap_dma_readfn[] = {
     omap_badwidth_read16,
     omap_dma_read,
     omap_badwidth_read16,
 };
 
-static CPUWriteMemoryFunc * const omap_dma_writefn[] = {
+static CPUWriteMemoryFunc *omap_dma_writefn[] = {
     omap_badwidth_write16,
     omap_dma_write,
     omap_badwidth_write16,
@@ -1658,7 +1655,7 @@ struct soc_dma_s *omap_dma_init(target_phys_addr_t base, qemu_irq *irqs,
     omap_dma_reset(s->dma);
     omap_dma_clk_update(s, 0, 1);
 
-    iomemtype = cpu_register_io_memory(omap_dma_readfn,
+    iomemtype = cpu_register_io_memory(0, omap_dma_readfn,
                     omap_dma_writefn, s);
     cpu_register_physical_memory(base, memsize, iomemtype);
 
@@ -2021,13 +2018,13 @@ static void omap_dma4_write(void *opaque, target_phys_addr_t addr,
     }
 }
 
-static CPUReadMemoryFunc * const omap_dma4_readfn[] = {
+static CPUReadMemoryFunc *omap_dma4_readfn[] = {
     omap_badwidth_read16,
     omap_dma4_read,
     omap_dma4_read,
 };
 
-static CPUWriteMemoryFunc * const omap_dma4_writefn[] = {
+static CPUWriteMemoryFunc *omap_dma4_writefn[] = {
     omap_badwidth_write16,
     omap_dma4_write,
     omap_dma4_write,
@@ -2065,7 +2062,7 @@ struct soc_dma_s *omap_dma4_init(target_phys_addr_t base, qemu_irq *irqs,
     omap_dma_reset(s->dma);
     omap_dma_clk_update(s, 0, !!s->dma->freq);
 
-    iomemtype = cpu_register_io_memory(omap_dma4_readfn,
+    iomemtype = cpu_register_io_memory(0, omap_dma4_readfn,
                     omap_dma4_writefn, s);
     cpu_register_physical_memory(base, 0x1000, iomemtype);
 

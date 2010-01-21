@@ -4,9 +4,6 @@ i386
 *-darwin-user
 *-linux-user
 *-bsd-user
-libhw32
-libhw64
-libuser
 qemu-doc.html
 qemu-tech.html
 qemu-doc.info
@@ -19,11 +16,6 @@ qemu-img
 qemu-nbd
 qemu-nbd.8
 qemu-nbd.pod
-qemu-options.texi
-qemu-img-cmds.texi
-qemu-img-cmds.h
-qemu-io
-qemu-monitor.texi
 .gdbinit
 *.a
 *.aux
@@ -43,6 +35,4 @@ qemu-monitor.texi
 patches
 pc-bios/bios-pq/status
 pc-bios/vgabios-pq/status
-pc-bios/optionrom/multiboot.bin
-pc-bios/optionrom/multiboot.raw
 .stgit-*

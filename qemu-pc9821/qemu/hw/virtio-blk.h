@@ -16,6 +16,7 @@
 
 #include "virtio.h"
 #include "block.h"
+#include "pci.h"
 
 /* from Linux's linux/virtio_blk.h */
 
@@ -27,15 +28,6 @@
 #define VIRTIO_BLK_F_SIZE_MAX   1       /* Indicates maximum segment size */
 #define VIRTIO_BLK_F_SEG_MAX    2       /* Indicates maximum # of segments */
 #define VIRTIO_BLK_F_GEOMETRY   4       /* Indicates support of legacy geometry */
-#define VIRTIO_BLK_F_RO         5       /* Disk is read-only */
-#define VIRTIO_BLK_F_BLK_SIZE   6       /* Block size of disk is available*/
-#define VIRTIO_BLK_F_SCSI       7       /* Supports scsi command passthru */
-#define VIRTIO_BLK_F_IDENTIFY   8       /* ATA IDENTIFY supported */
-#define VIRTIO_BLK_F_WCACHE     9       /* write cache enabled */
-
-#define VIRTIO_BLK_ID_LEN       256     /* length of identify u16 array */
-#define VIRTIO_BLK_ID_SN        10      /* start of char * serial# */
-#define VIRTIO_BLK_ID_SN_BYTES  20      /* length in bytes of serial# */
 
 struct virtio_blk_config
 {
@@ -45,8 +37,6 @@ struct virtio_blk_config
     uint16_t cylinders;
     uint8_t heads;
     uint8_t sectors;
-    uint32_t _blk_size;    /* structure pad, currently unused */
-    uint16_t identify[VIRTIO_BLK_ID_LEN];
 } __attribute__((packed));
 
 /* These two define direction. */
@@ -55,9 +45,6 @@ struct virtio_blk_config
 
 /* This bit says it's a scsi command, not an actual read or write. */
 #define VIRTIO_BLK_T_SCSI_CMD   2
-
-/* Flush the volatile write cache */
-#define VIRTIO_BLK_T_FLUSH      4
 
 /* Barrier before this op. */
 #define VIRTIO_BLK_T_BARRIER    0x80000000
@@ -77,19 +64,12 @@ struct virtio_blk_outhdr
 #define VIRTIO_BLK_S_IOERR      1
 #define VIRTIO_BLK_S_UNSUPP     2
 
-/* This is the last element of the write scatter-gather list */
+/* This is the first element of the write scatter-gather list */
 struct virtio_blk_inhdr
 {
     unsigned char status;
 };
 
-/* SCSI pass-through header */
-struct virtio_scsi_inhdr
-{
-    uint32_t errors;
-    uint32_t data_len;
-    uint32_t sense_len;
-    uint32_t residual;
-};
+void *virtio_blk_init(PCIBus *bus, BlockDriverState *bs);
 
 #endif

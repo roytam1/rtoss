@@ -126,19 +126,19 @@ static void nvram_writel_protected (void *opaque, target_phys_addr_t addr, uint3
     nvram_writeb_protected(opaque, addr + 3, (val >> 24) & 0xff);
 }
 
-static CPUReadMemoryFunc * const nvram_read[] = {
+static CPUReadMemoryFunc *nvram_read[] = {
     &nvram_readb,
     &nvram_readw,
     &nvram_readl,
 };
 
-static CPUWriteMemoryFunc * const nvram_write[] = {
+static CPUWriteMemoryFunc *nvram_write[] = {
     &nvram_writeb,
     &nvram_writew,
     &nvram_writel,
 };
 
-static CPUWriteMemoryFunc * const nvram_write_protected[] = {
+static CPUWriteMemoryFunc *nvram_write_protected[] = {
     &nvram_writeb_protected,
     &nvram_writew_protected,
     &nvram_writel_protected,
@@ -171,10 +171,10 @@ void *ds1225y_init(target_phys_addr_t mem_base, const char *filename)
     }
 
     /* Read/write memory */
-    mem_indexRW = cpu_register_io_memory(nvram_read, nvram_write, s);
+    mem_indexRW = cpu_register_io_memory(0, nvram_read, nvram_write, s);
     cpu_register_physical_memory(mem_base, s->chip_size, mem_indexRW);
     /* Read/write protected memory */
-    mem_indexRP = cpu_register_io_memory(nvram_read, nvram_write_protected, s);
+    mem_indexRP = cpu_register_io_memory(0, nvram_read, nvram_write_protected, s);
     cpu_register_physical_memory(mem_base + s->chip_size, s->chip_size, mem_indexRP);
     return s;
 }

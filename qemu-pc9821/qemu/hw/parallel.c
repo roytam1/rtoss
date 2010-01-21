@@ -30,9 +30,9 @@
 //#define DEBUG_PARALLEL
 
 #ifdef DEBUG_PARALLEL
-#define pdebug(fmt, ...) printf("pp: " fmt, ## __VA_ARGS__)
+#define pdebug(fmt, arg...) printf("pp: " fmt, ##arg)
 #else
-#define pdebug(fmt, ...) ((void)0)
+#define pdebug(fmt, arg...) ((void)0)
 #endif
 
 #define PARA_REG_DATA 0
@@ -77,14 +77,6 @@ struct ParallelState {
     /* Memory-mapped interface */
     int it_shift;
 };
-
-typedef struct ISAParallelState {
-    ISADevice dev;
-    uint32_t index;
-    uint32_t iobase;
-    uint32_t isairq;
-    ParallelState state;
-} ISAParallelState;
 
 static void parallel_update_irq(ParallelState *s)
 {
@@ -446,35 +438,19 @@ static void parallel_reset(void *opaque)
     s->last_read_offset = ~0U;
 }
 
-static const int isa_parallel_io[MAX_PARALLEL_PORTS] = { 0x378, 0x278, 0x3bc };
-
-static int parallel_isa_initfn(ISADevice *dev)
+/* If fd is zero, it means that the parallel device uses the console */
+ParallelState *parallel_init(int base, qemu_irq irq, CharDriverState *chr)
 {
-    static int index;
-    ISAParallelState *isa = DO_UPCAST(ISAParallelState, dev, dev);
-    ParallelState *s = &isa->state;
-    int base;
+    ParallelState *s;
     uint8_t dummy;
 
-    if (!s->chr) {
-        fprintf(stderr, "Can't create parallel device, empty char device\n");
-        exit(1);
-    }
-
-    if (isa->index == -1)
-        isa->index = index;
-    if (isa->index >= MAX_PARALLEL_PORTS)
-        return -1;
-    if (isa->iobase == -1)
-        isa->iobase = isa_parallel_io[isa->index];
-    index++;
-
-    base = isa->iobase;
-    isa_init_irq(dev, &s->irq, isa->isairq);
+    s = qemu_mallocz(sizeof(ParallelState));
+    s->irq = irq;
+    s->chr = chr;
     parallel_reset(s);
     qemu_register_reset(parallel_reset, s);
 
-    if (qemu_chr_ioctl(s->chr, CHR_IOCTL_PP_READ_STATUS, &dummy) == 0) {
+    if (qemu_chr_ioctl(chr, CHR_IOCTL_PP_READ_STATUS, &dummy) == 0) {
         s->hw_driver = 1;
         s->status = dummy;
     }
@@ -493,19 +469,7 @@ static int parallel_isa_initfn(ISADevice *dev)
         register_ioport_write(base, 8, 1, parallel_ioport_write_sw, s);
         register_ioport_read(base, 8, 1, parallel_ioport_read_sw, s);
     }
-    return 0;
-}
-
-ParallelState *parallel_init(int index, CharDriverState *chr)
-{
-    ISADevice *dev;
-
-    dev = isa_create("isa-parallel");
-    qdev_prop_set_uint32(&dev->qdev, "index", index);
-    qdev_prop_set_chr(&dev->qdev, "chardev", chr);
-    if (qdev_init(&dev->qdev) < 0)
-        return NULL;
-    return &DO_UPCAST(ISAParallelState, dev, dev)->state;
+    return s;
 }
 
 /* Memory mapped interface */
@@ -554,13 +518,13 @@ static void parallel_mm_writel (void *opaque,
     parallel_ioport_write_sw(s, addr >> s->it_shift, value);
 }
 
-static CPUReadMemoryFunc * const parallel_mm_read_sw[] = {
+static CPUReadMemoryFunc *parallel_mm_read_sw[] = {
     &parallel_mm_readb,
     &parallel_mm_readw,
     &parallel_mm_readl,
 };
 
-static CPUWriteMemoryFunc * const parallel_mm_write_sw[] = {
+static CPUWriteMemoryFunc *parallel_mm_write_sw[] = {
     &parallel_mm_writeb,
     &parallel_mm_writew,
     &parallel_mm_writel,
@@ -579,27 +543,7 @@ ParallelState *parallel_mm_init(target_phys_addr_t base, int it_shift, qemu_irq 
     parallel_reset(s);
     qemu_register_reset(parallel_reset, s);
 
-    io_sw = cpu_register_io_memory(parallel_mm_read_sw, parallel_mm_write_sw, s);
+    io_sw = cpu_register_io_memory(0, parallel_mm_read_sw, parallel_mm_write_sw, s);
     cpu_register_physical_memory(base, 8 << it_shift, io_sw);
     return s;
 }
-
-static ISADeviceInfo parallel_isa_info = {
-    .qdev.name  = "isa-parallel",
-    .qdev.size  = sizeof(ISAParallelState),
-    .init       = parallel_isa_initfn,
-    .qdev.props = (Property[]) {
-        DEFINE_PROP_HEX32("index",  ISAParallelState, index,   -1),
-        DEFINE_PROP_HEX32("iobase", ISAParallelState, iobase,  -1),
-        DEFINE_PROP_UINT32("irq",   ISAParallelState, isairq,  7),
-        DEFINE_PROP_CHR("chardev",  ISAParallelState, state.chr),
-        DEFINE_PROP_END_OF_LIST(),
-    },
-};
-
-static void parallel_register_devices(void)
-{
-    isa_qdev_register(&parallel_isa_info);
-}
-
-device_init(parallel_register_devices)

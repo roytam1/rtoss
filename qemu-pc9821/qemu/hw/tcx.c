@@ -21,11 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+#include "hw.h"
+#include "sun4m.h"
 #include "console.h"
 #include "pixel_ops.h"
-#include "sysbus.h"
-#include "qdev-addr.h"
 
 #define MAXX 1024
 #define MAXY 768
@@ -35,13 +34,11 @@
 #define TCX_TEC_NREGS    0x1000
 
 typedef struct TCXState {
-    SysBusDevice busdev;
     target_phys_addr_t addr;
     DisplayState *ds;
     uint8_t *vram;
     uint32_t *vram24, *cplane;
     ram_addr_t vram_offset, vram24_offset, cplane_offset;
-    uint32_t vram_size;
     uint16_t width, height, depth;
     uint8_t r[256], g[256], b[256];
     uint32_t palette[256];
@@ -50,25 +47,8 @@ typedef struct TCXState {
 
 static void tcx_screen_dump(void *opaque, const char *filename);
 static void tcx24_screen_dump(void *opaque, const char *filename);
-
-static void tcx_set_dirty(TCXState *s)
-{
-    unsigned int i;
-
-    for (i = 0; i < MAXX * MAXY; i += TARGET_PAGE_SIZE) {
-        cpu_physical_memory_set_dirty(s->vram_offset + i);
-    }
-}
-
-static void tcx24_set_dirty(TCXState *s)
-{
-    unsigned int i;
-
-    for (i = 0; i < MAXX * MAXY * 4; i += TARGET_PAGE_SIZE) {
-        cpu_physical_memory_set_dirty(s->vram24_offset + i);
-        cpu_physical_memory_set_dirty(s->cplane_offset + i);
-    }
-}
+static void tcx_invalidate_display(void *opaque);
+static void tcx24_invalidate_display(void *opaque);
 
 static void update_palette_entries(TCXState *s, int start, int end)
 {
@@ -86,18 +66,14 @@ static void update_palette_entries(TCXState *s, int start, int end)
             s->palette[i] = rgb_to_pixel16(s->r[i], s->g[i], s->b[i]);
             break;
         case 32:
-            if (is_surface_bgr(s->ds->surface))
-                s->palette[i] = rgb_to_pixel32bgr(s->r[i], s->g[i], s->b[i]);
-            else
-                s->palette[i] = rgb_to_pixel32(s->r[i], s->g[i], s->b[i]);
+            s->palette[i] = rgb_to_pixel32(s->r[i], s->g[i], s->b[i]);
             break;
         }
     }
-    if (s->depth == 24) {
-        tcx24_set_dirty(s);
-    } else {
-        tcx_set_dirty(s);
-    }
+    if (s->depth == 24)
+        tcx24_invalidate_display(s);
+    else
+        tcx_invalidate_display(s);
 }
 
 static void tcx_draw_line32(TCXState *s1, uint8_t *d,
@@ -148,12 +124,11 @@ static inline void tcx24_draw_line32(TCXState *s1, uint8_t *d,
                                      const uint32_t *cplane,
                                      const uint32_t *s24)
 {
-    int x, bgr, r, g, b;
+    int x, r, g, b;
     uint8_t val, *p8;
     uint32_t *p = (uint32_t *)d;
     uint32_t dval;
 
-    bgr = is_surface_bgr(s1->ds->surface);
     for(x = 0; x < width; x++, s++, s24++) {
         if ((be32_to_cpu(*cplane++) & 0xff000000) == 0x03000000) {
             // 24-bit direct, BGR order
@@ -162,10 +137,7 @@ static inline void tcx24_draw_line32(TCXState *s1, uint8_t *d,
             b = *p8++;
             g = *p8++;
             r = *p8++;
-            if (bgr)
-                dval = rgb_to_pixel32bgr(r, g, b);
-            else
-                dval = rgb_to_pixel32(r, g, b);
+            dval = rgb_to_pixel32(r, g, b);
         } else {
             val = *s;
             dval = s1->palette[val];
@@ -218,7 +190,7 @@ static void tcx_update_display(void *opaque)
         return;
     page = ts->vram_offset;
     y_start = -1;
-    page_min = -1;
+    page_min = 0xffffffff;
     page_max = 0;
     d = ds_get_data(ts->ds);
     s = ts->vram;
@@ -278,7 +250,7 @@ static void tcx_update_display(void *opaque)
                    ts->width, y - y_start);
     }
     /* reset modified pages */
-    if (page_max >= page_min) {
+    if (page_min <= page_max) {
         cpu_physical_memory_reset_dirty(page_min, page_max + TARGET_PAGE_SIZE,
                                         VGA_DIRTY_FLAG);
     }
@@ -298,7 +270,7 @@ static void tcx24_update_display(void *opaque)
     page24 = ts->vram24_offset;
     cpage = ts->cplane_offset;
     y_start = -1;
-    page_min = -1;
+    page_min = 0xffffffff;
     page_max = 0;
     d = ds_get_data(ts->ds);
     s = ts->vram;
@@ -355,7 +327,7 @@ static void tcx24_update_display(void *opaque)
                    ts->width, y - y_start);
     }
     /* reset modified pages */
-    if (page_max >= page_min) {
+    if (page_min <= page_max) {
         reset_dirty(ts, page_min, page_max, page24, cpage);
     }
 }
@@ -363,56 +335,72 @@ static void tcx24_update_display(void *opaque)
 static void tcx_invalidate_display(void *opaque)
 {
     TCXState *s = opaque;
+    int i;
 
-    tcx_set_dirty(s);
-    qemu_console_resize(s->ds, s->width, s->height);
+    for (i = 0; i < MAXX*MAXY; i += TARGET_PAGE_SIZE) {
+        cpu_physical_memory_set_dirty(s->vram_offset + i);
+    }
 }
 
 static void tcx24_invalidate_display(void *opaque)
 {
     TCXState *s = opaque;
+    int i;
 
-    tcx_set_dirty(s);
-    tcx24_set_dirty(s);
-    qemu_console_resize(s->ds, s->width, s->height);
+    tcx_invalidate_display(s);
+    for (i = 0; i < MAXX*MAXY * 4; i += TARGET_PAGE_SIZE) {
+        cpu_physical_memory_set_dirty(s->vram24_offset + i);
+        cpu_physical_memory_set_dirty(s->cplane_offset + i);
+    }
 }
 
-static int vmstate_tcx_post_load(void *opaque, int version_id)
+static void tcx_save(QEMUFile *f, void *opaque)
 {
     TCXState *s = opaque;
 
-    update_palette_entries(s, 0, 256);
-    if (s->depth == 24) {
-        tcx24_set_dirty(s);
-    } else {
-        tcx_set_dirty(s);
+    qemu_put_be16s(f, &s->height);
+    qemu_put_be16s(f, &s->width);
+    qemu_put_be16s(f, &s->depth);
+    qemu_put_buffer(f, s->r, 256);
+    qemu_put_buffer(f, s->g, 256);
+    qemu_put_buffer(f, s->b, 256);
+    qemu_put_8s(f, &s->dac_index);
+    qemu_put_8s(f, &s->dac_state);
+}
+
+static int tcx_load(QEMUFile *f, void *opaque, int version_id)
+{
+    TCXState *s = opaque;
+    uint32_t dummy;
+
+    if (version_id != 3 && version_id != 4)
+        return -EINVAL;
+
+    if (version_id == 3) {
+        qemu_get_be32s(f, &dummy);
+        qemu_get_be32s(f, &dummy);
+        qemu_get_be32s(f, &dummy);
     }
+    qemu_get_be16s(f, &s->height);
+    qemu_get_be16s(f, &s->width);
+    qemu_get_be16s(f, &s->depth);
+    qemu_get_buffer(f, s->r, 256);
+    qemu_get_buffer(f, s->g, 256);
+    qemu_get_buffer(f, s->b, 256);
+    qemu_get_8s(f, &s->dac_index);
+    qemu_get_8s(f, &s->dac_state);
+    update_palette_entries(s, 0, 256);
+    if (s->depth == 24)
+        tcx24_invalidate_display(s);
+    else
+        tcx_invalidate_display(s);
 
     return 0;
 }
 
-static const VMStateDescription vmstate_tcx = {
-    .name ="tcx",
-    .version_id = 4,
-    .minimum_version_id = 4,
-    .minimum_version_id_old = 4,
-    .post_load = vmstate_tcx_post_load,
-    .fields      = (VMStateField []) {
-        VMSTATE_UINT16(height, TCXState),
-        VMSTATE_UINT16(width, TCXState),
-        VMSTATE_UINT16(depth, TCXState),
-        VMSTATE_BUFFER(r, TCXState),
-        VMSTATE_BUFFER(g, TCXState),
-        VMSTATE_BUFFER(b, TCXState),
-        VMSTATE_UINT8(dac_index, TCXState),
-        VMSTATE_UINT8(dac_state, TCXState),
-        VMSTATE_END_OF_LIST()
-    }
-};
-
-static void tcx_reset(DeviceState *d)
+static void tcx_reset(void *opaque)
 {
-    TCXState *s = container_of(d, TCXState, busdev.qdev);
+    TCXState *s = opaque;
 
     /* Initialize palette */
     memset(s->r, 0, 256);
@@ -468,13 +456,13 @@ static void tcx_dac_writel(void *opaque, target_phys_addr_t addr, uint32_t val)
     return;
 }
 
-static CPUReadMemoryFunc * const tcx_dac_read[3] = {
+static CPUReadMemoryFunc *tcx_dac_read[3] = {
     NULL,
     NULL,
     tcx_dac_readl,
 };
 
-static CPUWriteMemoryFunc * const tcx_dac_write[3] = {
+static CPUWriteMemoryFunc *tcx_dac_write[3] = {
     NULL,
     NULL,
     tcx_dac_writel,
@@ -490,78 +478,80 @@ static void tcx_dummy_writel(void *opaque, target_phys_addr_t addr,
 {
 }
 
-static CPUReadMemoryFunc * const tcx_dummy_read[3] = {
+static CPUReadMemoryFunc *tcx_dummy_read[3] = {
     NULL,
     NULL,
     tcx_dummy_readl,
 };
 
-static CPUWriteMemoryFunc * const tcx_dummy_write[3] = {
+static CPUWriteMemoryFunc *tcx_dummy_write[3] = {
     NULL,
     NULL,
     tcx_dummy_writel,
 };
 
-static int tcx_init1(SysBusDevice *dev)
+void tcx_init(target_phys_addr_t addr, uint8_t *vram_base,
+              unsigned long vram_offset, int vram_size, int width, int height,
+              int depth)
 {
-    TCXState *s = FROM_SYSBUS(TCXState, dev);
+    TCXState *s;
     int io_memory, dummy_memory;
-    ram_addr_t vram_offset;
     int size;
-    uint8_t *vram_base;
 
-    vram_offset = qemu_ram_alloc(s->vram_size * (1 + 4 + 4));
-    vram_base = qemu_get_ram_ptr(vram_offset);
+    s = qemu_mallocz(sizeof(TCXState));
+    s->addr = addr;
     s->vram_offset = vram_offset;
+    s->width = width;
+    s->height = height;
+    s->depth = depth;
 
-    /* 8-bit plane */
+    // 8-bit plane
     s->vram = vram_base;
-    size = s->vram_size;
-    sysbus_init_mmio(dev, size, s->vram_offset);
+    size = vram_size;
+    cpu_register_physical_memory(addr + 0x00800000ULL, size, vram_offset);
     vram_offset += size;
     vram_base += size;
 
-    /* DAC */
-    io_memory = cpu_register_io_memory(tcx_dac_read, tcx_dac_write, s);
-    sysbus_init_mmio(dev, TCX_DAC_NREGS, io_memory);
+    io_memory = cpu_register_io_memory(0, tcx_dac_read, tcx_dac_write, s);
+    cpu_register_physical_memory(addr + 0x00200000ULL, TCX_DAC_NREGS,
+                                 io_memory);
 
-    /* TEC (dummy) */
-    dummy_memory = cpu_register_io_memory(tcx_dummy_read, tcx_dummy_write,
+    dummy_memory = cpu_register_io_memory(0, tcx_dummy_read, tcx_dummy_write,
                                           s);
-    sysbus_init_mmio(dev, TCX_TEC_NREGS, dummy_memory);
-    /* THC: NetBSD writes here even with 8-bit display: dummy */
-    sysbus_init_mmio(dev, TCX_THC_NREGS_24, dummy_memory);
-
-    if (s->depth == 24) {
-        /* 24-bit plane */
-        size = s->vram_size * 4;
+    cpu_register_physical_memory(addr + 0x00700000ULL, TCX_TEC_NREGS,
+                                 dummy_memory);
+    if (depth == 24) {
+        // 24-bit plane
+        size = vram_size * 4;
         s->vram24 = (uint32_t *)vram_base;
         s->vram24_offset = vram_offset;
-        sysbus_init_mmio(dev, size, vram_offset);
+        cpu_register_physical_memory(addr + 0x02000000ULL, size, vram_offset);
         vram_offset += size;
         vram_base += size;
 
-        /* Control plane */
-        size = s->vram_size * 4;
+        // Control plane
+        size = vram_size * 4;
         s->cplane = (uint32_t *)vram_base;
         s->cplane_offset = vram_offset;
-        sysbus_init_mmio(dev, size, vram_offset);
-
+        cpu_register_physical_memory(addr + 0x0a000000ULL, size, vram_offset);
         s->ds = graphic_console_init(tcx24_update_display,
                                      tcx24_invalidate_display,
                                      tcx24_screen_dump, NULL, s);
     } else {
-        /* THC 8 bit (dummy) */
-        sysbus_init_mmio(dev, TCX_THC_NREGS_8, dummy_memory);
-
+        cpu_register_physical_memory(addr + 0x00300000ULL, TCX_THC_NREGS_8,
+                                     dummy_memory);
         s->ds = graphic_console_init(tcx_update_display,
                                      tcx_invalidate_display,
                                      tcx_screen_dump, NULL, s);
     }
+    // NetBSD writes here even with 8-bit display
+    cpu_register_physical_memory(addr + 0x00301000ULL, TCX_THC_NREGS_24,
+                                 dummy_memory);
 
-    tcx_reset(&s->busdev.qdev);
-    qemu_console_resize(s->ds, s->width, s->height);
-    return 0;
+    register_savevm("tcx", addr, 4, tcx_save, tcx_load, s);
+    qemu_register_reset(tcx_reset, s);
+    tcx_reset(s);
+    qemu_console_resize(s->ds, width, height);
 }
 
 static void tcx_screen_dump(void *opaque, const char *filename)
@@ -626,26 +616,3 @@ static void tcx24_screen_dump(void *opaque, const char *filename)
     fclose(f);
     return;
 }
-
-static SysBusDeviceInfo tcx_info = {
-    .init = tcx_init1,
-    .qdev.name  = "SUNW,tcx",
-    .qdev.size  = sizeof(TCXState),
-    .qdev.reset = tcx_reset,
-    .qdev.vmsd  = &vmstate_tcx,
-    .qdev.props = (Property[]) {
-        DEFINE_PROP_TADDR("addr",      TCXState, addr,      -1),
-        DEFINE_PROP_HEX32("vram_size", TCXState, vram_size, -1),
-        DEFINE_PROP_UINT16("width",    TCXState, width,     -1),
-        DEFINE_PROP_UINT16("height",   TCXState, height,    -1),
-        DEFINE_PROP_UINT16("depth",    TCXState, depth,     -1),
-        DEFINE_PROP_END_OF_LIST(),
-    }
-};
-
-static void tcx_register_devices(void)
-{
-    sysbus_register_withprop(&tcx_info);
-}
-
-device_init(tcx_register_devices)

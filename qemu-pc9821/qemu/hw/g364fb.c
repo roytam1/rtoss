@@ -14,7 +14,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along
- * with this program; if not, see <http://www.gnu.org/licenses/>.
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 #include "hw.h"
@@ -25,13 +26,13 @@
 //#define DEBUG_G364
 
 #ifdef DEBUG_G364
-#define DPRINTF(fmt, ...) \
-do { printf("g364: " fmt , ## __VA_ARGS__); } while (0)
+#define DPRINTF(fmt, args...) \
+do { printf("g364: " fmt , ##args); } while (0)
 #else
-#define DPRINTF(fmt, ...) do {} while (0)
+#define DPRINTF(fmt, args...) do {} while (0)
 #endif
-#define BADF(fmt, ...) \
-do { fprintf(stderr, "g364 ERROR: " fmt , ## __VA_ARGS__);} while (0)
+#define BADF(fmt, args...) \
+do { fprintf(stderr, "g364 ERROR: " fmt , ##args);} while (0)
 
 typedef struct G364State {
     /* hardware */
@@ -268,7 +269,7 @@ static void g364fb_update_display(void *opaque)
     qemu_irq_raise(s->irq);
 }
 
-static inline void g364fb_invalidate_display(void *opaque)
+static void inline g364fb_invalidate_display(void *opaque)
 {
     G364State *s = opaque;
     int i;
@@ -396,7 +397,7 @@ static uint32_t g364fb_ctrl_readb(void *opaque, target_phys_addr_t addr)
 
 static void g364fb_update_depth(G364State *s)
 {
-    static const int depths[8] = { 1, 2, 4, 8, 15, 16, 0 };
+    const static int depths[8] = { 1, 2, 4, 8, 15, 16, 0 };
     s->depth = depths[(s->ctla & 0x00700000) >> 20];
 }
 
@@ -522,13 +523,13 @@ static void g364fb_ctrl_writeb(void *opaque, target_phys_addr_t addr, uint32_t v
     g364fb_ctrl_writel(opaque, addr & ~0x3, val);
 }
 
-static CPUReadMemoryFunc * const g364fb_ctrl_read[3] = {
+static CPUReadMemoryFunc *g364fb_ctrl_read[3] = {
     g364fb_ctrl_readb,
     g364fb_ctrl_readw,
     g364fb_ctrl_readl,
 };
 
-static CPUWriteMemoryFunc * const g364fb_ctrl_write[3] = {
+static CPUWriteMemoryFunc *g364fb_ctrl_write[3] = {
     g364fb_ctrl_writeb,
     g364fb_ctrl_writew,
     g364fb_ctrl_writel,
@@ -583,7 +584,8 @@ static void g364fb_save(QEMUFile *f, void *opaque)
     qemu_put_be32(f, s->height);
 }
 
-int g364fb_mm_init(target_phys_addr_t vram_base,
+int g364fb_mm_init(uint8_t *vram, ram_addr_t vram_offset,
+                   int vram_size, target_phys_addr_t vram_base,
                    target_phys_addr_t ctrl_base, int it_shift,
                    qemu_irq irq)
 {
@@ -592,9 +594,9 @@ int g364fb_mm_init(target_phys_addr_t vram_base,
 
     s = qemu_mallocz(sizeof(G364State));
 
-    s->vram_size = 8 * 1024 * 1024;
-    s->vram_offset = qemu_ram_alloc(s->vram_size);
-    s->vram = qemu_get_ram_ptr(s->vram_offset);
+    s->vram = vram;
+    s->vram_offset = vram_offset;
+    s->vram_size = vram_size;
     s->irq = irq;
 
     qemu_register_reset(g364fb_reset, s);
@@ -607,7 +609,7 @@ int g364fb_mm_init(target_phys_addr_t vram_base,
 
     cpu_register_physical_memory(vram_base, s->vram_size, s->vram_offset);
 
-    io_ctrl = cpu_register_io_memory(g364fb_ctrl_read, g364fb_ctrl_write, s);
+    io_ctrl = cpu_register_io_memory(0, g364fb_ctrl_read, g364fb_ctrl_write, s);
     cpu_register_physical_memory(ctrl_base, 0x200000, io_ctrl);
 
     return 0;

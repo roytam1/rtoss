@@ -16,7 +16,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along
- * with this program; if not, see <http://www.gnu.org/licenses/>.
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 #include "hw.h"
 #include "omap.h"
@@ -1086,7 +1087,7 @@ static struct clk *onchip_clks[] = {
     &dss_l4_iclk,
     &omapctrl_clk,
 
-    NULL
+    0
 };
 
 void omap_clk_adduser(struct clk *clk, qemu_irq user)
@@ -1097,6 +1098,23 @@ void omap_clk_adduser(struct clk *clk, qemu_irq user)
     *i = user;
 }
 
+/* If a clock is allowed to idle, it is disabled automatically when
+ * all of clock domains using it are disabled.  */
+static int omap_clk_is_idle(struct clk *clk)
+{
+    struct clk *chld;
+
+    if (!clk->enabled && (!clk->usecount || !(clk->flags && ALWAYS_ENABLED)))
+        return 1;
+    if (clk->usecount)
+        return 0;
+
+    for (chld = clk->child1; chld; chld = chld->sibling)
+        if (!omap_clk_is_idle(chld))
+            return 0;
+    return 1;
+}
+
 struct clk *omap_findclk(struct omap_mpu_state_s *mpu, const char *name)
 {
     struct clk *i;
@@ -1104,7 +1122,7 @@ struct clk *omap_findclk(struct omap_mpu_state_s *mpu, const char *name)
     for (i = mpu->clks; i->name; i ++)
         if (!strcmp(i->name, name) || (i->alias && !strcmp(i->alias, name)))
             return i;
-    hw_error("%s: %s not found\n", __FUNCTION__, name);
+    cpu_abort(mpu->env, "%s: %s not found\n", __FUNCTION__, name);
 }
 
 void omap_clk_get(struct clk *clk)
@@ -1115,7 +1133,8 @@ void omap_clk_get(struct clk *clk)
 void omap_clk_put(struct clk *clk)
 {
     if (!(clk->usecount --))
-        hw_error("%s: %s is not in use\n", __FUNCTION__, clk->name);
+        cpu_abort(cpu_single_env, "%s: %s is not in use\n",
+                        __FUNCTION__, clk->name);
 }
 
 static void omap_clk_update(struct clk *clk)
@@ -1184,7 +1203,7 @@ void omap_clk_reparent(struct clk *clk, struct clk *parent)
         omap_clk_update(clk);
         omap_clk_rate_update(clk);
     } else
-        clk->sibling = NULL;
+        clk->sibling = 0;
 }
 
 void omap_clk_onoff(struct clk *clk, int on)

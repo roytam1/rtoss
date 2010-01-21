@@ -4,6 +4,28 @@
 
 #include "exec-all.h"
 
+void register_machines(void)
+{
+#ifdef TARGET_SPARC64
+    qemu_register_machine(&sun4u_machine);
+    qemu_register_machine(&sun4v_machine);
+    qemu_register_machine(&niagara_machine);
+#else
+    qemu_register_machine(&ss5_machine);
+    qemu_register_machine(&ss10_machine);
+    qemu_register_machine(&ss600mp_machine);
+    qemu_register_machine(&ss20_machine);
+    qemu_register_machine(&ss2_machine);
+    qemu_register_machine(&voyager_machine);
+    qemu_register_machine(&ss_lx_machine);
+    qemu_register_machine(&ss4_machine);
+    qemu_register_machine(&scls_machine);
+    qemu_register_machine(&sbook_machine);
+    qemu_register_machine(&ss1000_machine);
+    qemu_register_machine(&ss2000_machine);
+#endif
+}
+
 void cpu_save(QEMUFile *f, void *opaque)
 {
     CPUState *env = opaque;
@@ -52,10 +74,10 @@ void cpu_save(QEMUFile *f, void *opaque)
         qemu_put_be64s(f, &env->dmmuregs[i]);
     }
     for (i = 0; i < 64; i++) {
-        qemu_put_be64s(f, &env->itlb[i].tag);
-        qemu_put_be64s(f, &env->itlb[i].tte);
-        qemu_put_be64s(f, &env->dtlb[i].tag);
-        qemu_put_be64s(f, &env->dtlb[i].tte);
+        qemu_put_be64s(f, &env->itlb_tag[i]);
+        qemu_put_be64s(f, &env->itlb_tte[i]);
+        qemu_put_be64s(f, &env->dtlb_tag[i]);
+        qemu_put_be64s(f, &env->dtlb_tte[i]);
     }
     qemu_put_be32s(f, &env->mmu_version);
     for (i = 0; i < MAXTL_MAX; i++) {
@@ -148,10 +170,10 @@ int cpu_load(QEMUFile *f, void *opaque, int version_id)
         qemu_get_be64s(f, &env->dmmuregs[i]);
     }
     for (i = 0; i < 64; i++) {
-        qemu_get_be64s(f, &env->itlb[i].tag);
-        qemu_get_be64s(f, &env->itlb[i].tte);
-        qemu_get_be64s(f, &env->dtlb[i].tag);
-        qemu_get_be64s(f, &env->dtlb[i].tte);
+        qemu_get_be64s(f, &env->itlb_tag[i]);
+        qemu_get_be64s(f, &env->itlb_tte[i]);
+        qemu_get_be64s(f, &env->dtlb_tag[i]);
+        qemu_get_be64s(f, &env->dtlb_tte[i]);
     }
     qemu_get_be32s(f, &env->mmu_version);
     for (i = 0; i < MAXTL_MAX; i++) {
@@ -164,6 +186,7 @@ int cpu_load(QEMUFile *f, void *opaque, int version_id)
     qemu_get_be32s(f, &env->asi);
     qemu_get_be32s(f, &env->pstate);
     qemu_get_be32s(f, &env->tl);
+    env->tsptr = &env->ts[env->tl & MAXTL_MASK];
     qemu_get_be32s(f, &env->cansave);
     qemu_get_be32s(f, &env->canrestore);
     qemu_get_be32s(f, &env->otherwin);

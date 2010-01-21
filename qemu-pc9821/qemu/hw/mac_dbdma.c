@@ -44,10 +44,10 @@
 //#define DEBUG_DBDMA
 
 #ifdef DEBUG_DBDMA
-#define DBDMA_DPRINTF(fmt, ...)                                 \
-    do { printf("DBDMA: " fmt , ## __VA_ARGS__); } while (0)
+#define DBDMA_DPRINTF(fmt, args...) \
+do { printf("DBDMA: " fmt , ##args); } while (0)
 #else
-#define DBDMA_DPRINTF(fmt, ...)
+#define DBDMA_DPRINTF(fmt, args...)
 #endif
 
 /*
@@ -651,7 +651,9 @@ void DBDMA_register_channel(void *dbdma, int nchan, qemu_irq irq,
 
 void DBDMA_schedule(void)
 {
-    qemu_notify_event();
+    CPUState *env = cpu_single_env;
+    if (env)
+        cpu_interrupt(env, CPU_INTERRUPT_EXIT);
 }
 
 static void
@@ -785,13 +787,13 @@ static uint32_t dbdma_readl (void *opaque, target_phys_addr_t addr)
     return value;
 }
 
-static CPUWriteMemoryFunc * const dbdma_write[] = {
+static CPUWriteMemoryFunc *dbdma_write[] = {
     NULL,
     NULL,
     dbdma_writel,
 };
 
-static CPUReadMemoryFunc * const dbdma_read[] = {
+static CPUReadMemoryFunc *dbdma_read[] = {
     NULL,
     NULL,
     dbdma_readl,
@@ -837,7 +839,7 @@ void* DBDMA_init (int *dbdma_mem_index)
 
     s = qemu_mallocz(sizeof(DBDMA_channel) * DBDMA_CHANNELS);
 
-    *dbdma_mem_index = cpu_register_io_memory(dbdma_read, dbdma_write, s);
+    *dbdma_mem_index = cpu_register_io_memory(0, dbdma_read, dbdma_write, s);
     register_savevm("dbdma", -1, 1, dbdma_save, dbdma_load, s);
     qemu_register_reset(dbdma_reset, s);
     dbdma_reset(s);

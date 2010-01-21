@@ -38,8 +38,11 @@ static struct {
     char *sink;
     char *source;
 } conf = {
-    .samples = 1024,
-    .divisor = 2,
+    1024,
+    2,
+    NULL,
+    NULL,
+    NULL
 };
 
 static void GCC_FMT_ATTR (2, 3) qpa_logerr (int err, const char *fmt, ...)
@@ -120,15 +123,16 @@ static void *qpa_thread_out (void *arg)
     return NULL;
 }
 
-static int qpa_run_out (HWVoiceOut *hw, int live)
+static int qpa_run_out (HWVoiceOut *hw)
 {
-    int decr;
+    int live, decr;
     PAVoiceOut *pa = (PAVoiceOut *) hw;
 
     if (audio_pt_lock (&pa->pt, AUDIO_FUNC)) {
         return 0;
     }
 
+    live = audio_pcm_hw_get_live_out (hw);
     decr = audio_MIN (live, pa->decr);
     pa->decr -= decr;
     pa->live = live - decr;
@@ -336,7 +340,7 @@ static int qpa_init_out (HWVoiceOut *hw, struct audsettings *as)
     return 0;
 
  fail3:
-    qemu_free (pa->pcm_buf);
+    free (pa->pcm_buf);
     pa->pcm_buf = NULL;
  fail2:
     pa_simple_free (pa->s);
@@ -390,7 +394,7 @@ static int qpa_init_in (HWVoiceIn *hw, struct audsettings *as)
     return 0;
 
  fail3:
-    qemu_free (pa->pcm_buf);
+    free (pa->pcm_buf);
     pa->pcm_buf = NULL;
  fail2:
     pa_simple_free (pa->s);
@@ -465,63 +469,47 @@ static void qpa_audio_fini (void *opaque)
 }
 
 struct audio_option qpa_options[] = {
-    {
-        .name  = "SAMPLES",
-        .tag   = AUD_OPT_INT,
-        .valp  = &conf.samples,
-        .descr = "buffer size in samples"
-    },
-    {
-        .name  = "DIVISOR",
-        .tag   = AUD_OPT_INT,
-        .valp  = &conf.divisor,
-        .descr = "threshold divisor"
-    },
-    {
-        .name  = "SERVER",
-        .tag   = AUD_OPT_STR,
-        .valp  = &conf.server,
-        .descr = "server address"
-    },
-    {
-        .name  = "SINK",
-        .tag   = AUD_OPT_STR,
-        .valp  = &conf.sink,
-        .descr = "sink device name"
-    },
-    {
-        .name  = "SOURCE",
-        .tag   = AUD_OPT_STR,
-        .valp  = &conf.source,
-        .descr = "source device name"
-    },
-    { /* End of list */ }
+    {"SAMPLES", AUD_OPT_INT, &conf.samples,
+     "buffer size in samples", NULL, 0},
+
+    {"DIVISOR", AUD_OPT_INT, &conf.divisor,
+     "threshold divisor", NULL, 0},
+
+    {"SERVER", AUD_OPT_STR, &conf.server,
+     "server address", NULL, 0},
+
+    {"SINK", AUD_OPT_STR, &conf.sink,
+     "sink device name", NULL, 0},
+
+    {"SOURCE", AUD_OPT_STR, &conf.source,
+     "source device name", NULL, 0},
+
+    {NULL, 0, NULL, NULL, NULL, 0}
 };
 
 static struct audio_pcm_ops qpa_pcm_ops = {
-    .init_out = qpa_init_out,
-    .fini_out = qpa_fini_out,
-    .run_out  = qpa_run_out,
-    .write    = qpa_write,
-    .ctl_out  = qpa_ctl_out,
-
-    .init_in  = qpa_init_in,
-    .fini_in  = qpa_fini_in,
-    .run_in   = qpa_run_in,
-    .read     = qpa_read,
-    .ctl_in   = qpa_ctl_in
+    qpa_init_out,
+    qpa_fini_out,
+    qpa_run_out,
+    qpa_write,
+    qpa_ctl_out,
+    qpa_init_in,
+    qpa_fini_in,
+    qpa_run_in,
+    qpa_read,
+    qpa_ctl_in
 };
 
 struct audio_driver pa_audio_driver = {
-    .name           = "pa",
-    .descr          = "http://www.pulseaudio.org/",
-    .options        = qpa_options,
-    .init           = qpa_audio_init,
-    .fini           = qpa_audio_fini,
-    .pcm_ops        = &qpa_pcm_ops,
-    .can_be_default = 1,
-    .max_voices_out = INT_MAX,
-    .max_voices_in  = INT_MAX,
-    .voice_size_out = sizeof (PAVoiceOut),
-    .voice_size_in  = sizeof (PAVoiceIn)
+    INIT_FIELD (name           = ) "pa",
+    INIT_FIELD (descr          = ) "http://www.pulseaudio.org/",
+    INIT_FIELD (options        = ) qpa_options,
+    INIT_FIELD (init           = ) qpa_audio_init,
+    INIT_FIELD (fini           = ) qpa_audio_fini,
+    INIT_FIELD (pcm_ops        = ) &qpa_pcm_ops,
+    INIT_FIELD (can_be_default = ) 0,
+    INIT_FIELD (max_voices_out = ) INT_MAX,
+    INIT_FIELD (max_voices_in  = ) INT_MAX,
+    INIT_FIELD (voice_size_out = ) sizeof (PAVoiceOut),
+    INIT_FIELD (voice_size_in  = ) sizeof (PAVoiceIn)
 };

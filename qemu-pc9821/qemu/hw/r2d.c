@@ -31,8 +31,6 @@
 #include "pci.h"
 #include "net.h"
 #include "sh7750_regs.h"
-#include "ide.h"
-#include "loader.h"
 
 #define SDRAM_BASE 0x0c000000 /* Physical location of SDRAM: Area 3 */
 #define SDRAM_SIZE 0x04000000
@@ -157,13 +155,13 @@ r2d_fpga_write(void *opaque, target_phys_addr_t addr, uint32_t value)
     }
 }
 
-static CPUReadMemoryFunc * const r2d_fpga_readfn[] = {
+static CPUReadMemoryFunc *r2d_fpga_readfn[] = {
     r2d_fpga_read,
     r2d_fpga_read,
     NULL,
 };
 
-static CPUWriteMemoryFunc * const r2d_fpga_writefn[] = {
+static CPUWriteMemoryFunc *r2d_fpga_writefn[] = {
     r2d_fpga_write,
     r2d_fpga_write,
     NULL,
@@ -178,16 +176,14 @@ static qemu_irq *r2d_fpga_init(target_phys_addr_t base, qemu_irq irl)
 
     s->irl = irl;
 
-    iomemtype = cpu_register_io_memory(r2d_fpga_readfn,
+    iomemtype = cpu_register_io_memory(0, r2d_fpga_readfn,
 				       r2d_fpga_writefn, s);
     cpu_register_physical_memory(base, 0x40, iomemtype);
     return qemu_allocate_irqs(r2d_fpga_irq_set, s, NR_IRQS);
 }
 
-static void r2d_pci_set_irq(void *opaque, int n, int l)
+static void r2d_pci_set_irq(qemu_irq *p, int n, int l)
 {
-    qemu_irq *p = opaque;
-
     qemu_set_irq(p[n], l);
 }
 
@@ -197,17 +193,16 @@ static int r2d_pci_map_irq(PCIDevice *d, int irq_num)
     return intx[d->devfn >> 3];
 }
 
-static void r2d_init(ram_addr_t ram_size,
+static void r2d_init(ram_addr_t ram_size, int vga_ram_size,
               const char *boot_device,
 	      const char *kernel_filename, const char *kernel_cmdline,
 	      const char *initrd_filename, const char *cpu_model)
 {
     CPUState *env;
     struct SH7750State *s;
-    ram_addr_t sdram_addr;
+    ram_addr_t sdram_addr, sm501_vga_ram_addr;
     qemu_irq *irq;
     PCIBus *pci;
-    DriveInfo *dinfo;
     int i;
 
     if (!cpu_model)
@@ -227,16 +222,18 @@ static void r2d_init(ram_addr_t ram_size,
     irq = r2d_fpga_init(0x04000000, sh7750_irl(s));
     pci = sh_pci_register_bus(r2d_pci_set_irq, r2d_pci_map_irq, irq, 0, 4);
 
-    sm501_init(0x10000000, SM501_VRAM_SIZE, irq[SM501], serial_hds[2]);
+    sm501_vga_ram_addr = qemu_ram_alloc(SM501_VRAM_SIZE);
+    sm501_init(0x10000000, sm501_vga_ram_addr, SM501_VRAM_SIZE,
+	       serial_hds[2]);
 
     /* onboard CF (True IDE mode, Master only). */
-    if ((dinfo = drive_get(IF_IDE, 0, 0)) != NULL)
+    if ((i = drive_get_index(IF_IDE, 0, 0)) != -1)
 	mmio_ide_init(0x14001000, 0x1400080c, irq[CF_IDE], 1,
-		      dinfo, NULL);
+		      drives_table[i].bdrv, NULL);
 
     /* NIC: rtl8139 on-board, and 2 slots. */
     for (i = 0; i < nb_nics; i++)
-        pci_nic_init_nofail(&nd_table[i], "rtl8139", i==0 ? "2" : NULL);
+        pci_nic_init(pci, &nd_table[i], (i==0)? 2<<3: -1, "rtl8139");
 
     /* Todo: register on board registers */
     if (kernel_filename) {
@@ -250,7 +247,7 @@ static void r2d_init(ram_addr_t ram_size,
 				   SDRAM_BASE + LINUX_LOAD_OFFSET,
 				   SDRAM_SIZE - LINUX_LOAD_OFFSET);
           env->pc = (SDRAM_BASE + LINUX_LOAD_OFFSET) | 0xa0000000;
-          pstrcpy_targphys("cmdline", SDRAM_BASE + 0x10100, 256, kernel_cmdline);
+          pstrcpy_targphys(SDRAM_BASE + 0x10100, 256, kernel_cmdline);
       } else {
           kernel_size = load_image_targphys(kernel_filename, SDRAM_BASE, SDRAM_SIZE);
           env->pc = SDRAM_BASE | 0xa0000000; /* Start from P2 area */
@@ -263,15 +260,9 @@ static void r2d_init(ram_addr_t ram_size,
     }
 }
 
-static QEMUMachine r2d_machine = {
+QEMUMachine r2d_machine = {
     .name = "r2d",
     .desc = "r2d-plus board",
     .init = r2d_init,
+    .ram_require = (SDRAM_SIZE + SM501_VRAM_SIZE) | RAMSIZE_FIXED,
 };
-
-static void r2d_machine_init(void)
-{
-    qemu_register_machine(&r2d_machine);
-}
-
-machine_init(r2d_machine_init);

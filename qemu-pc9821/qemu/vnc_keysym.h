@@ -1,6 +1,7 @@
-
-#include "keymaps.h"
-
+typedef struct {
+	const char* name;
+	int keysym;
+} name2keysym_t;
 static const name2keysym_t name2keysym[]={
 /* ascii */
     { "space",                0x020},
@@ -320,5 +321,5 @@ static const name2keysym_t name2keysym[]={
 {"Katakana_Real", 0xff25},
 {"Eisu_toggle", 0xff30},
 
-{NULL,0},
+{0,0},
 };

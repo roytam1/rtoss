@@ -22,30 +22,30 @@
  * THE SOFTWARE.
  */
 #include "hw.h"
+#include "sysemu.h"
 #include "pc.h"
-#include "qemu-timer.h"
 #include "isa.h"
-#include "qdev-addr.h"
+#include "qemu-timer.h"
 
 enum {
-    RTC_STROBE          = 0x08,
-    RTC_CLOCK           = 0x10,
-    RTC_DIN             = 0x20,
+    RTC_STROBE = 0x08,
+    RTC_CLOCK  = 0x10,
+    RTC_DIN    = 0x20,
 };
 
 enum {
-    RTC_CMD_SHIFT       = 0x01,
-    RTC_CMD_READ        = 0x03,
-    RTC_CMD_EXMODE      = 0x07,
+    RTC_CMD_SHIFT  = 0x01,
+    RTC_CMD_READ   = 0x03,
+    RTC_CMD_EXMODE = 0x07,
 };
 
 enum {
-    RTC_MODE_UPD4993A   = 0x20,
+    RTC_MODE_UPD4993A = 0x20,
 };
 
-#define TSTMP_FREQ      307200
+#define TSTMP_FREQ 307200
 
-struct sysport_t {
+struct SysPortState {
     uint8_t rtc_mode;
     uint8_t rtc_reg;
     uint8_t rtc_cmd;
@@ -59,18 +59,15 @@ struct sysport_t {
     uint8_t prn_porta;
     uint8_t prn_portc;
 
+    uint8_t sdip[24];
+    uint8_t sdip_bank;
+
     QEMUTimer *rtc_timer;
     qemu_irq irq;
     int64_t tstmp_initial_clock;
 };
 
-typedef struct sysport_isabus_t {
-    ISADevice dev;
-    uint32_t isairq;
-    struct sysport_t state;
-} sysport_isabus_t;
-
-typedef struct sysport_t sysport_t;
+typedef struct SysPortState SysPortState;
 
 /* NEC uPD4993A RTC */
 
@@ -80,7 +77,7 @@ static int rtc_period_ptr = 0;
 
 static void rtc_timer_handler(void *opaque)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
 
     /* rtc_irq_mode = 0 : 1/64 sec
                     = 1 : 1/32 sec
@@ -99,24 +96,24 @@ static void rtc_timer_handler(void *opaque)
                    rtc_period[(rtc_period_ptr++) & 7]);
 }
 
-static inline uint64_t to_bcd(int a)
+static inline uint8_t to_bcd(uint8_t val)
 {
-    return ((a / 10) << 4) | (a % 10);
+    return ((val / 10) << 4) | (val % 10);
 }
 
 static void rtc_read_time(void *opaque)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
     struct tm tm;
 
     qemu_get_timedate(&tm, 0);
-    s->rtc_shift_out = to_bcd(tm.tm_sec);
-    s->rtc_shift_out |= to_bcd(tm.tm_min) << 8;
-    s->rtc_shift_out |= to_bcd(tm.tm_hour) << 16;
-    s->rtc_shift_out |= to_bcd(tm.tm_mday) << 24;
+    s->rtc_shift_out = (uint64_t)to_bcd(tm.tm_sec);
+    s->rtc_shift_out |= (uint64_t)to_bcd(tm.tm_min) << 8;
+    s->rtc_shift_out |= (uint64_t)to_bcd(tm.tm_hour) << 16;
+    s->rtc_shift_out |= (uint64_t)to_bcd(tm.tm_mday) << 24;
     s->rtc_shift_out |= (uint64_t)tm.tm_wday << 32;
     s->rtc_shift_out |= (uint64_t)(tm.tm_mon + 1) << 36;
-    s->rtc_shift_out |= to_bcd(tm.tm_year % 100) << 40;
+    s->rtc_shift_out |= (uint64_t)to_bcd(tm.tm_year % 100) << 40;
     if (s->rtc_mode & RTC_MODE_UPD4993A) {
         s->rtc_shift_out <<= 4;
     }
@@ -124,7 +121,7 @@ static void rtc_read_time(void *opaque)
 
 static void rtc_reg_write(void *opaque, uint32_t addr, uint32_t value)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
 
     if ((s->rtc_reg & RTC_STROBE) && !(value & RTC_STROBE)) {
         s->rtc_cmd = s->rtc_reg & 0x07;
@@ -151,21 +148,21 @@ static void rtc_reg_write(void *opaque, uint32_t addr, uint32_t value)
 
 static void rtc_mode_write(void *opaque, uint32_t addr, uint32_t value)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
 
     s->rtc_mode = value;
 }
 
 static uint32_t rtc_mode_read(void *opaque, uint32_t addr)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
 
     return s->rtc_mode;
 }
 
 static void rtc_irq_mode_write(void *opaque, uint32_t addr, uint32_t value)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
 
     s->rtc_irq_mode = value;
     s->rtc_irq_count = 0;
@@ -173,7 +170,7 @@ static void rtc_irq_mode_write(void *opaque, uint32_t addr, uint32_t value)
 
 static uint32_t rtc_irq_mode_read(void *opaque, uint32_t addr)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
 
     qemu_set_irq(s->irq, 0);
     return s->rtc_irq_mode;
@@ -188,26 +185,22 @@ static uint32_t sys_porta_read(void *opaque, uint32_t addr)
 
 static uint32_t sys_portb_read(void *opaque, uint32_t addr)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
 
     return 0xf8 | (s->rtc_shift_out & 1);
 }
 
 static void sys_portc_write(void *opaque, uint32_t addr, uint32_t value)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
 
-    if ((s->sys_portc & 0xa0) != (value & 0xa0)) {
-        pc98_system_log("shut0=%d shut1=%d\n",
-                        (value & 0x80) != 0, (value & 0x20) != 0);
-    }
     s->sys_portc = value;
     pc98_pcspk_write(value);
 }
 
 static uint32_t sys_portc_read(void *opaque, uint32_t addr)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
 
     if (s->sys_portc_patch) {
         /* itf protect mode patch */
@@ -221,7 +214,7 @@ static uint32_t sys_portc_read(void *opaque, uint32_t addr)
 
 static void sys_ctrl_write(void *opaque, uint32_t addr, uint32_t value)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
 
     if (!(value & 0x80)) {
         /* set/reset portc bit */
@@ -238,7 +231,7 @@ static void sys_ctrl_write(void *opaque, uint32_t addr, uint32_t value)
 
 uint8_t pc98_sys_read_shut(void *opaque)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
 
     return ((s->sys_portc & 0xa0) == 0xa0);
 }
@@ -247,14 +240,14 @@ uint8_t pc98_sys_read_shut(void *opaque)
 
 static void prn_porta_write(void *opaque, uint32_t addr, uint32_t value)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
 
     s->prn_porta = value;
 }
 
 static uint32_t prn_porta_read(void *opaque, uint32_t addr)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
 
     return s->prn_porta;
 }
@@ -270,21 +263,21 @@ static uint32_t prn_portb_read(void *opaque, uint32_t addr)
 
 static void prn_portc_write(void *opaque, uint32_t addr, uint32_t value)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
 
     s->prn_portc = value;
 }
 
 static uint32_t prn_portc_read(void *opaque, uint32_t addr)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
 
     return s->prn_portc;
 }
 
 static void prn_ctrl_write(void *opaque, uint32_t addr, uint32_t value)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
 
     if (!(value & 0x80)) {
         /* set/reset portc bit */
@@ -303,9 +296,9 @@ static void prn_ctrl_write(void *opaque, uint32_t addr, uint32_t value)
 
 static uint32_t tstmp_read(void *opaque, uint32_t addr)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
     uint64_t d = muldiv64(qemu_get_clock(vm_clock) - s->tstmp_initial_clock,
-                          TSTMP_FREQ, get_ticks_per_sec());
+                          TSTMP_FREQ, ticks_per_sec);
 
     switch(addr) {
     case 0x5c:
@@ -316,11 +309,46 @@ static uint32_t tstmp_read(void *opaque, uint32_t addr)
     return 0xffff;
 }
 
+/* software dip-switch */
+
+static void sdip_data_write(void *opaque, uint32_t addr, uint32_t value)
+{
+    SysPortState *s = opaque;
+    uint8_t bank;
+
+    if (s->sdip_bank & 0x40) {
+        bank = ((addr >> 8) & 0x0f) + 8;
+    } else {
+        bank = ((addr >> 8) & 0x0f) - 4;
+    }
+    s->sdip[bank] = value;
+}
+
+static uint32_t sdip_data_read(void *opaque, uint32_t addr)
+{
+    SysPortState *s = opaque;
+    uint8_t bank;
+ 
+    if (s->sdip_bank & 0x40) {
+        bank = ((addr >> 8) & 0x0f) + 8;
+    } else {
+        bank = ((addr >> 8) & 0x0f) - 4;
+    }
+    return s->sdip[bank];
+}
+
+static void sdip_bank_write(void *opaque, uint32_t addr, uint32_t value)
+{
+    SysPortState *s = opaque;
+
+    s->sdip_bank = value;
+}
+
 /* interface */
 
 static void pc98_sys_reset(void *opaque)
 {
-    sysport_t *s = opaque;
+    SysPortState *s = opaque;
 
     s->rtc_mode = 0xff;
     s->rtc_reg = 0;
@@ -333,29 +361,64 @@ static void pc98_sys_reset(void *opaque)
     s->prn_portc = 0x81;
 }
 
-static const VMStateDescription vmstate_sysport = {
-    .name = "pc98-sys",
-    .version_id = 1,
-    .minimum_version_id = 1,
-    .minimum_version_id_old = 1,
-    .fields      = (VMStateField []) {
-        VMSTATE_UINT8(rtc_reg, sysport_t),
-        VMSTATE_UINT8(rtc_cmd, sysport_t),
-        VMSTATE_UINT64(rtc_shift_out, sysport_t),
-        VMSTATE_UINT8(rtc_shift_cmd, sysport_t),
-        VMSTATE_UINT8(rtc_irq_mode, sysport_t),
-        VMSTATE_UINT8(rtc_irq_count, sysport_t),
-        VMSTATE_UINT8(sys_portc, sysport_t),
-        VMSTATE_UINT8(prn_porta, sysport_t),
-        VMSTATE_UINT8(prn_portc, sysport_t),
-        VMSTATE_END_OF_LIST()
+static void pc98_sys_save(QEMUFile *f, void *opaque)
+{
+    SysPortState *s = opaque;
+
+    qemu_put_8s(f, &s->rtc_reg);
+    qemu_put_8s(f, &s->rtc_cmd);
+    qemu_put_be64(f, s->rtc_shift_out);
+    qemu_put_8s(f, &s->rtc_shift_cmd);
+    qemu_put_8s(f, &s->rtc_irq_mode);
+    qemu_put_8s(f, &s->rtc_irq_count);
+    qemu_put_8s(f, &s->sys_portc);
+    qemu_put_8s(f, &s->prn_porta);
+    qemu_put_8s(f, &s->prn_portc);
+    qemu_put_buffer(f, s->sdip, 24);
+    qemu_put_8s(f, &s->sdip_bank);
+}
+
+static int pc98_sys_load(QEMUFile *f, void *opaque, int version_id)
+{
+    SysPortState *s = opaque;
+
+    if (version_id != 1) {
+        return -EINVAL;
     }
+
+    qemu_get_8s(f, &s->rtc_reg);
+    qemu_get_8s(f, &s->rtc_cmd);
+    s->rtc_shift_out = qemu_get_be64(f);
+    qemu_get_8s(f, &s->rtc_shift_cmd);
+    qemu_get_8s(f, &s->rtc_irq_mode);
+    qemu_get_8s(f, &s->rtc_irq_count);
+    qemu_get_8s(f, &s->sys_portc);
+    qemu_get_8s(f, &s->prn_porta);
+    qemu_get_8s(f, &s->prn_portc);
+    qemu_get_buffer(f, s->sdip, 24);
+    qemu_get_8s(f, &s->sdip_bank);
+
+    return 0;
+}
+
+static const uint8_t sdip_default[] = {
+#ifdef PC98_DONT_USE_16MB_MEM
+    0x7c, 0x12, 0xf7, 0x3e, 0x7c, 0x7f, 0xff, 0xbf, 0x7f, 0x7f, 0x49, 0x19,
+#else
+    0x7c, 0x12, 0xf7, 0x3e, 0x7c, 0x7f, 0xff, 0xbf, 0x7f, 0x7f, 0x49, 0x98,
+#endif
+    0x8f, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
 };
 
-static int pc98_sys_initfn(ISADevice *dev)
+void *pc98_sys_init(qemu_irq irq)
 {
-    sysport_isabus_t *isa = DO_UPCAST(sysport_isabus_t, dev, dev);
-    sysport_t *s = &isa->state;
+    SysPortState *s;
+    int i;
+
+    s = qemu_mallocz(sizeof(SysPortState));
+
+    memcpy(s->sdip, sdip_default, 24);
+    s->sdip_bank = 0;
 
     register_ioport_write(0x20, 1, 1, rtc_reg_write, s);
     register_ioport_write(0x22, 1, 1, rtc_mode_write, s);
@@ -379,47 +442,23 @@ static int pc98_sys_initfn(ISADevice *dev)
     register_ioport_read(0x5c, 2, 2, tstmp_read, s);
     register_ioport_read(0x5e, 2, 2, tstmp_read, s);
 
-    isa_init_irq(dev, &s->irq, isa->isairq);
+    for (i = 0; i < 12; i++) {
+        register_ioport_write(0x841e + i * 0x100, 1, 1, sdip_data_write, s);
+        register_ioport_read(0x841e + i * 0x100, 1, 1, sdip_data_read, s);
+    }
+    register_ioport_write(0x8f1f, 1, 1, sdip_bank_write, s);
+    register_ioport_write(0xf0f6, 1, 1, sdip_bank_write, s);
+
+    s->irq = irq;
 
     s->rtc_timer = qemu_new_timer(rt_clock, rtc_timer_handler, s);
     qemu_mod_timer(s->rtc_timer, qemu_get_clock(rt_clock) +
                    rtc_period[(rtc_period_ptr++) & 7]);
     s->tstmp_initial_clock = qemu_get_clock(vm_clock);
 
-    vmstate_register(-1, &vmstate_sysport, s);
+    register_savevm("pc98sys", 0, 1, pc98_sys_save, pc98_sys_load, s);
     pc98_sys_reset(s);
     qemu_register_reset(pc98_sys_reset, s);
 
-    return 0;
+    return s;
 }
-
-
-
-void *pc98_sys_init(void)
-{
-    ISADevice *dev;
-    sysport_isabus_t *isa;
-
-    dev = isa_create("pc98-sys");
-    qdev_init_nofail(&dev->qdev);
-
-    isa = DO_UPCAST(sysport_isabus_t, dev, dev);
-    return &isa->state;
-}
-
-static ISADeviceInfo pc98_sys_info = {
-    .qdev.name  = "pc98-sys",
-    .qdev.size  = sizeof(sysport_isabus_t),
-    .init       = pc98_sys_initfn,
-    .qdev.props = (Property[]) {
-        DEFINE_PROP_UINT32("irq", sysport_isabus_t, isairq, 15),
-        DEFINE_PROP_END_OF_LIST(),
-    },
-};
-
-static void pc98_sys_register_devices(void)
-{
-    isa_qdev_register(&pc98_sys_info);
-}
-
-device_init(pc98_sys_register_devices)

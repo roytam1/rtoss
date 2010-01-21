@@ -17,6 +17,8 @@ register struct CPUMIPSState *env asm(AREG0);
 #include "softmmu_exec.h"
 #endif /* !defined(CONFIG_USER_ONLY) */
 
+void do_mtc0_status_debug(uint32_t old, uint32_t val);
+void do_mtc0_status_irqraise_debug(void);
 void dump_fpu(CPUState *env);
 void fpu_dump_state(CPUState *env, FILE *f,
                     int (*fpu_fprintf)(FILE *f, const char *fmt, ...),
@@ -33,18 +35,12 @@ static inline void regs_to_env(void)
 {
 }
 
-static inline int cpu_has_work(CPUState *env)
-{
-    return (env->interrupt_request &
-            (CPU_INTERRUPT_HARD | CPU_INTERRUPT_TIMER));
-}
-
-
 static inline int cpu_halted(CPUState *env)
 {
     if (!env->halted)
         return 0;
-    if (cpu_has_work(env)) {
+    if (env->interrupt_request &
+        (CPU_INTERRUPT_HARD | CPU_INTERRUPT_TIMER)) {
         env->halted = 0;
         return 0;
     }

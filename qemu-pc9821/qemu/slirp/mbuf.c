@@ -17,7 +17,10 @@
 
 #include <slirp.h>
 
+int mbuf_alloced = 0;
+struct mbuf m_freelist, m_usedlist;
 #define MBUF_THRESH 30
+int mbuf_max = 0;
 
 /*
  * Find a nice value for msize
@@ -26,10 +29,10 @@
 #define SLIRP_MSIZE (IF_MTU + IF_MAXLINKHDR + sizeof(struct m_hdr ) + 6)
 
 void
-m_init(Slirp *slirp)
+m_init()
 {
-    slirp->m_freelist.m_next = slirp->m_freelist.m_prev = &slirp->m_freelist;
-    slirp->m_usedlist.m_next = slirp->m_usedlist.m_prev = &slirp->m_usedlist;
+	m_freelist.m_next = m_freelist.m_prev = &m_freelist;
+	m_usedlist.m_next = m_usedlist.m_prev = &m_usedlist;
 }
 
 /*
@@ -41,42 +44,44 @@ m_init(Slirp *slirp)
  * which tells m_free to actually free() it
  */
 struct mbuf *
-m_get(Slirp *slirp)
+m_get()
 {
 	register struct mbuf *m;
 	int flags = 0;
 
 	DEBUG_CALL("m_get");
 
-	if (slirp->m_freelist.m_next == &slirp->m_freelist) {
+	if (m_freelist.m_next == &m_freelist) {
 		m = (struct mbuf *)malloc(SLIRP_MSIZE);
 		if (m == NULL) goto end_error;
-		slirp->mbuf_alloced++;
-		if (slirp->mbuf_alloced > MBUF_THRESH)
+		mbuf_alloced++;
+		if (mbuf_alloced > MBUF_THRESH)
 			flags = M_DOFREE;
-		m->slirp = slirp;
+		if (mbuf_alloced > mbuf_max)
+			mbuf_max = mbuf_alloced;
 	} else {
-		m = slirp->m_freelist.m_next;
+		m = m_freelist.m_next;
 		remque(m);
 	}
 
 	/* Insert it in the used list */
-	insque(m,&slirp->m_usedlist);
+	insque(m,&m_usedlist);
 	m->m_flags = (flags | M_USEDLIST);
 
 	/* Initialise it */
 	m->m_size = SLIRP_MSIZE - sizeof(struct m_hdr);
 	m->m_data = m->m_dat;
 	m->m_len = 0;
-        m->m_nextpkt = NULL;
-        m->m_prevpkt = NULL;
+	m->m_nextpkt = 0;
+	m->m_prevpkt = 0;
 end_error:
 	DEBUG_ARG("m = %lx", (long )m);
 	return m;
 }
 
 void
-m_free(struct mbuf *m)
+m_free(m)
+	struct mbuf *m;
 {
 
   DEBUG_CALL("m_free");
@@ -96,9 +101,9 @@ m_free(struct mbuf *m)
 	 */
 	if (m->m_flags & M_DOFREE) {
 		free(m);
-		m->slirp->mbuf_alloced--;
+		mbuf_alloced--;
 	} else if ((m->m_flags & M_FREELIST) == 0) {
-		insque(m,&m->slirp->m_freelist);
+		insque(m,&m_freelist);
 		m->m_flags = M_FREELIST; /* Clobber other flags */
 	}
   } /* if(m) */
@@ -110,7 +115,8 @@ m_free(struct mbuf *m)
  * an M_EXT data segment
  */
 void
-m_cat(struct mbuf *m, struct mbuf *n)
+m_cat(m, n)
+	register struct mbuf *m, *n;
 {
 	/*
 	 * If there's no room, realloc
@@ -127,7 +133,9 @@ m_cat(struct mbuf *m, struct mbuf *n)
 
 /* make m size bytes large */
 void
-m_inc(struct mbuf *m, int size)
+m_inc(m, size)
+        struct mbuf *m;
+        int size;
 {
 	int datasize;
 
@@ -137,11 +145,17 @@ m_inc(struct mbuf *m, int size)
         if (m->m_flags & M_EXT) {
 	  datasize = m->m_data - m->m_ext;
 	  m->m_ext = (char *)realloc(m->m_ext,size);
+/*		if (m->m_ext == NULL)
+ *			return (struct mbuf *)NULL;
+ */
 	  m->m_data = m->m_ext + datasize;
         } else {
 	  char *dat;
 	  datasize = m->m_data - m->m_dat;
 	  dat = (char *)malloc(size);
+/*		if (dat == NULL)
+ *			return (struct mbuf *)NULL;
+ */
 	  memcpy(dat, m->m_dat, m->m_size);
 
 	  m->m_ext = dat;
@@ -156,7 +170,9 @@ m_inc(struct mbuf *m, int size)
 
 
 void
-m_adj(struct mbuf *m, int len)
+m_adj(m, len)
+	struct mbuf *m;
+	int len;
 {
 	if (m == NULL)
 		return;
@@ -176,7 +192,9 @@ m_adj(struct mbuf *m, int len)
  * Copy len bytes from m, starting off bytes into n
  */
 int
-m_copy(struct mbuf *n, struct mbuf *m, int off, int len)
+m_copy(n, m, off, len)
+	struct mbuf *n, *m;
+	int off, len;
 {
 	if (len > M_FREEROOM(n))
 		return -1;
@@ -193,7 +211,8 @@ m_copy(struct mbuf *n, struct mbuf *m, int off, int len)
  * Fortunately, it's not used often
  */
 struct mbuf *
-dtom(Slirp *slirp, void *dat)
+dtom(dat)
+	void *dat;
 {
 	struct mbuf *m;
 
@@ -201,8 +220,7 @@ dtom(Slirp *slirp, void *dat)
 	DEBUG_ARG("dat = %lx", (long )dat);
 
 	/* bug corrected for M_EXT buffers */
-	for (m = slirp->m_usedlist.m_next; m != &slirp->m_usedlist;
-	     m = m->m_next) {
+	for (m = m_usedlist.m_next; m != &m_usedlist; m = m->m_next) {
 	  if (m->m_flags & M_EXT) {
 	    if( (char *)dat>=m->m_ext && (char *)dat<(m->m_ext + m->m_size) )
 	      return m;

@@ -14,7 +14,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 #include "exec.h"
 #include "helpers.h"
@@ -306,7 +307,7 @@ void HELPER(set_user_reg)(uint32_t regno, uint32_t val)
 uint32_t HELPER (add_cc)(uint32_t a, uint32_t b)
 {
     uint32_t result;
-    result = a + b;
+    result = T0 + T1;
     env->NF = env->ZF = result;
     env->CF = result < a;
     env->VF = (a ^ b ^ -1) & (a ^ result);
@@ -377,6 +378,14 @@ uint32_t HELPER(sar)(uint32_t x, uint32_t i)
     if (shift >= 32)
         shift = 31;
     return (int32_t)x >> shift;
+}
+
+uint32_t HELPER(ror)(uint32_t x, uint32_t i)
+{
+    int shift = i & 0xff;
+    if (shift == 0)
+        return x;
+    return (x >> shift) | (x << (32 - shift));
 }
 
 uint32_t HELPER(shl_cc)(uint32_t x, uint32_t i)
@@ -486,4 +495,62 @@ uint64_t HELPER(neon_sub_saturate_u64)(uint64_t src1, uint64_t src2)
         res = src1 - src2;
     }
     return res;
+}
+
+/* These need to return a pair of value, so still use T0/T1.  */
+/* Transpose.  Argument order is rather strange to avoid special casing
+   the tranlation code.
+   On input T0 = rm, T1 = rd.  On output T0 = rd, T1 = rm  */
+void HELPER(neon_trn_u8)(void)
+{
+    uint32_t rd;
+    uint32_t rm;
+    rd = ((T0 & 0x00ff00ff) << 8) | (T1 & 0x00ff00ff);
+    rm = ((T1 & 0xff00ff00) >> 8) | (T0 & 0xff00ff00);
+    T0 = rd;
+    T1 = rm;
+}
+
+void HELPER(neon_trn_u16)(void)
+{
+    uint32_t rd;
+    uint32_t rm;
+    rd = (T0 << 16) | (T1 & 0xffff);
+    rm = (T1 >> 16) | (T0 & 0xffff0000);
+    T0 = rd;
+    T1 = rm;
+}
+
+/* Worker routines for zip and unzip.  */
+void HELPER(neon_unzip_u8)(void)
+{
+    uint32_t rd;
+    uint32_t rm;
+    rd = (T0 & 0xff) | ((T0 >> 8) & 0xff00)
+         | ((T1 << 16) & 0xff0000) | ((T1 << 8) & 0xff000000);
+    rm = ((T0 >> 8) & 0xff) | ((T0 >> 16) & 0xff00)
+         | ((T1 << 8) & 0xff0000) | (T1 & 0xff000000);
+    T0 = rd;
+    T1 = rm;
+}
+
+void HELPER(neon_zip_u8)(void)
+{
+    uint32_t rd;
+    uint32_t rm;
+    rd = (T0 & 0xff) | ((T1 << 8) & 0xff00)
+         | ((T0 << 16) & 0xff0000) | ((T1 << 24) & 0xff000000);
+    rm = ((T0 >> 16) & 0xff) | ((T1 >> 8) & 0xff00)
+         | ((T0 >> 8) & 0xff0000) | (T1 & 0xff000000);
+    T0 = rd;
+    T1 = rm;
+}
+
+void HELPER(neon_zip_u16)(void)
+{
+    uint32_t tmp;
+
+    tmp = (T0 & 0xffff) | (T1 << 16);
+    T1 = (T1 & 0xffff0000) | (T0 >> 16);
+    T0 = tmp;
 }

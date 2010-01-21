@@ -20,7 +20,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston,
+ * MA  02110-1301  USA
  */
 
 /* BD Address */
@@ -109,6 +111,9 @@ void bt_device_done(struct bt_device_s *dev);
 
 /* bt-hci.c */
 struct HCIInfo *bt_new_hci(struct bt_scatternet_s *net);
+
+/* bt-host.c */
+struct HCIInfo *bt_host_hci(const char *id);
 
 /* bt-vhci.c */
 void bt_vhci_init(struct HCIInfo *info);

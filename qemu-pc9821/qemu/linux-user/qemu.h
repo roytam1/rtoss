@@ -18,9 +18,8 @@
 #include "syscall.h"
 #include "target_signal.h"
 #include "gdbstub.h"
-#include "qemu-queue.h"
 
-#if defined(CONFIG_USE_NPTL)
+#if defined(USE_NPTL)
 #define THREAD __thread
 #else
 #define THREAD
@@ -45,9 +44,6 @@ struct image_info {
         abi_ulong       entry;
         abi_ulong       code_offset;
         abi_ulong       data_offset;
-        abi_ulong       saved_auxv;
-        abi_ulong       arg_start;
-        abi_ulong       arg_end;
         char            **host_argv;
 	int		personality;
 };
@@ -91,7 +87,7 @@ struct emulated_sigtable {
 /* NOTE: we force a big alignment so that the stack stored after is
    aligned too */
 typedef struct TaskState {
-    pid_t ts_tid;     /* tid (or pid) of this task */
+    struct TaskState *next;
 #ifdef TARGET_ARM
     /* FPA state */
     FPA11 fpa;
@@ -104,9 +100,6 @@ typedef struct TaskState {
     uint32_t v86flags;
     uint32_t v86mask;
 #endif
-#ifdef CONFIG_USE_NPTL
-    abi_ulong child_tidptr;
-#endif
 #ifdef TARGET_M68K
     int sim_syscalls;
 #endif
@@ -118,7 +111,6 @@ typedef struct TaskState {
 #endif
     int used; /* non zero if used */
     struct image_info *info;
-    struct linux_binprm *bprm;
 
     struct emulated_sigtable sigtab[TARGET_NSIG];
     struct sigqueue sigqueue_table[MAX_SIGQUEUE_SIZE]; /* siginfo queue */
@@ -130,12 +122,7 @@ typedef struct TaskState {
 
 extern char *exec_path;
 void init_task_state(TaskState *ts);
-void task_settid(TaskState *);
-void stop_all_tasks(void);
 extern const char *qemu_uname_release;
-#if defined(CONFIG_USE_GUEST_BASE)
-extern unsigned long mmap_min_addr;
-#endif
 
 /* ??? See if we can avoid exposing so much of the loader internals.  */
 /*
@@ -143,7 +130,7 @@ extern unsigned long mmap_min_addr;
  * and envelope for the new program. 32 should suffice, this gives
  * a maximum env+arg of 128kB w/4KB pages!
  */
-#define MAX_ARG_PAGES 33
+#define MAX_ARG_PAGES 32
 
 /*
  * This structure is used to hold the arguments that are
@@ -159,15 +146,13 @@ struct linux_binprm {
         char **argv;
         char **envp;
         char * filename;        /* Name of binary */
-        int (*core_dump)(int, const CPUState *); /* coredump routine */
 };
 
 void do_init_thread(struct target_pt_regs *regs, struct image_info *infop);
 abi_ulong loader_build_argptr(int envc, int argc, abi_ulong sp,
                               abi_ulong stringp, int push_ptr);
 int loader_exec(const char * filename, char ** argv, char ** envp,
-             struct target_pt_regs * regs, struct image_info *infop,
-             struct linux_binprm *);
+             struct target_pt_regs * regs, struct image_info *infop);
 
 int load_elf_binary(struct linux_binprm * bprm, struct target_pt_regs * regs,
                     struct image_info * info);
@@ -190,6 +175,8 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
 void gemu_log(const char *fmt, ...) __attribute__((format(printf,1,2)));
 extern THREAD CPUState *thread_env;
 void cpu_loop(CPUState *env);
+void init_paths(const char *prefix);
+const char *path(const char *pathname);
 char *target_strerror(int err);
 int get_osversion(void);
 void fork_start(void);
@@ -211,7 +198,6 @@ int queue_signal(CPUState *env, int sig, target_siginfo_t *info);
 void host_to_target_siginfo(target_siginfo_t *tinfo, const siginfo_t *info);
 void target_to_host_siginfo(siginfo_t *info, const target_siginfo_t *tinfo);
 int target_to_host_signal(int sig);
-int host_to_target_signal(int sig);
 long do_sigreturn(CPUState *env);
 long do_rt_sigreturn(CPUState *env);
 abi_long do_sigaltstack(abi_ulong uss_addr, abi_ulong uoss_addr, abi_ulong sp);
@@ -239,10 +225,7 @@ int target_msync(abi_ulong start, abi_ulong len, int flags);
 extern unsigned long last_brk;
 void mmap_lock(void);
 void mmap_unlock(void);
-abi_ulong mmap_find_vma(abi_ulong, abi_ulong);
-void cpu_list_lock(void);
-void cpu_list_unlock(void);
-#if defined(CONFIG_USE_NPTL)
+#if defined(USE_NPTL)
 void mmap_fork_start(void);
 void mmap_fork_end(int child);
 #endif
@@ -273,10 +256,10 @@ static inline int access_ok(int type, abi_ulong addr, abi_ulong size)
         *(uint8_t *)(hptr) = (uint8_t)(typeof(*hptr))(x);\
         break;\
     case 2:\
-        *(uint16_t *)(hptr) = tswap16((uint16_t)(typeof(*hptr))(x));\
+        *(uint16_t *)(hptr) = tswap16((typeof(*hptr))(x));\
         break;\
     case 4:\
-        *(uint32_t *)(hptr) = tswap32((uint32_t)(typeof(*hptr))(x));\
+        *(uint32_t *)(hptr) = tswap32((typeof(*hptr))(x));\
         break;\
     case 8:\
         *(uint64_t *)(hptr) = tswap64((typeof(*hptr))(x));\
@@ -439,7 +422,7 @@ static inline void *lock_user_string(abi_ulong guest_addr)
 #define unlock_user_struct(host_ptr, guest_addr, copy)		\
     unlock_user(host_ptr, guest_addr, (copy) ? sizeof(*host_ptr) : 0)
 
-#if defined(CONFIG_USE_NPTL)
+#if defined(USE_NPTL)
 #include <pthread.h>
 #endif
 

@@ -22,38 +22,37 @@
 #include "qemu-common.h"
 #include "sysemu.h"
 #include "device_tree.h"
-#include "hw/loader.h"
 
 #include <libfdt.h>
 
-void *load_device_tree(const char *filename_path, int *sizep)
+void *load_device_tree(const char *filename_path, void *load_addr)
 {
-    int dt_size;
+    int dt_file_size;
     int dt_file_load_size;
+    int new_dt_size;
     int ret;
-    void *fdt = NULL;
+    void *dt_file = NULL;
+    void *fdt;
 
-    *sizep = 0;
-    dt_size = get_image_size(filename_path);
-    if (dt_size < 0) {
+    dt_file_size = get_image_size(filename_path);
+    if (dt_file_size < 0) {
         printf("Unable to get size of device tree file '%s'\n",
             filename_path);
         goto fail;
     }
 
-    /* Expand to 2x size to give enough room for manipulation.  */
-    dt_size *= 2;
     /* First allocate space in qemu for device tree */
-    fdt = qemu_mallocz(dt_size);
+    dt_file = qemu_mallocz(dt_file_size);
 
-    dt_file_load_size = load_image(filename_path, fdt);
-    if (dt_file_load_size < 0) {
-        printf("Unable to open device tree file '%s'\n",
-               filename_path);
-        goto fail;
-    }
+    dt_file_load_size = load_image(filename_path, dt_file);
 
-    ret = fdt_open_into(fdt, fdt, dt_size);
+    /* Second we place new copy of 2x size in guest memory
+     * This give us enough room for manipulation.
+     */
+    new_dt_size = dt_file_size * 2;
+
+    fdt = load_addr;
+    ret = fdt_open_into(dt_file, fdt, new_dt_size);
     if (ret) {
         printf("Unable to copy device tree in memory\n");
         goto fail;
@@ -65,11 +64,12 @@ void *load_device_tree(const char *filename_path, int *sizep)
             filename_path);
         goto fail;
     }
-    *sizep = dt_size;
+    /* free qemu memory with old device tree */
+    qemu_free(dt_file);
     return fdt;
 
 fail:
-    qemu_free(fdt);
+    qemu_free(dt_file);
     return NULL;
 }
 

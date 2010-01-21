@@ -24,5 +24,19 @@
 
 #include "etraxfs_dma.h"
 
-qemu_irq *cris_pic_init_cpu(CPUState *env);
-void *etraxfs_eth_init(NICInfo *nd, target_phys_addr_t base, int phyaddr);
+struct etraxfs_pic
+{
+    qemu_irq *irq;
+    qemu_irq *nmi;
+    qemu_irq *guru;
+
+    void *internal;
+};
+
+struct etraxfs_pic *etraxfs_pic_init(CPUState *env, target_phys_addr_t base);
+void etraxfs_timer_init(CPUState *env, qemu_irq *irqs, qemu_irq *nmi,
+                        target_phys_addr_t base);
+void *etraxfs_eth_init(NICInfo *nd, CPUState *env,
+                       qemu_irq *irq, target_phys_addr_t base, int phyaddr);
+void etraxfs_ser_init(CPUState *env, qemu_irq *irq, CharDriverState *chr,
+                      target_phys_addr_t base);

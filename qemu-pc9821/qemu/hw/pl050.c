@@ -7,11 +7,11 @@
  * This code is licenced under the GPL.
  */
 
-#include "sysbus.h"
+#include "hw.h"
+#include "primecell.h"
 #include "ps2.h"
 
 typedef struct {
-    SysBusDevice busdev;
     void *dev;
     uint32_t cr;
     uint32_t clk;
@@ -79,7 +79,7 @@ static uint32_t pl050_read(void *opaque, target_phys_addr_t offset)
     case 4: /* KMIIR */
         return s->pending | 2;
     default:
-        hw_error("pl050_read: Bad offset %x\n", (int)offset);
+        cpu_abort (cpu_single_env, "pl050_read: Bad offset %x\n", (int)offset);
         return 0;
     }
 }
@@ -107,55 +107,35 @@ static void pl050_write(void *opaque, target_phys_addr_t offset,
         s->clk = value;
         return;
     default:
-        hw_error("pl050_write: Bad offset %x\n", (int)offset);
+        cpu_abort (cpu_single_env, "pl050_write: Bad offset %x\n", (int)offset);
     }
 }
-static CPUReadMemoryFunc * const pl050_readfn[] = {
+static CPUReadMemoryFunc *pl050_readfn[] = {
    pl050_read,
    pl050_read,
    pl050_read
 };
 
-static CPUWriteMemoryFunc * const pl050_writefn[] = {
+static CPUWriteMemoryFunc *pl050_writefn[] = {
    pl050_write,
    pl050_write,
    pl050_write
 };
 
-static int pl050_init(SysBusDevice *dev, int is_mouse)
+void pl050_init(uint32_t base, qemu_irq irq, int is_mouse)
 {
-    pl050_state *s = FROM_SYSBUS(pl050_state, dev);
     int iomemtype;
+    pl050_state *s;
 
-    iomemtype = cpu_register_io_memory(pl050_readfn,
+    s = (pl050_state *)qemu_mallocz(sizeof(pl050_state));
+    iomemtype = cpu_register_io_memory(0, pl050_readfn,
                                        pl050_writefn, s);
-    sysbus_init_mmio(dev, 0x1000, iomemtype);
-    sysbus_init_irq(dev, &s->irq);
+    cpu_register_physical_memory(base, 0x00001000, iomemtype);
+    s->irq = irq;
     s->is_mouse = is_mouse;
-    if (s->is_mouse)
+    if (is_mouse)
         s->dev = ps2_mouse_init(pl050_update, s);
     else
         s->dev = ps2_kbd_init(pl050_update, s);
     /* ??? Save/restore.  */
-    return 0;
 }
-
-static int pl050_init_keyboard(SysBusDevice *dev)
-{
-    return pl050_init(dev, 0);
-}
-
-static int pl050_init_mouse(SysBusDevice *dev)
-{
-    return pl050_init(dev, 1);
-}
-
-static void pl050_register_devices(void)
-{
-    sysbus_register_dev("pl050_keyboard", sizeof(pl050_state),
-                        pl050_init_keyboard);
-    sysbus_register_dev("pl050_mouse", sizeof(pl050_state),
-                        pl050_init_mouse);
-}
-
-device_init(pl050_register_devices)

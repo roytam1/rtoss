@@ -14,7 +14,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 
 #include "exec.h"
@@ -24,7 +25,7 @@
 
 void helper_tb_flush (void)
 {
-    tb_flush(env);
+    tlb_flush(env, 1);
 }
 
 /*****************************************************************************/
@@ -36,10 +37,30 @@ void helper_excp (int excp, int error)
     cpu_loop_exit();
 }
 
+uint64_t helper_amask (uint64_t arg)
+{
+    switch (env->implver) {
+    case IMPLVER_2106x:
+        /* EV4, EV45, LCA, LCA45 & EV5 */
+        break;
+    case IMPLVER_21164:
+    case IMPLVER_21264:
+    case IMPLVER_21364:
+        arg &= ~env->amask;
+        break;
+    }
+    return arg;
+}
+
 uint64_t helper_load_pcc (void)
 {
     /* XXX: TODO */
     return 0;
+}
+
+uint64_t helper_load_implver (void)
+{
+    return env->implver;
 }
 
 uint64_t helper_load_fpcr (void)
@@ -89,7 +110,7 @@ void helper_store_fpcr (uint64_t val)
     }
 }
 
-static spinlock_t intr_cpu_lock = SPIN_LOCK_UNLOCKED;
+spinlock_t intr_cpu_lock = SPIN_LOCK_UNLOCKED;
 
 uint64_t helper_rs(void)
 {
@@ -137,22 +158,22 @@ uint64_t helper_addlv (uint64_t op1, uint64_t op2)
 
 uint64_t helper_subqv (uint64_t op1, uint64_t op2)
 {
-    uint64_t res;
-    res = op1 - op2;
-    if (unlikely((op1 ^ op2) & (res ^ op1) & (1ULL << 63))) {
+    uint64_t tmp = op1;
+    op1 -= op2;
+    if (unlikely(((~tmp) ^ op1 ^ (-1ULL)) & ((~tmp) ^ op2) & (1ULL << 63))) {
         helper_excp(EXCP_ARITH, EXCP_ARITH_OVERFLOW);
     }
-    return res;
+    return op1;
 }
 
 uint64_t helper_sublv (uint64_t op1, uint64_t op2)
 {
-    uint32_t res;
-    res = op1 - op2;
-    if (unlikely((op1 ^ op2) & (res ^ op1) & (1UL << 31))) {
+    uint64_t tmp = op1;
+    op1 = (uint32_t)(op1 - op2);
+    if (unlikely(((~tmp) ^ op1 ^ (-1UL)) & ((~tmp) ^ op2) & (1UL << 31))) {
         helper_excp(EXCP_ARITH, EXCP_ARITH_OVERFLOW);
     }
-    return res;
+    return op1;
 }
 
 uint64_t helper_mullv (uint64_t op1, uint64_t op2)
@@ -200,7 +221,7 @@ uint64_t helper_cttz (uint64_t arg)
     return ctz64(arg);
 }
 
-static inline uint64_t byte_zap(uint64_t op, uint8_t mskb)
+static always_inline uint64_t byte_zap (uint64_t op, uint8_t mskb)
 {
     uint64_t mask;
 
@@ -322,7 +343,7 @@ uint64_t helper_cmpbge (uint64_t op1, uint64_t op2)
 /* Floating point helpers */
 
 /* F floating (VAX) */
-static inline uint64_t float32_to_f(float32 fa)
+static always_inline uint64_t float32_to_f (float32 fa)
 {
     uint64_t r, exp, mant, sig;
     CPU_FloatU a;
@@ -355,7 +376,7 @@ static inline uint64_t float32_to_f(float32 fa)
     return r;
 }
 
-static inline float32 f_to_float32(uint64_t a)
+static always_inline float32 f_to_float32 (uint64_t a)
 {
     uint32_t exp, mant_sig;
     CPU_FloatU r;
@@ -449,7 +470,7 @@ uint64_t helper_sqrtf (uint64_t t)
 
 
 /* G floating (VAX) */
-static inline uint64_t float64_to_g(float64 fa)
+static always_inline uint64_t float64_to_g (float64 fa)
 {
     uint64_t r, exp, mant, sig;
     CPU_DoubleU a;
@@ -482,7 +503,7 @@ static inline uint64_t float64_to_g(float64 fa)
     return r;
 }
 
-static inline float64 g_to_float64(uint64_t a)
+static always_inline float64 g_to_float64 (uint64_t a)
 {
     uint64_t exp, mant_sig;
     CPU_DoubleU r;
@@ -576,7 +597,7 @@ uint64_t helper_sqrtg (uint64_t a)
 
 
 /* S floating (single) */
-static inline uint64_t float32_to_s(float32 fa)
+static always_inline uint64_t float32_to_s (float32 fa)
 {
     CPU_FloatU a;
     uint64_t r;
@@ -589,7 +610,7 @@ static inline uint64_t float32_to_s(float32 fa)
     return r;
 }
 
-static inline float32 s_to_float32(uint64_t a)
+static always_inline float32 s_to_float32 (uint64_t a)
 {
     CPU_FloatU r;
     r.l = ((a >> 32) & 0xc0000000) | ((a >> 29) & 0x3fffffff);
@@ -660,7 +681,7 @@ uint64_t helper_sqrts (uint64_t a)
 
 
 /* T floating (double) */
-static inline float64 t_to_float64(uint64_t a)
+static always_inline float64 t_to_float64 (uint64_t a)
 {
     /* Memory format is the same as float64 */
     CPU_DoubleU r;
@@ -668,7 +689,7 @@ static inline float64 t_to_float64(uint64_t a)
     return r.d;
 }
 
-static inline uint64_t float64_to_t(float64 fa)
+static always_inline uint64_t float64_to_t (float64 fa)
 {
     /* Memory format is the same as float64 */
     CPU_DoubleU r;
@@ -939,7 +960,7 @@ uint64_t helper_cvtlq (uint64_t a)
     return (int64_t)((int32_t)((a >> 32) | ((a >> 29) & 0x3FFFFFFF)));
 }
 
-static inline uint64_t __helper_cvtql(uint64_t a, int s, int v)
+static always_inline uint64_t __helper_cvtql (uint64_t a, int s, int v)
 {
     uint64_t r;
 

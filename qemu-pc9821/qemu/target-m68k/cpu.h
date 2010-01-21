@@ -15,14 +15,13 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 #ifndef CPU_M68K_H
 #define CPU_M68K_H
 
 #define TARGET_LONG_BITS 32
-
-#define CPUState struct CPUM68KState
 
 #include "cpu-defs.h"
 
@@ -198,8 +197,6 @@ static inline int m68k_feature(CPUM68KState *env, int feature)
     return (env->features & (1u << feature)) != 0;
 }
 
-void m68k_cpu_list(FILE *f, int (*cpu_fprintf)(FILE *f, const char *fmt, ...));
-
 void register_m68k_insns (CPUM68KState *env);
 
 #ifdef CONFIG_USER_ONLY
@@ -210,11 +207,11 @@ void register_m68k_insns (CPUM68KState *env);
 #define TARGET_PAGE_BITS 10
 #endif
 
+#define CPUState CPUM68KState
 #define cpu_init cpu_m68k_init
 #define cpu_exec cpu_m68k_exec
 #define cpu_gen_code cpu_m68k_gen_code
 #define cpu_signal_handler cpu_m68k_signal_handler
-#define cpu_list m68k_cpu_list
 
 /* MMU modes definitions */
 #define MMU_MODE0_SUFFIX _kernel
@@ -224,10 +221,6 @@ static inline int cpu_mmu_index (CPUState *env)
 {
     return (env->sr & SR_S) == 0 ? 1 : 0;
 }
-
-int cpu_m68k_handle_mmu_fault(CPUState *env, target_ulong address, int rw,
-                              int mmu_idx, int is_softmmu);
-#define cpu_handle_mmu_fault cpu_m68k_handle_mmu_fault
 
 #if defined(CONFIG_USER_ONLY)
 static inline void cpu_clone_regs(CPUState *env, target_ulong newsp)

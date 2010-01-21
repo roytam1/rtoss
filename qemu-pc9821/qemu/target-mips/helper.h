@@ -1,5 +1,10 @@
 #include "def-helper.h"
 
+/* FIXME: We should rename the helper functions and remove this hack.  */
+#undef HELPER
+#define HELPER(name) do_##name
+
+
 DEF_HELPER_2(raise_exception_err, void, i32, int)
 DEF_HELPER_1(raise_exception, void, i32)
 DEF_HELPER_0(interrupt_restart, void)
@@ -15,11 +20,11 @@ DEF_HELPER_3(lwr, tl, tl, tl, int)
 DEF_HELPER_3(swl, void, tl, tl, int)
 DEF_HELPER_3(swr, void, tl, tl, int)
 
-DEF_HELPER_FLAGS_1(clo, TCG_CALL_CONST | TCG_CALL_PURE, tl, tl)
-DEF_HELPER_FLAGS_1(clz, TCG_CALL_CONST | TCG_CALL_PURE, tl, tl)
+DEF_HELPER_1(clo, tl, tl)
+DEF_HELPER_1(clz, tl, tl)
 #ifdef TARGET_MIPS64
-DEF_HELPER_FLAGS_1(dclo, TCG_CALL_CONST | TCG_CALL_PURE, tl, tl)
-DEF_HELPER_FLAGS_1(dclz, TCG_CALL_CONST | TCG_CALL_PURE, tl, tl)
+DEF_HELPER_1(dclo, tl, tl)
+DEF_HELPER_1(dclz, tl, tl)
 DEF_HELPER_2(dmult, void, tl, tl)
 DEF_HELPER_2(dmultu, void, tl, tl)
 #endif

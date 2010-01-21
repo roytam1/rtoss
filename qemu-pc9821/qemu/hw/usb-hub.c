@@ -486,7 +486,7 @@ static int usb_hub_broadcast_packet(USBHubState *s, USBPacket *p)
         port = &s->ports[i];
         dev = port->port.dev;
         if (dev && (port->wPortStatus & PORT_STAT_ENABLE)) {
-            ret = dev->info->handle_packet(dev, p);
+            ret = dev->handle_packet(dev, p);
             if (ret != USB_RET_NODEV) {
                 return ret;
             }
@@ -517,45 +517,36 @@ static int usb_hub_handle_packet(USBDevice *dev, USBPacket *p)
 static void usb_hub_handle_destroy(USBDevice *dev)
 {
     USBHubState *s = (USBHubState *)dev;
-    int i;
 
-    for (i = 0; i < s->nb_ports; i++) {
-        usb_unregister_port(usb_bus_from_device(dev),
-                            &s->ports[i].port);
-    }
+    qemu_free(s);
 }
 
-static int usb_hub_initfn(USBDevice *dev)
+USBDevice *usb_hub_init(int nb_ports)
 {
-    USBHubState *s = DO_UPCAST(USBHubState, dev, dev);
+    USBHubState *s;
     USBHubPort *port;
     int i;
 
-    s->dev.speed  = USB_SPEED_FULL,
-    s->nb_ports = MAX_PORTS; /* FIXME: make configurable */
-    for (i = 0; i < s->nb_ports; i++) {
+    if (nb_ports > MAX_PORTS)
+        return NULL;
+    s = qemu_mallocz(sizeof(USBHubState));
+    s->dev.speed = USB_SPEED_FULL;
+    s->dev.handle_packet = usb_hub_handle_packet;
+
+    /* generic USB device init */
+    s->dev.handle_reset = usb_hub_handle_reset;
+    s->dev.handle_control = usb_hub_handle_control;
+    s->dev.handle_data = usb_hub_handle_data;
+    s->dev.handle_destroy = usb_hub_handle_destroy;
+
+    pstrcpy(s->dev.devname, sizeof(s->dev.devname), "QEMU USB Hub");
+
+    s->nb_ports = nb_ports;
+    for(i = 0; i < s->nb_ports; i++) {
         port = &s->ports[i];
-        usb_register_port(usb_bus_from_device(dev),
-                          &port->port, s, i, usb_hub_attach);
+        qemu_register_usb_port(&port->port, s, i, usb_hub_attach);
         port->wPortStatus = PORT_STAT_POWER;
         port->wPortChange = 0;
     }
-    return 0;
+    return (USBDevice *)s;
 }
-
-static struct USBDeviceInfo hub_info = {
-    .qdev.name      = "QEMU USB Hub",
-    .qdev.size      = sizeof(USBHubState),
-    .init           = usb_hub_initfn,
-    .handle_packet  = usb_hub_handle_packet,
-    .handle_reset   = usb_hub_handle_reset,
-    .handle_control = usb_hub_handle_control,
-    .handle_data    = usb_hub_handle_data,
-    .handle_destroy = usb_hub_handle_destroy,
-};
-
-static void usb_hub_register_devices(void)
-{
-    usb_qdev_register(&hub_info);
-}
-device_init(usb_hub_register_devices)

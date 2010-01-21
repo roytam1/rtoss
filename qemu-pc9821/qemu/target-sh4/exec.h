@@ -14,7 +14,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 #ifndef _EXEC_SH4_H
 #define _EXEC_SH4_H
@@ -27,15 +28,10 @@ register struct CPUSH4State *env asm(AREG0);
 #include "cpu.h"
 #include "exec-all.h"
 
-static inline int cpu_has_work(CPUState *env)
-{
-    return (env->interrupt_request & CPU_INTERRUPT_HARD);
-}
-
 static inline int cpu_halted(CPUState *env) {
     if (!env->halted)
         return 0;
-    if (cpu_has_work(env)) {
+    if (env->interrupt_request & CPU_INTERRUPT_HARD) {
         env->halted = 0;
         env->intr_at_halt = 1;
         return 0;

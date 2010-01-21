@@ -14,7 +14,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 #define CPU_NO_GLOBAL_REGS
 #include "exec.h"
@@ -558,32 +559,32 @@ void helper_check_iol(uint32_t t0)
 
 void helper_outb(uint32_t port, uint32_t data)
 {
-    cpu_outb(port, data & 0xff);
+    cpu_outb(env, port, data & 0xff);
 }
 
 target_ulong helper_inb(uint32_t port)
 {
-    return cpu_inb(port);
+    return cpu_inb(env, port);
 }
 
 void helper_outw(uint32_t port, uint32_t data)
 {
-    cpu_outw(port, data & 0xffff);
+    cpu_outw(env, port, data & 0xffff);
 }
 
 target_ulong helper_inw(uint32_t port)
 {
-    return cpu_inw(port);
+    return cpu_inw(env, port);
 }
 
 void helper_outl(uint32_t port, uint32_t data)
 {
-    cpu_outl(port, data);
+    cpu_outl(env, port, data);
 }
 
 target_ulong helper_inl(uint32_t port)
 {
-    return cpu_inl(port);
+    return cpu_inl(env, port);
 }
 
 static inline unsigned int get_sp_mask(unsigned int e2)
@@ -592,21 +593,6 @@ static inline unsigned int get_sp_mask(unsigned int e2)
         return 0xffffffff;
     else
         return 0xffff;
-}
-
-static int exeption_has_error_code(int intno)
-{
-        switch(intno) {
-        case 8:
-        case 10:
-        case 11:
-        case 12:
-        case 13:
-        case 14:
-        case 17:
-            return 1;
-        }
-	return 0;
 }
 
 #ifdef TARGET_X86_64
@@ -664,8 +650,19 @@ static void do_interrupt_protected(int intno, int is_int, int error_code,
     uint32_t old_eip, sp_mask;
 
     has_error_code = 0;
-    if (!is_int && !is_hw)
-        has_error_code = exeption_has_error_code(intno);
+    if (!is_int && !is_hw) {
+        switch(intno) {
+        case 8:
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+        case 17:
+            has_error_code = 1;
+            break;
+        }
+    }
     if (is_int)
         old_eip = next_eip;
     else
@@ -889,8 +886,19 @@ static void do_interrupt64(int intno, int is_int, int error_code,
     target_ulong old_eip, esp, offset;
 
     has_error_code = 0;
-    if (!is_int && !is_hw)
-        has_error_code = exeption_has_error_code(intno);
+    if (!is_int && !is_hw) {
+        switch(intno) {
+        case 8:
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+        case 17:
+            has_error_code = 1;
+            break;
+        }
+    }
     if (is_int)
         old_eip = next_eip;
     else
@@ -1111,6 +1119,14 @@ void helper_sysret(int dflag)
         env->eflags |= IF_MASK;
         cpu_x86_set_cpl(env, 3);
     }
+#ifdef USE_KQEMU
+    if (kqemu_is_ok(env)) {
+        if (env->hflags & HF_LMA_MASK)
+            CC_OP = CC_OP_EFLAGS;
+        env->exception_index = -1;
+        cpu_loop_exit();
+    }
+#endif
 }
 #endif
 
@@ -1182,27 +1198,6 @@ void do_interrupt_user(int intno, int is_int, int error_code,
         EIP = next_eip;
 }
 
-#if !defined(CONFIG_USER_ONLY)
-static void handle_even_inj(int intno, int is_int, int error_code,
-		int is_hw, int rm)
-{
-    uint32_t event_inj = ldl_phys(env->vm_vmcb + offsetof(struct vmcb, control.event_inj));
-    if (!(event_inj & SVM_EVTINJ_VALID)) {
-	    int type;
-	    if (is_int)
-		    type = SVM_EVTINJ_TYPE_SOFT;
-	    else
-		    type = SVM_EVTINJ_TYPE_EXEPT;
-	    event_inj = intno | type | SVM_EVTINJ_VALID;
-	    if (!rm && exeption_has_error_code(intno)) {
-		    event_inj |= SVM_EVTINJ_VALID_ERR;
-		    stl_phys(env->vm_vmcb + offsetof(struct vmcb, control.event_inj_err), error_code);
-	    }
-	    stl_phys(env->vm_vmcb + offsetof(struct vmcb, control.event_inj), event_inj);
-    }
-}
-#endif
-
 /*
  * Begin execution of an interruption. is_int is TRUE if coming from
  * the int instruction. next_eip is the EIP value AFTER the interrupt
@@ -1243,10 +1238,6 @@ void do_interrupt(int intno, int is_int, int error_code,
         }
     }
     if (env->cr[0] & CR0_PE_MASK) {
-#if !defined(CONFIG_USER_ONLY)
-        if (env->hflags & HF_SVMI_MASK)
-            handle_even_inj(intno, is_int, error_code, is_hw, 0);
-#endif
 #ifdef TARGET_X86_64
         if (env->hflags & HF_LMA_MASK) {
             do_interrupt64(intno, is_int, error_code, next_eip, is_hw);
@@ -1256,19 +1247,8 @@ void do_interrupt(int intno, int is_int, int error_code,
             do_interrupt_protected(intno, is_int, error_code, next_eip, is_hw);
         }
     } else {
-#if !defined(CONFIG_USER_ONLY)
-        if (env->hflags & HF_SVMI_MASK)
-            handle_even_inj(intno, is_int, error_code, is_hw, 1);
-#endif
         do_interrupt_real(intno, is_int, error_code, next_eip);
     }
-
-#if !defined(CONFIG_USER_ONLY)
-    if (env->hflags & HF_SVMI_MASK) {
-	    uint32_t event_inj = ldl_phys(env->vm_vmcb + offsetof(struct vmcb, control.event_inj));
-	    stl_phys(env->vm_vmcb + offsetof(struct vmcb, control.event_inj), event_inj & ~SVM_EVTINJ_VALID);
-    }
-#endif
 }
 
 /* This should come from sysemu.h - if we could include it here... */
@@ -2498,6 +2478,12 @@ void helper_lcall_protected(int new_cs, target_ulong new_eip,
         SET_ESP(sp, sp_mask);
         EIP = offset;
     }
+#ifdef USE_KQEMU
+    if (kqemu_is_ok(env)) {
+        env->exception_index = -1;
+        cpu_loop_exit();
+    }
+#endif
 }
 
 /* real and vm86 mode iret */
@@ -2778,11 +2764,24 @@ void helper_iret_protected(int shift, int next_eip)
         helper_ret_protected(shift, 1, 0);
     }
     env->hflags2 &= ~HF2_NMI_MASK;
+#ifdef USE_KQEMU
+    if (kqemu_is_ok(env)) {
+        CC_OP = CC_OP_EFLAGS;
+        env->exception_index = -1;
+        cpu_loop_exit();
+    }
+#endif
 }
 
 void helper_lret_protected(int shift, int addend)
 {
     helper_ret_protected(shift, 0, addend);
+#ifdef USE_KQEMU
+    if (kqemu_is_ok(env)) {
+        env->exception_index = -1;
+        cpu_loop_exit();
+    }
+#endif
 }
 
 void helper_sysenter(void)
@@ -2855,6 +2854,12 @@ void helper_sysexit(int dflag)
     }
     ESP = ECX;
     EIP = EDX;
+#ifdef USE_KQEMU
+    if (kqemu_is_ok(env)) {
+        env->exception_index = -1;
+        cpu_loop_exit();
+    }
+#endif
 }
 
 #if defined(CONFIG_USER_ONLY)
@@ -2967,12 +2972,6 @@ void helper_rdtsc(void)
     val = cpu_get_tsc(env) + env->tsc_offset;
     EAX = (uint32_t)(val);
     EDX = (uint32_t)(val >> 32);
-}
-
-void helper_rdtscp(void)
-{
-    helper_rdtsc();
-    ECX = (uint32_t)(env->tsc_aux);
 }
 
 void helper_rdpmc(void)
@@ -3105,26 +3104,7 @@ void helper_wrmsr(void)
     case MSR_MTRRdefType:
         env->mtrr_deftype = val;
         break;
-    case MSR_MCG_STATUS:
-        env->mcg_status = val;
-        break;
-    case MSR_MCG_CTL:
-        if ((env->mcg_cap & MCG_CTL_P)
-            && (val == 0 || val == ~(uint64_t)0))
-            env->mcg_ctl = val;
-        break;
-    case MSR_TSC_AUX:
-        env->tsc_aux = val;
-        break;
     default:
-        if ((uint32_t)ECX >= MSR_MC0_CTL
-            && (uint32_t)ECX < MSR_MC0_CTL + (4 * env->mcg_cap & 0xff)) {
-            uint32_t offset = (uint32_t)ECX - MSR_MC0_CTL;
-            if ((offset & 0x3) != 0
-                || (val == 0 || val == ~(uint64_t)0))
-                env->mce_banks[offset] = val;
-            break;
-        }
         /* XXX: exception ? */
         break;
     }
@@ -3186,8 +3166,14 @@ void helper_rdmsr(void)
     case MSR_KERNELGSBASE:
         val = env->kernelgsbase;
         break;
-    case MSR_TSC_AUX:
-        val = env->tsc_aux;
+#endif
+#ifdef USE_KQEMU
+    case MSR_QPI_COMMBASE:
+        if (env->kqemu_enabled) {
+            val = kqemu_comm_base;
+        } else {
+            val = 0;
+        }
         break;
 #endif
     case MSR_MTRRphysBase(0):
@@ -3237,25 +3223,7 @@ void helper_rdmsr(void)
             /* XXX: exception ? */
             val = 0;
         break;
-    case MSR_MCG_CAP:
-        val = env->mcg_cap;
-        break;
-    case MSR_MCG_CTL:
-        if (env->mcg_cap & MCG_CTL_P)
-            val = env->mcg_ctl;
-        else
-            val = 0;
-        break;
-    case MSR_MCG_STATUS:
-        val = env->mcg_status;
-        break;
     default:
-        if ((uint32_t)ECX >= MSR_MC0_CTL
-            && (uint32_t)ECX < MSR_MC0_CTL + (4 * env->mcg_cap & 0xff)) {
-            uint32_t offset = (uint32_t)ECX - MSR_MC0_CTL;
-            val = env->mce_banks[offset];
-            break;
-        }
         /* XXX: exception ? */
         val = 0;
         break;
@@ -4350,11 +4318,6 @@ void helper_fxsave(target_ulong ptr, int data64)
     CPU86_LDouble tmp;
     target_ulong addr;
 
-    /* The operand must be 16 byte aligned */
-    if (ptr & 0xf) {
-        raise_exception(EXCP0D_GPF);
-    }
-
     fpus = (env->fpus & ~0x3800) | (env->fpstt & 0x7) << 11;
     fptag = 0;
     for(i = 0; i < 8; i++) {
@@ -4410,11 +4373,6 @@ void helper_fxrstor(target_ulong ptr, int data64)
     int i, fpus, fptag, nb_xmm_regs;
     CPU86_LDouble tmp;
     target_ulong addr;
-
-    /* The operand must be 16 byte aligned */
-    if (ptr & 0xf) {
-        raise_exception(EXCP0D_GPF);
-    }
 
     env->fpuc = lduw(ptr);
     fpus = lduw(ptr + 2);
@@ -4699,11 +4657,6 @@ void helper_debug(void)
 {
     env->exception_index = EXCP_DEBUG;
     cpu_loop_exit();
-}
-
-void helper_reset_rf(void)
-{
-    env->eflags &= ~RF_MASK;
 }
 
 void helper_raise_interrupt(int intno, int next_eip_addend)
@@ -5041,6 +4994,7 @@ void helper_vmrun(int aflag, int next_eip_addend)
         uint8_t vector = event_inj & SVM_EVTINJ_VEC_MASK;
         uint16_t valid_err = event_inj & SVM_EVTINJ_VALID_ERR;
         uint32_t event_inj_err = ldl_phys(env->vm_vmcb + offsetof(struct vmcb, control.event_inj_err));
+        stl_phys(env->vm_vmcb + offsetof(struct vmcb, control.event_inj), event_inj & ~SVM_EVTINJ_VALID);
 
         qemu_log_mask(CPU_LOG_TB_IN_ASM, "Injecting(%#hx): ", valid_err);
         /* FIXME: need to implement valid_err */
@@ -5378,11 +5332,6 @@ void helper_vmexit(uint32_t exit_code, uint64_t exit_info_1)
     stq_phys(env->vm_vmcb + offsetof(struct vmcb, control.exit_code), exit_code);
     stq_phys(env->vm_vmcb + offsetof(struct vmcb, control.exit_info_1), exit_info_1);
 
-    stl_phys(env->vm_vmcb + offsetof(struct vmcb, control.exit_int_info),
-             ldl_phys(env->vm_vmcb + offsetof(struct vmcb, control.event_inj)));
-    stl_phys(env->vm_vmcb + offsetof(struct vmcb, control.exit_int_info_err),
-             ldl_phys(env->vm_vmcb + offsetof(struct vmcb, control.event_inj_err)));
-
     env->hflags2 &= ~HF2_GIF_MASK;
     /* FIXME: Resets the current ASID register to zero (host ASID). */
 
@@ -5479,14 +5428,11 @@ target_ulong helper_bsf(target_ulong t0)
     return count;
 }
 
-target_ulong helper_lzcnt(target_ulong t0, int wordsize)
+target_ulong helper_bsr(target_ulong t0)
 {
     int count;
     target_ulong res, mask;
-
-    if (wordsize > 0 && t0 == 0) {
-        return wordsize;
-    }
+    
     res = t0;
     count = TARGET_LONG_BITS - 1;
     mask = (target_ulong)1 << (TARGET_LONG_BITS - 1);
@@ -5494,16 +5440,9 @@ target_ulong helper_lzcnt(target_ulong t0, int wordsize)
         count--;
         res <<= 1;
     }
-    if (wordsize > 0) {
-        return wordsize - 1 - count;
-    }
     return count;
 }
 
-target_ulong helper_bsr(target_ulong t0)
-{
-	return helper_lzcnt(t0, 0);
-}
 
 static int compute_all_eflags(void)
 {

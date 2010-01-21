@@ -2,15 +2,11 @@
    context is supported */
 #include "softfloat.h"
 #include <math.h>
-#if defined(CONFIG_SOLARIS)
-#include <fenv.h>
-#endif
 
 void set_float_rounding_mode(int val STATUS_PARAM)
 {
     STATUS(float_rounding_mode) = val;
-#if defined(CONFIG_BSD) && !defined(__APPLE__) ||         \
-    (defined(CONFIG_SOLARIS) && CONFIG_SOLARIS_VERSION < 10)
+#if defined(_BSD) && !defined(__APPLE__) || (defined(HOST_SOLARIS) && HOST_SOLARIS < 10)
     fpsetround(val);
 #elif defined(__arm__)
     /* nothing to do */
@@ -26,8 +22,7 @@ void set_floatx80_rounding_precision(int val STATUS_PARAM)
 }
 #endif
 
-#if defined(CONFIG_BSD) || \
-    (defined(CONFIG_SOLARIS) && CONFIG_SOLARIS_VERSION < 10)
+#if defined(_BSD) || (defined(HOST_SOLARIS) && HOST_SOLARIS < 10)
 #define lrint(d)		((int32_t)rint(d))
 #define llrint(d)		((int64_t)rint(d))
 #define lrintf(f)		((int32_t)rint(f))
@@ -35,8 +30,7 @@ void set_floatx80_rounding_precision(int val STATUS_PARAM)
 #define sqrtf(f)		((float)sqrt(f))
 #define remainderf(fa, fb)	((float)remainder(fa, fb))
 #define rintf(f)		((float)rint(f))
-#if !defined(__sparc__) && \
-    (defined(CONFIG_SOLARIS) && CONFIG_SOLARIS_VERSION < 10)
+#if !defined(__sparc__) && defined(HOST_SOLARIS) && HOST_SOLARIS < 10
 extern long double rintl(long double);
 extern long double scalbnl(long double, int);
 
@@ -351,8 +345,7 @@ uint64_t float64_to_uint64_round_to_zero (float64 a STATUS_PARAM)
 /*----------------------------------------------------------------------------
 | Software IEC/IEEE double-precision operations.
 *----------------------------------------------------------------------------*/
-#if defined(__sun__) && \
-    (defined(CONFIG_SOLARIS) && CONFIG_SOLARIS_VERSION < 10)
+#if defined(__sun__) && defined(HOST_SOLARIS) && HOST_SOLARIS < 10
 static inline float64 trunc(float64 x)
 {
     return x < 0 ? -floor(-x) : floor(x);

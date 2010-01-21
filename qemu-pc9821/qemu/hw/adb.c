@@ -29,10 +29,10 @@
 //#define DEBUG_ADB
 
 #ifdef DEBUG_ADB
-#define ADB_DPRINTF(fmt, ...) \
-do { printf("ADB: " fmt , ## __VA_ARGS__); } while (0)
+#define ADB_DPRINTF(fmt, args...) \
+do { printf("ADB: " fmt , ##args); } while (0)
 #else
-#define ADB_DPRINTF(fmt, ...)
+#define ADB_DPRINTF(fmt, args...)
 #endif
 
 /* ADB commands */

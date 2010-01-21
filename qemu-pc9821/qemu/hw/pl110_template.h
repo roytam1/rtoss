@@ -95,18 +95,18 @@ static drawfn glue(pl110_draw_fn_,BITS)[36] =
 
 #if ORDER == 0
 #define NAME glue(glue(lblp_, BORDER), BITS)
-#ifdef HOST_WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 #define SWAP_WORDS 1
 #endif
 #elif ORDER == 1
 #define NAME glue(glue(bbbp_, BORDER), BITS)
-#ifndef HOST_WORDS_BIGENDIAN
+#ifndef WORDS_BIGENDIAN
 #define SWAP_WORDS 1
 #endif
 #else
 #define SWAP_PIXELS 1
 #define NAME glue(glue(lbbp_, BORDER), BITS)
-#ifdef HOST_WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 #define SWAP_WORDS 1
 #endif
 #endif
@@ -115,9 +115,8 @@ static drawfn glue(pl110_draw_fn_,BITS)[36] =
 #define FN_4(x, y) FN_2(x, y) FN_2(x+2, y)
 #define FN_8(y) FN_4(0, y) FN_4(4, y)
 
-static void glue(pl110_draw_line1_,NAME)(void *opaque, uint8_t *d, const uint8_t *src, int width, int deststep)
+static void glue(pl110_draw_line1_,NAME)(uint32_t *pallette, uint8_t *d, const uint8_t *src, int width)
 {
-    uint32_t *pallette = opaque;
     uint32_t data;
     while (width > 0) {
         data = *(uint32_t *)src;
@@ -143,9 +142,8 @@ static void glue(pl110_draw_line1_,NAME)(void *opaque, uint8_t *d, const uint8_t
     }
 }
 
-static void glue(pl110_draw_line2_,NAME)(void *opaque, uint8_t *d, const uint8_t *src, int width, int deststep)
+static void glue(pl110_draw_line2_,NAME)(uint32_t *pallette, uint8_t *d, const uint8_t *src, int width)
 {
-    uint32_t *pallette = opaque;
     uint32_t data;
     while (width > 0) {
         data = *(uint32_t *)src;
@@ -171,9 +169,8 @@ static void glue(pl110_draw_line2_,NAME)(void *opaque, uint8_t *d, const uint8_t
     }
 }
 
-static void glue(pl110_draw_line4_,NAME)(void *opaque, uint8_t *d, const uint8_t *src, int width, int deststep)
+static void glue(pl110_draw_line4_,NAME)(uint32_t *pallette, uint8_t *d, const uint8_t *src, int width)
 {
-    uint32_t *pallette = opaque;
     uint32_t data;
     while (width > 0) {
         data = *(uint32_t *)src;
@@ -199,9 +196,8 @@ static void glue(pl110_draw_line4_,NAME)(void *opaque, uint8_t *d, const uint8_t
     }
 }
 
-static void glue(pl110_draw_line8_,NAME)(void *opaque, uint8_t *d, const uint8_t *src, int width, int deststep)
+static void glue(pl110_draw_line8_,NAME)(uint32_t *pallette, uint8_t *d, const uint8_t *src, int width)
 {
-    uint32_t *pallette = opaque;
     uint32_t data;
     while (width > 0) {
         data = *(uint32_t *)src;
@@ -223,7 +219,7 @@ static void glue(pl110_draw_line8_,NAME)(void *opaque, uint8_t *d, const uint8_t
     }
 }
 
-static void glue(pl110_draw_line16_,NAME)(void *opaque, uint8_t *d, const uint8_t *src, int width, int deststep)
+static void glue(pl110_draw_line16_,NAME)(uint32_t *pallette, uint8_t *d, const uint8_t *src, int width)
 {
     uint32_t data;
     unsigned int r, g, b;
@@ -269,7 +265,7 @@ static void glue(pl110_draw_line16_,NAME)(void *opaque, uint8_t *d, const uint8_
     }
 }
 
-static void glue(pl110_draw_line32_,NAME)(void *opaque, uint8_t *d, const uint8_t *src, int width, int deststep)
+static void glue(pl110_draw_line32_,NAME)(uint32_t *pallette, uint8_t *d, const uint8_t *src, int width)
 {
     uint32_t data;
     unsigned int r, g, b;
@@ -282,7 +278,7 @@ static void glue(pl110_draw_line32_,NAME)(void *opaque, uint8_t *d, const uint8_
 #define LSB b
 #define MSB r
 #endif
-#ifndef SWAP_WORDS
+#ifdef SWAP_WORDS
         LSB = data & 0xff;
         g = (data >> 8) & 0xff;
         MSB = (data >> 16) & 0xff;

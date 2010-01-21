@@ -97,12 +97,16 @@ static void pcspk_callback(void *opaque, int free)
     }
 }
 
-int pcspk_audio_init(qemu_irq *pic)
+int pcspk_audio_init(AudioState *audio, qemu_irq *pic)
 {
     PCSpkState *s = &pcspk_state;
     struct audsettings as = {PCSPK_SAMPLE_RATE, 1, AUD_FMT_U8, 0};
 
-    AUD_register_card(s_spk, &s->card);
+    if (!audio) {
+        AUD_log(s_spk, "No audio state\n");
+        return -1;
+    }
+    AUD_register_card(audio, s_spk, &s->card);
 
     s->voice = AUD_open_out(&s->card, s->voice, s_spk, s, pcspk_callback, &as);
     if (!s->voice) {
@@ -150,6 +154,14 @@ void pcspk_init(PITState *pit)
 
 /* NEC PC-9821 */
 
+void pc98_pcspk_init(PITState *pit)
+{
+    PCSpkState *s = &pcspk_state;
+
+    s->pit = pit;
+    s->pit_ch = 1;
+}
+
 void pc98_pcspk_write(uint32_t val)
 {
     PCSpkState *s = &pcspk_state;
@@ -158,12 +170,4 @@ void pc98_pcspk_write(uint32_t val)
     if (s->voice) {
         AUD_set_active_out(s->voice, s->data_on);
     }
-}
-
-void pc98_pcspk_init(PITState *pit)
-{
-    PCSpkState *s = &pcspk_state;
-
-    s->pit = pit;
-    s->pit_ch = 1;
 }

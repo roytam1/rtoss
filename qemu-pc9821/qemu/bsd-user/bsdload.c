@@ -10,7 +10,7 @@
 
 #include "qemu.h"
 
-#define TARGET_NGROUPS 32
+#define NGROUPS 32
 
 /* ??? This should really be somewhere else.  */
 abi_long memcpy_to_target(abi_ulong dest, const void *src,
@@ -31,9 +31,9 @@ static int in_group_p(gid_t g)
     /* return TRUE if we're in the specified group, FALSE otherwise */
     int         ngroup;
     int         i;
-    gid_t       grouplist[TARGET_NGROUPS];
+    gid_t       grouplist[NGROUPS];
 
-    ngroup = getgroups(TARGET_NGROUPS, grouplist);
+    ngroup = getgroups(NGROUPS, grouplist);
     for(i = 0; i < ngroup; i++) {
         if(grouplist[i] == g) {
             return 1;
@@ -163,7 +163,7 @@ int loader_exec(const char * filename, char ** argv, char ** envp,
 
     bprm.p = TARGET_PAGE_SIZE*MAX_ARG_PAGES-sizeof(unsigned int);
     for (i=0 ; i<MAX_ARG_PAGES ; i++)       /* clear page-table */
-            bprm.page[i] = NULL;
+            bprm.page[i] = 0;
     retval = open(filename, O_RDONLY);
     if (retval < 0)
         return retval;

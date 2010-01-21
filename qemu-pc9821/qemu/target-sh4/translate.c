@@ -14,13 +14,15 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+#include <assert.h>
 
 #define DEBUG_DISAS
 #define SH4_DEBUG_DISAS
@@ -48,7 +50,6 @@ typedef struct DisasContext {
     uint32_t delayed_pc;
     int singlestep_enabled;
     uint32_t features;
-    int has_movcal;
 } DisasContext;
 
 #if defined(CONFIG_USER_ONLY)
@@ -282,13 +283,11 @@ CPUSH4State *cpu_sh4_init(const char *cpu_model)
     env = qemu_mallocz(sizeof(CPUSH4State));
     env->features = def->features;
     cpu_exec_init(env);
-    env->movcal_backup_tail = &(env->movcal_backup);
     sh4_translate_init();
     env->cpu_model_str = cpu_model;
     cpu_sh4_reset(env);
     cpu_sh4_register(env, def);
     tlb_flush(env, 1);
-    qemu_init_vcpu(env);
     return env;
 }
 
@@ -496,37 +495,6 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
 
 static void _decode_opc(DisasContext * ctx)
 {
-    /* This code tries to make movcal emulation sufficiently
-       accurate for Linux purposes.  This instruction writes
-       memory, and prior to that, always allocates a cache line.
-       It is used in two contexts:
-       - in memcpy, where data is copied in blocks, the first write
-       of to a block uses movca.l for performance.
-       - in arch/sh/mm/cache-sh4.c, movcal.l + ocbi combination is used
-       to flush the cache. Here, the data written by movcal.l is never
-       written to memory, and the data written is just bogus.
-
-       To simulate this, we simulate movcal.l, we store the value to memory,
-       but we also remember the previous content. If we see ocbi, we check
-       if movcal.l for that address was done previously. If so, the write should
-       not have hit the memory, so we restore the previous content.
-       When we see an instruction that is neither movca.l
-       nor ocbi, the previous content is discarded.
-
-       To optimize, we only try to flush stores when we're at the start of
-       TB, or if we already saw movca.l in this TB and did not flush stores
-       yet.  */
-    if (ctx->has_movcal)
-	{
-	  int opcode = ctx->opcode & 0xf0ff;
-	  if (opcode != 0x0093 /* ocbi */
-	      && opcode != 0x00c3 /* movca.l */)
-	      {
-		  gen_helper_discard_movcal_backup ();
-		  ctx->has_movcal = 0;
-	      }
-	}
-
 #if 0
     fprintf(stderr, "Translating opcode 0x%04x\n", ctx->opcode);
 #endif
@@ -1577,13 +1545,7 @@ static void _decode_opc(DisasContext * ctx)
 	}
 	return;
     case 0x00c3:		/* movca.l R0,@Rm */
-        {
-            TCGv val = tcg_temp_new();
-            tcg_gen_qemu_ld32u(val, REG(B11_8), ctx->memidx);
-            gen_helper_movcal (REG(B11_8), val);            
-            tcg_gen_qemu_st32(REG(0), REG(B11_8), ctx->memidx);
-        }
-        ctx->has_movcal = 1;
+	tcg_gen_qemu_st32(REG(0), REG(B11_8), ctx->memidx);
 	return;
     case 0x40a9:
 	/* MOVUA.L @Rm,R0 (Rm) -> R0
@@ -1632,7 +1594,9 @@ static void _decode_opc(DisasContext * ctx)
 	    break;
     case 0x0093:		/* ocbi @Rn */
 	{
-	    gen_helper_ocbi (REG(B11_8));
+	    TCGv dummy = tcg_temp_new();
+	    tcg_gen_qemu_ld32s(dummy, REG(B11_8), ctx->memidx);
+	    tcg_temp_free(dummy);
 	}
 	return;
     case 0x00a3:		/* ocbp @Rn */
@@ -1912,7 +1876,6 @@ gen_intermediate_code_internal(CPUState * env, TranslationBlock * tb,
     ctx.tb = tb;
     ctx.singlestep_enabled = env->singlestep_enabled;
     ctx.features = env->features;
-    ctx.has_movcal = (tb->flags & TB_FLAG_PENDING_MOVCA);
 
 #ifdef DEBUG_DISAS
     qemu_log_mask(CPU_LOG_TB_CPU,
@@ -1927,8 +1890,8 @@ gen_intermediate_code_internal(CPUState * env, TranslationBlock * tb,
         max_insns = CF_COUNT_MASK;
     gen_icount_start();
     while (ctx.bstate == BS_NONE && gen_opc_ptr < gen_opc_end) {
-        if (unlikely(!QTAILQ_EMPTY(&env->breakpoints))) {
-            QTAILQ_FOREACH(bp, &env->breakpoints, entry) {
+        if (unlikely(!TAILQ_EMPTY(&env->breakpoints))) {
+            TAILQ_FOREACH(bp, &env->breakpoints, entry) {
                 if (ctx.pc == bp->pc) {
 		    /* We have hit a breakpoint - make sure PC is up-to-date */
 		    tcg_gen_movi_i32(cpu_pc, ctx.pc);
@@ -1966,8 +1929,9 @@ gen_intermediate_code_internal(CPUState * env, TranslationBlock * tb,
 	    break;
         if (num_insns >= max_insns)
             break;
-        if (singlestep)
-            break;
+#ifdef SH4_SINGLE_STEP
+	break;
+#endif
     }
     if (tb->cflags & CF_LAST_IO)
         gen_io_end();

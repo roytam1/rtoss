@@ -13,7 +13,9 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston,
+   MA 02110-1301, USA.  */
 
 #include <stdio.h>
 #include "dis-asm.h"
@@ -1164,14 +1166,17 @@ const sh_opcode_info sh_table[] =
 #endif
 
 static void print_movxy
-  (const sh_opcode_info *, int, int, fprintf_ftype, void *);
-static void print_insn_ddt (int, struct disassemble_info *);
-static void print_dsp_reg (int, fprintf_ftype, void *);
-static void print_insn_ppi (int, struct disassemble_info *);
+  PARAMS ((const sh_opcode_info *, int, int, fprintf_ftype, void *));
+static void print_insn_ddt PARAMS ((int, struct disassemble_info *));
+static void print_dsp_reg PARAMS ((int, fprintf_ftype, void *));
+static void print_insn_ppi PARAMS ((int, struct disassemble_info *));
 
 static void
-print_movxy (const sh_opcode_info *op, int rn, int rm,
-	     fprintf_ftype fprintf_fn, void *stream)
+print_movxy (op, rn, rm, fprintf_fn, stream)
+     const sh_opcode_info *op;
+     int rn, rm;
+     fprintf_ftype fprintf_fn;
+     void *stream;
 {
   int n;
 
@@ -1245,7 +1250,9 @@ print_movxy (const sh_opcode_info *op, int rn, int rm,
    Return nonzero if a field b of a parallel processing insns follows.  */
 
 static void
-print_insn_ddt (int insn, struct disassemble_info *info)
+print_insn_ddt (insn, info)
+     int insn;
+     struct disassemble_info *info;
 {
   fprintf_ftype fprintf_fn = info->fprintf_func;
   void *stream = info->stream;
@@ -1332,7 +1339,10 @@ print_insn_ddt (int insn, struct disassemble_info *info)
 }
 
 static void
-print_dsp_reg (int rm, fprintf_ftype fprintf_fn, void *stream)
+print_dsp_reg (rm, fprintf_fn, stream)
+     int rm;
+     fprintf_ftype fprintf_fn;
+     void *stream;
 {
   switch (rm)
     {
@@ -1373,7 +1383,9 @@ print_dsp_reg (int rm, fprintf_ftype fprintf_fn, void *stream)
 }
 
 static void
-print_insn_ppi (int field_b, struct disassemble_info *info)
+print_insn_ppi (field_b, info)
+     int field_b;
+     struct disassemble_info *info;
 {
   static const char *sx_tab[] = { "x0", "x1", "a0", "a1" };
   static const char *sy_tab[] = { "y0", "y1", "m0", "m1" };
@@ -1518,7 +1530,9 @@ print_insn_ppi (int field_b, struct disassemble_info *info)
 /* FIXME mvs: movx insns print as ".word 0x%03x", insn & 0xfff
    (ie. the upper nibble is missing).  */
 int
-print_insn_sh (bfd_vma memaddr, struct disassemble_info *info)
+print_insn_sh (memaddr, info)
+     bfd_vma memaddr;
+     struct disassemble_info *info;
 {
   fprintf_ftype fprintf_fn = info->fprintf_func;
   void *stream = info->stream;

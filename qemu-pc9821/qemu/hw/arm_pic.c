@@ -8,15 +8,14 @@
  */
 
 #include "hw.h"
-#include "pc.h"
 #include "arm-misc.h"
 
 /* Stub functions for hardware that doesn't exist.  */
-void pic_info(Monitor *mon)
+void pic_info(void)
 {
 }
 
-void irq_info(Monitor *mon)
+void irq_info(void)
 {
 }
 
@@ -39,7 +38,7 @@ static void arm_pic_cpu_handler(void *opaque, int irq, int level)
             cpu_reset_interrupt(env, CPU_INTERRUPT_FIQ);
         break;
     default:
-        hw_error("arm_pic_cpu_handler: Bad interrput line %d\n", irq);
+        cpu_abort(env, "arm_pic_cpu_handler: Bad interrput line %d\n", irq);
     }
 }
 

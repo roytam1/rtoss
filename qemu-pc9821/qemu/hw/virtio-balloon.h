@@ -37,4 +37,6 @@ struct virtio_balloon_config
     uint32_t actual;
 };
 
+void *virtio_balloon_init(PCIBus *bus);
+
 #endif

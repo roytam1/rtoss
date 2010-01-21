@@ -319,6 +319,8 @@ static void mdio_cycle(struct qemu_mdio *bus)
 
 struct fs_eth
 {
+	CPUState *env;
+	qemu_irq *irq;
 	VLANClientState *vc;
 	int ethregs;
 
@@ -495,21 +497,21 @@ static int eth_match_groupaddr(struct fs_eth *eth, const unsigned char *sa)
 	return match;
 }
 
-static int eth_can_receive(VLANClientState *vc)
+static int eth_can_receive(void *opaque)
 {
 	return 1;
 }
 
-static ssize_t eth_receive(VLANClientState *vc, const uint8_t *buf, size_t size)
+static void eth_receive(void *opaque, const uint8_t *buf, int size)
 {
 	unsigned char sa_bcast[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
-	struct fs_eth *eth = vc->opaque;
+	struct fs_eth *eth = opaque;
 	int use_ma0 = eth->regs[RW_REC_CTRL] & 1;
 	int use_ma1 = eth->regs[RW_REC_CTRL] & 2;
 	int r_bcast = eth->regs[RW_REC_CTRL] & 8;
 
 	if (size < 12)
-		return -1;
+		return;
 
 	D(printf("%x.%x.%x.%x.%x.%x ma=%d %d bc=%d\n",
 		 buf[0], buf[1], buf[2], buf[3], buf[4], buf[5],
@@ -520,12 +522,10 @@ static ssize_t eth_receive(VLANClientState *vc, const uint8_t *buf, size_t size)
 	    && (!use_ma1 || memcmp(buf, eth->macaddr[1], 6))
 	    && (!r_bcast || memcmp(buf, sa_bcast, 6))
 	    && !eth_match_groupaddr(eth, buf))
-		return size;
+		return;
 
 	/* FIXME: Find another way to pass on the fake csum.  */
 	etraxfs_dmac_input(eth->dma_in, (void *)buf, size + 4, 1);
-
-        return size;
 }
 
 static int eth_tx_push(void *opaque, unsigned char *buf, int len)
@@ -544,12 +544,12 @@ static void eth_set_link(VLANClientState *vc)
 	eth->phy.link = !vc->link_down;
 }
 
-static CPUReadMemoryFunc * const eth_read[] = {
+static CPUReadMemoryFunc *eth_read[] = {
 	NULL, NULL,
 	&eth_readl,
 };
 
-static CPUWriteMemoryFunc * const eth_write[] = {
+static CPUWriteMemoryFunc *eth_write[] = {
 	NULL, NULL,
 	&eth_writel,
 };
@@ -564,7 +564,8 @@ static void eth_cleanup(VLANClientState *vc)
         qemu_free(eth);
 }
 
-void *etraxfs_eth_init(NICInfo *nd, target_phys_addr_t base, int phyaddr)
+void *etraxfs_eth_init(NICInfo *nd, CPUState *env, 
+		       qemu_irq *irq, target_phys_addr_t base, int phyaddr)
 {
 	struct etraxfs_dma_client *dma = NULL;	
 	struct fs_eth *eth = NULL;
@@ -572,6 +573,7 @@ void *etraxfs_eth_init(NICInfo *nd, target_phys_addr_t base, int phyaddr)
 	qemu_check_nic_model(nd, "fseth");
 
 	dma = qemu_mallocz(sizeof *dma * 2);
+
 	eth = qemu_mallocz(sizeof *eth);
 
 	dma[0].client.push = eth_tx_push;
@@ -579,6 +581,8 @@ void *etraxfs_eth_init(NICInfo *nd, target_phys_addr_t base, int phyaddr)
 	dma[1].client.opaque = eth;
 	dma[1].client.pull = NULL;
 
+	eth->env = env;
+	eth->irq = irq;
 	eth->dma_out = dma;
 	eth->dma_in = dma + 1;
 
@@ -587,14 +591,12 @@ void *etraxfs_eth_init(NICInfo *nd, target_phys_addr_t base, int phyaddr)
 	tdk_init(&eth->phy);
 	mdio_attach(&eth->mdio_bus, &eth->phy, eth->phyaddr);
 
-	eth->ethregs = cpu_register_io_memory(eth_read, eth_write, eth);
+	eth->ethregs = cpu_register_io_memory(0, eth_read, eth_write, eth);
 	cpu_register_physical_memory (base, 0x5c, eth->ethregs);
 
-	eth->vc = nd->vc = qemu_new_vlan_client(NET_CLIENT_TYPE_NIC,
-                                                nd->vlan, nd->netdev,
-                                                nd->model, nd->name,
-                                                eth_can_receive, eth_receive,
-                                                NULL, NULL, eth_cleanup, eth);
+	eth->vc = nd->vc = qemu_new_vlan_client(nd->vlan, nd->model, nd->name,
+                                                eth_receive, eth_can_receive,
+                                                eth_cleanup, eth);
 	eth->vc->opaque = eth;
 	eth->vc->link_status_changed = eth_set_link;
 

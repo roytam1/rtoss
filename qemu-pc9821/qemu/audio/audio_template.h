@@ -36,9 +36,11 @@
 #define HWBUF hw->conv_buf
 #endif
 
-static void glue (audio_init_nb_voices_, TYPE) (struct audio_driver *drv)
+static void glue (audio_init_nb_voices_, TYPE) (
+    AudioState *s,
+    struct audio_driver *drv
+    )
 {
-    AudioState *s = &glob_audio_state;
     int max_voices = glue (drv->max_voices_, TYPE);
     int voice_size = glue (drv->voice_size_, TYPE);
 
@@ -184,24 +186,23 @@ static void glue (audio_pcm_sw_fini_, TYPE) (SW *sw)
 
 static void glue (audio_pcm_hw_add_sw_, TYPE) (HW *hw, SW *sw)
 {
-    QLIST_INSERT_HEAD (&hw->sw_head, sw, entries);
+    LIST_INSERT_HEAD (&hw->sw_head, sw, entries);
 }
 
 static void glue (audio_pcm_hw_del_sw_, TYPE) (SW *sw)
 {
-    QLIST_REMOVE (sw, entries);
+    LIST_REMOVE (sw, entries);
 }
 
-static void glue (audio_pcm_hw_gc_, TYPE) (HW **hwp)
+static void glue (audio_pcm_hw_gc_, TYPE) (AudioState *s, HW **hwp)
 {
-    AudioState *s = &glob_audio_state;
     HW *hw = *hwp;
 
     if (!hw->sw_head.lh_first) {
 #ifdef DAC
         audio_detach_capture (hw);
 #endif
-        QLIST_REMOVE (hw, entries);
+        LIST_REMOVE (hw, entries);
         glue (s->nb_hw_voices_, TYPE) += 1;
         glue (audio_pcm_hw_free_resources_ ,TYPE) (hw);
         glue (hw->pcm_ops->fini_, TYPE) (hw);
@@ -210,15 +211,14 @@ static void glue (audio_pcm_hw_gc_, TYPE) (HW **hwp)
     }
 }
 
-static HW *glue (audio_pcm_hw_find_any_, TYPE) (HW *hw)
+static HW *glue (audio_pcm_hw_find_any_, TYPE) (AudioState *s, HW *hw)
 {
-    AudioState *s = &glob_audio_state;
-    return hw ? hw->entries.le_next : glue (s->hw_head_, TYPE).lh_first;
+    return hw ? hw->entries.le_next : s->glue (hw_head_, TYPE).lh_first;
 }
 
-static HW *glue (audio_pcm_hw_find_any_enabled_, TYPE) (HW *hw)
+static HW *glue (audio_pcm_hw_find_any_enabled_, TYPE) (AudioState *s, HW *hw)
 {
-    while ((hw = glue (audio_pcm_hw_find_any_, TYPE) (hw))) {
+    while ((hw = glue (audio_pcm_hw_find_any_, TYPE) (s, hw))) {
         if (hw->enabled) {
             return hw;
         }
@@ -227,11 +227,12 @@ static HW *glue (audio_pcm_hw_find_any_enabled_, TYPE) (HW *hw)
 }
 
 static HW *glue (audio_pcm_hw_find_specific_, TYPE) (
+    AudioState *s,
     HW *hw,
     struct audsettings *as
     )
 {
-    while ((hw = glue (audio_pcm_hw_find_any_, TYPE) (hw))) {
+    while ((hw = glue (audio_pcm_hw_find_any_, TYPE) (s, hw))) {
         if (audio_pcm_info_eq (&hw->info, as)) {
             return hw;
         }
@@ -239,10 +240,10 @@ static HW *glue (audio_pcm_hw_find_specific_, TYPE) (
     return NULL;
 }
 
-static HW *glue (audio_pcm_hw_add_new_, TYPE) (struct audsettings *as)
+static HW *glue (audio_pcm_hw_add_new_, TYPE) (AudioState *s,
+                                               struct audsettings *as)
 {
     HW *hw;
-    AudioState *s = &glob_audio_state;
     struct audio_driver *drv = s->drv;
 
     if (!glue (s->nb_hw_voices_, TYPE)) {
@@ -267,9 +268,9 @@ static HW *glue (audio_pcm_hw_add_new_, TYPE) (struct audsettings *as)
     }
 
     hw->pcm_ops = drv->pcm_ops;
-    QLIST_INIT (&hw->sw_head);
+    LIST_INIT (&hw->sw_head);
 #ifdef DAC
-    QLIST_INIT (&hw->cap_head);
+    LIST_INIT (&hw->cap_head);
 #endif
     if (glue (hw->pcm_ops->init_, TYPE) (hw, as)) {
         goto err0;
@@ -294,10 +295,10 @@ static HW *glue (audio_pcm_hw_add_new_, TYPE) (struct audsettings *as)
         goto err1;
     }
 
-    QLIST_INSERT_HEAD (&s->glue (hw_head_, TYPE), hw, entries);
+    LIST_INSERT_HEAD (&s->glue (hw_head_, TYPE), hw, entries);
     glue (s->nb_hw_voices_, TYPE) -= 1;
 #ifdef DAC
-    audio_attach_capture (hw);
+    audio_attach_capture (s, hw);
 #endif
     return hw;
 
@@ -308,31 +309,33 @@ static HW *glue (audio_pcm_hw_add_new_, TYPE) (struct audsettings *as)
     return NULL;
 }
 
-static HW *glue (audio_pcm_hw_add_, TYPE) (struct audsettings *as)
+static HW *glue (audio_pcm_hw_add_, TYPE) (AudioState *s,
+                                           struct audsettings *as)
 {
     HW *hw;
 
     if (glue (conf.fixed_, TYPE).enabled && glue (conf.fixed_, TYPE).greedy) {
-        hw = glue (audio_pcm_hw_add_new_, TYPE) (as);
+        hw = glue (audio_pcm_hw_add_new_, TYPE) (s, as);
         if (hw) {
             return hw;
         }
     }
 
-    hw = glue (audio_pcm_hw_find_specific_, TYPE) (NULL, as);
+    hw = glue (audio_pcm_hw_find_specific_, TYPE) (s, NULL, as);
     if (hw) {
         return hw;
     }
 
-    hw = glue (audio_pcm_hw_add_new_, TYPE) (as);
+    hw = glue (audio_pcm_hw_add_new_, TYPE) (s, as);
     if (hw) {
         return hw;
     }
 
-    return glue (audio_pcm_hw_find_any_, TYPE) (NULL);
+    return glue (audio_pcm_hw_find_any_, TYPE) (s, NULL);
 }
 
 static SW *glue (audio_pcm_create_voice_pair_, TYPE) (
+    AudioState *s,
     const char *sw_name,
     struct audsettings *as
     )
@@ -355,7 +358,7 @@ static SW *glue (audio_pcm_create_voice_pair_, TYPE) (
         goto err1;
     }
 
-    hw = glue (audio_pcm_hw_add_, TYPE) (&hw_as);
+    hw = glue (audio_pcm_hw_add_, TYPE) (s, &hw_as);
     if (!hw) {
         goto err2;
     }
@@ -370,30 +373,31 @@ static SW *glue (audio_pcm_create_voice_pair_, TYPE) (
 
 err3:
     glue (audio_pcm_hw_del_sw_, TYPE) (sw);
-    glue (audio_pcm_hw_gc_, TYPE) (&hw);
+    glue (audio_pcm_hw_gc_, TYPE) (s, &hw);
 err2:
     qemu_free (sw);
 err1:
     return NULL;
 }
 
-static void glue (audio_close_, TYPE) (SW *sw)
+static void glue (audio_close_, TYPE) (AudioState *s, SW *sw)
 {
     glue (audio_pcm_sw_fini_, TYPE) (sw);
     glue (audio_pcm_hw_del_sw_, TYPE) (sw);
-    glue (audio_pcm_hw_gc_, TYPE) (&sw->hw);
+    glue (audio_pcm_hw_gc_, TYPE) (s, &sw->hw);
     qemu_free (sw);
 }
 
 void glue (AUD_close_, TYPE) (QEMUSoundCard *card, SW *sw)
 {
     if (sw) {
-        if (audio_bug (AUDIO_FUNC, !card)) {
-            dolog ("card=%p\n", card);
+        if (audio_bug (AUDIO_FUNC, !card || !card->audio)) {
+            dolog ("card=%p card->audio=%p\n",
+                   card, card ? card->audio : NULL);
             return;
         }
 
-        glue (audio_close_, TYPE) (sw);
+        glue (audio_close_, TYPE) (card->audio, sw);
     }
 }
 
@@ -402,11 +406,11 @@ SW *glue (AUD_open_, TYPE) (
     SW *sw,
     const char *name,
     void *callback_opaque ,
-    audio_callback_fn callback_fn,
+    audio_callback_fn_t callback_fn,
     struct audsettings *as
     )
 {
-    AudioState *s = &glob_audio_state;
+    AudioState *s;
 #ifdef DAC
     int live = 0;
     SW *old_sw = NULL;
@@ -415,11 +419,14 @@ SW *glue (AUD_open_, TYPE) (
     ldebug ("open %s, freq %d, nchannels %d, fmt %d\n",
             name, as->freq, as->nchannels, as->fmt);
 
-    if (audio_bug (AUDIO_FUNC, !card || !name || !callback_fn || !as)) {
-        dolog ("card=%p name=%p callback_fn=%p as=%p\n",
-               card, name, callback_fn, as);
+    if (audio_bug (AUDIO_FUNC,
+                   !card || !card->audio || !name || !callback_fn || !as)) {
+        dolog ("card=%p card->audio=%p name=%p callback_fn=%p as=%p\n",
+               card, card ? card->audio : NULL, name, callback_fn, as);
         goto fail;
     }
+
+    s = card->audio;
 
     if (audio_bug (AUDIO_FUNC, audio_validate_settings (as))) {
         audio_print_settings (as);
@@ -478,7 +485,7 @@ SW *glue (AUD_open_, TYPE) (
         }
     }
     else {
-        sw = glue (audio_pcm_create_voice_pair_, TYPE) (name, as);
+        sw = glue (audio_pcm_create_voice_pair_, TYPE) (s, name, as);
         if (!sw) {
             dolog ("Failed to create voice `%s'\n", name);
             return NULL;
@@ -486,7 +493,6 @@ SW *glue (AUD_open_, TYPE) (
     }
 
     if (sw) {
-        sw->card = card;
         sw->vol = nominal_volume;
         sw->callback.fn = callback_fn;
         sw->callback.opaque = callback_opaque;
@@ -556,7 +562,7 @@ uint64_t glue (AUD_get_elapsed_usec_, TYPE) (SW *sw, QEMUAudioTimeStamp *ts)
         return 0;
     }
 
-    return muldiv64 (delta, sw->hw->info.freq, 1000000);
+    return (delta * sw->hw->info.freq) / 1000000;
 }
 
 #undef TYPE

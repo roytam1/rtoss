@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 #include <stdio.h>
+#include <assert.h>
 #include "hw.h"
 #include "sh.h"
 #include "sysemu.h"
@@ -69,7 +70,7 @@ typedef struct SH7750State {
     struct intc_desc intc;
 } SH7750State;
 
-static inline int has_bcr3_and_bcr4(SH7750State * s)
+static int inline has_bcr3_and_bcr4(SH7750State * s)
 {
 	return (s->cpu->features & SH_FEATURE_BCR3_AND_BCR4);
 }
@@ -434,13 +435,13 @@ static void sh7750_mem_writel(void *opaque, target_phys_addr_t addr,
     }
 }
 
-static CPUReadMemoryFunc * const sh7750_mem_read[] = {
+static CPUReadMemoryFunc *sh7750_mem_read[] = {
     sh7750_mem_readb,
     sh7750_mem_readw,
     sh7750_mem_readl
 };
 
-static CPUWriteMemoryFunc * const sh7750_mem_write[] = {
+static CPUWriteMemoryFunc *sh7750_mem_write[] = {
     sh7750_mem_writeb,
     sh7750_mem_writew,
     sh7750_mem_writel
@@ -688,13 +689,13 @@ static void sh7750_mmct_writel(void *opaque, target_phys_addr_t addr,
     }
 }
 
-static CPUReadMemoryFunc * const sh7750_mmct_read[] = {
+static CPUReadMemoryFunc *sh7750_mmct_read[] = {
     invalid_read,
     invalid_read,
     sh7750_mmct_readl
 };
 
-static CPUWriteMemoryFunc * const sh7750_mmct_write[] = {
+static CPUWriteMemoryFunc *sh7750_mmct_write[] = {
     invalid_write,
     invalid_write,
     sh7750_mmct_writel
@@ -709,7 +710,8 @@ SH7750State *sh7750_init(CPUSH4State * cpu)
     s = qemu_mallocz(sizeof(SH7750State));
     s->cpu = cpu;
     s->periph_freq = 60000000;	/* 60MHz */
-    sh7750_io_memory = cpu_register_io_memory(sh7750_mem_read,
+    sh7750_io_memory = cpu_register_io_memory(0,
+					      sh7750_mem_read,
 					      sh7750_mem_write, s);
     cpu_register_physical_memory_offset(0x1f000000, 0x1000,
                                         sh7750_io_memory, 0x1f000000);
@@ -724,7 +726,8 @@ SH7750State *sh7750_init(CPUSH4State * cpu)
     cpu_register_physical_memory_offset(0xffc00000, 0x1000,
                                         sh7750_io_memory, 0x1fc00000);
 
-    sh7750_mm_cache_and_tlb = cpu_register_io_memory(sh7750_mmct_read,
+    sh7750_mm_cache_and_tlb = cpu_register_io_memory(0,
+						     sh7750_mmct_read,
 						     sh7750_mmct_write, s);
     cpu_register_physical_memory(0xf0000000, 0x08000000,
 				 sh7750_mm_cache_and_tlb);

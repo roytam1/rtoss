@@ -21,6 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
+#include "qemu-common.h"
+#include "console.h"
+#include "sysemu.h"
+
 #include <curses.h>
 
 #ifndef _WIN32
@@ -32,10 +37,6 @@
 #ifdef __OpenBSD__
 #define resize_term resizeterm
 #endif
-
-#include "qemu-common.h"
-#include "console.h"
-#include "sysemu.h"
 
 #define FONT_HEIGHT 16
 #define FONT_WIDTH 8
@@ -157,8 +158,9 @@ static void curses_cursor_position(DisplayState *ds, int x, int y)
 /* generic keyboard conversion */
 
 #include "curses_keys.h"
+#include "keymaps.c"
 
-static kbd_layout_t *kbd_layout = NULL;
+static kbd_layout_t *kbd_layout = 0;
 static int keycode2keysym[CURSES_KEYS];
 
 static void curses_refresh(DisplayState *ds)
@@ -309,7 +311,7 @@ static void curses_keyboard_setup(void)
         keyboard_layout = "en-us";
 #endif
     if(keyboard_layout) {
-        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout);
+        kbd_layout = init_keyboard_layout(keyboard_layout);
         if (!kbd_layout)
             exit(1);
     }
@@ -364,8 +366,11 @@ void curses_display_init(DisplayState *ds, int full_screen)
     dcl->dpy_refresh = curses_refresh;
     dcl->dpy_text_cursor = curses_cursor_position;
     register_displaychangelistener(ds, dcl);
-    qemu_free_displaysurface(ds);
+    qemu_free_displaysurface(ds->surface);
     ds->surface = qemu_create_displaysurface_from(640, 400, 0, 0, (uint8_t*) screen);
 
     invalidate = 1;
+
+    /* Standard VGA initial text mode dimensions */
+    curses_resize(ds);
 }

@@ -22,10 +22,10 @@
  * THE SOFTWARE.
  */
 #include "hw.h"
-#include "pc.h"
 #include "isa.h"
-#include "qdev.h"
+#include "pc.h"
 #include "console.h"
+#include "sysemu.h"
 #include "qemu-timer.h"
 
 #define SIO_BUFFER_SIZE 256
@@ -82,7 +82,7 @@ static const uint8_t kbd_table[128] = {
     0xff, 0x35, 0xff, 0x51, 0xff, 0x0d, 0xff, 0xff,
 };
 
-struct kbd_t {
+struct KeyBoardState {
     /* keyboard */
     uint8_t lock;
     uint8_t pressed[128];
@@ -104,19 +104,13 @@ struct kbd_t {
     qemu_irq irq;
 };
 
-typedef struct kbd_isabus_t {
-    ISADevice dev;
-    uint32_t isairq;
-    struct kbd_t state;
-} kbd_isabus_t;
-
-typedef struct kbd_t kbd_t;
+typedef struct KeyBoardState KeyBoardState;
 
 /* keyboard */
 
 static void kbd_recv(void *opaque, uint8_t value)
 {
-    kbd_t *s = opaque;
+    KeyBoardState *s = opaque;
 
     if (s->recv_count < SIO_BUFFER_SIZE) {
         s->recv_buf[(s->recv_write++) & (SIO_BUFFER_SIZE - 1)] = value;
@@ -130,7 +124,7 @@ static void kbd_recv(void *opaque, uint8_t value)
 
 static void kbd_send(void *opaque, uint8_t value)
 {
-    kbd_t *s = opaque;
+    KeyBoardState *s = opaque;
 
     s->send_buf[(s->send_count++) & 1] = value;
 
@@ -179,7 +173,7 @@ static void kbd_send(void *opaque, uint8_t value)
 
 static void kbd_event_handler(void *opaque, int keycode)
 {
-    kbd_t *s = opaque;
+    KeyBoardState *s = opaque;
 
     if (keycode & 0x80) {
         /* key released */
@@ -219,7 +213,7 @@ static void kbd_event_handler(void *opaque, int keycode)
 
 static void sio_data_write(void *opaque, uint32_t addr, uint32_t value)
 {
-    kbd_t *s = opaque;
+    KeyBoardState *s = opaque;
 
     if (s->status & SIO_STAT_TXRDY) {
         s->status &= ~SIO_STAT_TXE;
@@ -229,7 +223,7 @@ static void sio_data_write(void *opaque, uint32_t addr, uint32_t value)
 
 static uint32_t sio_data_read(void *opaque, uint32_t addr)
 {
-    kbd_t *s = opaque;
+    KeyBoardState *s = opaque;
 
     s->status &= ~SIO_STAT_RXRDY;
     qemu_set_irq(s->irq, 0);
@@ -238,7 +232,7 @@ static uint32_t sio_data_read(void *opaque, uint32_t addr)
 
 static void sio_cmd_write(void *opaque, uint32_t addr, uint32_t value)
 {
-    kbd_t *s = opaque;
+    KeyBoardState *s = opaque;
 
     switch(s->mode) {
     case SIO_MODE_CLEAR:
@@ -273,7 +267,7 @@ static void sio_cmd_write(void *opaque, uint32_t addr, uint32_t value)
 
 static uint32_t sio_status_read(void *opaque, uint32_t addr)
 {
-    kbd_t *s = opaque;
+    KeyBoardState *s = opaque;
     uint8_t value;
 
     value = s->status;
@@ -285,7 +279,7 @@ static uint32_t sio_status_read(void *opaque, uint32_t addr)
 
 static void sio_timer_handler(void *opaque)
 {
-    kbd_t *s = opaque;
+    KeyBoardState *s = opaque;
 
     if (s->recv_count > 0) {
         uint8_t value = s->recv_buf[(s->recv_read++) & 0xff];
@@ -311,7 +305,7 @@ static void sio_timer_handler(void *opaque)
 
 static void pc98_kbd_reset(void *opaque)
 {
-    kbd_t *s = opaque;
+    KeyBoardState *s = opaque;
 
     s->lock = 0;
     memset(s->pressed, 0, 128);
@@ -324,72 +318,55 @@ static void pc98_kbd_reset(void *opaque)
     s->send_count = 0;
 }
 
-static int pc98_kbd_pre_load(void *opaque)
+static void pc98_kbd_save(QEMUFile *f, void *opaque)
 {
-    pc98_kbd_reset(opaque);
+    KeyBoardState *s = opaque;
+
+    qemu_put_8s(f, &s->lock);
+    qemu_put_8s(f, &s->mode);
+    qemu_put_8s(f, &s->status);
+    qemu_put_8s(f, &s->rxen);
+    qemu_put_8s(f, &s->txen);
+    qemu_put_8s(f, &s->recv_data);
+}
+
+static int pc98_kbd_load(QEMUFile *f, void *opaque, int version_id)
+{
+    KeyBoardState *s = opaque;
+
+    if (version_id != 1) {
+        return -EINVAL;
+    }
+
+    pc98_kbd_reset(s);
+
+    qemu_get_8s(f, &s->lock);
+    qemu_get_8s(f, &s->mode);
+    qemu_get_8s(f, &s->status);
+    qemu_get_8s(f, &s->rxen);
+    qemu_get_8s(f, &s->txen);
+    qemu_get_8s(f, &s->recv_data);
+
     return 0;
 }
 
-static const VMStateDescription vmstate_kbd = {
-    .name = "pc98-kbd",
-    .version_id = 1,
-    .minimum_version_id = 1,
-    .minimum_version_id_old = 1,
-    .pre_load = pc98_kbd_pre_load,
-    .fields      = (VMStateField []) {
-        VMSTATE_UINT8(lock, kbd_t),
-        VMSTATE_UINT8(mode, kbd_t),
-        VMSTATE_UINT8(status, kbd_t),
-        VMSTATE_UINT8(rxen, kbd_t),
-        VMSTATE_UINT8(txen, kbd_t),
-        VMSTATE_UINT8(recv_data, kbd_t),
-        VMSTATE_END_OF_LIST()
-    }
-};
-
-static int pc98_kbd_initfn(ISADevice *dev)
+void pc98_kbd_init(qemu_irq irq)
 {
-    kbd_isabus_t *isa = DO_UPCAST(kbd_isabus_t, dev, dev);
-    kbd_t *s = &isa->state;
+    KeyBoardState *s;
+
+    s = qemu_mallocz(sizeof(KeyBoardState));
 
     register_ioport_write(0x41, 1, 1, sio_data_write, s);
     register_ioport_read(0x41, 1, 1, sio_data_read, s);
     register_ioport_write(0x43, 1, 1, sio_cmd_write, s);
     register_ioport_read(0x43, 1, 1, sio_status_read, s);
 
-    isa_init_irq(dev, &s->irq, isa->isairq);
+    s->irq = irq;
 
     s->sio_timer = qemu_new_timer(rt_clock, sio_timer_handler, s);
     qemu_add_kbd_event_handler(kbd_event_handler, s);
 
-    vmstate_register(-1, &vmstate_kbd, s);
+    register_savevm("pc98kbd", 0, 1, pc98_kbd_save, pc98_kbd_load, s);
     pc98_kbd_reset(s);
     qemu_register_reset(pc98_kbd_reset, s);
-
-    return 0;
 }
-
-void pc98_kbd_init(void)
-{
-    ISADevice *dev;
-
-    dev = isa_create("pc98-kbd");
-    qdev_init_nofail(&dev->qdev);
-}
-
-static ISADeviceInfo pc98_kbd_info = {
-    .qdev.name  = "pc98-kbd",
-    .qdev.size  = sizeof(kbd_isabus_t),
-    .init       = pc98_kbd_initfn,
-    .qdev.props = (Property[]) {
-        DEFINE_PROP_UINT32("irq", kbd_isabus_t, isairq, 1),
-        DEFINE_PROP_END_OF_LIST(),
-    },
-};
-
-static void pc98_kbd_register_devices(void)
-{
-    isa_qdev_register(&pc98_kbd_info);
-}
-
-device_init(pc98_kbd_register_devices)

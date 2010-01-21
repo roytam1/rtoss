@@ -18,7 +18,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along
- * with this program; if not, see <http://www.gnu.org/licenses/>.
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 #if BITS == 8
@@ -35,14 +36,14 @@
 #endif
 
 
-static void glue(tc6393xb_draw_graphic, BITS)(TC6393xbState *s)
+static void glue(tc6393xb_draw_graphic, BITS)(struct tc6393xb_s *s)
 {
     int i;
     int w_display;
     uint16_t *data_buffer;
     uint8_t *data_display;
 
-    data_buffer = s->vram_ptr;
+    data_buffer = (uint16_t*)(phys_ram_base + s->vram_addr);
     w_display = s->scr_width * BITS / 8;
     data_display = ds_get_data(s->ds);
     for(i = 0; i < s->scr_height; i++) {

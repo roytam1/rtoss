@@ -78,7 +78,7 @@
 #define NAND_MODE_ECC_READ  0x40
 #define NAND_MODE_ECC_RST   0x60
 
-struct TC6393xbState {
+struct tc6393xb_s {
     qemu_irq irq;
     qemu_irq *sub_irqs;
     struct {
@@ -118,26 +118,25 @@ struct TC6393xbState {
     } nand;
     int nand_enable;
     uint32_t nand_phys;
-    NANDFlashState *flash;
-    ECCState ecc;
+    struct nand_flash_s *flash;
+    struct ecc_state_s ecc;
 
     DisplayState *ds;
     ram_addr_t vram_addr;
-    uint16_t *vram_ptr;
     uint32_t scr_width, scr_height; /* in pixels */
     qemu_irq l3v;
     unsigned blank : 1,
              blanked : 1;
 };
 
-qemu_irq *tc6393xb_gpio_in_get(TC6393xbState *s)
+qemu_irq *tc6393xb_gpio_in_get(struct tc6393xb_s *s)
 {
     return s->gpio_in;
 }
 
 static void tc6393xb_gpio_set(void *opaque, int line, int level)
 {
-//    TC6393xbState *s = opaque;
+//    struct tc6393xb_s *s = opaque;
 
     if (line > TC6393XB_GPIOS) {
         printf("%s: No GPIO pin %i\n", __FUNCTION__, line);
@@ -147,7 +146,7 @@ static void tc6393xb_gpio_set(void *opaque, int line, int level)
     // FIXME: how does the chip reflect the GPIO input level change?
 }
 
-void tc6393xb_gpio_out_set(TC6393xbState *s, int line,
+void tc6393xb_gpio_out_set(struct tc6393xb_s *s, int line,
                     qemu_irq handler)
 {
     if (line >= TC6393XB_GPIOS) {
@@ -158,7 +157,7 @@ void tc6393xb_gpio_out_set(TC6393xbState *s, int line,
     s->handler[line] = handler;
 }
 
-static void tc6393xb_gpio_handler_update(TC6393xbState *s)
+static void tc6393xb_gpio_handler_update(struct tc6393xb_s *s)
 {
     uint32_t level, diff;
     int bit;
@@ -173,20 +172,20 @@ static void tc6393xb_gpio_handler_update(TC6393xbState *s)
     s->prev_level = level;
 }
 
-qemu_irq tc6393xb_l3v_get(TC6393xbState *s)
+qemu_irq tc6393xb_l3v_get(struct tc6393xb_s *s)
 {
     return s->l3v;
 }
 
 static void tc6393xb_l3v(void *opaque, int line, int level)
 {
-    TC6393xbState *s = opaque;
+    struct tc6393xb_s *s = opaque;
     s->blank = !level;
     fprintf(stderr, "L3V: %d\n", level);
 }
 
 static void tc6393xb_sub_irq(void *opaque, int line, int level) {
-    TC6393xbState *s = opaque;
+    struct tc6393xb_s *s = opaque;
     uint8_t isr = s->scr.ISR;
     if (level)
         isr |= 1 << line;
@@ -211,7 +210,7 @@ static void tc6393xb_sub_irq(void *opaque, int line, int level) {
     case SCR_ ##N(1): return s->scr.N[1];       \
     case SCR_ ##N(2): return s->scr.N[2]
 
-static uint32_t tc6393xb_scr_readb(TC6393xbState *s, target_phys_addr_t addr)
+static uint32_t tc6393xb_scr_readb(struct tc6393xb_s *s, target_phys_addr_t addr)
 {
     switch (addr) {
         case SCR_REVID:
@@ -272,7 +271,7 @@ static uint32_t tc6393xb_scr_readb(TC6393xbState *s, target_phys_addr_t addr)
     case SCR_ ##N(1): s->scr.N[1] = value; return;   \
     case SCR_ ##N(2): s->scr.N[2] = value; return
 
-static void tc6393xb_scr_writeb(TC6393xbState *s, target_phys_addr_t addr, uint32_t value)
+static void tc6393xb_scr_writeb(struct tc6393xb_s *s, target_phys_addr_t addr, uint32_t value)
 {
     switch (addr) {
         SCR_REG_B(ISR);
@@ -318,12 +317,12 @@ static void tc6393xb_scr_writeb(TC6393xbState *s, target_phys_addr_t addr, uint3
 #undef SCR_REG_L
 #undef SCR_REG_A
 
-static void tc6393xb_nand_irq(TC6393xbState *s) {
+static void tc6393xb_nand_irq(struct tc6393xb_s *s) {
     qemu_set_irq(s->sub_irqs[IRQ_TC6393_NAND],
             (s->nand.imr & 0x80) && (s->nand.imr & s->nand.isr));
 }
 
-static uint32_t tc6393xb_nand_cfg_readb(TC6393xbState *s, target_phys_addr_t addr) {
+static uint32_t tc6393xb_nand_cfg_readb(struct tc6393xb_s *s, target_phys_addr_t addr) {
     switch (addr) {
         case NAND_CFG_COMMAND:
             return s->nand_enable ? 2 : 0;
@@ -336,7 +335,7 @@ static uint32_t tc6393xb_nand_cfg_readb(TC6393xbState *s, target_phys_addr_t add
     fprintf(stderr, "tc6393xb_nand_cfg: unhandled read at %08x\n", (uint32_t) addr);
     return 0;
 }
-static void tc6393xb_nand_cfg_writeb(TC6393xbState *s, target_phys_addr_t addr, uint32_t value) {
+static void tc6393xb_nand_cfg_writeb(struct tc6393xb_s *s, target_phys_addr_t addr, uint32_t value) {
     switch (addr) {
         case NAND_CFG_COMMAND:
             s->nand_enable = (value & 0x2);
@@ -353,7 +352,7 @@ static void tc6393xb_nand_cfg_writeb(TC6393xbState *s, target_phys_addr_t addr, 
 					(uint32_t) addr, value & 0xff);
 }
 
-static uint32_t tc6393xb_nand_readb(TC6393xbState *s, target_phys_addr_t addr) {
+static uint32_t tc6393xb_nand_readb(struct tc6393xb_s *s, target_phys_addr_t addr) {
     switch (addr) {
         case NAND_DATA + 0:
         case NAND_DATA + 1:
@@ -372,7 +371,7 @@ static uint32_t tc6393xb_nand_readb(TC6393xbState *s, target_phys_addr_t addr) {
     fprintf(stderr, "tc6393xb_nand: unhandled read at %08x\n", (uint32_t) addr);
     return 0;
 }
-static void tc6393xb_nand_writeb(TC6393xbState *s, target_phys_addr_t addr, uint32_t value) {
+static void tc6393xb_nand_writeb(struct tc6393xb_s *s, target_phys_addr_t addr, uint32_t value) {
 //    fprintf(stderr, "tc6393xb_nand: write at %08x: %02x\n",
 //					(uint32_t) addr, value & 0xff);
     switch (addr) {
@@ -427,7 +426,7 @@ static void tc6393xb_nand_writeb(TC6393xbState *s, target_phys_addr_t addr, uint
 #define BITS 32
 #include "tc6393xb_template.h"
 
-static void tc6393xb_draw_graphic(TC6393xbState *s, int full_update)
+static void tc6393xb_draw_graphic(struct tc6393xb_s *s, int full_update)
 {
     switch (ds_get_bits_per_pixel(s->ds)) {
         case 8:
@@ -453,7 +452,7 @@ static void tc6393xb_draw_graphic(TC6393xbState *s, int full_update)
     dpy_update(s->ds, 0, 0, s->scr_width, s->scr_height);
 }
 
-static void tc6393xb_draw_blank(TC6393xbState *s, int full_update)
+static void tc6393xb_draw_blank(struct tc6393xb_s *s, int full_update)
 {
     int i, w;
     uint8_t *d;
@@ -473,7 +472,7 @@ static void tc6393xb_draw_blank(TC6393xbState *s, int full_update)
 
 static void tc6393xb_update_display(void *opaque)
 {
-    TC6393xbState *s = opaque;
+    struct tc6393xb_s *s = opaque;
     int full_update;
 
     if (s->scr_width == 0 || s->scr_height == 0)
@@ -496,7 +495,7 @@ static void tc6393xb_update_display(void *opaque)
 
 
 static uint32_t tc6393xb_readb(void *opaque, target_phys_addr_t addr) {
-    TC6393xbState *s = opaque;
+    struct tc6393xb_s *s = opaque;
 
     switch (addr >> 8) {
         case 0:
@@ -517,7 +516,7 @@ static uint32_t tc6393xb_readb(void *opaque, target_phys_addr_t addr) {
 }
 
 static void tc6393xb_writeb(void *opaque, target_phys_addr_t addr, uint32_t value) {
-    TC6393xbState *s = opaque;
+    struct tc6393xb_s *s = opaque;
 
     switch (addr >> 8) {
         case 0:
@@ -563,22 +562,22 @@ static void tc6393xb_writel(void *opaque, target_phys_addr_t addr, uint32_t valu
     tc6393xb_writeb(opaque, addr + 3, value >> 24);
 }
 
-TC6393xbState *tc6393xb_init(uint32_t base, qemu_irq irq)
+struct tc6393xb_s *tc6393xb_init(uint32_t base, qemu_irq irq)
 {
     int iomemtype;
-    TC6393xbState *s;
-    CPUReadMemoryFunc * const tc6393xb_readfn[] = {
+    struct tc6393xb_s *s;
+    CPUReadMemoryFunc *tc6393xb_readfn[] = {
         tc6393xb_readb,
         tc6393xb_readw,
         tc6393xb_readl,
     };
-    CPUWriteMemoryFunc * const tc6393xb_writefn[] = {
+    CPUWriteMemoryFunc *tc6393xb_writefn[] = {
         tc6393xb_writeb,
         tc6393xb_writew,
         tc6393xb_writel,
     };
 
-    s = (TC6393xbState *) qemu_mallocz(sizeof(TC6393xbState));
+    s = (struct tc6393xb_s *) qemu_mallocz(sizeof(struct tc6393xb_s));
     s->irq = irq;
     s->gpio_in = qemu_allocate_irqs(tc6393xb_gpio_set, s, TC6393XB_GPIOS);
 
@@ -589,12 +588,11 @@ TC6393xbState *tc6393xb_init(uint32_t base, qemu_irq irq)
 
     s->flash = nand_init(NAND_MFR_TOSHIBA, 0x76);
 
-    iomemtype = cpu_register_io_memory(tc6393xb_readfn,
+    iomemtype = cpu_register_io_memory(0, tc6393xb_readfn,
                     tc6393xb_writefn, s);
     cpu_register_physical_memory(base, 0x10000, iomemtype);
 
     s->vram_addr = qemu_ram_alloc(0x100000);
-    s->vram_ptr = qemu_get_ram_ptr(s->vram_addr);
     cpu_register_physical_memory(base + 0x100000, 0x100000, s->vram_addr);
     s->scr_width = 480;
     s->scr_height = 640;

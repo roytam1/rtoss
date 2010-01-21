@@ -1,22 +1,19 @@
 /* PCMCIA/Cardbus */
 
-#include "qemu-common.h"
-#include "sysemu.h"
-
-typedef struct {
+struct pcmcia_socket_s {
     qemu_irq irq;
     int attached;
     const char *slot_string;
     const char *card_string;
-} PCMCIASocket;
+};
 
-void pcmcia_socket_register(PCMCIASocket *socket);
-void pcmcia_socket_unregister(PCMCIASocket *socket);
-void pcmcia_info(Monitor *mon);
+void pcmcia_socket_register(struct pcmcia_socket_s *socket);
+void pcmcia_socket_unregister(struct pcmcia_socket_s *socket);
+void pcmcia_info(void);
 
-struct PCMCIACardState {
+struct pcmcia_card_s {
     void *state;
-    PCMCIASocket *slot;
+    struct pcmcia_socket_s *slot;
     int (*attach)(void *state);
     int (*detach)(void *state);
     const uint8_t *cis;
@@ -49,4 +46,4 @@ struct PCMCIACardState {
 #define CISTPL_ENDMARK		0xff
 
 /* dscm1xxxx.c */
-PCMCIACardState *dscm1xxxx_init(DriveInfo *bdrv);
+struct pcmcia_card_s *dscm1xxxx_init(BlockDriverState *bdrv);

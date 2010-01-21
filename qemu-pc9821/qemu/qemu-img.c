@@ -22,19 +22,14 @@
  * THE SOFTWARE.
  */
 #include "qemu-common.h"
-#include "qemu-option.h"
 #include "osdep.h"
 #include "block_int.h"
-#include <stdio.h>
+#include <assert.h>
 
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
-
-typedef struct img_cmd_t {
-    const char *name;
-    int (*handler)(int argc, char **argv);
-} img_cmd_t;
 
 /* Default to cache=writeback as data integrity is not important for qemu-tcg. */
 #define BRDV_O_FLAGS BDRV_O_CACHE_WB
@@ -63,11 +58,11 @@ static void help(void)
            "QEMU disk image utility\n"
            "\n"
            "Command syntax:\n"
-#define DEF(option, callback, arg_string)        \
-           "  " arg_string "\n"
-#include "qemu-img-cmds.h"
-#undef DEF
-#undef GEN_DOCS
+           "  create [-e] [-6] [-b base_image] [-f fmt] filename [size]\n"
+           "  commit [-f fmt] filename\n"
+           "  convert [-c] [-e] [-6] [-f fmt] [-O output_fmt] [-B output_base_image] filename [filename2 [...]] output_filename\n"
+           "  info [-f fmt] filename\n"
+           "  snapshot [-l | -a snapshot | -c snapshot | -d snapshot] filename\n"
            "\n"
            "Command parameters:\n"
            "  'filename' is a disk image filename\n"
@@ -83,10 +78,9 @@ static void help(void)
            "    supported any 'k' or 'K' is ignored\n"
            "  'output_filename' is the destination disk image filename\n"
            "  'output_fmt' is the destination format\n"
-           "  'options' is a comma separated list of format specific options in a\n"
-           "    name=value format. Use -o ? for an overview of the options supported by the\n"
-           "    used format\n"
            "  '-c' indicates that target image must be compressed (qcow format only)\n"
+           "  '-e' indicates that the target image must be encrypted (qcow format only)\n"
+           "  '-6' indicates that the target image must use compatibility level 6 (vmdk format only)\n"
            "  '-h' with or without a command shows this help and lists the supported formats\n"
            "\n"
            "Parameters to snapshot subcommand:\n"
@@ -220,54 +214,24 @@ static BlockDriverState *bdrv_new_open(const char *filename,
     return bs;
 }
 
-static void add_old_style_options(const char *fmt, QEMUOptionParameter *list,
-    int flags, const char *base_filename, const char *base_fmt)
-{
-    if (flags & BLOCK_FLAG_ENCRYPT) {
-        if (set_option_parameter(list, BLOCK_OPT_ENCRYPT, "on")) {
-            error("Encryption not supported for file format '%s'", fmt);
-        }
-    }
-    if (flags & BLOCK_FLAG_COMPAT6) {
-        if (set_option_parameter(list, BLOCK_OPT_COMPAT6, "on")) {
-            error("VMDK version 6 not supported for file format '%s'", fmt);
-        }
-    }
-
-    if (base_filename) {
-        if (set_option_parameter(list, BLOCK_OPT_BACKING_FILE, base_filename)) {
-            error("Backing file not supported for file format '%s'", fmt);
-        }
-    }
-    if (base_fmt) {
-        if (set_option_parameter(list, BLOCK_OPT_BACKING_FMT, base_fmt)) {
-            error("Backing file format not supported for file format '%s'", fmt);
-        }
-    }
-}
-
 static int img_create(int argc, char **argv)
 {
     int c, ret, flags;
     const char *fmt = "raw";
-    const char *base_fmt = NULL;
     const char *filename;
     const char *base_filename = NULL;
+    uint64_t size;
+    const char *p;
     BlockDriver *drv;
-    QEMUOptionParameter *param = NULL;
-    char *options = NULL;
 
     flags = 0;
     for(;;) {
-        c = getopt(argc, argv, "F:b:f:he6o:");
+        c = getopt(argc, argv, "b:f:he6");
         if (c == -1)
             break;
         switch(c) {
         case 'h':
             help();
-            break;
-        case 'F':
-            base_fmt = optarg;
             break;
         case 'b':
             base_filename = optarg;
@@ -281,87 +245,48 @@ static int img_create(int argc, char **argv)
         case '6':
             flags |= BLOCK_FLAG_COMPAT6;
             break;
-        case 'o':
-            options = optarg;
-            break;
         }
     }
-
-    /* Find driver and parse its options */
-    drv = bdrv_find_format(fmt);
-    if (!drv)
-        error("Unknown file format '%s'", fmt);
-
-    if (options && !strcmp(options, "?")) {
-        print_option_help(drv->create_options);
-        return 0;
-    }
-
-    if (options) {
-        param = parse_option_parameters(options, drv->create_options, param);
-        if (param == NULL) {
-            error("Invalid options for file format '%s'.", fmt);
-        }
-    } else {
-        param = parse_option_parameters("", drv->create_options, param);
-    }
-
-    /* Get the filename */
     if (optind >= argc)
         help();
     filename = argv[optind++];
-
-    /* Add size to parameters */
-    if (optind < argc) {
-        set_option_parameter(param, BLOCK_OPT_SIZE, argv[optind++]);
-    }
-
-    /* Add old-style options to parameters */
-    add_old_style_options(fmt, param, flags, base_filename, base_fmt);
-
-    // The size for the image must always be specified, with one exception:
-    // If we are using a backing file, we can obtain the size from there
-    if (get_option_parameter(param, BLOCK_OPT_SIZE)->value.n == 0) {
-
-        QEMUOptionParameter *backing_file =
-            get_option_parameter(param, BLOCK_OPT_BACKING_FILE);
-        QEMUOptionParameter *backing_fmt =
-            get_option_parameter(param, BLOCK_OPT_BACKING_FMT);
-
-        if (backing_file && backing_file->value.s) {
-            BlockDriverState *bs;
-            uint64_t size;
-            const char *fmt = NULL;
-            char buf[32];
-
-            if (backing_fmt && backing_fmt->value.s) {
-                 if (bdrv_find_format(backing_fmt->value.s)) {
-                     fmt = backing_fmt->value.s;
-                } else {
-                     error("Unknown backing file format '%s'",
-                        backing_fmt->value.s);
-                }
-            }
-
-            bs = bdrv_new_open(backing_file->value.s, fmt);
-            bdrv_get_geometry(bs, &size);
-            size *= 512;
-            bdrv_delete(bs);
-
-            snprintf(buf, sizeof(buf), "%" PRId64, size);
-            set_option_parameter(param, BLOCK_OPT_SIZE, buf);
+    size = 0;
+    if (base_filename) {
+        BlockDriverState *bs;
+        bs = bdrv_new_open(base_filename, NULL);
+        bdrv_get_geometry(bs, &size);
+        size *= 512;
+        bdrv_delete(bs);
+    } else {
+        if (optind >= argc)
+            help();
+        p = argv[optind];
+        size = strtoul(p, (char **)&p, 0);
+        if (*p == 'M') {
+            size *= 1024 * 1024;
+        } else if (*p == 'G') {
+            size *= 1024 * 1024 * 1024;
+        } else if (*p == 'k' || *p == 'K' || *p == '\0') {
+            size *= 1024;
         } else {
-            error("Image creation needs a size parameter");
+            help();
         }
     }
-
-    printf("Formatting '%s', fmt=%s ", filename, fmt);
-    print_option_parameters(param);
-    puts("");
-
-    ret = bdrv_create(drv, filename, param);
-    free_option_parameters(param);
-
+    drv = bdrv_find_format(fmt);
+    if (!drv)
+        error("Unknown file format '%s'", fmt);
+    printf("Formatting '%s', fmt=%s",
+           filename, fmt);
+    if (flags & BLOCK_FLAG_ENCRYPT)
+        printf(", encrypted");
+    if (flags & BLOCK_FLAG_COMPAT6)
+        printf(", compatibility level=6");
+    if (base_filename) {
+        printf(", backing_file=%s",
+               base_filename);
+    }
+    printf(", size=%" PRIu64 " kB\n", size / 1024);
+    ret = bdrv_create(drv, filename, size / 512, base_filename, flags);
     if (ret < 0) {
         if (ret == -ENOTSUP) {
             error("Formatting or formatting option not supported for file format '%s'", fmt);
@@ -371,65 +296,6 @@ static int img_create(int argc, char **argv)
             error("Error while formatting");
         }
     }
-    return 0;
-}
-
-static int img_check(int argc, char **argv)
-{
-    int c, ret;
-    const char *filename, *fmt;
-    BlockDriver *drv;
-    BlockDriverState *bs;
-
-    fmt = NULL;
-    for(;;) {
-        c = getopt(argc, argv, "f:h");
-        if (c == -1)
-            break;
-        switch(c) {
-        case 'h':
-            help();
-            break;
-        case 'f':
-            fmt = optarg;
-            break;
-        }
-    }
-    if (optind >= argc)
-        help();
-    filename = argv[optind++];
-
-    bs = bdrv_new("");
-    if (!bs)
-        error("Not enough memory");
-    if (fmt) {
-        drv = bdrv_find_format(fmt);
-        if (!drv)
-            error("Unknown file format '%s'", fmt);
-    } else {
-        drv = NULL;
-    }
-    if (bdrv_open2(bs, filename, BRDV_O_FLAGS, drv) < 0) {
-        error("Could not open '%s'", filename);
-    }
-    ret = bdrv_check(bs);
-    switch(ret) {
-    case 0:
-        printf("No errors were found on the image.\n");
-        break;
-    case -ENOTSUP:
-        error("This image format does not support checks");
-        break;
-    default:
-        if (ret < 0) {
-            error("An error occurred during the check");
-        } else {
-            printf("%d errors were found on the image.\n", ret);
-        }
-        break;
-    }
-
-    bdrv_delete(bs);
     return 0;
 }
 
@@ -530,7 +396,7 @@ static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum)
     return v;
 }
 
-#define IO_BUF_SIZE (2 * 1024 * 1024)
+#define IO_BUF_SIZE 65536
 
 static int img_convert(int argc, char **argv)
 {
@@ -543,15 +409,13 @@ static int img_convert(int argc, char **argv)
     uint8_t buf[IO_BUF_SIZE];
     const uint8_t *buf1;
     BlockDriverInfo bdi;
-    QEMUOptionParameter *param = NULL;
-    char *options = NULL;
 
     fmt = NULL;
     out_fmt = "raw";
     out_baseimg = NULL;
     flags = 0;
     for(;;) {
-        c = getopt(argc, argv, "f:O:B:hce6o:");
+        c = getopt(argc, argv, "f:O:B:hce6");
         if (c == -1)
             break;
         switch(c) {
@@ -575,9 +439,6 @@ static int img_convert(int argc, char **argv)
             break;
         case '6':
             flags |= BLOCK_FLAG_COMPAT6;
-            break;
-        case 'o':
-            options = optarg;
             break;
         }
     }
@@ -603,46 +464,19 @@ static int img_convert(int argc, char **argv)
         total_sectors += bs_sectors;
     }
 
-    /* Find driver and parse its options */
     drv = bdrv_find_format(out_fmt);
     if (!drv)
         error("Unknown file format '%s'", out_fmt);
+    if (flags & BLOCK_FLAG_COMPRESS && drv != &bdrv_qcow && drv != &bdrv_qcow2)
+        error("Compression not supported for this file format");
+    if (flags & BLOCK_FLAG_ENCRYPT && drv != &bdrv_qcow && drv != &bdrv_qcow2)
+        error("Encryption not supported for this file format");
+    if (flags & BLOCK_FLAG_COMPAT6 && drv != &bdrv_vmdk)
+        error("Alternative compatibility level not supported for this file format");
+    if (flags & BLOCK_FLAG_ENCRYPT && flags & BLOCK_FLAG_COMPRESS)
+        error("Compression and encryption not supported at the same time");
 
-    if (options && !strcmp(options, "?")) {
-        print_option_help(drv->create_options);
-        return 0;
-    }
-
-    if (options) {
-        param = parse_option_parameters(options, drv->create_options, param);
-        if (param == NULL) {
-            error("Invalid options for file format '%s'.", out_fmt);
-        }
-    } else {
-        param = parse_option_parameters("", drv->create_options, param);
-    }
-
-    set_option_parameter_int(param, BLOCK_OPT_SIZE, total_sectors * 512);
-    add_old_style_options(out_fmt, param, flags, out_baseimg, NULL);
-
-    /* Check if compression is supported */
-    if (flags & BLOCK_FLAG_COMPRESS) {
-        QEMUOptionParameter *encryption =
-            get_option_parameter(param, BLOCK_OPT_ENCRYPT);
-
-        if (!drv->bdrv_write_compressed) {
-            error("Compression not supported for this file format");
-        }
-
-        if (encryption && encryption->value.n) {
-            error("Compression and encryption not supported at the same time");
-        }
-    }
-
-    /* Create the new image */
-    ret = bdrv_create(drv, out_filename, param);
-    free_option_parameters(param);
-
+    ret = bdrv_create(drv, out_filename, total_sectors, out_baseimg, flags);
     if (ret < 0) {
         if (ret == -ENOTSUP) {
             error("Formatting not supported for file format '%s'", out_fmt);
@@ -746,23 +580,18 @@ static int img_convert(int argc, char **argv)
             if (n > bs_offset + bs_sectors - sector_num)
                 n = bs_offset + bs_sectors - sector_num;
 
-            if (strcmp(drv->format_name, "host_device")) {
-                /* If the output image is being created as a copy on write image,
-                   assume that sectors which are unallocated in the input image
-                   are present in both the output's and input's base images (no
-                   need to copy them). */
-                if (out_baseimg) {
-                    if (!bdrv_is_allocated(bs[bs_i], sector_num - bs_offset,
-                                           n, &n1)) {
-                        sector_num += n1;
-                        continue;
-                    }
-                    /* The next 'n1' sectors are allocated in the input image. Copy
-                       only those as they may be followed by unallocated sectors. */
-                    n = n1;
-                }
-            } else {
-                n1 = n;
+            /* If the output image is being created as a copy on write image,
+               assume that sectors which are unallocated in the input image
+               are present in both the output's and input's base images (no
+               need to copy them). */
+            if (out_baseimg) {
+               if (!bdrv_is_allocated(bs[bs_i], sector_num - bs_offset, n, &n1)) {
+                  sector_num += n1;
+                  continue;
+               }
+               /* The next 'n1' sectors are allocated in the input image. Copy
+                  only those as they may be followed by unallocated sectors. */
+               n = n1;
             }
 
             if (bdrv_read(bs[bs_i], sector_num - bs_offset, buf, n) < 0) 
@@ -774,13 +603,8 @@ static int img_convert(int argc, char **argv)
             while (n > 0) {
                 /* If the output image is being created as a copy on write image,
                    copy all sectors even the ones containing only NUL bytes,
-                   because they may differ from the sectors in the base image.
-
-                   If the output is to a host device, we also write out
-                   sectors that are entirely 0, since whatever data was
-                   already there is garbage, not 0s. */
-                if (strcmp(drv->format_name, "host_device") == 0 || out_baseimg ||
-                    is_allocated_sectors(buf1, n, &n1)) {
+                   because they may differ from the sectors in the base image. */
+                if (out_baseimg || is_allocated_sectors(buf1, n, &n1)) {
                     if (bdrv_write(out_bs, sector_num, buf1, n1) < 0)
                         error("error while writing");
                 }
@@ -929,7 +753,7 @@ static int img_info(int argc, char **argv)
 #define SNAPSHOT_APPLY  3
 #define SNAPSHOT_DELETE 4
 
-static int img_snapshot(int argc, char **argv)
+static void img_snapshot(int argc, char **argv)
 {
     BlockDriverState *bs;
     QEMUSnapshotInfo sn;
@@ -946,18 +770,18 @@ static int img_snapshot(int argc, char **argv)
         switch(c) {
         case 'h':
             help();
-            return 0;
+            return;
         case 'l':
             if (action) {
                 help();
-                return 0;
+                return;
             }
             action = SNAPSHOT_LIST;
             break;
         case 'a':
             if (action) {
                 help();
-                return 0;
+                return;
             }
             action = SNAPSHOT_APPLY;
             snapshot_name = optarg;
@@ -965,7 +789,7 @@ static int img_snapshot(int argc, char **argv)
         case 'c':
             if (action) {
                 help();
-                return 0;
+                return;
             }
             action = SNAPSHOT_CREATE;
             snapshot_name = optarg;
@@ -973,7 +797,7 @@ static int img_snapshot(int argc, char **argv)
         case 'd':
             if (action) {
                 help();
-                return 0;
+                return;
             }
             action = SNAPSHOT_DELETE;
             snapshot_name = optarg;
@@ -1031,38 +855,29 @@ static int img_snapshot(int argc, char **argv)
 
     /* Cleanup */
     bdrv_delete(bs);
-
-    return 0;
 }
-
-static const img_cmd_t img_cmds[] = {
-#define DEF(option, callback, arg_string)        \
-    { option, callback },
-#include "qemu-img-cmds.h"
-#undef DEF
-#undef GEN_DOCS
-    { NULL, NULL, },
-};
 
 int main(int argc, char **argv)
 {
-    const img_cmd_t *cmd;
-    const char *cmdname;
+    const char *cmd;
 
     bdrv_init();
     if (argc < 2)
         help();
-    cmdname = argv[1];
+    cmd = argv[1];
     argc--; argv++;
-
-    /* find the command */
-    for(cmd = img_cmds; cmd->name != NULL; cmd++) {
-        if (!strcmp(cmdname, cmd->name)) {
-            return cmd->handler(argc, argv);
-        }
+    if (!strcmp(cmd, "create")) {
+        img_create(argc, argv);
+    } else if (!strcmp(cmd, "commit")) {
+        img_commit(argc, argv);
+    } else if (!strcmp(cmd, "convert")) {
+        img_convert(argc, argv);
+    } else if (!strcmp(cmd, "info")) {
+        img_info(argc, argv);
+    } else if (!strcmp(cmd, "snapshot")) {
+        img_snapshot(argc, argv);
+    } else {
+        help();
     }
-
-    /* not found */
-    help();
     return 0;
 }

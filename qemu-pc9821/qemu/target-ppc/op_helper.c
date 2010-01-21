@@ -14,7 +14,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 #include <string.h>
 #include "exec.h"
@@ -53,17 +54,41 @@ void helper_raise_exception (uint32_t exception)
 }
 
 /*****************************************************************************/
+/* Registers load and stores */
+target_ulong helper_load_cr (void)
+{
+    return (env->crf[0] << 28) |
+           (env->crf[1] << 24) |
+           (env->crf[2] << 20) |
+           (env->crf[3] << 16) |
+           (env->crf[4] << 12) |
+           (env->crf[5] << 8) |
+           (env->crf[6] << 4) |
+           (env->crf[7] << 0);
+}
+
+void helper_store_cr (target_ulong val, uint32_t mask)
+{
+    int i, sh;
+
+    for (i = 0, sh = 7; i < 8; i++, sh--) {
+        if (mask & (1 << sh))
+            env->crf[i] = (val >> (sh * 4)) & 0xFUL;
+    }
+}
+
+/*****************************************************************************/
 /* SPR accesses */
 void helper_load_dump_spr (uint32_t sprn)
 {
-    qemu_log("Read SPR %d %03x => " TARGET_FMT_lx "\n", sprn, sprn,
-             env->spr[sprn]);
+    qemu_log("Read SPR %d %03x => " ADDRX "\n",
+                sprn, sprn, env->spr[sprn]);
 }
 
 void helper_store_dump_spr (uint32_t sprn)
 {
-    qemu_log("Write SPR %d %03x <= " TARGET_FMT_lx "\n", sprn, sprn,
-             env->spr[sprn]);
+    qemu_log("Write SPR %d %03x <= " ADDRX "\n",
+                sprn, sprn, env->spr[sprn]);
 }
 
 target_ulong helper_load_tbl (void)
@@ -160,8 +185,8 @@ void helper_store_hid0_601 (target_ulong val)
         env->hflags_nmsr &= ~(1 << MSR_LE);
         env->hflags_nmsr |= (1 << MSR_LE) & (((val >> 3) & 1) << MSR_LE);
         env->hflags |= env->hflags_nmsr;
-        qemu_log("%s: set endianness to %c => " TARGET_FMT_lx "\n", __func__,
-                 val & 0x8 ? 'l' : 'b', env->hflags);
+        qemu_log("%s: set endianness to %c => " ADDRX "\n",
+                    __func__, val & 0x8 ? 'l' : 'b', env->hflags);
     }
     env->spr[SPR_HID0] = (uint32_t)val;
 }
@@ -239,7 +264,7 @@ void helper_store_601_batu (uint32_t nr, target_ulong val)
 /*****************************************************************************/
 /* Memory load and stores */
 
-static inline target_ulong addr_add(target_ulong addr, target_long arg)
+static always_inline target_ulong addr_add(target_ulong addr, target_long arg)
 {
 #if defined(TARGET_PPC64)
         if (!msr_sf)
@@ -329,8 +354,8 @@ static void do_dcbz(target_ulong addr, int dcache_line_size)
     for (i = 0 ; i < dcache_line_size ; i += 4) {
         stl(addr + i , 0);
     }
-    if (env->reserve_addr == addr)
-        env->reserve_addr = (target_ulong)-1ULL;
+    if (env->reserve == addr)
+        env->reserve = (target_ulong)-1ULL;
 }
 
 void helper_dcbz(target_ulong addr)
@@ -532,7 +557,7 @@ uint32_t helper_float64_to_float32(uint64_t arg)
     return f.l;
 }
 
-static inline int isden(float64 d)
+static always_inline int isden (float64 d)
 {
     CPU_DoubleU u;
 
@@ -594,7 +619,7 @@ uint32_t helper_compute_fprf (uint64_t arg, uint32_t set_fprf)
 }
 
 /* Floating-point invalid operations exception */
-static inline uint64_t fload_invalid_op_excp(int op)
+static always_inline uint64_t fload_invalid_op_excp (int op)
 {
     uint64_t ret = 0;
     int ve;
@@ -675,7 +700,7 @@ static inline uint64_t fload_invalid_op_excp(int op)
     return ret;
 }
 
-static inline void float_zero_divide_excp(void)
+static always_inline void float_zero_divide_excp (void)
 {
     env->fpscr |= 1 << FPSCR_ZX;
     env->fpscr &= ~((1 << FPSCR_FR) | (1 << FPSCR_FI));
@@ -691,7 +716,7 @@ static inline void float_zero_divide_excp(void)
     }
 }
 
-static inline void float_overflow_excp(void)
+static always_inline void float_overflow_excp (void)
 {
     env->fpscr |= 1 << FPSCR_OX;
     /* Update the floating-point exception summary */
@@ -709,7 +734,7 @@ static inline void float_overflow_excp(void)
     }
 }
 
-static inline void float_underflow_excp(void)
+static always_inline void float_underflow_excp (void)
 {
     env->fpscr |= 1 << FPSCR_UX;
     /* Update the floating-point exception summary */
@@ -724,7 +749,7 @@ static inline void float_underflow_excp(void)
     }
 }
 
-static inline void float_inexact_excp(void)
+static always_inline void float_inexact_excp (void)
 {
     env->fpscr |= 1 << FPSCR_XX;
     /* Update the floating-point exception summary */
@@ -738,7 +763,7 @@ static inline void float_inexact_excp(void)
     }
 }
 
-static inline void fpscr_set_rounding_mode(void)
+static always_inline void fpscr_set_rounding_mode (void)
 {
     int rnd_type;
 
@@ -1199,7 +1224,7 @@ uint64_t helper_fctidz (uint64_t arg)
 
 #endif
 
-static inline uint64_t do_fri(uint64_t arg, int rounding_mode)
+static always_inline uint64_t do_fri (uint64_t arg, int rounding_mode)
 {
     CPU_DoubleU farg;
     farg.ll = arg;
@@ -1614,8 +1639,8 @@ void helper_store_msr (target_ulong val)
     }
 }
 
-static inline void do_rfi(target_ulong nip, target_ulong msr,
-                          target_ulong msrm, int keep_msrh)
+static always_inline void do_rfi (target_ulong nip, target_ulong msr,
+                                    target_ulong msrm, int keep_msrh)
 {
 #if defined(TARGET_PPC64)
     if (msr & (1ULL << MSR_SF)) {
@@ -1646,20 +1671,20 @@ static inline void do_rfi(target_ulong nip, target_ulong msr,
 void helper_rfi (void)
 {
     do_rfi(env->spr[SPR_SRR0], env->spr[SPR_SRR1],
-           ~((target_ulong)0x0), 1);
+           ~((target_ulong)0xFFFF0000), 1);
 }
 
 #if defined(TARGET_PPC64)
 void helper_rfid (void)
 {
     do_rfi(env->spr[SPR_SRR0], env->spr[SPR_SRR1],
-           ~((target_ulong)0x0), 0);
+           ~((target_ulong)0xFFFF0000), 0);
 }
 
 void helper_hrfid (void)
 {
     do_rfi(env->spr[SPR_HSRR0], env->spr[SPR_HSRR1],
-           ~((target_ulong)0x0), 0);
+           ~((target_ulong)0xFFFF0000), 0);
 }
 #endif
 #endif
@@ -1921,7 +1946,7 @@ target_ulong helper_dlmzb (target_ulong high, target_ulong low, uint32_t update_
 
 /*****************************************************************************/
 /* Altivec extension helpers */
-#if defined(HOST_WORDS_BIGENDIAN)
+#if defined(WORDS_BIGENDIAN)
 #define HI_IDX 0
 #define LO_IDX 1
 #else
@@ -1929,7 +1954,7 @@ target_ulong helper_dlmzb (target_ulong high, target_ulong low, uint32_t update_
 #define LO_IDX 0
 #endif
 
-#if defined(HOST_WORDS_BIGENDIAN)
+#if defined(WORDS_BIGENDIAN)
 #define VECTOR_FOR_INORDER_I(index, element)            \
     for (index = 0; index < ARRAY_SIZE(r->element); index++)
 #else
@@ -1956,7 +1981,7 @@ target_ulong helper_dlmzb (target_ulong high, target_ulong low, uint32_t update_
 
 /* Saturating arithmetic helpers.  */
 #define SATCVT(from, to, from_type, to_type, min, max, use_min, use_max) \
-    static inline to_type cvt##from##to(from_type x, int *sat)          \
+    static always_inline to_type cvt##from##to (from_type x, int *sat)  \
     {                                                                   \
         to_type r;                                                      \
         if (use_min && x < min) {                                       \
@@ -1973,21 +1998,7 @@ target_ulong helper_dlmzb (target_ulong high, target_ulong low, uint32_t update_
 SATCVT(sh, sb, int16_t, int8_t, INT8_MIN, INT8_MAX, 1, 1)
 SATCVT(sw, sh, int32_t, int16_t, INT16_MIN, INT16_MAX, 1, 1)
 SATCVT(sd, sw, int64_t, int32_t, INT32_MIN, INT32_MAX, 1, 1)
-
-/* Work around gcc problems with the macro version */
-static inline uint8_t cvtuhub(uint16_t x, int *sat)
-{
-    uint8_t r;
-
-    if (x > UINT8_MAX) {
-        r = UINT8_MAX;
-        *sat = 1;
-    } else {
-        r = x;
-    }
-    return r;
-}
-//SATCVT(uh, ub, uint16_t, uint8_t, 0, UINT8_MAX, 0, 1)
+SATCVT(uh, ub, uint16_t, uint8_t, 0, UINT8_MAX, 0, 1)
 SATCVT(uw, uh, uint32_t, uint16_t, 0, UINT16_MAX, 0, 1)
 SATCVT(ud, uw, uint64_t, uint32_t, 0, UINT32_MAX, 0, 1)
 SATCVT(sh, ub, int16_t, uint8_t, 0, UINT8_MAX, 1, 1)
@@ -2055,7 +2066,7 @@ STVE(stvewx, stl, bswap32, u32)
 
 void helper_mtvscr (ppc_avr_t *r)
 {
-#if defined(HOST_WORDS_BIGENDIAN)
+#if defined(WORDS_BIGENDIAN)
     env->vscr = r->u32[3];
 #else
     env->vscr = r->u32[0];
@@ -2243,8 +2254,8 @@ VCMPFP(gtfp, ==, float_relation_greater)
 #undef VCMPFP_DO
 #undef VCMPFP
 
-static inline void vcmpbfp_internal(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b,
-                                    int record)
+static always_inline void vcmpbfp_internal (ppc_avr_t *r, ppc_avr_t *a,
+                                            ppc_avr_t *b, int record)
 {
     int i;
     int all_in = 0;
@@ -2422,7 +2433,7 @@ void helper_vmladduhm (ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
         }                                                               \
         *r = result;                                                    \
     }
-#if defined(HOST_WORDS_BIGENDIAN)
+#if defined(WORDS_BIGENDIAN)
 #define MRGHI 0
 #define MRGLO 1
 #else
@@ -2583,7 +2594,7 @@ void helper_vperm (ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
     int i;
     VECTOR_FOR_INORDER_I (i, u8) {
         int s = c->u8[i] & 0x1f;
-#if defined(HOST_WORDS_BIGENDIAN)
+#if defined(WORDS_BIGENDIAN)
         int index = s & 0xf;
 #else
         int index = 15 - (s & 0xf);
@@ -2597,7 +2608,7 @@ void helper_vperm (ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
     *r = result;
 }
 
-#if defined(HOST_WORDS_BIGENDIAN)
+#if defined(WORDS_BIGENDIAN)
 #define PKBIG 1
 #else
 #define PKBIG 0
@@ -2606,7 +2617,7 @@ void helper_vpkpx (ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
 {
     int i, j;
     ppc_avr_t result;
-#if defined(HOST_WORDS_BIGENDIAN)
+#if defined(WORDS_BIGENDIAN)
     const ppc_avr_t *x[2] = { a, b };
 #else
     const ppc_avr_t *x[2] = { b, a };
@@ -2723,7 +2734,7 @@ void helper_vlogefp (ppc_avr_t *r, ppc_avr_t *b)
     }
 }
 
-#if defined(HOST_WORDS_BIGENDIAN)
+#if defined(WORDS_BIGENDIAN)
 #define LEFT 0
 #define RIGHT 1
 #else
@@ -2736,7 +2747,7 @@ void helper_vlogefp (ppc_avr_t *r, ppc_avr_t *b)
 #define VSHIFT(suffix, leftp)                                           \
     void helper_vs##suffix (ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)   \
     {                                                                   \
-        int shift = b->u8[LO_IDX*15] & 0x7;                             \
+        int shift = b->u8[LO_IDX*0x15] & 0x7;                           \
         int doit = 1;                                                   \
         int i;                                                          \
         for (i = 0; i < ARRAY_SIZE(r->u8); i++) {                       \
@@ -2783,7 +2794,7 @@ void helper_vsldoi (ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t shift)
     int i;
     ppc_avr_t result;
 
-#if defined(HOST_WORDS_BIGENDIAN)
+#if defined(WORDS_BIGENDIAN)
     for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
         int index = sh + i;
         if (index > 0xf) {
@@ -2809,7 +2820,7 @@ void helper_vslo (ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
 {
   int sh = (b->u8[LO_IDX*0xf] >> 3) & 0xf;
 
-#if defined (HOST_WORDS_BIGENDIAN)
+#if defined (WORDS_BIGENDIAN)
   memmove (&r->u8[0], &a->u8[sh], 16-sh);
   memset (&r->u8[16-sh], 0, sh);
 #else
@@ -2820,7 +2831,7 @@ void helper_vslo (ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
 
 /* Experimental testing shows that hardware masks the immediate.  */
 #define _SPLAT_MASKED(element) (splat & (ARRAY_SIZE(r->element) - 1))
-#if defined(HOST_WORDS_BIGENDIAN)
+#if defined(WORDS_BIGENDIAN)
 #define SPLAT_ELEMENT(element) _SPLAT_MASKED(element)
 #else
 #define SPLAT_ELEMENT(element) (ARRAY_SIZE(r->element)-1 - _SPLAT_MASKED(element))
@@ -2877,7 +2888,7 @@ void helper_vsro (ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
 {
   int sh = (b->u8[LO_IDX*0xf] >> 3) & 0xf;
 
-#if defined (HOST_WORDS_BIGENDIAN)
+#if defined (WORDS_BIGENDIAN)
   memmove (&r->u8[sh], &a->u8[0], 16-sh);
   memset (&r->u8[0], 0, sh);
 #else
@@ -2901,7 +2912,7 @@ void helper_vsumsws (ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
     ppc_avr_t result;
     int sat = 0;
 
-#if defined(HOST_WORDS_BIGENDIAN)
+#if defined(WORDS_BIGENDIAN)
     upper = ARRAY_SIZE(r->s32)-1;
 #else
     upper = 0;
@@ -2925,7 +2936,7 @@ void helper_vsum2sws (ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
     ppc_avr_t result;
     int sat = 0;
 
-#if defined(HOST_WORDS_BIGENDIAN)
+#if defined(WORDS_BIGENDIAN)
     upper = 1;
 #else
     upper = 0;
@@ -2997,7 +3008,7 @@ void helper_vsum4ubs (ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
     }
 }
 
-#if defined(HOST_WORDS_BIGENDIAN)
+#if defined(WORDS_BIGENDIAN)
 #define UPKHI 1
 #define UPKLO 0
 #else
@@ -3063,12 +3074,12 @@ static uint8_t hbrev[16] = {
     0x1, 0x9, 0x5, 0xD, 0x3, 0xB, 0x7, 0xF,
 };
 
-static inline uint8_t byte_reverse(uint8_t val)
+static always_inline uint8_t byte_reverse (uint8_t val)
 {
     return hbrev[val >> 4] | (hbrev[val & 0xF] << 4);
 }
 
-static inline uint32_t word_reverse(uint32_t val)
+static always_inline uint32_t word_reverse (uint32_t val)
 {
     return byte_reverse(val >> 24) | (byte_reverse(val >> 16) << 8) |
         (byte_reverse(val >> 8) << 16) | (byte_reverse(val) << 24);
@@ -3100,7 +3111,7 @@ uint32_t helper_cntlzw32 (uint32_t val)
 }
 
 /* Single-precision floating-point conversions */
-static inline uint32_t efscfsi(uint32_t val)
+static always_inline uint32_t efscfsi (uint32_t val)
 {
     CPU_FloatU u;
 
@@ -3109,7 +3120,7 @@ static inline uint32_t efscfsi(uint32_t val)
     return u.l;
 }
 
-static inline uint32_t efscfui(uint32_t val)
+static always_inline uint32_t efscfui (uint32_t val)
 {
     CPU_FloatU u;
 
@@ -3118,7 +3129,7 @@ static inline uint32_t efscfui(uint32_t val)
     return u.l;
 }
 
-static inline int32_t efsctsi(uint32_t val)
+static always_inline int32_t efsctsi (uint32_t val)
 {
     CPU_FloatU u;
 
@@ -3130,7 +3141,7 @@ static inline int32_t efsctsi(uint32_t val)
     return float32_to_int32(u.f, &env->vec_status);
 }
 
-static inline uint32_t efsctui(uint32_t val)
+static always_inline uint32_t efsctui (uint32_t val)
 {
     CPU_FloatU u;
 
@@ -3142,7 +3153,7 @@ static inline uint32_t efsctui(uint32_t val)
     return float32_to_uint32(u.f, &env->vec_status);
 }
 
-static inline uint32_t efsctsiz(uint32_t val)
+static always_inline uint32_t efsctsiz (uint32_t val)
 {
     CPU_FloatU u;
 
@@ -3154,7 +3165,7 @@ static inline uint32_t efsctsiz(uint32_t val)
     return float32_to_int32_round_to_zero(u.f, &env->vec_status);
 }
 
-static inline uint32_t efsctuiz(uint32_t val)
+static always_inline uint32_t efsctuiz (uint32_t val)
 {
     CPU_FloatU u;
 
@@ -3166,7 +3177,7 @@ static inline uint32_t efsctuiz(uint32_t val)
     return float32_to_uint32_round_to_zero(u.f, &env->vec_status);
 }
 
-static inline uint32_t efscfsf(uint32_t val)
+static always_inline uint32_t efscfsf (uint32_t val)
 {
     CPU_FloatU u;
     float32 tmp;
@@ -3178,7 +3189,7 @@ static inline uint32_t efscfsf(uint32_t val)
     return u.l;
 }
 
-static inline uint32_t efscfuf(uint32_t val)
+static always_inline uint32_t efscfuf (uint32_t val)
 {
     CPU_FloatU u;
     float32 tmp;
@@ -3190,7 +3201,7 @@ static inline uint32_t efscfuf(uint32_t val)
     return u.l;
 }
 
-static inline uint32_t efsctsf(uint32_t val)
+static always_inline uint32_t efsctsf (uint32_t val)
 {
     CPU_FloatU u;
     float32 tmp;
@@ -3205,7 +3216,7 @@ static inline uint32_t efsctsf(uint32_t val)
     return float32_to_int32(u.f, &env->vec_status);
 }
 
-static inline uint32_t efsctuf(uint32_t val)
+static always_inline uint32_t efsctuf (uint32_t val)
 {
     CPU_FloatU u;
     float32 tmp;
@@ -3274,7 +3285,7 @@ HELPER_SPE_VECTOR_CONV(fsctsf);
 HELPER_SPE_VECTOR_CONV(fsctuf);
 
 /* Single-precision floating-point arithmetic */
-static inline uint32_t efsadd(uint32_t op1, uint32_t op2)
+static always_inline uint32_t efsadd (uint32_t op1, uint32_t op2)
 {
     CPU_FloatU u1, u2;
     u1.l = op1;
@@ -3283,7 +3294,7 @@ static inline uint32_t efsadd(uint32_t op1, uint32_t op2)
     return u1.l;
 }
 
-static inline uint32_t efssub(uint32_t op1, uint32_t op2)
+static always_inline uint32_t efssub (uint32_t op1, uint32_t op2)
 {
     CPU_FloatU u1, u2;
     u1.l = op1;
@@ -3292,7 +3303,7 @@ static inline uint32_t efssub(uint32_t op1, uint32_t op2)
     return u1.l;
 }
 
-static inline uint32_t efsmul(uint32_t op1, uint32_t op2)
+static always_inline uint32_t efsmul (uint32_t op1, uint32_t op2)
 {
     CPU_FloatU u1, u2;
     u1.l = op1;
@@ -3301,7 +3312,7 @@ static inline uint32_t efsmul(uint32_t op1, uint32_t op2)
     return u1.l;
 }
 
-static inline uint32_t efsdiv(uint32_t op1, uint32_t op2)
+static always_inline uint32_t efsdiv (uint32_t op1, uint32_t op2)
 {
     CPU_FloatU u1, u2;
     u1.l = op1;
@@ -3340,7 +3351,7 @@ HELPER_SPE_VECTOR_ARITH(fsmul);
 HELPER_SPE_VECTOR_ARITH(fsdiv);
 
 /* Single-precision floating-point comparisons */
-static inline uint32_t efststlt(uint32_t op1, uint32_t op2)
+static always_inline uint32_t efststlt (uint32_t op1, uint32_t op2)
 {
     CPU_FloatU u1, u2;
     u1.l = op1;
@@ -3348,7 +3359,7 @@ static inline uint32_t efststlt(uint32_t op1, uint32_t op2)
     return float32_lt(u1.f, u2.f, &env->vec_status) ? 4 : 0;
 }
 
-static inline uint32_t efststgt(uint32_t op1, uint32_t op2)
+static always_inline uint32_t efststgt (uint32_t op1, uint32_t op2)
 {
     CPU_FloatU u1, u2;
     u1.l = op1;
@@ -3356,7 +3367,7 @@ static inline uint32_t efststgt(uint32_t op1, uint32_t op2)
     return float32_le(u1.f, u2.f, &env->vec_status) ? 0 : 4;
 }
 
-static inline uint32_t efststeq(uint32_t op1, uint32_t op2)
+static always_inline uint32_t efststeq (uint32_t op1, uint32_t op2)
 {
     CPU_FloatU u1, u2;
     u1.l = op1;
@@ -3364,19 +3375,19 @@ static inline uint32_t efststeq(uint32_t op1, uint32_t op2)
     return float32_eq(u1.f, u2.f, &env->vec_status) ? 4 : 0;
 }
 
-static inline uint32_t efscmplt(uint32_t op1, uint32_t op2)
+static always_inline uint32_t efscmplt (uint32_t op1, uint32_t op2)
 {
     /* XXX: TODO: test special values (NaN, infinites, ...) */
     return efststlt(op1, op2);
 }
 
-static inline uint32_t efscmpgt(uint32_t op1, uint32_t op2)
+static always_inline uint32_t efscmpgt (uint32_t op1, uint32_t op2)
 {
     /* XXX: TODO: test special values (NaN, infinites, ...) */
     return efststgt(op1, op2);
 }
 
-static inline uint32_t efscmpeq(uint32_t op1, uint32_t op2)
+static always_inline uint32_t efscmpeq (uint32_t op1, uint32_t op2)
 {
     /* XXX: TODO: test special values (NaN, infinites, ...) */
     return efststeq(op1, op2);
@@ -3400,7 +3411,7 @@ HELPER_SINGLE_SPE_CMP(fscmpgt);
 /* efscmpeq */
 HELPER_SINGLE_SPE_CMP(fscmpeq);
 
-static inline uint32_t evcmp_merge(int t0, int t1)
+static always_inline uint32_t evcmp_merge (int t0, int t1)
 {
     return (t0 << 3) | (t1 << 2) | ((t0 | t1) << 1) | (t0 & t1);
 }
@@ -3741,10 +3752,6 @@ void tlb_fill (target_ulong addr, int is_write, int mmu_idx, void *retaddr)
 /* Segment registers load and store */
 target_ulong helper_load_sr (target_ulong sr_num)
 {
-#if defined(TARGET_PPC64)
-    if (env->mmu_model & POWERPC_MMU_64)
-        return ppc_load_sr(env, sr_num);
-#endif
     return env->sr[sr_num];
 }
 
@@ -3760,9 +3767,9 @@ target_ulong helper_load_slb (target_ulong slb_nr)
     return ppc_load_slb(env, slb_nr);
 }
 
-void helper_store_slb (target_ulong rb, target_ulong rs)
+void helper_store_slb (target_ulong slb_nr, target_ulong rs)
 {
-    ppc_store_slb(env, rb, rs);
+    ppc_store_slb(env, slb_nr, rs);
 }
 
 void helper_slbia (void)
@@ -3804,9 +3811,9 @@ static void do_6xx_tlb (target_ulong new_EPN, int is_code)
         EPN = env->spr[SPR_DMISS];
     }
     way = (env->spr[SPR_SRR1] >> 17) & 1;
-    LOG_SWTLB("%s: EPN " TARGET_FMT_lx " " TARGET_FMT_lx " PTE0 " TARGET_FMT_lx
-              " PTE1 " TARGET_FMT_lx " way %d\n", __func__, new_EPN, EPN, CMP,
-              RPN, way);
+    LOG_SWTLB("%s: EPN " ADDRX " " ADDRX " PTE0 " ADDRX
+                " PTE1 " ADDRX " way %d\n",
+                __func__, new_EPN, EPN, CMP, RPN, way);
     /* Store this TLB */
     ppc6xx_tlb_store(env, (uint32_t)(new_EPN & TARGET_PAGE_MASK),
                      way, is_code, CMP, RPN);
@@ -3832,9 +3839,9 @@ static void do_74xx_tlb (target_ulong new_EPN, int is_code)
     CMP = env->spr[SPR_PTEHI];
     EPN = env->spr[SPR_TLBMISS] & ~0x3;
     way = env->spr[SPR_TLBMISS] & 0x3;
-    LOG_SWTLB("%s: EPN " TARGET_FMT_lx " " TARGET_FMT_lx " PTE0 " TARGET_FMT_lx
-              " PTE1 " TARGET_FMT_lx " way %d\n", __func__, new_EPN, EPN, CMP,
-              RPN, way);
+    LOG_SWTLB("%s: EPN " ADDRX " " ADDRX " PTE0 " ADDRX
+                " PTE1 " ADDRX " way %d\n",
+                __func__, new_EPN, EPN, CMP, RPN, way);
     /* Store this TLB */
     ppc6xx_tlb_store(env, (uint32_t)(new_EPN & TARGET_PAGE_MASK),
                      way, is_code, CMP, RPN);
@@ -3850,12 +3857,12 @@ void helper_74xx_tlbi (target_ulong EPN)
     do_74xx_tlb(EPN, 1);
 }
 
-static inline target_ulong booke_tlb_to_page_size(int size)
+static always_inline target_ulong booke_tlb_to_page_size (int size)
 {
     return 1024 << (2 * size);
 }
 
-static inline int booke_page_size_to_tlb(target_ulong page_size)
+static always_inline int booke_page_size_to_tlb (target_ulong page_size)
 {
     int size;
 
@@ -3958,15 +3965,14 @@ void helper_4xx_tlbwe_hi (target_ulong entry, target_ulong val)
     ppcemb_tlb_t *tlb;
     target_ulong page, end;
 
-    LOG_SWTLB("%s entry %d val " TARGET_FMT_lx "\n", __func__, (int)entry,
-              val);
+    LOG_SWTLB("%s entry %d val " ADDRX "\n", __func__, (int)entry, val);
     entry &= 0x3F;
     tlb = &env->tlb[entry].tlbe;
     /* Invalidate previous TLB (if it's valid) */
     if (tlb->prot & PAGE_VALID) {
         end = tlb->EPN + tlb->size;
-        LOG_SWTLB("%s: invalidate old TLB %d start " TARGET_FMT_lx " end "
-                  TARGET_FMT_lx "\n", __func__, (int)entry, tlb->EPN, end);
+        LOG_SWTLB("%s: invalidate old TLB %d start " ADDRX
+                    " end " ADDRX "\n", __func__, (int)entry, tlb->EPN, end);
         for (page = tlb->EPN; page < end; page += TARGET_PAGE_SIZE)
             tlb_flush_page(env, page);
     }
@@ -3991,18 +3997,18 @@ void helper_4xx_tlbwe_hi (target_ulong entry, target_ulong val)
     }
     tlb->PID = env->spr[SPR_40x_PID]; /* PID */
     tlb->attr = val & 0xFF;
-    LOG_SWTLB("%s: set up TLB %d RPN " TARGET_FMT_plx " EPN " TARGET_FMT_lx
-              " size " TARGET_FMT_lx " prot %c%c%c%c PID %d\n", __func__,
-              (int)entry, tlb->RPN, tlb->EPN, tlb->size,
-              tlb->prot & PAGE_READ ? 'r' : '-',
-              tlb->prot & PAGE_WRITE ? 'w' : '-',
-              tlb->prot & PAGE_EXEC ? 'x' : '-',
-              tlb->prot & PAGE_VALID ? 'v' : '-', (int)tlb->PID);
+    LOG_SWTLB("%s: set up TLB %d RPN " PADDRX " EPN " ADDRX
+                " size " ADDRX " prot %c%c%c%c PID %d\n", __func__,
+                (int)entry, tlb->RPN, tlb->EPN, tlb->size,
+                tlb->prot & PAGE_READ ? 'r' : '-',
+                tlb->prot & PAGE_WRITE ? 'w' : '-',
+                tlb->prot & PAGE_EXEC ? 'x' : '-',
+                tlb->prot & PAGE_VALID ? 'v' : '-', (int)tlb->PID);
     /* Invalidate new TLB (if valid) */
     if (tlb->prot & PAGE_VALID) {
         end = tlb->EPN + tlb->size;
-        LOG_SWTLB("%s: invalidate TLB %d start " TARGET_FMT_lx " end "
-                  TARGET_FMT_lx "\n", __func__, (int)entry, tlb->EPN, end);
+        LOG_SWTLB("%s: invalidate TLB %d start " ADDRX
+                    " end " ADDRX "\n", __func__, (int)entry, tlb->EPN, end);
         for (page = tlb->EPN; page < end; page += TARGET_PAGE_SIZE)
             tlb_flush_page(env, page);
     }
@@ -4012,8 +4018,7 @@ void helper_4xx_tlbwe_lo (target_ulong entry, target_ulong val)
 {
     ppcemb_tlb_t *tlb;
 
-    LOG_SWTLB("%s entry %i val " TARGET_FMT_lx "\n", __func__, (int)entry,
-              val);
+    LOG_SWTLB("%s entry %i val " ADDRX "\n", __func__, (int)entry, val);
     entry &= 0x3F;
     tlb = &env->tlb[entry].tlbe;
     tlb->RPN = val & 0xFFFFFC00;
@@ -4022,13 +4027,13 @@ void helper_4xx_tlbwe_lo (target_ulong entry, target_ulong val)
         tlb->prot |= PAGE_EXEC;
     if (val & 0x100)
         tlb->prot |= PAGE_WRITE;
-    LOG_SWTLB("%s: set up TLB %d RPN " TARGET_FMT_plx " EPN " TARGET_FMT_lx
-              " size " TARGET_FMT_lx " prot %c%c%c%c PID %d\n", __func__,
-              (int)entry, tlb->RPN, tlb->EPN, tlb->size,
-              tlb->prot & PAGE_READ ? 'r' : '-',
-              tlb->prot & PAGE_WRITE ? 'w' : '-',
-              tlb->prot & PAGE_EXEC ? 'x' : '-',
-              tlb->prot & PAGE_VALID ? 'v' : '-', (int)tlb->PID);
+    LOG_SWTLB("%s: set up TLB %d RPN " PADDRX " EPN " ADDRX
+                " size " ADDRX " prot %c%c%c%c PID %d\n", __func__,
+                (int)entry, tlb->RPN, tlb->EPN, tlb->size,
+                tlb->prot & PAGE_READ ? 'r' : '-',
+                tlb->prot & PAGE_WRITE ? 'w' : '-',
+                tlb->prot & PAGE_EXEC ? 'x' : '-',
+                tlb->prot & PAGE_VALID ? 'v' : '-', (int)tlb->PID);
 }
 
 target_ulong helper_4xx_tlbsx (target_ulong address)
@@ -4043,8 +4048,8 @@ void helper_440_tlbwe (uint32_t word, target_ulong entry, target_ulong value)
     target_ulong EPN, RPN, size;
     int do_flush_tlbs;
 
-    LOG_SWTLB("%s word %d entry %d value " TARGET_FMT_lx "\n",
-              __func__, word, (int)entry, value);
+    LOG_SWTLB("%s word %d entry %d value " ADDRX "\n",
+                __func__, word, (int)entry, value);
     do_flush_tlbs = 0;
     entry &= 0x3F;
     tlb = &env->tlb[entry].tlbe;

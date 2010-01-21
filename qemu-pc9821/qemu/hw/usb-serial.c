@@ -15,10 +15,10 @@
 //#define DEBUG_Serial
 
 #ifdef DEBUG_Serial
-#define DPRINTF(fmt, ...) \
-do { printf("usb-serial: " fmt , ## __VA_ARGS__); } while (0)
+#define DPRINTF(fmt, args...) \
+do { printf("usb-serial: " fmt , ##args); } while (0)
 #else
-#define DPRINTF(fmt, ...) do {} while(0)
+#define DPRINTF(fmt, args...) do {} while(0)
 #endif
 
 #define RECV_BUF 384
@@ -445,15 +445,7 @@ static int usb_serial_handle_data(USBDevice *dev, USBPacket *p)
         }
         *data++ = usb_get_modem_lines(s) | 1;
         /* We do not have the uart details */
-        /* handle serial break */
-        if (s->event_trigger && s->event_trigger & FTDI_BI) {
-            s->event_trigger &= ~FTDI_BI;
-            *data++ = FTDI_BI;
-            ret = 2;
-            break;
-        } else {
-            *data++ = 0;
-        }
+        *data++ = 0;
         len -= 2;
         if (len > s->recv_used)
             len = s->recv_used;
@@ -486,6 +478,7 @@ static void usb_serial_handle_destroy(USBDevice *dev)
     USBSerialState *s = (USBSerialState *)dev;
 
     qemu_chr_close(s->cs);
+    qemu_free(s);
 }
 
 static int usb_serial_can_read(void *opaque)
@@ -512,27 +505,19 @@ static void usb_serial_event(void *opaque, int event)
 
     switch (event) {
         case CHR_EVENT_BREAK:
-            s->event_trigger |= FTDI_BI;
+            /* TODO: Send Break to USB */
             break;
         case CHR_EVENT_FOCUS:
             break;
-        case CHR_EVENT_OPENED:
+        case CHR_EVENT_RESET:
             usb_serial_reset(s);
             /* TODO: Reset USB port */
             break;
     }
 }
 
-static int usb_serial_initfn(USBDevice *dev)
-{
-    USBSerialState *s = DO_UPCAST(USBSerialState, dev, dev);
-    s->dev.speed = USB_SPEED_FULL;
-    return 0;
-}
-
 USBDevice *usb_serial_init(const char *filename)
 {
-    USBDevice *dev;
     USBSerialState *s;
     CharDriverState *cdrv;
     unsigned short vendorid = 0x0403, productid = 0x6001;
@@ -568,40 +553,32 @@ USBDevice *usb_serial_init(const char *filename)
         return NULL;
     }
     filename++;
+    s = qemu_mallocz(sizeof(USBSerialState));
 
     snprintf(label, sizeof(label), "usbserial%d", index++);
     cdrv = qemu_chr_open(label, filename, NULL);
     if (!cdrv)
-        return NULL;
-
-    dev = usb_create_simple(NULL /* FIXME */, "QEMU USB Serial");
-    s = DO_UPCAST(USBSerialState, dev, dev);
+        goto fail;
     s->cs = cdrv;
+    qemu_chr_add_handlers(cdrv, usb_serial_can_read, usb_serial_read, usb_serial_event, s);
+
+    s->dev.speed = USB_SPEED_FULL;
+    s->dev.handle_packet = usb_generic_handle_packet;
+
+    s->dev.handle_reset = usb_serial_handle_reset;
+    s->dev.handle_control = usb_serial_handle_control;
+    s->dev.handle_data = usb_serial_handle_data;
+    s->dev.handle_destroy = usb_serial_handle_destroy;
+
     s->vendorid = vendorid;
     s->productid = productid;
+
     snprintf(s->dev.devname, sizeof(s->dev.devname), "QEMU USB Serial(%.16s)",
              filename);
 
-    qemu_chr_add_handlers(cdrv, usb_serial_can_read, usb_serial_read,
-                          usb_serial_event, s);
-
     usb_serial_handle_reset((USBDevice *)s);
     return (USBDevice *)s;
+ fail:
+    qemu_free(s);
+    return NULL;
 }
-
-static struct USBDeviceInfo serial_info = {
-    .qdev.name      = "QEMU USB Serial",
-    .qdev.size      = sizeof(USBSerialState),
-    .init           = usb_serial_initfn,
-    .handle_packet  = usb_generic_handle_packet,
-    .handle_reset   = usb_serial_handle_reset,
-    .handle_control = usb_serial_handle_control,
-    .handle_data    = usb_serial_handle_data,
-    .handle_destroy = usb_serial_handle_destroy,
-};
-
-static void usb_serial_register_devices(void)
-{
-    usb_qdev_register(&serial_info);
-}
-device_init(usb_serial_register_devices)

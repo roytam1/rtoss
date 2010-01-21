@@ -43,10 +43,9 @@
 /*
  * 2-bit colour
  */
-static void glue(draw_line2_, DEPTH)(void *opaque,
-                uint8_t *d, const uint8_t *s, int width, int deststep)
+static void glue(draw_line2_, DEPTH)(
+                uint8_t *d, const uint8_t *s, int width, const uint16_t *pal)
 {
-    uint16_t *pal = opaque;
     uint8_t v, r, g, b;
 
     do {
@@ -82,10 +81,9 @@ static void glue(draw_line2_, DEPTH)(void *opaque,
 /*
  * 4-bit colour
  */
-static void glue(draw_line4_, DEPTH)(void *opaque,
-                uint8_t *d, const uint8_t *s, int width, int deststep)
+static void glue(draw_line4_, DEPTH)(
+                uint8_t *d, const uint8_t *s, int width, const uint16_t *pal)
 {
-    uint16_t *pal = opaque;
     uint8_t v, r, g, b;
 
     do {
@@ -109,10 +107,9 @@ static void glue(draw_line4_, DEPTH)(void *opaque,
 /*
  * 8-bit colour
  */
-static void glue(draw_line8_, DEPTH)(void *opaque,
-                uint8_t *d, const uint8_t *s, int width, int deststep)
+static void glue(draw_line8_, DEPTH)(
+                uint8_t *d, const uint8_t *s, int width, const uint16_t *pal)
 {
-    uint16_t *pal = opaque;
     uint8_t v, r, g, b;
 
     do {
@@ -129,8 +126,8 @@ static void glue(draw_line8_, DEPTH)(void *opaque,
 /*
  * 12-bit colour
  */
-static void glue(draw_line12_, DEPTH)(void *opaque,
-                uint8_t *d, const uint8_t *s, int width, int deststep)
+static void glue(draw_line12_, DEPTH)(
+                uint8_t *d, const uint8_t *s, int width, const uint16_t *pal)
 {
     uint16_t v;
     uint8_t r, g, b;
@@ -149,10 +146,10 @@ static void glue(draw_line12_, DEPTH)(void *opaque,
 /*
  * 16-bit colour
  */
-static void glue(draw_line16_, DEPTH)(void *opaque,
-                uint8_t *d, const uint8_t *s, int width, int deststep)
+static void glue(draw_line16_, DEPTH)(
+                uint8_t *d, const uint8_t *s, int width, const uint16_t *pal)
 {
-#if DEPTH == 16 && defined(HOST_WORDS_BIGENDIAN) == defined(TARGET_WORDS_BIGENDIAN)
+#if DEPTH == 16 && defined(WORDS_BIGENDIAN) == defined(TARGET_WORDS_BIGENDIAN)
     memcpy(d, s, width * 2);
 #else
     uint16_t v;

@@ -29,10 +29,10 @@
 //#define DEBUG_PIC
 
 #ifdef DEBUG_PIC
-#define PIC_DPRINTF(fmt, ...)                                   \
-    do { printf("PIC: " fmt , ## __VA_ARGS__); } while (0)
+#define PIC_DPRINTF(fmt, args...) \
+do { printf("PIC: " fmt , ##args); } while (0)
 #else
-#define PIC_DPRINTF(fmt, ...)
+#define PIC_DPRINTF(fmt, args...)
 #endif
 
 typedef struct HeathrowPIC {
@@ -126,13 +126,13 @@ static uint32_t pic_readl (void *opaque, target_phys_addr_t addr)
     return value;
 }
 
-static CPUWriteMemoryFunc * const pic_write[] = {
+static CPUWriteMemoryFunc *pic_write[] = {
     &pic_writel,
     &pic_writel,
     &pic_writel,
 };
 
-static CPUReadMemoryFunc * const pic_read[] = {
+static CPUReadMemoryFunc *pic_read[] = {
     &pic_readl,
     &pic_readl,
     &pic_readl,
@@ -226,7 +226,7 @@ qemu_irq *heathrow_pic_init(int *pmem_index,
     s = qemu_mallocz(sizeof(HeathrowPICS));
     /* only 1 CPU */
     s->irqs = irqs[0];
-    *pmem_index = cpu_register_io_memory(pic_read, pic_write, s);
+    *pmem_index = cpu_register_io_memory(0, pic_read, pic_write, s);
 
     register_savevm("heathrow_pic", -1, 1, heathrow_pic_save,
                     heathrow_pic_load, s);

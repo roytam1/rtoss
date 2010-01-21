@@ -190,14 +190,16 @@ static int coreaudio_unlock (coreaudioVoiceOut *core, const char *fn_name)
     return 0;
 }
 
-static int coreaudio_run_out (HWVoiceOut *hw, int live)
+static int coreaudio_run_out (HWVoiceOut *hw)
 {
-    int decr;
+    int live, decr;
     coreaudioVoiceOut *core = (coreaudioVoiceOut *) hw;
 
     if (coreaudio_lock (core, "coreaudio_run_out")) {
         return 0;
     }
+
+    live = audio_pcm_hw_get_live_out (hw);
 
     if (core->decr > live) {
         ldebug ("core->decr %d live %d core->live %d\n",
@@ -511,39 +513,38 @@ static void coreaudio_audio_fini (void *opaque)
 }
 
 static struct audio_option coreaudio_options[] = {
-    {
-        .name  = "BUFFER_SIZE",
-        .tag   = AUD_OPT_INT,
-        .valp  = &conf.buffer_frames,
-        .descr = "Size of the buffer in frames"
-    },
-    {
-        .name  = "BUFFER_COUNT",
-        .tag   = AUD_OPT_INT,
-        .valp  = &conf.nbuffers,
-        .descr = "Number of buffers"
-    },
-    { /* End of list */ }
+    {"BUFFER_SIZE", AUD_OPT_INT, &conf.buffer_frames,
+     "Size of the buffer in frames", NULL, 0},
+    {"BUFFER_COUNT", AUD_OPT_INT, &conf.nbuffers,
+     "Number of buffers", NULL, 0},
+    {NULL, 0, NULL, NULL, NULL, 0}
 };
 
 static struct audio_pcm_ops coreaudio_pcm_ops = {
-    .init_out = coreaudio_init_out,
-    .fini_out = coreaudio_fini_out,
-    .run_out  = coreaudio_run_out,
-    .write    = coreaudio_write,
-    .ctl_out  = coreaudio_ctl_out
+    coreaudio_init_out,
+    coreaudio_fini_out,
+    coreaudio_run_out,
+    coreaudio_write,
+    coreaudio_ctl_out,
+
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
 };
 
 struct audio_driver coreaudio_audio_driver = {
-    .name           = "coreaudio",
-    .descr          = "CoreAudio http://developer.apple.com/audio/coreaudio.html",
-    .options        = coreaudio_options,
-    .init           = coreaudio_audio_init,
-    .fini           = coreaudio_audio_fini,
-    .pcm_ops        = &coreaudio_pcm_ops,
-    .can_be_default = 1,
-    .max_voices_out = 1,
-    .max_voices_in  = 0,
-    .voice_size_out = sizeof (coreaudioVoiceOut),
-    .voice_size_in  = 0
+    INIT_FIELD (name           = ) "coreaudio",
+    INIT_FIELD (descr          = )
+    "CoreAudio http://developer.apple.com/audio/coreaudio.html",
+    INIT_FIELD (options        = ) coreaudio_options,
+    INIT_FIELD (init           = ) coreaudio_audio_init,
+    INIT_FIELD (fini           = ) coreaudio_audio_fini,
+    INIT_FIELD (pcm_ops        = ) &coreaudio_pcm_ops,
+    INIT_FIELD (can_be_default = ) 1,
+    INIT_FIELD (max_voices_out = ) 1,
+    INIT_FIELD (max_voices_in  = ) 0,
+    INIT_FIELD (voice_size_out = ) sizeof (coreaudioVoiceOut),
+    INIT_FIELD (voice_size_in  = ) 0
 };

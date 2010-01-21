@@ -9,16 +9,18 @@
  *
  */
 
-#include "sysbus.h"
+#include "hw.h"
+#include "primecell.h"
 #include "qemu-timer.h"
+#include "sysemu.h"
 
 //#define DEBUG_PL031
 
 #ifdef DEBUG_PL031
-#define DPRINTF(fmt, ...) \
-do { printf("pl031: " fmt , ## __VA_ARGS__); } while (0)
+#define DPRINTF(fmt, args...) \
+do { printf("pl031: " fmt , ##args); } while (0)
 #else
-#define DPRINTF(fmt, ...) do {} while(0)
+#define DPRINTF(fmt, args...) do {} while(0)
 #endif
 
 #define RTC_DR      0x00    /* Data read register */
@@ -31,7 +33,6 @@ do { printf("pl031: " fmt , ## __VA_ARGS__); } while (0)
 #define RTC_ICR     0x1c    /* Interrupt clear register */
 
 typedef struct {
-    SysBusDevice busdev;
     QEMUTimer *timer;
     qemu_irq irq;
 
@@ -67,7 +68,7 @@ static uint32_t pl031_get_count(pl031_state *s)
 {
     /* This assumes qemu_get_clock returns the time since the machine was
        created.  */
-    return s->tick_offset + qemu_get_clock(vm_clock) / get_ticks_per_sec();
+    return s->tick_offset + qemu_get_clock(vm_clock) / ticks_per_sec;
 }
 
 static void pl031_set_alarm(pl031_state *s)
@@ -76,7 +77,7 @@ static void pl031_set_alarm(pl031_state *s)
     uint32_t ticks;
 
     now = qemu_get_clock(vm_clock);
-    ticks = s->tick_offset + now / get_ticks_per_sec();
+    ticks = s->tick_offset + now / ticks_per_sec;
 
     /* The timer wraps around.  This subtraction also wraps in the same way,
        and gives correct results when alarm < now_ticks.  */
@@ -86,7 +87,7 @@ static void pl031_set_alarm(pl031_state *s)
         qemu_del_timer(s->timer);
         pl031_interrupt(s);
     } else {
-        qemu_mod_timer(s->timer, now + (int64_t)ticks * get_ticks_per_sec());
+        qemu_mod_timer(s->timer, now + (int64_t)ticks * ticks_per_sec);
     }
 }
 
@@ -118,7 +119,8 @@ static uint32_t pl031_read(void *opaque, target_phys_addr_t offset)
                 (int)offset);
         break;
     default:
-        hw_error("pl031_read: Bad offset 0x%x\n", (int)offset);
+        cpu_abort(cpu_single_env, "pl031_read: Bad offset 0x%x\n",
+                  (int)offset);
         break;
     }
 
@@ -166,48 +168,42 @@ static void pl031_write(void * opaque, target_phys_addr_t offset,
         break;
 
     default:
-        hw_error("pl031_write: Bad offset 0x%x\n", (int)offset);
+        cpu_abort(cpu_single_env, "pl031_write: Bad offset 0x%x\n",
+                  (int)offset);
         break;
     }
 }
 
-static CPUWriteMemoryFunc * const  pl031_writefn[] = {
+static CPUWriteMemoryFunc * pl031_writefn[] = {
     pl031_write,
     pl031_write,
     pl031_write
 };
 
-static CPUReadMemoryFunc * const  pl031_readfn[] = {
+static CPUReadMemoryFunc * pl031_readfn[] = {
     pl031_read,
     pl031_read,
     pl031_read
 };
 
-static int pl031_init(SysBusDevice *dev)
+void pl031_init(uint32_t base, qemu_irq irq)
 {
     int iomemtype;
-    pl031_state *s = FROM_SYSBUS(pl031_state, dev);
+    pl031_state *s;
     struct tm tm;
 
-    iomemtype = cpu_register_io_memory(pl031_readfn, pl031_writefn, s);
-    if (iomemtype == -1) {
-        hw_error("pl031_init: Can't register I/O memory\n");
-    }
+    s = qemu_mallocz(sizeof(pl031_state));
 
-    sysbus_init_mmio(dev, 0x1000, iomemtype);
+    iomemtype = cpu_register_io_memory(0, pl031_readfn, pl031_writefn, s);
+    if (iomemtype == -1)
+        cpu_abort(cpu_single_env, "pl031_init: Can't register I/O memory\n");
 
-    sysbus_init_irq(dev, &s->irq);
+    cpu_register_physical_memory(base, 0x00001000, iomemtype);
+
+    s->irq  = irq;
     /* ??? We assume vm_clock is zero at this point.  */
     qemu_get_timedate(&tm, 0);
     s->tick_offset = mktimegm(&tm);
 
     s->timer = qemu_new_timer(vm_clock, pl031_interrupt, s);
-    return 0;
 }
-
-static void pl031_register_devices(void)
-{
-    sysbus_register_dev("pl031", sizeof(pl031_state), pl031_init);
-}
-
-device_init(pl031_register_devices)

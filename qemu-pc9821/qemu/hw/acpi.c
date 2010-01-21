@@ -13,7 +13,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 #include "hw.h"
 #include "pc.h"
@@ -79,7 +80,7 @@ static PIIX4PMState *pm_state;
 static uint32_t get_pmtmr(PIIX4PMState *s)
 {
     uint32_t d;
-    d = muldiv64(qemu_get_clock(vm_clock), PM_FREQ, get_ticks_per_sec());
+    d = muldiv64(qemu_get_clock(vm_clock), PM_FREQ, ticks_per_sec);
     return d & 0xffffff;
 }
 
@@ -88,7 +89,7 @@ static int get_pmsts(PIIX4PMState *s)
     int64_t d;
     int pmsts;
     pmsts = s->pmsts;
-    d = muldiv64(qemu_get_clock(vm_clock), PM_FREQ, get_ticks_per_sec());
+    d = muldiv64(qemu_get_clock(vm_clock), PM_FREQ, ticks_per_sec);
     if (d >= s->tmr_overflow_time)
         s->pmsts |= TMROF_EN;
     return s->pmsts;
@@ -105,7 +106,7 @@ static void pm_update_sci(PIIX4PMState *s)
     qemu_set_irq(s->irq, sci_level);
     /* schedule a timer interruption if needed */
     if ((s->pmen & TMROF_EN) && !(pmsts & TMROF_EN)) {
-        expire_time = muldiv64(s->tmr_overflow_time, get_ticks_per_sec(), PM_FREQ);
+        expire_time = muldiv64(s->tmr_overflow_time, ticks_per_sec, PM_FREQ);
         qemu_mod_timer(s->tmr_timer, expire_time);
     } else {
         qemu_del_timer(s->tmr_timer);
@@ -130,8 +131,7 @@ static void pm_ioport_writew(void *opaque, uint32_t addr, uint32_t val)
             pmsts = get_pmsts(s);
             if (pmsts & val & TMROF_EN) {
                 /* if TMRSTS is reset, then compute the new overflow time */
-                d = muldiv64(qemu_get_clock(vm_clock), PM_FREQ,
-                             get_ticks_per_sec());
+                d = muldiv64(qemu_get_clock(vm_clock), PM_FREQ, ticks_per_sec);
                 s->tmr_overflow_time = (d + 0x800000LL) & ~0x7fffffLL;
             }
             s->pmsts &= ~val;
@@ -441,61 +441,55 @@ static void pm_write_config(PCIDevice *d,
         pm_io_space_update((PIIX4PMState *)d);
 }
 
-static int vmstate_acpi_post_load(void *opaque, int version_id)
+static void pm_save(QEMUFile* f,void *opaque)
 {
     PIIX4PMState *s = opaque;
 
+    pci_device_save(&s->dev, f);
+
+    qemu_put_be16s(f, &s->pmsts);
+    qemu_put_be16s(f, &s->pmen);
+    qemu_put_be16s(f, &s->pmcntrl);
+    qemu_put_8s(f, &s->apmc);
+    qemu_put_8s(f, &s->apms);
+    qemu_put_timer(f, s->tmr_timer);
+    qemu_put_be64(f, s->tmr_overflow_time);
+}
+
+static int pm_load(QEMUFile* f,void* opaque,int version_id)
+{
+    PIIX4PMState *s = opaque;
+    int ret;
+
+    if (version_id > 1)
+        return -EINVAL;
+
+    ret = pci_device_load(&s->dev, f);
+    if (ret < 0)
+        return ret;
+
+    qemu_get_be16s(f, &s->pmsts);
+    qemu_get_be16s(f, &s->pmen);
+    qemu_get_be16s(f, &s->pmcntrl);
+    qemu_get_8s(f, &s->apmc);
+    qemu_get_8s(f, &s->apms);
+    qemu_get_timer(f, s->tmr_timer);
+    s->tmr_overflow_time=qemu_get_be64(f);
+
     pm_io_space_update(s);
+
     return 0;
 }
 
-static const VMStateDescription vmstate_acpi = {
-    .name = "piix4_pm",
-    .version_id = 1,
-    .minimum_version_id = 1,
-    .minimum_version_id_old = 1,
-    .post_load = vmstate_acpi_post_load,
-    .fields      = (VMStateField []) {
-        VMSTATE_PCI_DEVICE(dev, PIIX4PMState),
-        VMSTATE_UINT16(pmsts, PIIX4PMState),
-        VMSTATE_UINT16(pmen, PIIX4PMState),
-        VMSTATE_UINT16(pmcntrl, PIIX4PMState),
-        VMSTATE_UINT8(apmc, PIIX4PMState),
-        VMSTATE_UINT8(apms, PIIX4PMState),
-        VMSTATE_TIMER(tmr_timer, PIIX4PMState),
-        VMSTATE_INT64(tmr_overflow_time, PIIX4PMState),
-        VMSTATE_END_OF_LIST()
-    }
-};
-
 static void piix4_reset(void *opaque)
 {
-    PIIX4PMState *s = opaque;
-    uint8_t *pci_conf = s->dev.config;
+	PIIX4PMState *s = opaque;
+	uint8_t *pci_conf = s->dev.config;
 
-    pci_conf[0x58] = 0;
-    pci_conf[0x59] = 0;
-    pci_conf[0x5a] = 0;
-    pci_conf[0x5b] = 0;
-
-    if (kvm_enabled()) {
-        /* Mark SMM as already inited (until KVM supports SMM). */
-        pci_conf[0x5B] = 0x02;
-    }
-}
-
-static void piix4_powerdown(void *opaque, int irq, int power_failing)
-{
-#if defined(TARGET_I386)
-    PIIX4PMState *s = opaque;
-
-    if (!s) {
-        qemu_system_shutdown_request();
-    } else if (s->pmen & PWRBTN_EN) {
-        s->pmsts |= PWRBTN_EN;
-        pm_update_sci(s);
-    }
-#endif
+	pci_conf[0x58] = 0;
+	pci_conf[0x59] = 0;
+	pci_conf[0x5a] = 0;
+	pci_conf[0x5b] = 0;
 }
 
 i2c_bus *piix4_pm_init(PCIBus *bus, int devfn, uint32_t smb_io_base,
@@ -516,7 +510,7 @@ i2c_bus *piix4_pm_init(PCIBus *bus, int devfn, uint32_t smb_io_base,
     pci_conf[0x08] = 0x03; // revision number
     pci_conf[0x09] = 0x00;
     pci_config_set_class(pci_conf, PCI_CLASS_BRIDGE_OTHER);
-    pci_conf[PCI_HEADER_TYPE] = PCI_HEADER_TYPE_NORMAL; // header_type
+    pci_conf[0x0e] = 0x00; // header_type
     pci_conf[0x3d] = 0x01; // interrupt pin 1
 
     pci_conf[0x40] = 0x01; /* PM io base read only bit */
@@ -547,16 +541,26 @@ i2c_bus *piix4_pm_init(PCIBus *bus, int devfn, uint32_t smb_io_base,
 
     s->tmr_timer = qemu_new_timer(vm_clock, pm_tmr_timer, s);
 
-    qemu_system_powerdown = *qemu_allocate_irqs(piix4_powerdown, s, 1);
+    register_savevm("piix4_pm", 0, 1, pm_save, pm_load, s);
 
-    vmstate_register(0, &vmstate_acpi, s);
-
-    s->smbus = i2c_init_bus(NULL, "i2c");
+    s->smbus = i2c_init_bus();
     s->irq = sci_irq;
     qemu_register_reset(piix4_reset, s);
 
     return s->smbus;
 }
+
+#if defined(TARGET_I386)
+void qemu_system_powerdown(void)
+{
+    if (!pm_state) {
+        qemu_system_shutdown_request();
+    } else if (pm_state->pmen & PWRBTN_EN) {
+        pm_state->pmsts |= PWRBTN_EN;
+	pm_update_sci(pm_state);
+    }
+}
+#endif
 
 #define GPE_BASE 0xafe0
 #define PCI_BASE 0xae00
@@ -694,27 +698,18 @@ static uint32_t pciej_read(void *opaque, uint32_t addr)
 
 static void pciej_write(void *opaque, uint32_t addr, uint32_t val)
 {
-    BusState *bus = opaque;
-    DeviceState *qdev, *next;
-    PCIDevice *dev;
+#if defined (TARGET_I386)
     int slot = ffs(val) - 1;
 
-    QLIST_FOREACH_SAFE(qdev, &bus->children, sibling, next) {
-        dev = DO_UPCAST(PCIDevice, qdev, qdev);
-        if (PCI_SLOT(dev->devfn) == slot) {
-            qdev_free(qdev);
-        }
-    }
-
+    pci_device_hot_remove_success(0, slot);
+#endif
 
 #if defined(DEBUG)
     printf("pciej write %x <== %d\n", addr, val);
 #endif
 }
 
-static int piix4_device_hotplug(PCIDevice *dev, int state);
-
-void piix4_acpi_system_hot_add_init(PCIBus *bus)
+void qemu_system_hot_add_init(void)
 {
     register_ioport_write(GPE_BASE, 4, 1, gpe_writeb, &gpe);
     register_ioport_read(GPE_BASE, 4, 1,  gpe_readb, &gpe);
@@ -722,10 +717,8 @@ void piix4_acpi_system_hot_add_init(PCIBus *bus)
     register_ioport_write(PCI_BASE, 8, 4, pcihotplug_write, &pci0_status);
     register_ioport_read(PCI_BASE, 8, 4,  pcihotplug_read, &pci0_status);
 
-    register_ioport_write(PCI_EJ_BASE, 4, 4, pciej_write, bus);
-    register_ioport_read(PCI_EJ_BASE, 4, 4,  pciej_read, bus);
-
-    pci_bus_hotplug(bus, piix4_device_hotplug);
+    register_ioport_write(PCI_EJ_BASE, 4, 4, pciej_write, NULL);
+    register_ioport_read(PCI_EJ_BASE, 4, 4,  pciej_read, NULL);
 }
 
 static void enable_device(struct pci_status *p, struct gpe_regs *g, int slot)
@@ -740,10 +733,8 @@ static void disable_device(struct pci_status *p, struct gpe_regs *g, int slot)
     p->down |= (1 << slot);
 }
 
-static int piix4_device_hotplug(PCIDevice *dev, int state)
+void qemu_system_device_hot_add(int bus, int slot, int state)
 {
-    int slot = PCI_SLOT(dev->devfn);
-
     pci0_status.up = 0;
     pci0_status.down = 0;
     if (state)
@@ -754,7 +745,6 @@ static int piix4_device_hotplug(PCIDevice *dev, int state)
         qemu_set_irq(pm_state->irq, 1);
         qemu_set_irq(pm_state->irq, 0);
     }
-    return 0;
 }
 
 struct acpi_table_header

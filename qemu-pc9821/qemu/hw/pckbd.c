@@ -109,6 +109,8 @@
 #define MOUSE_STATUS_ENABLED    0x20
 #define MOUSE_STATUS_SCALE21    0x10
 
+#define KBD_QUEUE_SIZE 256
+
 #define KBD_PENDING_KBD         1
 #define KBD_PENDING_AUX         2
 
@@ -339,19 +341,50 @@ static void kbd_reset(void *opaque)
     s->status = KBD_STAT_CMD | KBD_STAT_UNLOCKED;
 }
 
-static const VMStateDescription vmstate_kbd = {
-    .name = "pckbd",
-    .version_id = 3,
-    .minimum_version_id = 3,
-    .minimum_version_id_old = 3,
-    .fields      = (VMStateField []) {
-        VMSTATE_UINT8(write_cmd, KBDState),
-        VMSTATE_UINT8(status, KBDState),
-        VMSTATE_UINT8(mode, KBDState),
-        VMSTATE_UINT8(pending, KBDState),
-        VMSTATE_END_OF_LIST()
-    }
-};
+static void kbd_save(QEMUFile* f, void* opaque)
+{
+    KBDState *s = (KBDState*)opaque;
+
+    qemu_put_8s(f, &s->write_cmd);
+    qemu_put_8s(f, &s->status);
+    qemu_put_8s(f, &s->mode);
+    qemu_put_8s(f, &s->pending);
+}
+
+static int kbd_load(QEMUFile* f, void* opaque, int version_id)
+{
+    KBDState *s = (KBDState*)opaque;
+
+    if (version_id != 3)
+        return -EINVAL;
+    qemu_get_8s(f, &s->write_cmd);
+    qemu_get_8s(f, &s->status);
+    qemu_get_8s(f, &s->mode);
+    qemu_get_8s(f, &s->pending);
+    return 0;
+}
+
+void i8042_init(qemu_irq kbd_irq, qemu_irq mouse_irq, uint32_t io_base)
+{
+    KBDState *s = &kbd_state;
+
+    s->irq_kbd = kbd_irq;
+    s->irq_mouse = mouse_irq;
+
+    kbd_reset(s);
+    register_savevm("pckbd", 0, 3, kbd_save, kbd_load, s);
+    register_ioport_read(io_base, 1, 1, kbd_read_data, s);
+    register_ioport_write(io_base, 1, 1, kbd_write_data, s);
+    register_ioport_read(io_base + 4, 1, 1, kbd_read_status, s);
+    register_ioport_write(io_base + 4, 1, 1, kbd_write_command, s);
+
+    s->kbd = ps2_kbd_init(kbd_update_kbd_irq, s);
+    s->mouse = ps2_mouse_init(kbd_update_aux_irq, s);
+#ifdef TARGET_I386
+    vmmouse_init(s->mouse);
+#endif
+    qemu_register_reset(kbd_reset, s);
+}
 
 /* Memory mapped interface */
 static uint32_t kbd_mm_readb (void *opaque, target_phys_addr_t addr)
@@ -374,13 +407,13 @@ static void kbd_mm_writeb (void *opaque, target_phys_addr_t addr, uint32_t value
         kbd_write_data(s, 0, value & 0xff);
 }
 
-static CPUReadMemoryFunc * const kbd_mm_read[] = {
+static CPUReadMemoryFunc *kbd_mm_read[] = {
     &kbd_mm_readb,
     &kbd_mm_readb,
     &kbd_mm_readb,
 };
 
-static CPUWriteMemoryFunc * const kbd_mm_write[] = {
+static CPUWriteMemoryFunc *kbd_mm_write[] = {
     &kbd_mm_writeb,
     &kbd_mm_writeb,
     &kbd_mm_writeb,
@@ -398,8 +431,8 @@ void i8042_mm_init(qemu_irq kbd_irq, qemu_irq mouse_irq,
     s->mask = mask;
 
     kbd_reset(s);
-    vmstate_register(0, &vmstate_kbd, s);
-    s_io_memory = cpu_register_io_memory(kbd_mm_read, kbd_mm_write, s);
+    register_savevm("pckbd", 0, 3, kbd_save, kbd_load, s);
+    s_io_memory = cpu_register_io_memory(0, kbd_mm_read, kbd_mm_write, s);
     cpu_register_physical_memory(base, size, s_io_memory);
 
     s->kbd = ps2_kbd_init(kbd_update_kbd_irq, s);
@@ -409,44 +442,3 @@ void i8042_mm_init(qemu_irq kbd_irq, qemu_irq mouse_irq,
 #endif
     qemu_register_reset(kbd_reset, s);
 }
-
-typedef struct ISAKBDState {
-    ISADevice dev;
-    KBDState  kbd;
-} ISAKBDState;
-
-static int i8042_initfn(ISADevice *dev)
-{
-    KBDState *s = &(DO_UPCAST(ISAKBDState, dev, dev)->kbd);
-
-    isa_init_irq(dev, &s->irq_kbd, 1);
-    isa_init_irq(dev, &s->irq_mouse, 12);
-
-    kbd_reset(s);
-    vmstate_register(0, &vmstate_kbd, s);
-    register_ioport_read(0x60, 1, 1, kbd_read_data, s);
-    register_ioport_write(0x60, 1, 1, kbd_write_data, s);
-    register_ioport_read(0x64, 1, 1, kbd_read_status, s);
-    register_ioport_write(0x64, 1, 1, kbd_write_command, s);
-
-    s->kbd = ps2_kbd_init(kbd_update_kbd_irq, s);
-    s->mouse = ps2_mouse_init(kbd_update_aux_irq, s);
-#ifdef TARGET_I386
-    vmmouse_init(s->mouse);
-#endif
-    qemu_register_reset(kbd_reset, s);
-    return 0;
-}
-
-static ISADeviceInfo i8042_info = {
-    .qdev.name     = "i8042",
-    .qdev.size     = sizeof(ISAKBDState),
-    .qdev.no_user  = 1,
-    .init          = i8042_initfn,
-};
-
-static void i8042_register(void)
-{
-    isa_qdev_register(&i8042_info);
-}
-device_init(i8042_register)

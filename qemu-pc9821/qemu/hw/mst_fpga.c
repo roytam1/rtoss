@@ -164,12 +164,12 @@ mst_fpga_writeb(void *opaque, target_phys_addr_t addr, uint32_t value)
 	}
 }
 
-static CPUReadMemoryFunc * const mst_fpga_readfn[] = {
+static CPUReadMemoryFunc *mst_fpga_readfn[] = {
 	mst_fpga_readb,
 	mst_fpga_readb,
 	mst_fpga_readb,
 };
-static CPUWriteMemoryFunc * const mst_fpga_writefn[] = {
+static CPUWriteMemoryFunc *mst_fpga_writefn[] = {
 	mst_fpga_writeb,
 	mst_fpga_writeb,
 	mst_fpga_writeb,
@@ -216,7 +216,7 @@ mst_fpga_load(QEMUFile *f, void *opaque, int version_id)
 	return 0;
 }
 
-qemu_irq *mst_irq_init(PXA2xxState *cpu, uint32_t base, int irq)
+qemu_irq *mst_irq_init(struct pxa2xx_state_s *cpu, uint32_t base, int irq)
 {
 	mst_irq_state *s;
 	int iomemtype;
@@ -231,7 +231,7 @@ qemu_irq *mst_irq_init(PXA2xxState *cpu, uint32_t base, int irq)
 	qi  = qemu_allocate_irqs(mst_fpga_set_irq, s, MST_NUM_IRQS);
 	s->pins = qi;
 
-	iomemtype = cpu_register_io_memory(mst_fpga_readfn,
+	iomemtype = cpu_register_io_memory(0, mst_fpga_readfn,
 		mst_fpga_writefn, s);
 	cpu_register_physical_memory(base, 0x00100000, iomemtype);
 	register_savevm("mainstone_fpga", 0, 0, mst_fpga_save, mst_fpga_load, s);

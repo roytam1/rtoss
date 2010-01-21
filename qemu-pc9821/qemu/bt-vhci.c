@@ -14,7 +14,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along
- * with this program; if not, see <http://www.gnu.org/licenses/>.
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 #include "qemu-common.h"
@@ -164,5 +165,5 @@ void bt_vhci_init(struct HCIInfo *info)
     s->info->evt_recv = vhci_out_hci_packet_event;
     s->info->acl_recv = vhci_out_hci_packet_acl;
 
-    qemu_set_fd_handler(s->fd, vhci_read, NULL, s);
+    qemu_set_fd_handler(s->fd, vhci_read, 0, s);
 }

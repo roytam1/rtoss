@@ -22,20 +22,34 @@
  * THE SOFTWARE.
  */
 
-#include "keymaps.h"
-#include "sysemu.h"
-
-static int get_keysym(const name2keysym_t *table,
-		      const char *name)
+static int get_keysym(const char *name)
 {
     const name2keysym_t *p;
-    for(p = table; p->name != NULL; p++) {
+    for(p = name2keysym; p->name != NULL; p++) {
         if (!strcmp(p->name, name))
             return p->keysym;
     }
     return 0;
 }
 
+struct key_range {
+    int start;
+    int end;
+    struct key_range *next;
+};
+
+#define MAX_NORMAL_KEYCODE 512
+#define MAX_EXTRA_COUNT 256
+typedef struct {
+    uint16_t keysym2keycode[MAX_NORMAL_KEYCODE];
+    struct {
+	int keysym;
+	uint16_t keycode;
+    } keysym2keycode_extra[MAX_EXTRA_COUNT];
+    int extra_count;
+    struct key_range *keypad_range;
+    struct key_range *numlock_range;
+} kbd_layout_t;
 
 static void add_to_key_range(struct key_range **krp, int code) {
     struct key_range *kr;
@@ -59,25 +73,24 @@ static void add_to_key_range(struct key_range **krp, int code) {
     }
 }
 
-static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
-					   const char *language,
+static kbd_layout_t *parse_keyboard_layout(const char *language,
 					   kbd_layout_t * k)
 {
     FILE *f;
-    char * filename;
+    char file_name[1024];
     char line[1024];
     int len;
 
-    filename = qemu_find_file(QEMU_FILE_TYPE_KEYMAP, language);
+    snprintf(file_name, sizeof(file_name),
+             "%s/keymaps/%s", bios_dir, language);
 
     if (!k)
 	k = qemu_mallocz(sizeof(kbd_layout_t));
-    if (!(filename && (f = fopen(filename, "r")))) {
+    if (!(f = fopen(file_name, "r"))) {
 	fprintf(stderr,
-		"Could not read keymap file: '%s'\n", language);
-	return NULL;
+		"Could not read keymap file: '%s'\n", file_name);
+	return 0;
     }
-    qemu_free(filename);
     for(;;) {
 	if (fgets(line, 1024, f) == NULL)
             break;
@@ -89,7 +102,7 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
 	if (!strncmp(line, "map ", 4))
 	    continue;
 	if (!strncmp(line, "include ", 8)) {
-	    parse_keyboard_layout(table, line + 8, k);
+	    parse_keyboard_layout(line + 8, k);
         } else {
 	    char *end_of_keysym = line;
 	    while (*end_of_keysym != 0 && *end_of_keysym != ' ')
@@ -97,7 +110,7 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
 	    if (*end_of_keysym) {
 		int keysym;
 		*end_of_keysym = 0;
-		keysym = get_keysym(table, line);
+		keysym = get_keysym(line);
 		if (keysym == 0) {
                     //		    fprintf(stderr, "Warning: unknown keysym %s\n", line);
 		} else {
@@ -141,14 +154,12 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
     return k;
 }
 
-
-void *init_keyboard_layout(const name2keysym_t *table, const char *language)
+static void *init_keyboard_layout(const char *language)
 {
-    return parse_keyboard_layout(table, language, NULL);
+    return parse_keyboard_layout(language, 0);
 }
 
-
-int keysym2scancode(void *kbd_layout, int keysym)
+static int keysym2scancode(void *kbd_layout, int keysym)
 {
     kbd_layout_t *k = kbd_layout;
     if (keysym < MAX_NORMAL_KEYCODE) {
@@ -169,7 +180,7 @@ int keysym2scancode(void *kbd_layout, int keysym)
     return 0;
 }
 
-int keycode_is_keypad(void *kbd_layout, int keycode)
+static inline int keycode_is_keypad(void *kbd_layout, int keycode)
 {
     kbd_layout_t *k = kbd_layout;
     struct key_range *kr;
@@ -180,7 +191,7 @@ int keycode_is_keypad(void *kbd_layout, int keycode)
     return 0;
 }
 
-int keysym_is_numlock(void *kbd_layout, int keysym)
+static inline int keysym_is_numlock(void *kbd_layout, int keysym)
 {
     kbd_layout_t *k = kbd_layout;
     struct key_range *kr;
