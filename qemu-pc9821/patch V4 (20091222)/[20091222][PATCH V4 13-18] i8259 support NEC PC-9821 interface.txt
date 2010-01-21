@@ -1,0 +1,135 @@
+Signed-off-by: TAKEDA, toshiya <t-takeda@m1.interq.or.jp>
+---
+ hw/i8259.c |   63 ++++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 files changed, 55 insertions(+), 8 deletions(-)
+
+diff --git a/hw/i8259.c b/hw/i8259.c
+index 3de22e3..eaf75dd 100644
+--- a/hw/i8259.c
++++ b/hw/i8259.c
+@@ -59,6 +59,7 @@ struct PicState2 {
+     /* XXX: better separation between the two pics */
+     PicState pics[2];
+     qemu_irq parent_irq;
++    uint8_t irq_cascade;
+     void *irq_request_opaque;
+ };
+ 
+@@ -124,7 +125,7 @@ static int pic_get_irq(PicState *s)
+     if (s->special_mask)
+         mask &= ~s->imr;
+     if (s->special_fully_nested_mode && s == &s->pics_state->pics[0])
+-        mask &= ~(1 << 2);
++        mask &= ~(1 << s->pics_state->irq_cascade);
+     cur_priority = get_priority(s, mask);
+     if (priority < cur_priority) {
+         /* higher priority found: an irq should be generated */
+@@ -145,8 +146,8 @@ void pic_update_irq(PicState2 *s)
+     irq2 = pic_get_irq(&s->pics[1]);
+     if (irq2 >= 0) {
+         /* if irq request by slave pic, signal master PIC */
+-        pic_set_irq1(&s->pics[0], 2, 1);
+-        pic_set_irq1(&s->pics[0], 2, 0);
++        pic_set_irq1(&s->pics[0], s->irq_cascade, 1);
++        pic_set_irq1(&s->pics[0], s->irq_cascade, 0);
+     }
+     /* look at requested irq */
+     irq = pic_get_irq(&s->pics[0]);
+@@ -171,6 +172,11 @@ void pic_update_irq(PicState2 *s)
+     else {
+         qemu_irq_lower(s->parent_irq);
+     }
++#elif defined(TARGET_I386)
++    else if (s->irq_cascade == 7) {
++        /* NEC PC-9821 */
++        qemu_irq_lower(s->parent_irq);
++    }
+ #endif
+ }
+ 
+@@ -224,7 +230,7 @@ int pic_read_irq(PicState2 *s)
+     irq = pic_get_irq(&s->pics[0]);
+     if (irq >= 0) {
+         pic_intack(&s->pics[0], irq);
+-        if (irq == 2) {
++        if (irq == s->irq_cascade) {
+             irq2 = pic_get_irq(&s->pics[1]);
+             if (irq2 >= 0) {
+                 pic_intack(&s->pics[1], irq2);
+@@ -377,12 +383,12 @@ static uint32_t pic_poll_read (PicState *s, uint32_t addr1)
+     ret = pic_get_irq(s);
+     if (ret >= 0) {
+         if (addr1 >> 7) {
+-            s->pics_state->pics[0].isr &= ~(1 << 2);
+-            s->pics_state->pics[0].irr &= ~(1 << 2);
++            s->pics_state->pics[0].isr &= ~(1 << s->pics_state->irq_cascade);
++            s->pics_state->pics[0].irr &= ~(1 << s->pics_state->irq_cascade);
+         }
+         s->irr &= ~(1 << ret);
+         s->isr &= ~(1 << ret);
+-        if (addr1 >> 7 || ret != 2)
++        if (addr1 >> 7 || ret != s->pics_state->irq_cascade)
+             pic_update_irq(s->pics_state);
+     } else {
+         ret = 0x07;
+@@ -426,7 +432,7 @@ uint32_t pic_intack_read(PicState2 *s)
+     int ret;
+ 
+     ret = pic_poll_read(&s->pics[0], 0x00);
+-    if (ret == 2)
++    if (ret == s->irq_cascade)
+         ret = pic_poll_read(&s->pics[1], 0x80) + 8;
+     /* Prepare for ISR read */
+     s->pics[0].read_reg_select = 1;
+@@ -530,6 +536,47 @@ qemu_irq *i8259_init(qemu_irq parent_irq)
+     s->pics[0].elcr_mask = 0xf8;
+     s->pics[1].elcr_mask = 0xde;
+     s->parent_irq = parent_irq;
++    s->irq_cascade = 2;
++    s->pics[0].pics_state = s;
++    s->pics[1].pics_state = s;
++    isa_pic = s;
++    return qemu_allocate_irqs(i8259_set_irq, s, 16);
++}
++
++/* NEC PC-9821 */
++
++static void pc98_pic_ioport_write(void *opaque, uint32_t addr, uint32_t val)
++{
++    pic_ioport_write(opaque, addr >> 1, val);
++}
++
++static uint32_t pc98_pic_ioport_read(void *opaque, uint32_t addr)
++{
++    return pic_ioport_read(opaque, addr >> 1);
++}
++
++static void pc98_pic_init1(int io_addr, PicState *s)
++{
++    int i;
++    for (i = 0; i < 2; i++) {
++        register_ioport_write(io_addr + (i << 1), 1, 1, pc98_pic_ioport_write, s);
++        register_ioport_read(io_addr + (i << 1), 1, 1, pc98_pic_ioport_read, s);
++    }
++    vmstate_register(io_addr, &vmstate_pic, s);
++    qemu_register_reset(pic_reset, s);
++}
++
++qemu_irq *pc98_i8259_init(qemu_irq parent_irq)
++{
++    PicState2 *s;
++
++    s = qemu_mallocz(sizeof(PicState2));
++    pc98_pic_init1(0x00, &s->pics[0]);
++    pc98_pic_init1(0x08, &s->pics[1]);
++    s->pics[0].elcr_mask = 0;
++    s->pics[1].elcr_mask = 0;
++    s->parent_irq = parent_irq;
++    s->irq_cascade = 7;
+     s->pics[0].pics_state = s;
+     s->pics[1].pics_state = s;
+     isa_pic = s;
+-- 
+1.6.4
+
+

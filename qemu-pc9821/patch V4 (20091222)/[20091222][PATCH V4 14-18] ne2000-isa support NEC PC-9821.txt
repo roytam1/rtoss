@@ -1,0 +1,108 @@
+Signed-off-by: TAKEDA, toshiya <t-takeda@m1.interq.or.jp>
+---
+ hw/ne2000-isa.c |   71 ++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 files changed, 63 insertions(+), 8 deletions(-)
+
+diff --git a/hw/ne2000-isa.c b/hw/ne2000-isa.c
+index 03a5a1f..4a1733b 100644
+--- a/hw/ne2000-isa.c
++++ b/hw/ne2000-isa.c
+@@ -61,6 +61,19 @@ static const VMStateDescription vmstate_isa_ne2000 = {
+     }
+ };
+ 
++static void isa_ne2000_initfn_common(ISADevice *dev,
++                                     ISANE2000State *isa, NE2000State *s)
++{
++    isa_init_irq(dev, &s->irq, isa->isairq);
++
++    qemu_macaddr_default_if_unset(&s->c.macaddr);
++    ne2000_reset(s);
++
++    s->nic = qemu_new_nic(&net_ne2000_isa_info, &s->c,
++                          dev->qdev.info->name, dev->qdev.id, s);
++    qemu_format_nic_info_str(&s->nic->nc, s->c.macaddr.a);
++}
++
+ static int isa_ne2000_initfn(ISADevice *dev)
+ {
+     ISANE2000State *isa = DO_UPCAST(ISANE2000State, dev, dev);
+@@ -77,14 +90,7 @@ static int isa_ne2000_initfn(ISADevice *dev)
+     register_ioport_write(isa->iobase + 0x1f, 1, 1, ne2000_reset_ioport_write, s);
+     register_ioport_read(isa->iobase + 0x1f, 1, 1, ne2000_reset_ioport_read, s);
+ 
+-    isa_init_irq(dev, &s->irq, isa->isairq);
+-
+-    qemu_macaddr_default_if_unset(&s->c.macaddr);
+-    ne2000_reset(s);
+-
+-    s->nic = qemu_new_nic(&net_ne2000_isa_info, &s->c,
+-                          dev->qdev.info->name, dev->qdev.id, s);
+-    qemu_format_nic_info_str(&s->nic->nc, s->c.macaddr.a);
++    isa_ne2000_initfn_common(dev, isa, s);
+ 
+     return 0;
+ }
+@@ -114,9 +120,58 @@ static ISADeviceInfo ne2000_isa_info = {
+     },
+ };
+ 
++/* NEC PC-9821 (MELCO LGY-98) */
++
++static int pc98_ne2000_initfn(ISADevice *dev)
++{
++    ISANE2000State *isa = DO_UPCAST(ISANE2000State, dev, dev);
++    NE2000State *s = &isa->ne2000;
++
++    register_ioport_write(isa->iobase, 16, 1, ne2000_ioport_write, s);
++    register_ioport_read(isa->iobase, 16, 1, ne2000_ioport_read, s);
++
++    register_ioport_write(isa->iobase + 0x200, 1, 1, ne2000_asic_ioport_write, s);
++    register_ioport_read(isa->iobase + 0x200, 1, 1, ne2000_asic_ioport_read, s);
++    register_ioport_write(isa->iobase + 0x200, 2, 2, ne2000_asic_ioport_write, s);
++    register_ioport_read(isa->iobase + 0x200, 2, 2, ne2000_asic_ioport_read, s);
++
++    register_ioport_write(isa->iobase + 0x18, 1, 1, ne2000_reset_ioport_write, s);
++    register_ioport_read(isa->iobase + 0x18, 1, 1, ne2000_reset_ioport_read, s);
++
++    isa_ne2000_initfn_common(dev, isa, s);
++
++    return 0;
++}
++
++void pc98_ne2000_init(int base, int irq, NICInfo *nd)
++{
++    ISADevice *dev;
++
++    qemu_check_nic_model(nd, "ne2k_isa");
++
++    dev = isa_create("ne2k_pc98");
++    qdev_prop_set_uint32(&dev->qdev, "iobase", base);
++    qdev_prop_set_uint32(&dev->qdev, "irq",    irq);
++    qdev_set_nic_properties(&dev->qdev, nd);
++    qdev_init_nofail(&dev->qdev);
++}
++
++static ISADeviceInfo ne2000_pc98_info = {
++    .qdev.name  = "ne2k_pc98",
++    .qdev.size  = sizeof(ISANE2000State),
++    .init       = pc98_ne2000_initfn,
++    .qdev.props = (Property[]) {
++        DEFINE_PROP_HEX32("iobase", ISANE2000State, iobase, 0xd0),
++        DEFINE_PROP_UINT32("irq",   ISANE2000State, isairq, 3),
++        DEFINE_NIC_PROPERTIES(ISANE2000State, ne2000.c),
++        DEFINE_PROP_END_OF_LIST(),
++    },
++};
++
+ static void ne2000_isa_register_devices(void)
+ {
+     isa_qdev_register(&ne2000_isa_info);
++    isa_qdev_register(&ne2000_pc98_info);
+ }
+ 
+ device_init(ne2000_isa_register_devices)
+-- 
+1.6.4
+
+

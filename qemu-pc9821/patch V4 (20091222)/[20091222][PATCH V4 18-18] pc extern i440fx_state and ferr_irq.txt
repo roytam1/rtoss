@@ -1,0 +1,57 @@
+Signed-off-by: TAKEDA, toshiya <t-takeda@m1.interq.or.jp>
+---
+ hw/pc.c |    4 ++--
+ hw/pc.h |    7 +++++--
+ 2 files changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/hw/pc.c b/hw/pc.c
+index db7d58e..ddefb7f 100644
+--- a/hw/pc.c
++++ b/hw/pc.c
+@@ -67,7 +67,7 @@
+ static fdctrl_t *floppy_controller;
+ static RTCState *rtc_state;
+ static PITState *pit;
+-static PCII440FXState *i440fx_state;
++PCII440FXState *i440fx_state;
+ 
+ typedef struct isa_irq_state {
+     qemu_irq *i8259;
+@@ -90,7 +90,7 @@ static void ioport80_write(void *opaque, uint32_t addr, uint32_t data)
+ }
+ 
+ /* MSDOS compatibility mode FPU exception support */
+-static qemu_irq ferr_irq;
++qemu_irq ferr_irq;
+ /* XXX: add IGNNE support */
+ void cpu_set_ferr(CPUX86State *s)
+ {
+diff --git a/hw/pc.h b/hw/pc.h
+index 03ffc91..b39d7a1 100644
+--- a/hw/pc.h
++++ b/hw/pc.h
+@@ -93,6 +93,7 @@ extern int fd_bootchk;
+ 
+ void ioport_set_a20(int enable);
+ int ioport_get_a20(void);
++int cpu_is_bsp(CPUState *env);
+ 
+ /* acpi.c */
+ extern int acpi_enabled;
+@@ -146,8 +147,10 @@ void pci_cirrus_vga_init(PCIBus *bus);
+ void isa_cirrus_vga_init(void);
+ 
+ /* ne2000.c */
+-
+ void isa_ne2000_init(int base, int irq, NICInfo *nd);
+ 
+-int cpu_is_bsp(CPUState *env);
++/* NEC PC-9821 */
++extern PCII440FXState *i440fx_state;
++extern qemu_irq ferr_irq;
++#include "pc98.h"
+ #endif
+-- 
+1.6.4
+
+

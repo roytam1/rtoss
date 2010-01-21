@@ -1,0 +1,157 @@
+Signed-off-by: TAKEDA, toshiya <t-takeda@m1.interq.or.jp>
+---
+ target-i386/cpu.h    |    3 +++
+ target-i386/helper.c |   46 ++++++++++++++++++++++++++++++++++++++++------
+ 2 files changed, 43 insertions(+), 6 deletions(-)
+
+diff --git a/target-i386/cpu.h b/target-i386/cpu.h
+index f3834b3..271cc20 100644
+--- a/target-i386/cpu.h
++++ b/target-i386/cpu.h
+@@ -405,6 +405,8 @@
+ #define CPUID_EXT3_IBS     (1 << 10)
+ #define CPUID_EXT3_SKINIT  (1 << 12)
+ 
++#define PRIVATE_FEATURE_PC98_A20MASK (1 << 0)
++
+ #define CPUID_VENDOR_INTEL_1 0x756e6547 /* "Genu" */
+ #define CPUID_VENDOR_INTEL_2 0x49656e69 /* "ineI" */
+ #define CPUID_VENDOR_INTEL_3 0x6c65746e /* "ntel" */
+@@ -684,6 +686,7 @@ typedef struct CPUX86State {
+     uint32_t cpuid_model[12];
+     uint32_t cpuid_ext2_features;
+     uint32_t cpuid_ext3_features;
++    uint32_t private_features; /* private features not defined in CPUID */
+     uint32_t cpuid_apic_id;
+     int cpuid_vendor_override;
+ 
+diff --git a/target-i386/helper.c b/target-i386/helper.c
+index 730e396..53d9422 100644
+--- a/target-i386/helper.c
++++ b/target-i386/helper.c
+@@ -57,11 +57,18 @@ static const char *ext3_feature_name[] = {
+     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+ };
++static const char *private_feature_name[] = {
++    "pc98_a20mask", NULL, NULL, NULL, NULL, NULL, NULL, NULL,
++    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
++    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
++    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
++};
+ 
+ static void add_flagname_to_bitmaps(const char *flagname, uint32_t *features,
+                                     uint32_t *ext_features,
+                                     uint32_t *ext2_features,
+-                                    uint32_t *ext3_features)
++                                    uint32_t *ext3_features,
++                                    uint32_t *private_features)
+ {
+     int i;
+     int found = 0;
+@@ -86,6 +93,11 @@ static void add_flagname_to_bitmaps(const char *flagname, uint32_t *features,
+             *ext3_features |= 1 << i;
+             found = 1;
+         }
++    for ( i = 0 ; i < 32 ; i++ )
++        if (private_feature_name[i] && !strcmp (flagname, private_feature_name[i])) {
++            *private_features |= 1 << i;
++            found = 1;
++        }
+     if (!found) {
+         fprintf(stderr, "CPU feature %s not found\n", flagname);
+     }
+@@ -99,6 +111,7 @@ typedef struct x86_def_t {
+     int model;
+     int stepping;
+     uint32_t features, ext_features, ext2_features, ext3_features;
++    uint32_t private_features;
+     uint32_t xlevel;
+     char model_id[48];
+     int vendor_override;
+@@ -377,6 +390,7 @@ static int cpu_x86_find_by_name(x86_def_t *x86_cpu_def, const char *cpu_model)
+     char *featurestr, *name = strtok(s, ",");
+     uint32_t plus_features = 0, plus_ext_features = 0, plus_ext2_features = 0, plus_ext3_features = 0;
+     uint32_t minus_features = 0, minus_ext_features = 0, minus_ext2_features = 0, minus_ext3_features = 0;
++    uint32_t plus_private_features = 0, minus_private_features = 0;
+     uint32_t numvalue;
+ 
+     def = NULL;
+@@ -395,16 +409,21 @@ static int cpu_x86_find_by_name(x86_def_t *x86_cpu_def, const char *cpu_model)
+     }
+ 
+     add_flagname_to_bitmaps("hypervisor", &plus_features,
+-        &plus_ext_features, &plus_ext2_features, &plus_ext3_features);
++        &plus_ext_features, &plus_ext2_features, &plus_ext3_features,
++        &plus_private_features);
+ 
+     featurestr = strtok(NULL, ",");
+ 
+     while (featurestr) {
+         char *val;
+         if (featurestr[0] == '+') {
+-            add_flagname_to_bitmaps(featurestr + 1, &plus_features, &plus_ext_features, &plus_ext2_features, &plus_ext3_features);
++            add_flagname_to_bitmaps(featurestr + 1, &plus_features,
++                &plus_ext_features, &plus_ext2_features, &plus_ext3_features,
++                &plus_private_features);
+         } else if (featurestr[0] == '-') {
+-            add_flagname_to_bitmaps(featurestr + 1, &minus_features, &minus_ext_features, &minus_ext2_features, &minus_ext3_features);
++            add_flagname_to_bitmaps(featurestr + 1, &minus_features,
++                &minus_ext_features, &minus_ext2_features, &minus_ext3_features,
++                &minus_private_features);
+         } else if ((val = strchr(featurestr, '='))) {
+             *val = 0; val++;
+             if (!strcmp(featurestr, "family")) {
+@@ -481,10 +500,12 @@ static int cpu_x86_find_by_name(x86_def_t *x86_cpu_def, const char *cpu_model)
+     x86_cpu_def->ext_features |= plus_ext_features;
+     x86_cpu_def->ext2_features |= plus_ext2_features;
+     x86_cpu_def->ext3_features |= plus_ext3_features;
++    x86_cpu_def->private_features |= plus_private_features;
+     x86_cpu_def->features &= ~minus_features;
+     x86_cpu_def->ext_features &= ~minus_ext_features;
+     x86_cpu_def->ext2_features &= ~minus_ext2_features;
+     x86_cpu_def->ext3_features &= ~minus_ext3_features;
++    x86_cpu_def->private_features &= ~minus_private_features;
+     free(s);
+     return 0;
+ 
+@@ -530,6 +551,7 @@ static int cpu_x86_register (CPUX86State *env, const char *cpu_model)
+     env->cpuid_ext2_features = def->ext2_features;
+     env->cpuid_xlevel = def->xlevel;
+     env->cpuid_ext3_features = def->ext3_features;
++    env->private_features = def->private_features;
+     {
+         const char *model_id = def->model_id;
+         int c, len, i;
+@@ -571,7 +593,11 @@ void cpu_reset(CPUX86State *env)
+     env->hflags2 |= HF2_GIF_MASK;
+ 
+     cpu_x86_update_cr0(env, 0x60000010);
+-    env->a20_mask = ~0x0;
++    if (env->private_features & PRIVATE_FEATURE_PC98_A20MASK) {
++        env->a20_mask = 0xfffff;
++    } else {
++        env->a20_mask = ~0x0;
++    }
+     env->smbase = 0x30000;
+ 
+     env->idt.limit = 0xffff;
+@@ -940,7 +966,15 @@ void cpu_x86_set_a20(CPUX86State *env, int a20_state)
+         /* when a20 is changed, all the MMU mappings are invalid, so
+            we must flush everything */
+         tlb_flush(env, 1);
+-        env->a20_mask = ~(1 << 20) | (a20_state << 20);
++        if (env->private_features & PRIVATE_FEATURE_PC98_A20MASK) {
++            if (a20_state) {
++                env->a20_mask = ~0x0;
++            } else {
++                env->a20_mask = 0xfffff;
++            }
++        } else {
++            env->a20_mask = ~(1 << 20) | (a20_state << 20);
++        }
+     }
+ }
+ 
+-- 
+1.6.4
