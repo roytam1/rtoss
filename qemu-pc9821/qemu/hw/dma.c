@@ -45,7 +45,7 @@ struct dma_regs {
     uint8_t eop;
     DMA_transfer_handler transfer_handler;
     void *opaque;
-    /* NEC PC-9821 quirks? */
+    /* NEC PC-9821 */
     uint8_t bound;
 };
 
@@ -59,7 +59,7 @@ static struct dma_cont {
     uint8_t flip_flop;
     int dshift;
     struct dma_regs regs[4];
-    /* NEC PC-9821 quirks? */
+    /* NEC PC-9821 */
     uint8_t pc98;
     uint8_t access_ctrl;
 } dma_controllers[2];

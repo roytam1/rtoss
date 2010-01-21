@@ -191,25 +191,10 @@ static int pc98_ide_load(QEMUFile* f, void *opaque, int version_id)
     return 0;
 }
 
-static void pc98_ide_reset(void *opaque)
-{
-    PC98IDEState *s = opaque;
-    int i, j;
-
-    for (i = 0; i < 2; i++) {
-        for (j = 0; j < 2; j++) {
-            ide_reset(&s->bus[i].ifs[j]);
-            s->bus[i].ifs[j].status = BUSY_STAT | SEEK_STAT;
-            s->bus[i].ifs[j].error = 0x01;
-        }
-    }
-    s->cur_bus = &s->bus[0];
-}
-
 static int pc98_ide_initfn(ISADevice *dev)
 {
     PC98IDEState *s = DO_UPCAST(PC98IDEState, dev, dev);
-    int i;
+    int i, j;
 
     ide_bus_new(&s->bus[0], &s->dev.qdev);
     ide_bus_new(&s->bus[1], &s->dev.qdev);
@@ -217,6 +202,15 @@ static int pc98_ide_initfn(ISADevice *dev)
     isa_init_irq(dev, &s->irq, s->isairq);
     ide_init2(&s->bus[0], NULL, NULL, s->irq);
     ide_init2(&s->bus[1], NULL, NULL, s->irq);
+
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 2; j++) {
+            s->bus[i].ifs[j].status = BUSY_STAT | SEEK_STAT;
+            s->bus[i].ifs[j].error = 0x01;
+        }
+        s->bus[i].unit = 0;
+    }
+    s->cur_bus = &s->bus[0];
 
     register_ioport_write(0xf0, 1, 1, pc98_ide_cpu_shutdown, s);
     register_ioport_read(0xf0, 1, 1, pc98_ide_connection_read, s);
@@ -238,8 +232,6 @@ static int pc98_ide_initfn(ISADevice *dev)
     register_ioport_read(0x74e, 1, 1, pc98_ide_digital_read, s);
 
     register_savevm("pc98-ide", 0, 1, pc98_ide_save, pc98_ide_load, s);
-    qemu_register_reset(pc98_ide_reset, s);
-    pc98_ide_reset(s);
 
     return 0;
 };
@@ -266,7 +258,7 @@ int pc98_ide_init(int isairq, DriveInfo **hd_table)
         if (!s->bus[bus[i]].ifs[unit[i]].is_cdrom &&
             !s->bus[bus[i]].ifs[unit[i]].is_cf
            ) {
-            s->bus[bus[i]].ifs[unit[i]].chs = 1;
+            s->bus[bus[i]].ifs[unit[i]].support_chs = 1;
         }
     }
     return 0;

@@ -34,53 +34,67 @@
 #include "ide.h"
 #include "loader.h"
 
-#define IDE_FILE_NAME "pc98ide.bin"
-#define ITF_FILE_NAME "pc98itf.bin"
-#define BIOS_FILE_NAME "pc98bios.bin"
-#define BANK_FILE_NAME "pc98bank%d.bin"
+#define IDE_FILE_NAME   "pc98ide.bin"
+#define IDE_FILE_SIZE   0x2000
+#define ITF_FILE_NAME   "pc98itf.bin"
+#define ITF_FILE_SIZE   0x8000
+#define BIOS_FILE_NAME  "pc98bios.bin"
+#define BIOS_FILE_SIZE  0x18000
+/* reserved */
+#define SOUND_FILE_NAME "pc98sound.bin"
+#define SOUND_FILE_SIZE 0x2000
+#define SCSI_FILE_NAME  "pc98scsi.bin"
+#define SCSI_FILE_SIZE  0x1000
 
-#define IDE_FILE_SIZE 0x2000
-#define ITF_FILE_SIZE 0x8000
-#define BIOS_FILE_SIZE 0x18000
-#define BANK_FILE_SIZE 0x8000
+#define BANK_FILE_NAME  "pc98bank%d.bin"
+#define BANK_FILE_SIZE  0x8000
+
+#define PCI_ROM_BANK  0
+#define IDE_ROM_BANK  3
+#define ITF_ROM_BANK  4
+#define BIOS_ROM_BANK 5
+#define ROM_BANK_NUM  8
+
+#define REQUIRED_ROM_BANK ((1 << ITF_ROM_BANK) | (7 << BIOS_ROM_BANK))
+
+#define BANK_BITS 12
+/* (1 << BANK_BITS) */
+#define BANK_SIZE 0x1000
+
+#define PCI_BIOS_OFS   (BANK_FILE_SIZE * PCI_ROM_BANK)
+#define IDE_BIOS_OFS   (BANK_FILE_SIZE * IDE_ROM_BANK)
+#define ITF_OFS        (BANK_FILE_SIZE * ITF_ROM_BANK)
+#define BIOS_OFS       (BANK_FILE_SIZE * BIOS_ROM_BANK)
+#define SOUND_BIOS_OFS (BANK_FILE_SIZE * ROM_BANK_NUM)
+#define SCSI_BIOS_OFS  (SOUND_BIOS_OFS + SOUND_FILE_SIZE)
+#define NONE_OFS       (SCSI_BIOS_OFS + SCSI_FILE_SIZE)
+#define TOTAL_ROM_SIZE (NONE_OFS + BANK_SIZE)
+
+static ram_addr_t ram_addr[0x1000000 >> BANK_BITS]; /* 16MB */
+static ram_addr_t rom_addr[TOTAL_ROM_SIZE >> BANK_BITS];
+static ram_addr_t mem_bank[0x100000 >> BANK_BITS]; /* 1MB */
 
 enum {
-    PCI_BANK  = 0,
-    IDE_BANK  = 3,
-    ITF_BANK  = 4,
-    BIOS_BANK = 5,
-    NONE_BANK = 8,
+    D8000_BANK_IDE = 1,
+    D8000_BANK_PCI = 2,
+    D8000_BANK_PnP = 3,
 };
-#define PCI_BANK_OFS (PCI_BANK * 0x8000)
-#define IDE_BANK_OFS (IDE_BANK * 0x8000)
-#define ITF_BANK_OFS (ITF_BANK * 0x8000)
-#define BIOS_BANK_OFS (BIOS_BANK * 0x8000)
-#define NONE_BANK_OFS (NONE_BANK * 0x8000)
 
-#define REQUIRED_BANK ((1 << IDE_BANK) | (1 << ITF_BANK) | (7 << BIOS_BANK))
+static int tvram_io_memory;
+static int vram_io_memory;
+static int vram_e0000_io_memory;
 
-#define BANK_BITS 13
-/* (1 << BANK_BITS) */
-#define BANK_SIZE 0x2000
-
-#define BANK_ROM 0x8000
-
-static ram_addr_t ram_addr[2048]; /* 16MB  >> BANK_BITS     */
-static ram_addr_t rom_addr[33];   /* 256KB >> BANK_BITS + 1 */
-static uint16_t mem_bank[128];    /* 1MB   >> BANK_BITS     */
-
-static uint8_t ide_selected = 1;
+static uint8_t ram_window_map1 = 0x08;
+static uint8_t ram_window_map2 = 0x0a;
+static uint8_t d8000_bank = D8000_BANK_IDE;
 static uint8_t ide_ram_selected = 1;
-static uint8_t pci_selected = 0;
 static uint8_t bios_ram_selected = 0;
 static uint8_t itf_selected = 1;
-static uint8_t ram_window_map = 8;
+
+static uint8_t ide_bios_loaded = 0;
 static uint8_t hd_connect = 0;
 
 #define MAX_IDE_BUS 2
-
-static fdctrl_t *floppy_controller;
-static PITState *pit;
 
 typedef struct isa_irq_state {
     qemu_irq *i8259;
@@ -106,15 +120,17 @@ static void pic_irq_request(void *opaque, int irq, int level)
 
     if (env->apic_state) {
         while (env) {
-            if (apic_accept_pic_intr(env))
+            if (apic_accept_pic_intr(env)) {
                 apic_deliver_pic_intr(env, level);
+            }
             env = env->next_cpu;
         }
     } else {
-        if (level)
+        if (level) {
             cpu_interrupt(env, CPU_INTERRUPT_HARD);
-        else
+        } else {
             cpu_reset_interrupt(env, CPU_INTERRUPT_HARD);
+        }
     }
 }
 
@@ -166,19 +182,19 @@ static void register_ram(uint32_t top, uint32_t size, uint32_t addr)
 {
     uint32_t a;
     for (a = top; a < top + size; a += BANK_SIZE) {
-        if ((a >= 0xa0000 && a < 0xc0000) || (a >= 0xe0000 && a < 0xe8000)) {
-            continue;
-        }
-        if (mem_bank[a >> BANK_BITS] != (addr >> BANK_BITS)) {
-            ram_addr_t mem = ram_addr[addr >> BANK_BITS];
-            cpu_register_physical_memory(a, BANK_SIZE, mem);
-            if (a >= 0xc0000 && a < 0x100000) {
-#ifdef PC98_USE_16MB_AREA
-                cpu_register_physical_memory(0x00f00000 | a, BANK_SIZE, mem);
-#endif
-                cpu_register_physical_memory(0xfff00000 | a, BANK_SIZE, mem);
+        ram_addr_t phys_offset = ram_addr[addr >> BANK_BITS];
+        if (mem_bank[a >> BANK_BITS] != phys_offset) {
+            cpu_register_physical_memory(a, BANK_SIZE, phys_offset);
+            if (i440fx_state) {
+                i440fx_update_isa_page_descs(i440fx_state, a, BANK_SIZE);
             }
-            mem_bank[a >> BANK_BITS] = (addr >> BANK_BITS);
+            if (a >= 0xa0000 && a < 0x100000) {
+#ifdef PC98_USE_SYSTEM_16MB_REGION
+                cpu_register_physical_memory(0x00f00000 | a, BANK_SIZE, phys_offset);
+#endif
+                cpu_register_physical_memory(0xfff00000 | a, BANK_SIZE, phys_offset);
+            }
+            mem_bank[a >> BANK_BITS] = phys_offset;
         }
         addr += BANK_SIZE;
     }
@@ -188,46 +204,64 @@ static void register_rom(uint32_t top, uint32_t size, uint32_t addr)
 {
     uint32_t a;
     for (a = top; a < top + size; a += BANK_SIZE) {
-        if ((a >= 0xa0000 && a < 0xc0000) || (a >= 0xe0000 && a < 0xe8000)) {
-            continue;
-        }
-        if (mem_bank[a >> BANK_BITS] != ((addr >> BANK_BITS) | BANK_ROM)) {
-            ram_addr_t mem = rom_addr[addr >> BANK_BITS] | IO_MEM_ROM;
-            cpu_register_physical_memory(a, BANK_SIZE, mem);
-            if (a >= 0xc0000 && a < 0x100000) {
-#ifdef PC98_USE_16MB_AREA
-                cpu_register_physical_memory(0x00f00000 | a, BANK_SIZE, mem);
-#endif
-                cpu_register_physical_memory(0xfff00000 | a, BANK_SIZE, mem);
+        ram_addr_t phys_offset = rom_addr[addr >> BANK_BITS] | IO_MEM_ROM;
+        if (mem_bank[a >> BANK_BITS] != phys_offset) {
+            cpu_register_physical_memory(a, BANK_SIZE, phys_offset);
+            if (i440fx_state) {
+                i440fx_update_isa_page_descs(i440fx_state, a, BANK_SIZE);
             }
-            mem_bank[a >> BANK_BITS] = ((addr >> BANK_BITS) | BANK_ROM);
+            if (a >= 0xa0000 && a < 0x100000) {
+#ifdef PC98_USE_SYSTEM_16MB_REGION
+                cpu_register_physical_memory(0x00f00000 | a, BANK_SIZE, phys_offset);
+#endif
+                cpu_register_physical_memory(0xfff00000 | a, BANK_SIZE, phys_offset);
+            }
+            mem_bank[a >> BANK_BITS] = phys_offset;
         }
-        if (addr != NONE_BANK_OFS) {
+        if (addr != NONE_OFS) {
             addr += BANK_SIZE;
         }
+    }
+}
+
+static void register_io_memory(uint32_t top, uint32_t size, ram_addr_t phys_offset)
+{
+    uint32_t a;
+    for (a = top; a < top + size; a += BANK_SIZE) {
+        mem_bank[a >> BANK_BITS] = -1;
+    }
+    cpu_register_physical_memory(top, size, phys_offset);
+    if (i440fx_state) {
+        i440fx_update_isa_page_descs(i440fx_state, top, size);
+    }
+    if (a >= 0xa0000 && a < 0x100000) {
+#ifdef PC98_USE_SYSTEM_16MB_REGION
+        cpu_register_physical_memory(0x00f00000 | top, size, phys_offset);
+#endif
+        cpu_register_physical_memory(0xfff00000 | top, size, phys_offset);
     }
 }
 
 static void register_ide_rom(void)
 {
     if (ide_ram_selected) {
-        register_rom(0xd8000, 0x2000, IDE_BANK_OFS);
+        register_rom(0xd8000, 0x2000, IDE_BIOS_OFS);
         register_ram(0xda000, 0x2000, 0xda000);
-        register_rom(0xdc000, 0x4000, NONE_BANK_OFS);
+        register_rom(0xdc000, 0x4000, NONE_OFS);
     } else {
-        register_rom(0xd8000, 0x2000, IDE_BANK_OFS);
-        register_rom(0xda000, 0x6000, NONE_BANK_OFS);
+        register_rom(0xd8000, 0x2000, IDE_BIOS_OFS);
+        register_rom(0xda000, 0x6000, NONE_OFS);
     }
 }
 
 static void register_pci_rom(void)
 {
-    register_rom(0xd8000, 0x8000, PCI_BANK_OFS);
+    register_rom(0xd8000, 0x8000, PCI_BIOS_OFS);
 }
 
 static void register_bios_rom(void)
 {
-    register_rom(0xe8000, 0x18000, BIOS_BANK_OFS);
+    register_rom(0xe8000, 0x18000, BIOS_OFS);
 }
 
 static void register_bios_ram(void)
@@ -237,8 +271,8 @@ static void register_bios_ram(void)
 
 static void register_itf_rom(void)
 {
-    register_rom(0xe8000, 0x10000, NONE_BANK_OFS);
-    register_rom(0xf8000, 0x8000, ITF_BANK_OFS);
+    register_rom(0xe8000, 0x10000, NONE_OFS);
+    register_rom(0xf8000, 0x8000, ITF_OFS);
 }
 
 /* I/O */
@@ -269,9 +303,13 @@ static uint32_t ioport_f6_read(void *opaque, uint32_t addr)
     return (ioport_get_a20() ^ 1) | 0x5e;
 }
 
+static void ioport_43b_write(void *opaque, uint32_t addr, uint32_t data)
+{
+}
+
 static uint32_t ioport_43b_read(void *opaque, uint32_t addr)
 {
-#ifdef PC98_USE_16MB_AREA
+#ifdef PC98_USE_SYSTEM_16MB_REGION
     return 0x00;
 #else
     return 0x04;
@@ -293,7 +331,7 @@ static void ioport_43d_write(void *opaque, uint32_t addr, uint32_t data)
         if (itf_selected) {
             itf_selected = 0;
             if (bios_ram_selected) {
-                if (hd_connect) {
+                if (ide_bios_loaded && hd_connect) {
                     /* IDE BIOS patch */
                     if (hd_connect & 1) {
                         *get_ram_ptr(0x457) = 0x90;
@@ -322,20 +360,44 @@ static void ioport_43d_write(void *opaque, uint32_t addr, uint32_t data)
 
 static void ioport_461_write(void *opaque, uint32_t addr, uint32_t data)
 {
-    if (ram_window_map != (data & 0xfe)) {
-        ram_window_map = data & 0xfe;
-        register_ram(0x80000, 0x20000, ram_window_map * 0x10000);
+    if (ram_window_map1 != (data & 0xfe)) {
+        ram_window_map1 = data & 0xfe;
+        if (ram_window_map1 == 0x0a) {
+            register_io_memory(0x80000, 0x08000, tvram_io_memory);
+            register_io_memory(0x88000, 0x18000, vram_io_memory);
+        } else if (ram_window_map1 == 0x0e) {
+            register_io_memory(0x80000, 0x08000, vram_e0000_io_memory);
+            register_ram(0x88000, 0x18000, 0xe8000);
+        } else {
+            register_ram(0x80000, 0x20000, ram_window_map1 * 0x10000);
+        }
     }
 }
 
 static uint32_t ioport_461_read(void *opaque, uint32_t addr)
 {
-    return ram_window_map;
+    return ram_window_map1;
+}
+
+static void ioport_463_write(void *opaque, uint32_t addr, uint32_t data)
+{
+    if (ram_window_map2 != (data & 0xfe)) {
+        ram_window_map2 = data & 0xfe;
+        if (ram_window_map2 == 0x0a) {
+            register_io_memory(0xa0000, 0x08000, tvram_io_memory);
+            register_io_memory(0xa8000, 0x18000, vram_io_memory);
+        } else if (ram_window_map2 == 0x0e) {
+            register_io_memory(0xa0000, 0x08000, vram_e0000_io_memory);
+            register_ram(0xa8000, 0x18000, 0xe8000);
+        } else {
+            register_ram(0xa0000, 0x20000, ram_window_map2 * 0x10000);
+        }
+    }
 }
 
 static uint32_t ioport_463_read(void *opaque, uint32_t addr)
 {
-    return 0x0a;
+    return ram_window_map2;
 }
 
 static uint32_t ioport_534_read(void *opaque, uint32_t addr)
@@ -362,30 +424,27 @@ static void ioport_63c_write(void *opaque, uint32_t addr, uint32_t data)
 {
     switch (data & 0x03) {
     case 1:
-        if (!ide_selected) {
-            ide_selected = 1;
+        if (d8000_bank != D8000_BANK_IDE) {
             register_ide_rom();
         }
-        pci_selected = 0;
         break;
     case 2:
-        if (!pci_selected) {
-            pci_selected = 1;
+        if (d8000_bank != D8000_BANK_PCI) {
             register_pci_rom();
         }
-        ide_selected = 0;
+        break;
+    case 3:
+        if (d8000_bank != D8000_BANK_PnP) {
+//            register_pnp_rom();
+        }
         break;
     }
+    d8000_bank = data & 0x03;
 }
 
 static uint32_t ioport_63c_read(void *opaque, uint32_t addr)
 {
-    if (ide_selected) {
-        return 0x01;
-    } else if (pci_selected) {
-        return 0x02;
-    }
-    return 0x00;
+    return d8000_bank;
 }
 
 static uint32_t ioport_63d_read(void *opaque, uint32_t addr)
@@ -399,7 +458,7 @@ static void ioport_1e8e_write(void *opaque, uint32_t addr, uint32_t data)
     case 0x80:
         if (ide_ram_selected) {
             ide_ram_selected = 0;
-            if (ide_selected) {
+            if (d8000_bank == D8000_BANK_IDE) {
                 register_ide_rom();
             }
         }
@@ -407,7 +466,7 @@ static void ioport_1e8e_write(void *opaque, uint32_t addr, uint32_t data)
     case 0x81:
         if (!ide_ram_selected) {
             ide_ram_selected = 1;
-            if (ide_selected) {
+            if (d8000_bank == D8000_BANK_IDE) {
                 register_ide_rom();
             }
         }
@@ -431,12 +490,12 @@ static uint32_t ioport_9894_read(void *opaque, uint32_t addr)
 
 static void pc98_save(QEMUFile* f, void *opaque)
 {
-    qemu_put_8s(f, &ide_selected);
+    qemu_put_8s(f, &ram_window_map1);
+    qemu_put_8s(f, &ram_window_map2);
+    qemu_put_8s(f, &d8000_bank);
     qemu_put_8s(f, &ide_ram_selected);
-    qemu_put_8s(f, &pci_selected);
     qemu_put_8s(f, &bios_ram_selected);
     qemu_put_8s(f, &itf_selected);
-    qemu_put_8s(f, &ram_window_map);
     qemu_put_buffer(f, (const uint8_t *)mem_bank, sizeof(mem_bank));
 }
 
@@ -444,34 +503,38 @@ static int pc98_load(QEMUFile* f, void *opaque, int version_id)
 {
     uint32_t a;
 
-    qemu_get_8s(f, &ide_selected);
+    qemu_get_8s(f, &ram_window_map1);
+    qemu_get_8s(f, &ram_window_map2);
+    qemu_get_8s(f, &d8000_bank);
     qemu_get_8s(f, &ide_ram_selected);
-    qemu_get_8s(f, &pci_selected);
     qemu_get_8s(f, &bios_ram_selected);
     qemu_get_8s(f, &itf_selected);
-    qemu_get_8s(f, &ram_window_map);
     qemu_get_buffer(f, (uint8_t *)mem_bank, sizeof(mem_bank));
 
     /* restore memory bank */
-    for (a = 0; a < 0x10000; a += BANK_SIZE) {
-        uint16_t bank = mem_bank[a >> BANK_BITS];
-        ram_addr_t mem;
-        if ((a >= 0xa0000 && a < 0xc0000) || (a >= 0xe000 && a < 0xe8000)) {
-            /* vram area */
-            continue;
-        }
-        if (bank & BANK_ROM) {
-            mem = rom_addr[bank & ~BANK_ROM] | IO_MEM_ROM;
-        } else {
-            mem = ram_addr[bank];
-        }
-        cpu_register_physical_memory(a, BANK_SIZE, mem);
-        if (a >= 0xc0000 && a < 0x100000) {
-#ifdef PC98_USE_16MB_AREA
-            cpu_register_physical_memory(0x00f00000 | a, BANK_SIZE, mem);
+    for (a = 0; a < 0x100000; a += BANK_SIZE) {
+        ram_addr_t phys_offset = mem_bank[a >> BANK_BITS];
+        if (phys_offset != -1) {
+            cpu_register_physical_memory(a, BANK_SIZE, phys_offset);
+            if (a >= 0xa0000 && a < 0x100000) {
+#ifdef PC98_USE_SYSTEM_16MB_REGION
+                cpu_register_physical_memory(0x00f00000 | a, BANK_SIZE, phys_offset);
 #endif
-            cpu_register_physical_memory(0xfff00000 | a, BANK_SIZE, mem);
+                cpu_register_physical_memory(0xfff00000 | a, BANK_SIZE, phys_offset);
+            }
         }
+    }
+    if (ram_window_map1 == 0x0a) {
+        register_io_memory(0x80000, 0x08000, tvram_io_memory);
+        register_io_memory(0x88000, 0x18000, vram_io_memory);
+    } else if (ram_window_map1 == 0x0e) {
+        register_io_memory(0x80000, 0x08000, vram_e0000_io_memory);
+    }
+    if (ram_window_map2 == 0x0a) {
+        register_io_memory(0xa0000, 0x08000, tvram_io_memory);
+        register_io_memory(0xa8000, 0x18000, vram_io_memory);
+    } else if (ram_window_map2 == 0x0e) {
+        register_io_memory(0xa0000, 0x08000, vram_e0000_io_memory);
     }
 
     return 0;
@@ -479,24 +542,28 @@ static int pc98_load(QEMUFile* f, void *opaque, int version_id)
 
 static void pc98_reset(void *opaque)
 {
-    if (!(ide_selected && ide_ram_selected)) {
-        ide_selected = 1;
-        ide_ram_selected = 1;
-        pci_selected = 0;
-        register_ide_rom();
-    }
-    if (!itf_selected || bios_ram_selected) {
-       itf_selected = 1;
-        bios_ram_selected = 0;
-        register_itf_rom();
-    }
-    if (ram_window_map != 0x08) {
-        ram_window_map = 0x08;
+    if (ram_window_map1 != 0x08) {
+        ram_window_map1 = 0x08;
         register_ram(0x80000, 0x20000, 0x80000);
     }
+    if (ram_window_map2 != 0x0a) {
+        ram_window_map2 = 0x0a;
+        register_io_memory(0xa0000, 0x08000, tvram_io_memory);
+        register_io_memory(0xa8000, 0x18000, vram_io_memory);
+    }
+    if (!(d8000_bank == D8000_BANK_IDE && ide_ram_selected)) {
+        d8000_bank = D8000_BANK_IDE;
+        ide_ram_selected = 1;
+        register_ide_rom();
+    }
+    if (!itf_selected) {
+        itf_selected = 1;
+        register_itf_rom();
+    }
+    bios_ram_selected = 0;
 }
 
-static int patch_itf(uint8_t buf[], const char msg[])
+static int patch_itf(uint8_t *buf, const char *msg)
 {
     uint8_t op[12] = {
         0xbe, 0x00, 0x00, //     mov si,msg
@@ -516,25 +583,38 @@ static int patch_itf(uint8_t buf[], const char msg[])
                 break;
             }
         }
-        if (i == len && buf[a1 - 1] == 0x41) {
+        if (i == len) {
             op[1] = (a1 - 1) & 0xff;
             op[2] = (a1 - 1) >> 8;
             for (a2 = 0; a2 < 0x8000 - 12; a2++) {
                 op[4] = (a2 + 9) & 0xff;
                 op[5] = (a2 + 9) >> 8;
                 for (i = 0; i < 12; i++) {
-                    if (!(buf[a2 + i] == op[i] || op[i] == 0x00)) {
+                    if (!(op[i] == buf[a2 + i] || op[i] == 0x00)) {
                         break;
                     }
                 }
-                if (i == 12) {
-                    memset(buf + a2, 0x90, 12);
+                if (i == 9 || i == 12) {
+                    memset(buf + a2, 0x90, i);
                     ret = 1;
                 }
             }
         }
     }
     return ret;
+}
+
+static void update_check_sum(uint8_t *buf)
+{
+    uint8_t l = 0, h = 0;
+    int i;
+
+    for (i = 0; i < 0x8000; i += 2) {
+        l += buf[i + 0];
+        h += buf[i + 1];
+    }
+    buf[0x7ffe] -= l;
+    buf[0x7fff] -= h;
 }
 
 /* PC-9821 hardware initialisation */
@@ -546,7 +626,7 @@ static void pc98_init1(ram_addr_t ram_size,
     uint8_t *buf;
     char filename[16], *filepath;
     uint8_t loaded = 0;
-    int i, j;
+    int i;
     uint32_t a;
     PCIBus *pci_bus;
     int piix3_devfn = -1;
@@ -555,8 +635,11 @@ static void pc98_init1(ram_addr_t ram_size,
     qemu_irq *isa_irq;
     qemu_irq *i8259;
     IsaIrqState *isa_irq_state;
+    PITState *pit;
     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
     DriveInfo *fd[MAX_FD];
+
+    i440fx_state = NULL;
 
     /* init CPUs */
     if (cpu_model == NULL) {
@@ -572,86 +655,25 @@ static void pc98_init1(ram_addr_t ram_size,
         env = pc_new_cpu(cpu_model_opt);
     }
 
-    /* init memory */
-    for (i = 0; i < 2048; i++) {
-        ram_addr[i] = qemu_ram_alloc(BANK_SIZE);
+    /* allocate RAM */
+    if (ram_size < 0x1000000) {
+        ram_size = 0x1000000; /* >= 16MB */
     }
-    for (i = 0; i < 33; i++) {
-        rom_addr[i] = qemu_ram_alloc(BANK_SIZE);
-    }
-    for (i = 0; i < 128; i++) {
+    ram_size &= ~0x7fffff; /* 8MB * num */
+
+    for (i = 0; i < (0x100000 >> BANK_BITS); i++) {
         mem_bank[i] = -1;
     }
+    for (a = 0; a < 0xa0000; a += BANK_SIZE) {
+        ram_addr[a >> BANK_BITS] = qemu_ram_alloc(BANK_SIZE);
+    }
+    qemu_ram_alloc(0x100000 - 0xa0000); /* for PAM and SMRAM */
+    for (a = 0xa0000; a < 0x1000000; a += BANK_SIZE) {
+        ram_addr[a >> BANK_BITS] = qemu_ram_alloc(BANK_SIZE);
+    }
 
-    buf = qemu_malloc(0x42000);
-    memset(buf, 0xff, 0x42000);
-    filepath = qemu_find_file(QEMU_FILE_TYPE_BIOS, IDE_FILE_NAME);
-    if (filepath) {
-        if (load_image(filepath, buf + IDE_BANK_OFS) == IDE_FILE_SIZE) {
-            loaded |= (1 << IDE_BANK);
-        }
-        qemu_free(filepath);
-    }
-    filepath = qemu_find_file(QEMU_FILE_TYPE_BIOS, ITF_FILE_NAME);
-    if (filepath) {
-        if (load_image(filepath, buf + ITF_BANK_OFS) == ITF_FILE_SIZE) {
-            loaded |= (1 << ITF_BANK);
-        }
-        qemu_free(filepath);
-    }
-    filepath = qemu_find_file(QEMU_FILE_TYPE_BIOS, BIOS_FILE_NAME);
-    if (filepath) {
-        if (load_image(filepath, buf + BIOS_BANK_OFS) == BIOS_FILE_SIZE) {
-            loaded |= (7 << BIOS_BANK);
-        }
-        qemu_free(filepath);
-    }
-    for (i = 0; i < 8; i++) {
-        sprintf(filename, BANK_FILE_NAME, i);
-        filepath = qemu_find_file(QEMU_FILE_TYPE_BIOS, filename);
-        if (filepath) {
-            if (load_image(filepath, buf + 0x8000 * i) == BANK_FILE_SIZE) {
-                loaded |= (1 << i);
-            }
-            qemu_free(filepath);
-        }
-    }
-    if ((loaded & REQUIRED_BANK) == REQUIRED_BANK) {
-        /* ITF: ignore TIMER INTERRUPT ERROR */
-        uint8_t *itf = buf + ITF_BANK_OFS;
-        int patched = 0;
-        patched |= patch_itf(itf, "TIMER INTERRUPT ERROR");
-        if (patched) {
-            uint8_t l = 0, h = 0;
-            for (j = 0; j < 0x8000; j += 2) {
-                l += itf[j + 0];
-                h += itf[j + 1];
-            }
-            itf[0x7ffe] -= l;
-            itf[0x7fff] -= h;
-        }
-        /* copy to rom_addr */
-        for (i = 0; i < 33; i++) {
-            memcpy(qemu_get_ram_ptr(rom_addr[i]), buf + BANK_SIZE * i, BANK_SIZE);
-        }
-    } else {
-        fprintf(stderr, "qemu: could not load PC-9821 BIOS\n");
-        exit(1);
-    }
-    qemu_free(buf);
-
-    /* 0x0a0000 - 0x09ffff : ram */
     register_ram(0, 0xa0000, 0);
-    /* 0x0a0000 - 0x0bffff : vram */
-    /* 0x0c0000 - 0x0d7fff : none */
-    register_rom(0xc0000, 0x18000, NONE_BANK_OFS);
-    /* 0x0d8000 - 0x0dffff : ide/pci bios */
-    register_ide_rom();
-    /* 0x0e0000 - 0x0e7fff : vram */
-    /* 0x0e8000 - 0x0fffff : itf/bios */
-    register_itf_rom();
-    /* 0x100000-           : ram */
-#ifdef PC98_USE_16MB_AREA
+#ifdef PC98_USE_SYSTEM_16MB_REGION
     for (a = 0x100000; a < 0x0f00000; a += BANK_SIZE) {
 #else
     for (a = 0x100000; a < 0x1000000; a += BANK_SIZE) {
@@ -659,35 +681,113 @@ static void pc98_init1(ram_addr_t ram_size,
         cpu_register_physical_memory(a, BANK_SIZE, ram_addr[a >> BANK_BITS]);
     }
     if (ram_size > 0x1000000) {
-        ram_addr_t mem = qemu_ram_alloc(ram_size - 0x1000000);
-        cpu_register_physical_memory(0x1000000, ram_size - 0x1000000, mem);
+        ram_addr_t ram_addr = qemu_ram_alloc(ram_size - 0x1000000);
+        cpu_register_physical_memory(0x1000000, ram_size - 0x1000000, ram_addr);
     }
 
-    cpu_irq = qemu_allocate_irqs(pic_irq_request, NULL, 1);
-    i8259 = pc98_i8259_init(cpu_irq[0]);
-    isa_irq_state = qemu_mallocz(sizeof(*isa_irq_state));
-    isa_irq_state->i8259 = i8259;
-    isa_irq = qemu_allocate_irqs(isa_irq_handler, isa_irq_state, 24);
+    /* BIOS load */
+    for (a = 0; a < TOTAL_ROM_SIZE; a += BANK_SIZE) {
+        rom_addr[a >> BANK_BITS] = qemu_ram_alloc(BANK_SIZE);
+    }
+    buf = qemu_malloc(TOTAL_ROM_SIZE);
+    memset(buf, 0xff, TOTAL_ROM_SIZE);
 
-    if (pci_enabled) {
-        pci_bus = pc98_i440fx_init(&i440fx_state, &piix3_devfn, isa_irq);
+    filepath = qemu_find_file(QEMU_FILE_TYPE_BIOS, IDE_FILE_NAME);
+    if (filepath) {
+        if (load_image(filepath, buf + IDE_BIOS_OFS) == IDE_FILE_SIZE) {
+            loaded |= (1 << IDE_ROM_BANK);
+        }
+        qemu_free(filepath);
+    }
+    filepath = qemu_find_file(QEMU_FILE_TYPE_BIOS, ITF_FILE_NAME);
+    if (filepath) {
+        if (load_image(filepath, buf + ITF_OFS) == ITF_FILE_SIZE) {
+            loaded |= (1 << ITF_ROM_BANK);
+        }
+        qemu_free(filepath);
+    }
+    filepath = qemu_find_file(QEMU_FILE_TYPE_BIOS, BIOS_FILE_NAME);
+    if (filepath) {
+        if (load_image(filepath, buf + BIOS_OFS) == BIOS_FILE_SIZE) {
+            loaded |= (7 << BIOS_ROM_BANK);
+        }
+        qemu_free(filepath);
+    }
+/*
+    filepath = qemu_find_file(QEMU_FILE_TYPE_BIOS, SOUND_FILE_NAME);
+    if (filepath) {
+        load_image(filepath, buf + SOUND_BIOS_OFS);
+        qemu_free(filepath);
+    }
+    filepath = qemu_find_file(QEMU_FILE_TYPE_BIOS, SCSI_FILE_NAME);
+    if (filepath) {
+        load_image(filepath, buf + SCSI_BIOS_OFS);
+        qemu_free(filepath);
+    }
+*/
+    for (i = 0; i < ROM_BANK_NUM; i++) {
+        sprintf(filename, BANK_FILE_NAME, i);
+        filepath = qemu_find_file(QEMU_FILE_TYPE_BIOS, filename);
+        if (filepath) {
+            if (load_image(filepath, buf + BANK_FILE_SIZE * i) == BANK_FILE_SIZE) {
+                loaded |= (1 << i);
+            }
+            qemu_free(filepath);
+        }
+    }
+    if ((loaded & REQUIRED_ROM_BANK) == REQUIRED_ROM_BANK) {
+        /* ITF: disable hardware check */
+        static const char msg[][32] = {
+            "TIMER INTERRUPT ERROR", "SIMM SETTING ERROR",
+            "CACHE RAM ERROR", "CACHE ERROR",
+            "2ND CACHE RAM ERROR", "2ND CACHE ERROR",
+            "MEMORY SWITCH ERROR", "SET THE SOFTWARE DIP-SWITCH",
+            "PROCESSOR UPDATE ERROR",
+            /* end of array */
+            "",
+        };
+        int patched = 0;
+        for (i = 0; msg[i][0] != '\0'; i++) {
+            patched |= patch_itf(buf + ITF_OFS, msg[i]);
+        }
+        if (patched) {
+            update_check_sum(buf + ITF_OFS);
+        }
+        /* BIOS: disable PnP BIOS */
+        for (a = 0x8000; a < 0x18000; a += 0x10) {
+            uint8_t *p = buf + BIOS_OFS + a;
+            if (p[0] == 0x24 && p[1] == 'P' && p[2] == 'n' && p[3] == 'P') {
+                p[0] = 'n';
+                p[2] = 0x24;
+                break;
+            }
+        }
+        /* copy to rom_addr */
+        for (a = 0; a < TOTAL_ROM_SIZE; a += BANK_SIZE) {
+            memcpy(qemu_get_ram_ptr(rom_addr[a >> BANK_BITS]), buf + a, BANK_SIZE);
+        }
+        ide_bios_loaded = ((loaded & (1 << IDE_ROM_BANK)) != 0);
     } else {
-        pci_bus = NULL;
-        isa_bus_new(NULL);
+        fprintf(stderr, "qemu: could not load PC-9821 BIOS\n");
+        exit(1);
     }
-    isa_bus_irqs(isa_irq);
+    qemu_free(buf);
 
-    ferr_irq = isa_reserve_irq(8);
+    register_rom(0xc0000, 0x18000, NONE_OFS);
+    register_ide_rom();
+    register_itf_rom();
 
     /* init basic PC-9821 hardware */
     register_ioport_write(0xf2, 1, 1, ioport_f2_write, env);
     register_ioport_read(0xf2, 1, 1, ioport_f2_read, env);
     register_ioport_write(0xf6, 1, 1, ioport_f6_write, env);
     register_ioport_read(0xf6, 1, 1, ioport_f6_read, env);
+    register_ioport_write(0x43b, 1, 1, ioport_43b_write, env);
     register_ioport_read(0x43b, 1, 1, ioport_43b_read, env);
     register_ioport_write(0x43d, 1, 1, ioport_43d_write, env);
     register_ioport_write(0x461, 1, 1, ioport_461_write, env);
     register_ioport_read(0x461, 1, 1, ioport_461_read, env);
+    register_ioport_write(0x463, 1, 1, ioport_463_write, env);
     register_ioport_read(0x463, 1, 1, ioport_463_read, env);
     register_ioport_read(0x534, 1, 1, ioport_534_read, env);
     register_ioport_write(0x53d, 1, 1, ioport_53d_write, env);
@@ -701,6 +801,22 @@ static void pc98_init1(ram_addr_t ram_size,
     qemu_register_reset(pc98_reset, env);
     register_savevm("pc98", 0, 1, pc98_save, pc98_load, env);
 
+    cpu_irq = qemu_allocate_irqs(pic_irq_request, NULL, 1);
+    i8259 = pc98_i8259_init(cpu_irq[0]);
+    isa_irq_state = qemu_mallocz(sizeof(*isa_irq_state));
+    isa_irq_state->i8259 = i8259;
+    isa_irq = qemu_allocate_irqs(isa_irq_handler, isa_irq_state, 24);
+
+    if (pci_enabled) {
+        pci_bus = pc98_i440fx_init(&i440fx_state, &piix3_devfn, isa_irq, ram_size);
+    } else {
+        pci_bus = NULL;
+        isa_bus_new(NULL);
+    }
+    isa_bus_irqs(isa_irq);
+
+    ferr_irq = isa_reserve_irq(8);
+
     if (pci_enabled) {
         isa_irq_state->ioapic = ioapic_init();
     }
@@ -709,15 +825,25 @@ static void pc98_init1(ram_addr_t ram_size,
 #ifdef HAS_AUDIO
     pcspk_audio_init(isa_irq);
 #endif
+    pc98_DMA_init(1);
+
+    pc98_kbd_init(1);
+    pc98_mouse_init(13);
+    pc98_sys_init(15);
+    pc98_vga_init(2);
+
+    tvram_io_memory = cpu_get_physical_page_desc(0xa0000);
+    vram_io_memory = cpu_get_physical_page_desc(0xa8000);
+    vram_e0000_io_memory = cpu_get_physical_page_desc(0xe0000);
 
     for(i = 0; i < nb_nics; i++) {
         NICInfo *nd = &nd_table[i];
 
-//        if (!pci_enabled || (nd->model && strcmp(nd->model, "ne2k_isa") == 0)) {
-            pc98_init_ne2k_isa(nd);
-//        } else {
-//            pci_nic_init(nd, "ne2k_pci", NULL);
-//        }
+        if (!pci_enabled || (nd->model && strcmp(nd->model, "ne2k_isa") == 0)) {
+            pc98_init_ne2k_isa(nd); /* MELCO LGY-98 */
+        } else {
+            pci_nic_init(nd, "ne2k_pci", NULL);
+        }
     }
 
     if (drive_get_max_bus(IF_IDE) >= MAX_IDE_BUS) {
@@ -733,17 +859,10 @@ static void pc98_init1(ram_addr_t ram_size,
     }
     pc98_ide_init(9, hd);
 
-    pc98_DMA_init(1);
-
-    isa_create_simple("pc98-kbd");
-    isa_create_simple("pc98-mouse");
-    isa_create_simple("pc98-sys");
-    isa_create_simple("pc98-vga");
-
     for(i = 0; i < MAX_FD; i++) {
         fd[i] = drive_get(IF_FLOPPY, 0, i);
     }
-    floppy_controller = pc98_fdctrl_init(fd);
+    pc98_fdctrl_init(fd);
 
 //    if (pci_enabled && usb_enabled) {
 //        usb_uhci_piix3_init(pci_bus, piix3_devfn + 2);

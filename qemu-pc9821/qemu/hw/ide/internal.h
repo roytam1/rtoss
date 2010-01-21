@@ -396,7 +396,7 @@ struct IDEState {
 
     /* set for lba48 access */
     uint8_t lba48;
-    uint8_t chs;
+    uint8_t support_chs;
     BlockDriverState *bs;
     /* ATAPI specific */
     uint8_t sense_key;

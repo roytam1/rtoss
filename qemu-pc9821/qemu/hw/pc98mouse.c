@@ -42,7 +42,8 @@ struct mouse_t {
 };
 
 typedef struct mouse_isabus_t {
-    ISADevice busdev;
+    ISADevice dev;
+    uint32_t isairq;
     struct mouse_t state;
 } mouse_isabus_t;
 
@@ -214,11 +215,10 @@ static const VMStateDescription vmstate_mouse = {
     }
 };
 
-static int pc98_mouse_init1(ISADevice *dev)
+static int pc98_mouse_initfn(ISADevice *dev)
 {
-    mouse_isabus_t *isa = DO_UPCAST(mouse_isabus_t, busdev, dev);
+    mouse_isabus_t *isa = DO_UPCAST(mouse_isabus_t, dev, dev);
     mouse_t *s = &isa->state;
-    int isairq = 13;
 
     register_ioport_read(0x7fd9, 1, 1, pio_porta_read, s);
     register_ioport_read(0x7fdb, 1, 1, pio_portb_read, s);
@@ -228,7 +228,7 @@ static int pc98_mouse_init1(ISADevice *dev)
     register_ioport_write(0xbfdb, 1, 1, mouse_freq_write, s);
     register_ioport_read(0xbfdb, 1, 1, mouse_freq_read, s);
 
-    isa_init_irq(&isa->busdev, &s->irq, isairq);
+    isa_init_irq(dev, &s->irq, isa->isairq);
 
     s->mouse_timer = qemu_new_timer(vm_clock, mouse_timer_handler, s);
     qemu_add_mouse_event_handler(mouse_event_handler, s, 0, "pc98-mouse");
@@ -240,10 +240,23 @@ static int pc98_mouse_init1(ISADevice *dev)
     return 0;
 }
 
+void pc98_mouse_init(int irq)
+{
+    ISADevice *dev;
+
+    dev = isa_create("pc98-mouse");
+    qdev_prop_set_uint32(&dev->qdev, "irq", irq);
+    qdev_init_nofail(&dev->qdev);
+}
+
 static ISADeviceInfo pc98_mouse_info = {
-    .init = pc98_mouse_init1,
     .qdev.name  = "pc98-mouse",
     .qdev.size  = sizeof(mouse_isabus_t),
+    .init       = pc98_mouse_initfn,
+    .qdev.props = (Property[]) {
+        DEFINE_PROP_UINT32("irq", mouse_isabus_t, isairq, 13),
+        DEFINE_PROP_END_OF_LIST(),
+    },
 };
 
 static void pc98_mouse_register_devices(void)

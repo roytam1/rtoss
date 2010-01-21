@@ -124,6 +124,8 @@ typedef struct PCII440FXState PCII440FXState;
 PCIBus *i440fx_init(PCII440FXState **pi440fx_state, int *piix_devfn, qemu_irq *pic);
 void i440fx_set_smm(PCII440FXState *d, int val);
 void i440fx_init_memory_mappings(PCII440FXState *d);
+void i440fx_update_isa_page_descs(PCII440FXState *d,
+                                  uint32_t start_addr, uint32_t size);
 
 /* piix4.c */
 extern PCIDevice *piix4_dev;
