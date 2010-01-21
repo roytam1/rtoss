@@ -54,10 +54,16 @@ struct SysPortState {
     uint8_t rtc_irq_mode;
     uint8_t rtc_irq_count;
 
+    uint8_t sys_porta;
+    uint8_t sys_portb;
     uint8_t sys_portc;
     int sys_portc_patch;
+    uint8_t sys_mode;
+
     uint8_t prn_porta;
+    uint8_t prn_portb;
     uint8_t prn_portc;
+    uint8_t prn_mode;
 
     uint8_t sdip[24];
     uint8_t sdip_bank;
@@ -178,16 +184,40 @@ static uint32_t rtc_irq_mode_read(void *opaque, uint32_t addr)
 
 /* system port */
 
+static void sys_porta_write(void *opaque, uint32_t addr, uint32_t value)
+{
+    SysPortState *s = opaque;
+
+    s->sys_porta = value;
+}
+
 static uint32_t sys_porta_read(void *opaque, uint32_t addr)
 {
-    return 0x73;
+    SysPortState *s = opaque;
+
+    if (s->sys_mode & 0x10) {
+        return 0x73;
+    } else {
+        return s->sys_porta;
+    }
+}
+
+static void sys_portb_write(void *opaque, uint32_t addr, uint32_t value)
+{
+    SysPortState *s = opaque;
+
+    s->sys_portb = value;
 }
 
 static uint32_t sys_portb_read(void *opaque, uint32_t addr)
 {
     SysPortState *s = opaque;
 
-    return 0xf8 | (s->rtc_shift_out & 1);
+    if (s->sys_mode & 0x02) {
+        return 0xf8 | (s->rtc_shift_out & 1);
+    } else {
+        return s->sys_porta;
+    }
 }
 
 static void sys_portc_write(void *opaque, uint32_t addr, uint32_t value)
@@ -226,6 +256,8 @@ static void sys_ctrl_write(void *opaque, uint32_t addr, uint32_t value)
             portc &= ~bit;
         }
         sys_portc_write(s, 0, portc);
+    } else {
+        s->sys_mode = value;
     }
 }
 
@@ -252,13 +284,26 @@ static uint32_t prn_porta_read(void *opaque, uint32_t addr)
     return s->prn_porta;
 }
 
+static void prn_portb_write(void *opaque, uint32_t addr, uint32_t value)
+{
+    SysPortState *s = opaque;
+
+    s->prn_portb = value;
+}
+
 static uint32_t prn_portb_read(void *opaque, uint32_t addr)
 {
+    SysPortState *s = opaque;
+
+    if (s->prn_mode & 0x02) {
 #ifdef PC98_SYSCLOCK_5MHZ
-    return 0x94;
+        return 0x94;
 #else
-    return 0xb4;
+        return 0xb4;
 #endif
+    } else {
+        return s->prn_portb;
+    }
 }
 
 static void prn_portc_write(void *opaque, uint32_t addr, uint32_t value)
@@ -289,6 +334,8 @@ static void prn_ctrl_write(void *opaque, uint32_t addr, uint32_t value)
             portc &= ~bit;
         }
         prn_portc_write(s, 0, portc);
+    } else {
+        s->prn_mode = value;
     }
 }
 
@@ -355,10 +402,16 @@ static void pc98_sys_reset(void *opaque)
     s->rtc_cmd = 0;
     s->rtc_irq_mode = 2;
 
+    s->sys_porta = 0x00;
+    s->sys_portb = 0x00;
     s->sys_portc = 0xff;//b8;
     s->sys_portc_patch = 8;
+    s->sys_mode = 0x92;
+
     s->prn_porta = 0xff;
+    s->prn_portb = 0x00;
     s->prn_portc = 0x81;
+    s->prn_mode = 0x82;
 }
 
 static void pc98_sys_save(QEMUFile *f, void *opaque)
@@ -371,9 +424,14 @@ static void pc98_sys_save(QEMUFile *f, void *opaque)
     qemu_put_8s(f, &s->rtc_shift_cmd);
     qemu_put_8s(f, &s->rtc_irq_mode);
     qemu_put_8s(f, &s->rtc_irq_count);
+    qemu_put_8s(f, &s->sys_porta);
+    qemu_put_8s(f, &s->sys_portb);
     qemu_put_8s(f, &s->sys_portc);
+    qemu_put_8s(f, &s->sys_mode);
     qemu_put_8s(f, &s->prn_porta);
+    qemu_put_8s(f, &s->prn_portb);
     qemu_put_8s(f, &s->prn_portc);
+    qemu_put_8s(f, &s->prn_mode);
     qemu_put_buffer(f, s->sdip, 24);
     qemu_put_8s(f, &s->sdip_bank);
 }
@@ -392,9 +450,14 @@ static int pc98_sys_load(QEMUFile *f, void *opaque, int version_id)
     qemu_get_8s(f, &s->rtc_shift_cmd);
     qemu_get_8s(f, &s->rtc_irq_mode);
     qemu_get_8s(f, &s->rtc_irq_count);
+    qemu_get_8s(f, &s->sys_porta);
+    qemu_get_8s(f, &s->sys_portb);
     qemu_get_8s(f, &s->sys_portc);
+    qemu_get_8s(f, &s->sys_mode);
     qemu_get_8s(f, &s->prn_porta);
+    qemu_get_8s(f, &s->prn_portb);
     qemu_get_8s(f, &s->prn_portc);
+    qemu_get_8s(f, &s->prn_mode);
     qemu_get_buffer(f, s->sdip, 24);
     qemu_get_8s(f, &s->sdip_bank);
 
@@ -426,7 +489,9 @@ void *pc98_sys_init(qemu_irq irq)
     register_ioport_write(0x128, 1, 1, rtc_irq_mode_write, s);
     register_ioport_read(0x128, 1, 1, rtc_irq_mode_read, s);
 
+    register_ioport_write(0x31, 1, 1, sys_porta_write, s);
     register_ioport_read(0x31, 1, 1, sys_porta_read, s);
+    register_ioport_write(0x33, 1, 1, sys_portb_write, s);
     register_ioport_read(0x33, 1, 1, sys_portb_read, s);
     register_ioport_write(0x35, 1, 1, sys_portc_write, s);
     register_ioport_read(0x35, 1, 1, sys_portc_read, s);
@@ -434,6 +499,7 @@ void *pc98_sys_init(qemu_irq irq)
 
     register_ioport_write(0x40, 1, 1, prn_porta_write, s);
     register_ioport_read(0x40, 1, 1, prn_porta_read, s);
+    register_ioport_write(0x42, 1, 1, prn_portb_write, s);
     register_ioport_read(0x42, 1, 1, prn_portb_read, s);
     register_ioport_write(0x44, 1, 1, prn_portc_write, s);
     register_ioport_read(0x44, 1, 1, prn_portc_read, s);

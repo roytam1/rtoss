@@ -413,6 +413,17 @@ int pc98_piix3_init(PCIBus *bus)
     PCIDevice *d;
     uint8_t *pci_conf;
 
+    /* devfn of graphics bus bridge must be 0x38 */
+    d = pci_register_device(bus, "PC98GFX", sizeof(PCIDevice), 0x38, NULL, NULL);
+    register_savevm("PC98GFX", 0, 2, piix_save, piix_load, d);
+
+    pci_conf = d->config;
+
+    pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_NEC);
+    pci_config_set_device_id(pci_conf, PCI_DEVICE_ID_NEC_PC98_GRAPHICS);
+    pci_config_set_class(pci_conf, PCI_CLASS_BRIDGE_OTHER);
+    pci_conf[0x0e] = 0x80; // header_type = PCI_multifunction, generic
+
     /* devfn of cbus bridge must be 0x30 */
     d = pci_register_device(bus, "PIIX3", sizeof(PCIDevice), 0x30, NULL, NULL);
     register_savevm("PIIX3", 0, 2, piix_save, piix_load, d);

@@ -176,7 +176,15 @@ void isa_ne2000_init(int base, qemu_irq irq, NICInfo *nd);
     #define PC98_PIT_FREQ 1996800
 #endif
 
-#define PC98_DONT_USE_16MB_MEM
+//#define PC98_DONT_USE_16MB_MEM
+
+//#define PC98_SUPPORT_CIRRUS_VGA
+
+/* cirrus_vga.c */
+void *pc98_cirrus_vga_init(DisplayState *ds);
+void pc98_cirrus_vga_update_display(void *opaque);
+void pc98_cirrus_vga_invalidate_display(void *opaque);
+void pc98_cirrus_vga_invalidate_display_size(void *opaque);
 
 /* i8254.c */
 PITState *pc98_pit_init(qemu_irq irq);
