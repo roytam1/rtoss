@@ -23,10 +23,10 @@
  */
 #include "hw.h"
 #include "pc.h"
+#include "isa.h"
+#include "qdev.h"
 #include "console.h"
 #include "qemu-timer.h"
-#include "isa.h"
-#include "qdev-addr.h"
 
 #define SIO_BUFFER_SIZE 256
 #define SIO_RECV_DELAY 1600
@@ -78,7 +78,7 @@ static const uint8_t kbd_table[128] = {
     0x61, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0xff, 0xff, 0xff, 0xff, 0x33, 0xff, 0xff, 0xff,
+    0xff, 0xff, 0xff, 0x33, 0xff, 0xff, 0xff, 0xff,
     0xff, 0x35, 0xff, 0x51, 0xff, 0x0d, 0xff, 0xff,
 };
 
@@ -105,7 +105,8 @@ struct kbd_t {
 };
 
 typedef struct kbd_isabus_t {
-    ISADevice busdev;
+    ISADevice dev;
+    uint32_t isairq;
     struct kbd_t state;
 } kbd_isabus_t;
 
@@ -346,18 +347,17 @@ static const VMStateDescription vmstate_kbd = {
     }
 };
 
-static int pc98_kbd_init1(ISADevice *dev)
+static int pc98_kbd_initfn(ISADevice *dev)
 {
-    kbd_isabus_t *isa = DO_UPCAST(kbd_isabus_t, busdev, dev);
+    kbd_isabus_t *isa = DO_UPCAST(kbd_isabus_t, dev, dev);
     kbd_t *s = &isa->state;
-    int isairq = 1;
 
     register_ioport_write(0x41, 1, 1, sio_data_write, s);
     register_ioport_read(0x41, 1, 1, sio_data_read, s);
     register_ioport_write(0x43, 1, 1, sio_cmd_write, s);
     register_ioport_read(0x43, 1, 1, sio_status_read, s);
 
-    isa_init_irq(&isa->busdev, &s->irq, isairq);
+    isa_init_irq(dev, &s->irq, isa->isairq);
 
     s->sio_timer = qemu_new_timer(vm_clock, sio_timer_handler, s);
     qemu_add_kbd_event_handler(kbd_event_handler, s);
@@ -369,10 +369,23 @@ static int pc98_kbd_init1(ISADevice *dev)
     return 0;
 }
 
+void pc98_kbd_init(int irq)
+{
+    ISADevice *dev;
+
+    dev = isa_create("pc98-kbd");
+    qdev_prop_set_uint32(&dev->qdev, "irq", irq);
+    qdev_init_nofail(&dev->qdev);
+}
+
 static ISADeviceInfo pc98_kbd_info = {
-    .init = pc98_kbd_init1,
     .qdev.name  = "pc98-kbd",
     .qdev.size  = sizeof(kbd_isabus_t),
+    .init       = pc98_kbd_initfn,
+    .qdev.props = (Property[]) {
+        DEFINE_PROP_UINT32("irq", kbd_isabus_t, isairq, 1),
+        DEFINE_PROP_END_OF_LIST(),
+    },
 };
 
 static void pc98_kbd_register_devices(void)

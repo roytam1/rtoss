@@ -65,7 +65,8 @@ struct sysport_t {
 };
 
 typedef struct sysport_isabus_t {
-    ISADevice busdev;
+    ISADevice dev;
+    uint32_t isairq;
     struct sysport_t state;
 } sysport_isabus_t;
 
@@ -82,10 +83,9 @@ static void rtc_timer_handler(void *opaque)
                     = 2 : no irq
                     = 3 : 1/16 sec
     */
-    if (s->rtc_irq_mode != 2) {
-        if (++s->rtc_irq_count > s->rtc_irq_mode) {
+    if ((s->rtc_irq_mode & 0x03) != 2) {
+        if (++s->rtc_irq_count > (s->rtc_irq_mode & 0x03)) {
             qemu_set_irq(s->irq, 1);
-            qemu_set_irq(s->irq, 0);
             s->rtc_irq_count = 0;
         }
     }
@@ -163,8 +163,16 @@ static void rtc_irq_mode_write(void *opaque, uint32_t addr, uint32_t value)
 {
     sysport_t *s = opaque;
 
-    s->rtc_irq_mode = value & 0x03;
+    s->rtc_irq_mode = value;
     s->rtc_irq_count = 0;
+}
+
+static uint32_t rtc_irq_mode_read(void *opaque, uint32_t addr)
+{
+    sysport_t *s = opaque;
+
+    qemu_set_irq(s->irq, 0);
+    return s->rtc_irq_mode;
 }
 
 /* system port */
@@ -329,16 +337,16 @@ static const VMStateDescription vmstate_sysport = {
     }
 };
 
-static int pc98_sys_init1(ISADevice *dev)
+static int pc98_sys_initfn(ISADevice *dev)
 {
-    sysport_isabus_t *isa = DO_UPCAST(sysport_isabus_t, busdev, dev);
+    sysport_isabus_t *isa = DO_UPCAST(sysport_isabus_t, dev, dev);
     sysport_t *s = &isa->state;
-    int isairq = 15;
 
     register_ioport_write(0x20, 1, 1, rtc_reg_write, s);
     register_ioport_write(0x22, 1, 1, rtc_mode_write, s);
     register_ioport_read(0x22, 1, 1, rtc_mode_read, s);
     register_ioport_write(0x128, 1, 1, rtc_irq_mode_write, s);
+    register_ioport_read(0x128, 1, 1, rtc_irq_mode_read, s);
 
     register_ioport_read(0x31, 1, 1, sys_porta_read, s);
     register_ioport_read(0x33, 1, 1, sys_portb_read, s);
@@ -356,7 +364,7 @@ static int pc98_sys_init1(ISADevice *dev)
     register_ioport_read(0x5c, 2, 2, tstmp_read, s);
     register_ioport_read(0x5e, 2, 2, tstmp_read, s);
 
-    isa_init_irq(&isa->busdev, &s->irq, isairq);
+    isa_init_irq(dev, &s->irq, isa->isairq);
 
     s->rtc_timer = qemu_new_timer(vm_clock, rtc_timer_handler, s);
     qemu_mod_timer(s->rtc_timer, qemu_get_clock(vm_clock) +
@@ -370,10 +378,23 @@ static int pc98_sys_init1(ISADevice *dev)
     return 0;
 }
 
+void pc98_sys_init(int irq)
+{
+    ISADevice *dev;
+
+    dev = isa_create("pc98-sys");
+    qdev_prop_set_uint32(&dev->qdev, "irq", irq);
+    qdev_init_nofail(&dev->qdev);
+}
+
 static ISADeviceInfo pc98_sys_info = {
-    .init = pc98_sys_init1,
     .qdev.name  = "pc98-sys",
     .qdev.size  = sizeof(sysport_isabus_t),
+    .init       = pc98_sys_initfn,
+    .qdev.props = (Property[]) {
+        DEFINE_PROP_UINT32("irq", sysport_isabus_t, isairq, 15),
+        DEFINE_PROP_END_OF_LIST(),
+    },
 };
 
 static void pc98_sys_register_devices(void)

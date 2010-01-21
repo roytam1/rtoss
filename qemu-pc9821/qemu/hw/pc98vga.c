@@ -37,6 +37,7 @@
 #define VRAM16_SIZE     0x40000
 #define VRAM256_SIZE    0x80000
 #define EMS_SIZE        0x10000
+#define SMRAM_SIZE      0x20000
 
 #define GDC_BUFFERS     1024
 #define GDC_TABLEMAX    0x1000
@@ -53,9 +54,9 @@ typedef struct vga_t vga_t;
 struct gdc_t {
     void *vga;
 
-    /* vram */
-    uint8_t *vram_ptr;
-    uint32_t vram_size;
+    /* vram access */
+    IOPortReadFunc *vram_read;
+    IOPortWriteFunc *vram_write;
 
     /* address */
     uint32_t address[480][80];
@@ -156,6 +157,7 @@ struct vga_t {
     int last_width;
     int last_height;
     uint8_t dirty;
+    uint8_t blink;
     uint32_t palette_chr[8];
     uint32_t palette_gfx[256];
 
@@ -304,30 +306,29 @@ static const int gdc_vectdir[16][4] = {
 static void gdc_draw_pset(void *opaque, int x, int y)
 {
     gdc_t *s = opaque;
+    vga_t *v = s->vga;
+    uint16_t dot = s->pattern & 1;
+    uint32_t addr = y * 80 + (x >> 3) + 0x8000;
+    uint8_t bit = 0x80 >> (x & 7);
+    uint8_t cur = s->vram_read(v, addr);
 
-    if (s->vram_ptr) {
-        uint16_t dot = s->pattern & 1;
-        uint32_t addr = (y * 80 + (x >> 3) + 0x8000) & (s->vram_size - 1);
-        uint8_t bit = 0x80 >> (x & 7);
-        uint8_t cur = s->vram_ptr[addr];
-        s->pattern = (s->pattern >> 1) | (dot << 15);
+    s->pattern = (s->pattern >> 1) | (dot << 15);
 
-        switch (s->mod) {
-        case 0:    /* replace */
-            s->vram_ptr[addr] = (cur & ~bit) | (dot ? bit : 0);
-            break;
-        case 1:    /* complement */
-            s->vram_ptr[addr] = (cur & ~bit) | ((cur ^ (dot ? 0xff : 0)) & bit);
-            break;
-        case 2:    /* reset */
-            s->vram_ptr[addr] &= dot ? ~bit : 0xff;
-            break;
-        case 3:    /* set */
-            s->vram_ptr[addr] |= dot ? bit : 0;
-            break;
-        }
-        s->dirty |= GDC_DIRTY_VRAM;
+    switch (s->mod) {
+    case 0: /* replace */
+        s->vram_write(v, addr, (cur & ~bit) | (dot ? bit : 0));
+        break;
+    case 1: /* complement */
+        s->vram_write(v, addr, (cur & ~bit) | ((cur ^ (dot ? 0xff : 0)) & bit));
+        break;
+    case 2: /* reset */
+        s->vram_write(v, addr, cur & (dot ? ~bit : 0xff));
+        break;
+    case 3: /* set */
+        s->vram_write(v, addr, cur | (dot ? bit : 0));
+        break;
     }
+    s->dirty |= GDC_DIRTY_VRAM;
 }
 
 static void gdc_draw_vectl(void *opaque)
@@ -624,34 +625,31 @@ static void gdc_reset_vect(void *opaque)
 static void gdc_write_sub(void *opaque, uint32_t addr, uint8_t value)
 {
     gdc_t *s = opaque;
+    vga_t *v = s->vga;
 
-    if (s->vram_ptr) {
-        switch (s->mod) {
-        case 0:    /* replace */
-            s->vram_ptr[addr & (s->vram_size - 1)] = value;
-            break;
-        case 1:    /* complement */
-            s->vram_ptr[addr & (s->vram_size - 1)] ^= value;
-            break;
-        case 2:    /* reset */
-            s->vram_ptr[addr & (s->vram_size - 1)] &= ~value;
-            break;
-        case 3:    /* set */
-            s->vram_ptr[addr & (s->vram_size - 1)] |= value;
-            break;
-        }
-        s->dirty |= GDC_DIRTY_VRAM;
+    switch (s->mod) {
+    case 0: /* replace */
+        s->vram_write(v, addr, value);
+        break;
+    case 1: /* complement */
+        s->vram_write(v, addr, s->vram_read(v, addr) ^ value);
+        break;
+    case 2: /* reset */
+        s->vram_write(v, addr, s->vram_read(v, addr) & ~value);
+        break;
+    case 3: /* set */
+        s->vram_write(v, addr, s->vram_read(v, addr) | value);
+        break;
     }
+    s->dirty |= GDC_DIRTY_VRAM;
 }
 
 static uint8_t gdc_read_sub(void *opaque, uint32_t addr)
 {
     gdc_t *s = opaque;
+    vga_t *v = s->vga;
 
-    if (s->vram_ptr) {
-        return s->vram_ptr[addr & (s->vram_size - 1)];
-    }
-    return 0xff;
+    return s->vram_read(v, addr);
 }
 
 static void gdc_fifo_write(void *opaque, uint8_t value)
@@ -925,7 +923,7 @@ static void gdc_cmd_write(void *opaque)
 
     s->mod = s->cmdreg & 3;
     switch (s->cmdreg & 0x18) {
-    case 0x00:    /* low and high */
+    case 0x00: /* low and high */
         if (s->params_count > 1) {
             l = s->params[0] & s->maskl;
             h = s->params[1] & s->maskh;
@@ -938,7 +936,7 @@ static void gdc_cmd_write(void *opaque)
             s->cmdreg = -1;
         }
         break;
-    case 0x10:    /* low byte */
+    case 0x10: /* low byte */
         if (s->params_count > 0) {
             l = s->params[0] & s->maskl;
             for (i = 0; i < s->dc + 1; i++) {
@@ -949,7 +947,7 @@ static void gdc_cmd_write(void *opaque)
             s->cmdreg = -1;
         }
         break;
-    case 0x18:    /* high byte */
+    case 0x18: /* high byte */
         if (s->params_count > 0) {
             h = s->params[0] & s->maskh;
             for (i = 0; i < s->dc + 1; i++) {
@@ -973,26 +971,26 @@ static void gdc_cmd_read(void *opaque)
 
     s->mod = s->cmdreg & 3;
     switch (s->cmdreg & 0x18) {
-    case 0x00:    /* low and high */
+    case 0x00: /* low and high */
         for (i = 0; i < s->dc; i++) {
             gdc_fifo_write(s, gdc_read_sub(s, s->ead * 2 + 0));
             gdc_fifo_write(s, gdc_read_sub(s, s->ead * 2 + 1));
             s->ead += s->diff;
         }
         break;
-    case 0x10:    /* low byte */
+    case 0x10: /* low byte */
         for (i = 0; i < s->dc; i++) {
             gdc_fifo_write(s, gdc_read_sub(s, s->ead * 2 + 0));
             s->ead += s->diff;
         }
         break;
-    case 0x18:    /* high byte */
+    case 0x18: /* high byte */
         for (i = 0; i < s->dc; i++) {
             gdc_fifo_write(s, gdc_read_sub(s, s->ead * 2 + 1));
             s->ead += s->diff;
         }
         break;
-    default:    /* invalid */
+    default: /* invalid */
         break;
     }
     gdc_reset_vect(s);
@@ -1291,14 +1289,6 @@ static uint32_t gdc_data_read(void *opaque, uint32_t addr)
 
 /* interface */
 
-static void gdc_set_vram(void *opaque, uint8_t *vram_ptr, uint32_t vram_size)
-{
-    gdc_t *s = opaque;
-
-    s->vram_ptr = vram_ptr;
-    s->vram_size = vram_size;
-}
-
 static uint32_t *gdc_get_address(void *opaque, int ofs, uint32_t mask)
 {
     gdc_t *s = opaque;
@@ -1379,7 +1369,8 @@ static void gdc_reset(void *opaque)
     gdc_cmd_reset(s);
 }
 
-static void gdc_init(void *opaque, void *vga)
+static void gdc_init(void *opaque, void *vga,
+                     IOPortReadFunc *vram_read, IOPortWriteFunc *vram_write)
 {
     gdc_t *s = opaque;
     int i;
@@ -1388,6 +1379,8 @@ static void gdc_init(void *opaque, void *vga)
         s->rt[i] = (int)((double)(1 << GDC_MULBIT) * (1 - sqrt(1 - pow((0.70710678118654 * i) / GDC_TABLEMAX, 2))));
     }
     s->vga = vga;
+    s->vram_read = vram_read;
+    s->vram_write = vram_write;
 }
 
 /***********************************************************/
@@ -2719,8 +2712,10 @@ static const VMStateDescription vmstate_egc = {
 static void egc_reset(void *opaque)
 {
     egc_t *s = opaque;
+    vga_t *v = s->vga;
 
     memset(s, 0, sizeof(egc_t));
+    s->vga = v;
     s->access = 0xfff0;
     s->fgbg = 0x00ff;
     s->mask.w = 0xffff;
@@ -2780,7 +2775,8 @@ enum {
 };
 
 typedef struct vga_isabus_t {
-    ISADevice busdev;
+    ISADevice dev;
+    uint32_t isairq;
     struct vga_t state;
 } vga_isabus_t;
 
@@ -2789,10 +2785,15 @@ typedef struct vga_isabus_t {
 static void vsync_timer_handler(void *opaque)
 {
     vga_t *s = opaque;
-    
+    uint8_t prev_blink = s->blink++;
 
+    /* blink */
+    if ((prev_blink & 0x20) != (s->blink & 0x20)) {
+        s->dirty |= DIRTY_TVRAM;
+    }
+
+    /* vsync irq */
     if (s->crtv) {
-        /* pulse ??? */
         qemu_set_irq(s->irq, 1);
         qemu_set_irq(s->irq, 0);
         s->crtv = 0;
@@ -3105,50 +3106,62 @@ static uint32_t cgwindow_pattern_read(void *opaque, uint32_t addr)
 
 static uint32_t cgwindow_readb(void *opaque, target_phys_addr_t addr)
 {
-    uint8_t font_line = ((addr >> 1) & 0x1f) | ((addr & 1) ? 0 : 0x20);
-
-    return font_read(opaque, font_line);
+    if (addr < 0x1000) {
+        uint8_t font_line = ((addr >> 1) & 0x1f) | ((addr & 1) ? 0 : 0x20);
+        return font_read(opaque, font_line);
+    } else {
+        return 0xff;
+    }
 }
 
 static uint32_t cgwindow_readw(void *opaque, target_phys_addr_t addr)
 {
-    uint32_t value;
-
-    value = cgwindow_readb(opaque, addr + 0);
-    value |= cgwindow_readb(opaque, addr + 1) << 8;
-    return value;
+    if (addr < 0x1000) {
+        uint16_t value = cgwindow_readb(opaque, addr + 0);
+        value |= cgwindow_readb(opaque, addr + 1) << 8;
+        return value;
+    } else {
+        return 0xffff;
+    }
 }
 
 static uint32_t cgwindow_readl(void *opaque, target_phys_addr_t addr)
 {
-    uint32_t value;
-
-    value = cgwindow_readb(opaque, addr + 0);
-    value |= cgwindow_readb(opaque, addr + 1) << 8;
-    value |= cgwindow_readb(opaque, addr + 2) << 16;
-    value |= cgwindow_readb(opaque, addr + 3) << 24;
-    return value;
+    if (addr < 0x1000) {
+        uint32_t value = cgwindow_readb(opaque, addr + 0);
+        value |= cgwindow_readb(opaque, addr + 1) << 8;
+        value |= cgwindow_readb(opaque, addr + 2) << 16;
+        value |= cgwindow_readb(opaque, addr + 3) << 24;
+        return value;
+    } else {
+        return 0xffffffff;
+    }
 }
 
 static void cgwindow_writeb(void *opaque, target_phys_addr_t addr, uint32_t value)
 {
-    uint8_t font_line = ((addr >> 1) & 0x1f) | ((addr & 1) ? 0 : 0x20);
-
-    font_write(opaque, font_line, value);
+    if (addr < 0x1000) {
+        uint8_t font_line = ((addr >> 1) & 0x1f) | ((addr & 1) ? 0 : 0x20);
+        font_write(opaque, font_line, value);
+    }
 }
 
 static void cgwindow_writew(void *opaque, target_phys_addr_t addr, uint32_t value)
 {
-    cgwindow_writeb(opaque, addr + 0, value & 0xff);
-    cgwindow_writeb(opaque, addr + 1, (value >> 8) & 0xff);
+    if (addr < 0x1000) {
+        cgwindow_writeb(opaque, addr + 0, value & 0xff);
+        cgwindow_writeb(opaque, addr + 1, (value >> 8) & 0xff);
+    }
 }
 
 static void cgwindow_writel(void *opaque, target_phys_addr_t addr, uint32_t value)
 {
-    cgwindow_writeb(opaque, addr + 0, value & 0xff);
-    cgwindow_writeb(opaque, addr + 1, (value >> 8) & 0xff);
-    cgwindow_writeb(opaque, addr + 2, (value >> 16) & 0xff);
-    cgwindow_writeb(opaque, addr + 3, (value >> 24) & 0xff);
+    if (addr < 0x1000) {
+        cgwindow_writeb(opaque, addr + 0, value & 0xff);
+        cgwindow_writeb(opaque, addr + 1, (value >> 8) & 0xff);
+        cgwindow_writeb(opaque, addr + 2, (value >> 16) & 0xff);
+        cgwindow_writeb(opaque, addr + 3, (value >> 24) & 0xff);
+    }
 }
 
 /* memory bank switch */
@@ -3261,11 +3274,11 @@ static void mode_flipflop2_write(void *opaque, uint32_t addr, uint32_t value1)
         s->mode2[num] = value;
         break;
     }
-    if (s->mode2[MODE2_256COLOR] && s->mode2[MODE2_480LINE]) {
-        s->height = 480;
-    } else {
-        s->height = 400;
-    }
+//    if (s->mode2[MODE2_256COLOR] && s->mode2[MODE2_480LINE]) {
+//        s->height = 480;
+//    } else {
+//        s->height = 400;
+//    }
 }
 
 static uint32_t mode_flipflop2_read(void *opaque, uint32_t addr)
@@ -3424,7 +3437,6 @@ static void vram_draw_write(void *opaque, uint32_t addr, uint32_t value)
         s->vram16_draw_e = s->vram16 + 0x18000;
         s->bank_draw = DIRTY_VRAM0;
     }
-    gdc_set_vram(&s->gdc_gfx, s->vram16_draw_b, VRAM16_SIZE >> 1);
     egc_set_vram(&s->egc, s->vram16_draw_b);
 }
 
@@ -3664,35 +3676,49 @@ static uint32_t tvram_readb(void *opaque, target_phys_addr_t addr)
 {
     vga_t *s = opaque;
 
-    return s->tvram[addr];
+    if (addr < 0x4000) {
+        return s->tvram[addr];
+    } else {
+        return cgwindow_readb(s, addr & 0x3fff);
+    }
 }
 
 static uint32_t tvram_readw(void *opaque, target_phys_addr_t addr)
 {
     vga_t *s = opaque;
 
-    return *(uint16_t *)(s->tvram + addr);
+    if (addr < 0x4000) {
+        return *(uint16_t *)(s->tvram + addr);
+    } else {
+        return cgwindow_readw(s, addr & 0x3fff);
+    }
 }
 
 static uint32_t tvram_readl(void *opaque, target_phys_addr_t addr)
 {
     vga_t *s = opaque;
 
-    return *(uint32_t *)(s->tvram + addr);
+    if (addr < 0x4000) {
+        return *(uint32_t *)(s->tvram + addr);
+    } else {
+        return cgwindow_readl(s, addr & 0x3fff);
+    }
 }
 
 static void tvram_writeb(void *opaque, target_phys_addr_t addr, uint32_t value)
 {
     vga_t *s = opaque;
 
-    if (addr >= 0x3fe2) {
+    if (addr < 0x3fe2) {
+        s->tvram[addr] = value;
+        s->dirty |= DIRTY_TVRAM;
+    } else if (addr < 0x4000) {
         /* memory switch */
         if (s->mode1[MODE1_MEMSW]) {
             s->tvram[addr] = value;
         }
     } else {
-        s->tvram[addr] = value;
-        s->dirty |= DIRTY_TVRAM;
+        cgwindow_writeb(s, addr & 0x3fff, value);
     }
 }
 
@@ -3700,14 +3726,16 @@ static void tvram_writew(void *opaque, target_phys_addr_t addr, uint32_t value)
 {
     vga_t *s = opaque;
 
-    if (addr >= 0x3fe2) {
+    if (addr < 0x3fe2) {
+        *(uint16_t *)(s->tvram + addr) = value;
+        s->dirty |= DIRTY_TVRAM;
+    } else if (addr < 0x4000) {
         /* memory switch */
         if (s->mode1[MODE1_MEMSW]) {
             *(uint16_t *)(s->tvram + addr) = value;
         }
     } else {
-        *(uint16_t *)(s->tvram + addr) = value;
-        s->dirty |= DIRTY_TVRAM;
+        cgwindow_writew(s, addr & 0x3fff, value);
     }
 }
 
@@ -3715,14 +3743,16 @@ static void tvram_writel(void *opaque, target_phys_addr_t addr, uint32_t value)
 {
     vga_t *s = opaque;
 
-    if (addr >= 0x3fe2) {
+    if (addr < 0x3fe2) {
+        *(uint32_t *)(s->tvram + addr) = value;
+        s->dirty |= DIRTY_TVRAM;
+    } else if (addr < 0x4000) {
         /* memory switch */
         if (s->mode1[MODE1_MEMSW]) {
             *(uint32_t *)(s->tvram + addr) = value;
         }
     } else {
-        *(uint32_t *)(s->tvram + addr) = value;
-        s->dirty |= DIRTY_TVRAM;
+        cgwindow_writel(s, addr & 0x3fff, value);
     }
 }
 
@@ -3730,15 +3760,15 @@ static uint32_t vram_readb(void *opaque, target_phys_addr_t addr)
 {
     vga_t *s = opaque;
 
-    if (s->mode2[MODE2_256COLOR]) {
+    if (s->ems_selected && addr >= 0x8000 && addr < 0x18000) {
+        return s->ems[addr & 0xffff];
+    } else if (s->mode2[MODE2_256COLOR]) {
         if (addr < 0x8000) {
             return s->vram256_draw_0[addr];
         } else if (addr < 0x10000) {
             return s->vram256_draw_1[addr & 0x7fff];
         }
         return 0xff;
-    } else if (s->ems_selected && addr >= 0x8000 && addr < 0x18000) {
-        return s->ems[addr & 0xffff];
     } else if (s->grcg_mode & 0x80) {
         if (s->mode2[MODE2_EGC]) {
             return egc_mem_readb(s, addr);
@@ -3754,15 +3784,15 @@ static uint32_t vram_readw(void *opaque, target_phys_addr_t addr)
 {
     vga_t *s = opaque;
 
-    if (s->mode2[MODE2_256COLOR]) {
+    if (s->ems_selected && addr >= 0x8000 && addr < 0x18000) {
+        return *(uint16_t *)(s->ems + (addr & 0xffff));
+    } else if (s->mode2[MODE2_256COLOR]) {
         if (addr < 0x8000) {
             return *(uint16_t *)(s->vram256_draw_0 + addr);
         } else if (addr < 0x10000) {
             return *(uint16_t *)(s->vram256_draw_1 + (addr & 0x7fff));
         }
         return 0xffff;
-    } else if (s->ems_selected && addr >= 0x8000 && addr < 0x18000) {
-        return *(uint16_t *)(s->ems + (addr & 0xffff));
     } else if (s->grcg_mode & 0x80) {
         if (s->mode2[MODE2_EGC]) {
             return egc_mem_readw(s, addr);
@@ -3779,15 +3809,15 @@ static uint32_t vram_readl(void *opaque, target_phys_addr_t addr)
     vga_t *s = opaque;
     uint32_t value;
 
-    if (s->mode2[MODE2_256COLOR]) {
+    if (s->ems_selected && addr >= 0x8000 && addr < 0x18000) {
+        return *(uint32_t *)(s->ems + (addr & 0xffff));
+    } else if (s->mode2[MODE2_256COLOR]) {
         if (addr < 0x8000) {
             return *(uint32_t *)(s->vram256_draw_0 + addr);
         } else if (addr < 0x10000) {
             return *(uint32_t *)(s->vram256_draw_1 + (addr & 0x7fff));
         }
         return 0xffffffff;
-    } else if (s->ems_selected && addr >= 0x8000 && addr < 0x18000) {
-        return *(uint32_t *)(s->ems + (addr & 0xffff));
     } else if (s->grcg_mode & 0x80) {
         if (s->mode2[MODE2_EGC]) {
             value = egc_mem_readw(s, addr);
@@ -3807,7 +3837,9 @@ static void vram_writeb(void *opaque, target_phys_addr_t addr, uint32_t value)
 {
     vga_t *s = opaque;
 
-    if (s->mode2[MODE2_256COLOR]) {
+    if (s->ems_selected && addr >= 0x8000 && addr < 0x18000) {
+        s->ems[addr & 0xffff] = value;
+    } else if (s->mode2[MODE2_256COLOR]) {
         if (addr < 0x8000) {
             s->vram256_draw_0[addr] = value;
             s->dirty |= s->bank256_draw_0;
@@ -3815,8 +3847,6 @@ static void vram_writeb(void *opaque, target_phys_addr_t addr, uint32_t value)
             s->vram256_draw_1[addr & 0x7fff] = value;
             s->dirty |= s->bank256_draw_1;
         }
-    } else if (s->ems_selected && addr >= 0x8000 && addr < 0x18000) {
-        s->ems[addr & 0xffff] = value;
     } else if (s->grcg_mode & 0x80) {
         if (s->mode2[MODE2_EGC]) {
             egc_mem_writeb(s, addr, value);
@@ -3834,7 +3864,9 @@ static void vram_writew(void *opaque, target_phys_addr_t addr, uint32_t value)
 {
     vga_t *s = opaque;
 
-    if (s->mode2[MODE2_256COLOR]) {
+    if (s->ems_selected && addr >= 0x8000 && addr < 0x18000) {
+        *(uint16_t *)(s->ems + (addr & 0xffff)) = value;
+    } else if (s->mode2[MODE2_256COLOR]) {
         if (addr < 0x8000) {
             *(uint16_t *)(s->vram256_draw_0 + addr) = value;
             s->dirty |= s->bank256_draw_0;
@@ -3842,8 +3874,6 @@ static void vram_writew(void *opaque, target_phys_addr_t addr, uint32_t value)
             *(uint16_t *)(s->vram256_draw_1 + (addr & 0x7fff)) = value;
             s->dirty |= s->bank256_draw_1;
         }
-    } else if (s->ems_selected && addr >= 0x8000 && addr < 0x18000) {
-        *(uint16_t *)(s->ems + (addr & 0xffff)) = value;
     } else if (s->grcg_mode & 0x80) {
         if (s->mode2[MODE2_EGC]) {
             egc_mem_writew(s, addr, value);
@@ -3861,7 +3891,9 @@ static void vram_writel(void *opaque, target_phys_addr_t addr, uint32_t value)
 {
     vga_t *s = opaque;
 
-    if (s->mode2[MODE2_256COLOR]) {
+    if (s->ems_selected && addr >= 0x8000 && addr < 0x18000) {
+        *(uint32_t *)(s->ems + (addr & 0xffff)) = value;
+    } else if (s->mode2[MODE2_256COLOR]) {
         if (addr < 0x8000) {
             *(uint32_t *)(s->vram256_draw_0 + addr) = value;
             s->dirty |= s->bank256_draw_0;
@@ -3869,8 +3901,6 @@ static void vram_writel(void *opaque, target_phys_addr_t addr, uint32_t value)
             *(uint32_t *)(s->vram256_draw_1 + (addr & 0x7fff)) = value;
             s->dirty |= s->bank256_draw_1;
         }
-    } else if (s->ems_selected && addr >= 0x8000 && addr < 0x18000) {
-        *(uint32_t *)(s->ems + (addr & 0xffff)) = value;
     } else if (s->grcg_mode & 0x80) {
         if (s->mode2[MODE2_EGC]) {
             egc_mem_writew(s, addr, value & 0xffff);
@@ -4049,6 +4079,48 @@ static void vram_f00000_writel(void *opaque, target_phys_addr_t addr, uint32_t v
     }
 }
 
+/* gdc */
+
+static uint32_t gdc_tvram_read(void *opaque, target_phys_addr_t addr1)
+{
+    vga_t *s = opaque;
+    uint32_t addr = addr1 & 0x3fff;
+
+    return s->tvram[addr];
+}
+
+static void gdc_tvram_write(void *opaque, target_phys_addr_t addr1, uint32_t value)
+{
+    vga_t *s = opaque;
+    uint32_t addr = addr1 & 0x3fff;
+
+    if (addr < 0x3fe2) {
+        s->tvram[addr] = value;
+    }
+}
+
+static uint32_t gdc_vram_read(void *opaque, target_phys_addr_t addr1)
+{
+    uint32_t addr = addr1 & 0x1ffff;
+
+    if (addr < 0x18000) {
+        return vram_readb(opaque, addr);
+    } else {
+        return vram_e0000_readb(opaque, addr & 0x7fff);
+    }
+}
+
+static void gdc_vram_write(void *opaque, target_phys_addr_t addr1, uint32_t value)
+{
+    uint32_t addr = addr1 & 0x1ffff;
+
+    if (addr < 0x18000) {
+        return vram_writeb(opaque, addr, value);
+    } else {
+        return vram_e0000_writeb(opaque, addr & 0x7fff, value);
+    }
+}
+
 /* render */
 
 static inline uint32_t rgb_to_pixel(int depth, uint8_t r, uint8_t g, uint8_t b)
@@ -4197,10 +4269,16 @@ static void render_chr_screen(void *opaque)
                 if(yy >= ytop && yy < 480) {
                     uint8_t *dest = s->tvram_buffer + yy * 640 + x;
                     uint8_t pattern = s->font[offset + l];
-                    if (!(attr & 1)) {
+                    if (!(attr & 0x01)) {
                         pattern = 0;
-                    } else if (attr & 4) {
+                    } else if (((attr & 0x02) && (s->blink & 0x20)) || (attr & 0x04)) {
                         pattern = ~pattern;
+                    }
+                    if ((attr & 0x08) && l == 15) {
+                        pattern = 0xff;
+                    }
+                    if (attr & 0x10) {
+                        pattern |= 0x08;
                     }
                     if (s->mode1[MODE1_COLUMN]) {
                         if (pattern & 0x80) dest[ 0] = dest[ 1] = color;
@@ -4295,13 +4373,20 @@ static void update_display(void *opaque)
 {
     vga_t *s = opaque;
 
+    /* resize screen */
+    if (s->mode2[MODE2_256COLOR] && s->mode2[MODE2_480LINE]) {
+        s->height = 480;
+    } else {
+        s->height = 400;
+    }
     if (s->width != s->last_width || s->height != s->last_height) {
-        /* resize screen */
         s->last_width = s->width;
         s->last_height = s->height;
         qemu_console_resize(s->ds, s->width, s->height);
         s->dirty |= DIRTY_DISPLAY;
     }
+
+    /* render screen */
     if (s->mode1[MODE1_DISP]) {
         if (s->dirty & DIRTY_PALETTE) {
             /* update palette */
@@ -4342,9 +4427,10 @@ static void update_display(void *opaque)
             }
         }
     }
+
+    /* update screen */
     if (s->dirty & DIRTY_DISPLAY) {
-        /* update screen */
-        int x, y, ymax = 0;
+        int x, y;
         int depth = ds_get_bits_per_pixel(s->ds);
         int size = ds_get_linesize(s->ds);
         uint8_t *dest1 = ds_get_data(s->ds);
@@ -4367,12 +4453,7 @@ static void update_display(void *opaque)
             } else {
                 src_gfx = s->vram1_buffer;
             }
-            if (s->mode2[MODE2_256COLOR] && s->mode2[MODE2_480LINE]) {
-                ymax = 480;
-            } else {
-                ymax = 400;
-            }
-            for(y = 0; y < ymax; y++) {
+            for(y = 0; y < s->height; y++) {
                 uint8_t *dest = dest1;
                 switch(depth) {
                 case 8:
@@ -4415,11 +4496,12 @@ static void update_display(void *opaque)
                 }
                 dest1 += size;
             }
+        } else {
+            for(y = 0; y < s->height; y++) {
+                memset(dest1, 0, size);
+                dest1 += size;
+            }
         }
-//        for(y = ymax; y < 480; y++) {
-//            memset(dest1, 0, size);
-//            dest1 += size;
-//        }
         dpy_update(s->ds, 0, 0, s->width, s->height);
         s->dirty &= ~DIRTY_DISPLAY;
     }
@@ -4487,7 +4569,6 @@ static int pc98_vga_post_load(void *opaque, int version_id)
     s->vram256_draw_0 = s->vram256 + (s->vram256_bank_0 & 0x0f) * 0x8000;
     s->vram256_draw_1 = s->vram256 + (s->vram256_bank_1 & 0x0f) * 0x8000;
 
-    gdc_set_vram(&s->gdc_gfx, s->vram16_draw_b, VRAM16_SIZE >> 1);
     egc_set_vram(&s->egc, s->vram16_draw_b);
 
     for (i = 0; i < 4; i++) {
@@ -4601,8 +4682,6 @@ static void pc98_vga_reset(void *opaque)
     s->vram256_draw_0 = s->vram256;
     s->vram256_draw_1 = s->vram256;
 
-    gdc_set_vram(&s->gdc_chr, s->tvram, TVRAM_SIZE);
-    gdc_set_vram(&s->gdc_gfx, s->vram16_draw_b, VRAM16_SIZE >> 1);
     egc_set_vram(&s->egc, s->vram16_draw_b);
 
     gdc_reset(&s->gdc_chr);
@@ -4658,6 +4737,7 @@ static void pc98_vga_reset(void *opaque)
 
     /* force redraw */
     s->dirty = 0xff;
+    s->blink = 0;
 }
 
 static void kanji_copy(uint8_t *dst, uint8_t *src, int from, int to)
@@ -4684,75 +4764,53 @@ static CPUReadMemoryFunc *tvram_read[] = {
     &tvram_readw,
     &tvram_readl,
 };
-
 static CPUWriteMemoryFunc *tvram_write[] = {
     &tvram_writeb,
     &tvram_writew,
     &tvram_writel,
 };
-
-static CPUReadMemoryFunc *cgwindow_read[] = {
-    &cgwindow_readb,
-    &cgwindow_readw,
-    &cgwindow_readl,
-};
-
-static CPUWriteMemoryFunc *cgwindow_write[] = {
-    &cgwindow_writeb,
-    &cgwindow_writew,
-    &cgwindow_writel,
-};
-
 static CPUReadMemoryFunc *vram_read[] = {
     &vram_readb,
     &vram_readw,
     &vram_readl,
 };
-
 static CPUWriteMemoryFunc *vram_write[] = {
     &vram_writeb,
     &vram_writew,
     &vram_writel,
 };
-
 static CPUReadMemoryFunc *vram_e0000_read[] = {
     &vram_e0000_readb,
     &vram_e0000_readw,
     &vram_e0000_readl,
 };
-
 static CPUWriteMemoryFunc *vram_e0000_write[] = {
     &vram_e0000_writeb,
     &vram_e0000_writew,
     &vram_e0000_writel,
 };
-
 static CPUReadMemoryFunc *vram_f00000_read[] = {
     &vram_f00000_readb,
     &vram_f00000_readw,
     &vram_f00000_readl,
 };
-
 static CPUWriteMemoryFunc *vram_f00000_write[] = {
     &vram_f00000_writeb,
     &vram_f00000_writew,
     &vram_f00000_writel,
 };
-
 #define FONT_FILE_NAME "pc98font.bin"
 #define FONT_FILE_SIZE 0x46800
 
-static int pc98_vga_init1(ISADevice *dev)
+static int pc98_vga_initfn(ISADevice *dev)
 {
-    vga_isabus_t *isa = DO_UPCAST(vga_isabus_t, busdev, dev);
+    vga_isabus_t *isa = DO_UPCAST(vga_isabus_t, dev, dev);
     vga_t *s = &isa->state;
-    int isairq = 2;
 
     char *filename;
     uint8_t *buf;
     uint8_t *p, *q;
     int tvram_io_memory;
-    int cgwindow_io_memory;
     int vram_io_memory;
     int vram_e0000_io_memory;
     int vram_f00000_io_memory;
@@ -4807,8 +4865,8 @@ static int pc98_vga_init1(ISADevice *dev)
     }
 
     /* gdc */
-    gdc_init(&s->gdc_chr, s);
-    gdc_init(&s->gdc_gfx, s);
+    gdc_init(&s->gdc_chr, s, gdc_tvram_read, gdc_tvram_write);
+    gdc_init(&s->gdc_gfx, s, gdc_vram_read, gdc_vram_write);
     egc_init(&s->egc, s);
 
     /* register */
@@ -4884,43 +4942,31 @@ static int pc98_vga_init1(ISADevice *dev)
     register_ioport_write(0xf0f6, 1, 1, swdip_bank_write, s);
 
     tvram_io_memory = cpu_register_io_memory(tvram_read, tvram_write, s);
-    cgwindow_io_memory = cpu_register_io_memory(cgwindow_read, cgwindow_write, s);
     vram_io_memory = cpu_register_io_memory(vram_read, vram_write, s);
     vram_e0000_io_memory = cpu_register_io_memory(vram_e0000_read, vram_e0000_write, s);
     vram_f00000_io_memory = cpu_register_io_memory(vram_f00000_read, vram_f00000_write, s);
 
-    cpu_register_physical_memory(0x000a0000, 0x04000, tvram_io_memory);
-    qemu_register_coalesced_mmio(0x000a0000, 0x04000);
-    cpu_register_physical_memory(0x000a4000, 0x01000, cgwindow_io_memory);
-    qemu_register_coalesced_mmio(0x000a4000, 0x01000);
-    cpu_register_physical_memory(0x000a8000, 0x18000, vram_io_memory);
-    qemu_register_coalesced_mmio(0x000a8000, 0x18000);
-    cpu_register_physical_memory(0x000e0000, 0x08000, vram_e0000_io_memory);
-    qemu_register_coalesced_mmio(0x000e0000, 0x08000);
-#ifdef PC98_USE_16MB_AREA
-    cpu_register_physical_memory(0x00f00000, 0x80000, vram_f00000_io_memory);
-    qemu_register_coalesced_mmio(0x00f00000, 0x80000);
-    cpu_register_physical_memory(0x00fa0000, 0x04000, tvram_io_memory);
-    qemu_register_coalesced_mmio(0x00fa0000, 0x04000);
-    cpu_register_physical_memory(0x00fa4000, 0x01000, cgwindow_io_memory);
-    qemu_register_coalesced_mmio(0x00fa4000, 0x01000);
-    cpu_register_physical_memory(0x00fa8000, 0x18000, vram_io_memory);
-    qemu_register_coalesced_mmio(0x00fa8000, 0x18000);
-    cpu_register_physical_memory(0x00fe0000, 0x08000, vram_e0000_io_memory);
-    qemu_register_coalesced_mmio(0x00fe0000, 0x08000);
+    cpu_register_physical_memory(isa_mem_base + 0x000a0000, 0x08000, tvram_io_memory);
+    cpu_register_physical_memory(isa_mem_base + 0x000a8000, 0x18000, vram_io_memory);
+    qemu_register_coalesced_mmio(isa_mem_base + 0x000a0000, 0x20000);
+    cpu_register_physical_memory(isa_mem_base + 0x000e0000, 0x08000, vram_e0000_io_memory);
+    qemu_register_coalesced_mmio(isa_mem_base + 0x000e0000, 0x08000);
+#ifdef PC98_USE_SYSTEM_16MB_REGION
+    cpu_register_physical_memory(isa_mem_base + 0x00f00000, 0x80000, vram_f00000_io_memory);
+    cpu_register_physical_memory(isa_mem_base + 0x00fa0000, 0x08000, tvram_io_memory);
+    cpu_register_physical_memory(isa_mem_base + 0x00fa8000, 0x18000, vram_io_memory);
+    qemu_register_coalesced_mmio(isa_mem_base + 0x00fa0000, 0x20000);
+    cpu_register_physical_memory(isa_mem_base + 0x00fe0000, 0x08000, vram_e0000_io_memory);
+    qemu_register_coalesced_mmio(isa_mem_base + 0x00fe0000, 0x08000);
 #endif
-    cpu_register_physical_memory(0xfff00000, 0x80000, vram_f00000_io_memory);
-    qemu_register_coalesced_mmio(0xfff00000, 0x80000);
-    cpu_register_physical_memory(0xfffa0000, 0x04000, tvram_io_memory);
-    qemu_register_coalesced_mmio(0xfffa0000, 0x04000);
-    cpu_register_physical_memory(0xfffa4000, 0x01000, cgwindow_io_memory);
-    qemu_register_coalesced_mmio(0xfffa4000, 0x01000);
-    cpu_register_physical_memory(0xfffa8000, 0x18000, vram_io_memory);
-    qemu_register_coalesced_mmio(0xfffa8000, 0x18000);
-    cpu_register_physical_memory(0xfffe0000, 0x08000, vram_e0000_io_memory);
-    qemu_register_coalesced_mmio(0xfffe0000, 0x08000);
+    cpu_register_physical_memory(isa_mem_base + 0xfff00000, 0x80000, vram_f00000_io_memory);
+    cpu_register_physical_memory(isa_mem_base + 0xfffa0000, 0x08000, tvram_io_memory);
+    cpu_register_physical_memory(isa_mem_base + 0xfffa8000, 0x18000, vram_io_memory);
+    qemu_register_coalesced_mmio(isa_mem_base + 0xfffa0000, 0x20000);
+    cpu_register_physical_memory(isa_mem_base + 0xfffe0000, 0x08000, vram_e0000_io_memory);
+    qemu_register_coalesced_mmio(isa_mem_base + 0xfffe0000, 0x08000);
 
-    isa_init_irq(&isa->busdev, &s->irq, isairq);
+    isa_init_irq(dev, &s->irq, isa->isairq);
 
     s->vsync_timer = qemu_new_timer(vm_clock, vsync_timer_handler, s);
 
@@ -4939,10 +4985,23 @@ static int pc98_vga_init1(ISADevice *dev)
     return 0;
 }
 
+void pc98_vga_init(int irq)
+{
+    ISADevice *dev;
+
+    dev = isa_create("pc98-vga");
+    qdev_prop_set_uint32(&dev->qdev, "irq", irq);
+    qdev_init_nofail(&dev->qdev);
+}
+
 static ISADeviceInfo pc98_vga_info = {
-    .init = pc98_vga_init1,
     .qdev.name  = "pc98-vga",
     .qdev.size  = sizeof(vga_isabus_t),
+    .init       = pc98_vga_initfn,
+    .qdev.props = (Property[]) {
+        DEFINE_PROP_UINT32("irq", vga_isabus_t, isairq, 2),
+        DEFINE_PROP_END_OF_LIST(),
+    },
 };
 
 static void pc98_vga_register_devices(void)

@@ -44,6 +44,9 @@ struct PCII440FXState {
     target_phys_addr_t isa_page_descs[384 / 4];
     uint8_t smm_enabled;
     PIIX3State *piix3;
+    /* NEC PC-9821 */
+    uint8_t drb;
+    uint8_t errsts_no_error;
 };
 
 static void i440fx_addr_writel(void* opaque, uint32_t addr, uint32_t val)
@@ -139,6 +142,19 @@ void i440fx_init_memory_mappings(PCII440FXState *d)
     }
 }
 
+void i440fx_update_isa_page_descs(PCII440FXState *d,
+                                  uint32_t start_addr, uint32_t size)
+{
+    int i = (start_addr - 0xa0000) >> 12;
+    uint32_t addr;
+
+    for (addr = start_addr; addr < start_addr + size; addr += 0x1000, i++) {
+        if (addr >= 0xa0000 && addr < 0x100000) {
+            d->isa_page_descs[i] = cpu_get_physical_page_desc(addr);
+        }
+    }
+}
+
 static void i440fx_write_config(PCIDevice *dev,
                                 uint32_t address, uint32_t val, int len)
 {
@@ -146,8 +162,17 @@ static void i440fx_write_config(PCIDevice *dev,
 
     /* XXX: implement SMRAM.D_LOCK */
     pci_default_write_config(dev, address, val, len);
-    if ((address >= 0x59 && address <= 0x5f) || address == 0x72)
+    if ((address >= 0x59 && address <= 0x5f) || address == 0x72) {
         i440fx_update_memory_mappings(d);
+    } else if (address >= 0x60 && address <= 0x67) {
+        if (d->drb) {
+            d->dev.config[address] = d->drb; /* DRB */
+        }
+    } else if (address == 0x91) {
+        if (d->errsts_no_error) {
+            d->dev.config[address] = 0x00; /* ERRSTS */
+        }
+    }
 }
 
 static int i440fx_load_old(QEMUFile* f, void *opaque, int version_id)
@@ -355,17 +380,33 @@ static int piix3_initfn(PCIDevice *dev)
 
 /* NEC PC-9821 */
 
-PCIBus *pc98_i440fx_init(PCII440FXState **pi440fx_state, int *piix3_devfn, qemu_irq *pic)
+PCIBus *pc98_i440fx_init(PCII440FXState **pi440fx_state,
+                         int *piix3_devfn, qemu_irq *pic, uint32_t ram_size)
 {
-    return i440fx_init_common(pi440fx_state, piix3_devfn, pic, "STAR-ALPHA", 0x30);
+    PCIBus *pci_bus;
+    PCII440FXState *d;
+    int i;
+
+    /* XXX: implement PC-98 graphics bus bridge */
+    pci_bus = i440fx_init_common(pi440fx_state, piix3_devfn, pic,
+                                 "STAR_ALPHA", 0x30);
+    d = *pi440fx_state;
+    d->drb = (uint8_t)(ram_size / 0x800000);
+    for (i = 0; i < 8; i++) {
+        d->dev.config[0x60 + i] = d->drb;
+    }
+    d->errsts_no_error = 1;
+
+    return pci_bus;
 }
 
 static void pc98_piix3_reset(void *opaque)
 {
     static const struct {
-        uint8_t port;
+        int port;
         uint32_t data;
     } params[] = {
+        /* initialized in PC-9821Rv20 ITF */
         { 0x04, 0x3a000107 },
         { 0x40, 0x00ef0010 },
         { 0x44, 0xfffbfffa },
@@ -382,16 +423,13 @@ static void pc98_piix3_reset(void *opaque)
         { 0x70, 0x0000c00c },
         { 0x78, 0x000fd9b2 },
         /* end of params */
-        { 0xff, 0xffffffff },
+        { -1,   0xffffffff },
     };
     PIIX3State *d = opaque;
     uint8_t *pci_conf = d->dev.config;
     int i;
     
-    for (i = 0;; i++) {
-        if (params[i].port == 0xff && params[i].data == 0xffffffff) {
-            break;
-        }
+    for (i = 0; params[i].port != -1; i++) {
         pci_conf[params[i].port + 0] = (params[i].data >>  0) & 0xff;
         pci_conf[params[i].port + 1] = (params[i].data >>  8) & 0xff;
         pci_conf[params[i].port + 2] = (params[i].data >> 16) & 0xff;
@@ -409,8 +447,9 @@ static int pc98_piix3_initfn(PCIDevice *dev)
     isa_bus_new(&d->dev.qdev);
     vmstate_register(0, &vmstate_piix3, d);
 
+    pci_conf = d->dev.config;
     pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_NEC);
-    pci_config_set_device_id(pci_conf, PCI_DEVICE_ID_NEC_CBUS_BRIDGE); // Star Alpha
+    pci_config_set_device_id(pci_conf, PCI_DEVICE_ID_NEC_CBUS_BRIDGE); // STAR ALPHA
     pci_config_set_class(pci_conf, PCI_CLASS_BRIDGE_OTHER);
     pci_conf[PCI_HEADER_TYPE] =
         PCI_HEADER_TYPE_NORMAL | PCI_HEADER_TYPE_MULTI_FUNCTION; // header_type = PCI_multifunction, generic
@@ -435,8 +474,8 @@ static PCIDeviceInfo i440fx_info[] = {
         .qdev.no_user = 1,
         .init         = piix3_initfn,
     },{
-        .qdev.name    = "STAR-ALPHA",
-        .qdev.desc    = "CBUS bridge",
+        .qdev.name    = "STAR_ALPHA",
+        .qdev.desc    = "ISA bridge",
         .qdev.size    = sizeof(PIIX3State),
         .qdev.no_user = 1,
         .init         = pc98_piix3_initfn,
