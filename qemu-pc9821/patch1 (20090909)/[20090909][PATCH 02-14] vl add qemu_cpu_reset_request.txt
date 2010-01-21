@@ -1,0 +1,102 @@
+This patch is to add qemu_cpu_reset_request() function.
+It is like qemu_syste_reset_request(), but it resets only CPUs
+and does not reset other devices.
+
+diff -ur a/sysemu.h b/sysemu.h
+--- a/sysemu.h	Tue Sep  8 21:26:50 2009
++++ b/sysemu.h	Wed Sep  9 21:49:51 2009
+@@ -43,13 +43,16 @@
+ void cpu_disable_ticks(void);
+ 
+ void qemu_system_reset_request(void);
++void qemu_cpu_reset_request(void);
+ void qemu_system_shutdown_request(void);
+ void qemu_system_powerdown_request(void);
+ int qemu_shutdown_requested(void);
+ int qemu_reset_requested(void);
++int qemu_cpu_reset_requested(void);
+ int qemu_powerdown_requested(void);
+ extern qemu_irq qemu_system_powerdown;
+ void qemu_system_reset(void);
++void qemu_cpu_reset(void);
+ 
+ void do_savevm(Monitor *mon, const QDict *qdict);
+ int load_vmstate(Monitor *mon, const char *name);
+diff -ur a/vl.c b/vl.c
+--- a/vl.c	Tue Sep  8 21:26:51 2009
++++ b/vl.c	Wed Sep  9 21:49:43 2009
+@@ -3430,6 +3430,7 @@
+ static TAILQ_HEAD(reset_handlers, QEMUResetEntry) reset_handlers =
+     TAILQ_HEAD_INITIALIZER(reset_handlers);
+ static int reset_requested;
++static int cpu_reset_requested;
+ static int shutdown_requested;
+ static int powerdown_requested;
+ static int debug_requested;
+@@ -3449,6 +3450,13 @@
+     return r;
+ }
+ 
++int qemu_cpu_reset_requested(void)
++{
++    int r = cpu_reset_requested;
++    cpu_reset_requested = 0;
++    return r;
++}
++
+ int qemu_powerdown_requested(void)
+ {
+     int r = powerdown_requested;
+@@ -3512,6 +3520,16 @@
+     }
+ }
+ 
++void qemu_cpu_reset(void)
++{
++    CPUState *env;
++
++    /* reset all cpus */
++    for(env = first_cpu; env != NULL; env = env->next_cpu) {
++        cpu_reset(env);
++    }
++}
++
+ void qemu_system_reset_request(void)
+ {
+     if (no_reboot) {
+@@ -3522,6 +3540,12 @@
+     qemu_notify_event();
+ }
+ 
++void qemu_cpu_reset_request(void)
++{
++    cpu_reset_requested = 1;
++    qemu_notify_event();
++}
++
+ void qemu_system_shutdown_request(void)
+ {
+     shutdown_requested = 1;
+@@ -4285,6 +4309,8 @@
+         return 0;
+     if (reset_requested)
+         return 0;
++    if (cpu_reset_requested)
++        return 0;
+     if (shutdown_requested)
+         return 0;
+     if (debug_requested)
+@@ -4332,6 +4358,11 @@
+         if (qemu_reset_requested()) {
+             pause_all_vcpus();
+             qemu_system_reset();
++            resume_all_vcpus();
++        }
++        if (qemu_cpu_reset_requested()) {
++            pause_all_vcpus();
++            qemu_cpu_reset();
+             resume_all_vcpus();
+         }
+         if (qemu_powerdown_requested()) {
+
+

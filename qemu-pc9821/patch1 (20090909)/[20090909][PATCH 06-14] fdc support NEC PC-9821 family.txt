@@ -1,0 +1,373 @@
+This patch is to add NEC PC-9821 family i/o to fdc.
+
+diff -ur a/hw/fdc.c b/hw/fdc.c
+--- a/hw/fdc.c	Tue Sep  8 21:26:50 2009
++++ b/hw/fdc.c	Wed Sep  9 21:51:23 2009
+@@ -85,6 +85,7 @@
+     /* Drive status */
+     fdrive_type_t drive;
+     uint8_t perpendicular;    /* 2.88 MB access mode    */
++    uint8_t seek_result;
+     /* Position */
+     uint8_t head;
+     uint8_t track;
+@@ -175,6 +176,7 @@
+     drv->head = 0;
+     drv->track = 0;
+     drv->sect = 1;
++    drv->seek_result = 0;
+ }
+ 
+ /* Recognize floppy formats */
+@@ -387,6 +389,7 @@
+ };
+ 
+ enum {
++    FD_SR0_NOTRDY   = 0x08,
+     FD_SR0_EQPMT    = 0x10,
+     FD_SR0_SEEK     = 0x20,
+     FD_SR0_ABNTERM  = 0x40,
+@@ -507,8 +510,10 @@
+     uint8_t pwrd;
+     /* Sun4m quirks? */
+     int sun4m;
++    /* NEC PC-98x1 quirks? */
++    int pc98;
+     /* Floppy drives */
+-    fdrive_t drives[MAX_FD];
++    fdrive_t drives[4];
+     int reset_sensei;
+ };
+ 
+@@ -803,7 +808,7 @@
+     fdctrl->data_len = 0;
+     fdctrl->data_state = 0;
+     fdctrl->data_dir = FD_DIR_WRITE;
+-    for (i = 0; i < MAX_FD; i++)
++    for (i = 0; i < 4; i++)
+         fd_recalibrate(&fdctrl->drives[i]);
+     fdctrl_reset_fifo(fdctrl);
+     if (do_irq) {
+@@ -825,7 +830,6 @@
+         return &fdctrl->drives[0];
+ }
+ 
+-#if MAX_FD == 4
+ static inline fdrive_t *drv2 (fdctrl_t *fdctrl)
+ {
+     if ((fdctrl->tdr & FD_TDR_BOOTSEL) < (2 << 2))
+@@ -841,7 +845,6 @@
+     else
+         return &fdctrl->drives[2];
+ }
+-#endif
+ 
+ static fdrive_t *get_cur_drv (fdctrl_t *fdctrl)
+ {
+@@ -1603,11 +1606,28 @@
+ 
+ static void fdctrl_handle_recalibrate (fdctrl_t *fdctrl, int direction)
+ {
+-    fdrive_t *cur_drv;
++    fdrive_t *cur_drv = NULL;
+ 
+-    SET_CUR_DRV(fdctrl, fdctrl->fifo[1] & FD_DOR_SELMASK);
+-    cur_drv = get_cur_drv(fdctrl);
+-    fd_recalibrate(cur_drv);
++    if (fdctrl->pc98 && (fdctrl->fifo[1] & 3) >= MAX_FD) {
++        switch (fdctrl->fifo[1] & 3) {
++            case 0: cur_drv = drv0(fdctrl); break;
++            case 1: cur_drv = drv1(fdctrl); break;
++            case 2: cur_drv = drv2(fdctrl); break;
++            case 3: cur_drv = drv3(fdctrl); break;
++        }
++        if (cur_drv != NULL) {
++            cur_drv->seek_result = FD_SR0_ABNTERM | FD_SR0_SEEK | FD_SR0_NOTRDY;
++        }
++    } else {
++        SET_CUR_DRV(fdctrl, fdctrl->fifo[1] & FD_DOR_SELMASK);
++        cur_drv = get_cur_drv(fdctrl);
++        fd_recalibrate(cur_drv);
++        if (cur_drv->bs != NULL && bdrv_is_inserted(cur_drv->bs)) {
++            cur_drv->seek_result = 0;
++        } else {
++            cur_drv->seek_result = FD_SR0_ABNTERM | FD_SR0_SEEK | FD_SR0_NOTRDY;
++        }
++    }
+     fdctrl_reset_fifo(fdctrl);
+     /* Raise Interrupt */
+     fdctrl_raise_irq(fdctrl, FD_SR0_SEEK);
+@@ -1615,39 +1635,72 @@
+ 
+ static void fdctrl_handle_sense_interrupt_status (fdctrl_t *fdctrl, int direction)
+ {
+-    fdrive_t *cur_drv = get_cur_drv(fdctrl);
+-
+-    if(fdctrl->reset_sensei > 0) {
+-        fdctrl->fifo[0] =
+-            FD_SR0_RDYCHG + FD_RESET_SENSEI_COUNT - fdctrl->reset_sensei;
+-        fdctrl->reset_sensei--;
++    if (fdctrl->pc98) {
++        int i;
++        for (i = 0; i < 4; i++) {
++            if (fdctrl->drives[i].seek_result) {
++                fdctrl->fifo[0] = fdctrl->drives[i].seek_result | i;
++                fdctrl->fifo[1] = fdctrl->drives[i].track;
++                fdctrl_set_fifo(fdctrl, 2, 0);
++                fdctrl->drives[i].seek_result = 0;
++                break;
++            }
++        }
++        if (i == 4) {
++            fdctrl->fifo[0] = FD_SR0_INVCMD;
++            fdctrl_set_fifo(fdctrl, 1, 0);
++            fdctrl_reset_irq(fdctrl);
++        }
+     } else {
+-        /* XXX: status0 handling is broken for read/write
+-           commands, so we do this hack. It should be suppressed
+-           ASAP */
+-        fdctrl->fifo[0] =
+-            FD_SR0_SEEK | (cur_drv->head << 2) | GET_CUR_DRV(fdctrl);
+-    }
++        fdrive_t *cur_drv = get_cur_drv(fdctrl);
+ 
+-    fdctrl->fifo[1] = cur_drv->track;
+-    fdctrl_set_fifo(fdctrl, 2, 0);
+-    fdctrl_reset_irq(fdctrl);
++        if(fdctrl->reset_sensei > 0) {
++            fdctrl->fifo[0] =
++                FD_SR0_RDYCHG + FD_RESET_SENSEI_COUNT - fdctrl->reset_sensei;
++            fdctrl->reset_sensei--;
++        } else {
++            /* XXX: status0 handling is broken for read/write
++               commands, so we do this hack. It should be suppressed
++               ASAP */
++            fdctrl->fifo[0] =
++                FD_SR0_SEEK | (cur_drv->head << 2) | GET_CUR_DRV(fdctrl);
++        }
++
++        fdctrl->fifo[1] = cur_drv->track;
++        fdctrl_set_fifo(fdctrl, 2, 0);
++        fdctrl_reset_irq(fdctrl);
++    }
+     fdctrl->status0 = FD_SR0_RDYCHG;
+ }
+ 
+ static void fdctrl_handle_seek (fdctrl_t *fdctrl, int direction)
+ {
+-    fdrive_t *cur_drv;
++    fdrive_t *cur_drv = NULL;
+ 
+-    SET_CUR_DRV(fdctrl, fdctrl->fifo[1] & FD_DOR_SELMASK);
+-    cur_drv = get_cur_drv(fdctrl);
+-    fdctrl_reset_fifo(fdctrl);
+-    if (fdctrl->fifo[2] > cur_drv->max_track) {
+-        fdctrl_raise_irq(fdctrl, FD_SR0_ABNTERM | FD_SR0_SEEK);
++    if (fdctrl->pc98 && (fdctrl->fifo[1] & 3) >= MAX_FD) {
++        switch (fdctrl->fifo[1] & 3) {
++            case 0: cur_drv = drv0(fdctrl); break;
++            case 1: cur_drv = drv1(fdctrl); break;
++            case 2: cur_drv = drv2(fdctrl); break;
++            case 3: cur_drv = drv3(fdctrl); break;
++        }
++        if (cur_drv != NULL) {
++            cur_drv->seek_result = FD_SR0_ABNTERM | FD_SR0_SEEK | FD_SR0_NOTRDY;
++        }
++        /* Raise Interrupt */
++        fdctrl_raise_irq(fdctrl, FD_SR0_ABNTERM | FD_SR0_SEEK | FD_SR0_NOTRDY);
+     } else {
+-        cur_drv->track = fdctrl->fifo[2];
++        SET_CUR_DRV(fdctrl, fdctrl->fifo[1] & FD_DOR_SELMASK);
++        cur_drv = get_cur_drv(fdctrl);
++        fdctrl_reset_fifo(fdctrl);
++        if (fdctrl->fifo[2] > cur_drv->max_track) {
++            cur_drv->seek_result = FD_SR0_ABNTERM | FD_SR0_SEEK;
++        } else {
++            cur_drv->track = fdctrl->fifo[2];
++            cur_drv->seek_result = FD_SR0_SEEK;
++        }
+         /* Raise Interrupt */
+-        fdctrl_raise_irq(fdctrl, FD_SR0_SEEK);
++        fdctrl_raise_irq(fdctrl, cur_drv->seek_result);
+     }
+ }
+ 
+@@ -1860,6 +1913,92 @@
+     fdctrl_stop_transfer(fdctrl, 0x00, 0x00, 0x00);
+ }
+ 
++/* NEC PC-98x1 */
++
++/*
++    MEMO: Use fdctrl->pwrd to store access mode flag:
++
++    bit0-3: 1.44MB access mode of drive #0-#3
++    bit5-6: drive select of bit0-3
++    bit7  : 1MB/640KB access mode
++*/
++
++static uint32_t pc98_fdctrl_read_port (void *opaque, uint32_t reg)
++{
++    fdctrl_t *fdctrl = opaque;
++    int bit;
++
++    switch (reg) {
++    case 0x90:
++        return fdctrl_read_main_status(fdctrl);
++    case 0x92:
++        return fdctrl_read_data(fdctrl);
++    case 0x94:
++        return 0x44;
++    case 0xbe:
++        if (fdctrl->pwrd & 0x80) {
++            return 0xff;
++        } else {
++            return 0xfd;
++        }
++    case 0x4be:
++        bit = 1 << ((fdctrl->pwrd >> 5) & 3);
++        if (fdctrl->pwrd & bit) {
++            return 0xff;
++        } else {
++            return 0xfe;
++        }
++    }
++    return 0xff;
++}
++
++static void pc98_fdctrl_write_port (void *opaque, uint32_t reg, uint32_t value)
++{
++    fdctrl_t *fdctrl = opaque;
++
++    switch (reg) {
++    case 0x90:
++        /* read-only */
++        break;
++    case 0x92:
++        fdctrl_write_data(fdctrl, value);
++        break;
++    case 0x94:
++        /* Reset */
++        if (!(value & 0x80)) {
++            if (fdctrl->dor & 0x80) {
++                FLOPPY_DPRINTF("controller enter RESET state\n");
++            }
++        } else {
++            if (!(fdctrl->dor & 0x80)) {
++                FLOPPY_DPRINTF("controller out of RESET state\n");
++                fdctrl_reset(fdctrl, 1);
++                fdctrl->dsr &= ~FD_DSR_PWRDOWN;
++            }
++        }
++        fdctrl->dor = value;
++        break;
++    case 0xbe:
++        if (value & 2) {
++            fdctrl->pwrd |= 0x80;
++        } else {
++            fdctrl->pwrd &= ~0x80;
++        }
++        break;
++    case 0x4be:
++        if (value & 0x10) {
++            int bit = 1 << ((value >> 5) & 3);
++            if (value & 1) {
++                fdctrl->pwrd |= bit;
++            } else {
++                fdctrl->pwrd &= ~bit;
++            }
++        }
++        fdctrl->pwrd = (fdctrl->pwrd & ~0x60) | (value & 0x60);
++        break;
++    }
++}
++
+ /* Init functions */
+ static void fdctrl_connect_drives(fdctrl_t *fdctrl, BlockDriverState **fds)
+ {
+@@ -1933,6 +2072,24 @@
+     return fdctrl;
+ }
+ 
++fdctrl_t *pc98_fdctrl_init(int isairq, int dma_chann,
++                           uint32_t io_base,
++                           BlockDriverState **fds)
++{
++    fdctrl_t *fdctrl;
++    ISADevice *dev;
++
++    dev = isa_create_simple("pc98-fdc", io_base, 0, isairq, -1);
++    fdctrl = &(DO_UPCAST(fdctrl_isabus_t, busdev, dev)->state);
++
++    fdctrl->dma_chann = dma_chann;
++    DMA_register_channel(dma_chann, &fdctrl_transfer_handler, fdctrl);
++
++    fdctrl_connect_drives(fdctrl, fds);
++
++    return fdctrl;
++}
++
+ static int fdctrl_init_common(fdctrl_t *fdctrl)
+ {
+     int i, j;
+@@ -2010,6 +2167,27 @@
+     return fdctrl_init_common(fdctrl);
+ }
+ 
++static const int pc98_io_base[5] = {0x90, 0x92, 0x94, 0xbe, 0x4be};
++
++static int pc98_fdc_init1(ISADevice *dev)
++{
++    fdctrl_isabus_t *isa = DO_UPCAST(fdctrl_isabus_t, busdev, dev);
++    fdctrl_t *fdctrl = &isa->state;
++    int i;
++    uint32_t io_base = pc98_io_base[0];
++
++    for (i = 0; i < 5; i++) {
++        register_ioport_read(isa->busdev.iobase[0] + pc98_io_base[i] - io_base, 1, 1,
++                             &pc98_fdctrl_read_port, fdctrl);
++        register_ioport_write(isa->busdev.iobase[0] + pc98_io_base[i] - io_base, 1, 1,
++                              &pc98_fdctrl_write_port, fdctrl);
++    }
++    isa_init_irq(&isa->busdev, &fdctrl->irq);
++
++    fdctrl->pc98 = 1;
++    return fdctrl_init_common(fdctrl);
++}
++
+ static ISADeviceInfo isa_fdc_info = {
+     .init = isabus_fdc_init1,
+     .qdev.name  = "isa-fdc",
+@@ -2028,11 +2206,18 @@
+     .qdev.size  = sizeof(fdctrl_sysbus_t),
+ };
+ 
++static ISADeviceInfo pc98_fdc_info = {
++    .init = pc98_fdc_init1,
++    .qdev.name  = "pc98-fdc",
++    .qdev.size  = sizeof(fdctrl_isabus_t),
++};
++
+ static void fdc_register_devices(void)
+ {
+     isa_qdev_register(&isa_fdc_info);
+     sysbus_register_withprop(&sysbus_fdc_info);
+     sysbus_register_withprop(&sun4m_fdc_info);
++    isa_qdev_register(&pc98_fdc_info);
+ }
+ 
+ device_init(fdc_register_devices)
+diff -ur a/hw/fdc.h b/hw/fdc.h
+--- a/hw/fdc.h	Tue Sep  8 21:26:50 2009
++++ b/hw/fdc.h	Wed Sep  9 21:51:31 2009
+@@ -11,4 +11,7 @@
+                              BlockDriverState **fds);
+ fdctrl_t *sun4m_fdctrl_init (qemu_irq irq, target_phys_addr_t io_base,
+                              BlockDriverState **fds, qemu_irq *fdc_tc);
++fdctrl_t *pc98_fdctrl_init(int isairq, int dma_chann,
++                           uint32_t io_base,
++                           BlockDriverState **fds);
+ int fdctrl_get_drive_type(fdctrl_t *fdctrl, int drive_num);
+
+

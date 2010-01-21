@@ -1,0 +1,111 @@
+Now ioport read function and write function that have the same address
+must be registered with one opaque.
+But there may be the case that read-only iodevice and write-only one
+are assigned to same address.
+
+This patch is to divide ioport_opaque for read/write functions.
+
+diff -ur a/ioport.c b/ioport.c
+--- a/ioport.c	Tue Sep  8 21:26:50 2009
++++ b/ioport.c	Wed Sep  9 21:50:06 2009
+@@ -47,7 +47,8 @@
+ 
+ /* XXX: use a two level table to limit memory usage */
+ 
+-static void *ioport_opaque[MAX_IOPORTS];
++static void *ioport_read_opaque[MAX_IOPORTS];
++static void *ioport_write_opaque[MAX_IOPORTS];
+ static IOPortReadFunc *ioport_read_table[3][MAX_IOPORTS];
+ static IOPortWriteFunc *ioport_write_table[3][MAX_IOPORTS];
+ 
+@@ -64,7 +65,7 @@
+     IOPortReadFunc *func = ioport_read_table[index][address];
+     if (!func)
+         func = default_func[index];
+-    return func(ioport_opaque[address], address);
++    return func(ioport_read_opaque[address], address);
+ }
+ 
+ static void ioport_write(int index, uint32_t address, uint32_t data)
+@@ -77,7 +78,7 @@
+     IOPortWriteFunc *func = ioport_write_table[index][address];
+     if (!func)
+         func = default_func[index];
+-    func(ioport_opaque[address], address, data);
++    func(ioport_write_opaque[address], address, data);
+ }
+ 
+ static uint32_t default_ioport_readb(void *opaque, uint32_t address)
+@@ -147,9 +148,9 @@
+     }
+     for(i = start; i < start + length; i += size) {
+         ioport_read_table[bsize][i] = func;
+-        if (ioport_opaque[i] != NULL && ioport_opaque[i] != opaque)
++        if (ioport_read_opaque[i] != NULL && ioport_read_opaque[i] != opaque)
+             hw_error("register_ioport_read: invalid opaque");
+-        ioport_opaque[i] = opaque;
++        ioport_read_opaque[i] = opaque;
+     }
+     return 0;
+ }
+@@ -166,14 +167,14 @@
+     }
+     for(i = start; i < start + length; i += size) {
+         ioport_write_table[bsize][i] = func;
+-        if (ioport_opaque[i] != NULL && ioport_opaque[i] != opaque)
++        if (ioport_write_opaque[i] != NULL && ioport_write_opaque[i] != opaque)
+             hw_error("register_ioport_write: invalid opaque");
+-        ioport_opaque[i] = opaque;
++        ioport_write_opaque[i] = opaque;
+     }
+     return 0;
+ }
+ 
+-void isa_unassign_ioport(pio_addr_t start, int length)
++void isa_unassign_ioport_read(pio_addr_t start, int length)
+ {
+     int i;
+ 
+@@ -182,12 +183,27 @@
+         ioport_read_table[1][i] = default_ioport_readw;
+         ioport_read_table[2][i] = default_ioport_readl;
+ 
++        ioport_read_opaque[i] = NULL;
++    }
++}
++
++void isa_unassign_ioport_write(pio_addr_t start, int length)
++{
++    int i;
++
++    for(i = start; i < start + length; i++) {
+         ioport_write_table[0][i] = default_ioport_writeb;
+         ioport_write_table[1][i] = default_ioport_writew;
+         ioport_write_table[2][i] = default_ioport_writel;
+ 
+-        ioport_opaque[i] = NULL;
++        ioport_write_opaque[i] = NULL;
+     }
++}
++
++void isa_unassign_ioport(pio_addr_t start, int length)
++{
++    isa_unassign_ioport_read(start, length);
++    isa_unassign_ioport_write(start, length);
+ }
+ 
+ /***********************************************************/
+diff -ur a/ioport.h b/ioport.h
+--- a/ioport.h	Tue Sep  8 21:26:50 2009
++++ b/ioport.h	Wed Sep  9 21:49:58 2009
+@@ -40,6 +40,8 @@
+                          IOPortReadFunc *func, void *opaque);
+ int register_ioport_write(pio_addr_t start, int length, int size,
+                           IOPortWriteFunc *func, void *opaque);
++void isa_unassign_ioport_read(pio_addr_t start, int length);
++void isa_unassign_ioport_write(pio_addr_t start, int length);
+ void isa_unassign_ioport(pio_addr_t start, int length);
+ 
+ 
+
+
