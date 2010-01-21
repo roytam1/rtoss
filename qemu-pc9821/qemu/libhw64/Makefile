@@ -1,0 +1,45 @@
+# Makefile for qemu target independent devices.
+
+include ../config-host.mak
+include config.mak
+include $(SRC_PATH)/rules.mak
+
+.PHONY: all
+
+VPATH=$(SRC_PATH):$(SRC_PATH)/hw
+
+QEMU_CFLAGS+=-I.. -I$(SRC_PATH)/fpu
+
+obj-y =
+obj-y += loader.o
+obj-y += virtio.o
+obj-y += fw_cfg.o
+obj-y += watchdog.o
+obj-y += nand.o ecc.o
+
+obj-y += m48t59.o escc.o
+
+# PCI watchdog devices
+obj-y += wdt_i6300esb.o
+
+obj-y += msix.o
+
+# PCI network cards
+obj-y += ne2000.o
+
+# SCSI layer
+obj-y += lsi53c895a.o esp.o
+
+obj-y += dma-helpers.o sysbus.o qdev-addr.o isa-bus.o
+
+all: $(HWLIB)
+# Dummy command so that make thinks it has done something
+	@true
+
+$(HWLIB): $(obj-y)
+
+clean:
+	rm -f *.o *.d *.a *~
+
+# Include automatically generated dependency files
+-include $(wildcard *.d */*.d)
