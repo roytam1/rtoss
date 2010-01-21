@@ -111,9 +111,9 @@ static void sio_cmd_write(void *opaque, uint32_t addr, uint32_t value)
 
     switch(s->mode) {
     case SIO_MODE_CLEAR:
-        if(value & 3) {
+        if (value & 3) {
             s->mode = SIO_MODE_ASYNC;
-        } else if(value & 0x80) {
+        } else if (value & 0x80) {
             s->mode = SIO_MODE_SYNC2;	/* 1char */
         } else {
             s->mode = SIO_MODE_SYNC1;	/* 2chars */
@@ -127,11 +127,11 @@ static void sio_cmd_write(void *opaque, uint32_t addr, uint32_t value)
         break;
     case SIO_MODE_ASYNC:
     case SIO_MODE_SYNC:
-        if(value & 0x40) {
+        if (value & 0x40) {
             s->mode = SIO_MODE_CLEAR;
             break;
         }
-        if(value & 0x10) {
+        if (value & 0x10) {
             s->status &= ~(SIO_STAT_PE | SIO_STAT_OE | SIO_STAT_FE);
         }
         s->rxen = value & 4;

@@ -298,6 +298,9 @@ static void ioport_43d_write(void *opaque, uint32_t addr, uint32_t data)
                 buf[0x401] = 0x70;
 #endif
                 *(uint16_t *)(buf + 0x594) = ((s->ram_size - 0x1000000) >> 20);
+                /* printer interface */
+                buf[0x458] &= ~0x06;
+                buf[0x5b3] &= ~0xe0;
                 /* IDE BIOS patch */
                 if (s->ide_bios_loaded && s->hd_connect) {
                     if (s->hd_connect & 1) {
@@ -757,7 +760,7 @@ void pc98_mem_init(ram_addr_t ram_size, uint8_t hd_connect)
     }
     snprintf(filename, sizeof(filename), "%s/%s", bios_dir, BIOS_FILE_NAME);
     if (load_image(filename, buf + BIOS_OFS) == BIOS_FILE_SIZE) {
-        loaded |= (7 << PCI_ROM_BANK);
+        loaded |= (7 << BIOS_ROM_BANK);
     }
     if ((loaded & REQUIRED_ROM_BANK) == REQUIRED_ROM_BANK) {
         /* ITF: disable hardware check */

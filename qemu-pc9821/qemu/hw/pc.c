@@ -27,8 +27,10 @@
 #include "pci.h"
 #include "block.h"
 #include "sysemu.h"
-#include "audiodev.h"
 #include "audio/audio.h"
+#ifdef CONFIG_CS4231A
+#include "audiodev.h"
+#endif
 #include "net.h"
 #include "smbus.h"
 #include "boards.h"
@@ -1236,6 +1238,11 @@ static uint32_t pc98_ioport_9894_read(void *opaque, uint32_t addr)
     return 0x90; /* cpu wait */
 }
 
+static uint32_t pc98_ioport_a460_read(void *opaque, uint32_t addr)
+{
+    return 0x7f; /* Mate-X PCM (CS4231) */
+}
+
 void pc98_cpu_shutdown(void)
 {
     if (pc98_sys_read_shut(pc98_sys)) {
@@ -1274,7 +1281,7 @@ static void pc98_init1(ram_addr_t ram_size,
     BlockDriverState *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
     BlockDriverState *fd[MAX_FD];
 #ifdef HAS_AUDIO
-    AudioState *aud;
+    AudioState *audio;
 #endif
     int i, index;
     uint8_t hd_connect = 0;
@@ -1371,6 +1378,7 @@ static void pc98_init1(ram_addr_t ram_size,
     register_ioport_read(0xf6, 1, 1, pc98_ioport_f6_read, NULL);
     register_ioport_read(0x534, 1, 1, pc98_ioport_534_read, NULL);
     register_ioport_read(0x9894, 1, 1, pc98_ioport_9894_read, NULL);
+    register_ioport_read(0xa460, 1, 1, pc98_ioport_a460_read, NULL);
 
     cpu_irq = qemu_allocate_irqs(pic_irq_request, NULL, 1);
     i8259 = pc98_i8259_init(cpu_irq[0]);
@@ -1411,9 +1419,11 @@ static void pc98_init1(ram_addr_t ram_size,
     pc98_ide_init(hd, i8259[9]);
     pc98_DMA_init(1);
 #ifdef HAS_AUDIO
-    aud = AUD_init();
-    pcspk_audio_init(aud, i8259);
-    pc98_cs4231a_init(aud, i8259, 12, 1);
+    audio = AUD_init();
+    pcspk_audio_init(audio, i8259);
+#ifdef CONFIG_CS4231A
+    pc98_cs4231a_init(audio, i8259, 12, 1);
+#endif
 #endif
     pc98_fdctrl_init(i8259[11], 2, fd);
     pc98_kbd_init(i8259[1]);

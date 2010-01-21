@@ -69,23 +69,21 @@ static void mouse_event_handler(void *opaque,
 
     s->button = buttons_state;
     s->dx += dx;
-    if (s->dx > 16) {
-        s->dx = 16;
-    } else if (s->dx < -16) {
-        s->dx = -16;
+    if (s->dx > 64) {
+        s->dx = 64;
+    } else if (s->dx < -64) {
+        s->dx = -64;
     }
     s->dy += dy;
-    if (s->dy > 16) {
-        s->dy = 16;
-    } else if (s->dy < -16) {
-        s->dy = -16;
+    if (s->dy > 64) {
+        s->dy = 64;
+    } else if (s->dy < -64) {
+        s->dy = -64;
     }
 }
 
 static uint32_t mouse_irq_read(void *opaque, uint32_t addr)
 {
-    MouseState *s = opaque;
-
     return 0x0d;
 }
 
@@ -93,7 +91,7 @@ static void mouse_freq_write(void *opaque, uint32_t addr, uint32_t value)
 {
     MouseState *s = opaque;
 
-    if(!(value & 0xfc)) {
+    if (!(value & 0xfc)) {
         s->freq = value;
     }
 }
@@ -111,7 +109,7 @@ static void pio_porta_write(void *opaque, uint32_t addr, uint32_t value)
 {
     MouseState *s = opaque;
 
-    s->porta = (uint8_t)value;
+    s->porta = value;
 }
 
 static uint32_t pio_porta_read(void *opaque, uint32_t addr)
@@ -165,7 +163,7 @@ static void pio_portb_write(void *opaque, uint32_t addr, uint32_t value)
 {
     MouseState *s = opaque;
 
-    s->portb = (uint8_t)value;
+    s->portb = value;
 }
 
 static uint32_t pio_portb_read(void *opaque, uint32_t addr)
@@ -189,7 +187,7 @@ static void pio_portc_write(void *opaque, uint32_t addr, uint32_t value)
         s->ly = s->dy;
         s->dx = s->dy = 0;
     }
-    s->portc = (uint8_t)value;
+    s->portc = value;
 }
 
 static uint32_t pio_portc_read(void *opaque, uint32_t addr)
@@ -222,7 +220,7 @@ static void pio_ctrl_write(void *opaque, uint32_t addr, uint32_t value)
         }
         pio_portc_write(s, 0, portc);
     } else {
-        s->mode = (uint8_t)value;
+        s->mode = value;
     }
 }
 

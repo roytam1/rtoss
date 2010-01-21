@@ -53,8 +53,8 @@ typedef struct EGCState EGCState;
 struct VGAState;
 typedef struct VGAState VGAState;
 
-typedef uint32_t (VGAReadFunc)(VGAState *s, uint32_t address);
-typedef void (VGAWriteFunc)(VGAState *s, uint32_t address, uint32_t data);
+typedef uint32_t (VGAReadFunc)(VGAState *s, target_phys_addr_t address);
+typedef void (VGAWriteFunc)(VGAState *s, target_phys_addr_t address, uint32_t data);
 
 struct GDCState {
     void *vga;
@@ -223,7 +223,8 @@ struct VGAState {
     void* cirrus_vga;
     uint8_t cirrus_regnum;
     uint8_t cirrus_reg[256];
-    uint8_t prev_vga;
+    uint8_t disp_select;
+    uint8_t prev_select;
 #endif
 
     QEMUTimer *vsync_timer;
@@ -248,9 +249,6 @@ enum {
     MODE2_WRITE_MASK    = 0x03,
     MODE2_256COLOR      = 0x10,
     MODE2_480LINE       = 0x34,
-#ifdef PC98_SUPPORT_CIRRUS_VGA
-    MODE2_CIRRUS        = 0x47,
-#endif
 };
 
 enum {
@@ -450,23 +448,23 @@ static void gdc_draw_vectt(GDCState *s)
                (draw & 0x8000 ? 0x0002 : 0) | (draw & 0x8000 ? 0x0001 : 0);
     }
     s->pattern = 0xffff;
-    while(muly--) {
+    while (muly--) {
         int cx = s->dx;
         int cy = s->dy;
         int xrem = s->d;
-        while(xrem--) {
+        while (xrem--) {
             int mulx = s->zw + 1;
             if (draw & 1) {
                 draw >>= 1;
                 draw |= 0x8000;
-                while(mulx--) {
+                while (mulx--) {
                     gdc_draw_pset(s, cx, cy);
                     cx += vx1;
                     cy += vy1;
                 }
             } else {
                 draw >>= 1;
-                while(mulx--) {
+                while (mulx--) {
                     cx += vx1;
                     cy += vy1;
                 }
@@ -594,18 +592,18 @@ static void gdc_draw_text(GDCState *s)
     int sy = s->dc + 1;
     int index = 15;
 
-    while(sy--) {
+    while (sy--) {
         int muly = s->zw + 1;
-        while(muly--) {
+        while (muly--) {
             int cx = s->dx;
             int cy = s->dy;
             uint8_t bit = s->ra[index];
             int xrem = sx;
-            while(xrem--) {
+            while (xrem--) {
                 s->pattern = (bit & 1) ? 0xffff : 0;
                 bit = (bit >> 1) | ((bit & 1) ? 0x80 : 0);
                 int mulx = s->zw + 1;
-                while(mulx--) {
+                while (mulx--) {
                     gdc_draw_pset(s, cx, cy);
                     cx += vx1;
                     cy += vy1;
@@ -1275,7 +1273,7 @@ static uint32_t *gdc_get_address(GDCState *s, int ofs, uint32_t mask)
         uint32_t ra, sad;
         int len;
 
-        for(i = 0; i < 4; i++) {
+        for (i = 0; i < 4; i++) {
             ra  = s->ra[4 * i + 0];
             ra |= s->ra[4 * i + 1] << 8;
             ra |= s->ra[4 * i + 2] << 16;
@@ -1283,8 +1281,8 @@ static uint32_t *gdc_get_address(GDCState *s, int ofs, uint32_t mask)
             sad = (ra << 1) & mask;
             len = (ra >> 20) & 0x3ff;
 
-            for(y = ytop; y < (ytop + len) && y < 480; y++) {
-                for(x = 0; x < 80; x++) {
+            for (y = ytop; y < (ytop + len) && y < 480; y++) {
+                for (x = 0; x < 80; x++) {
                     s->address[y][x] = sad;
                     sad = (sad + ofs) & mask;
                 }
@@ -1380,7 +1378,7 @@ static void gdc_init(GDCState *s, void *vga,
 {
     int i;
 
-    for(i = 0; i <= GDC_TABLEMAX; i++) {
+    for (i = 0; i <= GDC_TABLEMAX; i++) {
         s->rt[i] = (int)((double)(1 << GDC_MULBIT) * (1 - sqrt(1 - pow((0.70710678118654 * i) / GDC_TABLEMAX, 2))));
     }
     s->vga = vga;
@@ -1915,7 +1913,7 @@ static void egc_shiftinput_decw(EGCState *s)
             s->inptr[12] = (uint8_t)value; \
             egc_shiftinput_byte(s, addr & 1); \
         } \
-    } while(0)
+    } while (0)
 
 #define PC98EGC_OPE_SHIFTW \
     do { \
@@ -1942,7 +1940,7 @@ static void egc_shiftinput_decw(EGCState *s)
                 egc_shiftinput_decw(s); \
             }  \
         } \
-    } while(0)
+    } while (0)
 
 static uint64_t egc_ope_00(EGCState *s, uint8_t ope, uint32_t addr)
 {
@@ -3110,7 +3108,7 @@ static void ems_select_write(void *opaque, uint32_t addr, uint32_t value)
 
     if (value == 0x20) {
         s->ems_selected = 0;
-    } else if(value == 0x22) {
+    } else if (value == 0x22) {
         s->ems_selected = 1;
     }
 }
@@ -3555,10 +3553,8 @@ static uint32_t horiz_freq_read(void *opaque, uint32_t addr)
     return 0;
 }
 
-/* cirrus vga interface */
-
 #ifdef PC98_SUPPORT_CIRRUS_VGA
-static uint32_t cirrus_regnum_readb(void *opaque, uint32_t addr)
+static uint32_t cirrus_regnum_read(void *opaque, uint32_t addr)
 {
     /* ioport 0xfaa */
     VGAState *s = opaque;
@@ -3566,7 +3562,7 @@ static uint32_t cirrus_regnum_readb(void *opaque, uint32_t addr)
     return s->cirrus_regnum;
 }
 
-static void cirrus_regnum_writeb(void *opaque, uint32_t addr, uint32_t value)
+static void cirrus_regnum_write(void *opaque, uint32_t addr, uint32_t value)
 {
     /* ioport 0xfaa */
     VGAState *s = opaque;
@@ -3574,7 +3570,7 @@ static void cirrus_regnum_writeb(void *opaque, uint32_t addr, uint32_t value)
     s->cirrus_regnum = value;
 }
 
-static uint32_t cirrus_reg_readb(void *opaque, uint32_t addr)
+static uint32_t cirrus_reg_read(void *opaque, uint32_t addr)
 {
     /* ioport 0xfab */
     VGAState *s = opaque;
@@ -3586,21 +3582,29 @@ static uint32_t cirrus_reg_readb(void *opaque, uint32_t addr)
     }
 }
 
-static void cirrus_reg_writeb(void *opaque, uint32_t addr, uint32_t value)
+static void cirrus_reg_write(void *opaque, uint32_t addr, uint32_t value)
 {
     /* ioport 0xfab */
     VGAState *s = opaque;
 
     s->cirrus_reg[s->cirrus_regnum] = value;
+    s->disp_select = s->cirrus_reg[3];
 }
 
-static void cirrus_reg_writew(void *opaque, uint32_t addr, uint32_t value)
+static void disp_select_write(void *opaque, uint32_t addr, uint32_t value)
 {
-    /* ioport 0xfaa */
+    /* ioport 0xfac */
     VGAState *s = opaque;
 
-    s->cirrus_regnum = value & 0xff;
-    s->cirrus_reg[s->cirrus_regnum] = value >> 8;
+    s->disp_select = value & 0x03;
+}
+
+static uint32_t disp_select_read(void *opaque, uint32_t addr)
+{
+    /* ioport 0xfac */
+    VGAState *s = opaque;
+
+    return s->disp_select | 0xfc;
 }
 #endif
 
@@ -3844,10 +3848,6 @@ static uint32_t vram_b0000_readb(void *opaque, target_phys_addr_t addr)
 
     if (s->ems_selected) {
         return s->ems[addr];
-#ifdef PC98_SUPPORT_CIRRUS_VGA
-    } else if (s->mode2[MODE2_CIRRUS]) {
-        return pc98_cirrus_vram_readb(s->cirrus_vga, addr);
-#endif
     } else {
         return vram_readb(opaque, addr + 0x8000);
     }
@@ -3859,10 +3859,6 @@ static uint32_t vram_b0000_readw(void *opaque, target_phys_addr_t addr)
 
     if (s->ems_selected) {
         return *(uint16_t *)(s->ems + addr);
-#ifdef PC98_SUPPORT_CIRRUS_VGA
-    } else if (s->mode2[MODE2_CIRRUS]) {
-        return pc98_cirrus_vram_readw(s->cirrus_vga, addr);
-#endif
     } else {
         return vram_readw(opaque, addr + 0x8000);
     }
@@ -3874,10 +3870,6 @@ static uint32_t vram_b0000_readl(void *opaque, target_phys_addr_t addr)
 
     if (s->ems_selected) {
         return *(uint32_t *)(s->ems + addr);
-#ifdef PC98_SUPPORT_CIRRUS_VGA
-    } else if (s->mode2[MODE2_CIRRUS]) {
-        return pc98_cirrus_vram_readl(s->cirrus_vga, addr);
-#endif
     } else {
         return vram_readl(opaque, addr + 0x8000);
     }
@@ -3889,10 +3881,6 @@ static void vram_b0000_writeb(void *opaque, target_phys_addr_t addr, uint32_t va
 
     if (s->ems_selected) {
         s->ems[addr] = value;
-#ifdef PC98_SUPPORT_CIRRUS_VGA
-    } else if (s->mode2[MODE2_CIRRUS]) {
-        pc98_cirrus_vram_writeb(s->cirrus_vga, addr, value);
-#endif
     } else {
         vram_writeb(opaque, addr + 0x8000, value);
     }
@@ -3904,10 +3892,6 @@ static void vram_b0000_writew(void *opaque, target_phys_addr_t addr, uint32_t va
 
     if (s->ems_selected) {
         *(uint16_t *)(s->ems + addr) = value;
-#ifdef PC98_SUPPORT_CIRRUS_VGA
-    } else if (s->mode2[MODE2_CIRRUS]) {
-        pc98_cirrus_vram_writew(s->cirrus_vga, addr, value);
-#endif
     } else {
         vram_writew(opaque, addr + 0x8000, value);
     }
@@ -3919,10 +3903,6 @@ static void vram_b0000_writel(void *opaque, target_phys_addr_t addr, uint32_t va
 
     if (s->ems_selected) {
         *(uint32_t *)(s->ems + addr) = value;
-#ifdef PC98_SUPPORT_CIRRUS_VGA
-    } else if (s->mode2[MODE2_CIRRUS]) {
-        pc98_cirrus_vram_writel(s->cirrus_vga, addr, value);
-#endif
     } else {
         vram_writel(opaque, addr + 0x8000, value);
     }
@@ -4041,11 +4021,6 @@ static uint32_t vram_f00000_readb(void *opaque, target_phys_addr_t addr)
 {
     VGAState *s = opaque;
 
-#ifdef PC98_SUPPORT_CIRRUS_VGA
-    if (s->mode2[MODE2_CIRRUS]) {
-        return pc98_cirrus_vram_readb(s->cirrus_vga, addr);
-    }
-#endif
     if (s->mode2[MODE2_256COLOR]) {
         return s->vram256[addr];
     }
@@ -4056,11 +4031,6 @@ static uint32_t vram_f00000_readw(void *opaque, target_phys_addr_t addr)
 {
     VGAState *s = opaque;
 
-#ifdef PC98_SUPPORT_CIRRUS_VGA
-    if (s->mode2[MODE2_CIRRUS]) {
-        return pc98_cirrus_vram_readw(s->cirrus_vga, addr);
-    }
-#endif
     if (s->mode2[MODE2_256COLOR]) {
         return *(uint16_t *)(s->vram256 + addr);
     }
@@ -4071,11 +4041,6 @@ static uint32_t vram_f00000_readl(void *opaque, target_phys_addr_t addr)
 {
     VGAState *s = opaque;
 
-#ifdef PC98_SUPPORT_CIRRUS_VGA
-    if (s->mode2[MODE2_CIRRUS]) {
-        return pc98_cirrus_vram_readl(s->cirrus_vga, addr);
-    }
-#endif
     if (s->mode2[MODE2_256COLOR]) {
         return *(uint32_t *)(s->vram256 + addr);
     }
@@ -4086,12 +4051,6 @@ static void vram_f00000_writeb(void *opaque, target_phys_addr_t addr, uint32_t v
 {
     VGAState *s = opaque;
 
-#ifdef PC98_SUPPORT_CIRRUS_VGA
-    if (s->mode2[MODE2_CIRRUS]) {
-        pc98_cirrus_vram_writeb(s->cirrus_vga, addr, value);
-        return;
-    }
-#endif
     if (s->mode2[MODE2_256COLOR]) {
         s->vram256[addr] = value;
         if (addr & 0x40000) {
@@ -4106,12 +4065,6 @@ static void vram_f00000_writew(void *opaque, target_phys_addr_t addr, uint32_t v
 {
     VGAState *s = opaque;
 
-#ifdef PC98_SUPPORT_CIRRUS_VGA
-    if (s->mode2[MODE2_CIRRUS]) {
-        pc98_cirrus_vram_writew(s->cirrus_vga, addr, value);
-        return;
-    }
-#endif
     if (s->mode2[MODE2_256COLOR]) {
         *(uint16_t *)(s->vram256 + addr) = value;
         if (addr & 0x40000) {
@@ -4126,12 +4079,6 @@ static void vram_f00000_writel(void *opaque, target_phys_addr_t addr, uint32_t v
 {
     VGAState *s = opaque;
 
-#ifdef PC98_SUPPORT_CIRRUS_VGA
-    if (s->mode2[MODE2_CIRRUS]) {
-        pc98_cirrus_vram_writel(s->cirrus_vga, addr, value);
-        return;
-    }
-#endif
     if (s->mode2[MODE2_256COLOR]) {
         *(uint32_t *)(s->vram256 + addr) = value;
         if (addr & 0x40000) {
@@ -4206,21 +4153,21 @@ static void update_palette(VGAState *s)
     uint8_t r, g, b;
 
     depth = ds_get_bits_per_pixel(s->ds);
-    for(i = 0; i < 8; i++) {
+    for (i = 0; i < 8; i++) {
         r = (i & 2) ? 0xff : 0;
         g = (i & 4) ? 0xff : 0;
         b = (i & 1) ? 0xff : 0;
         s->palette_chr[i] = rgb_to_pixel(depth, r, g, b);
     }
     if (s->mode2[MODE2_256COLOR]) {
-        for(i = 0; i < 256; i++) {
+        for (i = 0; i < 256; i++) {
             r = s->anapal[PALETTE_R][i];
             g = s->anapal[PALETTE_G][i];
             b = s->anapal[PALETTE_B][i];
             s->palette_gfx[i] = rgb_to_pixel(depth, r, g, b);
         }
     } else if (s->mode2[MODE2_16COLOR]) {
-        for(i = 0; i < 16; i++) {
+        for (i = 0; i < 16; i++) {
             r = s->anapal[PALETTE_R][i] << 4;
             g = s->anapal[PALETTE_G][i] << 4;
             b = s->anapal[PALETTE_B][i] << 4;
@@ -4328,9 +4275,9 @@ static void render_chr_screen(VGAState *s)
                 gaiji1st = 0;
             }
             last = offset;
-            for(l = 0; l < cl && l < 16; l++) {
+            for (l = 0; l < cl && l < 16; l++) {
                 int yy = y + l + pl;
-                if(yy >= ytop && yy < 480) {
+                if (yy >= ytop && yy < 480) {
                     uint8_t *dest = s->tvram_buffer + yy * 640 + x;
                     uint8_t pattern = s->font[offset + l];
                     if (!(attr & ATTR_ST)) {
@@ -4383,8 +4330,8 @@ static void render_gfx_screen(VGAState *s)
         int addr = 0;
         if (s->mode2[MODE2_480LINE]) {
             dest = s->vram0_buffer;
-            for(y = 0; y < 480; y++) {
-                for(x = 0; x < 640; x++) {
+            for (y = 0; y < 480; y++) {
+                for (x = 0; x < 640; x++) {
                     *dest++ = s->vram256[addr++];
                 }
                 addr += 128 * 3;
@@ -4395,8 +4342,8 @@ static void render_gfx_screen(VGAState *s)
             } else {
                 dest = s->vram1_buffer;
             }
-            for(y = 0; y < 400; y++) {
-                for(x = 0; x < 640; x++) {
+            for (y = 0; y < 400; y++) {
+                for (x = 0; x < 640; x++) {
                     *dest++ = s->vram256_disp[addr++];
                 }
             }
@@ -4408,8 +4355,8 @@ static void render_gfx_screen(VGAState *s)
         } else {
             dest = s->vram1_buffer;
         }
-        for(y = 0; y < 400; y++) {
-            for(x = 0; x < 640; x += 8) {
+        for (y = 0; y < 400; y++) {
+            for (x = 0; x < 640; x += 8) {
                 b = s->vram16_draw_b[*addr];
                 r = s->vram16_draw_r[*addr];
                 g = s->vram16_draw_g[*addr];
@@ -4441,19 +4388,21 @@ static void update_display(void *opaque)
 
 #ifdef PC98_SUPPORT_CIRRUS_VGA
     /* cirrus vga */
-    if (s->prev_vga != s->mode2[MODE2_CIRRUS]) {
-        s->prev_vga = s->mode2[MODE2_CIRRUS];
-        /* force resize screen */
-        if (s->mode2[MODE2_CIRRUS]) {
-            pc98_cirrus_vga_invalidate_display_size(s->cirrus_vga);
-        } else {
-            s->last_width = -1;
-            s->last_height = -1;
+    if (s->cirrus_vga) {
+        if (s->prev_select != (s->disp_select & 1)) {
+            s->prev_select = s->disp_select & 1;
+            /* force resize screen */
+            if (s->prev_select) {
+                pc98_cirrus_vga_invalidate_display_size(s->cirrus_vga);
+            } else {
+                s->last_width = -1;
+                s->last_height = -1;
+            }
         }
-    }
-    if (s->mode2[MODE2_CIRRUS]) {
-        pc98_cirrus_vga_update_display(s->cirrus_vga);
-        return;
+        if (s->prev_select) {
+            pc98_cirrus_vga_update_display(s->cirrus_vga);
+            return;
+        }
     }
 #endif
 
@@ -4537,11 +4486,11 @@ static void update_display(void *opaque)
             } else {
                 src_gfx = s->vram1_buffer;
             }
-            for(y = 0; y < s->height; y++) {
+            for (y = 0; y < s->height; y++) {
                 uint8_t *dest = dest1;
                 switch(depth) {
                 case 8:
-                    for(x = 0; x < 640; x++) {
+                    for (x = 0; x < 640; x++) {
                         if (*src_chr) {
                             *((uint8_t *)dest) = s->palette_chr[*src_chr & 0x07];
                         } else {
@@ -4554,7 +4503,7 @@ static void update_display(void *opaque)
                     break;
                 case 15:
                 case 16:
-                    for(x = 0; x < 640; x++) {
+                    for (x = 0; x < 640; x++) {
                         if (*src_chr) {
                             *((uint16_t *)dest) = s->palette_chr[*src_chr & 0x07];
                         } else {
@@ -4566,7 +4515,7 @@ static void update_display(void *opaque)
                     }
                     break;
                 case 32:
-                    for(x = 0; x < 640; x++) {
+                    for (x = 0; x < 640; x++) {
                         if (*src_chr) {
                             *((uint32_t *)dest) = s->palette_chr[*src_chr & 0x07];
                         } else {
@@ -4581,7 +4530,7 @@ static void update_display(void *opaque)
                 dest1 += size;
             }
         } else {
-            for(y = 0; y < s->height; y++) {
+            for (y = 0; y < s->height; y++) {
                 memset(dest1, 0, size);
                 dest1 += size;
             }
@@ -4596,7 +4545,7 @@ static void invalidate_display(void *opaque)
     VGAState *s = opaque;
 
 #ifdef PC98_SUPPORT_CIRRUS_VGA
-    if (s->mode2[MODE2_CIRRUS]) {
+    if (s->cirrus_vga && s->prev_select) {
         pc98_cirrus_vga_invalidate_display(s->cirrus_vga);
         return;
     }
@@ -4621,11 +4570,11 @@ static void kanji_copy(uint8_t *dst, uint8_t *src, int from, int to)
     int i, j, k;
     uint8_t *p, *q;
 
-    for(i = from; i < to; i++) {
+    for (i = from; i < to; i++) {
         p = src + 0x1800 + (0x60 * 32 * (i - 1));
         q = dst + 0x20000 + (i << 4);
-        for(j = 0x20; j < 0x80; j++) {
-            for(k = 0; k < 16; k++) {
+        for (j = 0x20; j < 0x80; j++) {
+            for (k = 0; k < 16; k++) {
                 *(q + 0x800) = *(p + 16);
                 *q++ = *p++;
             }
@@ -4644,9 +4593,9 @@ static void font_init(VGAState *s)
 
     p = s->font + 0x81000;
     q = s->font + 0x82000;
-    for(i = 0; i < 256; i++) {
+    for (i = 0; i < 256; i++) {
         q += 8;
-        for(j = 0; j < 4; j++) {
+        for (j = 0; j < 4; j++) {
             uint32_t bit = 0;
             if (i & (1 << j))
                 bit |= 0xf0f0f0f0;
@@ -4658,7 +4607,7 @@ static void font_init(VGAState *s)
             q += 2;
         }
     }
-    for(i = 0; i < 0x80; i++) {
+    for (i = 0; i < 0x80; i++) {
         q = s->font + (i << 12);
         memset(q + 0x000, 0, 0x0560 - 0x000);
         memset(q + 0x580, 0, 0x0d60 - 0x580);
@@ -4671,7 +4620,7 @@ static void font_init(VGAState *s)
         uint8_t *dst = s->font + 0x82000;
         uint8_t *src = buf;
         int cnt = 256;
-        while(cnt--) {
+        while (cnt--) {
             memcpy(dst, src, 8);
             dst += 16;
             src += 8;
@@ -4734,6 +4683,7 @@ static void pc98_vga_save(QEMUFile *f, void *opaque)
 #ifdef PC98_SUPPORT_CIRRUS_VGA
     qemu_put_8s(f, &s->cirrus_regnum);
     qemu_put_buffer(f, s->cirrus_reg, 256);
+    qemu_put_8s(f, &s->disp_select);
 #endif
 };
 
@@ -4787,6 +4737,7 @@ static int pc98_vga_load(QEMUFile *f, void *opaque, int version_id)
 #ifdef PC98_SUPPORT_CIRRUS_VGA
     qemu_get_8s(f, &s->cirrus_regnum);
     qemu_get_buffer(f, s->cirrus_reg, 256);
+    qemu_get_8s(f, &s->disp_select);
 #endif
 
     if (s->bank_draw == DIRTY_VRAM0) {
@@ -4851,7 +4802,7 @@ static int pc98_vga_load(QEMUFile *f, void *opaque, int version_id)
     /* force redraw */
     s->dirty = 0xff;
 #ifdef PC98_SUPPORT_CIRRUS_VGA
-    s->prev_vga = -1;
+    s->prev_select = -1;
 #endif
 
     return 0;
@@ -4921,7 +4872,7 @@ static void pc98_vga_reset(void *opaque)
     s->font_code2 = 0;
     s->font_line = 0;
 
-    for(i = 0; i < 16; i++) {
+    for (i = 0; i < 16; i++) {
         s->tvram[0x3fe0 + (i << 1)] = memsw_default[i];
     }
 
@@ -4939,10 +4890,10 @@ static void pc98_vga_reset(void *opaque)
     s->anapal_select = 0;
 
 #ifdef PC98_SUPPORT_CIRRUS_VGA
-    /* reset cirrus vga */
     s->cirrus_regnum = 0;
     memset(s->cirrus_reg, 0, sizeof(s->cirrus_reg));
-    s->prev_vga = -1;
+    s->disp_select = 0;
+    s->prev_select = -1;
 #endif
 
     /* force redraw */
@@ -5076,10 +5027,23 @@ void pc98_vga_init(qemu_irq irq)
 
     register_ioport_write(0x43f, 1, 1, ems_select_write, s);
 
-    for(i = 0; i < 16; i++) {
+#ifdef PC98_SUPPORT_CIRRUS_VGA
+//    register_ioport_write(0xfa2, 1, 1, cirrus_regnum_write, s);
+//    register_ioport_read(0xfa2, 1, 1, cirrus_regnum_read, s);
+//    register_ioport_write(0xfa3, 1, 1, cirrus_reg_write, s);
+//    register_ioport_read(0xfa3, 1, 1, cirrus_reg_read, s);
+    register_ioport_write(0xfaa, 1, 1, cirrus_regnum_write, s);
+    register_ioport_read(0xfaa, 1, 1, cirrus_regnum_read, s);
+    register_ioport_write(0xfab, 1, 1, cirrus_reg_write, s);
+    register_ioport_read(0xfab, 1, 1, cirrus_reg_read, s);
+//    register_ioport_write(0xfac, 1, 1, disp_select_write, s);
+//    register_ioport_read(0xfac, 1, 1, disp_select_read, s);
+#endif
+
+    for (i = 0; i < 16; i++) {
         register_ioport_write(0x4a0 + i, 1, 1, egc_ioport_writeb, &s->egc);
     }
-    for(i = 0; i < 16; i += 2) {
+    for (i = 0; i < 16; i += 2) {
         register_ioport_write(0x4a0 + i, 2, 2, egc_ioport_writew, &s->egc);
     }
 
@@ -5088,14 +5052,6 @@ void pc98_vga_init(qemu_irq irq)
 
     register_ioport_write(0x9a8, 1, 1, horiz_freq_write, s);
     register_ioport_read(0x9a8, 1, 1, horiz_freq_read, s);
-
-#ifdef PC98_SUPPORT_CIRRUS_VGA
-    register_ioport_write(0xfaa, 1, 1, cirrus_regnum_writeb, s);
-    register_ioport_read(0xfaa, 1, 1, cirrus_regnum_readb, s);
-    register_ioport_write(0xfab, 1, 1, cirrus_reg_writeb, s);
-    register_ioport_read(0xfab, 1, 1, cirrus_reg_readb, s);
-    register_ioport_write(0xfaa, 2, 2, cirrus_reg_writew, s);
-#endif
 
     tvram_io_memory = cpu_register_io_memory(0, tvram_read, tvram_write, s);
     vram_a8000_io_memory = cpu_register_io_memory(0, vram_a8000_read, vram_a8000_write, s);
