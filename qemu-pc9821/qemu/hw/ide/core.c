@@ -1770,8 +1770,8 @@ void ide_ioport_write(void *opaque, uint32_t addr, uint32_t val)
         break;
     case 6:
 	/* FIXME: HOB readback uses bit 7 */
-        bus->ifs[0].select = (val & ~0x10) | 0xa0;
-        bus->ifs[1].select = (val | 0x10) | 0xa0;
+        bus->ifs[0].select = (val & ~0x10) | (bus->ifs[0].chs ? 0x80 : 0xa0);
+        bus->ifs[1].select = (val | 0x10) | (bus->ifs[1].chs ? 0x80 : 0xa0);
         /* select drive */
         bus->unit = (val >> 4) & 1;
         break;
@@ -1808,6 +1808,13 @@ void ide_ioport_write(void *opaque, uint32_t addr, uint32_t val)
             ide_set_irq(s->bus);
             break;
         case WIN_SPECIFY:
+            if (!(s->select & 0x40)) {
+                uint64_t sectors;
+                bdrv_get_geometry(s->bs, &sectors);
+                s->heads = (s->select & 0xf) + 1;
+                s->sectors = s->nsector;
+                s->cylinders = sectors / (s->heads * s->sectors);
+            }
         case WIN_RECAL:
             s->error = 0;
             s->status = READY_STAT | SEEK_STAT;

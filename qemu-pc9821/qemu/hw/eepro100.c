@@ -73,7 +73,7 @@
 
 #define TRACE(flag, command) ((flag) ? (command) : (void)0)
 
-#define missing(text)       assert(!"feature is missing in this emulation: " text)
+#define missing(text) fprintf(stderr, "eepro100: feature is missing in this emulation: " text "\n")
 
 #define MAX_ETH_FRAME_SIZE 1514
 
@@ -191,32 +191,14 @@ typedef enum {
 
 typedef struct {
     PCIDevice dev;
-#if 1
-    uint8_t cmd;
-    uint32_t start;
-    uint32_t stop;
-    uint8_t boundary;
-    uint8_t tsr;
-    uint8_t tpsr;
-    uint16_t tcnt;
-    uint16_t rcnt;
-    uint32_t rsar;
-    uint8_t rsr;
-    uint8_t rxcr;
-    uint8_t isr;
-    uint8_t dcfg;
-    uint8_t imr;
-    uint8_t phys[6];            /* mac address */
-    uint8_t curpag;
     uint8_t mult[8];            /* multicast mask array */
     int mmio_index;
     VLANClientState *vc;
-#endif
     uint8_t scb_stat;           /* SCB stat/ack byte */
     uint8_t int_stat;           /* PCI interrupt status */
+    /* region must not be saved by nic_save. */
     uint32_t region[3];         /* PCI region addresses */
     uint8_t macaddr[6];
-    uint32_t statcounter[19];
     uint16_t mdimem[32];
     eeprom_t *eeprom;
     uint32_t device;            /* device variant */
@@ -502,6 +484,8 @@ static void nic_selective_reset(EEPRO100State * s)
     //~ eeprom93xx_reset(s->eeprom);
     memcpy(eeprom_contents, s->macaddr, 6);
     eeprom_contents[0xa] = 0x4000;
+    if (s->device == i82557B || s->device == i82557C)
+        eeprom_contents[5] = 0x0100;
     uint16_t sum = 0;
     for (i = 0; i < EEPROM_SIZE - 1; i++) {
         sum += eeprom_contents[i];
@@ -672,6 +656,7 @@ static void eepro100_cu_command(EEPRO100State * s, uint8_t val)
         bool bit_s = ((command & 0x4000) != 0);
         bool bit_i = ((command & 0x2000) != 0);
         bool bit_nc = ((command & 0x0010) != 0);
+        bool success = true;
         //~ bool bit_sf = ((command & 0x0008) != 0);
         uint16_t cmd = command & 0x0007;
         s->cu_offset = le32_to_cpu(tx.link);
@@ -698,9 +683,17 @@ static void eepro100_cu_command(EEPRO100State * s, uint8_t val)
             TRACE(RXTX, logout
                 ("transmit, TBD array address 0x%08x, TCB byte count 0x%04x, TBD count %u\n",
                  tbd_array, tcb_bytes, tx.tbd_count));
-            assert(!bit_nc);
+
+            if (bit_nc) {
+                missing("CmdTx: NC = 0");
+                success = false;
+                break;
+            }
             //~ assert(!bit_sf);
-            assert(tcb_bytes <= 2600);
+            if (tcb_bytes > 2600) {
+                logout("TCB byte count too large, using 2600\n");
+                tcb_bytes = 2600;
+            }
             /* Next assertion fails for local configuration. */
             //~ assert((tcb_bytes > 0) || (tbd_array != 0xffffffff));
             if (!((tcb_bytes > 0) || (tbd_array != 0xffffffff))) {
@@ -732,7 +725,6 @@ static void eepro100_cu_command(EEPRO100State * s, uint8_t val)
                 uint8_t tbd_count = 0;
                 if (device_supports_eTxCB(s) && !(s->configuration[6] & BIT(4))) {
                     /* Extended Flexible TCB. */
-                    assert(tcb_bytes == 0);
                     for (; tbd_count < 2; tbd_count++) {
                         uint32_t tx_buffer_address = ldl_phys(tbd_address);
                         uint16_t tx_buffer_size = lduw_phys(tbd_address + 4);
@@ -782,9 +774,11 @@ static void eepro100_cu_command(EEPRO100State * s, uint8_t val)
             break;
         default:
             missing("undefined command");
+            success = false;
+            break;
         }
-        /* Write new status (success). */
-        stw_phys(cb_address, status | 0x8000 | 0x2000);
+        /* Write new status. */
+        stw_phys(cb_address, status | 0x8000 | (success ? 0x2000 : 0));
         if (bit_i) {
             /* CU completed action. */
             eepro100_cx_interrupt(s);
@@ -1199,6 +1193,7 @@ static uint16_t eepro100_read2(EEPRO100State * s, uint32_t addr)
     switch (addr) {
     case SCBStatus:
         //~ val = eepro100_read_status(s);
+    case SCBCmd:
         TRACE(OTHER, logout("addr=%s val=0x%04x\n", regname(addr), val));
         break;
     case SCBeeprom:
@@ -1492,7 +1487,10 @@ static ssize_t nic_receive(VLANClientState *vc, const uint8_t * buf, size_t size
         { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
     /* TODO: check multiple IA bit. */
-    assert(!(s->configuration[20] & BIT(6)));
+    if (s->configuration[20] & BIT(6)) {
+        missing("Multiple IA bit");
+        return -1;
+    }
 
     if (s->configuration[8] & 0x80) {
         /* CSMA is disabled. */
@@ -1521,7 +1519,9 @@ static ssize_t nic_receive(VLANClientState *vc, const uint8_t * buf, size_t size
         /* Multicast frame. */
         TRACE(RXTX, logout("%p received multicast, len=%zu\n", s, size));
         /* TODO: check multicast all bit. */
-        assert(!(s->configuration[21] & BIT(3)));
+        if (s->configuration[21] & BIT(3)) {
+            missing("Multicast All bit");
+        }
         int mcast_idx = compute_mcast_idx(buf);
         if (!(s->mult[mcast_idx >> 3] & (1 << (mcast_idx & 7)))) {
             return size;
@@ -1551,7 +1551,12 @@ static ssize_t nic_receive(VLANClientState *vc, const uint8_t * buf, size_t size
                              offsetof(eepro100_rx_t, packet));
     uint16_t rfd_command = le16_to_cpu(rx.command);
     uint16_t rfd_size = le16_to_cpu(rx.size);
-    assert(size <= rfd_size);
+
+    if (size > rfd_size) {
+        logout("Receive buffer (%" PRId16 " bytes) too small for data "
+            "(%zu bytes); data truncated\n", rfd_size, size);
+        size = rfd_size;
+    }
     if (size < 64) {
         rfd_status |= 0x0080;
     }
@@ -1563,7 +1568,10 @@ static ssize_t nic_receive(VLANClientState *vc, const uint8_t * buf, size_t size
     /* Early receive interrupt not supported. */
     //~ eepro100_er_interrupt(s);
     /* Receive CRC Transfer not supported. */
-    assert(!(s->configuration[18] & 4));
+    if (s->configuration[18] & 4) {
+        missing("Receive CRC Transfer");
+        return -1;
+    }
     /* TODO: check stripping enable bit. */
     //~ assert(!(s->configuration[17] & 1));
     cpu_physical_memory_write(s->ru_base + s->ru_offset +
@@ -1573,7 +1581,8 @@ static ssize_t nic_receive(VLANClientState *vc, const uint8_t * buf, size_t size
     s->ru_offset = le32_to_cpu(rx.link);
     if (rfd_command & 0x8000) {
         /* EL bit is set, so this was the last frame. */
-        assert(0);
+        logout("receive: Running out of frames\n");
+        set_ru_state(s, ru_suspended);
     }
     if (rfd_command & 0x4000) {
         /* S bit is set. */
@@ -1591,51 +1600,31 @@ static int nic_load(QEMUFile * f, void *opaque, int version_id)
     if (version_id > 3)
         return -EINVAL;
 
-    if (version_id >= 3) {
-        ret = pci_device_load(&s->dev, f);
-        if (ret < 0)
-            return ret;
+    ret = pci_device_load(&s->dev, f);
+    if (ret < 0) {
+        return ret;
     }
 
-    if (version_id >= 2) {
-        qemu_get_8s(f, &s->rxcr);
-    } else {
-        s->rxcr = 0x0c;
-    }
+    /* Skip unused entries. */
+    qemu_fseek(f, 32, SEEK_CUR);
 
-    qemu_get_8s(f, &s->cmd);
-    qemu_get_be32s(f, &s->start);
-    qemu_get_be32s(f, &s->stop);
-    qemu_get_8s(f, &s->boundary);
-    qemu_get_8s(f, &s->tsr);
-    qemu_get_8s(f, &s->tpsr);
-    qemu_get_be16s(f, &s->tcnt);
-    qemu_get_be16s(f, &s->rcnt);
-    qemu_get_be32s(f, &s->rsar);
-    qemu_get_8s(f, &s->rsr);
-    qemu_get_8s(f, &s->isr);
-    qemu_get_8s(f, &s->dcfg);
-    qemu_get_8s(f, &s->imr);
-    qemu_get_buffer(f, s->phys, 6);
-    qemu_get_8s(f, &s->curpag);
     qemu_get_buffer(f, s->mult, 8);
     qemu_get_buffer(f, s->mem, sizeof(s->mem));
 
-    /* Restore all members of struct between scv_stat and mem. */
+    /* Restore all members of struct between scb_stat and mem. */
     qemu_get_8s(f, &s->scb_stat);
     qemu_get_8s(f, &s->int_stat);
-    for (i = 0; i < 3; i++) {
-        qemu_get_be32s(f, &s->region[i]);
-    }
+    /* Skip unused entries. */
+    qemu_fseek(f, 3 * 4, SEEK_CUR);
     qemu_get_buffer(f, s->macaddr, 6);
-    for (i = 0; i < 19; i++) {
-        qemu_get_be32s(f, &s->statcounter[i]);
-    }
+    /* Skip unused entries. */
+    qemu_fseek(f, 19 * 4, SEEK_CUR);
     for (i = 0; i < 32; i++) {
         qemu_get_be16s(f, &s->mdimem[i]);
     }
     /* The eeprom should be saved and restored by its own routines. */
     qemu_get_be32s(f, &s->device);
+    // TODO check device.
     qemu_get_be32s(f, &s->pointer);
     qemu_get_be32s(f, &s->cu_base);
     qemu_get_be32s(f, &s->cu_offset);
@@ -1682,36 +1671,20 @@ static void nic_save(QEMUFile * f, void *opaque)
 
     pci_device_save(&s->dev, f);
 
-    qemu_put_8s(f, &s->rxcr);
+    /* Skip unused entries. */
+    qemu_fseek(f, 32, SEEK_CUR);
 
-    qemu_put_8s(f, &s->cmd);
-    qemu_put_be32s(f, &s->start);
-    qemu_put_be32s(f, &s->stop);
-    qemu_put_8s(f, &s->boundary);
-    qemu_put_8s(f, &s->tsr);
-    qemu_put_8s(f, &s->tpsr);
-    qemu_put_be16s(f, &s->tcnt);
-    qemu_put_be16s(f, &s->rcnt);
-    qemu_put_be32s(f, &s->rsar);
-    qemu_put_8s(f, &s->rsr);
-    qemu_put_8s(f, &s->isr);
-    qemu_put_8s(f, &s->dcfg);
-    qemu_put_8s(f, &s->imr);
-    qemu_put_buffer(f, s->phys, 6);
-    qemu_put_8s(f, &s->curpag);
     qemu_put_buffer(f, s->mult, 8);
     qemu_put_buffer(f, s->mem, sizeof(s->mem));
 
-    /* Save all members of struct between scv_stat and mem. */
+    /* Save all members of struct between scb_stat and mem. */
     qemu_put_8s(f, &s->scb_stat);
     qemu_put_8s(f, &s->int_stat);
-    for (i = 0; i < 3; i++) {
-        qemu_put_be32s(f, &s->region[i]);
-    }
+    /* Skip unused entries. */
+    qemu_fseek(f, 3 * 4, SEEK_CUR);
     qemu_put_buffer(f, s->macaddr, 6);
-    for (i = 0; i < 19; i++) {
-        qemu_put_be32s(f, &s->statcounter[i]);
-    }
+    /* Skip unused entries. */
+    qemu_fseek(f, 19 * 4, SEEK_CUR);
     for (i = 0; i < 32; i++) {
         qemu_put_be16s(f, &s->mdimem[i]);
     }
@@ -1777,8 +1750,6 @@ static int nic_init(PCIDevice *pci_dev, uint32_t device)
     EEPRO100State *s = DO_UPCAST(EEPRO100State, dev, pci_dev);
 
     TRACE(OTHER, logout("\n"));
-
-    s->dev.unregister = pci_nic_uninit;
 
     s->device = device;
 
@@ -1888,6 +1859,7 @@ static PCIDeviceInfo eepro100_info[] = {
         .qdev.name = "i82551",
         .qdev.size = sizeof(EEPRO100State),
         .init      = pci_i82551_init,
+        .exit      = pci_nic_uninit,
     },{
         .qdev.name = "i82557a",
         .qdev.size = sizeof(EEPRO100State),
@@ -1896,6 +1868,7 @@ static PCIDeviceInfo eepro100_info[] = {
         .qdev.name = "i82557b",
         .qdev.size = sizeof(EEPRO100State),
         .init      = pci_i82557b_init,
+        .exit      = pci_nic_uninit,
     },{
         .qdev.name = "i82557c",
         .qdev.size = sizeof(EEPRO100State),
@@ -1924,6 +1897,7 @@ static PCIDeviceInfo eepro100_info[] = {
         .qdev.name = "i82559er",
         .qdev.size = sizeof(EEPRO100State),
         .init      = pci_i82559er_init,
+        .exit      = pci_nic_uninit,
     },{
         .qdev.name = "i82562",
         .qdev.size = sizeof(EEPRO100State),

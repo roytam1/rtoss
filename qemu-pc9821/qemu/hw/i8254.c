@@ -532,7 +532,7 @@ PITState *pit_init(int base, qemu_irq irq)
     return pit;
 }
 
-/* NEC PC-98x1 */
+/* NEC PC-9821 */
 
 static void pc98_pit_ioport_write(void *opaque, uint32_t addr, uint32_t val)
 {

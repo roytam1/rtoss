@@ -81,12 +81,11 @@ typedef enum fdisk_flags_t {
 } fdisk_flags_t;
 
 typedef struct fdrive_t {
+    DriveInfo *dinfo;
     BlockDriverState *bs;
     /* Drive status */
-    uint8_t connected;
     fdrive_type_t drive;
     uint8_t perpendicular;    /* 2.88 MB access mode    */
-    uint8_t intr_status;
     /* Position */
     uint8_t head;
     uint8_t track;
@@ -97,12 +96,14 @@ typedef struct fdrive_t {
     uint8_t max_track;        /* Nb of tracks           */
     uint16_t bps;             /* Bytes per sector       */
     uint8_t ro;               /* Is read-only           */
+    /* PC-9821 quirks? */
+    uint8_t status0;
 } fdrive_t;
 
-static void fd_init (fdrive_t *drv, BlockDriverState *bs)
+static void fd_init (fdrive_t *drv)
 {
     /* Drive */
-    drv->bs = bs;
+    drv->bs = drv->dinfo ? drv->dinfo->bdrv : NULL;
     drv->drive = FDRIVE_DRV_NONE;
     drv->perpendicular = 0;
     /* Disk */
@@ -174,10 +175,10 @@ static int fd_seek (fdrive_t *drv, uint8_t head, uint8_t track, uint8_t sect,
 static void fd_recalibrate (fdrive_t *drv)
 {
     FLOPPY_DPRINTF("recalibrate\n");
-    drv->intr_status = 0;
     drv->head = 0;
     drv->track = 0;
     drv->sect = 1;
+    drv->status0 = 0;
 }
 
 /* Recognize floppy formats */
@@ -390,7 +391,8 @@ enum {
 };
 
 enum {
-    FD_SR0_INTRSTAT = 0x01,
+    FD_SR0_INT      = 0x01, /* flag for drv->status0 */
+    FD_SR0_UNITSEL  = 0x03,
     FD_SR0_NOTRDY   = 0x08,
     FD_SR0_EQPMT    = 0x10,
     FD_SR0_SEEK     = 0x20,
@@ -406,6 +408,12 @@ enum {
 enum {
     FD_SR2_SNS      = 0x04, /* Scan not satisfied */
     FD_SR2_SEH      = 0x08, /* Scan equal hit */
+};
+
+enum {
+    FD_SR3_TS       = 0x08,
+    FD_SR3_RDY      = 0x20,
+    FD_SR3_FAULT    = 0x80,
 };
 
 enum {
@@ -464,33 +472,35 @@ enum {
 };
 
 enum {
-    PC98_FD_SW_TYP0 = 0x04,
-    PC98_FD_SW_TYP1 = 0x08,
-    PC98_FD_SW_RDY = 0x10,
-    PC98_FD_SW_DMACH = 0x20,
-    PC98_FD_SW_FINT0 = 0x40,
-    PC98_FD_SW_FINT1 = 0x80,
+    PC98_SW_TYP0 = 0x04,
+    PC98_SW_TYP1 = 0x08,
+    PC98_SW_RDY = 0x10,
+    PC98_SW_DMACH = 0x20,
+    PC98_SW_FINT0 = 0x40,
+    PC98_SW_FINT1 = 0x80,
 };
 
 enum {
-    PC98_FD_DOR_MTON = 0x08,
-    PC98_FD_DOR_DMAEN = 0x10,
-    PC98_FD_DOR_AIE = 0x20,
-    PC98_FD_DOR_FRY = 0x40,
-    PC98_FD_DOR_nRESET = 0x80,
+    PC98_DOR_MTON = 0x08,
+    PC98_DOR_DMAEN = 0x10,
+    PC98_DOR_AIE = 0x20,
+    PC98_DOR_FRDY = 0x40,
+    PC98_DOR_nRESET = 0x80,
 };
 
 enum {
-    PC98_FD_MODE_PORTEXC = 0x01,
-    PC98_FD_MODE_FDDEXC = 0x02,
-    PC98_FD_MODE_EMTON = 0x04,
+    PC98_MODE_PORTEXC = 0x01,
+    PC98_MODE_FDDEXC = 0x02,
+    PC98_MODE_EMTON = 0x04,
 };
 
 enum {
-    PC98_FD_MODE1440_MODE = 0x01,
-    PC98_FD_MODE1440_EMODE = 0x10,
-    PC98_FD_MODE1440_DRVSEL = 0x60,
+    PC98_MODE144_MODE = 0x01,
+    PC98_MODE144_EMODE = 0x10,
+    PC98_MODE144_DRVSEL = 0x60,
 };
+
+#define SET_DRV_ST0(drv, status) ((drv)->status0 = (status) | FD_SR0_INT)
 
 #define FD_MULTI_TRACK(state) ((state) & FD_STATE_MULTI)
 #define FD_DID_SEEK(state) ((state) & FD_STATE_SEEK)
@@ -546,13 +556,14 @@ struct fdctrl_t {
     uint8_t pwrd;
     /* Sun4m quirks? */
     uint8_t sun4m;
-    /* PC-98x1 quirks? */
+    /* PC-9821 quirks? */
     uint8_t pc98;
-    qemu_irq irq1200;
+    qemu_irq irq120;
     qemu_irq irq640;
-    uint8_t forced_ready;
-    uint8_t access_mode;
-    uint8_t access_mode1440;
+    uint8_t frdy;
+    uint8_t if_mode;
+    uint8_t if_mode144;
+    QEMUTimer *media_timer;
     /* Floppy drives */
     uint8_t num_floppies;
     fdrive_t drives[MAX_LOGICAL_FD];
@@ -1004,15 +1015,23 @@ static int fdctrl_media_changed(fdrive_t *drv)
     return ret;
 }
 
+static int fdctrl_media_inserted(fdrive_t *drv)
+{
+    if (drv->dinfo && drv->bs && bdrv_is_inserted(drv->bs)) {
+        return 1;
+    }
+    return 0;
+}
+
 /* Digital input register : 0x07 (read-only) */
 static uint32_t fdctrl_read_dir (fdctrl_t *fdctrl)
 {
     uint32_t retval = 0;
 
-    if ((drv0(fdctrl)->connected && fdctrl_media_changed(drv0(fdctrl)))
-     || (drv1(fdctrl)->connected && fdctrl_media_changed(drv1(fdctrl)))
-     || (drv2(fdctrl)->connected && fdctrl_media_changed(drv2(fdctrl)))
-     || (drv3(fdctrl)->connected && fdctrl_media_changed(drv3(fdctrl)))
+    if ((drv0(fdctrl)->dinfo && fdctrl_media_changed(drv0(fdctrl)))
+     || (drv1(fdctrl)->dinfo && fdctrl_media_changed(drv1(fdctrl)))
+     || (drv2(fdctrl)->dinfo && fdctrl_media_changed(drv2(fdctrl)))
+     || (drv3(fdctrl)->dinfo && fdctrl_media_changed(drv3(fdctrl)))
         )
         retval |= FD_DIR_DSKCHG;
     if (retval != 0)
@@ -1205,7 +1224,7 @@ static void fdctrl_start_transfer (fdctrl_t *fdctrl, int direction)
     if (direction != FD_DIR_WRITE)
         fdctrl->msr |= FD_MSR_DIO;
     /* IO based transfer: calculate len */
-    cur_drv->intr_status = FD_SR0_INTRSTAT;
+    SET_DRV_ST0(cur_drv, 0);
     fdctrl_raise_irq(fdctrl, 0x00);
 
     return;
@@ -1242,7 +1261,7 @@ static int fdctrl_transfer_handler (void *opaque, int nchan,
         status2 = FD_SR2_SNS;
     if (dma_len > fdctrl->data_len)
         dma_len = fdctrl->data_len;
-    if (cur_drv->bs == NULL) {
+    if (!fdctrl_media_inserted(cur_drv)) {
         if (fdctrl->data_dir == FD_DIR_WRITE)
             fdctrl_stop_transfer(fdctrl, FD_SR0_ABNTERM | FD_SR0_SEEK, 0x00, 0x00);
         else
@@ -1455,10 +1474,10 @@ static void fdctrl_handle_dumpreg (fdctrl_t *fdctrl, int direction)
     fdrive_t *cur_drv = get_cur_drv(fdctrl);
 
     /* Drives position */
-    fdctrl->fifo[0] = drv0(fdctrl)->connected ? drv0(fdctrl)->track : 0;
-    fdctrl->fifo[1] = drv1(fdctrl)->connected ? drv1(fdctrl)->track : 0;
-    fdctrl->fifo[2] = drv2(fdctrl)->connected ? drv2(fdctrl)->track : 0;
-    fdctrl->fifo[3] = drv3(fdctrl)->connected ? drv3(fdctrl)->track : 0;
+    fdctrl->fifo[0] = drv0(fdctrl)->dinfo ? drv0(fdctrl)->track : 0;
+    fdctrl->fifo[1] = drv1(fdctrl)->dinfo ? drv1(fdctrl)->track : 0;
+    fdctrl->fifo[2] = drv2(fdctrl)->dinfo ? drv2(fdctrl)->track : 0;
+    fdctrl->fifo[3] = drv3(fdctrl)->dinfo ? drv3(fdctrl)->track : 0;
     /* timers */
     fdctrl->fifo[4] = fdctrl->timer0;
     fdctrl->fifo[5] = (fdctrl->timer1 << 1) | (fdctrl->dor & FD_DOR_DMAEN ? 1 : 0);
@@ -1488,16 +1507,16 @@ static void fdctrl_handle_restore (fdctrl_t *fdctrl, int direction)
     fdrive_t *cur_drv = get_cur_drv(fdctrl);
 
     /* Drives position */
-    if(drv0(fdctrl)->connected) {
+    if (drv0(fdctrl)->dinfo) {
         drv0(fdctrl)->track = fdctrl->fifo[3];
     }
-    if(drv1(fdctrl)->connected) {
+    if (drv1(fdctrl)->dinfo) {
         drv1(fdctrl)->track = fdctrl->fifo[4];
     }
-    if(drv2(fdctrl)->connected) {
+    if (drv2(fdctrl)->dinfo) {
         drv2(fdctrl)->track = fdctrl->fifo[5];
     }
-    if(drv3(fdctrl)->connected) {
+    if (drv3(fdctrl)->dinfo) {
         drv3(fdctrl)->track = fdctrl->fifo[6];
     }
     /* timers */
@@ -1519,10 +1538,10 @@ static void fdctrl_handle_save (fdctrl_t *fdctrl, int direction)
     fdctrl->fifo[0] = 0;
     fdctrl->fifo[1] = 0;
     /* Drives position */
-    fdctrl->fifo[2] = drv0(fdctrl)->connected ? drv0(fdctrl)->track : 0;
-    fdctrl->fifo[3] = drv1(fdctrl)->connected ? drv1(fdctrl)->track : 0;
-    fdctrl->fifo[4] = drv2(fdctrl)->connected ? drv2(fdctrl)->track : 0;
-    fdctrl->fifo[5] = drv3(fdctrl)->connected ? drv3(fdctrl)->track : 0;
+    fdctrl->fifo[2] = drv0(fdctrl)->dinfo ? drv0(fdctrl)->track : 0;
+    fdctrl->fifo[3] = drv1(fdctrl)->dinfo ? drv1(fdctrl)->track : 0;
+    fdctrl->fifo[4] = drv2(fdctrl)->dinfo ? drv2(fdctrl)->track : 0;
+    fdctrl->fifo[5] = drv3(fdctrl)->dinfo ? drv3(fdctrl)->track : 0;
     /* timers */
     fdctrl->fifo[6] = fdctrl->timer0;
     fdctrl->fifo[7] = fdctrl->timer1;
@@ -1594,13 +1613,19 @@ static void fdctrl_handle_sense_drive_status (fdctrl_t *fdctrl, int direction)
 
     SET_CUR_DRV(fdctrl, fdctrl->fifo[1] & FD_DOR_SELMASK);
     cur_drv = get_cur_drv(fdctrl);
-    cur_drv->head = (fdctrl->fifo[1] >> 2) & 1;
     /* 1 Byte status back */
-    fdctrl->fifo[0] = (cur_drv->ro << 6) |
-        (cur_drv->track == 0 ? 0x10 : 0x00) |
-        (cur_drv->head << 2) |
-        GET_CUR_DRV(fdctrl) |
-        0x28;
+    if (!cur_drv->dinfo) {
+        fdctrl->fifo[0] = GET_CUR_DRV(fdctrl) | FD_SR3_FAULT;
+    } if (!fdctrl_media_inserted(cur_drv)) {
+        fdctrl->fifo[0] = GET_CUR_DRV(fdctrl);
+    } else {
+        cur_drv->head = (fdctrl->fifo[1] >> 2) & 1;
+        fdctrl->fifo[0] = (cur_drv->ro << 6) |
+            (cur_drv->track == 0 ? 0x10 : 0x00) |
+            (cur_drv->head << 2) |
+            GET_CUR_DRV(fdctrl) |
+            FD_SR3_TS | FD_SR3_RDY;
+    }
     fdctrl_set_fifo(fdctrl, 1, 0);
 }
 
@@ -1611,12 +1636,12 @@ static void fdctrl_handle_recalibrate (fdctrl_t *fdctrl, int direction)
     SET_CUR_DRV(fdctrl, fdctrl->fifo[1] & FD_DOR_SELMASK);
     cur_drv = get_cur_drv(fdctrl);
     fd_recalibrate(cur_drv);
-    if (cur_drv->connected &&
-        ((fdctrl->pc98 && fdctrl->forced_ready) || bdrv_is_inserted(cur_drv->bs))
+    if (cur_drv->dinfo &&
+        ((fdctrl->pc98 && fdctrl->frdy) || fdctrl_media_inserted(cur_drv))
        ) {
-        cur_drv->intr_status = FD_SR0_INTRSTAT | FD_SR0_SEEK;
+        SET_DRV_ST0(cur_drv, FD_SR0_SEEK);
     } else {
-        cur_drv->intr_status = FD_SR0_INTRSTAT | FD_SR0_ABNTERM | FD_SR0_SEEK | FD_SR0_NOTRDY;
+        SET_DRV_ST0(cur_drv, FD_SR0_ABNTERM | FD_SR0_SEEK | FD_SR0_NOTRDY);
     }
     fdctrl_reset_fifo(fdctrl);
     /* Raise Interrupt */
@@ -1631,27 +1656,37 @@ static void fdctrl_handle_sense_interrupt_status (fdctrl_t *fdctrl, int directio
         /* NEC uPD765A sends 2 bytes only for each floppy drives
            that an error occured in recalib or seek command,
            and sends 1 byte after finished sending each drive status */
-        int drv = -1, i;
-        if (cur_drv->intr_status & FD_SR0_INTRSTAT) {
-            drv = GET_CUR_DRV(fdctrl);
+        int num = -1, i;
+        if (cur_drv->status0 & FD_SR0_INT) {
+            num = GET_CUR_DRV(fdctrl);
         } else {
             for (i = 0; i < MAX_LOGICAL_FD; i++) {
-                if (fdctrl->drives[i].intr_status & FD_SR0_INTRSTAT) {
-                    drv = i;
+                if (fdctrl->drives[i].status0 & FD_SR0_INT) {
+                    num = i;
                     break;
                 }
             }
         }
-        if (drv != -1) {
-            fdctrl->fifo[0] = (fdctrl->drives[drv].intr_status & 0xfc) | drv;
-            fdctrl->fifo[1] = fdctrl->drives[drv].track;
+        if (num != -1) {
+            fdrive_t *drv = &fdctrl->drives[num];
+            fdctrl->fifo[0] = (drv->status0 & ~FD_SR0_UNITSEL) | num;
+            fdctrl->fifo[1] = drv->track;
             fdctrl_set_fifo(fdctrl, 2, 0);
-            fdctrl->drives[drv].intr_status = 0;
+            drv->status0 = 0;
+            /* reset irq ? */
+            for (i = 0; i < MAX_LOGICAL_FD; i++) {
+                if (fdctrl->drives[i].status0 & FD_SR0_INT) {
+                    break;
+                }
+            }
+            if (i >= MAX_LOGICAL_FD) {
+                fdctrl_reset_irq(fdctrl);
+            }
         } else {
             fdctrl->fifo[0] = FD_SR0_INVCMD;
             fdctrl_set_fifo(fdctrl, 1, 0);
+            fdctrl_reset_irq(fdctrl);
         }
-        fdctrl_reset_irq(fdctrl);
     } else {
         if(fdctrl->reset_sensei > 0) {
             fdctrl->fifo[0] =
@@ -1679,12 +1714,12 @@ static void fdctrl_handle_seek (fdctrl_t *fdctrl, int direction)
     cur_drv = get_cur_drv(fdctrl);
     fdctrl_reset_fifo(fdctrl);
     if (fdctrl->fifo[2] > cur_drv->max_track) {
-        cur_drv->intr_status = FD_SR0_INTRSTAT | FD_SR0_ABNTERM | FD_SR0_SEEK;
+        SET_DRV_ST0(cur_drv, FD_SR0_ABNTERM | FD_SR0_SEEK);
         fdctrl_raise_irq(fdctrl, FD_SR0_ABNTERM | FD_SR0_SEEK);
     } else {
         cur_drv->track = fdctrl->fifo[2];
-        cur_drv->intr_status = FD_SR0_INTRSTAT | FD_SR0_SEEK;
         /* Raise Interrupt */
+        SET_DRV_ST0(cur_drv, FD_SR0_SEEK);
         fdctrl_raise_irq(fdctrl, FD_SR0_SEEK);
     }
 }
@@ -1750,10 +1785,10 @@ static void fdctrl_handle_relative_seek_out (fdctrl_t *fdctrl, int direction)
     cur_drv = get_cur_drv(fdctrl);
     if (fdctrl->fifo[2] + cur_drv->track >= cur_drv->max_track) {
         cur_drv->track = cur_drv->max_track - 1;
-        cur_drv->intr_status = FD_SR0_INTRSTAT | FD_SR0_ABNTERM | FD_SR0_SEEK;
+        SET_DRV_ST0(cur_drv, FD_SR0_ABNTERM | FD_SR0_SEEK);
     } else {
         cur_drv->track += fdctrl->fifo[2];
-        cur_drv->intr_status = FD_SR0_INTRSTAT | FD_SR0_SEEK;
+        SET_DRV_ST0(cur_drv, FD_SR0_SEEK);
     }
     fdctrl_reset_fifo(fdctrl);
     /* Raise Interrupt */
@@ -1768,10 +1803,10 @@ static void fdctrl_handle_relative_seek_in (fdctrl_t *fdctrl, int direction)
     cur_drv = get_cur_drv(fdctrl);
     if (fdctrl->fifo[2] > cur_drv->track) {
         cur_drv->track = 0;
-        cur_drv->intr_status = FD_SR0_INTRSTAT | FD_SR0_ABNTERM | FD_SR0_SEEK;
+        SET_DRV_ST0(cur_drv, FD_SR0_ABNTERM | FD_SR0_SEEK);
     } else {
         cur_drv->track -= fdctrl->fifo[2];
-        cur_drv->intr_status = FD_SR0_INTRSTAT | FD_SR0_SEEK;
+        SET_DRV_ST0(cur_drv, FD_SR0_SEEK);
     }
     fdctrl_reset_fifo(fdctrl);
     /* Raise Interrupt */
@@ -1903,20 +1938,20 @@ static void fdctrl_result_timer(void *opaque)
     fdctrl_stop_transfer(fdctrl, 0x00, 0x00, 0x00);
 }
 
-/* NEC PC-98x1 */
+/* NEC PC-9821 */
 
 static int pc98_fdc_post_load(void *opaque, int version_id)
 {
     fdctrl_t *fdctrl = opaque;
 
-    if (fdctrl->access_mode & PC98_FD_MODE_PORTEXC) {
-        fdctrl->irq = fdctrl->irq1200;
+    if (fdctrl->if_mode & PC98_MODE_PORTEXC) {
+        fdctrl->irq = fdctrl->irq120;
         fdctrl->dma_chann = 2;
     } else {
         fdctrl->irq = fdctrl->irq640;
         fdctrl->dma_chann = 3;
     }
-    fdc_post_load(fdctrl,version_id);
+    fdc_post_load(fdctrl, version_id);
 
     return 0;
 }
@@ -1930,8 +1965,8 @@ static const VMStateDescription vmstate_pc98_fdrive = {
         VMSTATE_UINT8(head, fdrive_t),
         VMSTATE_UINT8(track, fdrive_t),
         VMSTATE_UINT8(sect, fdrive_t),
-        /* PC-98x1 */
-        VMSTATE_UINT8(intr_status, fdrive_t),
+        /* PC-9821 */
+        VMSTATE_UINT8(status0, fdrive_t),
         VMSTATE_END_OF_LIST()
     }
 };
@@ -1971,10 +2006,10 @@ static const VMStateDescription vmstate_pc98_fdc = {
         VMSTATE_UINT8_EQUAL(num_floppies, fdctrl_t),
         VMSTATE_STRUCT_ARRAY_SIZE_UINT8(drives, fdctrl_t, num_floppies, 1,
                                         vmstate_fdrive, fdrive_t),
-        /* PC-98x1 */
-        VMSTATE_UINT8(forced_ready, fdctrl_t),
-        VMSTATE_UINT8(access_mode, fdctrl_t),
-        VMSTATE_UINT8(access_mode1440, fdctrl_t),
+        /* PC-9821 */
+        VMSTATE_UINT8(frdy, fdctrl_t),
+        VMSTATE_UINT8(if_mode, fdctrl_t),
+        VMSTATE_UINT8(if_mode144, fdctrl_t),
         VMSTATE_END_OF_LIST()
     }
 };
@@ -1997,20 +2032,20 @@ static uint32_t pc98_fdctrl_read_port (void *opaque, uint32_t reg)
         break;
     case 0x94:
     case 0xcc:
-        value = PC98_FD_SW_TYP0 | PC98_FD_SW_FINT0;
-        if (!(fdctrl->access_mode & PC98_FD_MODE_PORTEXC)) {
-            if (cur_drv->connected && bdrv_is_inserted(cur_drv->bs)) {
-                value |= PC98_FD_SW_RDY;
+        value = PC98_SW_TYP0 | PC98_SW_FINT0;
+        if (!(fdctrl->if_mode & PC98_MODE_PORTEXC)) {
+            if (cur_drv->dinfo && fdctrl_media_inserted(cur_drv)) {
+                value |= PC98_SW_RDY;
             }
-            value |= PC98_FD_SW_DMACH;
+            value |= PC98_SW_DMACH;
         }
         break;
     case 0xbe:
-        value = 0xf8 | (fdctrl->access_mode & (PC98_FD_MODE_FDDEXC | PC98_FD_MODE_PORTEXC));
+        value = 0xf8 | (fdctrl->if_mode & (PC98_MODE_FDDEXC | PC98_MODE_PORTEXC));
         break;
     case 0x4be:
-        bit = 1 << ((fdctrl->access_mode1440 & PC98_FD_MODE1440_DRVSEL) >> 5);
-        if (fdctrl->access_mode1440 & bit) {
+        bit = 1 << ((fdctrl->if_mode144 & PC98_MODE144_DRVSEL) >> 5);
+        if (fdctrl->if_mode144 & bit) {
             value = 0xff;
         } else {
             value = 0xfe;
@@ -2031,7 +2066,7 @@ static void pc98_fdctrl_write_port (void *opaque, uint32_t reg, uint32_t value)
         break;
     case 0x94:
     case 0xcc:
-        if (!(value & PC98_FD_DOR_nRESET)) {
+        if (!(value & PC98_DOR_nRESET)) {
             if (fdctrl->dor & FD_DOR_nRESET) {
                 FLOPPY_DPRINTF("controller enter RESET state\n");
             }
@@ -2044,10 +2079,10 @@ static void pc98_fdctrl_write_port (void *opaque, uint32_t reg, uint32_t value)
             }
             fdctrl->dor |= FD_DOR_nRESET;
         }
-        if (fdctrl->access_mode & PC98_FD_MODE_PORTEXC) {
-            fdctrl->forced_ready = ((value & PC98_FD_DOR_FRY) != 0);
-            if (fdctrl->access_mode & PC98_FD_MODE_EMTON) {
-                if (value & PC98_FD_DOR_MTON) {
+        if (fdctrl->if_mode & PC98_MODE_PORTEXC) {
+            fdctrl->frdy = ((value & PC98_DOR_FRDY) != 0);
+            if (fdctrl->if_mode & PC98_MODE_EMTON) {
+                if (value & PC98_DOR_MTON) {
                     fdctrl->dor |= (FD_DOR_MOTEN0 | FD_DOR_MOTEN1);
                     fdctrl->srb |= (FD_SRB_MTR0 | FD_SRB_MTR1);
                 } else {
@@ -2056,15 +2091,15 @@ static void pc98_fdctrl_write_port (void *opaque, uint32_t reg, uint32_t value)
                 }
             }
         } else {
-            if (value & PC98_FD_DOR_AIE) {
-                fdctrl->forced_ready = ((value & PC98_FD_DOR_FRY) != 0);
+            if (value & PC98_DOR_AIE) {
+                fdctrl->frdy = ((value & PC98_DOR_FRDY) != 0);
             }
-            if (value & PC98_FD_DOR_DMAEN) {
+            if (value & PC98_DOR_DMAEN) {
                 fdctrl->dor |= FD_DOR_DMAEN;
             } else {
                 fdctrl->dor &= ~FD_DOR_DMAEN;
             }
-            if (value & PC98_FD_DOR_MTON) {
+            if (value & PC98_DOR_MTON) {
                 fdctrl->dor |= (FD_DOR_MOTEN0 | FD_DOR_MOTEN1);
                 fdctrl->srb |= (FD_SRB_MTR0 | FD_SRB_MTR1);
             } else {
@@ -2074,14 +2109,14 @@ static void pc98_fdctrl_write_port (void *opaque, uint32_t reg, uint32_t value)
         }
         break;
     case 0xbe:
-        fdctrl->access_mode = value;
-        if (fdctrl->access_mode & PC98_FD_MODE_PORTEXC) {
-            if (!(fdctrl->access_mode & PC98_FD_MODE_EMTON)) {
+        fdctrl->if_mode = value;
+        if (fdctrl->if_mode & PC98_MODE_PORTEXC) {
+            if (!(fdctrl->if_mode & PC98_MODE_EMTON)) {
                 fdctrl->dor |= (FD_DOR_MOTEN0 | FD_DOR_MOTEN1);
                 fdctrl->srb |= (FD_SRB_MTR0 | FD_SRB_MTR1);
             }
             fdctrl->dor |= FD_DOR_DMAEN;
-            fdctrl->irq = fdctrl->irq1200;
+            fdctrl->irq = fdctrl->irq120;
             fdctrl->dma_chann = 2;
         } else {
             fdctrl->irq = fdctrl->irq640;
@@ -2089,125 +2124,132 @@ static void pc98_fdctrl_write_port (void *opaque, uint32_t reg, uint32_t value)
         }
         break;
     case 0x4be:
-        if (value & PC98_FD_MODE1440_EMODE) {
-            uint8_t bit = 1 << ((value & PC98_FD_MODE1440_DRVSEL) >> 5);
-            if (value & PC98_FD_MODE1440_MODE) {
-                fdctrl->access_mode1440 |= bit;
+        if (value & PC98_MODE144_EMODE) {
+            uint8_t bit = 1 << ((value & PC98_MODE144_DRVSEL) >> 5);
+            if (value & PC98_MODE144_MODE) {
+                fdctrl->if_mode144 |= bit;
             } else {
-                fdctrl->access_mode1440 &= ~bit;
+                fdctrl->if_mode144 &= ~bit;
             }
         }
-        fdctrl->access_mode1440 &= ~PC98_FD_MODE1440_DRVSEL;
-        fdctrl->access_mode1440 |= (value & PC98_FD_MODE1440_DRVSEL);
+        fdctrl->if_mode144 &= ~PC98_MODE144_DRVSEL;
+        fdctrl->if_mode144 |= (value & PC98_MODE144_DRVSEL);
         break;
     }
 }
 
+static void pc98_fdctrl_media_timer(void *opaque)
+{
+    fdctrl_t *fdctrl = opaque;
+    int i, irq = 0;
+
+    for (i = 0; i < MAX_FD; i++) {
+        fdrive_t *drv = &fdctrl->drives[i];
+        if (drv->dinfo && fdctrl_media_changed(drv)) {
+            SET_DRV_ST0(drv, FD_SR0_RDYCHG);
+            irq = 1;
+        }
+    }
+    if (irq) {
+        fdctrl_raise_irq(fdctrl, FD_SR0_RDYCHG);
+    }
+
+    /* set next timer */
+    qemu_mod_timer(fdctrl->media_timer,
+                   qemu_get_clock(vm_clock) + get_ticks_per_sec() / 10);
+}
+
 /* Init functions */
-static void fdctrl_connect_drives(fdctrl_t *fdctrl, BlockDriverState **fds)
+static void fdctrl_connect_drives(fdctrl_t *fdctrl)
 {
     unsigned int i;
 
     for (i = 0; i < MAX_LOGICAL_FD; i++) {
-        if (i < fdctrl->num_floppies) {
-            fdctrl->drives[i].connected = 1;
-            fd_init(&fdctrl->drives[i], fds[i]);
-        } else {
-            fdctrl->drives[i].connected = 0;
-            fd_init(&fdctrl->drives[i], NULL);
-        }
+        fd_init(&fdctrl->drives[i]);
         fd_revalidate(&fdctrl->drives[i]);
     }
 }
 
-fdctrl_t *fdctrl_init_isa(BlockDriverState **fds)
+fdctrl_t *fdctrl_init_isa(DriveInfo **fds)
 {
-    fdctrl_t *fdctrl;
     ISADevice *dev;
-    int dma_chann = 2;
 
-    dev = isa_create_simple("isa-fdc");
-    fdctrl = &(DO_UPCAST(fdctrl_isabus_t, busdev, dev)->state);
-
-    fdctrl->dma_chann = dma_chann;
-    DMA_register_channel(dma_chann, &fdctrl_transfer_handler, fdctrl);
-
-    fdctrl->num_floppies = MAX_FD;
-    fdctrl_connect_drives(fdctrl, fds);
-
-    return fdctrl;
+    dev = isa_create("isa-fdc");
+    qdev_prop_set_drive(&dev->qdev, "driveA", fds[0]);
+    qdev_prop_set_drive(&dev->qdev, "driveB", fds[1]);
+    if (qdev_init(&dev->qdev) < 0)
+        return NULL;
+    return &(DO_UPCAST(fdctrl_isabus_t, busdev, dev)->state);
 }
 
 fdctrl_t *fdctrl_init_sysbus(qemu_irq irq, int dma_chann,
                              target_phys_addr_t mmio_base,
-                             BlockDriverState **fds)
+                             DriveInfo **fds)
 {
     fdctrl_t *fdctrl;
     DeviceState *dev;
     fdctrl_sysbus_t *sys;
 
     dev = qdev_create(NULL, "sysbus-fdc");
-    qdev_init(dev);
     sys = DO_UPCAST(fdctrl_sysbus_t, busdev.qdev, dev);
     fdctrl = &sys->state;
+    fdctrl->dma_chann = dma_chann; /* FIXME */
+    qdev_prop_set_drive(dev, "driveA", fds[0]);
+    qdev_prop_set_drive(dev, "driveB", fds[1]);
+    qdev_init_nofail(dev);
     sysbus_connect_irq(&sys->busdev, 0, irq);
     sysbus_mmio_map(&sys->busdev, 0, mmio_base);
-
-    fdctrl->dma_chann = dma_chann;
-    DMA_register_channel(dma_chann, &fdctrl_transfer_handler, fdctrl);
-
-    fdctrl->num_floppies = MAX_FD;
-    fdctrl_connect_drives(fdctrl, fds);
 
     return fdctrl;
 }
 
 fdctrl_t *sun4m_fdctrl_init (qemu_irq irq, target_phys_addr_t io_base,
-                             BlockDriverState **fds, qemu_irq *fdc_tc)
+                             DriveInfo **fds, qemu_irq *fdc_tc)
 {
     DeviceState *dev;
     fdctrl_sysbus_t *sys;
     fdctrl_t *fdctrl;
 
     dev = qdev_create(NULL, "SUNW,fdtwo");
-    qdev_init(dev);
+    qdev_prop_set_drive(dev, "drive", fds[0]);
+    qdev_init_nofail(dev);
     sys = DO_UPCAST(fdctrl_sysbus_t, busdev.qdev, dev);
     fdctrl = &sys->state;
     sysbus_connect_irq(&sys->busdev, 0, irq);
     sysbus_mmio_map(&sys->busdev, 0, io_base);
     *fdc_tc = qdev_get_gpio_in(dev, 0);
 
-    fdctrl->dma_chann = -1;
-
-    fdctrl->num_floppies = MAX_FD;
-    fdctrl_connect_drives(fdctrl, fds);
-
     return fdctrl;
 }
 
-fdctrl_t *pc98_fdctrl_init(BlockDriverState **fds)
+fdctrl_t *pc98_fdctrl_init (DriveInfo **fds)
 {
-    fdctrl_t *fdctrl;
     ISADevice *dev;
+    fdctrl_t *fdctrl;
 
-    dev = isa_create_simple("pc98-fdc");
+    dev = isa_create("pc98-fdc");
+    qdev_prop_set_drive(&dev->qdev, "driveA", fds[0]);
+    qdev_prop_set_drive(&dev->qdev, "driveB", fds[1]);
+    if (qdev_init(&dev->qdev) < 0)
+        return NULL;
     fdctrl = &(DO_UPCAST(fdctrl_isabus_t, busdev, dev)->state);
 
-    fdctrl->access_mode = PC98_FD_MODE_FDDEXC | PC98_FD_MODE_PORTEXC;
+    fdctrl->if_mode = PC98_MODE_FDDEXC | PC98_MODE_PORTEXC;
+    fdctrl->if_mode144 = 0x0f;
     fdctrl->dor |= FD_DOR_DMAEN;
 
-    fdctrl->irq = fdctrl->irq1200;
+    fdctrl->irq = fdctrl->irq120;
     fdctrl->dma_chann = 2;
-    DMA_register_channel(2, &fdctrl_transfer_handler, fdctrl);
-    DMA_register_channel(3, &fdctrl_transfer_handler, fdctrl);
 
-    fdctrl->num_floppies = MAX_FD;
-    fdctrl_connect_drives(fdctrl, fds);
+    fdctrl->media_timer = qemu_new_timer(vm_clock,
+                                         pc98_fdctrl_media_timer, fdctrl);
+    qemu_mod_timer(fdctrl->media_timer,
+                   qemu_get_clock(vm_clock) + get_ticks_per_sec() / 10);
 
     return fdctrl;
 }
 
-static int fdctrl_init_common(fdctrl_t *fdctrl)
+static int fdctrl_init_common(fdctrl_t *fdctrl, uint8_t version)
 {
     int i, j;
     static int command_tables_inited = 0;
@@ -2216,7 +2258,7 @@ static int fdctrl_init_common(fdctrl_t *fdctrl)
     if (!command_tables_inited) {
         command_tables_inited = 1;
         for (i = ARRAY_SIZE(handlers) - 1; i >= 0; i--) {
-            if (handlers[i].version <= fdctrl->version) {
+            if (handlers[i].version <= version) {
                 for (j = 0; j < sizeof(command_to_handler); j++) {
                     if ((j & handlers[i].mask) == handlers[i].value) {
                         command_to_handler[j] = i;
@@ -2232,7 +2274,13 @@ static int fdctrl_init_common(fdctrl_t *fdctrl)
     fdctrl->result_timer = qemu_new_timer(vm_clock,
                                           fdctrl_result_timer, fdctrl);
 
+    fdctrl->version = version;
     fdctrl->config = FD_CONFIG_EIS | FD_CONFIG_EFIFO; /* Implicit seek, polling & FIFO enabled */
+    fdctrl->num_floppies = MAX_FD;
+
+    if (fdctrl->dma_chann != -1)
+        DMA_register_channel(fdctrl->dma_chann, &fdctrl_transfer_handler, fdctrl);
+    fdctrl_connect_drives(fdctrl);
 
     fdctrl_external_reset(fdctrl);
     qemu_register_reset(fdctrl_external_reset, fdctrl);
@@ -2245,6 +2293,7 @@ static int isabus_fdc_init1(ISADevice *dev)
     fdctrl_t *fdctrl = &isa->state;
     int iobase = 0x3f0;
     int isairq = 6;
+    int dma_chann = 2;
 
     register_ioport_read(iobase + 0x01, 5, 1,
                          &fdctrl_read_port, fdctrl);
@@ -2258,8 +2307,8 @@ static int isabus_fdc_init1(ISADevice *dev)
 
     vmstate_register(-1, &vmstate_fdc, fdctrl);
 
-    fdctrl->version = VERSION_INTEL_82078;
-    return fdctrl_init_common(fdctrl);
+    fdctrl->dma_chann = dma_chann;
+    return fdctrl_init_common(fdctrl, VERSION_INTEL_82078);
 }
 
 static int sysbus_fdc_init1(SysBusDevice *dev)
@@ -2274,8 +2323,8 @@ static int sysbus_fdc_init1(SysBusDevice *dev)
 
     vmstate_register(-1, &vmstate_fdc, fdctrl);
 
-    fdctrl->version = VERSION_INTEL_82078;
-    return fdctrl_init_common(fdctrl);
+    fdctrl->dma_chann = -1;
+    return fdctrl_init_common(fdctrl, VERSION_INTEL_82078);
 }
 
 static int sun4m_fdc_init1(SysBusDevice *dev)
@@ -2292,13 +2341,14 @@ static int sun4m_fdc_init1(SysBusDevice *dev)
     vmstate_register(-1, &vmstate_fdc, fdctrl);
 
     fdctrl->sun4m = 1;
-    fdctrl->version = VERSION_INTEL_82078;
-    return fdctrl_init_common(fdctrl);
+    return fdctrl_init_common(fdctrl, VERSION_INTEL_82078);
 }
 
 static int pc98_fdc_init1(ISADevice *dev)
 {
-    static const uint32_t port[8] = {0x90, 0x92, 0x94, 0xbe, 0xc8, 0xca, 0xcc, 0x4be};
+    static const uint32_t port[8] = {
+        0x90, 0x92, 0x94, 0xc8, 0xca, 0xcc, 0xbe, 0x4be
+    };
 
     fdctrl_isabus_t *isa = DO_UPCAST(fdctrl_isabus_t, busdev, dev);
     fdctrl_t *fdctrl = &isa->state;
@@ -2308,38 +2358,60 @@ static int pc98_fdc_init1(ISADevice *dev)
         register_ioport_read(port[i], 1, 1, &pc98_fdctrl_read_port, fdctrl);
         register_ioport_write(port[i], 1, 1, &pc98_fdctrl_write_port, fdctrl);
     }
-    isa_init_irq(&isa->busdev, &fdctrl->irq1200, 11);
+    isa_init_irq(&isa->busdev, &fdctrl->irq120, 11);
     isa_init_irq(&isa->busdev, &fdctrl->irq640, 10);
+    DMA_register_channel(2, &fdctrl_transfer_handler, fdctrl);
+    DMA_register_channel(3, &fdctrl_transfer_handler, fdctrl);
 
     vmstate_register(-1, &vmstate_pc98_fdc, fdctrl);
 
+    /* don't regist DMA channel in fdctrl_init_common */
+    fdctrl->dma_chann = -1;
     fdctrl->pc98 = 1;
-    fdctrl->version = VERSION_NEC_UPD765A;
-    return fdctrl_init_common(fdctrl);
+    return fdctrl_init_common(fdctrl, VERSION_NEC_UPD765A);
 }
 
 static ISADeviceInfo isa_fdc_info = {
     .init = isabus_fdc_init1,
     .qdev.name  = "isa-fdc",
     .qdev.size  = sizeof(fdctrl_isabus_t),
+    .qdev.props = (Property[]) {
+        DEFINE_PROP_DRIVE("driveA", fdctrl_isabus_t, state.drives[0].dinfo),
+        DEFINE_PROP_DRIVE("driveB", fdctrl_isabus_t, state.drives[1].dinfo),
+        DEFINE_PROP_END_OF_LIST(),
+    },
 };
 
 static SysBusDeviceInfo sysbus_fdc_info = {
     .init = sysbus_fdc_init1,
     .qdev.name  = "sysbus-fdc",
     .qdev.size  = sizeof(fdctrl_sysbus_t),
+    .qdev.props = (Property[]) {
+        DEFINE_PROP_DRIVE("driveA", fdctrl_sysbus_t, state.drives[0].dinfo),
+        DEFINE_PROP_DRIVE("driveB", fdctrl_sysbus_t, state.drives[1].dinfo),
+        DEFINE_PROP_END_OF_LIST(),
+    },
 };
 
 static SysBusDeviceInfo sun4m_fdc_info = {
     .init = sun4m_fdc_init1,
     .qdev.name  = "SUNW,fdtwo",
     .qdev.size  = sizeof(fdctrl_sysbus_t),
+    .qdev.props = (Property[]) {
+        DEFINE_PROP_DRIVE("drive", fdctrl_sysbus_t, state.drives[0].dinfo),
+        DEFINE_PROP_END_OF_LIST(),
+    },
 };
 
 static ISADeviceInfo pc98_fdc_info = {
     .init = pc98_fdc_init1,
     .qdev.name  = "pc98-fdc",
     .qdev.size  = sizeof(fdctrl_isabus_t),
+    .qdev.props = (Property[]) {
+        DEFINE_PROP_DRIVE("driveA", fdctrl_isabus_t, state.drives[0].dinfo),
+        DEFINE_PROP_DRIVE("driveB", fdctrl_isabus_t, state.drives[1].dinfo),
+        DEFINE_PROP_END_OF_LIST(),
+    },
 };
 
 static void fdc_register_devices(void)

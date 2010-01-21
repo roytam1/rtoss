@@ -13,7 +13,7 @@ CONFIG_AUDIO_DRIVERS=sdl
 CONFIG_SDL=y
 VERSION=0.11.50
 PKGVERSION=
-SRC_PATH=/usr/home/User/qemu-pc98_20091005-p2
+SRC_PATH=/usr/home/User/qemu-pc98_20091017-p3
 TARGET_DIRS=i386-softmmu
 CONFIG_SDL=y
 SDL_CFLAGS=-I/usr/local/include/SDL -D_GNU_SOURCE=1 -Dmain=SDL_main
@@ -37,8 +37,8 @@ HOST_CC=gcc
 AR=ar
 OBJCOPY=objcopy
 LD=ld
-CFLAGS=-I$(SRC_PATH)/slirp -O2 -g 
-QEMU_CFLAGS=-I. -I$(SRC_PATH) -MMD -MP -MT $@ -U_FORTIFY_SOURCE -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wendif-labels -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -m32 -DWIN32_LEAN_AND_MEAN -DWINVER=0x501 
+CFLAGS=-O2 -g 
+QEMU_CFLAGS=-I$(SRC_PATH)/slirp -Wold-style-definition -I. -I$(SRC_PATH) -U_FORTIFY_SOURCE -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wendif-labels -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -m32 -DWIN32_LEAN_AND_MEAN -DWINVER=0x501 
 HELPER_CFLAGS=-fomit-frame-pointer
 LDFLAGS=-Wl,--warn-common -g -m32 
 ARLIBS_BEGIN=-Wl,--whole-archive

@@ -128,6 +128,11 @@ DEF("alt-grab", 0, QEMU_OPTION_alt_grab,
 #endif
 
 #ifdef CONFIG_SDL
+DEF("ctrl-grab", 0, QEMU_OPTION_ctrl_grab,
+"-ctrl-grab       use Right-Ctrl to grab mouse (instead of Ctrl-Alt)\n")
+#endif
+
+#ifdef CONFIG_SDL
 DEF("no-quit", 0, QEMU_OPTION_no_quit,
 "-no-quit        disable SDL window close capability\n")
 #endif
@@ -168,8 +173,7 @@ DEF("win2k-hack", 0, QEMU_OPTION_win2k_hack,
 #endif
 
 #ifdef TARGET_I386
-DEF("rtc-td-hack", 0, QEMU_OPTION_rtc_td_hack,
-"-rtc-td-hack    use it to fix time drift in Windows ACPI HAL\n")
+DEF("rtc-td-hack", 0, QEMU_OPTION_rtc_td_hack, "")
 #endif
 
 #ifdef TARGET_I386
@@ -273,6 +277,16 @@ DEF("net", HAS_ARG, QEMU_OPTION_net,
 "                dump traffic on vlan 'n' to file 'f' (max n bytes per packet)\n"
 "-net none       use it alone to have zero network devices; if no -net option\n"
 "                is provided, the default is '-net nic -net user'\n")
+DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
+"-netdev ["
+#ifdef CONFIG_SLIRP
+"user|"
+#endif
+"tap|"
+#ifdef CONFIG_VDE
+"vde|"
+#endif
+"socket],id=str[,option][,option][,...]\n")
 
 DEF("bt", HAS_ARG, QEMU_OPTION_bt, \
 "\n" \
@@ -383,11 +397,19 @@ DEF("clock", HAS_ARG, QEMU_OPTION_clock, \
 "-clock          force the use of the given methods for timer alarm.\n" \
 "                To see what timers are available use -clock ?\n")
 
-DEF("localtime", 0, QEMU_OPTION_localtime, \
-"-localtime      set the real time clock to local time [default=utc]\n")
+DEF("localtime", 0, QEMU_OPTION_localtime, "")
+DEF("startdate", HAS_ARG, QEMU_OPTION_startdate, "")
 
-DEF("startdate", HAS_ARG, QEMU_OPTION_startdate, \
-"-startdate      select initial date of the clock\n")
+#ifdef TARGET_I386
+DEF("rtc", HAS_ARG, QEMU_OPTION_rtc, \
+"-rtc [base=utc|localtime|date][,clock=host|vm][,driftfix=none|slew]\n" \
+"                set the RTC base and clock, enable drift fix for clock ticks\n")
+#else
+DEF("rtc", HAS_ARG, QEMU_OPTION_rtc, \
+"-rtc [base=utc|localtime|date][,clock=host|vm]\n" \
+"                set the RTC base and clock\n")
+#endif
+
 
 DEF("icount", HAS_ARG, QEMU_OPTION_icount, \
 "-icount [N|auto]\n" \

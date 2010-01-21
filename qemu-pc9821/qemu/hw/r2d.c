@@ -236,7 +236,7 @@ static void r2d_init(ram_addr_t ram_size,
 
     /* NIC: rtl8139 on-board, and 2 slots. */
     for (i = 0; i < nb_nics; i++)
-        pci_nic_init(&nd_table[i], "rtl8139", i==0 ? "2" : NULL);
+        pci_nic_init_nofail(&nd_table[i], "rtl8139", i==0 ? "2" : NULL);
 
     /* Todo: register on board registers */
     if (kernel_filename) {
@@ -250,7 +250,7 @@ static void r2d_init(ram_addr_t ram_size,
 				   SDRAM_BASE + LINUX_LOAD_OFFSET,
 				   SDRAM_SIZE - LINUX_LOAD_OFFSET);
           env->pc = (SDRAM_BASE + LINUX_LOAD_OFFSET) | 0xa0000000;
-          pstrcpy_targphys(SDRAM_BASE + 0x10100, 256, kernel_cmdline);
+          pstrcpy_targphys("cmdline", SDRAM_BASE + 0x10100, 256, kernel_cmdline);
       } else {
           kernel_size = load_image_targphys(kernel_filename, SDRAM_BASE, SDRAM_SIZE);
           env->pc = SDRAM_BASE | 0xa0000000; /* Start from P2 area */

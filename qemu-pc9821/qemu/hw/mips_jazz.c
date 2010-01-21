@@ -126,7 +126,7 @@ void mips_jazz_init (ram_addr_t ram_size,
     int s_rtc, s_dma_dummy;
     NICInfo *nd;
     PITState *pit;
-    BlockDriverState *fds[MAX_FD];
+    DriveInfo *fds[MAX_FD];
     qemu_irq esp_reset;
     ram_addr_t ram_offset;
     ram_addr_t bios_offset;
@@ -185,6 +185,8 @@ void mips_jazz_init (ram_addr_t ram_size,
 
     /* ISA devices */
     i8259 = i8259_init(env->irq[4]);
+    isa_bus_new(NULL);
+    isa_bus_irqs(i8259);
     DMA_init(0);
     pit = pit_init(0x40, i8259[0]);
     pcspk_init(pit);
@@ -209,7 +211,7 @@ void mips_jazz_init (ram_addr_t ram_size,
     for (n = 0; n < nb_nics; n++) {
         nd = &nd_table[n];
         if (!nd->model)
-            nd->model = "dp83932";
+            nd->model = qemu_strdup("dp83932");
         if (strcmp(nd->model, "dp83932") == 0) {
             dp83932_init(nd, 0x80001000, 2, rc4030[4],
                          rc4030_opaque, rc4030_dma_memory_rw);
@@ -234,8 +236,7 @@ void mips_jazz_init (ram_addr_t ram_size,
         exit(1);
     }
     for (n = 0; n < MAX_FD; n++) {
-        DriveInfo *dinfo = drive_get(IF_FLOPPY, 0, n);
-        fds[n] = dinfo ? dinfo->bdrv : NULL;
+        fds[n] = drive_get(IF_FLOPPY, 0, n);
     }
     fdctrl_init_sysbus(rc4030[1], 0, 0x80003000, fds);
 

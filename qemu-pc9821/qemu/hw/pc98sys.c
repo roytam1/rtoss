@@ -1,5 +1,5 @@
 /*
- * QEMU NEC PC-98x1 systemp port
+ * QEMU NEC PC-9821 systemp port
  *
  * Copyright (c) 2009 TAKEDA, toshiya
  *
@@ -27,37 +27,41 @@
 #include "isa.h"
 #include "qdev-addr.h"
 
-#define RTC_STROBE      0x08
-#define RTC_CLOCK       0x10
-#define RTC_DIN         0x20
+enum {
+    RTC_STROBE          = 0x08,
+    RTC_CLOCK           = 0x10,
+    RTC_DIN             = 0x20,
+};
+
+enum {
+    RTC_CMD_SHIFT       = 0x01,
+    RTC_CMD_READ        = 0x03,
+    RTC_CMD_EXMODE      = 0x07,
+};
+
+enum {
+    RTC_MODE_UPD4993A   = 0x20,
+};
 
 #define TSTMP_FREQ      307200
 
-static const int64_t rtc_expire[3] = {64, 256, 2048};
-
 struct sysport_t {
-    uint8_t rtc_cmd;
     uint8_t rtc_mode;
-    uint8_t rtc_tpmode;
-    uint64_t rtc_shift;
+    uint8_t rtc_reg;
+    uint8_t rtc_cmd;
+    uint64_t rtc_shift_out;
+    uint8_t rtc_shift_cmd;
+    uint8_t rtc_irq_mode;
+    uint8_t rtc_irq_count;
+
     uint8_t sys_portc;
     int sys_portc_patch;
     uint8_t prn_porta;
     uint8_t prn_portc;
 
-    uint8_t mbcfg1[256];
-    uint8_t mbcfg1_bank;
-    uint8_t mbcfg2[256];
-    uint8_t mbcfg2_bank;
-
-    uint16_t unkreg[4][256];
-    uint8_t unkreg_bank1;
-    uint8_t unkreg_bank2;
-
-    int64_t initial_clock;
-    int64_t expire_clock;
     QEMUTimer *rtc_timer;
     qemu_irq irq;
+    int64_t initial_clock;
 };
 
 typedef struct sysport_isabus_t {
@@ -67,72 +71,100 @@ typedef struct sysport_isabus_t {
 
 typedef struct sysport_t sysport_t;
 
-/* rtc */
+/* NEC uPD4993A RTC */
 
 static void rtc_timer_handler(void *opaque)
 {
     sysport_t *s = opaque;
 
-    if (s->rtc_tpmode != 3) {
-        qemu_set_irq(s->irq, 1);
-        qemu_set_irq(s->irq, 0);
-
-        /* set next timer */
-        s->expire_clock += get_ticks_per_sec() / rtc_expire[s->rtc_tpmode];
-        qemu_mod_timer(s->rtc_timer, s->expire_clock);
+    /* rtc_irq_mode = 0 : 1/64 sec
+                    = 1 : 1/32 sec
+                    = 2 : no irq
+                    = 3 : 1/16 sec
+    */
+    if (s->rtc_irq_mode != 2) {
+        if (++s->rtc_irq_count > s->rtc_irq_mode) {
+            qemu_set_irq(s->irq, 1);
+            qemu_set_irq(s->irq, 0);
+            s->rtc_irq_count = 0;
+        }
     }
+
+    /* set next timer */
+    qemu_mod_timer(s->rtc_timer, qemu_get_clock(vm_clock) +
+                   get_ticks_per_sec() / 64);
 }
 
-static inline int64_t to_bcd(int a)
+static inline uint64_t to_bcd(int a)
 {
     return ((a / 10) << 4) | (a % 10);
 }
 
-static void rtc_cmd_write(void *opaque, uint32_t addr, uint32_t value)
+static void rtc_read_time(void *opaque)
+{
+    sysport_t *s = opaque;
+    struct tm tm;
+
+    qemu_get_timedate(&tm, 0);
+    s->rtc_shift_out = to_bcd(tm.tm_sec);
+    s->rtc_shift_out |= to_bcd(tm.tm_min) << 8;
+    s->rtc_shift_out |= to_bcd(tm.tm_hour) << 16;
+    s->rtc_shift_out |= to_bcd(tm.tm_mday) << 24;
+    s->rtc_shift_out |= (uint64_t)tm.tm_wday << 32;
+    s->rtc_shift_out |= (uint64_t)(tm.tm_mon + 1) << 36;
+    s->rtc_shift_out |= to_bcd(tm.tm_year % 100) << 40;
+    if (s->rtc_mode & RTC_MODE_UPD4993A) {
+        s->rtc_shift_out <<= 4;
+    }
+}
+
+static void rtc_reg_write(void *opaque, uint32_t addr, uint32_t value)
 {
     sysport_t *s = opaque;
 
-    if ((s->rtc_cmd & RTC_STROBE) && !(value & RTC_STROBE)) {
-        if (!(s->rtc_cmd & RTC_CLOCK)) {
-            if (s->rtc_cmd & 4) {
-                uint8_t tpmode = s->rtc_cmd & 3;
-                if (s->rtc_tpmode == 3 && tpmode != 3) {
-                    s->expire_clock = qemu_get_clock(vm_clock) + 
-                                      get_ticks_per_sec() / rtc_expire[tpmode];
-                    qemu_mod_timer(s->rtc_timer, s->expire_clock);
-                } else if (s->rtc_tpmode != 3 && tpmode == 3) {
-                    qemu_del_timer(s->rtc_timer);
-                }
-                s->rtc_tpmode = tpmode;
-            } else {
-                s->rtc_mode = s->rtc_cmd & 3;
-                if (s->rtc_mode == 3) {
-                    struct tm tm;
-                    qemu_get_timedate(&tm, 0);
-                    s->rtc_shift = to_bcd(tm.tm_sec);
-                    s->rtc_shift |= to_bcd(tm.tm_min) << 8;
-                    s->rtc_shift |= to_bcd(tm.tm_hour) << 16;
-                    s->rtc_shift |= to_bcd(tm.tm_mday) << 24;
-                    s->rtc_shift |= (int64_t)tm.tm_wday << 32;
-                    s->rtc_shift |= (int64_t)tm.tm_mon << 36;
-                    s->rtc_shift |= to_bcd(tm.tm_year % 100) << 40;
-                }
+    if ((s->rtc_reg & RTC_STROBE) && !(value & RTC_STROBE)) {
+        s->rtc_cmd = s->rtc_reg & 0x07;
+        if (s->rtc_cmd == RTC_CMD_READ) {
+            rtc_read_time(s);
+        } else if (s->rtc_cmd == RTC_CMD_EXMODE) {
+            s->rtc_cmd = s->rtc_shift_cmd & 0x0f;
+            if (s->rtc_cmd == RTC_CMD_READ) {
+                rtc_read_time(s);
             }
         }
     }
-    if (!(s->rtc_cmd & RTC_CLOCK) && (value & RTC_CLOCK)) {
-        if (s->rtc_mode == 1) {
-            uint64_t din = ((s->rtc_cmd & 0x20) != 0);
-            s->rtc_shift |= (din << 40);
-            s->rtc_shift >>= 1;
-        }
+    if ((s->rtc_reg & RTC_CLOCK) && !(value & RTC_CLOCK)) {
+        uint8_t din = ((s->rtc_reg & RTC_DIN) != 0);
+//        if ((s->rtc_reg & 0x07) == RTC_CMD_EXMODE) {
+            s->rtc_shift_cmd |= din << 4;
+            s->rtc_shift_cmd >>= 1;
+//        } else if (s->rtc_cmd == RTC_CMD_SHIFT) {
+            s->rtc_shift_out >>= 1;
+//        }
     }
-    s->rtc_cmd = value;
+    s->rtc_reg = value;
+}
+
+static void rtc_mode_write(void *opaque, uint32_t addr, uint32_t value)
+{
+    sysport_t *s = opaque;
+
+    s->rtc_mode = value;
 }
 
 static uint32_t rtc_mode_read(void *opaque, uint32_t addr)
 {
-    return 0xef;
+    sysport_t *s = opaque;
+
+    return s->rtc_mode;
+}
+
+static void rtc_irq_mode_write(void *opaque, uint32_t addr, uint32_t value)
+{
+    sysport_t *s = opaque;
+
+    s->rtc_irq_mode = value & 0x03;
+    s->rtc_irq_count = 0;
 }
 
 /* system port */
@@ -146,7 +178,7 @@ static uint32_t sys_portb_read(void *opaque, uint32_t addr)
 {
     sysport_t *s = opaque;
 
-    return 0xf8 | (s->rtc_shift & 1);
+    return 0xf8 | (s->rtc_shift_out & 1);
 }
 
 static void sys_portc_write(void *opaque, uint32_t addr, uint32_t value)
@@ -154,6 +186,7 @@ static void sys_portc_write(void *opaque, uint32_t addr, uint32_t value)
     sysport_t *s = opaque;
 
     s->sys_portc = value;
+    pc98_pcspk_write(value);
 }
 
 static uint32_t sys_portc_read(void *opaque, uint32_t addr)
@@ -260,136 +293,21 @@ static uint32_t tstmp_read(void *opaque, uint32_t addr)
     return 0xffff;
 }
 
-/* mother board configs */
-
-static void mbcfg1_bank_write(void *opaque, uint32_t addr, uint32_t value)
-{
-    sysport_t *s = opaque;
-
-    s->mbcfg1_bank = value;
-}
-
-static uint32_t mbcfg1_bank_read(void *opaque, uint32_t addr)
-{
-    sysport_t *s = opaque;
-
-    return s->mbcfg1_bank;
-}
-
-static void mbcfg1_data_write(void *opaque, uint32_t addr, uint32_t value)
-{
-    sysport_t *s = opaque;
-
-    s->mbcfg1[s->mbcfg1_bank] = value;
-}
-
-static uint32_t mbcfg1_data_read(void *opaque, uint32_t addr)
-{
-    sysport_t *s = opaque;
-
-    if (s->mbcfg1_bank == 0) {
-        uint32_t value = s->mbcfg1[0];
-        s->mbcfg1[0] += 0x40;
-        return value;
-    }
-    return s->mbcfg1[s->mbcfg1_bank];
-}
-
-static void mbcfg2_bank_write(void *opaque, uint32_t addr, uint32_t value)
-{
-    sysport_t *s = opaque;
-
-    s->mbcfg2_bank = value;
-}
-
-static uint32_t mbcfg2_bank_read(void *opaque, uint32_t addr)
-{
-    sysport_t *s = opaque;
-
-    return s->mbcfg2_bank;
-}
-
-static void mbcfg2_data_write(void *opaque, uint32_t addr, uint32_t value)
-{
-    sysport_t *s = opaque;
-
-    s->mbcfg2[s->mbcfg2_bank] = value;
-}
-
-static uint32_t mbcfg2_data_read(void *opaque, uint32_t addr)
-{
-    sysport_t *s = opaque;
-
-    return s->mbcfg2[s->mbcfg2_bank];
-}
-
-static void unkreg_bank_write(void *opaque, uint32_t addr, uint32_t value)
-{
-    sysport_t *s = opaque;
-
-    s->unkreg_bank1 = value;
-    s->unkreg_bank2 = 0;
-}
-
-static uint32_t unkreg_bank_read(void *opaque, uint32_t addr)
-{
-    sysport_t *s = opaque;
-
-    return s->unkreg_bank1;
-}
-
-static void unkreg_data_write(void *opaque, uint32_t addr, uint32_t value)
-{
-    sysport_t *s = opaque;
-
-    s->unkreg[(s->unkreg_bank2++) & 3][s->unkreg_bank1] = value;
-}
-
-static uint32_t unkreg_data_read(void *opaque, uint32_t addr)
-{
-    sysport_t *s = opaque;
-
-    return s->unkreg[(s->unkreg_bank2++) & 3][s->unkreg_bank1];
-}
-
 /* interface */
 
 static void pc98_sys_reset(void *opaque)
 {
     sysport_t *s = opaque;
 
-    s->rtc_cmd = RTC_CLOCK;
-    s->rtc_mode = 0;
-    s->rtc_tpmode = 3;
-    s->rtc_shift = 0;
+    s->rtc_mode = 0xff;
+    s->rtc_reg = 0;
+    s->rtc_cmd = 0;
+    s->rtc_irq_mode = 2;
 
     s->sys_portc = 0xff;//b8;
     s->sys_portc_patch = 8;
     s->prn_porta = 0xff;
     s->prn_portc = 0x81;
-
-    memset(s->mbcfg1, 0, sizeof(s->mbcfg1));
-    s->mbcfg1[0] = 0x10;
-    s->mbcfg1_bank = 0;
-    memset(s->mbcfg2, 0, sizeof(s->mbcfg2));
-    s->mbcfg2_bank = 0;
-
-    memset(s->unkreg, 0, sizeof(s->unkreg));
-    s->unkreg_bank1 = s->unkreg_bank2 = 0;
-}
-
-static int pc98_sys_post_load(void *opaque, int version_id)
-{
-    sysport_t *s = opaque;
-
-    if (s->rtc_tpmode != 3) {
-        s->expire_clock = qemu_get_clock(vm_clock) +
-                          get_ticks_per_sec() / rtc_expire[s->rtc_tpmode];
-        qemu_mod_timer(s->rtc_timer, s->expire_clock);
-    } else {
-        qemu_del_timer(s->rtc_timer);
-    }
-    return 0;
 }
 
 static const VMStateDescription vmstate_sysport = {
@@ -397,19 +315,16 @@ static const VMStateDescription vmstate_sysport = {
     .version_id = 1,
     .minimum_version_id = 1,
     .minimum_version_id_old = 1,
-    .post_load = pc98_sys_post_load,
     .fields      = (VMStateField []) {
+        VMSTATE_UINT8(rtc_reg, sysport_t),
         VMSTATE_UINT8(rtc_cmd, sysport_t),
-        VMSTATE_UINT8(rtc_mode, sysport_t),
-        VMSTATE_UINT8(rtc_tpmode, sysport_t),
-        VMSTATE_UINT64(rtc_shift, sysport_t),
+        VMSTATE_UINT64(rtc_shift_out, sysport_t),
+        VMSTATE_UINT8(rtc_shift_cmd, sysport_t),
+        VMSTATE_UINT8(rtc_irq_mode, sysport_t),
+        VMSTATE_UINT8(rtc_irq_count, sysport_t),
         VMSTATE_UINT8(sys_portc, sysport_t),
         VMSTATE_UINT8(prn_porta, sysport_t),
         VMSTATE_UINT8(prn_portc, sysport_t),
-        VMSTATE_BUFFER(mbcfg1, sysport_t),
-        VMSTATE_UINT8(mbcfg1_bank, sysport_t),
-        VMSTATE_BUFFER(mbcfg2, sysport_t),
-        VMSTATE_UINT8(mbcfg2_bank, sysport_t),
         VMSTATE_END_OF_LIST()
     }
 };
@@ -420,8 +335,10 @@ static int pc98_sys_init1(ISADevice *dev)
     sysport_t *s = &isa->state;
     int isairq = 15;
 
-    register_ioport_write(0x20, 1, 1, rtc_cmd_write, s);
+    register_ioport_write(0x20, 1, 1, rtc_reg_write, s);
+    register_ioport_write(0x22, 1, 1, rtc_mode_write, s);
     register_ioport_read(0x22, 1, 1, rtc_mode_read, s);
+    register_ioport_write(0x128, 1, 1, rtc_irq_mode_write, s);
 
     register_ioport_read(0x31, 1, 1, sys_porta_read, s);
     register_ioport_read(0x33, 1, 1, sys_portb_read, s);
@@ -439,24 +356,11 @@ static int pc98_sys_init1(ISADevice *dev)
     register_ioport_read(0x5c, 2, 2, tstmp_read, s);
     register_ioport_read(0x5e, 2, 2, tstmp_read, s);
 
-    register_ioport_write(0x411, 1, 1, mbcfg1_bank_write, s);
-    register_ioport_read(0x411, 1, 1, mbcfg1_bank_read, s);
-    register_ioport_write(0x413, 1, 1, mbcfg1_data_write, s);
-    register_ioport_read(0x413, 1, 1, mbcfg1_data_read, s);
-
-    register_ioport_write(0xb00, 2, 2, mbcfg2_bank_write, s);
-    register_ioport_read(0xb00, 2, 2, mbcfg2_bank_read, s);
-    register_ioport_write(0xb02, 1, 1, mbcfg2_data_write, s);
-    register_ioport_read(0xb02, 1, 1, mbcfg2_data_read, s);
-
-    register_ioport_write(0x18f0, 2, 2, unkreg_bank_write, s);
-    register_ioport_read(0x18f0, 2, 2, unkreg_bank_read, s);
-    register_ioport_write(0x18f2, 2, 2, unkreg_data_write, s);
-    register_ioport_read(0x18f2, 2, 2, unkreg_data_read, s);
-
     isa_init_irq(&isa->busdev, &s->irq, isairq);
 
     s->rtc_timer = qemu_new_timer(vm_clock, rtc_timer_handler, s);
+    qemu_mod_timer(s->rtc_timer, qemu_get_clock(vm_clock) +
+                   get_ticks_per_sec() / 64);
     s->initial_clock = qemu_get_clock(vm_clock);
 
     vmstate_register(-1, &vmstate_sysport, s);

@@ -29,12 +29,9 @@ static struct BusInfo ide_bus_info = {
     .size  = sizeof(IDEBus),
 };
 
-IDEBus *ide_bus_new(DeviceState *dev)
+void ide_bus_new(IDEBus *idebus, DeviceState *dev)
 {
-    IDEBus *idebus;
-
-    idebus = FROM_QBUS(IDEBus, qbus_create(&ide_bus_info, dev, NULL));
-    return idebus;
+    qbus_create_inplace(&idebus->qbus, &ide_bus_info, dev, NULL);
 }
 
 static int ide_qdev_init(DeviceState *qdev, DeviceInfo *base)
@@ -88,7 +85,7 @@ IDEDevice *ide_create_drive(IDEBus *bus, int unit, DriveInfo *drive)
     dev = qdev_create(&bus->qbus, "ide-drive");
     qdev_prop_set_uint32(dev, "unit", unit);
     qdev_prop_set_drive(dev, "drive", drive);
-    if (qdev_init(dev) != 0)
+    if (qdev_init(dev) < 0)
         return NULL;
     return DO_UPCAST(IDEDevice, qdev, dev);
 }
