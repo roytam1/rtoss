@@ -774,7 +774,7 @@ cat > $TMPC << EOF
 #undef main /* We don't want SDL to override our main() */
 int main( void ) { return SDL_Init (SDL_INIT_VIDEO); }
 EOF
-    if $cc $ARCH_CFLAGS -o $TMPE ${OS_CFLAGS} `$sdl_config --cflags 2> /dev/null` $TMPC `$sdl_config --libs 2> /dev/null` > $TMPSDLLOG 2>&1 ; then
+    if $cc $ARCH_CFLAGS -o $TMPE ${OS_CFLAGS} ${CFLAGS} ${LDFLAGS} `$sdl_config --cflags 2> /dev/null` $TMPC `$sdl_config --libs 2> /dev/null` > $TMPSDLLOG 2>&1 ; then
         _sdlversion=`$sdl_config --version | sed 's/[^0-9]//g'`
         if test "$_sdlversion" -lt 121 ; then
             sdl_too_old=yes
