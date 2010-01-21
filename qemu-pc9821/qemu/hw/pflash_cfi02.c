@@ -14,7 +14,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 
 /*
@@ -42,12 +43,12 @@
 
 //#define PFLASH_DEBUG
 #ifdef PFLASH_DEBUG
-#define DPRINTF(fmt, ...)                          \
+#define DPRINTF(fmt, args...)                      \
 do {                                               \
-    printf("PFLASH: " fmt , ## __VA_ARGS__);       \
+        printf("PFLASH: " fmt , ##args);           \
 } while (0)
 #else
-#define DPRINTF(fmt, ...) do { } while (0)
+#define DPRINTF(fmt, args...) do { } while (0)
 #endif
 
 struct pflash_t {
@@ -389,7 +390,7 @@ static void pflash_write (pflash_t *pfl, uint32_t offset, uint32_t value,
             pflash_update(pfl, 0, pfl->chip_len);
             /* Let's wait 5 seconds before chip erase is done */
             qemu_mod_timer(pfl->timer,
-                           qemu_get_clock(vm_clock) + (get_ticks_per_sec() * 5));
+                           qemu_get_clock(vm_clock) + (ticks_per_sec * 5));
             break;
         case 0x30:
             /* Sector erase */
@@ -402,7 +403,7 @@ static void pflash_write (pflash_t *pfl, uint32_t offset, uint32_t value,
             pfl->status = 0x00;
             /* Let's wait 1/2 second before sector erase is done */
             qemu_mod_timer(pfl->timer,
-                           qemu_get_clock(vm_clock) + (get_ticks_per_sec() / 2));
+                           qemu_get_clock(vm_clock) + (ticks_per_sec / 2));
             break;
         default:
             DPRINTF("%s: invalid command %02x (wc 5)\n", __func__, cmd);
@@ -492,13 +493,13 @@ static void pflash_writel (void *opaque, target_phys_addr_t addr,
     pflash_write(pfl, addr, value, 4);
 }
 
-static CPUWriteMemoryFunc * const pflash_write_ops[] = {
+static CPUWriteMemoryFunc *pflash_write_ops[] = {
     &pflash_writeb,
     &pflash_writew,
     &pflash_writel,
 };
 
-static CPUReadMemoryFunc * const pflash_read_ops[] = {
+static CPUReadMemoryFunc *pflash_read_ops[] = {
     &pflash_readb,
     &pflash_readw,
     &pflash_readl,
@@ -547,7 +548,6 @@ pflash_t *pflash_cfi02_register(target_phys_addr_t base, ram_addr_t off,
 {
     pflash_t *pfl;
     int32_t chip_len;
-    int ret;
 
     chip_len = sector_len * nb_blocs;
     /* XXX: to be fixed */
@@ -557,9 +557,8 @@ pflash_t *pflash_cfi02_register(target_phys_addr_t base, ram_addr_t off,
         return NULL;
 #endif
     pfl = qemu_mallocz(sizeof(pflash_t));
-    /* FIXME: Allocate ram ourselves.  */
-    pfl->storage = qemu_get_ram_ptr(off);
-    pfl->fl_mem = cpu_register_io_memory(pflash_read_ops, pflash_write_ops,
+    pfl->storage = phys_ram_base + off;
+    pfl->fl_mem = cpu_register_io_memory(0, pflash_read_ops, pflash_write_ops,
                                          pfl);
     pfl->off = off;
     pfl->base = base;
@@ -569,12 +568,7 @@ pflash_t *pflash_cfi02_register(target_phys_addr_t base, ram_addr_t off,
     pfl->bs = bs;
     if (pfl->bs) {
         /* read the initial flash content */
-        ret = bdrv_read(pfl->bs, 0, pfl->storage, chip_len >> 9);
-        if (ret < 0) {
-            cpu_unregister_io_memory(pfl->fl_mem);
-            qemu_free(pfl);
-            return NULL;
-        }
+        bdrv_read(pfl->bs, 0, pfl->storage, chip_len >> 9);
     }
 #if 0 /* XXX: there should be a bit to set up read-only,
        *      the same way the hardware does (with WP pin).

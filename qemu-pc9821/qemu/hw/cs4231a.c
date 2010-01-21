@@ -25,7 +25,6 @@
 #include "audiodev.h"
 #include "audio/audio.h"
 #include "isa.h"
-#include "qdev.h"
 #include "qemu-timer.h"
 
 /*
@@ -41,8 +40,11 @@
 /* #define DEBUG_XLAW */
 
 static struct {
+    int irq;
+    int dma;
+    int port;
     int aci_counter;
-} conf = {1};
+} conf = {9, 3, 0x534, 1};
 
 #ifdef DEBUG
 #define dolog(...) AUD_log ("cs4231a", __VA_ARGS__)
@@ -57,14 +59,13 @@ static struct {
 #define CS_DREGS 32
 
 typedef struct CSState {
-    ISADevice dev;
     QEMUSoundCard card;
-    qemu_irq pic;
+    qemu_irq *pic;
     uint32_t regs[CS_REGS];
     uint8_t dregs[CS_DREGS];
-    uint32_t irq;
-    uint32_t dma;
-    uint32_t port;
+    int irq;
+    int dma;
+    int port;
     int shift;
     int dma_running;
     int audio_free;
@@ -215,7 +216,7 @@ static int16_t ALawDecompressTable[256] =
       944,   912,  1008,   976,   816,   784,   880,   848
 };
 
-static void cs_reset (void *opaque)
+static void cs_reset(void *opaque)
 {
     CSState *s = opaque;
 
@@ -482,7 +483,7 @@ IO_WRITE_PROTO (cs_write)
         case Alternate_Feature_Status:
             if ((s->dregs[iaddr] & PI) && !(val & PI)) {
                 /* XXX: TI CI */
-                qemu_irq_lower (s->pic);
+                qemu_irq_lower (s->pic[s->irq]);
                 s->regs[Status] &= ~INT;
             }
             s->dregs[iaddr] = val;
@@ -502,7 +503,7 @@ IO_WRITE_PROTO (cs_write)
 
     case Status:
         if (s->regs[Status] & INT) {
-            qemu_irq_lower (s->pic);
+            qemu_irq_lower (s->pic[s->irq]);
         }
         s->regs[Status] &= ~INT;
         s->dregs[Alternate_Feature_Status] &= ~(PI | CI | TI);
@@ -587,7 +588,7 @@ static int cs_dma_read (void *opaque, int nchan, int dma_pos, int dma_len)
         s->regs[Status] |= INT;
         s->dregs[Alternate_Feature_Status] |= PI;
         s->transferred = 0;
-        qemu_irq_raise (s->pic);
+        qemu_irq_raise (s->pic[s->irq]);
     }
     else {
         s->transferred += written;
@@ -596,23 +597,23 @@ static int cs_dma_read (void *opaque, int nchan, int dma_pos, int dma_len)
     return dma_pos;
 }
 
-static void cs_save (QEMUFile *f, void *opaque)
+static void cs_save(QEMUFile *f, void *opaque)
 {
     CSState *s = opaque;
     unsigned int i;
     uint32_t val;
 
     for (i = 0; i < CS_REGS; i++)
-        qemu_put_be32s (f, &s->regs[i]);
+        qemu_put_be32s(f, &s->regs[i]);
 
-    qemu_put_buffer (f, s->dregs, CS_DREGS);
-    val = s->dma_running; qemu_put_be32s (f, &val);
-    val = s->audio_free;  qemu_put_be32s (f, &val);
-    val = s->transferred; qemu_put_be32s (f, &val);
-    val = s->aci_counter; qemu_put_be32s (f, &val);
+    qemu_put_buffer(f, s->dregs, CS_DREGS);
+    val = s->dma_running; qemu_put_be32s(f, &val);
+    val = s->audio_free;  qemu_put_be32s(f, &val);
+    val = s->transferred; qemu_put_be32s(f, &val);
+    val = s->aci_counter; qemu_put_be32s(f, &val);
 }
 
-static int cs_load (QEMUFile *f, void *opaque, int version_id)
+static int cs_load(QEMUFile *f, void *opaque, int version_id)
 {
     CSState *s = opaque;
     unsigned int i;
@@ -622,25 +623,35 @@ static int cs_load (QEMUFile *f, void *opaque, int version_id)
         return -EINVAL;
 
     for (i = 0; i < CS_REGS; i++)
-        qemu_get_be32s (f, &s->regs[i]);
+        qemu_get_be32s(f, &s->regs[i]);
 
-    qemu_get_buffer (f, s->dregs, CS_DREGS);
+    qemu_get_buffer(f, s->dregs, CS_DREGS);
 
-    qemu_get_be32s (f, &dma_running);
-    qemu_get_be32s (f, &val); s->audio_free  = val;
-    qemu_get_be32s (f, &val); s->transferred = val;
-    qemu_get_be32s (f, &val); s->aci_counter = val;
+    qemu_get_be32s(f, &dma_running);
+    qemu_get_be32s(f, &val); s->audio_free  = val;
+    qemu_get_be32s(f, &val); s->transferred = val;
+    qemu_get_be32s(f, &val); s->aci_counter = val;
     if (dma_running && (s->dregs[Interface_Configuration] & PEN))
         cs_reset_voices (s, s->dregs[FS_And_Playback_Data_Format]);
     return 0;
 }
 
-static int cs4231a_initfn (ISADevice *dev)
+int cs4231a_init (AudioState *audio, qemu_irq *pic)
 {
-    CSState *s = DO_UPCAST (CSState, dev, dev);
     int i;
+    CSState *s;
 
-    isa_init_irq (dev, &s->pic, s->irq);
+    if (!audio) {
+        lerr ("No audio state\n");
+        return -1;
+    }
+
+    s = qemu_mallocz (sizeof (*s));
+
+    s->pic = pic;
+    s->irq = conf.irq;
+    s->dma = conf.dma;
+    s->port = conf.port;
 
     for (i = 0; i < 4; i++) {
         register_ioport_write (s->port + i, 1, 1, cs_write, s);
@@ -653,31 +664,66 @@ static int cs4231a_initfn (ISADevice *dev)
     qemu_register_reset (cs_reset, s);
     cs_reset (s);
 
-    AUD_register_card ("cs4231a", &s->card);
+    AUD_register_card (audio,"cs4231a", &s->card);
     return 0;
 }
 
-int cs4231a_init (qemu_irq *pic)
+/* NEC PC-9821 */
+
+IO_READ_PROTO (pc98_cs_read)
 {
-    isa_create_simple ("cs4231a");
-    return 0;
+    CSState *s = opaque;
+    uint32_t ret = 0;
+
+    switch (addr) {
+    case 0xf40:
+        if (s->irq == 4) {
+            ret |= 0x08; // INT0
+        } else if (s->irq == 6) {
+            ret |= 0x10; // INT2
+        } else if (s->irq == 10) {
+            ret |= 0x18; // INT41
+        } else if (s->irq == 12) {
+            ret |= 0x20; // INT5
+        }
+        if (s->dma == 0) {
+            ret |= 0x01;
+        } else if (s->dma == 1) {
+            ret |= 0x02;
+        } else if (s->dma == 3) {
+            ret |= 0x03;
+        }
+        break;
+    case 0xf43:
+        ret = 0x04;
+        break;
+    }
+    return ret;
 }
 
-static ISADeviceInfo cs4231a_info = {
-    .qdev.name     = "cs4231a",
-    .qdev.desc     = "Crystal Semiconductor CS4231A",
-    .qdev.size     = sizeof (CSState),
-    .init          = cs4231a_initfn,
-    .qdev.props    = (Property[]) {
-        DEFINE_PROP_HEX32  ("iobase",  CSState, port, 0x534),
-        DEFINE_PROP_UINT32 ("irq",     CSState, irq,  9),
-        DEFINE_PROP_UINT32 ("dma",     CSState, dma,  3),
-        DEFINE_PROP_END_OF_LIST (),
-    },
-};
-
-static void cs4231a_register (void)
+void pc98_cs4231a_init (AudioState *audio, qemu_irq *pic, int irq, int dma)
 {
-    isa_qdev_register (&cs4231a_info);
+    int i;
+    CSState *s;
+
+    s = qemu_mallocz (sizeof (*s));
+
+    s->pic = pic;
+    s->irq = irq;
+    s->dma = dma;
+
+    register_ioport_read (0xf40, 1, 1, pc98_cs_read, s);
+    register_ioport_read (0xf43, 1, 1, pc98_cs_read, s);
+    for (i = 0; i < 4; i++) {
+        register_ioport_write (0xf44 + i, 1, 1, cs_write, s);
+        register_ioport_read (0xf44 + i, 1, 1, cs_read, s);
+    }
+
+    DMA_register_channel (s->dma, cs_dma_read, s);
+
+    register_savevm ("cs4231a", 0, 1, cs_save, cs_load, s);
+    qemu_register_reset (cs_reset, s);
+    cs_reset (s);
+
+    AUD_register_card (audio,"cs4231a", &s->card);
 }
-device_init (cs4231a_register)

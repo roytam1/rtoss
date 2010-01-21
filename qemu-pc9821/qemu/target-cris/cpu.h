@@ -15,14 +15,13 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 #ifndef CPU_CRIS_H
 #define CPU_CRIS_H
 
 #define TARGET_LONG_BITS 32
-
-#define CPUState struct CPUCRISState
 
 #include "cpu-defs.h"
 
@@ -66,6 +65,8 @@
 #define R_FLAG 0x100
 #define P_FLAG 0x80
 #define U_FLAG 0x40
+#define P_FLAG 0x80
+#define U_FLAG 0x40
 #define I_FLAG 0x20
 #define X_FLAG 0x10
 #define N_FLAG 0x08
@@ -91,6 +92,9 @@
 #define CC_LE  13
 #define CC_A   14
 #define CC_P   15
+
+/* Internal flags for the implementation.  */
+#define F_DELAYSLOT 1
 
 #define NB_MMU_MODES 2
 
@@ -195,6 +199,7 @@ enum {
 #define TARGET_PAGE_BITS 13
 #define MMAP_SHIFT TARGET_PAGE_BITS
 
+#define CPUState CPUCRISState
 #define cpu_init cpu_cris_init
 #define cpu_exec cpu_cris_exec
 #define cpu_gen_code cpu_cris_gen_code
@@ -213,7 +218,6 @@ static inline int cpu_mmu_index (CPUState *env)
 
 int cpu_cris_handle_mmu_fault(CPUState *env, target_ulong address, int rw,
                               int mmu_idx, int is_softmmu);
-#define cpu_handle_mmu_fault cpu_cris_handle_mmu_fault
 
 #if defined(CONFIG_USER_ONLY)
 static inline void cpu_clone_regs(CPUState *env, target_ulong newsp)

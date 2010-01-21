@@ -1,36 +1,14 @@
 #ifndef HW_ISA_H
 #define HW_ISA_H
-
 /* ISA bus */
 
-#include "ioport.h"
-#include "qdev.h"
-
-typedef struct ISABus ISABus;
-typedef struct ISADevice ISADevice;
-typedef struct ISADeviceInfo ISADeviceInfo;
-
-struct ISADevice {
-    DeviceState qdev;
-    uint32_t isairq[2];
-    int nirqs;
-};
-
-typedef int (*isa_qdev_initfn)(ISADevice *dev);
-struct ISADeviceInfo {
-    DeviceInfo qdev;
-    isa_qdev_initfn init;
-};
-
-ISABus *isa_bus_new(DeviceState *dev);
-void isa_bus_irqs(qemu_irq *irqs);
-qemu_irq isa_reserve_irq(int isairq);
-void isa_init_irq(ISADevice *dev, qemu_irq *p, int isairq);
-void isa_qdev_register(ISADeviceInfo *info);
-ISADevice *isa_create(const char *name);
-ISADevice *isa_create_simple(const char *name);
-
 extern target_phys_addr_t isa_mem_base;
+
+int register_ioport_read(int start, int length, int size,
+                         IOPortReadFunc *func, void *opaque);
+int register_ioport_write(int start, int length, int size,
+                          IOPortWriteFunc *func, void *opaque);
+void isa_unassign_ioport(int start, int length);
 
 void isa_mmio_init(target_phys_addr_t base, target_phys_addr_t size);
 
@@ -42,8 +20,10 @@ void DMA_hold_DREQ (int nchan);
 void DMA_release_DREQ (int nchan);
 void DMA_schedule(int nchan);
 void DMA_init (int high_page_enable);
-void pc98_DMA_init (int high_page_enable);
 void DMA_register_channel (int nchan,
                            DMA_transfer_handler transfer_handler,
                            void *opaque);
+
+/* NEC PC-9821 */
+void pc98_DMA_init (int high_page_enable);
 #endif

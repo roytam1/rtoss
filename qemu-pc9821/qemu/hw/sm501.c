@@ -23,6 +23,7 @@
  */
 
 #include <stdio.h>
+#include <assert.h>
 #include "hw.h"
 #include "pc.h"
 #include "console.h"
@@ -46,9 +47,9 @@
 //#define DEBUG_BITBLT
 
 #ifdef DEBUG_SM501
-#define SM501_DPRINTF(fmt, ...) printf(fmt, ## __VA_ARGS__)
+#define SM501_DPRINTF(fmt...) printf(fmt)
 #else
-#define SM501_DPRINTF(fmt, ...) do {} while(0)
+#define SM501_DPRINTF(fmt...) do {} while(0)
 #endif
 
 
@@ -454,7 +455,6 @@ typedef struct SM501State {
     target_phys_addr_t base;
     uint32_t local_mem_size_index;
     uint8_t * local_mem;
-    ram_addr_t local_mem_offset;
     uint32_t last_width;
     uint32_t last_height;
 
@@ -626,13 +626,13 @@ static void sm501_system_config_write(void *opaque,
     }
 }
 
-static CPUReadMemoryFunc * const sm501_system_config_readfn[] = {
+static CPUReadMemoryFunc *sm501_system_config_readfn[] = {
     NULL,
     NULL,
     &sm501_system_config_read,
 };
 
-static CPUWriteMemoryFunc * const sm501_system_config_writefn[] = {
+static CPUWriteMemoryFunc *sm501_system_config_writefn[] = {
     NULL,
     NULL,
     &sm501_system_config_write,
@@ -864,13 +864,13 @@ static void sm501_disp_ctrl_write(void *opaque,
     }
 }
 
-static CPUReadMemoryFunc * const sm501_disp_ctrl_readfn[] = {
+static CPUReadMemoryFunc *sm501_disp_ctrl_readfn[] = {
     NULL,
     NULL,
     &sm501_disp_ctrl_read,
 };
 
-static CPUWriteMemoryFunc * const sm501_disp_ctrl_writefn[] = {
+static CPUWriteMemoryFunc *sm501_disp_ctrl_writefn[] = {
     NULL,
     NULL,
     &sm501_disp_ctrl_write,
@@ -948,10 +948,7 @@ static inline int get_depth_index(DisplayState *s)
     case 16:
         return 2;
     case 32:
-	if (is_surface_bgr(s->surface))
-	    return 4;
-	else
-	    return 3;
+        return 3;
     }
 }
 
@@ -972,7 +969,6 @@ static void sm501_draw_crt(SM501State * s)
     int y_start = -1;
     int page_min = 0x7fffffff;
     int page_max = -1;
-    ram_addr_t offset = s->local_mem_offset;
 
     /* choose draw_line function */
     switch (s->dc_crt_control & 3) {
@@ -1006,9 +1002,10 @@ static void sm501_draw_crt(SM501State * s)
     /* draw each line according to conditions */
     for (y = 0; y < height; y++) {
 	int update = full_update;
-	ram_addr_t page0 = offset & TARGET_PAGE_MASK;
-	ram_addr_t page1 = (offset + width * src_bpp - 1) & TARGET_PAGE_MASK;
-	ram_addr_t page;
+	uint8_t * line_end = &src[width * src_bpp - 1];
+	int page0 = (src - phys_ram_base) & TARGET_PAGE_MASK;
+	int page1 = (line_end - phys_ram_base) & TARGET_PAGE_MASK;
+	int page;
 
 	/* check dirty flags for each line */
 	for (page = page0; page <= page1; page += TARGET_PAGE_SIZE)
@@ -1033,7 +1030,6 @@ static void sm501_draw_crt(SM501State * s)
 	}
 
 	src += width * src_bpp;
-	offset += width * src_bpp;
     }
 
     /* complete flush to display */
@@ -1054,8 +1050,8 @@ static void sm501_update_display(void *opaque)
 	sm501_draw_crt(s);
 }
 
-void sm501_init(uint32_t base, uint32_t local_mem_bytes, qemu_irq irq,
-                CharDriverState *chr)
+void sm501_init(uint32_t base, unsigned long local_mem_base,
+		uint32_t local_mem_bytes, CharDriverState *chr)
 {
     SM501State * s;
     int sm501_system_config_index;
@@ -1074,29 +1070,24 @@ void sm501_init(uint32_t base, uint32_t local_mem_bytes, qemu_irq irq,
     s->dc_crt_control = 0x00010000;
 
     /* allocate local memory */
-    s->local_mem_offset = qemu_ram_alloc(local_mem_bytes);
-    s->local_mem = qemu_get_ram_ptr(s->local_mem_offset);
-    cpu_register_physical_memory(base, local_mem_bytes, s->local_mem_offset);
+    s->local_mem = (uint8 *)phys_ram_base + local_mem_base;
+    cpu_register_physical_memory(base, local_mem_bytes, local_mem_base);
 
     /* map mmio */
     sm501_system_config_index
-	= cpu_register_io_memory(sm501_system_config_readfn,
+	= cpu_register_io_memory(0, sm501_system_config_readfn,
 				 sm501_system_config_writefn, s);
     cpu_register_physical_memory(base + MMIO_BASE_OFFSET,
 				 0x6c, sm501_system_config_index);
-    sm501_disp_ctrl_index = cpu_register_io_memory(sm501_disp_ctrl_readfn,
+    sm501_disp_ctrl_index = cpu_register_io_memory(0, sm501_disp_ctrl_readfn,
 						   sm501_disp_ctrl_writefn, s);
     cpu_register_physical_memory(base + MMIO_BASE_OFFSET + SM501_DC,
                                  0x1000, sm501_disp_ctrl_index);
 
-    /* bridge to usb host emulation module */
-    usb_ohci_init_sm501(base + MMIO_BASE_OFFSET + SM501_USB_HOST, base,
-                        2, -1, irq);
-
     /* bridge to serial emulation module */
     if (chr)
 	serial_mm_init(base + MMIO_BASE_OFFSET + SM501_UART0, 2,
-		       NULL, /* TODO : chain irq to IRL */
+		       0, /* TODO : chain irq to IRL */
 		       115200, chr, 1);
 
     /* create qemu graphic console */

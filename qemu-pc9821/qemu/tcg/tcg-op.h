@@ -318,7 +318,7 @@ static inline void tcg_gen_br(int label)
 
 static inline void tcg_gen_mov_i32(TCGv_i32 ret, TCGv_i32 arg)
 {
-    if (!TCGV_EQUAL_I32(ret, arg))
+    if (GET_TCGV_I32(ret) != GET_TCGV_I32(arg))
         tcg_gen_op2_i32(INDEX_op_mov_i32, ret, arg);
 }
 
@@ -436,11 +436,7 @@ static inline void tcg_gen_subi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
 
 static inline void tcg_gen_and_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
 {
-    if (TCGV_EQUAL_I32(arg1, arg2)) {
-        tcg_gen_mov_i32(ret, arg1);
-    } else {
-        tcg_gen_op3_i32(INDEX_op_and_i32, ret, arg1, arg2);
-    }
+    tcg_gen_op3_i32(INDEX_op_and_i32, ret, arg1, arg2);
 }
 
 static inline void tcg_gen_andi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
@@ -459,11 +455,7 @@ static inline void tcg_gen_andi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
 
 static inline void tcg_gen_or_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
 {
-    if (TCGV_EQUAL_I32(arg1, arg2)) {
-        tcg_gen_mov_i32(ret, arg1);
-    } else {
-        tcg_gen_op3_i32(INDEX_op_or_i32, ret, arg1, arg2);
-    }
+    tcg_gen_op3_i32(INDEX_op_or_i32, ret, arg1, arg2);
 }
 
 static inline void tcg_gen_ori_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
@@ -482,11 +474,7 @@ static inline void tcg_gen_ori_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
 
 static inline void tcg_gen_xor_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
 {
-    if (TCGV_EQUAL_I32(arg1, arg2)) {
-        tcg_gen_movi_i32(ret, 0);
-    } else {
-        tcg_gen_op3_i32(INDEX_op_xor_i32, ret, arg1, arg2);
-    }
+    tcg_gen_op3_i32(INDEX_op_xor_i32, ret, arg1, arg2);
 }
 
 static inline void tcg_gen_xori_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
@@ -637,7 +625,7 @@ static inline void tcg_gen_remu_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
 
 static inline void tcg_gen_mov_i64(TCGv_i64 ret, TCGv_i64 arg)
 {
-    if (!TCGV_EQUAL_I64(ret, arg)) {
+    if (GET_TCGV_I64(ret) != GET_TCGV_I64(arg)) {
         tcg_gen_mov_i32(TCGV_LOW(ret), TCGV_LOW(arg));
         tcg_gen_mov_i32(TCGV_HIGH(ret), TCGV_HIGH(arg));
     }
@@ -870,7 +858,7 @@ static inline void tcg_gen_remu_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
 
 static inline void tcg_gen_mov_i64(TCGv_i64 ret, TCGv_i64 arg)
 {
-    if (!TCGV_EQUAL_I64(ret, arg))
+    if (GET_TCGV_I64(ret) != GET_TCGV_I64(arg))
         tcg_gen_op2_i64(INDEX_op_mov_i64, ret, arg);
 }
 
@@ -955,11 +943,7 @@ static inline void tcg_gen_sub_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
 
 static inline void tcg_gen_and_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
 {
-    if (TCGV_EQUAL_I64(arg1, arg2)) {
-        tcg_gen_mov_i64(ret, arg1);
-    } else {
-        tcg_gen_op3_i64(INDEX_op_and_i64, ret, arg1, arg2);
-    }
+    tcg_gen_op3_i64(INDEX_op_and_i64, ret, arg1, arg2);
 }
 
 static inline void tcg_gen_andi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
@@ -971,11 +955,7 @@ static inline void tcg_gen_andi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
 
 static inline void tcg_gen_or_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
 {
-    if (TCGV_EQUAL_I64(arg1, arg2)) {
-        tcg_gen_mov_i64(ret, arg1);
-    } else {
-        tcg_gen_op3_i64(INDEX_op_or_i64, ret, arg1, arg2);
-    }
+    tcg_gen_op3_i64(INDEX_op_or_i64, ret, arg1, arg2);
 }
 
 static inline void tcg_gen_ori_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
@@ -987,11 +967,7 @@ static inline void tcg_gen_ori_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
 
 static inline void tcg_gen_xor_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
 {
-    if (TCGV_EQUAL_I64(arg1, arg2)) {
-        tcg_gen_movi_i64(ret, 0);
-    } else {
-        tcg_gen_op3_i64(INDEX_op_xor_i64, ret, arg1, arg2);
-    }
+    tcg_gen_op3_i64(INDEX_op_xor_i64, ret, arg1, arg2);
 }
 
 static inline void tcg_gen_xori_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
@@ -1189,22 +1165,16 @@ static inline void tcg_gen_ext16s_i32(TCGv_i32 ret, TCGv_i32 arg)
 #endif
 }
 
+/* These are currently just for convenience.
+   We assume a target will recognise these automatically .  */
 static inline void tcg_gen_ext8u_i32(TCGv_i32 ret, TCGv_i32 arg)
 {
-#ifdef TCG_TARGET_HAS_ext8u_i32
-    tcg_gen_op2_i32(INDEX_op_ext8u_i32, ret, arg);
-#else
     tcg_gen_andi_i32(ret, arg, 0xffu);
-#endif
 }
 
 static inline void tcg_gen_ext16u_i32(TCGv_i32 ret, TCGv_i32 arg)
 {
-#ifdef TCG_TARGET_HAS_ext16u_i32
-    tcg_gen_op2_i32(INDEX_op_ext16u_i32, ret, arg);
-#else
     tcg_gen_andi_i32(ret, arg, 0xffffu);
-#endif
 }
 
 /* Note: we assume the two high bytes are set to zero */
@@ -1213,20 +1183,23 @@ static inline void tcg_gen_bswap16_i32(TCGv_i32 ret, TCGv_i32 arg)
 #ifdef TCG_TARGET_HAS_bswap16_i32
     tcg_gen_op2_i32(INDEX_op_bswap16_i32, ret, arg);
 #else
-    TCGv_i32 t0 = tcg_temp_new_i32();
+    TCGv_i32 t0, t1;
+    t0 = tcg_temp_new_i32();
+    t1 = tcg_temp_new_i32();
     
-    tcg_gen_ext8u_i32(t0, arg);
-    tcg_gen_shli_i32(t0, t0, 8);
-    tcg_gen_shri_i32(ret, arg, 8);
-    tcg_gen_or_i32(ret, ret, t0);
+    tcg_gen_shri_i32(t0, arg, 8);
+    tcg_gen_andi_i32(t1, arg, 0x000000ff);
+    tcg_gen_shli_i32(t1, t1, 8);
+    tcg_gen_or_i32(ret, t0, t1);
     tcg_temp_free_i32(t0);
+    tcg_temp_free_i32(t1);
 #endif
 }
 
-static inline void tcg_gen_bswap32_i32(TCGv_i32 ret, TCGv_i32 arg)
+static inline void tcg_gen_bswap_i32(TCGv_i32 ret, TCGv_i32 arg)
 {
-#ifdef TCG_TARGET_HAS_bswap32_i32
-    tcg_gen_op2_i32(INDEX_op_bswap32_i32, ret, arg);
+#ifdef TCG_TARGET_HAS_bswap_i32
+    tcg_gen_op2_i32(INDEX_op_bswap_i32, ret, arg);
 #else
     TCGv_i32 t0, t1;
     t0 = tcg_temp_new_i32();
@@ -1303,28 +1276,14 @@ static inline void tcg_gen_ext_i32_i64(TCGv_i64 ret, TCGv_i32 arg)
     tcg_gen_sari_i32(TCGV_HIGH(ret), TCGV_LOW(ret), 31);
 }
 
-/* Note: we assume the six high bytes are set to zero */
-static inline void tcg_gen_bswap16_i64(TCGv_i64 ret, TCGv_i64 arg)
-{
-    tcg_gen_mov_i32(TCGV_HIGH(ret), TCGV_HIGH(arg));
-    tcg_gen_bswap16_i32(TCGV_LOW(ret), TCGV_LOW(arg));
-}
-
-/* Note: we assume the four high bytes are set to zero */
-static inline void tcg_gen_bswap32_i64(TCGv_i64 ret, TCGv_i64 arg)
-{
-    tcg_gen_mov_i32(TCGV_HIGH(ret), TCGV_HIGH(arg));
-    tcg_gen_bswap32_i32(TCGV_LOW(ret), TCGV_LOW(arg));
-}
-
-static inline void tcg_gen_bswap64_i64(TCGv_i64 ret, TCGv_i64 arg)
+static inline void tcg_gen_bswap_i64(TCGv_i64 ret, TCGv_i64 arg)
 {
     TCGv_i32 t0, t1;
     t0 = tcg_temp_new_i32();
     t1 = tcg_temp_new_i32();
 
-    tcg_gen_bswap32_i32(t0, TCGV_LOW(arg));
-    tcg_gen_bswap32_i32(t1, TCGV_HIGH(arg));
+    tcg_gen_bswap_i32(t0, TCGV_LOW(arg));
+    tcg_gen_bswap_i32(t1, TCGV_HIGH(arg));
     tcg_gen_mov_i32(TCGV_LOW(ret), t1);
     tcg_gen_mov_i32(TCGV_HIGH(ret), t0);
     tcg_temp_free_i32(t0);
@@ -1364,29 +1323,17 @@ static inline void tcg_gen_ext32s_i64(TCGv_i64 ret, TCGv_i64 arg)
 
 static inline void tcg_gen_ext8u_i64(TCGv_i64 ret, TCGv_i64 arg)
 {
-#ifdef TCG_TARGET_HAS_ext8u_i64
-    tcg_gen_op2_i64(INDEX_op_ext8u_i64, ret, arg);
-#else
     tcg_gen_andi_i64(ret, arg, 0xffu);
-#endif
 }
 
 static inline void tcg_gen_ext16u_i64(TCGv_i64 ret, TCGv_i64 arg)
 {
-#ifdef TCG_TARGET_HAS_ext16u_i64
-    tcg_gen_op2_i64(INDEX_op_ext16u_i64, ret, arg);
-#else
     tcg_gen_andi_i64(ret, arg, 0xffffu);
-#endif
 }
 
 static inline void tcg_gen_ext32u_i64(TCGv_i64 ret, TCGv_i64 arg)
 {
-#ifdef TCG_TARGET_HAS_ext32u_i64
-    tcg_gen_op2_i64(INDEX_op_ext32u_i64, ret, arg);
-#else
     tcg_gen_andi_i64(ret, arg, 0xffffffffu);
-#endif
 }
 
 /* Note: we assume the target supports move between 32 and 64 bit
@@ -1400,7 +1347,7 @@ static inline void tcg_gen_trunc_i64_i32(TCGv_i32 ret, TCGv_i64 arg)
    registers */
 static inline void tcg_gen_extu_i32_i64(TCGv_i64 ret, TCGv_i32 arg)
 {
-    tcg_gen_ext32u_i64(ret, MAKE_TCGV_I64(GET_TCGV_I32(arg)));
+    tcg_gen_andi_i64(ret, MAKE_TCGV_I64(GET_TCGV_I32(arg)), 0xffffffffu);
 }
 
 /* Note: we assume the target supports move between 32 and 64 bit
@@ -1410,57 +1357,14 @@ static inline void tcg_gen_ext_i32_i64(TCGv_i64 ret, TCGv_i32 arg)
     tcg_gen_ext32s_i64(ret, MAKE_TCGV_I64(GET_TCGV_I32(arg)));
 }
 
-/* Note: we assume the six high bytes are set to zero */
-static inline void tcg_gen_bswap16_i64(TCGv_i64 ret, TCGv_i64 arg)
+static inline void tcg_gen_bswap_i64(TCGv_i64 ret, TCGv_i64 arg)
 {
-#ifdef TCG_TARGET_HAS_bswap16_i64
-    tcg_gen_op2_i64(INDEX_op_bswap16_i64, ret, arg);
+#ifdef TCG_TARGET_HAS_bswap_i64
+    tcg_gen_op2_i64(INDEX_op_bswap_i64, ret, arg);
 #else
-    TCGv_i64 t0 = tcg_temp_new_i64();
-
-    tcg_gen_ext8u_i64(t0, arg);
-    tcg_gen_shli_i64(t0, t0, 8);
-    tcg_gen_shri_i64(ret, arg, 8);
-    tcg_gen_or_i64(ret, ret, t0);
-    tcg_temp_free_i64(t0);
-#endif
-}
-
-/* Note: we assume the four high bytes are set to zero */
-static inline void tcg_gen_bswap32_i64(TCGv_i64 ret, TCGv_i64 arg)
-{
-#ifdef TCG_TARGET_HAS_bswap32_i64
-    tcg_gen_op2_i64(INDEX_op_bswap32_i64, ret, arg);
-#else
-    TCGv_i64 t0, t1;
-    t0 = tcg_temp_new_i64();
-    t1 = tcg_temp_new_i64();
-
-    tcg_gen_shli_i64(t0, arg, 24);
-    tcg_gen_ext32u_i64(t0, t0);
-
-    tcg_gen_andi_i64(t1, arg, 0x0000ff00);
-    tcg_gen_shli_i64(t1, t1, 8);
-    tcg_gen_or_i64(t0, t0, t1);
-
-    tcg_gen_shri_i64(t1, arg, 8);
-    tcg_gen_andi_i64(t1, t1, 0x0000ff00);
-    tcg_gen_or_i64(t0, t0, t1);
-
-    tcg_gen_shri_i64(t1, arg, 24);
-    tcg_gen_or_i64(ret, t0, t1);
-    tcg_temp_free_i64(t0);
-    tcg_temp_free_i64(t1);
-#endif
-}
-
-static inline void tcg_gen_bswap64_i64(TCGv_i64 ret, TCGv_i64 arg)
-{
-#ifdef TCG_TARGET_HAS_bswap64_i64
-    tcg_gen_op2_i64(INDEX_op_bswap64_i64, ret, arg);
-#else
-    TCGv_i64 t0 = tcg_temp_new_i64();
-    TCGv_i64 t1 = tcg_temp_new_i64();
+    TCGv_i32 t0, t1;
+    t0 = tcg_temp_new_i32();
+    t1 = tcg_temp_new_i32();
     
     tcg_gen_shli_i64(t0, arg, 56);
     
@@ -1490,8 +1394,8 @@ static inline void tcg_gen_bswap64_i64(TCGv_i64 ret, TCGv_i64 arg)
 
     tcg_gen_shri_i64(t1, arg, 56);
     tcg_gen_or_i64(ret, t0, t1);
-    tcg_temp_free_i64(t0);
-    tcg_temp_free_i64(t1);
+    tcg_temp_free_i32(t0);
+    tcg_temp_free_i32(t1);
 #endif
 }
 
@@ -1521,20 +1425,12 @@ static inline void tcg_gen_neg_i64(TCGv_i64 ret, TCGv_i64 arg)
 
 static inline void tcg_gen_not_i32(TCGv_i32 ret, TCGv_i32 arg)
 {
-#ifdef TCG_TARGET_HAS_not_i32
-    tcg_gen_op2_i32(INDEX_op_not_i32, ret, arg);
-#else
     tcg_gen_xori_i32(ret, arg, -1);
-#endif
 }
 
 static inline void tcg_gen_not_i64(TCGv_i64 ret, TCGv_i64 arg)
 {
-#ifdef TCG_TARGET_HAS_not_i64
-    tcg_gen_op2_i64(INDEX_op_not_i64, ret, arg);
-#else
     tcg_gen_xori_i64(ret, arg, -1);
-#endif
 }
 
 static inline void tcg_gen_discard_i32(TCGv_i32 arg)
@@ -1605,38 +1501,56 @@ static inline void tcg_gen_andc_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
 
 static inline void tcg_gen_eqv_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
 {
-    tcg_gen_xor_i32(ret, arg1, arg2);
-    tcg_gen_not_i32(ret, ret);
+    TCGv_i32 t0;
+    t0 = tcg_temp_new_i32();
+    tcg_gen_xor_i32(t0, arg1, arg2);
+    tcg_gen_not_i32(ret, t0);
+    tcg_temp_free_i32(t0);
 }
 
 static inline void tcg_gen_eqv_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
 {
-    tcg_gen_xor_i64(ret, arg1, arg2);
-    tcg_gen_not_i64(ret, ret);
+    TCGv_i64 t0;
+    t0 = tcg_temp_new_i64();
+    tcg_gen_xor_i64(t0, arg1, arg2);
+    tcg_gen_not_i64(ret, t0);
+    tcg_temp_free_i64(t0);
 }
 
 static inline void tcg_gen_nand_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
 {
-    tcg_gen_and_i32(ret, arg1, arg2);
-    tcg_gen_not_i32(ret, ret);
+    TCGv_i32 t0;
+    t0 = tcg_temp_new_i32();
+    tcg_gen_and_i32(t0, arg1, arg2);
+    tcg_gen_not_i32(ret, t0);
+    tcg_temp_free_i32(t0);
 }
 
 static inline void tcg_gen_nand_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
 {
-    tcg_gen_and_i64(ret, arg1, arg2);
-    tcg_gen_not_i64(ret, ret);
+    TCGv_i64 t0;
+    t0 = tcg_temp_new_i64();
+    tcg_gen_and_i64(t0, arg1, arg2);
+    tcg_gen_not_i64(ret, t0);
+    tcg_temp_free_i64(t0);
 }
 
 static inline void tcg_gen_nor_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
 {
-    tcg_gen_or_i32(ret, arg1, arg2);
-    tcg_gen_not_i32(ret, ret);
+    TCGv_i32 t0;
+    t0 = tcg_temp_new_i32();
+    tcg_gen_or_i32(t0, arg1, arg2);
+    tcg_gen_not_i32(ret, t0);
+    tcg_temp_free_i32(t0);
 }
 
 static inline void tcg_gen_nor_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
 {
-    tcg_gen_or_i64(ret, arg1, arg2);
-    tcg_gen_not_i64(ret, ret);
+    TCGv_i64 t0;
+    t0 = tcg_temp_new_i64();
+    tcg_gen_or_i64(t0, arg1, arg2);
+    tcg_gen_not_i64(ret, t0);
+    tcg_temp_free_i64(t0);
 }
 
 static inline void tcg_gen_orc_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
@@ -1659,9 +1573,6 @@ static inline void tcg_gen_orc_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
 
 static inline void tcg_gen_rotl_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
 {
-#ifdef TCG_TARGET_HAS_rot_i32
-    tcg_gen_op3_i32(INDEX_op_rotl_i32, ret, arg1, arg2);
-#else
     TCGv_i32 t0, t1;
 
     t0 = tcg_temp_new_i32();
@@ -1672,14 +1583,10 @@ static inline void tcg_gen_rotl_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
     tcg_gen_or_i32(ret, t0, t1);
     tcg_temp_free_i32(t0);
     tcg_temp_free_i32(t1);
-#endif
 }
 
 static inline void tcg_gen_rotl_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
 {
-#ifdef TCG_TARGET_HAS_rot_i64
-    tcg_gen_op3_i64(INDEX_op_rotl_i64, ret, arg1, arg2);
-#else
     TCGv_i64 t0, t1;
 
     t0 = tcg_temp_new_i64();
@@ -1690,7 +1597,6 @@ static inline void tcg_gen_rotl_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
     tcg_gen_or_i64(ret, t0, t1);
     tcg_temp_free_i64(t0);
     tcg_temp_free_i64(t1);
-#endif
 }
 
 static inline void tcg_gen_rotli_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
@@ -1699,11 +1605,6 @@ static inline void tcg_gen_rotli_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
     if (arg2 == 0) {
         tcg_gen_mov_i32(ret, arg1);
     } else {
-#ifdef TCG_TARGET_HAS_rot_i32
-        TCGv_i32 t0 = tcg_const_i32(arg2);
-        tcg_gen_rotl_i32(ret, arg1, t0);
-        tcg_temp_free_i32(t0);
-#else
         TCGv_i32 t0, t1;
         t0 = tcg_temp_new_i32();
         t1 = tcg_temp_new_i32();
@@ -1712,7 +1613,6 @@ static inline void tcg_gen_rotli_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
         tcg_gen_or_i32(ret, t0, t1);
         tcg_temp_free_i32(t0);
         tcg_temp_free_i32(t1);
-#endif
     }
 }
 
@@ -1722,11 +1622,6 @@ static inline void tcg_gen_rotli_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
     if (arg2 == 0) {
         tcg_gen_mov_i64(ret, arg1);
     } else {
-#ifdef TCG_TARGET_HAS_rot_i64
-        TCGv_i64 t0 = tcg_const_i64(arg2);
-        tcg_gen_rotl_i64(ret, arg1, t0);
-        tcg_temp_free_i64(t0);
-#else
         TCGv_i64 t0, t1;
         t0 = tcg_temp_new_i64();
         t1 = tcg_temp_new_i64();
@@ -1735,15 +1630,11 @@ static inline void tcg_gen_rotli_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
         tcg_gen_or_i64(ret, t0, t1);
         tcg_temp_free_i64(t0);
         tcg_temp_free_i64(t1);
-#endif
     }
 }
 
 static inline void tcg_gen_rotr_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
 {
-#ifdef TCG_TARGET_HAS_rot_i32
-    tcg_gen_op3_i32(INDEX_op_rotr_i32, ret, arg1, arg2);
-#else
     TCGv_i32 t0, t1;
 
     t0 = tcg_temp_new_i32();
@@ -1754,25 +1645,20 @@ static inline void tcg_gen_rotr_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
     tcg_gen_or_i32(ret, t0, t1);
     tcg_temp_free_i32(t0);
     tcg_temp_free_i32(t1);
-#endif
 }
 
 static inline void tcg_gen_rotr_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
 {
-#ifdef TCG_TARGET_HAS_rot_i64
-    tcg_gen_op3_i64(INDEX_op_rotr_i64, ret, arg1, arg2);
-#else
     TCGv_i64 t0, t1;
 
     t0 = tcg_temp_new_i64();
     t1 = tcg_temp_new_i64();
-    tcg_gen_shr_i64(t0, arg1, arg2);
+    tcg_gen_shl_i64(t0, arg1, arg2);
     tcg_gen_subfi_i64(t1, 64, arg2);
     tcg_gen_shl_i64(t1, arg1, t1);
     tcg_gen_or_i64(ret, t0, t1);
     tcg_temp_free_i64(t0);
     tcg_temp_free_i64(t1);
-#endif
 }
 
 static inline void tcg_gen_rotri_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
@@ -1812,7 +1698,7 @@ static inline void tcg_gen_rotri_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
 #define tcg_gen_qemu_ldst_op tcg_gen_op3i_i32
 #define tcg_gen_qemu_ldst_op_i64 tcg_gen_qemu_ldst_op_i64_i32
 #define TCGV_UNUSED(x) TCGV_UNUSED_I32(x)
-#define TCGV_EQUAL(a, b) TCGV_EQUAL_I32(a, b)
+#define TCGV_EQUAL(a, b) (GET_TCGV_I32(a) == GET_TCGV_I32(b))
 #else
 #define TCGv TCGv_i64
 #define tcg_temp_new() tcg_temp_new_i64()
@@ -1823,7 +1709,7 @@ static inline void tcg_gen_rotri_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
 #define tcg_gen_qemu_ldst_op tcg_gen_op3i_i64
 #define tcg_gen_qemu_ldst_op_i64 tcg_gen_qemu_ldst_op_i64_i64
 #define TCGV_UNUSED(x) TCGV_UNUSED_I64(x)
-#define TCGV_EQUAL(a, b) TCGV_EQUAL_I64(a, b)
+#define TCGV_EQUAL(a, b) (GET_TCGV_I64(a) == GET_TCGV_I64(b))
 #endif
 
 /* debug info: write the PC of the corresponding QEMU CPU instruction */
@@ -2069,10 +1955,6 @@ static inline void tcg_gen_qemu_st64(TCGv_i64 arg, TCGv addr, int mem_index)
 #define tcg_gen_brcondi_tl tcg_gen_brcondi_i64
 #define tcg_gen_mul_tl tcg_gen_mul_i64
 #define tcg_gen_muli_tl tcg_gen_muli_i64
-#define tcg_gen_div_tl tcg_gen_div_i64
-#define tcg_gen_rem_tl tcg_gen_rem_i64
-#define tcg_gen_divu_tl tcg_gen_divu_i64
-#define tcg_gen_remu_tl tcg_gen_remu_i64
 #define tcg_gen_discard_tl tcg_gen_discard_i64
 #define tcg_gen_trunc_tl_i32 tcg_gen_trunc_i64_i32
 #define tcg_gen_trunc_i64_tl tcg_gen_mov_i64
@@ -2086,9 +1968,6 @@ static inline void tcg_gen_qemu_st64(TCGv_i64 arg, TCGv addr, int mem_index)
 #define tcg_gen_ext16s_tl tcg_gen_ext16s_i64
 #define tcg_gen_ext32u_tl tcg_gen_ext32u_i64
 #define tcg_gen_ext32s_tl tcg_gen_ext32s_i64
-#define tcg_gen_bswap16_tl tcg_gen_bswap16_i64
-#define tcg_gen_bswap32_tl tcg_gen_bswap32_i64
-#define tcg_gen_bswap64_tl tcg_gen_bswap64_i64
 #define tcg_gen_concat_tl_i64 tcg_gen_concat32_i64
 #define tcg_gen_andc_tl tcg_gen_andc_i64
 #define tcg_gen_eqv_tl tcg_gen_eqv_i64
@@ -2139,10 +2018,6 @@ static inline void tcg_gen_qemu_st64(TCGv_i64 arg, TCGv addr, int mem_index)
 #define tcg_gen_brcondi_tl tcg_gen_brcondi_i32
 #define tcg_gen_mul_tl tcg_gen_mul_i32
 #define tcg_gen_muli_tl tcg_gen_muli_i32
-#define tcg_gen_div_tl tcg_gen_div_i32
-#define tcg_gen_rem_tl tcg_gen_rem_i32
-#define tcg_gen_divu_tl tcg_gen_divu_i32
-#define tcg_gen_remu_tl tcg_gen_remu_i32
 #define tcg_gen_discard_tl tcg_gen_discard_i32
 #define tcg_gen_trunc_tl_i32 tcg_gen_mov_i32
 #define tcg_gen_trunc_i64_tl tcg_gen_trunc_i64_i32
@@ -2156,8 +2031,6 @@ static inline void tcg_gen_qemu_st64(TCGv_i64 arg, TCGv addr, int mem_index)
 #define tcg_gen_ext16s_tl tcg_gen_ext16s_i32
 #define tcg_gen_ext32u_tl tcg_gen_mov_i32
 #define tcg_gen_ext32s_tl tcg_gen_mov_i32
-#define tcg_gen_bswap16_tl tcg_gen_bswap16_i32
-#define tcg_gen_bswap32_tl tcg_gen_bswap32_i32
 #define tcg_gen_concat_tl_i64 tcg_gen_concat_i32_i64
 #define tcg_gen_andc_tl tcg_gen_andc_i32
 #define tcg_gen_eqv_tl tcg_gen_eqv_i32

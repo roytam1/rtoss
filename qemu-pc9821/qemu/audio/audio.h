@@ -25,9 +25,9 @@
 #define QEMU_AUDIO_H
 
 #include "config-host.h"
-#include "qemu-queue.h"
+#include "sys-queue.h"
 
-typedef void (*audio_callback_fn) (void *opaque, int avail);
+typedef void (*audio_callback_fn_t) (void *opaque, int avail);
 
 typedef enum {
     AUD_FMT_U8,
@@ -38,7 +38,7 @@ typedef enum {
     AUD_FMT_S32
 } audfmt_e;
 
-#ifdef HOST_WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 #define AUDIO_HOST_ENDIANNESS 1
 #else
 #define AUDIO_HOST_ENDIANNESS 0
@@ -70,7 +70,7 @@ struct capture_ops {
 typedef struct CaptureState {
     void *opaque;
     struct capture_ops ops;
-    QLIST_ENTRY (CaptureState) entries;
+    LIST_ENTRY (CaptureState) entries;
 } CaptureState;
 
 typedef struct SWVoiceOut SWVoiceOut;
@@ -78,8 +78,9 @@ typedef struct CaptureVoiceOut CaptureVoiceOut;
 typedef struct SWVoiceIn SWVoiceIn;
 
 typedef struct QEMUSoundCard {
+    AudioState *audio;
     char *name;
-    QLIST_ENTRY (QEMUSoundCard) entries;
+    LIST_ENTRY (QEMUSoundCard) entries;
 } QEMUSoundCard;
 
 typedef struct QEMUAudioTimeStamp {
@@ -93,10 +94,12 @@ void AUD_log (const char *cap, const char *fmt, ...)
 #endif
     ;
 
+AudioState *AUD_init (void);
 void AUD_help (void);
-void AUD_register_card (const char *name, QEMUSoundCard *card);
+void AUD_register_card (AudioState *s, const char *name, QEMUSoundCard *card);
 void AUD_remove_card (QEMUSoundCard *card);
 CaptureVoiceOut *AUD_add_capture (
+    AudioState *s,
     struct audsettings *as,
     struct audio_capture_ops *ops,
     void *opaque
@@ -108,7 +111,7 @@ SWVoiceOut *AUD_open_out (
     SWVoiceOut *sw,
     const char *name,
     void *callback_opaque,
-    audio_callback_fn callback_fn,
+    audio_callback_fn_t callback_fn,
     struct audsettings *settings
     );
 
@@ -129,7 +132,7 @@ SWVoiceIn *AUD_open_in (
     SWVoiceIn *sw,
     const char *name,
     void *callback_opaque,
-    audio_callback_fn callback_fn,
+    audio_callback_fn_t callback_fn,
     struct audsettings *settings
     );
 
@@ -146,6 +149,9 @@ static inline void *advance (void *p, int incr)
     uint8_t *d = p;
     return (d + incr);
 }
+
+uint32_t popcount (uint32_t u);
+uint32_t lsbindex (uint32_t u);
 
 #ifdef __GNUC__
 #define audio_MIN(a, b) ( __extension__ ({      \

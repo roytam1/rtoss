@@ -23,8 +23,9 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with GAS or GDB; see the file COPYING. If not,
-   see <http://www.gnu.org/licenses/>.  */
+   along with GAS or GDB; see the file COPYING. If not, write to
+   the Free Software Foundation, 51 Franklin Street - Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 #include <stdlib.h>
 #include "dis-asm.h"
@@ -255,8 +256,9 @@ static const char *sparc_decode_sparclet_cpreg (int);
    for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this software; see the file COPYING.  If not,
-   see <http://www.gnu.org/licenses/>.  */
+   along with this software; see the file COPYING.  If not, write to
+   the Free Software Foundation, 51 Franklin Street - Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 /* FIXME-someday: perhaps the ,a's and such should be embedded in the
    instruction's name rather than the args.  This would make gas faster, pinsn
@@ -2115,7 +2117,7 @@ static const arg asi_table_v8[] =
   { 0x40, "#ASI_M_VIKING_TMP1" },
   { 0x41, "#ASI_M_VIKING_TMP2" },
   { 0x4c, "#ASI_M_ACTION" },
-  { 0, NULL }
+  { 0, 0 }
 };
 
 static const arg asi_table_v9[] =
@@ -2155,7 +2157,7 @@ static const arg asi_table_v9[] =
   /* These are UltraSPARC extensions.  */
   /* FIXME: There are dozens of them.  Not sure we want them all.
      Most are for kernel building but some are for vis type stuff.  */
-  { 0, NULL }
+  { 0, 0 }
 };
 
 /* Return the name for ASI value VALUE or NULL if not found.  */
@@ -2183,7 +2185,7 @@ static const arg membar_table[] =
   { 0x04, "#LoadStore" },
   { 0x02, "#StoreLoad" },
   { 0x01, "#LoadLoad" },
-  { 0, NULL }
+  { 0, 0 }
 };
 
 /* Return the name for membar value VALUE or NULL if not found.  */
@@ -2204,7 +2206,7 @@ static const arg prefetch_table[] =
   { 3, "#one_write" },
   { 4, "#page" },
   { 16, "#invalidate" },
-  { 0, NULL }
+  { 0, 0 }
 };
 
 /* Return the name for prefetch value VALUE or NULL if not found.  */
@@ -2226,7 +2228,7 @@ static const arg sparclet_cpreg_table[] =
   { 4, "%ccsr2" },
   { 5, "%cccrr" },
   { 6, "%ccrstr" },
-  { 0, NULL }
+  { 0, 0 }
 };
 
 /* Return the name for sparclet cpreg value VALUE or NULL if not found.  */
@@ -2256,7 +2258,9 @@ sparc_decode_sparclet_cpreg (int value)
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston,
+   MA 02110-1301, USA.  */
 
 /* Bitmask of v9 architectures.  */
 #define MASK_V9 ((1 << SPARC_OPCODE_ARCH_V9) \
@@ -2770,11 +2774,11 @@ print_insn_sparc (bfd_vma memaddr, disassemble_info *info)
             imm_added_to_rs1 = 1;
 
           if (X_RS1 (insn) != X_RD (insn)
-              && strchr (opcode->args, 'r') != NULL)
+              && strchr (opcode->args, 'r') != 0)
               /* Can't do simple format if source and dest are different.  */
               continue;
           if (X_RS2 (insn) != X_RD (insn)
-              && strchr (opcode->args, 'O') != NULL)
+              && strchr (opcode->args, 'O') != 0)
               /* Can't do simple format if source and dest are different.  */
               continue;
 

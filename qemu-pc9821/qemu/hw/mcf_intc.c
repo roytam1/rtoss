@@ -67,7 +67,7 @@ static uint32_t mcf_intc_read(void *opaque, target_phys_addr_t addr)
     case 0xe1: case 0xe2: case 0xe3: case 0xe4:
     case 0xe5: case 0xe6: case 0xe7:
         /* LnIACK */
-        hw_error("mcf_intc_read: LnIACK not implemented\n");
+        cpu_abort(cpu_single_env, "mcf_intc_read: LnIACK not implemented\n");
     default:
         return 0;
     }
@@ -99,7 +99,8 @@ static void mcf_intc_write(void *opaque, target_phys_addr_t addr, uint32_t val)
         s->imr = (s->imr & 0xffffffff00000000ull) | (uint32_t)val;
         break;
     default:
-        hw_error("mcf_intc_write: Bad write offset %d\n", offset);
+        cpu_abort(cpu_single_env, "mcf_intc_write: Bad write offset %d\n",
+                  offset);
         break;
     }
     mcf_intc_update(s);
@@ -127,13 +128,13 @@ static void mcf_intc_reset(mcf_intc_state *s)
     s->active_vector = 24;
 }
 
-static CPUReadMemoryFunc * const mcf_intc_readfn[] = {
+static CPUReadMemoryFunc *mcf_intc_readfn[] = {
    mcf_intc_read,
    mcf_intc_read,
    mcf_intc_read
 };
 
-static CPUWriteMemoryFunc * const mcf_intc_writefn[] = {
+static CPUWriteMemoryFunc *mcf_intc_writefn[] = {
    mcf_intc_write,
    mcf_intc_write,
    mcf_intc_write
@@ -148,7 +149,7 @@ qemu_irq *mcf_intc_init(target_phys_addr_t base, CPUState *env)
     s->env = env;
     mcf_intc_reset(s);
 
-    iomemtype = cpu_register_io_memory(mcf_intc_readfn,
+    iomemtype = cpu_register_io_memory(0, mcf_intc_readfn,
                                        mcf_intc_writefn, s);
     cpu_register_physical_memory(base, 0x100, iomemtype);
 

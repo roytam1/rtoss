@@ -38,17 +38,22 @@ typedef struct NoVoiceIn {
     int64_t old_ticks;
 } NoVoiceIn;
 
-static int no_run_out (HWVoiceOut *hw, int live)
+static int no_run_out (HWVoiceOut *hw)
 {
     NoVoiceOut *no = (NoVoiceOut *) hw;
-    int decr, samples;
+    int live, decr, samples;
     int64_t now;
     int64_t ticks;
     int64_t bytes;
 
+    live = audio_pcm_hw_get_live_out (&no->hw);
+    if (!live) {
+        return 0;
+    }
+
     now = qemu_get_clock (vm_clock);
     ticks = now - no->old_ticks;
-    bytes = muldiv64 (ticks, hw->info.bytes_per_second, get_ticks_per_sec ());
+    bytes = (ticks * hw->info.bytes_per_second) / ticks_per_sec;
     bytes = audio_MIN (bytes, INT_MAX);
     samples = bytes >> hw->info.shift;
 
@@ -104,8 +109,7 @@ static int no_run_in (HWVoiceIn *hw)
     if (dead) {
         int64_t now = qemu_get_clock (vm_clock);
         int64_t ticks = now - no->old_ticks;
-        int64_t bytes =
-            muldiv64 (ticks, hw->info.bytes_per_second, get_ticks_per_sec ());
+        int64_t bytes = (ticks * hw->info.bytes_per_second) / ticks_per_sec;
 
         no->old_ticks = now;
         bytes = audio_MIN (bytes, INT_MAX);
@@ -142,29 +146,29 @@ static void no_audio_fini (void *opaque)
 }
 
 static struct audio_pcm_ops no_pcm_ops = {
-    .init_out = no_init_out,
-    .fini_out = no_fini_out,
-    .run_out  = no_run_out,
-    .write    = no_write,
-    .ctl_out  = no_ctl_out,
+    no_init_out,
+    no_fini_out,
+    no_run_out,
+    no_write,
+    no_ctl_out,
 
-    .init_in  = no_init_in,
-    .fini_in  = no_fini_in,
-    .run_in   = no_run_in,
-    .read     = no_read,
-    .ctl_in   = no_ctl_in
+    no_init_in,
+    no_fini_in,
+    no_run_in,
+    no_read,
+    no_ctl_in
 };
 
 struct audio_driver no_audio_driver = {
-    .name           = "none",
-    .descr          = "Timer based audio emulation",
-    .options        = NULL,
-    .init           = no_audio_init,
-    .fini           = no_audio_fini,
-    .pcm_ops        = &no_pcm_ops,
-    .can_be_default = 1,
-    .max_voices_out = INT_MAX,
-    .max_voices_in  = INT_MAX,
-    .voice_size_out = sizeof (NoVoiceOut),
-    .voice_size_in  = sizeof (NoVoiceIn)
+    INIT_FIELD (name           = ) "none",
+    INIT_FIELD (descr          = ) "Timer based audio emulation",
+    INIT_FIELD (options        = ) NULL,
+    INIT_FIELD (init           = ) no_audio_init,
+    INIT_FIELD (fini           = ) no_audio_fini,
+    INIT_FIELD (pcm_ops        = ) &no_pcm_ops,
+    INIT_FIELD (can_be_default = ) 1,
+    INIT_FIELD (max_voices_out = ) INT_MAX,
+    INIT_FIELD (max_voices_in  = ) INT_MAX,
+    INIT_FIELD (voice_size_out = ) sizeof (NoVoiceOut),
+    INIT_FIELD (voice_size_in  = ) sizeof (NoVoiceIn)
 };

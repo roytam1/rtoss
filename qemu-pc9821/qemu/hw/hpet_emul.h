@@ -18,7 +18,12 @@
 
 #define FS_PER_NS 1000000
 #define HPET_NUM_TIMERS 3
-#define HPET_TIMER_TYPE_LEVEL 0x002
+#define HPET_TIMER_TYPE_LEVEL 1
+#define HPET_TIMER_TYPE_EDGE 0
+#define HPET_TIMER_DELIVERY_APIC 0
+#define HPET_TIMER_DELIVERY_FSB 1
+#define HPET_TIMER_CAP_FSB_INT_DEL (1 << 15)
+#define HPET_TIMER_CAP_PER_INT (1 << 4)
 
 #define HPET_CFG_ENABLE 0x001
 #define HPET_CFG_LEGACY 0x002
@@ -74,7 +79,7 @@ typedef struct HPETState {
     uint64_t hpet_counter;      /* main counter */
 } HPETState;
 
-#if defined TARGET_I386
+#if defined TARGET_I386 || defined TARGET_X86_64
 extern uint32_t hpet_in_legacy_mode(void);
 extern void hpet_init(qemu_irq *irq);
 #endif

@@ -16,7 +16,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along
- * with this program; if not, see <http://www.gnu.org/licenses/>.
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 #include "qemu-common.h"
 #include "qemu-timer.h"
@@ -25,10 +26,10 @@
 #include "irq.h"
 #include "devices.h"
 
-struct TUSBState {
+struct tusb_s {
     int iomemtype[2];
     qemu_irq irq;
-    MUSBState *musb;
+    struct musb_s *musb;
     QEMUTimer *otg_timer;
     QEMUTimer *pwr_timer;
 
@@ -234,17 +235,17 @@ struct TUSBState {
 #define TUSB_EP_CONFIG_XFR_SIZE(v)	((v) & 0x7fffffff)
 #define TUSB_PROD_TEST_RESET_VAL	0xa596
 
-int tusb6010_sync_io(TUSBState *s)
+int tusb6010_sync_io(struct tusb_s *s)
 {
     return s->iomemtype[0];
 }
 
-int tusb6010_async_io(TUSBState *s)
+int tusb6010_async_io(struct tusb_s *s)
 {
     return s->iomemtype[1];
 }
 
-static void tusb_intr_update(TUSBState *s)
+static void tusb_intr_update(struct tusb_s *s)
 {
     if (s->control_config & TUSB_INT_CTRL_CONF_INT_POLARITY)
         qemu_set_irq(s->irq, s->intr & ~s->mask & s->intr_ok);
@@ -252,7 +253,7 @@ static void tusb_intr_update(TUSBState *s)
         qemu_set_irq(s->irq, (!(s->intr & ~s->mask)) & s->intr_ok);
 }
 
-static void tusb_usbip_intr_update(TUSBState *s)
+static void tusb_usbip_intr_update(struct tusb_s *s)
 {
     /* TX interrupt in the MUSB */
     if (s->usbip_intr & 0x0000ffff & ~s->usbip_mask)
@@ -271,7 +272,7 @@ static void tusb_usbip_intr_update(TUSBState *s)
     tusb_intr_update(s);
 }
 
-static void tusb_dma_intr_update(TUSBState *s)
+static void tusb_dma_intr_update(struct tusb_s *s)
 {
     if (s->dma_intr & ~s->dma_mask)
         s->intr |= TUSB_INT_SRC_TXRX_DMA_DONE;
@@ -281,17 +282,17 @@ static void tusb_dma_intr_update(TUSBState *s)
     tusb_intr_update(s);
 }
 
-static void tusb_gpio_intr_update(TUSBState *s)
+static void tusb_gpio_intr_update(struct tusb_s *s)
 {
     /* TODO: How is this signalled?  */
 }
 
-extern CPUReadMemoryFunc * const musb_read[];
-extern CPUWriteMemoryFunc * const musb_write[];
+extern CPUReadMemoryFunc *musb_read[];
+extern CPUWriteMemoryFunc *musb_write[];
 
 static uint32_t tusb_async_readb(void *opaque, target_phys_addr_t addr)
 {
-    TUSBState *s = (TUSBState *) opaque;
+    struct tusb_s *s = (struct tusb_s *) opaque;
 
     switch (addr & 0xfff) {
     case TUSB_BASE_OFFSET ... (TUSB_BASE_OFFSET | 0x1ff):
@@ -308,7 +309,7 @@ static uint32_t tusb_async_readb(void *opaque, target_phys_addr_t addr)
 
 static uint32_t tusb_async_readh(void *opaque, target_phys_addr_t addr)
 {
-    TUSBState *s = (TUSBState *) opaque;
+    struct tusb_s *s = (struct tusb_s *) opaque;
 
     switch (addr & 0xfff) {
     case TUSB_BASE_OFFSET ... (TUSB_BASE_OFFSET | 0x1ff):
@@ -325,7 +326,7 @@ static uint32_t tusb_async_readh(void *opaque, target_phys_addr_t addr)
 
 static uint32_t tusb_async_readw(void *opaque, target_phys_addr_t addr)
 {
-    TUSBState *s = (TUSBState *) opaque;
+    struct tusb_s *s = (struct tusb_s *) opaque;
     int offset = addr & 0xfff;
     int epnum;
     uint32_t ret;
@@ -450,7 +451,7 @@ static uint32_t tusb_async_readw(void *opaque, target_phys_addr_t addr)
 static void tusb_async_writeb(void *opaque, target_phys_addr_t addr,
                 uint32_t value)
 {
-    TUSBState *s = (TUSBState *) opaque;
+    struct tusb_s *s = (struct tusb_s *) opaque;
 
     switch (addr & 0xfff) {
     case TUSB_BASE_OFFSET ... (TUSB_BASE_OFFSET | 0x1ff):
@@ -471,7 +472,7 @@ static void tusb_async_writeb(void *opaque, target_phys_addr_t addr,
 static void tusb_async_writeh(void *opaque, target_phys_addr_t addr,
                 uint32_t value)
 {
-    TUSBState *s = (TUSBState *) opaque;
+    struct tusb_s *s = (struct tusb_s *) opaque;
 
     switch (addr & 0xfff) {
     case TUSB_BASE_OFFSET ... (TUSB_BASE_OFFSET | 0x1ff):
@@ -492,7 +493,7 @@ static void tusb_async_writeh(void *opaque, target_phys_addr_t addr,
 static void tusb_async_writew(void *opaque, target_phys_addr_t addr,
                 uint32_t value)
 {
-    TUSBState *s = (TUSBState *) opaque;
+    struct tusb_s *s = (struct tusb_s *) opaque;
     int offset = addr & 0xfff;
     int epnum;
 
@@ -512,7 +513,8 @@ static void tusb_async_writew(void *opaque, target_phys_addr_t addr,
         s->dev_config = value;
         s->host_mode = (value & TUSB_DEV_CONF_USB_HOST_MODE);
         if (value & TUSB_DEV_CONF_PROD_TEST_MODE)
-            hw_error("%s: Product Test mode not allowed\n", __FUNCTION__);
+            cpu_abort(cpu_single_env, "%s: Product Test mode not allowed\n",
+                            __FUNCTION__);
         break;
 
     case TUSB_PHY_OTG_CTRL_ENABLE:
@@ -523,7 +525,7 @@ static void tusb_async_writew(void *opaque, target_phys_addr_t addr,
         if (value & TUSB_DEV_OTG_TIMER_ENABLE)
             qemu_mod_timer(s->otg_timer, qemu_get_clock(vm_clock) +
                             muldiv64(TUSB_DEV_OTG_TIMER_VAL(value),
-                                     get_ticks_per_sec(), TUSB_DEVCLOCK));
+                                    ticks_per_sec, TUSB_DEVCLOCK));
         else
             qemu_del_timer(s->otg_timer);
         break;
@@ -649,13 +651,13 @@ static void tusb_async_writew(void *opaque, target_phys_addr_t addr,
     }
 }
 
-static CPUReadMemoryFunc * const tusb_async_readfn[] = {
+static CPUReadMemoryFunc *tusb_async_readfn[] = {
     tusb_async_readb,
     tusb_async_readh,
     tusb_async_readw,
 };
 
-static CPUWriteMemoryFunc * const tusb_async_writefn[] = {
+static CPUWriteMemoryFunc *tusb_async_writefn[] = {
     tusb_async_writeb,
     tusb_async_writeh,
     tusb_async_writew,
@@ -663,7 +665,7 @@ static CPUWriteMemoryFunc * const tusb_async_writefn[] = {
 
 static void tusb_otg_tick(void *opaque)
 {
-    TUSBState *s = (TUSBState *) opaque;
+    struct tusb_s *s = (struct tusb_s *) opaque;
 
     s->otg_timer_val = 0;
     s->intr |= TUSB_INT_SRC_OTG_TIMEOUT;
@@ -672,7 +674,7 @@ static void tusb_otg_tick(void *opaque)
 
 static void tusb_power_tick(void *opaque)
 {
-    TUSBState *s = (TUSBState *) opaque;
+    struct tusb_s *s = (struct tusb_s *) opaque;
 
     if (s->power) {
         s->intr_ok = ~0;
@@ -682,7 +684,7 @@ static void tusb_power_tick(void *opaque)
 
 static void tusb_musb_core_intr(void *opaque, int source, int level)
 {
-    TUSBState *s = (TUSBState *) opaque;
+    struct tusb_s *s = (struct tusb_s *) opaque;
     uint16_t otg_status = s->otg_status;
 
     switch (source) {
@@ -729,9 +731,9 @@ static void tusb_musb_core_intr(void *opaque, int source, int level)
     }
 }
 
-TUSBState *tusb6010_init(qemu_irq intr)
+struct tusb_s *tusb6010_init(qemu_irq intr)
 {
-    TUSBState *s = qemu_mallocz(sizeof(*s));
+    struct tusb_s *s = qemu_mallocz(sizeof(*s));
 
     s->test_reset = TUSB_PROD_TEST_RESET_VAL;
     s->host_mode = 0;
@@ -741,7 +743,7 @@ TUSBState *tusb6010_init(qemu_irq intr)
     s->mask = 0xffffffff;
     s->intr = 0x00000000;
     s->otg_timer_val = 0;
-    s->iomemtype[1] = cpu_register_io_memory(tusb_async_readfn,
+    s->iomemtype[1] = cpu_register_io_memory(0, tusb_async_readfn,
                     tusb_async_writefn, s);
     s->irq = intr;
     s->otg_timer = qemu_new_timer(vm_clock, tusb_otg_tick, s);
@@ -752,7 +754,7 @@ TUSBState *tusb6010_init(qemu_irq intr)
     return s;
 }
 
-void tusb6010_power(TUSBState *s, int on)
+void tusb6010_power(struct tusb_s *s, int on)
 {
     if (!on)
         s->power = 0;
@@ -763,6 +765,6 @@ void tusb6010_power(TUSBState *s, int on)
         s->intr_ok = 0;
         tusb_intr_update(s);
         qemu_mod_timer(s->pwr_timer,
-                       qemu_get_clock(vm_clock) + get_ticks_per_sec() / 2);
+                        qemu_get_clock(vm_clock) + ticks_per_sec / 2);
     }
 }

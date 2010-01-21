@@ -24,9 +24,9 @@ typedef target_phys_addr_t pci_addr_t;
 #include "qemu-log.h"
 
 #ifdef DEBUG_PCI
-#define pci_debug(fmt, ...) fprintf(stderr, fmt, ## __VA_ARGS__)
+#define pci_debug(fmt, arg...) fprintf(stderr, fmt, ##arg)
 #else
-#define pci_debug(fmt, ...)
+#define pci_debug(fmt, arg...)
 #endif
 
 #define PCIE500_CFGADDR       0x0
@@ -89,12 +89,12 @@ static uint32_t pcie500_cfgaddr_readl(void *opaque, target_phys_addr_t addr)
 {
     PPCE500PCIState *pci = opaque;
 
-    pci_debug("%s: (addr:" TARGET_FMT_plx ") -> value:%x\n", __func__, addr,
-              pci->pci_state.config_reg);
+    pci_debug("%s: (addr:%Lx) -> value:%x\n", __func__, addr,
+                    pci->pci_state.config_reg);
     return pci->pci_state.config_reg;
 }
 
-static CPUReadMemoryFunc * const pcie500_cfgaddr_read[] = {
+static CPUReadMemoryFunc *pcie500_cfgaddr_read[] = {
     &pcie500_cfgaddr_readl,
     &pcie500_cfgaddr_readl,
     &pcie500_cfgaddr_readl,
@@ -105,24 +105,23 @@ static void pcie500_cfgaddr_writel(void *opaque, target_phys_addr_t addr,
 {
     PPCE500PCIState *controller = opaque;
 
-    pci_debug("%s: value:%x -> (addr:" TARGET_FMT_plx ")\n", __func__, value,
-              addr);
+    pci_debug("%s: value:%x -> (addr%Lx)\n", __func__, value, addr);
     controller->pci_state.config_reg = value & ~0x3;
 }
 
-static CPUWriteMemoryFunc * const pcie500_cfgaddr_write[] = {
+static CPUWriteMemoryFunc *pcie500_cfgaddr_write[] = {
     &pcie500_cfgaddr_writel,
     &pcie500_cfgaddr_writel,
     &pcie500_cfgaddr_writel,
 };
 
-static CPUReadMemoryFunc * const pcie500_cfgdata_read[] = {
+static CPUReadMemoryFunc *pcie500_cfgdata_read[] = {
     &pci_host_data_readb,
     &pci_host_data_readw,
     &pci_host_data_readl,
 };
 
-static CPUWriteMemoryFunc * const pcie500_cfgdata_write[] = {
+static CPUWriteMemoryFunc *pcie500_cfgdata_write[] = {
     &pci_host_data_writeb,
     &pci_host_data_writew,
     &pci_host_data_writel,
@@ -170,12 +169,11 @@ static uint32_t pci_reg_read4(void *opaque, target_phys_addr_t addr)
         break;
     }
 
-    pci_debug("%s: win:%lx(addr:" TARGET_FMT_plx ") -> value:%x\n", __func__,
-              win, addr, value);
+    pci_debug("%s: win:%lx(addr:%Lx) -> value:%x\n",__func__,win,addr,value);
     return value;
 }
 
-static CPUReadMemoryFunc * const e500_pci_reg_read[] = {
+static CPUReadMemoryFunc *e500_pci_reg_read[] = {
     &pci_reg_read4,
     &pci_reg_read4,
     &pci_reg_read4,
@@ -189,8 +187,7 @@ static void pci_reg_write4(void *opaque, target_phys_addr_t addr,
 
     win = addr & 0xfe0;
 
-    pci_debug("%s: value:%x -> win:%lx(addr:" TARGET_FMT_plx ")\n",
-              __func__, value, win, addr);
+    pci_debug("%s: value:%x -> win:%lx(addr:%Lx)\n",__func__,value,win,addr);
 
     switch (win) {
     case PPCE500_PCI_OW1:
@@ -227,7 +224,7 @@ static void pci_reg_write4(void *opaque, target_phys_addr_t addr,
     };
 }
 
-static CPUWriteMemoryFunc * const e500_pci_reg_write[] = {
+static CPUWriteMemoryFunc *e500_pci_reg_write[] = {
     &pci_reg_write4,
     &pci_reg_write4,
     &pci_reg_write4,
@@ -253,10 +250,8 @@ static int mpc85xx_pci_map_irq(PCIDevice *pci_dev, int irq_num)
     return ret;
 }
 
-static void mpc85xx_pci_set_irq(void *opaque, int irq_num, int level)
+static void mpc85xx_pci_set_irq(qemu_irq *pic, int irq_num, int level)
 {
-    qemu_irq *pic = opaque;
-
     pci_debug("%s: PCI irq %d, level:%d\n", __func__, irq_num, level);
 
     qemu_set_irq(pic[irq_num], level);
@@ -322,36 +317,35 @@ PCIBus *ppce500_pci_init(qemu_irq pci_irqs[4], target_phys_addr_t registers)
 
     controller = qemu_mallocz(sizeof(PPCE500PCIState));
 
-    controller->pci_state.bus = pci_register_bus(NULL, "pci",
-                                                 mpc85xx_pci_set_irq,
+    controller->pci_state.bus = pci_register_bus(mpc85xx_pci_set_irq,
                                                  mpc85xx_pci_map_irq,
                                                  pci_irqs, 0x88, 4);
     d = pci_register_device(controller->pci_state.bus,
                             "host bridge", sizeof(PCIDevice),
                             0, NULL, NULL);
 
-    pci_config_set_vendor_id(d->config, PCI_VENDOR_ID_FREESCALE);
-    pci_config_set_device_id(d->config, PCI_DEVICE_ID_MPC8533E);
+    pci_config_set_vendor_id(d->config, PCI_VENDOR_ID_FSL);
+    pci_config_set_device_id(d->config, PCI_DEVICE_ID_FSL_E500);
     pci_config_set_class(d->config, PCI_CLASS_PROCESSOR_POWERPC);
 
     controller->pci_dev = d;
 
     /* CFGADDR */
-    index = cpu_register_io_memory(pcie500_cfgaddr_read,
+    index = cpu_register_io_memory(0, pcie500_cfgaddr_read,
                                    pcie500_cfgaddr_write, controller);
     if (index < 0)
         goto free;
     cpu_register_physical_memory(registers + PCIE500_CFGADDR, 4, index);
 
     /* CFGDATA */
-    index = cpu_register_io_memory(pcie500_cfgdata_read,
+    index = cpu_register_io_memory(0, pcie500_cfgdata_read,
                                    pcie500_cfgdata_write,
                                    &controller->pci_state);
     if (index < 0)
         goto free;
     cpu_register_physical_memory(registers + PCIE500_CFGDATA, 4, index);
 
-    index = cpu_register_io_memory(e500_pci_reg_read,
+    index = cpu_register_io_memory(0, e500_pci_reg_read,
                                    e500_pci_reg_write, controller);
     if (index < 0)
         goto free;

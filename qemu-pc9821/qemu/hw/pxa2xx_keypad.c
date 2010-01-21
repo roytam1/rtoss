@@ -79,7 +79,7 @@
 #define PXAKBD_MAXROW   8
 #define PXAKBD_MAXCOL   8
 
-struct PXA2xxKeyPadState {
+struct pxa2xx_keypad_s{
     qemu_irq    irq;
     struct  keymap *map;
 
@@ -95,7 +95,7 @@ struct PXA2xxKeyPadState {
     uint32_t    kpkdi;
 };
 
-static void pxa27x_keyboard_event (PXA2xxKeyPadState *kp, int keycode)
+static void pxa27x_keyboard_event (struct  pxa2xx_keypad_s *kp, int keycode)
 {
     int row, col,rel;
 
@@ -156,7 +156,7 @@ out:
 
 static uint32_t pxa2xx_keypad_read(void *opaque, target_phys_addr_t offset)
 {
-    PXA2xxKeyPadState *s = (PXA2xxKeyPadState *) opaque;
+    struct pxa2xx_keypad_s *s = (struct pxa2xx_keypad_s *) opaque;
     uint32_t tmp;
 
     switch (offset) {
@@ -209,7 +209,8 @@ static uint32_t pxa2xx_keypad_read(void *opaque, target_phys_addr_t offset)
         return s->kpkdi;
         break;
     default:
-        hw_error("%s: Bad offset " REG_FMT "\n", __FUNCTION__, offset);
+        cpu_abort(cpu_single_env, "%s: Bad offset " REG_FMT "\n",
+                        __FUNCTION__, offset);
     }
 
     return 0;
@@ -218,7 +219,7 @@ static uint32_t pxa2xx_keypad_read(void *opaque, target_phys_addr_t offset)
 static void pxa2xx_keypad_write(void *opaque,
                 target_phys_addr_t offset, uint32_t value)
 {
-    PXA2xxKeyPadState *s = (PXA2xxKeyPadState *) opaque;
+    struct pxa2xx_keypad_s *s = (struct pxa2xx_keypad_s *) opaque;
 
     switch (offset) {
     case KPC:
@@ -253,17 +254,18 @@ static void pxa2xx_keypad_write(void *opaque,
         break;
 
     default:
-        hw_error("%s: Bad offset " REG_FMT "\n", __FUNCTION__, offset);
+        cpu_abort(cpu_single_env, "%s: Bad offset " REG_FMT "\n",
+                        __FUNCTION__, offset);
     }
 }
 
-static CPUReadMemoryFunc * const pxa2xx_keypad_readfn[] = {
+static CPUReadMemoryFunc *pxa2xx_keypad_readfn[] = {
     pxa2xx_keypad_read,
     pxa2xx_keypad_read,
     pxa2xx_keypad_read
 };
 
-static CPUWriteMemoryFunc * const pxa2xx_keypad_writefn[] = {
+static CPUWriteMemoryFunc *pxa2xx_keypad_writefn[] = {
     pxa2xx_keypad_write,
     pxa2xx_keypad_write,
     pxa2xx_keypad_write
@@ -271,7 +273,7 @@ static CPUWriteMemoryFunc * const pxa2xx_keypad_writefn[] = {
 
 static void pxa2xx_keypad_save(QEMUFile *f, void *opaque)
 {
-    PXA2xxKeyPadState *s = (PXA2xxKeyPadState *) opaque;
+    struct pxa2xx_keypad_s *s = (struct pxa2xx_keypad_s *) opaque;
 
     qemu_put_be32s(f, &s->kpc);
     qemu_put_be32s(f, &s->kpdk);
@@ -288,7 +290,7 @@ static void pxa2xx_keypad_save(QEMUFile *f, void *opaque)
 
 static int pxa2xx_keypad_load(QEMUFile *f, void *opaque, int version_id)
 {
-    PXA2xxKeyPadState *s = (PXA2xxKeyPadState *) opaque;
+    struct pxa2xx_keypad_s *s = (struct pxa2xx_keypad_s *) opaque;
 
     qemu_get_be32s(f, &s->kpc);
     qemu_get_be32s(f, &s->kpdk);
@@ -304,16 +306,16 @@ static int pxa2xx_keypad_load(QEMUFile *f, void *opaque, int version_id)
     return 0;
 }
 
-PXA2xxKeyPadState *pxa27x_keypad_init(target_phys_addr_t base,
+struct pxa2xx_keypad_s *pxa27x_keypad_init(target_phys_addr_t base,
         qemu_irq irq)
 {
     int iomemtype;
-    PXA2xxKeyPadState *s;
+    struct pxa2xx_keypad_s *s;
 
-    s = (PXA2xxKeyPadState *) qemu_mallocz(sizeof(PXA2xxKeyPadState));
+    s = (struct pxa2xx_keypad_s *) qemu_mallocz(sizeof(struct pxa2xx_keypad_s));
     s->irq = irq;
 
-    iomemtype = cpu_register_io_memory(pxa2xx_keypad_readfn,
+    iomemtype = cpu_register_io_memory(0, pxa2xx_keypad_readfn,
                     pxa2xx_keypad_writefn, s);
     cpu_register_physical_memory(base, 0x00100000, iomemtype);
 
@@ -323,7 +325,7 @@ PXA2xxKeyPadState *pxa27x_keypad_init(target_phys_addr_t base,
     return s;
 }
 
-void pxa27x_register_keypad(PXA2xxKeyPadState *kp, struct keymap *map,
+void pxa27x_register_keypad(struct pxa2xx_keypad_s *kp, struct keymap *map,
         int size)
 {
     if(!map || size < 0x80) {

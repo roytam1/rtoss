@@ -15,7 +15,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along
- * with this program; if not, see <http://www.gnu.org/licenses/>.
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 #include "hw.h"
 #include "console.h"
@@ -230,13 +231,13 @@ static void omap_diss_write(void *opaque, target_phys_addr_t addr,
     }
 }
 
-static CPUReadMemoryFunc * const omap_diss1_readfn[] = {
+static CPUReadMemoryFunc *omap_diss1_readfn[] = {
     omap_badwidth_read32,
     omap_badwidth_read32,
     omap_diss_read,
 };
 
-static CPUWriteMemoryFunc * const omap_diss1_writefn[] = {
+static CPUWriteMemoryFunc *omap_diss1_writefn[] = {
     omap_badwidth_write32,
     omap_badwidth_write32,
     omap_diss_write,
@@ -569,17 +570,36 @@ static void omap_disc_write(void *opaque, target_phys_addr_t addr,
     }
 }
 
-static CPUReadMemoryFunc * const omap_disc1_readfn[] = {
+static CPUReadMemoryFunc *omap_disc1_readfn[] = {
     omap_badwidth_read32,
     omap_badwidth_read32,
     omap_disc_read,
 };
 
-static CPUWriteMemoryFunc * const omap_disc1_writefn[] = {
+static CPUWriteMemoryFunc *omap_disc1_writefn[] = {
     omap_badwidth_write32,
     omap_badwidth_write32,
     omap_disc_write,
 };
+
+static void *omap_rfbi_get_buffer(struct omap_dss_s *s)
+{
+    target_phys_addr_t fb;
+    uint32_t pd;
+
+    /* TODO */
+    fb = s->dispc.l[0].addr[0];
+
+    pd = cpu_get_physical_page_desc(fb);
+    if ((pd & ~TARGET_PAGE_MASK) != IO_MEM_RAM)
+        /* TODO */
+        cpu_abort(cpu_single_env, "%s: framebuffer outside RAM!\n",
+                        __FUNCTION__);
+    else
+        return phys_ram_base +
+                (pd & TARGET_PAGE_MASK) +
+                (fb & ~TARGET_PAGE_MASK);
+}
 
 static void omap_rfbi_transfer_stop(struct omap_dss_s *s)
 {
@@ -594,11 +614,8 @@ static void omap_rfbi_transfer_stop(struct omap_dss_s *s)
 static void omap_rfbi_transfer_start(struct omap_dss_s *s)
 {
     void *data;
-    target_phys_addr_t len;
-    target_phys_addr_t data_addr;
+    size_t len;
     int pitch;
-    static void *bounce_buffer;
-    static target_phys_addr_t bounce_len;
 
     if (!s->rfbi.enable || s->rfbi.busy)
         return;
@@ -616,24 +633,10 @@ static void omap_rfbi_transfer_start(struct omap_dss_s *s)
 
     s->rfbi.busy = 1;
 
-    len = s->rfbi.pixels * 2;
-
-    data_addr = s->dispc.l[0].addr[0];
-    data = cpu_physical_memory_map(data_addr, &len, 0);
-    if (data && len != s->rfbi.pixels * 2) {
-        cpu_physical_memory_unmap(data, len, 0, 0);
-        data = NULL;
-        len = s->rfbi.pixels * 2;
-    }
-    if (!data) {
-        if (len > bounce_len) {
-            bounce_buffer = qemu_realloc(bounce_buffer, len);
-        }
-        data = bounce_buffer;
-        cpu_physical_memory_read(data_addr, data, len);
-    }
+    data = omap_rfbi_get_buffer(s);
 
     /* TODO bpp */
+    len = s->rfbi.pixels * 2;
     s->rfbi.pixels = 0;
 
     /* TODO: negative values */
@@ -643,10 +646,6 @@ static void omap_rfbi_transfer_start(struct omap_dss_s *s)
         s->rfbi.chip[0]->block(s->rfbi.chip[0]->opaque, 1, data, len, pitch);
     if ((s->rfbi.control & (1 << 3)) && s->rfbi.chip[1])
         s->rfbi.chip[1]->block(s->rfbi.chip[1]->opaque, 1, data, len, pitch);
-
-    if (data != bounce_buffer) {
-        cpu_physical_memory_unmap(data, len, 0, len);
-    }
 
     omap_rfbi_transfer_stop(s);
 
@@ -841,13 +840,13 @@ static void omap_rfbi_write(void *opaque, target_phys_addr_t addr,
     }
 }
 
-static CPUReadMemoryFunc * const omap_rfbi1_readfn[] = {
+static CPUReadMemoryFunc *omap_rfbi1_readfn[] = {
     omap_badwidth_read32,
     omap_badwidth_read32,
     omap_rfbi_read,
 };
 
-static CPUWriteMemoryFunc * const omap_rfbi1_writefn[] = {
+static CPUWriteMemoryFunc *omap_rfbi1_writefn[] = {
     omap_badwidth_write32,
     omap_badwidth_write32,
     omap_rfbi_write,
@@ -960,13 +959,13 @@ static void omap_venc_write(void *opaque, target_phys_addr_t addr,
     }
 }
 
-static CPUReadMemoryFunc * const omap_venc1_readfn[] = {
+static CPUReadMemoryFunc *omap_venc1_readfn[] = {
     omap_badwidth_read32,
     omap_badwidth_read32,
     omap_venc_read,
 };
 
-static CPUWriteMemoryFunc * const omap_venc1_writefn[] = {
+static CPUWriteMemoryFunc *omap_venc1_writefn[] = {
     omap_badwidth_write32,
     omap_badwidth_write32,
     omap_venc_write,
@@ -1010,13 +1009,13 @@ static void omap_im3_write(void *opaque, target_phys_addr_t addr,
     }
 }
 
-static CPUReadMemoryFunc * const omap_im3_readfn[] = {
+static CPUReadMemoryFunc *omap_im3_readfn[] = {
     omap_badwidth_read32,
     omap_badwidth_read32,
     omap_im3_read,
 };
 
-static CPUWriteMemoryFunc * const omap_im3_writefn[] = {
+static CPUWriteMemoryFunc *omap_im3_writefn[] = {
     omap_badwidth_write32,
     omap_badwidth_write32,
     omap_im3_write,
@@ -1036,15 +1035,15 @@ struct omap_dss_s *omap_dss_init(struct omap_target_agent_s *ta,
     s->drq = drq;
     omap_dss_reset(s);
 
-    iomemtype[0] = l4_register_io_memory(omap_diss1_readfn,
+    iomemtype[0] = l4_register_io_memory(0, omap_diss1_readfn,
                     omap_diss1_writefn, s);
-    iomemtype[1] = l4_register_io_memory(omap_disc1_readfn,
+    iomemtype[1] = l4_register_io_memory(0, omap_disc1_readfn,
                     omap_disc1_writefn, s);
-    iomemtype[2] = l4_register_io_memory(omap_rfbi1_readfn,
+    iomemtype[2] = l4_register_io_memory(0, omap_rfbi1_readfn,
                     omap_rfbi1_writefn, s);
-    iomemtype[3] = l4_register_io_memory(omap_venc1_readfn,
+    iomemtype[3] = l4_register_io_memory(0, omap_venc1_readfn,
                     omap_venc1_writefn, s);
-    iomemtype[4] = cpu_register_io_memory(omap_im3_readfn,
+    iomemtype[4] = cpu_register_io_memory(0, omap_im3_readfn,
                     omap_im3_writefn, s);
     omap_l4_attach(ta, 0, iomemtype[0]);
     omap_l4_attach(ta, 1, iomemtype[1]);
@@ -1063,6 +1062,6 @@ struct omap_dss_s *omap_dss_init(struct omap_target_agent_s *ta,
 void omap_rfbi_attach(struct omap_dss_s *s, int cs, struct rfbi_chip_s *chip)
 {
     if (cs < 0 || cs > 1)
-        hw_error("%s: wrong CS %i\n", __FUNCTION__, cs);
+        cpu_abort(cpu_single_env, "%s: wrong CS %i\n", __FUNCTION__, cs);
     s->rfbi.chip[cs] = chip;
 }

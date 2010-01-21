@@ -8,26 +8,26 @@
  * This code is licenced under the GPL.
  */
 
-#include "sysbus.h"
+#include "hw.h"
+#include "primecell.h"
 
 //#define DEBUG_PL061 1
 
 #ifdef DEBUG_PL061
-#define DPRINTF(fmt, ...) \
-do { printf("pl061: " fmt , ## __VA_ARGS__); } while (0)
-#define BADF(fmt, ...) \
-do { fprintf(stderr, "pl061: error: " fmt , ## __VA_ARGS__); exit(1);} while (0)
+#define DPRINTF(fmt, args...) \
+do { printf("pl061: " fmt , ##args); } while (0)
+#define BADF(fmt, args...) \
+do { fprintf(stderr, "pl061: error: " fmt , ##args); exit(1);} while (0)
 #else
-#define DPRINTF(fmt, ...) do {} while(0)
-#define BADF(fmt, ...) \
-do { fprintf(stderr, "pl061: error: " fmt , ## __VA_ARGS__);} while (0)
+#define DPRINTF(fmt, args...) do {} while(0)
+#define BADF(fmt, args...) \
+do { fprintf(stderr, "pl061: error: " fmt , ##args);} while (0)
 #endif
 
 static const uint8_t pl061_id[12] =
   { 0x00, 0x00, 0x00, 0x00, 0x61, 0x00, 0x18, 0x01, 0x0d, 0xf0, 0x05, 0xb1 };
 
 typedef struct {
-    SysBusDevice busdev;
     int locked;
     uint8_t data;
     uint8_t old_data;
@@ -126,7 +126,8 @@ static uint32_t pl061_read(void *opaque, target_phys_addr_t offset)
     case 0x524: /* Commit */
         return s->cr;
     default:
-        hw_error("pl061_read: Bad offset %x\n", (int)offset);
+        cpu_abort (cpu_single_env, "pl061_read: Bad offset %x\n",
+                   (int)offset);
         return 0;
     }
 }
@@ -198,7 +199,8 @@ static void pl061_write(void *opaque, target_phys_addr_t offset,
             s->cr = value;
         break;
     default:
-        hw_error("pl061_write: Bad offset %x\n", (int)offset);
+        cpu_abort (cpu_single_env, "pl061_write: Bad offset %x\n",
+                   (int)offset);
     }
     pl061_update(s);
 }
@@ -223,13 +225,13 @@ static void pl061_set_irq(void * opaque, int irq, int level)
     }
 }
 
-static CPUReadMemoryFunc * const pl061_readfn[] = {
+static CPUReadMemoryFunc *pl061_readfn[] = {
    pl061_read,
    pl061_read,
    pl061_read
 };
 
-static CPUWriteMemoryFunc * const pl061_writefn[] = {
+static CPUWriteMemoryFunc *pl061_writefn[] = {
    pl061_write,
    pl061_write,
    pl061_write
@@ -291,26 +293,21 @@ static int pl061_load(QEMUFile *f, void *opaque, int version_id)
     return 0;
 }
 
-static int pl061_init(SysBusDevice *dev)
+/* Returns an array of inputs.  */
+qemu_irq *pl061_init(uint32_t base, qemu_irq irq, qemu_irq **out)
 {
     int iomemtype;
-    pl061_state *s = FROM_SYSBUS(pl061_state, dev);
+    pl061_state *s;
 
-    iomemtype = cpu_register_io_memory(pl061_readfn,
+    s = (pl061_state *)qemu_mallocz(sizeof(pl061_state));
+    iomemtype = cpu_register_io_memory(0, pl061_readfn,
                                        pl061_writefn, s);
-    sysbus_init_mmio(dev, 0x1000, iomemtype);
-    sysbus_init_irq(dev, &s->irq);
-    qdev_init_gpio_in(&dev->qdev, pl061_set_irq, 8);
-    qdev_init_gpio_out(&dev->qdev, s->out, 8);
+    cpu_register_physical_memory(base, 0x00001000, iomemtype);
+    s->irq = irq;
     pl061_reset(s);
+    if (out)
+        *out = s->out;
+
     register_savevm("pl061_gpio", -1, 1, pl061_save, pl061_load, s);
-    return 0;
+    return qemu_allocate_irqs(pl061_set_irq, s, 8);
 }
-
-static void pl061_register_devices(void)
-{
-    sysbus_register_dev("pl061", sizeof(pl061_state),
-                        pl061_init);
-}
-
-device_init(pl061_register_devices)

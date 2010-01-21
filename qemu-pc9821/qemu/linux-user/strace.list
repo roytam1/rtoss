@@ -1,13 +1,8 @@
-/*
- * Note that if you change format strings in these, check also
- * that corresponding print functions are able to handle string
- * locking correctly (see strace.c).
- */
 #ifdef TARGET_NR_accept
-{ TARGET_NR_accept, "accept" , NULL, print_accept, NULL },
+{ TARGET_NR_accept, "accept" , "%s(%d,%#x,%#x)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_access
-{ TARGET_NR_access, "access" , NULL, print_access, NULL },
+{ TARGET_NR_access, "access" , "%s(\"%s\",%#o)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_acct
 { TARGET_NR_acct, "acct" , NULL, NULL, NULL },
@@ -43,7 +38,7 @@
 { TARGET_NR_break, "break" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_brk
-{ TARGET_NR_brk, "brk" , NULL, print_brk, print_syscall_ret_addr },
+{ TARGET_NR_brk, "brk" , NULL, NULL, print_syscall_ret_addr },
 #endif
 #ifdef TARGET_NR_cachectl
 { TARGET_NR_cachectl, "cachectl" , NULL, NULL, NULL },
@@ -58,10 +53,10 @@
 { TARGET_NR_capset, "capset" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_chdir
-{ TARGET_NR_chdir, "chdir" , NULL, print_chdir, NULL },
+{ TARGET_NR_chdir, "chdir" , "%s(\"%s\")", NULL, NULL },
 #endif
 #ifdef TARGET_NR_chmod
-{ TARGET_NR_chmod, "chmod" , NULL, print_chmod, NULL },
+{ TARGET_NR_chmod, "chmod" , "%s(\"%s\",%#o)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_chown
 { TARGET_NR_chown, "chown" , NULL, NULL, NULL },
@@ -94,7 +89,7 @@
 { TARGET_NR_connect, "connect" , "%s(%d,%#x,%d)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_creat
-{ TARGET_NR_creat, "creat" , NULL, print_creat, NULL },
+{ TARGET_NR_creat, "creat" , "%s(\"%s\",%#o)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_create_module
 { TARGET_NR_create_module, "create_module" , NULL, NULL, NULL },
@@ -127,7 +122,7 @@
 { TARGET_NR_epoll_wait_old, "epoll_wait_old" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_execv
-{ TARGET_NR_execv, "execv" , NULL, print_execv, NULL },
+{ TARGET_NR_execv, "execv" , "%s(\"%s\",%ld,%ld,%ld,%ld,%ld)\n", NULL, NULL },
 #endif
 #ifdef TARGET_NR_execve
 { TARGET_NR_execve, "execve" , NULL, print_execve, NULL },
@@ -145,7 +140,7 @@
 { TARGET_NR_exit_group, "exit_group" , "%s(%d)\n", NULL, NULL },
 #endif
 #ifdef TARGET_NR_faccessat
-{ TARGET_NR_faccessat, "faccessat" , NULL, print_faccessat, NULL },
+{ TARGET_NR_faccessat, "faccessat" , "%s(%d,\"%s\",%#o,%#x)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_fadvise64
 { TARGET_NR_fadvise64, "fadvise64" , NULL, NULL, NULL },
@@ -160,22 +155,22 @@
 { TARGET_NR_fchmod, "fchmod" , "%s(%d,%#o)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_fchmodat
-{ TARGET_NR_fchmodat, "fchmodat" , NULL, print_fchmodat, NULL },
+{ TARGET_NR_fchmodat, "fchmodat" , "%s(%d,\"%s\",%#o,%#x)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_fchown
-{ TARGET_NR_fchown, "fchown" , "%s(%d,%d,%d)", NULL, NULL },
+{ TARGET_NR_fchown, "fchown" , "%s(\"%s\",%d,%d)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_fchown32
 { TARGET_NR_fchown32, "fchown32" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_fchownat
-{ TARGET_NR_fchownat, "fchownat" , NULL, print_fchownat, NULL },
+{ TARGET_NR_fchownat, "fchownat" , "%s(%d,\"%s\",%d,%d,%#x)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_fcntl
-{ TARGET_NR_fcntl, "fcntl" , NULL, print_fcntl, NULL },
+{ TARGET_NR_fcntl, "fcntl" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_fcntl64
-{ TARGET_NR_fcntl64, "fcntl64" , NULL, print_fcntl64, NULL },
+{ TARGET_NR_fcntl64, "fcntl64" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_fdatasync
 { TARGET_NR_fdatasync, "fdatasync" , NULL, NULL, NULL },
@@ -199,10 +194,10 @@
 { TARGET_NR_fsetxattr, "fsetxattr" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_fstat
-{ TARGET_NR_fstat, "fstat" , NULL, print_fstat, NULL },
+{ TARGET_NR_fstat, "fstat" , "%s(%d,%p)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_fstat64
-{ TARGET_NR_fstat64, "fstat64" , NULL, print_fstat64, NULL },
+{ TARGET_NR_fstat64, "fstat64" , "%s(%d,%p)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_fstatfs
 { TARGET_NR_fstatfs, "fstatfs" , "%s(%d,%p)", NULL, NULL },
@@ -223,10 +218,10 @@
 { TARGET_NR_ftruncate64, "ftruncate64" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_futex
-{ TARGET_NR_futex, "futex" , NULL, print_futex, NULL },
+{ TARGET_NR_futex, "futex" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_futimesat
-{ TARGET_NR_futimesat, "futimesat" , NULL, print_futimesat, NULL },
+{ TARGET_NR_futimesat, "futimesat" , "%s(%d,\"%s\",%p)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_getcwd
 { TARGET_NR_getcwd, "getcwd" , "%s(%p,%d)", NULL, NULL },
@@ -430,10 +425,10 @@
 { TARGET_NR_lgetxattr, "lgetxattr" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_link
-{ TARGET_NR_link, "link" , NULL, print_link, NULL },
+{ TARGET_NR_link, "link" , "%s(\"%s\",\"%s\")", NULL, NULL },
 #endif
 #ifdef TARGET_NR_linkat
-{ TARGET_NR_linkat, "linkat" , NULL, print_linkat, NULL },
+{ TARGET_NR_linkat, "linkat" , "%s(%d,\"%s\",%d,\"%s\",%#x)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_Linux
 { TARGET_NR_Linux, "Linux" , NULL, NULL, NULL },
@@ -466,10 +461,10 @@
 { TARGET_NR_lsetxattr, "lsetxattr" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_lstat
-{ TARGET_NR_lstat, "lstat" , NULL, print_lstat, NULL },
+{ TARGET_NR_lstat, "lstat" , "%s(\"%s\",%p)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_lstat64
-{ TARGET_NR_lstat64, "lstat64" , NULL, print_lstat64, NULL },
+{ TARGET_NR_lstat64, "lstat64" , "%s(\"%s\",%p)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_madvise
 { TARGET_NR_madvise, "madvise" , NULL, NULL, NULL },
@@ -490,16 +485,16 @@
 { TARGET_NR_mincore, "mincore" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_mkdir
-{ TARGET_NR_mkdir, "mkdir" , NULL, print_mkdir, NULL },
+{ TARGET_NR_mkdir, "mkdir" , "%s(\"%s\",%#o)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_mkdirat
-{ TARGET_NR_mkdirat, "mkdirat" , NULL, print_mkdirat, NULL },
+{ TARGET_NR_mkdirat, "mkdirat" , "%s(%d,\"%s\",%#o)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_mknod
-{ TARGET_NR_mknod, "mknod" , NULL, print_mknod, NULL },
+{ TARGET_NR_mknod, "mknod" , "%s(\"%s\",%#o,%#x)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_mknodat
-{ TARGET_NR_mknodat, "mknodat" , NULL, print_mknodat, NULL },
+{ TARGET_NR_mknodat, "mknodat" , "%s(%d,\"%s\",%#o,%#x)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_mlock
 { TARGET_NR_mlock, "mlock" , NULL, NULL, NULL },
@@ -508,43 +503,43 @@
 { TARGET_NR_mlockall, "mlockall" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_mmap
-{ TARGET_NR_mmap, "mmap" , NULL, print_mmap, print_syscall_ret_addr },
+{ TARGET_NR_mmap, "mmap" , NULL, NULL, print_syscall_ret_addr },
 #endif
 #ifdef TARGET_NR_mmap2
-{ TARGET_NR_mmap2, "mmap2" , NULL, print_mmap2, print_syscall_ret_addr },
+{ TARGET_NR_mmap2, "mmap2" , NULL, NULL, print_syscall_ret_addr },
 #endif
 #ifdef TARGET_NR_modify_ldt
 { TARGET_NR_modify_ldt, "modify_ldt" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_mount
-{ TARGET_NR_mount, "mount" , NULL, print_mount, NULL },
+{ TARGET_NR_mount, "mount" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_move_pages
 { TARGET_NR_move_pages, "move_pages" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_mprotect
-{ TARGET_NR_mprotect, "mprotect" , NULL, print_mprotect, NULL },
+{ TARGET_NR_mprotect, "mprotect" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_mpx
 { TARGET_NR_mpx, "mpx" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_mq_getsetattr
-{ TARGET_NR_mq_getsetattr, "mq_getsetattr" , "%s(%d,%p,%p)", NULL, NULL },
+{ TARGET_NR_mq_getsetattr, "mq_getsetattr" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_mq_notify
-{ TARGET_NR_mq_notify, "mq_notify" , "%s(%d,%p)", NULL, NULL },
+{ TARGET_NR_mq_notify, "mq_notify" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_mq_open
-{ TARGET_NR_mq_open, "mq_open" , NULL, print_mq_open, NULL },
+{ TARGET_NR_mq_open, "mq_open" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_mq_timedreceive
-{ TARGET_NR_mq_timedreceive, "mq_timedreceive" , "%s(%d,%p,%d,%u,%p)", NULL, NULL },
+{ TARGET_NR_mq_timedreceive, "mq_timedreceive" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_mq_timedsend
-{ TARGET_NR_mq_timedsend, "mq_timedsend" , "%s(%d,%p,%d,%u,%p)", NULL, NULL },
+{ TARGET_NR_mq_timedsend, "mq_timedsend" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_mq_unlink
-{ TARGET_NR_mq_unlink, "mq_unlink" , NULL, print_mq_unlink, NULL },
+{ TARGET_NR_mq_unlink, "mq_unlink" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_mremap
 { TARGET_NR_mremap, "mremap" , NULL, NULL, NULL },
@@ -574,16 +569,16 @@
 { TARGET_NR_munlockall, "munlockall" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_munmap
-{ TARGET_NR_munmap, "munmap" , NULL, print_munmap, NULL },
+{ TARGET_NR_munmap, "munmap" , "%s(%p,%d)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_nanosleep
 { TARGET_NR_nanosleep, "nanosleep" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_fstatat64
-{ TARGET_NR_fstatat64, "fstatat64" , NULL, print_fstatat64, NULL },
+{ TARGET_NR_fstatat64, "fstatat64" , "%s(%d,\"%s\",%p,%#x)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_newfstatat
-{ TARGET_NR_newfstatat, "newfstatat" , NULL, print_newfstatat, NULL },
+{ TARGET_NR_newfstatat, "newfstatat" , "%s(%d,\"%s\",%p,%#x)", NULL, NULL },
 #endif
 #ifdef TARGET_NR__newselect
 { TARGET_NR__newselect, "_newselect" , NULL, print_newselect, print_syscall_ret_newselect },
@@ -616,10 +611,10 @@
 { TARGET_NR_olduname, "olduname" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_open
-{ TARGET_NR_open, "open" , NULL, print_open, NULL },
+{ TARGET_NR_open, "open" , "%s(\"%s\",%#x,%#o)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_openat
-{ TARGET_NR_openat, "openat" , NULL, print_openat, NULL },
+{ TARGET_NR_openat, "openat" , "%s(%d,\"%s\",%#x,%#o)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_osf_adjtime
 { TARGET_NR_osf_adjtime, "osf_adjtime" , NULL, NULL, NULL },
@@ -1012,10 +1007,10 @@
 { TARGET_NR_readdir, "readdir" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_readlink
-{ TARGET_NR_readlink, "readlink" , NULL, print_readlink, NULL },
+{ TARGET_NR_readlink, "readlink" , "%s(\"%s\",%p,%d)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_readlinkat
-{ TARGET_NR_readlinkat, "readlinkat" , NULL, print_readlinkat, NULL },
+{ TARGET_NR_readlinkat, "readlinkat" , "%s(%d,\"%s\",%p,%d)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_readv
 { TARGET_NR_readv, "readv" , NULL, NULL, NULL },
@@ -1039,10 +1034,10 @@
 { TARGET_NR_removexattr, "removexattr" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_rename
-{ TARGET_NR_rename, "rename" , NULL, print_rename, NULL },
+{ TARGET_NR_rename, "rename" , "%s(\"%s\",\"%s\")", NULL, NULL },
 #endif
 #ifdef TARGET_NR_renameat
-{ TARGET_NR_renameat, "renameat" , NULL, print_renameat, NULL },
+{ TARGET_NR_renameat, "renameat" , "%s(%d,\"%s\",%d,\"%s\")", NULL, NULL },
 #endif
 #ifdef TARGET_NR_request_key
 { TARGET_NR_request_key, "request_key" , NULL, NULL, NULL },
@@ -1306,16 +1301,16 @@
 { TARGET_NR_ssetmask, "ssetmask" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_stat
-{ TARGET_NR_stat, "stat" , NULL, print_stat, NULL },
+{ TARGET_NR_stat, "stat" , "%s(\"%s\",%p)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_stat64
-{ TARGET_NR_stat64, "stat64" , NULL, print_stat64, NULL },
+{ TARGET_NR_stat64, "stat64" , "%s(\"%s\",%p)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_statfs
-{ TARGET_NR_statfs, "statfs" , NULL, print_statfs, NULL },
+{ TARGET_NR_statfs, "statfs" , "%s(\"%s\",%p)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_statfs64
-{ TARGET_NR_statfs64, "statfs64" , NULL, print_statfs64, NULL },
+{ TARGET_NR_statfs64, "statfs64" , "%s(\"%s\",%p)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_stime
 { TARGET_NR_stime, "stime" , NULL, NULL, NULL },
@@ -1339,10 +1334,10 @@
 { TARGET_NR_swapon, "swapon" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_symlink
-{ TARGET_NR_symlink, "symlink" , NULL, print_symlink, NULL },
+{ TARGET_NR_symlink, "symlink" , "%s(\"%s\",\"%s\")", NULL, NULL },
 #endif
 #ifdef TARGET_NR_symlinkat
-{ TARGET_NR_symlinkat, "symlinkat", NULL, print_symlinkat, NULL },
+{ TARGET_NR_symlinkat, "symlinkat" , "%s(\"%s\",%d,\"%s\")", NULL, NULL },
 #endif
 #ifdef TARGET_NR_sync
 { TARGET_NR_sync, "sync" , NULL, NULL, NULL },
@@ -1432,19 +1427,19 @@
 { TARGET_NR_umask, "umask" , "%s(%#o)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_umount
-{ TARGET_NR_umount, "umount" , NULL, print_umount, NULL },
+{ TARGET_NR_umount, "umount" , "%s(\"%s\",\"%s\",\"%s\",%#x,%p)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_umount2
-{ TARGET_NR_umount2, "umount2" , NULL, print_umount2, NULL },
+{ TARGET_NR_umount2, "umount2" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_uname
 { TARGET_NR_uname, "uname" , "%s(%p)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_unlink
-{ TARGET_NR_unlink, "unlink" , NULL, print_unlink, NULL },
+{ TARGET_NR_unlink, "unlink" , "%s(\"%s\")", NULL, NULL },
 #endif
 #ifdef TARGET_NR_unlinkat
-{ TARGET_NR_unlinkat, "unlinkat" , NULL, print_unlinkat, NULL },
+{ TARGET_NR_unlinkat, "unlinkat" , "%s(%d,\"%s\",%#x)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_unshare
 { TARGET_NR_unshare, "unshare" , NULL, NULL, NULL },
@@ -1474,10 +1469,10 @@
 { TARGET_NR_ustat, "ustat" , "%s(%#x,%p)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_utime
-{ TARGET_NR_utime, "utime" , NULL, print_utime, NULL },
+{ TARGET_NR_utime, "utime" , "%s(\"%s\",%p)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_utimes
-{ TARGET_NR_utimes, "utimes" , NULL, print_utimes, NULL },
+{ TARGET_NR_utimes, "utimes" , NULL, NULL, NULL },
 #endif
 #ifdef TARGET_NR_utrap_install
 { TARGET_NR_utrap_install, "utrap_install" , NULL, NULL, NULL },
@@ -1516,5 +1511,5 @@
 { TARGET_NR_writev, "writev" , "%s(%d,%p,%#x)", NULL, NULL },
 #endif
 #ifdef TARGET_NR_utimensat
-{ TARGET_NR_utimensat, "utimensat", NULL, print_utimensat, NULL },
+{ TARGET_NR_utimensat, "utimensat", "%s(%d,\"%s\",%p,%#x)", NULL, NULL },
 #endif

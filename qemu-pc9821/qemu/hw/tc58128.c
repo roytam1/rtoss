@@ -1,7 +1,7 @@
+#include <assert.h>
 #include "hw.h"
 #include "sh.h"
 #include "sysemu.h"
-#include "loader.h"
 
 #define CE1  0x0100
 #define CE2  0x0200

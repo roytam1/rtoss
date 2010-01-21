@@ -147,7 +147,7 @@ unsigned int PerformFIX(const unsigned int opcode)
 }
 
 
-static __inline unsigned int
+static unsigned int __inline__
 PerformComparisonOperation(floatx80 Fn, floatx80 Fm)
 {
    FPA11 *fpa11 = GET_FPA11();

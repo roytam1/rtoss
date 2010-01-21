@@ -6,6 +6,7 @@
  */
 
 #include "qemu-common.h"
+#define WANT_SYS_IOCTL_H
 #include <slirp.h>
 #include "ip_icmp.h"
 #ifdef __sun__
@@ -15,9 +16,21 @@
 static void sofcantrcvmore(struct socket *so);
 static void sofcantsendmore(struct socket *so);
 
+#if 0
+static void
+so_init()
+{
+	/* Nothing yet */
+}
+#endif
+
 struct socket *
-solookup(struct socket *head, struct in_addr laddr, u_int lport,
-         struct in_addr faddr, u_int fport)
+solookup(head, laddr, lport, faddr, fport)
+	struct socket *head;
+	struct in_addr laddr;
+	u_int lport;
+	struct in_addr faddr;
+	u_int fport;
 {
 	struct socket *so;
 
@@ -41,7 +54,7 @@ solookup(struct socket *head, struct in_addr laddr, u_int lport,
  * insque() it into the correct linked-list
  */
 struct socket *
-socreate(Slirp *slirp)
+socreate()
 {
   struct socket *so;
 
@@ -50,7 +63,6 @@ socreate(Slirp *slirp)
     memset(so, 0, sizeof(struct socket));
     so->so_state = SS_NOFDREF;
     so->s = -1;
-    so->slirp = slirp;
   }
   return(so);
 }
@@ -59,19 +71,18 @@ socreate(Slirp *slirp)
  * remque and free a socket, clobber cache
  */
 void
-sofree(struct socket *so)
+sofree(so)
+	struct socket *so;
 {
-  Slirp *slirp = so->slirp;
-
   if (so->so_emu==EMU_RSH && so->extra) {
 	sofree(so->extra);
 	so->extra=NULL;
   }
-  if (so == slirp->tcp_last_so) {
-      slirp->tcp_last_so = &slirp->tcb;
-  } else if (so == slirp->udp_last_so) {
-      slirp->udp_last_so = &slirp->udb;
-  }
+  if (so == tcp_last_so)
+    tcp_last_so = &tcb;
+  else if (so == udp_last_so)
+    udp_last_so = &udb;
+
   m_free(so->so_m);
 
   if(so->so_next && so->so_prev)
@@ -147,7 +158,8 @@ size_t sopreprbuf(struct socket *so, struct iovec *iov, int *np)
  * a read() of 0 (or less) means it's disconnected
  */
 int
-soread(struct socket *so)
+soread(so)
+	struct socket *so;
 {
 	int n, nn;
 	struct sbuf *sb = &so->so_snd;
@@ -257,7 +269,8 @@ err:
  * in the send buffer is sent as urgent data
  */
 void
-sorecvoob(struct socket *so)
+sorecvoob(so)
+	struct socket *so;
 {
 	struct tcpcb *tp = sototcpcb(so);
 
@@ -284,7 +297,8 @@ sorecvoob(struct socket *so)
  * There's a lot duplicated code here, but...
  */
 int
-sosendoob(struct socket *so)
+sosendoob(so)
+	struct socket *so;
 {
 	struct sbuf *sb = &so->so_rcv;
 	char buff[2048]; /* XXX Shouldn't be sending more oob data than this */
@@ -342,7 +356,8 @@ sosendoob(struct socket *so)
  * updating all sbuf field as necessary
  */
 int
-sowrite(struct socket *so)
+sowrite(so)
+	struct socket *so;
 {
 	int  n,nn;
 	struct sbuf *sb = &so->so_rcv;
@@ -436,7 +451,8 @@ sowrite(struct socket *so)
  * recvfrom() a UDP socket
  */
 void
-sorecvfrom(struct socket *so)
+sorecvfrom(so)
+	struct socket *so;
 {
 	struct sockaddr_in addr;
 	socklen_t addrlen = sizeof(struct sockaddr_in);
@@ -463,23 +479,15 @@ sorecvfrom(struct socket *so)
 	    icmp_error(so->so_m, ICMP_UNREACH,code, 0,strerror(errno));
 	  } else {
 	    icmp_reflect(so->so_m);
-            so->so_m = NULL; /* Don't m_free() it again! */
+	    so->so_m = 0; /* Don't m_free() it again! */
 	  }
 	  /* No need for this socket anymore, udp_detach it */
 	  udp_detach(so);
 	} else {                            	/* A "normal" UDP packet */
 	  struct mbuf *m;
-          int len;
-#ifdef _WIN32
-          unsigned long n;
-#else
-          int n;
-#endif
+	  int len, n;
 
-	  m = m_get(so->slirp);
-	  if (!m) {
-	      return;
-	  }
+	  if (!(m = m_get())) return;
 	  m->m_data += IF_MAXLINKHDR;
 
 	  /*
@@ -524,6 +532,12 @@ sorecvfrom(struct socket *so)
 		so->so_expire = curtime + SO_EXPIRE;
 	    }
 
+	    /*		if (m->m_len == len) {
+	     *			m_inc(m, MINCSIZE);
+	     *			m->m_len = 0;
+	     *		}
+	     */
+
 	    /*
 	     * If this packet was destined for CTL_ADDR,
 	     * make it look like that's where it came from, done by udp_output
@@ -537,9 +551,10 @@ sorecvfrom(struct socket *so)
  * sendto() a socket
  */
 int
-sosendto(struct socket *so, struct mbuf *m)
+sosendto(so, m)
+	struct socket *so;
+	struct mbuf *m;
 {
-	Slirp *slirp = so->slirp;
 	int ret;
 	struct sockaddr_in addr;
 
@@ -548,14 +563,16 @@ sosendto(struct socket *so, struct mbuf *m)
 	DEBUG_ARG("m = %lx", (long)m);
 
         addr.sin_family = AF_INET;
-	if ((so->so_faddr.s_addr & slirp->vnetwork_mask.s_addr) ==
-	    slirp->vnetwork_addr.s_addr) {
+	if ((so->so_faddr.s_addr & htonl(0xffffff00)) == special_addr.s_addr) {
 	  /* It's an alias */
-	  if (so->so_faddr.s_addr == slirp->vnameserver_addr.s_addr) {
-	    if (get_dns_addr(&addr.sin_addr) < 0)
-	      addr.sin_addr = loopback_addr;
-	  } else {
+	  switch(ntohl(so->so_faddr.s_addr) & 0xff) {
+	  case CTL_DNS:
+	    addr.sin_addr = dns_addr;
+	    break;
+	  case CTL_ALIAS:
+	  default:
 	    addr.sin_addr = loopback_addr;
+	    break;
 	  }
 	} else
 	  addr.sin_addr = so->so_faddr;
@@ -575,32 +592,33 @@ sosendto(struct socket *so, struct mbuf *m)
 	 */
 	if (so->so_expire)
 		so->so_expire = curtime + SO_EXPIRE;
-	so->so_state &= SS_PERSISTENT_MASK;
-	so->so_state |= SS_ISFCONNECTED; /* So that it gets select()ed */
+	so->so_state = SS_ISFCONNECTED; /* So that it gets select()ed */
 	return 0;
 }
 
 /*
- * Listen for incoming TCP connections
+ * XXX This should really be tcp_listen
  */
 struct socket *
-tcp_listen(Slirp *slirp, u_int32_t haddr, u_int hport, u_int32_t laddr,
-           u_int lport, int flags)
+solisten(port, laddr, lport, flags)
+	u_int port;
+	u_int32_t laddr;
+	u_int lport;
+	int flags;
 {
 	struct sockaddr_in addr;
 	struct socket *so;
 	int s, opt = 1;
 	socklen_t addrlen = sizeof(addr);
 
-	DEBUG_CALL("tcp_listen");
-	DEBUG_ARG("haddr = %x", haddr);
-	DEBUG_ARG("hport = %d", hport);
+	DEBUG_CALL("solisten");
+	DEBUG_ARG("port = %d", port);
 	DEBUG_ARG("laddr = %x", laddr);
 	DEBUG_ARG("lport = %d", lport);
 	DEBUG_ARG("flags = %x", flags);
 
-	so = socreate(slirp);
-	if (!so) {
+	if ((so = socreate()) == NULL) {
+	  /* free(so);      Not sofree() ??? free(NULL) == NOP */
 	  return NULL;
 	}
 
@@ -609,7 +627,7 @@ tcp_listen(Slirp *slirp, u_int32_t haddr, u_int hport, u_int32_t laddr,
 		free(so);
 		return NULL;
 	}
-	insque(so, &slirp->tcb);
+	insque(so,&tcb);
 
 	/*
 	 * SS_FACCEPTONCE sockets must time out.
@@ -617,14 +635,13 @@ tcp_listen(Slirp *slirp, u_int32_t haddr, u_int hport, u_int32_t laddr,
 	if (flags & SS_FACCEPTONCE)
 	   so->so_tcpcb->t_timer[TCPT_KEEP] = TCPTV_KEEP_INIT*2;
 
-	so->so_state &= SS_PERSISTENT_MASK;
-	so->so_state |= (SS_FACCEPTCONN | flags);
+	so->so_state = (SS_FACCEPTCONN|flags);
 	so->so_lport = lport; /* Kept in network format */
 	so->so_laddr.s_addr = laddr; /* Ditto */
 
 	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = haddr;
-	addr.sin_port = hport;
+	addr.sin_addr.s_addr = INADDR_ANY;
+	addr.sin_port = port;
 
 	if (((s = socket(AF_INET,SOCK_STREAM,0)) < 0) ||
 	    (setsockopt(s,SOL_SOCKET,SO_REUSEADDR,(char *)&opt,sizeof(int)) < 0) ||
@@ -647,13 +664,40 @@ tcp_listen(Slirp *slirp, u_int32_t haddr, u_int hport, u_int32_t laddr,
 	getsockname(s,(struct sockaddr *)&addr,&addrlen);
 	so->so_fport = addr.sin_port;
 	if (addr.sin_addr.s_addr == 0 || addr.sin_addr.s_addr == loopback_addr.s_addr)
-	   so->so_faddr = slirp->vhost_addr;
+	   so->so_faddr = alias_addr;
 	else
 	   so->so_faddr = addr.sin_addr;
 
 	so->s = s;
 	return so;
 }
+
+#if 0
+/*
+ * Data is available in so_rcv
+ * Just write() the data to the socket
+ * XXX not yet...
+ */
+static void
+sorwakeup(so)
+	struct socket *so;
+{
+/*	sowrite(so); */
+/*	FD_CLR(so->s,&writefds); */
+}
+
+/*
+ * Data has been freed in so_snd
+ * We have room for a read() if we want to
+ * For now, don't read, it'll be done in the main loop
+ */
+static void
+sowwakeup(so)
+	struct socket *so;
+{
+	/* Nothing, yet */
+}
+#endif
 
 /*
  * Various session state calls
@@ -662,7 +706,8 @@ tcp_listen(Slirp *slirp, u_int32_t haddr, u_int hport, u_int32_t laddr,
  * times each when only 1 was needed
  */
 void
-soisfconnecting(struct socket *so)
+soisfconnecting(so)
+	register struct socket *so;
 {
 	so->so_state &= ~(SS_NOFDREF|SS_ISFCONNECTED|SS_FCANTRCVMORE|
 			  SS_FCANTSENDMORE|SS_FWDRAIN);
@@ -670,7 +715,8 @@ soisfconnecting(struct socket *so)
 }
 
 void
-soisfconnected(struct socket *so)
+soisfconnected(so)
+        register struct socket *so;
 {
 	so->so_state &= ~(SS_ISFCONNECTING|SS_FWDRAIN|SS_NOFDREF);
 	so->so_state |= SS_ISFCONNECTED; /* Clobber other states */
@@ -686,12 +732,10 @@ sofcantrcvmore(struct socket *so)
 		}
 	}
 	so->so_state &= ~(SS_ISFCONNECTING);
-	if (so->so_state & SS_FCANTSENDMORE) {
-	   so->so_state &= SS_PERSISTENT_MASK;
-	   so->so_state |= SS_NOFDREF; /* Don't select it */
-	} else {
+	if (so->so_state & SS_FCANTSENDMORE)
+	   so->so_state = SS_NOFDREF; /* Don't select it */ /* XXX close() here as well? */
+	else
 	   so->so_state |= SS_FCANTRCVMORE;
-	}
 }
 
 static void
@@ -707,12 +751,22 @@ sofcantsendmore(struct socket *so)
             }
 	}
 	so->so_state &= ~(SS_ISFCONNECTING);
-	if (so->so_state & SS_FCANTRCVMORE) {
-	   so->so_state &= SS_PERSISTENT_MASK;
-	   so->so_state |= SS_NOFDREF; /* as above */
-	} else {
+	if (so->so_state & SS_FCANTRCVMORE)
+	   so->so_state = SS_NOFDREF; /* as above */
+	else
 	   so->so_state |= SS_FCANTSENDMORE;
-	}
+}
+
+void
+soisfdisconnected(so)
+	struct socket *so;
+{
+/*	so->so_state &= ~(SS_ISFCONNECTING|SS_ISFCONNECTED); */
+/*	close(so->s); */
+/*	so->so_state = SS_ISFDISCONNECTED; */
+	/*
+	 * XXX Do nothing ... ?
+	 */
 }
 
 /*
@@ -720,7 +774,8 @@ sofcantsendmore(struct socket *so)
  * Set CANTSENDMORE once all data has been write()n
  */
 void
-sofwdrain(struct socket *so)
+sofwdrain(so)
+	struct socket *so;
 {
 	if (so->so_rcv.sb_cc)
 		so->so_state |= SS_FWDRAIN;

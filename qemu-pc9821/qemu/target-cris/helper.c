@@ -15,7 +15,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 
 #include <stdio.h>
@@ -76,14 +77,14 @@ static void cris_shift_ccs(CPUState *env)
 int cpu_cris_handle_mmu_fault (CPUState *env, target_ulong address, int rw,
                                int mmu_idx, int is_softmmu)
 {
-	struct cris_mmu_result res;
+	struct cris_mmu_result_t res;
 	int prot, miss;
 	int r = -1;
 	target_ulong phy;
 
 	D(printf ("%s addr=%x pc=%x rw=%x\n", __func__, address, env->pc, rw));
-	miss = cris_mmu_translate(&res, env, address & TARGET_PAGE_MASK,
-				  rw, mmu_idx);
+	address &= TARGET_PAGE_MASK;
+	miss = cris_mmu_translate(&res, env, address, rw, mmu_idx);
 	if (miss)
 	{
 		if (env->exception_index == EXCP_BUSFAULT)
@@ -92,7 +93,6 @@ int cpu_cris_handle_mmu_fault (CPUState *env, target_ulong address, int rw,
 				  "addr=%x rw=%d\n",
 				  address, rw);
 
-		env->pregs[PR_EDA] = address;
 		env->exception_index = EXCP_BUSFAULT;
 		env->fault_vector = res.bf_vec;
 		r = 1;
@@ -105,8 +105,7 @@ int cpu_cris_handle_mmu_fault (CPUState *env, target_ulong address, int rw,
 		 */
 		phy = res.phy & ~0x80000000;
 		prot = res.prot;
-		r = tlb_set_page(env, address & TARGET_PAGE_MASK,
-				 phy, prot, mmu_idx, is_softmmu);
+		r = tlb_set_page(env, address, phy, prot, mmu_idx, is_softmmu);
 	}
 	if (r > 0)
 		D_LOG("%s returns %d irqreq=%x addr=%x"
@@ -172,6 +171,8 @@ void do_interrupt(CPUState *env)
 		env->dslot = 0;
 	}
 	
+	env->pc = ldl_code(env->pregs[PR_EBP] + ex_vec * 4);
+
 	if (env->pregs[PR_CCS] & U_FLAG) {
 		/* Swap stack pointers.  */
 		env->pregs[PR_USP] = env->regs[R_SP];
@@ -180,10 +181,6 @@ void do_interrupt(CPUState *env)
 
 	/* Apply the CRIS CCS shift. Clears U if set.  */
 	cris_shift_ccs(env);
-
-	/* Now that we are in kernel mode, load the handlers address.  */
-	env->pc = ldl_code(env->pregs[PR_EBP] + ex_vec * 4);
-
 	D_LOG("%s isr=%x vec=%x ccs=%x pid=%d erp=%x\n", 
 		   __func__, env->pc, ex_vec, 
 		   env->pregs[PR_CCS],
@@ -194,7 +191,7 @@ void do_interrupt(CPUState *env)
 target_phys_addr_t cpu_get_phys_page_debug(CPUState * env, target_ulong addr)
 {
 	uint32_t phy = addr;
-	struct cris_mmu_result res;
+	struct cris_mmu_result_t res;
 	int miss;
 	miss = cris_mmu_translate(&res, env, addr, 0, 0);
 	if (!miss)

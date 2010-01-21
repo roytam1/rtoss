@@ -14,7 +14,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along
- * with this program; if not, see <http://www.gnu.org/licenses/>.
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 #include "qemu-common.h"
@@ -947,7 +948,7 @@ static int bt_l2cap_sdp_new_ch(struct bt_l2cap_device_s *dev,
         &sdp_service_sdp_s,
         &sdp_service_hid_s,
         &sdp_service_pnp_s,
-        NULL,
+        0,
     };
 
     sdp->channel = params;

@@ -15,7 +15,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 
 #ifndef CONFIG_USER_ONLY
@@ -122,7 +123,7 @@ static void dump_tlb(CPUState *env, int mmu)
 #endif
 
 /* rw 0 = read, 1 = write, 2 = exec.  */
-static int cris_mmu_translate_page(struct cris_mmu_result *res,
+static int cris_mmu_translate_page(struct cris_mmu_result_t *res,
 				   CPUState *env, uint32_t vaddr,
 				   int rw, int usermode)
 {
@@ -323,7 +324,7 @@ void cris_mmu_flush_pid(CPUState *env, uint32_t pid)
 	}
 }
 
-int cris_mmu_translate(struct cris_mmu_result *res,
+int cris_mmu_translate(struct cris_mmu_result_t *res,
 		       CPUState *env, uint32_t vaddr,
 		       int rw, int mmu_idx)
 {
@@ -345,7 +346,7 @@ int cris_mmu_translate(struct cris_mmu_result *res,
 	}
 
 	seg = vaddr >> 28;
-	if (!is_user && cris_mmu_segmented_addr(seg, env->sregs[SFR_RW_MM_CFG]))
+	if (cris_mmu_segmented_addr(seg, env->sregs[SFR_RW_MM_CFG]))
 	{
 		uint32_t base;
 

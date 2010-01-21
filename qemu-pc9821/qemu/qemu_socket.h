@@ -3,6 +3,8 @@
 #define QEMU_SOCKET_H
 
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#define WINVER 0x0501  /* needed for ipv6 bits */
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -29,23 +31,16 @@ int inet_aton(const char *cp, struct in_addr *ia);
 
 #endif /* !_WIN32 */
 
-#include "qemu-option.h"
-
 /* misc helpers */
 void socket_set_nonblock(int fd);
 int send_all(int fd, const void *buf, int len1);
 
 /* New, ipv6-ready socket helper functions, see qemu-sockets.c */
-int inet_listen_opts(QemuOpts *opts, int port_offset);
 int inet_listen(const char *str, char *ostr, int olen,
                 int socktype, int port_offset);
-int inet_connect_opts(QemuOpts *opts);
 int inet_connect(const char *str, int socktype);
-int inet_dgram_opts(QemuOpts *opts);
 
-int unix_listen_opts(QemuOpts *opts);
 int unix_listen(const char *path, char *ostr, int olen);
-int unix_connect_opts(QemuOpts *opts);
 int unix_connect(const char *path);
 
 /* Old, ipv4 only bits.  Don't use for new code. */

@@ -21,9 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include "qemu-common.h"
 #include "tcg-target.h"
-#include "tcg-runtime.h"
 
 #if TCG_TARGET_REG_BITS == 32
 typedef int32_t tcg_target_long;
@@ -122,9 +120,7 @@ typedef tcg_target_ulong TCGArg;
    are aliases for target_ulong and host pointer sized values respectively.
  */
 
-#ifdef CONFIG_DEBUG_TCG
-#define DEBUG_TCGV 1
-#endif
+//#define DEBUG_TCGV 1
 
 #ifdef DEBUG_TCGV
 
@@ -157,16 +153,12 @@ typedef int TCGv_i64;
 #define MAKE_TCGV_I64(x) (x)
 #define GET_TCGV_I32(t) (t)
 #define GET_TCGV_I64(t) (t)
-
 #if TCG_TARGET_REG_BITS == 32
 #define TCGV_LOW(t) (t)
 #define TCGV_HIGH(t) ((t) + 1)
 #endif
 
 #endif /* DEBUG_TCGV */
-
-#define TCGV_EQUAL_I32(a, b) (GET_TCGV_I32(a) == GET_TCGV_I32(b))
-#define TCGV_EQUAL_I64(a, b) (GET_TCGV_I64(a) == GET_TCGV_I64(b))
 
 /* Dummy definition to avoid compiler warnings.  */
 #define TCGV_UNUSED_I32(x) x = MAKE_TCGV_I32(-1)
@@ -178,14 +170,10 @@ typedef int TCGv_i64;
 #define TCG_CALL_TYPE_REGPARM_1 0x0001 /* i386 style regparm call (1 reg) */
 #define TCG_CALL_TYPE_REGPARM_2 0x0002 /* i386 style regparm call (2 regs) */
 #define TCG_CALL_TYPE_REGPARM   0x0003 /* i386 style regparm call (3 regs) */
-/* A pure function only reads its arguments and TCG global variables
-   and cannot raise exceptions. Hence a call to a pure function can be
+/* A pure function only reads its arguments and globals variables and
+   cannot raise exceptions. Hence a call to a pure function can be
    safely suppressed if the return value is not used. */
 #define TCG_CALL_PURE           0x0010 
-/* A const function only reads its arguments and does not use TCG
-   global variables. Hence a call to such a function does not
-   save TCG global variables back to their canonical location. */
-#define TCG_CALL_CONST          0x0020
 
 /* used to align parameters */
 #define TCG_CALL_DUMMY_TCGV     MAKE_TCGV_I32(-1)
@@ -453,6 +441,17 @@ TCGv_i64 tcg_const_local_i64(int64_t val);
 
 void tcg_out_reloc(TCGContext *s, uint8_t *code_ptr, int type, 
                    int label_index, long addend);
+const TCGArg *tcg_gen_code_op(TCGContext *s, int opc, const TCGArg *args1,
+                              unsigned int dead_iargs);
+
+/* tcg-runtime.c */
+int64_t tcg_helper_shl_i64(int64_t arg1, int64_t arg2);
+int64_t tcg_helper_shr_i64(int64_t arg1, int64_t arg2);
+int64_t tcg_helper_sar_i64(int64_t arg1, int64_t arg2);
+int64_t tcg_helper_div_i64(int64_t arg1, int64_t arg2);
+int64_t tcg_helper_rem_i64(int64_t arg1, int64_t arg2);
+uint64_t tcg_helper_divu_i64(uint64_t arg1, uint64_t arg2);
+uint64_t tcg_helper_remu_i64(uint64_t arg1, uint64_t arg2);
 
 extern uint8_t code_gen_prologue[];
 #if defined(_ARCH_PPC) && !defined(_ARCH_PPC64)

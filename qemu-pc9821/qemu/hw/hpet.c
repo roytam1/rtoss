@@ -17,7 +17,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  *
  * *****************************************************************
  *
@@ -157,55 +158,56 @@ static void update_irq(struct HPETTimer *timer)
     }
 }
 
-static void hpet_pre_save(void *opaque)
+static void hpet_save(QEMUFile *f, void *opaque)
 {
     HPETState *s = opaque;
+    int i;
+    qemu_put_be64s(f, &s->config);
+    qemu_put_be64s(f, &s->isr);
     /* save current counter value */
     s->hpet_counter = hpet_get_ticks();
+    qemu_put_be64s(f, &s->hpet_counter);
+
+    for (i = 0; i < HPET_NUM_TIMERS; i++) {
+        qemu_put_8s(f, &s->timer[i].tn);
+        qemu_put_be64s(f, &s->timer[i].config);
+        qemu_put_be64s(f, &s->timer[i].cmp);
+        qemu_put_be64s(f, &s->timer[i].fsb);
+        qemu_put_be64s(f, &s->timer[i].period);
+        qemu_put_8s(f, &s->timer[i].wrap_flag);
+        if (s->timer[i].qemu_timer) {
+            qemu_put_timer(f, s->timer[i].qemu_timer);
+        }
+    }
 }
 
-static int hpet_post_load(void *opaque, int version_id)
+static int hpet_load(QEMUFile *f, void *opaque, int version_id)
 {
     HPETState *s = opaque;
+    int i;
 
+    if (version_id != 1)
+        return -EINVAL;
+
+    qemu_get_be64s(f, &s->config);
+    qemu_get_be64s(f, &s->isr);
+    qemu_get_be64s(f, &s->hpet_counter);
     /* Recalculate the offset between the main counter and guest time */
     s->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_get_clock(vm_clock);
+
+    for (i = 0; i < HPET_NUM_TIMERS; i++) {
+        qemu_get_8s(f, &s->timer[i].tn);
+        qemu_get_be64s(f, &s->timer[i].config);
+        qemu_get_be64s(f, &s->timer[i].cmp);
+        qemu_get_be64s(f, &s->timer[i].fsb);
+        qemu_get_be64s(f, &s->timer[i].period);
+        qemu_get_8s(f, &s->timer[i].wrap_flag);
+        if (s->timer[i].qemu_timer) {
+            qemu_get_timer(f, s->timer[i].qemu_timer);
+        }
+    }
     return 0;
 }
-
-static const VMStateDescription vmstate_hpet_timer = {
-    .name = "hpet_timer",
-    .version_id = 1,
-    .minimum_version_id = 1,
-    .minimum_version_id_old = 1,
-    .fields      = (VMStateField []) {
-        VMSTATE_UINT8(tn, HPETTimer),
-        VMSTATE_UINT64(config, HPETTimer),
-        VMSTATE_UINT64(cmp, HPETTimer),
-        VMSTATE_UINT64(fsb, HPETTimer),
-        VMSTATE_UINT64(period, HPETTimer),
-        VMSTATE_UINT8(wrap_flag, HPETTimer),
-        VMSTATE_TIMER(qemu_timer, HPETTimer),
-        VMSTATE_END_OF_LIST()
-    }
-};
-
-static const VMStateDescription vmstate_hpet = {
-    .name = "hpet",
-    .version_id = 1,
-    .minimum_version_id = 1,
-    .minimum_version_id_old = 1,
-    .pre_save = hpet_pre_save,
-    .post_load = hpet_post_load,
-    .fields      = (VMStateField []) {
-        VMSTATE_UINT64(config, HPETState),
-        VMSTATE_UINT64(isr, HPETState),
-        VMSTATE_UINT64(hpet_counter, HPETState),
-        VMSTATE_STRUCT_ARRAY(timer, HPETState, HPET_NUM_TIMERS, 0,
-                             vmstate_hpet_timer, HPETTimer),
-        VMSTATE_END_OF_LIST()
-    }
-};
 
 /*
  * timer expiration callback
@@ -370,7 +372,7 @@ static void hpet_ram_writel(void *opaque, target_phys_addr_t addr,
 {
     int i;
     HPETState *s = (HPETState *)opaque;
-    uint64_t old_val, new_val, val, index;
+    uint64_t old_val, new_val, index;
 
     dprintf("qemu: Enter hpet_ram_writel at %" PRIx64 " = %#x\n", addr, value);
     index = addr;
@@ -386,8 +388,8 @@ static void hpet_ram_writel(void *opaque, target_phys_addr_t addr,
         switch ((addr - 0x100) % 0x20) {
             case HPET_TN_CFG:
                 dprintf("qemu: hpet_ram_writel HPET_TN_CFG\n");
-                val = hpet_fixup_reg(new_val, old_val, HPET_TN_CFG_WRITE_MASK);
-                timer->config = (timer->config & 0xffffffff00000000ULL) | val;
+                timer->config = hpet_fixup_reg(new_val, old_val, 
+                                               HPET_TN_CFG_WRITE_MASK);
                 if (new_val & HPET_TN_32BIT) {
                     timer->cmp = (uint32_t)timer->cmp;
                     timer->period = (uint32_t)timer->period;
@@ -455,8 +457,8 @@ static void hpet_ram_writel(void *opaque, target_phys_addr_t addr,
             case HPET_ID:
                 return;
             case HPET_CFG:
-                val = hpet_fixup_reg(new_val, old_val, HPET_CFG_WRITE_MASK);
-                s->config = (s->config & 0xffffffff00000000ULL) | val;
+                s->config = hpet_fixup_reg(new_val, old_val, 
+                                           HPET_CFG_WRITE_MASK);
                 if (activating_bit(old_val, new_val, HPET_CFG_ENABLE)) {
                     /* Enable main counter and interrupt generation. */
                     s->hpet_offset = ticks_to_ns(s->hpet_counter)
@@ -507,7 +509,7 @@ static void hpet_ram_writel(void *opaque, target_phys_addr_t addr,
     }
 }
 
-static CPUReadMemoryFunc * const hpet_ram_read[] = {
+static CPUReadMemoryFunc *hpet_ram_read[] = {
 #ifdef HPET_DEBUG
     hpet_ram_readb,
     hpet_ram_readw,
@@ -518,7 +520,7 @@ static CPUReadMemoryFunc * const hpet_ram_read[] = {
     hpet_ram_readl,
 };
 
-static CPUWriteMemoryFunc * const hpet_ram_write[] = {
+static CPUWriteMemoryFunc *hpet_ram_write[] = {
 #ifdef HPET_DEBUG
     hpet_ram_writeb,
     hpet_ram_writew,
@@ -540,8 +542,8 @@ static void hpet_reset(void *opaque) {
         timer->tn = i;
         timer->cmp = ~0ULL;
         timer->config =  HPET_TN_PERIODIC_CAP | HPET_TN_SIZE_CAP;
-        /* advertise availability of ioapic inti2 */
-        timer->config |=  0x00000004ULL << 32;
+        /* advertise availability of irqs 5,10,11 */
+        timer->config |=  0x00000c20ULL << 32;
         timer->state = s;
         timer->period = 0ULL;
         timer->wrap_flag = 0;
@@ -578,10 +580,10 @@ void hpet_init(qemu_irq *irq) {
         timer->qemu_timer = qemu_new_timer(vm_clock, hpet_timer, timer);
     }
     hpet_reset(s);
-    vmstate_register(-1, &vmstate_hpet, s);
+    register_savevm("hpet", -1, 1, hpet_save, hpet_load, s);
     qemu_register_reset(hpet_reset, s);
     /* HPET Area */
-    iomemtype = cpu_register_io_memory(hpet_ram_read,
+    iomemtype = cpu_register_io_memory(0, hpet_ram_read,
                                        hpet_ram_write, s);
     cpu_register_physical_memory(HPET_BASE, 0x400, iomemtype);
 }

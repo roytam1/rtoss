@@ -7,8 +7,9 @@
  * This code is licenced under the GPL.
  */
 
-#include "sysbus.h"
+#include "hw.h"
 #include "qemu-timer.h"
+#include "primecell.h"
 
 /* Common timer implementation.  */
 
@@ -61,7 +62,8 @@ static uint32_t arm_timer_read(void *opaque, target_phys_addr_t offset)
             return 0;
         return s->int_level;
     default:
-        hw_error("arm_timer_read: Bad offset %x\n", (int)offset);
+        cpu_abort (cpu_single_env, "arm_timer_read: Bad offset %x\n",
+                   (int)offset);
         return 0;
     }
 }
@@ -128,7 +130,8 @@ static void arm_timer_write(void *opaque, target_phys_addr_t offset,
         arm_timer_recalibrate(s, 0);
         break;
     default:
-        hw_error("arm_timer_write: Bad offset %x\n", (int)offset);
+        cpu_abort (cpu_single_env, "arm_timer_write: Bad offset %x\n",
+                   (int)offset);
     }
     arm_timer_update(s);
 }
@@ -163,12 +166,13 @@ static int arm_timer_load(QEMUFile *f, void *opaque, int version_id)
     return 0;
 }
 
-static arm_timer_state *arm_timer_init(uint32_t freq)
+static void *arm_timer_init(uint32_t freq, qemu_irq irq)
 {
     arm_timer_state *s;
     QEMUBH *bh;
 
     s = (arm_timer_state *)qemu_mallocz(sizeof(arm_timer_state));
+    s->irq = irq;
     s->freq = freq;
     s->control = TIMER_CTRL_IE;
 
@@ -184,8 +188,7 @@ static arm_timer_state *arm_timer_init(uint32_t freq)
    Integrator/CP timer modules.  */
 
 typedef struct {
-    SysBusDevice busdev;
-    arm_timer_state *timer[2];
+    void *timer[2];
     int level[2];
     qemu_irq irq;
 } sp804_state;
@@ -223,13 +226,13 @@ static void sp804_write(void *opaque, target_phys_addr_t offset,
     }
 }
 
-static CPUReadMemoryFunc * const sp804_readfn[] = {
+static CPUReadMemoryFunc *sp804_readfn[] = {
    sp804_read,
    sp804_read,
    sp804_read
 };
 
-static CPUWriteMemoryFunc * const sp804_writefn[] = {
+static CPUWriteMemoryFunc *sp804_writefn[] = {
    sp804_write,
    sp804_write,
    sp804_write
@@ -254,33 +257,30 @@ static int sp804_load(QEMUFile *f, void *opaque, int version_id)
     return 0;
 }
 
-static int sp804_init(SysBusDevice *dev)
+void sp804_init(uint32_t base, qemu_irq irq)
 {
     int iomemtype;
-    sp804_state *s = FROM_SYSBUS(sp804_state, dev);
+    sp804_state *s;
     qemu_irq *qi;
 
+    s = (sp804_state *)qemu_mallocz(sizeof(sp804_state));
     qi = qemu_allocate_irqs(sp804_set_irq, s, 2);
-    sysbus_init_irq(dev, &s->irq);
+    s->irq = irq;
     /* ??? The timers are actually configurable between 32kHz and 1MHz, but
        we don't implement that.  */
-    s->timer[0] = arm_timer_init(1000000);
-    s->timer[1] = arm_timer_init(1000000);
-    s->timer[0]->irq = qi[0];
-    s->timer[1]->irq = qi[1];
-    iomemtype = cpu_register_io_memory(sp804_readfn,
+    s->timer[0] = arm_timer_init(1000000, qi[0]);
+    s->timer[1] = arm_timer_init(1000000, qi[1]);
+    iomemtype = cpu_register_io_memory(0, sp804_readfn,
                                        sp804_writefn, s);
-    sysbus_init_mmio(dev, 0x1000, iomemtype);
+    cpu_register_physical_memory(base, 0x00001000, iomemtype);
     register_savevm("sp804", -1, 1, sp804_save, sp804_load, s);
-    return 0;
 }
 
 
 /* Integrator/CP timer module.  */
 
 typedef struct {
-    SysBusDevice busdev;
-    arm_timer_state *timer[3];
+    void *timer[3];
 } icp_pit_state;
 
 static uint32_t icp_pit_read(void *opaque, target_phys_addr_t offset)
@@ -290,9 +290,8 @@ static uint32_t icp_pit_read(void *opaque, target_phys_addr_t offset)
 
     /* ??? Don't know the PrimeCell ID for this device.  */
     n = offset >> 8;
-    if (n > 3) {
-        hw_error("sp804_read: Bad timer %d\n", n);
-    }
+    if (n > 3)
+        cpu_abort(cpu_single_env, "sp804_read: Bad timer %d\n", n);
 
     return arm_timer_read(s->timer[n], offset & 0xff);
 }
@@ -304,53 +303,40 @@ static void icp_pit_write(void *opaque, target_phys_addr_t offset,
     int n;
 
     n = offset >> 8;
-    if (n > 3) {
-        hw_error("sp804_write: Bad timer %d\n", n);
-    }
+    if (n > 3)
+        cpu_abort(cpu_single_env, "sp804_write: Bad timer %d\n", n);
 
     arm_timer_write(s->timer[n], offset & 0xff, value);
 }
 
 
-static CPUReadMemoryFunc * const icp_pit_readfn[] = {
+static CPUReadMemoryFunc *icp_pit_readfn[] = {
    icp_pit_read,
    icp_pit_read,
    icp_pit_read
 };
 
-static CPUWriteMemoryFunc * const icp_pit_writefn[] = {
+static CPUWriteMemoryFunc *icp_pit_writefn[] = {
    icp_pit_write,
    icp_pit_write,
    icp_pit_write
 };
 
-static int icp_pit_init(SysBusDevice *dev)
+void icp_pit_init(uint32_t base, qemu_irq *pic, int irq)
 {
     int iomemtype;
-    icp_pit_state *s = FROM_SYSBUS(icp_pit_state, dev);
+    icp_pit_state *s;
 
+    s = (icp_pit_state *)qemu_mallocz(sizeof(icp_pit_state));
     /* Timer 0 runs at the system clock speed (40MHz).  */
-    s->timer[0] = arm_timer_init(40000000);
+    s->timer[0] = arm_timer_init(40000000, pic[irq]);
     /* The other two timers run at 1MHz.  */
-    s->timer[1] = arm_timer_init(1000000);
-    s->timer[2] = arm_timer_init(1000000);
+    s->timer[1] = arm_timer_init(1000000, pic[irq + 1]);
+    s->timer[2] = arm_timer_init(1000000, pic[irq + 2]);
 
-    sysbus_init_irq(dev, &s->timer[0]->irq);
-    sysbus_init_irq(dev, &s->timer[1]->irq);
-    sysbus_init_irq(dev, &s->timer[2]->irq);
-
-    iomemtype = cpu_register_io_memory(icp_pit_readfn,
+    iomemtype = cpu_register_io_memory(0, icp_pit_readfn,
                                        icp_pit_writefn, s);
-    sysbus_init_mmio(dev, 0x1000, iomemtype);
+    cpu_register_physical_memory(base, 0x00001000, iomemtype);
     /* This device has no state to save/restore.  The component timers will
        save themselves.  */
-    return 0;
 }
-
-static void arm_timer_register_devices(void)
-{
-    sysbus_register_dev("integrator_pit", sizeof(icp_pit_state), icp_pit_init);
-    sysbus_register_dev("sp804", sizeof(sp804_state), sp804_init);
-}
-
-device_init(arm_timer_register_devices)

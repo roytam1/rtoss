@@ -59,6 +59,21 @@ const float32 float32Constant[] = {
   0x41200000				/* single 10.0 */
 };
 
+unsigned int getTransferLength(const unsigned int opcode)
+{
+  unsigned int nRc;
+
+  switch (opcode & MASK_TRANSFER_LENGTH)
+  {
+    case 0x00000000: nRc = 1; break; /* single precision */
+    case 0x00008000: nRc = 2; break; /* double precision */
+    case 0x00400000: nRc = 3; break; /* extended precision */
+    default: nRc = 0;
+  }
+
+  return(nRc);
+}
+
 unsigned int getRegisterCount(const unsigned int opcode)
 {
   unsigned int nRc;
@@ -69,6 +84,21 @@ unsigned int getRegisterCount(const unsigned int opcode)
     case 0x00008000: nRc = 1; break;
     case 0x00400000: nRc = 2; break;
     case 0x00408000: nRc = 3; break;
+    default: nRc = 0;
+  }
+
+  return(nRc);
+}
+
+unsigned int getRoundingPrecision(const unsigned int opcode)
+{
+  unsigned int nRc;
+
+  switch (opcode & MASK_ROUNDING_PRECISION)
+  {
+    case 0x00000000: nRc = 1; break;
+    case 0x00000080: nRc = 2; break;
+    case 0x00080000: nRc = 3; break;
     default: nRc = 0;
   }
 
@@ -111,3 +141,8 @@ static const unsigned short aCC[16] = {
     0xFFFF, // AL always
     0 // NV
 };
+
+unsigned int checkCondition(const unsigned int opcode, const unsigned int ccodes)
+{
+  return (aCC[opcode>>28] >> (ccodes>>28)) & 1;
+}

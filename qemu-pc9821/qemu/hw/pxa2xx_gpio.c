@@ -12,7 +12,7 @@
 
 #define PXA2XX_GPIO_BANKS	4
 
-struct PXA2xxGPIOInfo {
+struct pxa2xx_gpio_info_s {
     qemu_irq *pic;
     int lines;
     CPUState *cpu_env;
@@ -63,7 +63,7 @@ static struct {
     PXA2XX_REG(GAFR_U, 0x058, 0x060, 0x068, 0x070)
 };
 
-static void pxa2xx_gpio_irq_update(PXA2xxGPIOInfo *s)
+static void pxa2xx_gpio_irq_update(struct pxa2xx_gpio_info_s *s)
 {
     if (s->status[0] & (1 << 0))
         qemu_irq_raise(s->pic[PXA2XX_PIC_GPIO_0]);
@@ -88,7 +88,7 @@ static const int pxa2xx_gpio_wake[PXA2XX_GPIO_BANKS] = {
 
 static void pxa2xx_gpio_set(void *opaque, int line, int level)
 {
-    PXA2xxGPIOInfo *s = (PXA2xxGPIOInfo *) opaque;
+    struct pxa2xx_gpio_info_s *s = (struct pxa2xx_gpio_info_s *) opaque;
     int bank;
     uint32_t mask;
 
@@ -118,7 +118,7 @@ static void pxa2xx_gpio_set(void *opaque, int line, int level)
         cpu_interrupt(s->cpu_env, CPU_INTERRUPT_EXITTB);
 }
 
-static void pxa2xx_gpio_handler_update(PXA2xxGPIOInfo *s) {
+static void pxa2xx_gpio_handler_update(struct pxa2xx_gpio_info_s *s) {
     uint32_t level, diff;
     int i, bit, line;
     for (i = 0; i < PXA2XX_GPIO_BANKS; i ++) {
@@ -136,7 +136,7 @@ static void pxa2xx_gpio_handler_update(PXA2xxGPIOInfo *s) {
 
 static uint32_t pxa2xx_gpio_read(void *opaque, target_phys_addr_t offset)
 {
-    PXA2xxGPIOInfo *s = (PXA2xxGPIOInfo *) opaque;
+    struct pxa2xx_gpio_info_s *s = (struct pxa2xx_gpio_info_s *) opaque;
     uint32_t ret;
     int bank;
     if (offset >= 0x200)
@@ -179,7 +179,8 @@ static uint32_t pxa2xx_gpio_read(void *opaque, target_phys_addr_t offset)
         return s->status[bank];
 
     default:
-        hw_error("%s: Bad offset " REG_FMT "\n", __FUNCTION__, offset);
+        cpu_abort(cpu_single_env,
+                "%s: Bad offset " REG_FMT "\n", __FUNCTION__, offset);
     }
 
     return 0;
@@ -188,7 +189,7 @@ static uint32_t pxa2xx_gpio_read(void *opaque, target_phys_addr_t offset)
 static void pxa2xx_gpio_write(void *opaque,
                 target_phys_addr_t offset, uint32_t value)
 {
-    PXA2xxGPIOInfo *s = (PXA2xxGPIOInfo *) opaque;
+    struct pxa2xx_gpio_info_s *s = (struct pxa2xx_gpio_info_s *) opaque;
     int bank;
     if (offset >= 0x200)
         return;
@@ -233,17 +234,18 @@ static void pxa2xx_gpio_write(void *opaque,
         break;
 
     default:
-        hw_error("%s: Bad offset " REG_FMT "\n", __FUNCTION__, offset);
+        cpu_abort(cpu_single_env,
+                "%s: Bad offset " REG_FMT "\n", __FUNCTION__, offset);
     }
 }
 
-static CPUReadMemoryFunc * const pxa2xx_gpio_readfn[] = {
+static CPUReadMemoryFunc *pxa2xx_gpio_readfn[] = {
     pxa2xx_gpio_read,
     pxa2xx_gpio_read,
     pxa2xx_gpio_read
 };
 
-static CPUWriteMemoryFunc * const pxa2xx_gpio_writefn[] = {
+static CPUWriteMemoryFunc *pxa2xx_gpio_writefn[] = {
     pxa2xx_gpio_write,
     pxa2xx_gpio_write,
     pxa2xx_gpio_write
@@ -251,7 +253,7 @@ static CPUWriteMemoryFunc * const pxa2xx_gpio_writefn[] = {
 
 static void pxa2xx_gpio_save(QEMUFile *f, void *opaque)
 {
-    PXA2xxGPIOInfo *s = (PXA2xxGPIOInfo *) opaque;
+    struct pxa2xx_gpio_info_s *s = (struct pxa2xx_gpio_info_s *) opaque;
     int i;
 
     qemu_put_be32(f, s->lines);
@@ -272,7 +274,7 @@ static void pxa2xx_gpio_save(QEMUFile *f, void *opaque)
 
 static int pxa2xx_gpio_load(QEMUFile *f, void *opaque, int version_id)
 {
-    PXA2xxGPIOInfo *s = (PXA2xxGPIOInfo *) opaque;
+    struct pxa2xx_gpio_info_s *s = (struct pxa2xx_gpio_info_s *) opaque;
     int i;
 
     if (qemu_get_be32(f) != s->lines)
@@ -294,21 +296,21 @@ static int pxa2xx_gpio_load(QEMUFile *f, void *opaque, int version_id)
     return 0;
 }
 
-PXA2xxGPIOInfo *pxa2xx_gpio_init(target_phys_addr_t base,
+struct pxa2xx_gpio_info_s *pxa2xx_gpio_init(target_phys_addr_t base,
                 CPUState *env, qemu_irq *pic, int lines)
 {
     int iomemtype;
-    PXA2xxGPIOInfo *s;
+    struct pxa2xx_gpio_info_s *s;
 
-    s = (PXA2xxGPIOInfo *)
-            qemu_mallocz(sizeof(PXA2xxGPIOInfo));
-    memset(s, 0, sizeof(PXA2xxGPIOInfo));
+    s = (struct pxa2xx_gpio_info_s *)
+            qemu_mallocz(sizeof(struct pxa2xx_gpio_info_s));
+    memset(s, 0, sizeof(struct pxa2xx_gpio_info_s));
     s->pic = pic;
     s->lines = lines;
     s->cpu_env = env;
     s->in = qemu_allocate_irqs(pxa2xx_gpio_set, s, lines);
 
-    iomemtype = cpu_register_io_memory(pxa2xx_gpio_readfn,
+    iomemtype = cpu_register_io_memory(0, pxa2xx_gpio_readfn,
                     pxa2xx_gpio_writefn, s);
     cpu_register_physical_memory(base, 0x00001000, iomemtype);
 
@@ -318,12 +320,12 @@ PXA2xxGPIOInfo *pxa2xx_gpio_init(target_phys_addr_t base,
     return s;
 }
 
-qemu_irq *pxa2xx_gpio_in_get(PXA2xxGPIOInfo *s)
+qemu_irq *pxa2xx_gpio_in_get(struct pxa2xx_gpio_info_s *s)
 {
     return s->in;
 }
 
-void pxa2xx_gpio_out_set(PXA2xxGPIOInfo *s,
+void pxa2xx_gpio_out_set(struct pxa2xx_gpio_info_s *s,
                 int line, qemu_irq handler)
 {
     if (line >= s->lines) {
@@ -338,7 +340,7 @@ void pxa2xx_gpio_out_set(PXA2xxGPIOInfo *s,
  * Registers a callback to notify on GPLR reads.  This normally
  * shouldn't be needed but it is used for the hack on Spitz machines.
  */
-void pxa2xx_gpio_read_notifier(PXA2xxGPIOInfo *s, qemu_irq handler)
+void pxa2xx_gpio_read_notifier(struct pxa2xx_gpio_info_s *s, qemu_irq handler)
 {
     s->read_notify = handler;
 }

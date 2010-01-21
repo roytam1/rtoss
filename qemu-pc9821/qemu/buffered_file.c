@@ -52,7 +52,7 @@ static void buffered_append(QEMUFileBuffered *s,
     if (size > (s->buffer_capacity - s->buffer_size)) {
         void *tmp;
 
-        dprintf("increasing buffer capacity from %zu by %zu\n",
+        dprintf("increasing buffer capacity from %ld by %ld\n",
                 s->buffer_capacity, size + 1024);
 
         s->buffer_capacity += size + 1024;
@@ -79,7 +79,7 @@ static void buffered_flush(QEMUFileBuffered *s)
         return;
     }
 
-    dprintf("flushing %zu byte(s) of data\n", s->buffer_size);
+    dprintf("flushing %ld byte(s) of data\n", s->buffer_size);
 
     while (offset < s->buffer_size) {
         ssize_t ret;
@@ -93,16 +93,16 @@ static void buffered_flush(QEMUFileBuffered *s)
         }
 
         if (ret <= 0) {
-            dprintf("error flushing data, %zd\n", ret);
+            dprintf("error flushing data, %ld\n", ret);
             s->has_error = 1;
             break;
         } else {
-            dprintf("flushed %zd byte(s)\n", ret);
+            dprintf("flushed %ld byte(s)\n", ret);
             offset += ret;
         }
     }
 
-    dprintf("flushed %zu of %zu byte(s)\n", offset, s->buffer_size);
+    dprintf("flushed %ld of %ld byte(s)\n", offset, s->buffer_size);
     memmove(s->buffer, s->buffer + offset, s->buffer_size - offset);
     s->buffer_size -= offset;
 }
@@ -113,7 +113,7 @@ static int buffered_put_buffer(void *opaque, const uint8_t *buf, int64_t pos, in
     int offset = 0;
     ssize_t ret;
 
-    dprintf("putting %d bytes at %" PRId64 "\n", size, pos);
+    dprintf("putting %ld bytes at %Ld\n", size, pos);
 
     if (s->has_error) {
         dprintf("flush when error, bailing\n");
@@ -145,13 +145,13 @@ static int buffered_put_buffer(void *opaque, const uint8_t *buf, int64_t pos, in
             break;
         }
 
-        dprintf("put %zd byte(s)\n", ret);
+        dprintf("put %ld byte(s)\n", ret);
         offset += ret;
         s->bytes_xfer += ret;
     }
 
     if (offset >= 0) {
-        dprintf("buffering %d bytes\n", size - offset);
+        dprintf("buffering %ld bytes\n", size - offset);
         buffered_append(s, buf + offset, size - offset);
         offset = size;
     }
@@ -198,19 +198,6 @@ static int buffered_rate_limit(void *opaque)
     return 0;
 }
 
-static size_t buffered_set_rate_limit(void *opaque, size_t new_rate)
-{
-    QEMUFileBuffered *s = opaque;
-
-    if (s->has_error)
-        goto out;
-
-    s->xfer_limit = new_rate / 10;
-    
-out:
-    return s->xfer_limit;
-}
-
 static void buffered_rate_tick(void *opaque)
 {
     QEMUFileBuffered *s = opaque;
@@ -250,8 +237,7 @@ QEMUFile *qemu_fopen_ops_buffered(void *opaque,
     s->close = close;
 
     s->file = qemu_fopen_ops(s, buffered_put_buffer, NULL,
-                             buffered_close, buffered_rate_limit,
-                             buffered_set_rate_limit);
+                             buffered_close, buffered_rate_limit);
 
     s->timer = qemu_new_timer(rt_clock, buffered_rate_tick, s);
 

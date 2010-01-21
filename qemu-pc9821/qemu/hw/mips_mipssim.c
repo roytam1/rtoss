@@ -31,9 +31,12 @@
 #include "net.h"
 #include "sysemu.h"
 #include "boards.h"
-#include "mips-bios.h"
-#include "loader.h"
-#include "elf.h"
+
+#ifdef TARGET_WORDS_BIGENDIAN
+#define BIOS_FILENAME "mips_bios.bin"
+#else
+#define BIOS_FILENAME "mipsel_bios.bin"
+#endif
 
 #ifdef TARGET_MIPS64
 #define PHYS_TO_VIRT(x) ((x) | ~0x7fffffffULL)
@@ -56,17 +59,10 @@ static void load_kernel (CPUState *env)
     long kernel_size;
     long initrd_size;
     ram_addr_t initrd_offset;
-    int big_endian;
-
-#ifdef TARGET_WORDS_BIGENDIAN
-    big_endian = 1;
-#else
-    big_endian = 0;
-#endif
 
     kernel_size = load_elf(loaderparams.kernel_filename, VIRT_TO_PHYS_ADDEND,
                            (uint64_t *)&entry, (uint64_t *)&kernel_low,
-                           (uint64_t *)&kernel_high, big_endian, ELF_MACHINE, 1);
+                           (uint64_t *)&kernel_high);
     if (kernel_size >= 0) {
         if ((entry & ~0x7fffffffULL) == 0x80000000)
             entry = (int32_t)entry;
@@ -90,8 +86,8 @@ static void load_kernel (CPUState *env)
                         loaderparams.initrd_filename);
                 exit(1);
             }
-            initrd_size = load_image_targphys(loaderparams.initrd_filename,
-                initrd_offset, loaderparams.ram_size - initrd_offset);
+            initrd_size = load_image(loaderparams.initrd_filename,
+                                     phys_ram_base + initrd_offset);
         }
         if (initrd_size == (target_ulong) -1) {
             fprintf(stderr, "qemu: could not load initial ram disk '%s'\n",
@@ -111,14 +107,13 @@ static void main_cpu_reset(void *opaque)
 }
 
 static void
-mips_mipssim_init (ram_addr_t ram_size,
+mips_mipssim_init (ram_addr_t ram_size, int vga_ram_size,
                    const char *boot_device,
                    const char *kernel_filename, const char *kernel_cmdline,
                    const char *initrd_filename, const char *cpu_model)
 {
-    char *filename;
-    ram_addr_t ram_offset;
-    ram_addr_t bios_offset;
+    char buf[1024];
+    unsigned long bios_offset;
     CPUState *env;
     int bios_size;
 
@@ -138,31 +133,24 @@ mips_mipssim_init (ram_addr_t ram_size,
     qemu_register_reset(main_cpu_reset, env);
 
     /* Allocate RAM. */
-    ram_offset = qemu_ram_alloc(ram_size);
-    bios_offset = qemu_ram_alloc(BIOS_SIZE);
+    cpu_register_physical_memory(0, ram_size, IO_MEM_RAM);
 
-    cpu_register_physical_memory(0, ram_size, ram_offset | IO_MEM_RAM);
-
-    /* Map the BIOS / boot exception handler. */
-    cpu_register_physical_memory(0x1fc00000LL,
-                                 BIOS_SIZE, bios_offset | IO_MEM_ROM);
     /* Load a BIOS / boot exception handler image. */
+    bios_offset = ram_size + vga_ram_size;
     if (bios_name == NULL)
         bios_name = BIOS_FILENAME;
-    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
-    if (filename) {
-        bios_size = load_image_targphys(filename, 0x1fc00000LL, BIOS_SIZE);
-        qemu_free(filename);
-    } else {
-        bios_size = -1;
-    }
+    snprintf(buf, sizeof(buf), "%s/%s", bios_dir, bios_name);
+    bios_size = load_image(buf, phys_ram_base + bios_offset);
     if ((bios_size < 0 || bios_size > BIOS_SIZE) && !kernel_filename) {
         /* Bail out if we have neither a kernel image nor boot vector code. */
         fprintf(stderr,
                 "qemu: Could not load MIPS bios '%s', and no -kernel argument was specified\n",
-                filename);
+                buf);
         exit(1);
     } else {
+        /* Map the BIOS / boot exception handler. */
+        cpu_register_physical_memory(0x1fc00000LL,
+                                     bios_size, bios_offset | IO_MEM_ROM);
         /* We have a boot vector start address. */
         env->active_tc.PC = (target_long)(int32_t)0xbfc00000;
     }
@@ -192,15 +180,10 @@ mips_mipssim_init (ram_addr_t ram_size,
         mipsnet_init(0x4200, env->irq[2], &nd_table[0]);
 }
 
-static QEMUMachine mips_mipssim_machine = {
+QEMUMachine mips_mipssim_machine = {
     .name = "mipssim",
     .desc = "MIPS MIPSsim platform",
     .init = mips_mipssim_init,
+    .ram_require = BIOS_SIZE + VGA_RAM_SIZE /* unused */,
+    .nodisk_ok = 1,
 };
-
-static void mips_mipssim_machine_init(void)
-{
-    qemu_register_machine(&mips_mipssim_machine);
-}
-
-machine_init(mips_mipssim_machine_init);

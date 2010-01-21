@@ -1,27 +1,26 @@
 /*
  * SSI to SD card adapter.
  *
- * Copyright (c) 2007-2009 CodeSourcery.
+ * Copyright (c) 2007 CodeSourcery.
  * Written by Paul Brook
  *
- * This code is licenced under the GNU GPL v2.
+ * This code is licenced under the GPL.
  */
 
-#include "ssi.h"
+#include "hw.h"
 #include "sd.h"
-#include "sysemu.h"
 
 //#define DEBUG_SSI_SD 1
 
 #ifdef DEBUG_SSI_SD
-#define DPRINTF(fmt, ...) \
-do { printf("ssi_sd: " fmt , ## __VA_ARGS__); } while (0)
-#define BADF(fmt, ...) \
-do { fprintf(stderr, "ssi_sd: error: " fmt , ## __VA_ARGS__); exit(1);} while (0)
+#define DPRINTF(fmt, args...) \
+do { printf("ssi_sd: " fmt , ##args); } while (0)
+#define BADF(fmt, args...) \
+do { fprintf(stderr, "ssi_sd: error: " fmt , ##args); exit(1);} while (0)
 #else
-#define DPRINTF(fmt, ...) do {} while(0)
-#define BADF(fmt, ...) \
-do { fprintf(stderr, "ssi_sd: error: " fmt , ## __VA_ARGS__);} while (0)
+#define DPRINTF(fmt, args...) do {} while(0)
+#define BADF(fmt, args...) \
+do { fprintf(stderr, "ssi_sd: error: " fmt , ##args);} while (0)
 #endif
 
 typedef enum {
@@ -33,7 +32,6 @@ typedef enum {
 } ssi_sd_mode;
 
 typedef struct {
-    SSISlave ssidev;
     ssi_sd_mode mode;
     int cmd;
     uint8_t cmdarg[4];
@@ -61,9 +59,9 @@ typedef struct {
 #define SSI_SDR_ADDRESS_ERROR   0x2000
 #define SSI_SDR_PARAMETER_ERROR 0x4000
 
-static uint32_t ssi_sd_transfer(SSISlave *dev, uint32_t val)
+int ssi_sd_xfer(void *opaque, int val)
 {
-    ssi_sd_state *s = FROM_SSI_SLAVE(ssi_sd_state, dev);
+    ssi_sd_state *s = (ssi_sd_state *)opaque;
 
     /* Special case: allow CMD12 (STOP TRANSMISSION) while reading data.  */
     if (s->mode == SSI_SD_DATA_READ && val == 0x4d) {
@@ -84,7 +82,7 @@ static uint32_t ssi_sd_transfer(SSISlave *dev, uint32_t val)
         return 0xff;
     case SSI_SD_CMDARG:
         if (s->arglen == 4) {
-            SDRequest request;
+            struct sd_request_s request;
             uint8_t longresp[16];
             /* FIXME: Check CRC.  */
             request.cmd = s->cmd;
@@ -229,28 +227,13 @@ static int ssi_sd_load(QEMUFile *f, void *opaque, int version_id)
     return 0;
 }
 
-static int ssi_sd_init(SSISlave *dev)
+void *ssi_sd_init(BlockDriverState *bs)
 {
-    ssi_sd_state *s = FROM_SSI_SLAVE(ssi_sd_state, dev);
-    BlockDriverState *bs;
+    ssi_sd_state *s;
 
+    s = (ssi_sd_state *)qemu_mallocz(sizeof(ssi_sd_state));
     s->mode = SSI_SD_CMD;
-    bs = qdev_init_bdrv(&dev->qdev, IF_SD);
     s->sd = sd_init(bs, 1);
     register_savevm("ssi_sd", -1, 1, ssi_sd_save, ssi_sd_load, s);
-    return 0;
+    return s;
 }
-
-static SSISlaveInfo ssi_sd_info = {
-    .qdev.name = "ssi-sd",
-    .qdev.size = sizeof(ssi_sd_state),
-    .init = ssi_sd_init,
-    .transfer = ssi_sd_transfer
-};
-
-static void ssi_sd_register_devices(void)
-{
-    ssi_register_slave(&ssi_sd_info);
-}
-
-device_init(ssi_sd_register_devices)

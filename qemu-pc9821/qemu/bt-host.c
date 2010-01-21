@@ -14,14 +14,14 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along
- * with this program; if not, see <http://www.gnu.org/licenses/>.
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 #include "qemu-common.h"
 #include "qemu-char.h"
 #include "sysemu.h"
 #include "net.h"
-#include "bt-host.h"
 
 #ifndef _WIN32
 # include <errno.h>
@@ -52,7 +52,7 @@ static void bt_host_send(struct HCIInfo *hci,
     struct iovec iv[2];
     int ret;
 
-    iv[0].iov_base = (void *)&pkt;
+    iv[0].iov_base = &pkt;
     iv[0].iov_len  = 1;
     iv[1].iov_base = (void *) data;
     iv[1].iov_len  = len;
@@ -171,7 +171,7 @@ struct HCIInfo *bt_host_hci(const char *id)
     if (fd < 0) {
         fprintf(stderr, "qemu: Can't open `%s': %s (%i)\n",
                         id, strerror(errno), errno);
-        return NULL;
+        return 0;
     }
 
 # ifdef CONFIG_BLUEZ
@@ -192,7 +192,7 @@ struct HCIInfo *bt_host_hci(const char *id)
     s->hci.acl_send = bt_host_acl;
     s->hci.bdaddr_set = bt_host_bdaddr_set;
 
-    qemu_set_fd_handler2(s->fd, bt_host_read_poll, bt_host_read, NULL, s);
+    qemu_set_fd_handler2(s->fd, bt_host_read_poll, bt_host_read, 0, s);
 
     return &s->hci;
 }

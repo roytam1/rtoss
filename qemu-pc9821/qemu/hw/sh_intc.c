@@ -8,6 +8,7 @@
  * This code is licenced under the GPL.
  */
 
+#include <assert.h>
 #include "sh_intc.h"
 #include "hw.h"
 #include "sh.h"
@@ -282,13 +283,13 @@ static void sh_intc_write(void *opaque, target_phys_addr_t offset,
 #endif
 }
 
-static CPUReadMemoryFunc * const sh_intc_readfn[] = {
+static CPUReadMemoryFunc *sh_intc_readfn[] = {
     sh_intc_read,
     sh_intc_read,
     sh_intc_read
 };
 
-static CPUWriteMemoryFunc * const sh_intc_writefn[] = {
+static CPUWriteMemoryFunc *sh_intc_writefn[] = {
     sh_intc_write,
     sh_intc_write,
     sh_intc_write
@@ -442,7 +443,7 @@ int sh_intc_init(struct intc_desc *desc,
 
     desc->irqs = qemu_allocate_irqs(sh_intc_set_irq, desc, nr_sources);
  
-    desc->iomemtype = cpu_register_io_memory(sh_intc_readfn,
+    desc->iomemtype = cpu_register_io_memory(0, sh_intc_readfn,
 					     sh_intc_writefn, desc);
     if (desc->mask_regs) {
         for (i = 0; i < desc->nr_mask_regs; i++) {

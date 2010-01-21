@@ -7,11 +7,9 @@
  * This code is licenced under the GPL.
  */
 
-#include "sysbus.h"
+#include "hw.h"
 #include "arm-misc.h"
 #include "sysemu.h"
-#include "loader.h"
-#include "elf.h"
 
 /* Bitbanded IO.  Each word corresponds to a single bit.  */
 
@@ -107,47 +105,30 @@ static void bitband_writel(void *opaque, target_phys_addr_t offset,
     cpu_physical_memory_write(addr, (uint8_t *)&v, 4);
 }
 
-static CPUReadMemoryFunc * const bitband_readfn[] = {
+static CPUReadMemoryFunc *bitband_readfn[] = {
    bitband_readb,
    bitband_readw,
    bitband_readl
 };
 
-static CPUWriteMemoryFunc * const bitband_writefn[] = {
+static CPUWriteMemoryFunc *bitband_writefn[] = {
    bitband_writeb,
    bitband_writew,
    bitband_writel
 };
 
-typedef struct {
-    SysBusDevice busdev;
-    uint32_t base;
-} BitBandState;
-
-static int bitband_init(SysBusDevice *dev)
-{
-    BitBandState *s = FROM_SYSBUS(BitBandState, dev);
-    int iomemtype;
-
-    iomemtype = cpu_register_io_memory(bitband_readfn, bitband_writefn,
-                                       &s->base);
-    sysbus_init_mmio(dev, 0x02000000, iomemtype);
-    return 0;
-}
-
 static void armv7m_bitband_init(void)
 {
-    DeviceState *dev;
+    int iomemtype;
+    static uint32_t bitband1_offset = 0x20000000;
+    static uint32_t bitband2_offset = 0x40000000;
 
-    dev = qdev_create(NULL, "ARM,bitband-memory");
-    qdev_prop_set_uint32(dev, "base", 0x20000000);
-    qdev_init_nofail(dev);
-    sysbus_mmio_map(sysbus_from_qdev(dev), 0, 0x22000000);
-
-    dev = qdev_create(NULL, "ARM,bitband-memory");
-    qdev_prop_set_uint32(dev, "base", 0x40000000);
-    qdev_init_nofail(dev);
-    sysbus_mmio_map(sysbus_from_qdev(dev), 0, 0x42000000);
+    iomemtype = cpu_register_io_memory(0, bitband_readfn, bitband_writefn,
+                                       &bitband1_offset);
+    cpu_register_physical_memory(0x22000000, 0x02000000, iomemtype);
+    iomemtype = cpu_register_io_memory(0, bitband_readfn, bitband_writefn,
+                                       &bitband2_offset);
+    cpu_register_physical_memory(0x42000000, 0x02000000, iomemtype);
 }
 
 /* Board init.  */
@@ -159,16 +140,11 @@ qemu_irq *armv7m_init(int flash_size, int sram_size,
                       const char *kernel_filename, const char *cpu_model)
 {
     CPUState *env;
-    DeviceState *nvic;
-    /* FIXME: make this local state.  */
-    static qemu_irq pic[64];
-    qemu_irq *cpu_pic;
+    qemu_irq *pic;
     uint32_t pc;
     int image_size;
     uint64_t entry;
     uint64_t lowaddr;
-    int i;
-    int big_endian;
 
     flash_size *= 1024;
     sram_size *= 1024;
@@ -194,31 +170,16 @@ qemu_irq *armv7m_init(int flash_size, int sram_size,
 #endif
 
     /* Flash programming is done via the SCU, so pretend it is ROM.  */
-    cpu_register_physical_memory(0, flash_size,
-                                 qemu_ram_alloc(flash_size) | IO_MEM_ROM);
+    cpu_register_physical_memory(0, flash_size, IO_MEM_ROM);
     cpu_register_physical_memory(0x20000000, sram_size,
-                                 qemu_ram_alloc(sram_size) | IO_MEM_RAM);
+                                 flash_size + IO_MEM_RAM);
     armv7m_bitband_init();
 
-    nvic = qdev_create(NULL, "armv7m_nvic");
-    env->v7m.nvic = nvic;
-    qdev_init_nofail(nvic);
-    cpu_pic = arm_pic_init_cpu(env);
-    sysbus_connect_irq(sysbus_from_qdev(nvic), 0, cpu_pic[ARM_PIC_CPU_IRQ]);
-    for (i = 0; i < 64; i++) {
-        pic[i] = qdev_get_gpio_in(nvic, i);
-    }
+    pic = armv7m_nvic_init(env);
 
-#ifdef TARGET_WORDS_BIGENDIAN
-    big_endian = 1;
-#else
-    big_endian = 0;
-#endif
-
-    image_size = load_elf(kernel_filename, 0, &entry, &lowaddr, NULL,
-                          big_endian, ELF_MACHINE, 1);
+    image_size = load_elf(kernel_filename, 0, &entry, &lowaddr, NULL);
     if (image_size < 0) {
-        image_size = load_image_targphys(kernel_filename, 0, flash_size);
+        image_size = load_image(kernel_filename, phys_ram_base);
 	lowaddr = 0;
     }
     if (image_size < 0) {
@@ -231,8 +192,8 @@ qemu_irq *armv7m_init(int flash_size, int sram_size,
        regular ROM image and perform the normal CPU reset sequence.
        Otherwise jump directly to the entry point.  */
     if (lowaddr == 0) {
-	env->regs[13] = ldl_phys(0);
-	pc = ldl_phys(4);
+	env->regs[13] = tswap32(*(uint32_t *)phys_ram_base);
+	pc = tswap32(*(uint32_t *)(phys_ram_base + 4));
     } else {
 	pc = entry;
     }
@@ -242,25 +203,7 @@ qemu_irq *armv7m_init(int flash_size, int sram_size,
     /* Hack to map an additional page of ram at the top of the address
        space.  This stops qemu complaining about executing code outside RAM
        when returning from an exception.  */
-    cpu_register_physical_memory(0xfffff000, 0x1000,
-                                 qemu_ram_alloc(0x1000) | IO_MEM_RAM);
+    cpu_register_physical_memory(0xfffff000, 0x1000, IO_MEM_RAM + ram_size);
 
     return pic;
 }
-
-static SysBusDeviceInfo bitband_info = {
-    .init = bitband_init,
-    .qdev.name  = "ARM,bitband-memory",
-    .qdev.size  = sizeof(BitBandState),
-    .qdev.props = (Property[]) {
-        DEFINE_PROP_UINT32("base", BitBandState, base, 0),
-        DEFINE_PROP_END_OF_LIST(),
-    }
-};
-
-static void armv7m_register_devices(void)
-{
-    sysbus_register_withprop(&bitband_info);
-}
-
-device_init(armv7m_register_devices)

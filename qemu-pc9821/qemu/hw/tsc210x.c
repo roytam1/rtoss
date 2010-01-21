@@ -16,14 +16,15 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along
- * with this program; if not, see <http://www.gnu.org/licenses/>.
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 #include "hw.h"
 #include "audio/audio.h"
 #include "qemu-timer.h"
 #include "console.h"
-#include "omap.h"	/* For I2SCodec and uWireSlave */
+#include "omap.h"	/* For struct i2s_codec_s and struct uwire_slave_s */
 #include "devices.h"
 
 #define TSC_DATA_REGISTERS_PAGE		0x0
@@ -34,14 +35,14 @@
 
 #define TSC_CUT_RESOLUTION(value, p)	((value) >> (16 - resolution[p]))
 
-typedef struct {
+struct tsc210x_state_s {
     qemu_irq pint;
     qemu_irq kbint;
     qemu_irq davint;
     QEMUTimer *timer;
     QEMUSoundCard card;
-    uWireSlave chip;
-    I2SCodec codec;
+    struct uwire_slave_s chip;
+    struct i2s_codec_s codec;
     uint8_t in_fifo[16384];
     uint8_t out_fifo[16384];
     uint16_t model;
@@ -81,6 +82,7 @@ typedef struct {
     SWVoiceOut *dac_voice[1];
     int i2s_rx_rate;
     int i2s_tx_rate;
+    AudioState *audio;
 
     int tr[8];
 
@@ -92,7 +94,7 @@ typedef struct {
         int mode;
         int intr;
     } kb;
-} TSC210xState;
+};
 
 static const int resolution[4] = { 12, 8, 10, 12 };
 
@@ -151,7 +153,7 @@ static const uint16_t mode_regs[16] = {
 #define TSC_POWEROFF_DELAY		50
 #define TSC_SOFTSTEP_DELAY		50
 
-static void tsc210x_reset(TSC210xState *s)
+static void tsc210x_reset(struct tsc210x_state_s *s)
 {
     s->state = 0;
     s->pin_func = 2;
@@ -209,14 +211,14 @@ static void tsc210x_reset(TSC210xState *s)
     qemu_irq_raise(s->kbint);
 }
 
-typedef struct {
+struct tsc210x_rate_info_s {
     int rate;
     int dsor;
     int fsref;
-} TSC210xRateInfo;
+};
 
 /*  { rate,  dsor,  fsref } */
-static const TSC210xRateInfo tsc2101_rates[] = {
+static const struct tsc210x_rate_info_s tsc2101_rates[] = {
     /* Fsref / 6.0 */
     { 7350,	7,	1 },
     { 8000,	7,	0 },
@@ -246,7 +248,7 @@ static const TSC210xRateInfo tsc2101_rates[] = {
 };
 
 /*  { rate,   dsor, fsref }	*/
-static const TSC210xRateInfo tsc2102_rates[] = {
+static const struct tsc210x_rate_info_s tsc2102_rates[] = {
     /* Fsref / 6.0 */
     { 7350,	63,	1 },
     { 8000,	63,	0 },
@@ -275,7 +277,7 @@ static const TSC210xRateInfo tsc2102_rates[] = {
     { 0,	0, 	0 },
 };
 
-static inline void tsc210x_out_flush(TSC210xState *s, int len)
+static inline void tsc210x_out_flush(struct tsc210x_state_s *s, int len)
 {
     uint8_t *data = s->codec.out.fifo + s->codec.out.start;
     uint8_t *end = data + len;
@@ -289,7 +291,7 @@ static inline void tsc210x_out_flush(TSC210xState *s, int len)
     s->codec.out.start = 0;
 }
 
-static void tsc210x_audio_out_cb(TSC210xState *s, int free_b)
+static void tsc210x_audio_out_cb(struct tsc210x_state_s *s, int free_b)
 {
     if (s->codec.out.len >= free_b) {
         tsc210x_out_flush(s, free_b);
@@ -300,9 +302,9 @@ static void tsc210x_audio_out_cb(TSC210xState *s, int free_b)
     qemu_irq_raise(s->codec.tx_start);
 }
 
-static void tsc2102_audio_rate_update(TSC210xState *s)
+static void tsc2102_audio_rate_update(struct tsc210x_state_s *s)
 {
-    const TSC210xRateInfo *rate;
+    const struct tsc210x_rate_info_s *rate;
 
     s->codec.tx_rate = 0;
     s->codec.rx_rate = 0;
@@ -321,7 +323,7 @@ static void tsc2102_audio_rate_update(TSC210xState *s)
     s->codec.tx_rate = rate->rate;
 }
 
-static void tsc2102_audio_output_update(TSC210xState *s)
+static void tsc2102_audio_output_update(struct tsc210x_state_s *s)
 {
     int enable;
     struct audsettings fmt;
@@ -331,7 +333,7 @@ static void tsc2102_audio_output_update(TSC210xState *s)
         s->codec.out.size = 0;
         AUD_set_active_out(s->dac_voice[0], 0);
         AUD_close_out(&s->card, s->dac_voice[0]);
-        s->dac_voice[0] = NULL;
+        s->dac_voice[0] = 0;
     }
     s->codec.cts = 0;
 
@@ -355,7 +357,7 @@ static void tsc2102_audio_output_update(TSC210xState *s)
     }
 }
 
-static uint16_t tsc2102_data_register_read(TSC210xState *s, int reg)
+static uint16_t tsc2102_data_register_read(struct tsc210x_state_s *s, int reg)
 {
     switch (reg) {
     case 0x00:	/* X */
@@ -431,7 +433,7 @@ static uint16_t tsc2102_data_register_read(TSC210xState *s, int reg)
 }
 
 static uint16_t tsc2102_control_register_read(
-                TSC210xState *s, int reg)
+                struct tsc210x_state_s *s, int reg)
 {
     switch (reg) {
     case 0x00:	/* TSC ADC */
@@ -481,7 +483,7 @@ static uint16_t tsc2102_control_register_read(
     }
 }
 
-static uint16_t tsc2102_audio_register_read(TSC210xState *s, int reg)
+static uint16_t tsc2102_audio_register_read(struct tsc210x_state_s *s, int reg)
 {
     int l_ch, r_ch;
     uint16_t val;
@@ -563,7 +565,7 @@ static uint16_t tsc2102_audio_register_read(TSC210xState *s, int reg)
 }
 
 static void tsc2102_data_register_write(
-                TSC210xState *s, int reg, uint16_t value)
+                struct tsc210x_state_s *s, int reg, uint16_t value)
 {
     switch (reg) {
     case 0x00:	/* X */
@@ -587,7 +589,7 @@ static void tsc2102_data_register_write(
 }
 
 static void tsc2102_control_register_write(
-                TSC210xState *s, int reg, uint16_t value)
+                struct tsc210x_state_s *s, int reg, uint16_t value)
 {
     switch (reg) {
     case 0x00:	/* TSC ADC */
@@ -671,7 +673,7 @@ static void tsc2102_control_register_write(
 }
 
 static void tsc2102_audio_register_write(
-                TSC210xState *s, int reg, uint16_t value)
+                struct tsc210x_state_s *s, int reg, uint16_t value)
 {
     switch (reg) {
     case 0x00:	/* Audio Control 1 */
@@ -682,7 +684,8 @@ static void tsc2102_audio_register_write(
                             "wrong value written into Audio 1\n");
 #endif
         tsc2102_audio_rate_update(s);
-        tsc2102_audio_output_update(s);
+        if (s->audio)
+            tsc2102_audio_output_update(s);
         return;
 
     case 0x01:
@@ -726,7 +729,8 @@ static void tsc2102_audio_register_write(
                             "wrong value written into Power\n");
 #endif
         tsc2102_audio_rate_update(s);
-        tsc2102_audio_output_update(s);
+        if (s->audio)
+            tsc2102_audio_output_update(s);
         return;
 
     case 0x06:	/* Audio Control 3 */
@@ -737,7 +741,8 @@ static void tsc2102_audio_register_write(
             fprintf(stderr, "tsc2102_audio_register_write: "
                             "wrong value written into Audio 3\n");
 #endif
-        tsc2102_audio_output_update(s);
+        if (s->audio)
+            tsc2102_audio_output_update(s);
         return;
 
     case 0x07:	/* LCH_BASS_BOOST_N0 */
@@ -799,7 +804,7 @@ static void tsc2102_audio_register_write(
 }
 
 /* This handles most of the chip logic.  */
-static void tsc210x_pin_update(TSC210xState *s)
+static void tsc210x_pin_update(struct tsc210x_state_s *s)
 {
     int64_t expires;
     int pin_state;
@@ -864,11 +869,11 @@ static void tsc210x_pin_update(TSC210xState *s)
     s->busy = 1;
     s->precision = s->nextprecision;
     s->function = s->nextfunction;
-    expires = qemu_get_clock(vm_clock) + (get_ticks_per_sec() >> 10);
+    expires = qemu_get_clock(vm_clock) + (ticks_per_sec >> 10);
     qemu_mod_timer(s->timer, expires);
 }
 
-static uint16_t tsc210x_read(TSC210xState *s)
+static uint16_t tsc210x_read(struct tsc210x_state_s *s)
 {
     uint16_t ret = 0x0000;
 
@@ -888,7 +893,7 @@ static uint16_t tsc210x_read(TSC210xState *s)
         ret = tsc2102_audio_register_read(s, s->offset);
         break;
     default:
-        hw_error("tsc210x_read: wrong memory page\n");
+        cpu_abort(cpu_single_env, "tsc210x_read: wrong memory page\n");
     }
 
     tsc210x_pin_update(s);
@@ -899,7 +904,7 @@ static uint16_t tsc210x_read(TSC210xState *s)
     return ret;
 }
 
-static void tsc210x_write(TSC210xState *s, uint16_t value)
+static void tsc210x_write(struct tsc210x_state_s *s, uint16_t value)
 {
     /*
      * This is a two-state state machine for reading
@@ -925,7 +930,8 @@ static void tsc210x_write(TSC210xState *s, uint16_t value)
                 tsc2102_audio_register_write(s, s->offset, value);
                 break;
             default:
-                hw_error("tsc210x_write: wrong memory page\n");
+                cpu_abort(cpu_single_env,
+                                "tsc210x_write: wrong memory page\n");
             }
 
         tsc210x_pin_update(s);
@@ -935,11 +941,12 @@ static void tsc210x_write(TSC210xState *s, uint16_t value)
 
 uint32_t tsc210x_txrx(void *opaque, uint32_t value, int len)
 {
-    TSC210xState *s = opaque;
+    struct tsc210x_state_s *s = opaque;
     uint32_t ret = 0;
 
     if (len != 16)
-        hw_error("%s: FIXME: bad SPI word width %i\n", __FUNCTION__, len);
+        cpu_abort(cpu_single_env, "%s: FIXME: bad SPI word width %i\n",
+                        __FUNCTION__, len);
 
     /* TODO: sequential reads etc - how do we make sure the host doesn't
      * unintentionally read out a conversion result from a register while
@@ -954,7 +961,7 @@ uint32_t tsc210x_txrx(void *opaque, uint32_t value, int len)
 
 static void tsc210x_timer_tick(void *opaque)
 {
-    TSC210xState *s = opaque;
+    struct tsc210x_state_s *s = opaque;
 
     /* Timer ticked -- a set of conversions has been finished.  */
 
@@ -970,7 +977,7 @@ static void tsc210x_timer_tick(void *opaque)
 static void tsc210x_touchscreen_event(void *opaque,
                 int x, int y, int z, int buttons_state)
 {
-    TSC210xState *s = opaque;
+    struct tsc210x_state_s *s = opaque;
     int p = s->pressure;
 
     if (buttons_state) {
@@ -988,7 +995,7 @@ static void tsc210x_touchscreen_event(void *opaque,
         tsc210x_pin_update(s);
 }
 
-static void tsc210x_i2s_swallow(TSC210xState *s)
+static void tsc210x_i2s_swallow(struct tsc210x_state_s *s)
 {
     if (s->dac_voice[0])
         tsc210x_out_flush(s, s->codec.out.len);
@@ -996,7 +1003,7 @@ static void tsc210x_i2s_swallow(TSC210xState *s)
         s->codec.out.len = 0;
 }
 
-static void tsc210x_i2s_set_rate(TSC210xState *s, int in, int out)
+static void tsc210x_i2s_set_rate(struct tsc210x_state_s *s, int in, int out)
 {
     s->i2s_tx_rate = out;
     s->i2s_rx_rate = in;
@@ -1004,7 +1011,7 @@ static void tsc210x_i2s_set_rate(TSC210xState *s, int in, int out)
 
 static void tsc210x_save(QEMUFile *f, void *opaque)
 {
-    TSC210xState *s = (TSC210xState *) opaque;
+    struct tsc210x_state_s *s = (struct tsc210x_state_s *) opaque;
     int64_t now = qemu_get_clock(vm_clock);
     int i;
 
@@ -1050,7 +1057,7 @@ static void tsc210x_save(QEMUFile *f, void *opaque)
 
 static int tsc210x_load(QEMUFile *f, void *opaque, int version_id)
 {
-    TSC210xState *s = (TSC210xState *) opaque;
+    struct tsc210x_state_s *s = (struct tsc210x_state_s *) opaque;
     int64_t now = qemu_get_clock(vm_clock);
     int i;
 
@@ -1100,13 +1107,13 @@ static int tsc210x_load(QEMUFile *f, void *opaque, int version_id)
     return 0;
 }
 
-uWireSlave *tsc2102_init(qemu_irq pint)
+struct uwire_slave_s *tsc2102_init(qemu_irq pint, AudioState *audio)
 {
-    TSC210xState *s;
+    struct tsc210x_state_s *s;
 
-    s = (TSC210xState *)
-            qemu_mallocz(sizeof(TSC210xState));
-    memset(s, 0, sizeof(TSC210xState));
+    s = (struct tsc210x_state_s *)
+            qemu_mallocz(sizeof(struct tsc210x_state_s));
+    memset(s, 0, sizeof(struct tsc210x_state_s));
     s->x = 160;
     s->y = 160;
     s->pressure = 0;
@@ -1115,6 +1122,7 @@ uWireSlave *tsc2102_init(qemu_irq pint)
     s->pint = pint;
     s->model = 0x2102;
     s->name = "tsc2102";
+    s->audio = audio;
 
     s->tr[0] = 0;
     s->tr[1] = 1;
@@ -1140,7 +1148,8 @@ uWireSlave *tsc2102_init(qemu_irq pint)
     qemu_add_mouse_event_handler(tsc210x_touchscreen_event, s, 1,
                     "QEMU TSC2102-driven Touchscreen");
 
-    AUD_register_card(s->name, &s->card);
+    if (s->audio)
+        AUD_register_card(s->audio, s->name, &s->card);
 
     qemu_register_reset((void *) tsc210x_reset, s);
     register_savevm(s->name, -1, 0,
@@ -1149,13 +1158,14 @@ uWireSlave *tsc2102_init(qemu_irq pint)
     return &s->chip;
 }
 
-uWireSlave *tsc2301_init(qemu_irq penirq, qemu_irq kbirq, qemu_irq dav)
+struct uwire_slave_s *tsc2301_init(qemu_irq penirq, qemu_irq kbirq,
+                qemu_irq dav, AudioState *audio)
 {
-    TSC210xState *s;
+    struct tsc210x_state_s *s;
 
-    s = (TSC210xState *)
-            qemu_mallocz(sizeof(TSC210xState));
-    memset(s, 0, sizeof(TSC210xState));
+    s = (struct tsc210x_state_s *)
+            qemu_mallocz(sizeof(struct tsc210x_state_s));
+    memset(s, 0, sizeof(struct tsc210x_state_s));
     s->x = 400;
     s->y = 240;
     s->pressure = 0;
@@ -1166,6 +1176,7 @@ uWireSlave *tsc2301_init(qemu_irq penirq, qemu_irq kbirq, qemu_irq dav)
     s->davint = dav;
     s->model = 0x2301;
     s->name = "tsc2301";
+    s->audio = audio;
 
     s->tr[0] = 0;
     s->tr[1] = 1;
@@ -1191,7 +1202,8 @@ uWireSlave *tsc2301_init(qemu_irq penirq, qemu_irq kbirq, qemu_irq dav)
     qemu_add_mouse_event_handler(tsc210x_touchscreen_event, s, 1,
                     "QEMU TSC2301-driven Touchscreen");
 
-    AUD_register_card(s->name, &s->card);
+    if (s->audio)
+        AUD_register_card(s->audio, s->name, &s->card);
 
     qemu_register_reset((void *) tsc210x_reset, s);
     register_savevm(s->name, -1, 0, tsc210x_save, tsc210x_load, s);
@@ -1199,9 +1211,9 @@ uWireSlave *tsc2301_init(qemu_irq penirq, qemu_irq kbirq, qemu_irq dav)
     return &s->chip;
 }
 
-I2SCodec *tsc210x_codec(uWireSlave *chip)
+struct i2s_codec_s *tsc210x_codec(struct uwire_slave_s *chip)
 {
-    TSC210xState *s = (TSC210xState *) chip->opaque;
+    struct tsc210x_state_s *s = (struct tsc210x_state_s *) chip->opaque;
 
     return &s->codec;
 }
@@ -1211,10 +1223,10 @@ I2SCodec *tsc210x_codec(uWireSlave *chip)
  * from the touchscreen.  Assuming 12-bit precision was used during
  * tslib calibration.
  */
-void tsc210x_set_transform(uWireSlave *chip,
-                MouseTransformInfo *info)
+void tsc210x_set_transform(struct uwire_slave_s *chip,
+                struct mouse_transform_info_s *info)
 {
-    TSC210xState *s = (TSC210xState *) chip->opaque;
+    struct tsc210x_state_s *s = (struct tsc210x_state_s *) chip->opaque;
 #if 0
     int64_t ltr[8];
 
@@ -1273,9 +1285,9 @@ void tsc210x_set_transform(uWireSlave *chip,
 #endif
 }
 
-void tsc210x_key_event(uWireSlave *chip, int key, int down)
+void tsc210x_key_event(struct uwire_slave_s *chip, int key, int down)
 {
-    TSC210xState *s = (TSC210xState *) chip->opaque;
+    struct tsc210x_state_s *s = (struct tsc210x_state_s *) chip->opaque;
 
     if (down)
         s->kb.down |= 1 << key;

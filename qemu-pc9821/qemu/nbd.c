@@ -13,7 +13,8 @@
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 
 #include "nbd.h"
@@ -168,8 +169,7 @@ int tcp_socket_incoming(const char *address, uint16_t port)
     memcpy(&addr.sin_addr.s_addr, &in, sizeof(in));
 
     opt = 1;
-    if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR,
-                   (const void *) &opt, sizeof(opt)) == -1) {
+    if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
         goto error;
     }
 
@@ -579,7 +579,7 @@ int nbd_trip(BlockDriverState *bs, int csock, off_t size, uint64_t dev_offset,
 	if ((request.from + request.len) > size) {
 	        LOG("From: %" PRIu64 ", Len: %u, Size: %" PRIu64
 		    ", Offset: %" PRIu64 "\n",
-                    request.from, request.len, (uint64_t)size, dev_offset);
+		     request.from, request.len, size, dev_offset);
 		LOG("requested operation past EOF--bad client?");
 		errno = EINVAL;
 		return -1;

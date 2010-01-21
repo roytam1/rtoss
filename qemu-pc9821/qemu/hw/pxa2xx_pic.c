@@ -30,19 +30,19 @@
 
 #define PXA2XX_PIC_SRCS	40
 
-typedef struct {
+struct pxa2xx_pic_state_s {
     CPUState *cpu_env;
     uint32_t int_enabled[2];
     uint32_t int_pending[2];
     uint32_t is_fiq[2];
     uint32_t int_idle;
     uint32_t priority[PXA2XX_PIC_SRCS];
-} PXA2xxPICState;
+};
 
 static void pxa2xx_pic_update(void *opaque)
 {
     uint32_t mask[2];
-    PXA2xxPICState *s = (PXA2xxPICState *) opaque;
+    struct pxa2xx_pic_state_s *s = (struct pxa2xx_pic_state_s *) opaque;
 
     if (s->cpu_env->halted) {
         mask[0] = s->int_pending[0] & (s->int_enabled[0] | s->int_idle);
@@ -69,7 +69,7 @@ static void pxa2xx_pic_update(void *opaque)
  * IRQ/FIQ distinction as in PXA Developer Manual.  */
 static void pxa2xx_pic_set_irq(void *opaque, int irq, int level)
 {
-    PXA2xxPICState *s = (PXA2xxPICState *) opaque;
+    struct pxa2xx_pic_state_s *s = (struct pxa2xx_pic_state_s *) opaque;
     int int_set = (irq >= 32);
     irq &= 31;
 
@@ -81,7 +81,7 @@ static void pxa2xx_pic_set_irq(void *opaque, int irq, int level)
     pxa2xx_pic_update(opaque);
 }
 
-static inline uint32_t pxa2xx_pic_highest(PXA2xxPICState *s) {
+static inline uint32_t pxa2xx_pic_highest(struct pxa2xx_pic_state_s *s) {
     int i, int_set, irq;
     uint32_t bit, mask[2];
     uint32_t ichp = 0x003f003f;	/* Both IDs invalid */
@@ -115,7 +115,7 @@ static inline uint32_t pxa2xx_pic_highest(PXA2xxPICState *s) {
 
 static uint32_t pxa2xx_pic_mem_read(void *opaque, target_phys_addr_t offset)
 {
-    PXA2xxPICState *s = (PXA2xxPICState *) opaque;
+    struct pxa2xx_pic_state_s *s = (struct pxa2xx_pic_state_s *) opaque;
 
     switch (offset) {
     case ICIP:	/* IRQ Pending register */
@@ -155,7 +155,7 @@ static uint32_t pxa2xx_pic_mem_read(void *opaque, target_phys_addr_t offset)
 static void pxa2xx_pic_mem_write(void *opaque, target_phys_addr_t offset,
                 uint32_t value)
 {
-    PXA2xxPICState *s = (PXA2xxPICState *) opaque;
+    struct pxa2xx_pic_state_s *s = (struct pxa2xx_pic_state_s *) opaque;
 
     switch (offset) {
     case ICMR:	/* Mask register */
@@ -229,13 +229,13 @@ static void pxa2xx_pic_cp_write(void *opaque, int op2, int reg, int crm,
     pxa2xx_pic_mem_write(opaque, offset, value);
 }
 
-static CPUReadMemoryFunc * const pxa2xx_pic_readfn[] = {
+static CPUReadMemoryFunc *pxa2xx_pic_readfn[] = {
     pxa2xx_pic_mem_read,
     pxa2xx_pic_mem_read,
     pxa2xx_pic_mem_read,
 };
 
-static CPUWriteMemoryFunc * const pxa2xx_pic_writefn[] = {
+static CPUWriteMemoryFunc *pxa2xx_pic_writefn[] = {
     pxa2xx_pic_mem_write,
     pxa2xx_pic_mem_write,
     pxa2xx_pic_mem_write,
@@ -243,7 +243,7 @@ static CPUWriteMemoryFunc * const pxa2xx_pic_writefn[] = {
 
 static void pxa2xx_pic_save(QEMUFile *f, void *opaque)
 {
-    PXA2xxPICState *s = (PXA2xxPICState *) opaque;
+    struct pxa2xx_pic_state_s *s = (struct pxa2xx_pic_state_s *) opaque;
     int i;
 
     for (i = 0; i < 2; i ++)
@@ -259,7 +259,7 @@ static void pxa2xx_pic_save(QEMUFile *f, void *opaque)
 
 static int pxa2xx_pic_load(QEMUFile *f, void *opaque, int version_id)
 {
-    PXA2xxPICState *s = (PXA2xxPICState *) opaque;
+    struct pxa2xx_pic_state_s *s = (struct pxa2xx_pic_state_s *) opaque;
     int i;
 
     for (i = 0; i < 2; i ++)
@@ -278,12 +278,12 @@ static int pxa2xx_pic_load(QEMUFile *f, void *opaque, int version_id)
 
 qemu_irq *pxa2xx_pic_init(target_phys_addr_t base, CPUState *env)
 {
-    PXA2xxPICState *s;
+    struct pxa2xx_pic_state_s *s;
     int iomemtype;
     qemu_irq *qi;
 
-    s = (PXA2xxPICState *)
-            qemu_mallocz(sizeof(PXA2xxPICState));
+    s = (struct pxa2xx_pic_state_s *)
+            qemu_mallocz(sizeof(struct pxa2xx_pic_state_s));
     if (!s)
         return NULL;
 
@@ -299,7 +299,7 @@ qemu_irq *pxa2xx_pic_init(target_phys_addr_t base, CPUState *env)
     qi = qemu_allocate_irqs(pxa2xx_pic_set_irq, s, PXA2XX_PIC_SRCS);
 
     /* Enable IC memory-mapped registers access.  */
-    iomemtype = cpu_register_io_memory(pxa2xx_pic_readfn,
+    iomemtype = cpu_register_io_memory(0, pxa2xx_pic_readfn,
                     pxa2xx_pic_writefn, s);
     cpu_register_physical_memory(base, 0x00100000, iomemtype);
 

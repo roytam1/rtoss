@@ -1,6 +1,30 @@
 #include "hw/hw.h"
 #include "hw/boards.h"
 
+void register_machines(void)
+{
+    qemu_register_machine(&integratorcp_machine);
+    qemu_register_machine(&versatilepb_machine);
+    qemu_register_machine(&versatileab_machine);
+    qemu_register_machine(&realview_machine);
+    qemu_register_machine(&akitapda_machine);
+    qemu_register_machine(&spitzpda_machine);
+    qemu_register_machine(&borzoipda_machine);
+    qemu_register_machine(&terrierpda_machine);
+    qemu_register_machine(&sx1_machine_v1);
+    qemu_register_machine(&sx1_machine_v2);
+    qemu_register_machine(&palmte_machine);
+    qemu_register_machine(&n800_machine);
+    qemu_register_machine(&n810_machine);
+    qemu_register_machine(&lm3s811evb_machine);
+    qemu_register_machine(&lm3s6965evb_machine);
+    qemu_register_machine(&connex_machine);
+    qemu_register_machine(&verdex_machine);
+    qemu_register_machine(&mainstone2_machine);
+    qemu_register_machine(&musicpal_machine);
+    qemu_register_machine(&tosapda_machine);
+}
+
 void cpu_save(QEMUFile *f, void *opaque)
 {
     int i;
@@ -22,15 +46,12 @@ void cpu_save(QEMUFile *f, void *opaque)
     }
     qemu_put_be32(f, env->cp15.c0_cpuid);
     qemu_put_be32(f, env->cp15.c0_cachetype);
-    qemu_put_be32(f, env->cp15.c0_cssel);
     qemu_put_be32(f, env->cp15.c1_sys);
     qemu_put_be32(f, env->cp15.c1_coproc);
     qemu_put_be32(f, env->cp15.c1_xscaleauxcr);
     qemu_put_be32(f, env->cp15.c2_base0);
     qemu_put_be32(f, env->cp15.c2_base1);
-    qemu_put_be32(f, env->cp15.c2_control);
     qemu_put_be32(f, env->cp15.c2_mask);
-    qemu_put_be32(f, env->cp15.c2_base_mask);
     qemu_put_be32(f, env->cp15.c2_data);
     qemu_put_be32(f, env->cp15.c2_insn);
     qemu_put_be32(f, env->cp15.c3);
@@ -94,18 +115,12 @@ void cpu_save(QEMUFile *f, void *opaque)
         qemu_put_be32(f, env->v7m.current_sp);
         qemu_put_be32(f, env->v7m.exception);
     }
-
-    if (arm_feature(env, ARM_FEATURE_THUMB2EE)) {
-        qemu_put_be32(f, env->teecr);
-        qemu_put_be32(f, env->teehbr);
-    }
 }
 
 int cpu_load(QEMUFile *f, void *opaque, int version_id)
 {
     CPUARMState *env = (CPUARMState *)opaque;
     int i;
-    uint32_t val;
 
     if (version_id != CPU_SAVE_VERSION)
         return -EINVAL;
@@ -113,10 +128,7 @@ int cpu_load(QEMUFile *f, void *opaque, int version_id)
     for (i = 0; i < 16; i++) {
         env->regs[i] = qemu_get_be32(f);
     }
-    val = qemu_get_be32(f);
-    /* Avoid mode switch when restoring CPSR.  */
-    env->uncached_cpsr = val & CPSR_M;
-    cpsr_write(env, val, 0xffffffff);
+    cpsr_write(env, qemu_get_be32(f), 0xffffffff);
     env->spsr = qemu_get_be32(f);
     for (i = 0; i < 6; i++) {
         env->banked_spsr[i] = qemu_get_be32(f);
@@ -129,15 +141,12 @@ int cpu_load(QEMUFile *f, void *opaque, int version_id)
     }
     env->cp15.c0_cpuid = qemu_get_be32(f);
     env->cp15.c0_cachetype = qemu_get_be32(f);
-    env->cp15.c0_cssel = qemu_get_be32(f);
     env->cp15.c1_sys = qemu_get_be32(f);
     env->cp15.c1_coproc = qemu_get_be32(f);
     env->cp15.c1_xscaleauxcr = qemu_get_be32(f);
     env->cp15.c2_base0 = qemu_get_be32(f);
     env->cp15.c2_base1 = qemu_get_be32(f);
-    env->cp15.c2_control = qemu_get_be32(f);
     env->cp15.c2_mask = qemu_get_be32(f);
-    env->cp15.c2_base_mask = qemu_get_be32(f);
     env->cp15.c2_data = qemu_get_be32(f);
     env->cp15.c2_insn = qemu_get_be32(f);
     env->cp15.c3 = qemu_get_be32(f);
@@ -200,11 +209,6 @@ int cpu_load(QEMUFile *f, void *opaque, int version_id)
         env->v7m.control = qemu_get_be32(f);
         env->v7m.current_sp = qemu_get_be32(f);
         env->v7m.exception = qemu_get_be32(f);
-    }
-
-    if (arm_feature(env, ARM_FEATURE_THUMB2EE)) {
-        env->teecr = qemu_get_be32(f);
-        env->teehbr = qemu_get_be32(f);
     }
 
     return 0;

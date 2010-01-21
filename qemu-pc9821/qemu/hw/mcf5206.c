@@ -61,9 +61,11 @@ static void m5206_timer_recalibrate(m5206_timer_state *s)
         prescale *= 16;
 
     if (mode == 3 || mode == 0)
-        hw_error("m5206_timer: mode %d not implemented\n", mode);
+        cpu_abort(cpu_single_env,
+                  "m5206_timer: mode %d not implemented\n", mode);
     if ((s->tmr & TMR_FRR) == 0)
-        hw_error("m5206_timer: free running mode not implemented\n");
+        cpu_abort(cpu_single_env,
+                  "m5206_timer: free running mode not implemented\n");
 
     /* Assume 66MHz system clock.  */
     ptimer_set_freq(s->timer, 66000000 / prescale);
@@ -294,7 +296,7 @@ static uint32_t m5206_mbar_read(m5206_mbar_state *s, uint32_t offset)
     case 0x170: return s->uivr[0];
     case 0x1b0: return s->uivr[1];
     }
-    hw_error("Bad MBAR read offset 0x%x", (int)offset);
+    cpu_abort(cpu_single_env, "Bad MBAR read offset 0x%x", (int)offset);
     return 0;
 }
 
@@ -348,7 +350,7 @@ static void m5206_mbar_write(m5206_mbar_state *s, uint32_t offset,
         s->uivr[1] = value;
         break;
     default:
-        hw_error("Bad MBAR write offset 0x%x", (int)offset);
+        cpu_abort(cpu_single_env, "Bad MBAR write offset 0x%x", (int)offset);
         break;
     }
 }
@@ -375,7 +377,7 @@ static uint32_t m5206_mbar_readb(void *opaque, target_phys_addr_t offset)
     m5206_mbar_state *s = (m5206_mbar_state *)opaque;
     offset &= 0x3ff;
     if (offset > 0x200) {
-        hw_error("Bad MBAR read offset 0x%x", (int)offset);
+        cpu_abort(cpu_single_env, "Bad MBAR read offset 0x%x", (int)offset);
     }
     if (m5206_mbar_width[offset >> 2] > 1) {
         uint16_t val;
@@ -394,7 +396,7 @@ static uint32_t m5206_mbar_readw(void *opaque, target_phys_addr_t offset)
     int width;
     offset &= 0x3ff;
     if (offset > 0x200) {
-        hw_error("Bad MBAR read offset 0x%x", (int)offset);
+        cpu_abort(cpu_single_env, "Bad MBAR read offset 0x%x", (int)offset);
     }
     width = m5206_mbar_width[offset >> 2];
     if (width > 2) {
@@ -418,7 +420,7 @@ static uint32_t m5206_mbar_readl(void *opaque, target_phys_addr_t offset)
     int width;
     offset &= 0x3ff;
     if (offset > 0x200) {
-        hw_error("Bad MBAR read offset 0x%x", (int)offset);
+        cpu_abort(cpu_single_env, "Bad MBAR read offset 0x%x", (int)offset);
     }
     width = m5206_mbar_width[offset >> 2];
     if (width < 4) {
@@ -442,7 +444,7 @@ static void m5206_mbar_writeb(void *opaque, target_phys_addr_t offset,
     int width;
     offset &= 0x3ff;
     if (offset > 0x200) {
-        hw_error("Bad MBAR write offset 0x%x", (int)offset);
+        cpu_abort(cpu_single_env, "Bad MBAR write offset 0x%x", (int)offset);
     }
     width = m5206_mbar_width[offset >> 2];
     if (width > 1) {
@@ -466,7 +468,7 @@ static void m5206_mbar_writew(void *opaque, target_phys_addr_t offset,
     int width;
     offset &= 0x3ff;
     if (offset > 0x200) {
-        hw_error("Bad MBAR write offset 0x%x", (int)offset);
+        cpu_abort(cpu_single_env, "Bad MBAR write offset 0x%x", (int)offset);
     }
     width = m5206_mbar_width[offset >> 2];
     if (width > 2) {
@@ -494,7 +496,7 @@ static void m5206_mbar_writel(void *opaque, target_phys_addr_t offset,
     int width;
     offset &= 0x3ff;
     if (offset > 0x200) {
-        hw_error("Bad MBAR write offset 0x%x", (int)offset);
+        cpu_abort(cpu_single_env, "Bad MBAR write offset 0x%x", (int)offset);
     }
     width = m5206_mbar_width[offset >> 2];
     if (width < 4) {
@@ -505,13 +507,13 @@ static void m5206_mbar_writel(void *opaque, target_phys_addr_t offset,
     m5206_mbar_write(s, offset, value);
 }
 
-static CPUReadMemoryFunc * const m5206_mbar_readfn[] = {
+static CPUReadMemoryFunc *m5206_mbar_readfn[] = {
    m5206_mbar_readb,
    m5206_mbar_readw,
    m5206_mbar_readl
 };
 
-static CPUWriteMemoryFunc * const m5206_mbar_writefn[] = {
+static CPUWriteMemoryFunc *m5206_mbar_writefn[] = {
    m5206_mbar_writeb,
    m5206_mbar_writew,
    m5206_mbar_writel
@@ -524,7 +526,7 @@ qemu_irq *mcf5206_init(uint32_t base, CPUState *env)
     int iomemtype;
 
     s = (m5206_mbar_state *)qemu_mallocz(sizeof(m5206_mbar_state));
-    iomemtype = cpu_register_io_memory(m5206_mbar_readfn,
+    iomemtype = cpu_register_io_memory(0, m5206_mbar_readfn,
                                        m5206_mbar_writefn, s);
     cpu_register_physical_memory(base, 0x00001000, iomemtype);
 

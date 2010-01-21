@@ -854,13 +854,13 @@ static uint32_t gt64120_readl (void *opaque,
     return val;
 }
 
-static CPUWriteMemoryFunc * const gt64120_write[] = {
+static CPUWriteMemoryFunc *gt64120_write[] = {
     &gt64120_writel,
     &gt64120_writel,
     &gt64120_writel,
 };
 
-static CPUReadMemoryFunc * const gt64120_read[] = {
+static CPUReadMemoryFunc *gt64120_read[] = {
     &gt64120_readl,
     &gt64120_readl,
     &gt64120_readl,
@@ -893,10 +893,9 @@ static int pci_gt64120_map_irq(PCIDevice *pci_dev, int irq_num)
 
 static int pci_irq_levels[4];
 
-static void pci_gt64120_set_irq(void *opaque, int irq_num, int level)
+static void pci_gt64120_set_irq(qemu_irq *pic, int irq_num, int level)
 {
     int i, pic_irq, pic_level;
-    qemu_irq *pic = opaque;
 
     pci_irq_levels[irq_num] = level;
 
@@ -1129,17 +1128,16 @@ PCIBus *pci_gt64120_init(qemu_irq *pic)
     s = qemu_mallocz(sizeof(GT64120State));
     s->pci = qemu_mallocz(sizeof(GT64120PCIState));
 
-    s->pci->bus = pci_register_bus(NULL, "pci",
-                                   pci_gt64120_set_irq, pci_gt64120_map_irq,
+    s->pci->bus = pci_register_bus(pci_gt64120_set_irq, pci_gt64120_map_irq,
                                    pic, 144, 4);
-    s->ISD_handle = cpu_register_io_memory(gt64120_read, gt64120_write, s);
+    s->ISD_handle = cpu_register_io_memory(0, gt64120_read, gt64120_write, s);
     d = pci_register_device(s->pci->bus, "GT64120 PCI Bus", sizeof(PCIDevice),
                             0, gt64120_read_config, gt64120_write_config);
 
     /* FIXME: Malta specific hw assumptions ahead */
 
     pci_config_set_vendor_id(d->config, PCI_VENDOR_ID_MARVELL);
-    pci_config_set_device_id(d->config, PCI_DEVICE_ID_MARVELL_GT6412X);
+    pci_config_set_device_id(d->config, 0x4620); /* device_id */
 
     d->config[0x04] = 0x00;
     d->config[0x05] = 0x00;

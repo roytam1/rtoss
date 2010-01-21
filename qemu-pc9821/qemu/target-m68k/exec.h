@@ -15,7 +15,8 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 #include "dyngen-exec.h"
 
@@ -36,19 +37,17 @@ static inline void regs_to_env(void)
 {
 }
 
+int cpu_m68k_handle_mmu_fault (CPUState *env, target_ulong address, int rw,
+                              int mmu_idx, int is_softmmu);
+
 #if !defined(CONFIG_USER_ONLY)
 #include "softmmu_exec.h"
 #endif
 
-static inline int cpu_has_work(CPUState *env)
-{
-    return (env->interrupt_request & (CPU_INTERRUPT_HARD));
-}
-
 static inline int cpu_halted(CPUState *env) {
     if (!env->halted)
         return 0;
-    if (cpu_has_work(env)) {
+    if (env->interrupt_request & CPU_INTERRUPT_HARD) {
         env->halted = 0;
         return 0;
     }

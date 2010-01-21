@@ -5,13 +5,13 @@
 
 #include <inttypes.h>
 
-#ifdef CONFIG_MACHINE_BSWAP_H
+#ifdef HAVE_MACHINE_BSWAP_H
 #include <sys/endian.h>
 #include <sys/types.h>
 #include <machine/bswap.h>
 #else
 
-#ifdef CONFIG_BYTESWAP_H
+#ifdef HAVE_BYTESWAP_H
 #include <byteswap.h>
 #else
 
@@ -47,7 +47,7 @@
 		(uint64_t)(((uint64_t)(__x) & (uint64_t)0xff00000000000000ULL) >> 56) )); \
 })
 
-#endif /* !CONFIG_BYTESWAP_H */
+#endif /* !HAVE_BYTESWAP_H */
 
 static inline uint16_t bswap16(uint16_t x)
 {
@@ -64,7 +64,7 @@ static inline uint64_t bswap64(uint64_t x)
     return bswap_64(x);
 }
 
-#endif /* ! CONFIG_MACHINE_BSWAP_H */
+#endif /* ! HAVE_MACHINE_BSWAP_H */
 
 static inline void bswap16s(uint16_t *s)
 {
@@ -81,7 +81,7 @@ static inline void bswap64s(uint64_t *s)
     *s = bswap64(*s);
 }
 
-#if defined(HOST_WORDS_BIGENDIAN)
+#if defined(WORDS_BIGENDIAN)
 #define be_bswap(v, size) (v)
 #define le_bswap(v, size) bswap ## size(v)
 #define be_bswaps(v, size)
@@ -151,7 +151,7 @@ static inline void cpu_to_le16wu(uint16_t *p, uint16_t v)
 {
     uint8_t *p1 = (uint8_t *)p;
 
-    p1[0] = v & 0xff;
+    p1[0] = v;
     p1[1] = v >> 8;
 }
 
@@ -159,7 +159,7 @@ static inline void cpu_to_le32wu(uint32_t *p, uint32_t v)
 {
     uint8_t *p1 = (uint8_t *)p;
 
-    p1[0] = v & 0xff;
+    p1[0] = v;
     p1[1] = v >> 8;
     p1[2] = v >> 16;
     p1[3] = v >> 24;
@@ -188,7 +188,7 @@ static inline void cpu_to_be16wu(uint16_t *p, uint16_t v)
     uint8_t *p1 = (uint8_t *)p;
 
     p1[0] = v >> 8;
-    p1[1] = v & 0xff;
+    p1[1] = v;
 }
 
 static inline void cpu_to_be32wu(uint32_t *p, uint32_t v)
@@ -198,12 +198,12 @@ static inline void cpu_to_be32wu(uint32_t *p, uint32_t v)
     p1[0] = v >> 24;
     p1[1] = v >> 16;
     p1[2] = v >> 8;
-    p1[3] = v & 0xff;
+    p1[3] = v;
 }
 
 #endif
 
-#ifdef HOST_WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 #define cpu_to_32wu cpu_to_be32wu
 #else
 #define cpu_to_32wu cpu_to_le32wu

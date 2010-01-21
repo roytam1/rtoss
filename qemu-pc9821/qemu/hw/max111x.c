@@ -7,17 +7,17 @@
  * This code is licensed under the GNU GPLv2.
  */
 
-#include "ssi.h"
+#include "hw.h"
+#include "i2c.h"
 
-typedef struct {
-    SSISlave ssidev;
+struct max111x_s {
     qemu_irq interrupt;
     uint8_t tb1, rb2, rb3;
     int cycle;
 
     int input[8];
     int inputs, com;
-} MAX111xState;
+};
 
 /* Control-byte bitfields */
 #define CB_PD0		(1 << 0)
@@ -34,8 +34,10 @@ typedef struct {
 			 (((v) >> (3 + (b1))) & 2) |	\
 			 (((v) >> (4 + (b2))) & 1))
 
-static uint32_t max111x_read(MAX111xState *s)
+uint32_t max111x_read(void *opaque)
 {
+    struct max111x_s *s = (struct max111x_s *) opaque;
+
     if (!s->tb1)
         return 0;
 
@@ -50,8 +52,9 @@ static uint32_t max111x_read(MAX111xState *s)
 }
 
 /* Interpret a control-byte */
-static void max111x_write(MAX111xState *s, uint32_t value)
+void max111x_write(void *opaque, uint32_t value)
 {
+    struct max111x_s *s = (struct max111x_s *) opaque;
     int measure, chan;
 
     /* Ignore the value if START bit is zero */
@@ -83,20 +86,13 @@ static void max111x_write(MAX111xState *s, uint32_t value)
     s->rb2 = (measure >> 2) & 0x3f;
     s->rb3 = (measure << 6) & 0xc0;
 
-    /* FIXME: When should the IRQ be lowered?  */
-    qemu_irq_raise(s->interrupt);
-}
-
-static uint32_t max111x_transfer(SSISlave *dev, uint32_t value)
-{
-    MAX111xState *s = FROM_SSI_SLAVE(MAX111xState, dev);
-    max111x_write(s, value);
-    return max111x_read(s);
+    if (s->interrupt)
+        qemu_irq_raise(s->interrupt);
 }
 
 static void max111x_save(QEMUFile *f, void *opaque)
 {
-    MAX111xState *s = (MAX111xState *) opaque;
+    struct max111x_s *s = (struct max111x_s *) opaque;
     int i;
 
     qemu_put_8s(f, &s->tb1);
@@ -110,7 +106,7 @@ static void max111x_save(QEMUFile *f, void *opaque)
 
 static int max111x_load(QEMUFile *f, void *opaque, int version_id)
 {
-    MAX111xState *s = (MAX111xState *) opaque;
+    struct max111x_s *s = (struct max111x_s *) opaque;
     int i;
 
     qemu_get_8s(f, &s->tb1);
@@ -125,13 +121,15 @@ static int max111x_load(QEMUFile *f, void *opaque, int version_id)
     return 0;
 }
 
-static int max111x_init(SSISlave *dev, int inputs)
+static struct max111x_s *max111x_init(qemu_irq cb)
 {
-    MAX111xState *s = FROM_SSI_SLAVE(MAX111xState, dev);
+    struct max111x_s *s;
+    s = (struct max111x_s *)
+            qemu_mallocz(sizeof(struct max111x_s));
+    memset(s, 0, sizeof(struct max111x_s));
 
-    qdev_init_gpio_out(&dev->qdev, &s->interrupt, 1);
+    s->interrupt = cb;
 
-    s->inputs = inputs;
     /* TODO: add a user interface for setting these */
     s->input[0] = 0xf0;
     s->input[1] = 0xe0;
@@ -144,44 +142,30 @@ static int max111x_init(SSISlave *dev, int inputs)
     s->com = 0;
 
     register_savevm("max111x", -1, 0, max111x_save, max111x_load, s);
-    return 0;
+
+    return s;
 }
 
-static int max1110_init(SSISlave *dev)
+struct max111x_s *max1110_init(qemu_irq cb)
 {
-    return max111x_init(dev, 8);
+    struct max111x_s *s = max111x_init(cb);
+    s->inputs = 8;
+    return s;
 }
 
-static int max1111_init(SSISlave *dev)
+struct max111x_s *max1111_init(qemu_irq cb)
 {
-    return max111x_init(dev, 4);
+    struct max111x_s *s = max111x_init(cb);
+    s->inputs = 4;
+    return s;
 }
 
-void max111x_set_input(DeviceState *dev, int line, uint8_t value)
+void max111x_set_input(struct max111x_s *s, int line, uint8_t value)
 {
-    MAX111xState *s = FROM_SSI_SLAVE(MAX111xState, SSI_SLAVE_FROM_QDEV(dev));
-    assert(line >= 0 && line < s->inputs);
+    if (line >= s->inputs) {
+        printf("%s: There's no input %i\n", __FUNCTION__, line);
+        return;
+    }
+
     s->input[line] = value;
 }
-
-static SSISlaveInfo max1110_info = {
-    .qdev.name = "max1110",
-    .qdev.size = sizeof(MAX111xState),
-    .init = max1110_init,
-    .transfer = max111x_transfer
-};
-
-static SSISlaveInfo max1111_info = {
-    .qdev.name = "max1111",
-    .qdev.size = sizeof(MAX111xState),
-    .init = max1111_init,
-    .transfer = max111x_transfer
-};
-
-static void max111x_register_devices(void)
-{
-    ssi_register_slave(&max1110_info);
-    ssi_register_slave(&max1111_info);
-}
-
-device_init(max111x_register_devices)

@@ -26,7 +26,7 @@
 #include "qemu-common.h"
 #include "usb.h"
 #include "net.h"
-#include "qemu-queue.h"
+#include "sys-queue.h"
 
 /*#define TRAFFIC_DEBUG*/
 /* Thanks to NetChip Technologies for donating this product ID.
@@ -595,7 +595,7 @@ static const uint32_t oid_supported_list[] =
 #define NDIS_MAC_OPTION_8021P_PRIORITY		(1 << 6)
 
 struct rndis_response {
-    QTAILQ_ENTRY(rndis_response) entries;
+    TAILQ_ENTRY(rndis_response) entries;
     uint32_t length;
     uint8_t buf[0];
 };
@@ -621,7 +621,7 @@ typedef struct USBNetState {
 
     char usbstring_mac[13];
     VLANClientState *vc;
-    QTAILQ_HEAD(rndis_resp_head, rndis_response) rndis_resp;
+    TAILQ_HEAD(rndis_resp_head, rndis_response) rndis_resp;
 } USBNetState;
 
 static int ndis_query(USBNetState *s, uint32_t oid,
@@ -812,7 +812,7 @@ static int rndis_get_response(USBNetState *s, uint8_t *buf)
     if (!r)
         return ret;
 
-    QTAILQ_REMOVE(&s->rndis_resp, r, entries);
+    TAILQ_REMOVE(&s->rndis_resp, r, entries);
     ret = r->length;
     memcpy(buf, r->buf, r->length);
     qemu_free(r);
@@ -825,7 +825,7 @@ static void *rndis_queue_response(USBNetState *s, unsigned int length)
     struct rndis_response *r =
             qemu_mallocz(sizeof(struct rndis_response) + length);
 
-    QTAILQ_INSERT_TAIL(&s->rndis_resp, r, entries);
+    TAILQ_INSERT_TAIL(&s->rndis_resp, r, entries);
     r->length = length;
 
     return &r->buf[0];
@@ -836,7 +836,7 @@ static void rndis_clear_responsequeue(USBNetState *s)
     struct rndis_response *r;
 
     while ((r = s->rndis_resp.tqh_first)) {
-        QTAILQ_REMOVE(&s->rndis_resp, r, entries);
+        TAILQ_REMOVE(&s->rndis_resp, r, entries);
         qemu_free(r);
     }
 }
@@ -1369,17 +1369,17 @@ static int usb_net_handle_data(USBDevice *dev, USBPacket *p)
     return ret;
 }
 
-static ssize_t usbnet_receive(VLANClientState *vc, const uint8_t *buf, size_t size)
+static void usbnet_receive(void *opaque, const uint8_t *buf, int size)
 {
-    USBNetState *s = vc->opaque;
+    USBNetState *s = opaque;
     struct rndis_packet_msg_type *msg;
 
     if (s->rndis) {
         msg = (struct rndis_packet_msg_type *) s->in_buf;
         if (!s->rndis_state == RNDIS_DATA_INITIALIZED)
-            return -1;
+            return;
         if (size + sizeof(struct rndis_packet_msg_type) > sizeof(s->in_buf))
-            return -1;
+            return;
 
         memset(msg, 0, sizeof(struct rndis_packet_msg_type));
         msg->MessageType = cpu_to_le32(RNDIS_PACKET_MSG);
@@ -1398,17 +1398,16 @@ static ssize_t usbnet_receive(VLANClientState *vc, const uint8_t *buf, size_t si
         s->in_len = size + sizeof(struct rndis_packet_msg_type);
     } else {
         if (size > sizeof(s->in_buf))
-            return -1;
+            return;
         memcpy(s->in_buf, buf, size);
         s->in_len = size;
     }
     s->in_ptr = 0;
-    return size;
 }
 
-static int usbnet_can_receive(VLANClientState *vc)
+static int usbnet_can_receive(void *opaque)
 {
-    USBNetState *s = vc->opaque;
+    USBNetState *s = opaque;
 
     if (s->rndis && !s->rndis_state == RNDIS_DATA_INITIALIZED)
         return 1;
@@ -1432,40 +1431,35 @@ static void usb_net_handle_destroy(USBDevice *dev)
     qemu_del_vlan_client(s->vc);
 }
 
-static int usb_net_initfn(USBDevice *dev)
+USBDevice *usb_net_init(NICInfo *nd)
 {
-    USBNetState *s = DO_UPCAST(USBNetState, dev, dev);
+    USBNetState *s;
 
-    s->dev.speed  = USB_SPEED_FULL;
+    s = qemu_mallocz(sizeof(USBNetState));
+    s->dev.speed = USB_SPEED_FULL;
+    s->dev.handle_packet = usb_generic_handle_packet;
+
+    s->dev.handle_reset = usb_net_handle_reset;
+    s->dev.handle_control = usb_net_handle_control;
+    s->dev.handle_data = usb_net_handle_data;
+    s->dev.handle_destroy = usb_net_handle_destroy;
 
     s->rndis = 1;
     s->rndis_state = RNDIS_UNINITIALIZED;
-    QTAILQ_INIT(&s->rndis_resp);
-
     s->medium = 0;	/* NDIS_MEDIUM_802_3 */
     s->speed = 1000000; /* 100MBps, in 100Bps units */
     s->media_state = 0;	/* NDIS_MEDIA_STATE_CONNECTED */;
     s->filter = 0;
     s->vendorid = 0x1234;
-    return 0;
-}
-
-USBDevice *usb_net_init(NICInfo *nd)
-{
-    USBDevice *dev;
-    USBNetState *s;
-
-    dev = usb_create_simple(NULL /* FIXME */, "QEMU USB Network Interface");
-    s = DO_UPCAST(USBNetState, dev, dev);
 
     memcpy(s->mac, nd->macaddr, 6);
+    TAILQ_INIT(&s->rndis_resp);
 
-    s->vc = nd->vc = qemu_new_vlan_client(NET_CLIENT_TYPE_NIC,
-                                          nd->vlan, nd->netdev,
-                                          nd->model, nd->name,
-                                          usbnet_can_receive,
+    pstrcpy(s->dev.devname, sizeof(s->dev.devname),
+                    "QEMU USB Network Interface");
+    s->vc = nd->vc = qemu_new_vlan_client(nd->vlan, nd->model, nd->name,
                                           usbnet_receive,
-                                          NULL, NULL,
+                                          usbnet_can_receive,
                                           usbnet_cleanup, s);
 
     qemu_format_nic_info_str(s->vc, s->mac);
@@ -1480,20 +1474,3 @@ USBDevice *usb_net_init(NICInfo *nd)
 
     return (USBDevice *) s;
 }
-
-static struct USBDeviceInfo net_info = {
-    .qdev.name      = "QEMU USB Network Interface",
-    .qdev.size      = sizeof(USBNetState),
-    .init           = usb_net_initfn,
-    .handle_packet  = usb_generic_handle_packet,
-    .handle_reset   = usb_net_handle_reset,
-    .handle_control = usb_net_handle_control,
-    .handle_data    = usb_net_handle_data,
-    .handle_destroy = usb_net_handle_destroy,
-};
-
-static void usb_net_register_devices(void)
-{
-    usb_qdev_register(&net_info);
-}
-device_init(usb_net_register_devices)

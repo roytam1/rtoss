@@ -21,20 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 #include "hw.h"
 #include "sun4m.h"
-#include "monitor.h"
-#include "sysbus.h"
-
+#include "console.h"
 //#define DEBUG_IRQ_COUNT
 //#define DEBUG_IRQ
 
 #ifdef DEBUG_IRQ
-#define DPRINTF(fmt, ...)                                       \
-    do { printf("IRQ: " fmt , ## __VA_ARGS__); } while (0)
+#define DPRINTF(fmt, args...) \
+do { printf("IRQ: " fmt , ##args); } while (0)
 #else
-#define DPRINTF(fmt, ...)
+#define DPRINTF(fmt, args...)
 #endif
 
 /*
@@ -45,11 +42,10 @@
 #define MAX_PILS 16
 
 typedef struct Sun4c_INTCTLState {
-    SysBusDevice busdev;
 #ifdef DEBUG_IRQ_COUNT
     uint64_t irq_count;
 #endif
-    qemu_irq cpu_irqs[MAX_PILS];
+    qemu_irq *cpu_irqs;
     const uint32_t *intbit_to_level;
     uint32_t pil_out;
     uint8_t reg;
@@ -82,38 +78,38 @@ static void sun4c_intctl_mem_writeb(void *opaque, target_phys_addr_t addr,
     sun4c_check_interrupts(s);
 }
 
-static CPUReadMemoryFunc * const sun4c_intctl_mem_read[3] = {
+static CPUReadMemoryFunc *sun4c_intctl_mem_read[3] = {
     sun4c_intctl_mem_readb,
     NULL,
     NULL,
 };
 
-static CPUWriteMemoryFunc * const sun4c_intctl_mem_write[3] = {
+static CPUWriteMemoryFunc *sun4c_intctl_mem_write[3] = {
     sun4c_intctl_mem_writeb,
     NULL,
     NULL,
 };
 
-void sun4c_pic_info(Monitor *mon, void *opaque)
+void sun4c_pic_info(void *opaque)
 {
     Sun4c_INTCTLState *s = opaque;
 
-    monitor_printf(mon, "master: pending 0x%2.2x, enabled 0x%2.2x\n",
-                   s->pending, s->reg);
+    term_printf("master: pending 0x%2.2x, enabled 0x%2.2x\n", s->pending,
+                s->reg);
 }
 
-void sun4c_irq_info(Monitor *mon, void *opaque)
+void sun4c_irq_info(void *opaque)
 {
 #ifndef DEBUG_IRQ_COUNT
-    monitor_printf(mon, "irq statistic code not compiled.\n");
+    term_printf("irq statistic code not compiled.\n");
 #else
     Sun4c_INTCTLState *s = opaque;
     int64_t count;
 
-    monitor_printf(mon, "IRQ statistics:\n");
-    count = s->irq_count;
+    term_printf("IRQ statistics:\n");
+    count = s->irq_count[i];
     if (count > 0)
-        monitor_printf(mon, " %" PRId64 "\n", count);
+        term_printf("%2d: %" PRId64 "\n", i, count);
 #endif
 }
 
@@ -125,6 +121,7 @@ static void sun4c_check_interrupts(void *opaque)
     uint32_t pil_pending;
     unsigned int i;
 
+    DPRINTF("pending %x disabled %x\n", pending, s->intregm_disabled);
     pil_pending = 0;
     if (s->pending && !(s->reg & 0x80000000)) {
         for (i = 0; i < 8; i++) {
@@ -159,7 +156,7 @@ static void sun4c_set_irq(void *opaque, int irq, int level)
     if (pil > 0) {
         if (level) {
 #ifdef DEBUG_IRQ_COUNT
-            s->irq_count++;
+            s->irq_count[pil]++;
 #endif
             s->pending |= mask;
         } else {
@@ -169,57 +166,56 @@ static void sun4c_set_irq(void *opaque, int irq, int level)
     }
 }
 
-static const VMStateDescription vmstate_sun4c_intctl = {
-    .name ="sun4c_intctl",
-    .version_id = 1,
-    .minimum_version_id = 1,
-    .minimum_version_id_old = 1,
-    .fields      = (VMStateField []) {
-        VMSTATE_UINT8(reg, Sun4c_INTCTLState),
-        VMSTATE_UINT8(pending, Sun4c_INTCTLState),
-        VMSTATE_END_OF_LIST()
-    }
-};
-
-static void sun4c_intctl_reset(DeviceState *d)
+static void sun4c_intctl_save(QEMUFile *f, void *opaque)
 {
-    Sun4c_INTCTLState *s = container_of(d, Sun4c_INTCTLState, busdev.qdev);
+    Sun4c_INTCTLState *s = opaque;
 
-    s->reg = 1;
-    s->pending = 0;
+    qemu_put_8s(f, &s->reg);
+    qemu_put_8s(f, &s->pending);
 }
 
-static int sun4c_intctl_init1(SysBusDevice *dev)
+static int sun4c_intctl_load(QEMUFile *f, void *opaque, int version_id)
 {
-    Sun4c_INTCTLState *s = FROM_SYSBUS(Sun4c_INTCTLState, dev);
-    int io_memory;
-    unsigned int i;
+    Sun4c_INTCTLState *s = opaque;
 
-    io_memory = cpu_register_io_memory(sun4c_intctl_mem_read,
-                                       sun4c_intctl_mem_write, s);
-    sysbus_init_mmio(dev, INTCTL_SIZE, io_memory);
-    qdev_init_gpio_in(&dev->qdev, sun4c_set_irq, 8);
+    if (version_id != 1)
+        return -EINVAL;
 
-    for (i = 0; i < MAX_PILS; i++) {
-        sysbus_init_irq(dev, &s->cpu_irqs[i]);
-    }
-
-    sun4c_intctl_reset(&s->busdev.qdev);
+    qemu_get_8s(f, &s->reg);
+    qemu_get_8s(f, &s->pending);
+    sun4c_check_interrupts(s);
 
     return 0;
 }
 
-static SysBusDeviceInfo sun4c_intctl_info = {
-    .init = sun4c_intctl_init1,
-    .qdev.name  = "sun4c_intctl",
-    .qdev.size  = sizeof(Sun4c_INTCTLState),
-    .qdev.vmsd  = &vmstate_sun4c_intctl,
-    .qdev.reset = sun4c_intctl_reset,
-};
-
-static void sun4c_intctl_register_devices(void)
+static void sun4c_intctl_reset(void *opaque)
 {
-    sysbus_register_withprop(&sun4c_intctl_info);
+    Sun4c_INTCTLState *s = opaque;
+
+    s->reg = 1;
+    s->pending = 0;
+    sun4c_check_interrupts(s);
 }
 
-device_init(sun4c_intctl_register_devices)
+void *sun4c_intctl_init(target_phys_addr_t addr, qemu_irq **irq,
+                        qemu_irq *parent_irq)
+{
+    int sun4c_intctl_io_memory;
+    Sun4c_INTCTLState *s;
+
+    s = qemu_mallocz(sizeof(Sun4c_INTCTLState));
+
+    sun4c_intctl_io_memory = cpu_register_io_memory(0, sun4c_intctl_mem_read,
+                                                    sun4c_intctl_mem_write, s);
+    cpu_register_physical_memory(addr, INTCTL_SIZE, sun4c_intctl_io_memory);
+    s->cpu_irqs = parent_irq;
+
+    register_savevm("sun4c_intctl", addr, 1, sun4c_intctl_save,
+                    sun4c_intctl_load, s);
+
+    qemu_register_reset(sun4c_intctl_reset, s);
+    *irq = qemu_allocate_irqs(sun4c_set_irq, s, 8);
+
+    sun4c_intctl_reset(s);
+    return s;
+}

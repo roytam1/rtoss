@@ -14,7 +14,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 #if SHIFT == 0
 #define Reg MMXReg
@@ -187,10 +188,6 @@ DEF_HELPER_2(rsqrtps, void, XMMReg, XMMReg)
 DEF_HELPER_2(rsqrtss, void, XMMReg, XMMReg)
 DEF_HELPER_2(rcpps, void, XMMReg, XMMReg)
 DEF_HELPER_2(rcpss, void, XMMReg, XMMReg)
-DEF_HELPER_2(extrq_r, void, XMMReg, XMMReg)
-DEF_HELPER_3(extrq_i, void, XMMReg, int, int)
-DEF_HELPER_2(insertq_r, void, XMMReg, XMMReg)
-DEF_HELPER_3(insertq_i, void, XMMReg, int, int)
 DEF_HELPER_2(haddps, void, XMMReg, XMMReg)
 DEF_HELPER_2(haddpd, void, XMMReg, XMMReg)
 DEF_HELPER_2(hsubps, void, XMMReg, XMMReg)

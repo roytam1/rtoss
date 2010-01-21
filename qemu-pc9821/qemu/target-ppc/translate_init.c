@@ -14,7 +14,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 
 /* A lot of PowerPC definition have been included here.
@@ -233,7 +234,7 @@ static void spr_write_ibatu (void *opaque, int sprn, int gprn)
 
 static void spr_write_ibatu_h (void *opaque, int sprn, int gprn)
 {
-    TCGv_i32 t0 = tcg_const_i32(((sprn - SPR_IBAT4U) / 2) + 4);
+    TCGv_i32 t0 = tcg_const_i32((sprn - SPR_IBAT4U) / 2);
     gen_helper_store_ibatu(t0, cpu_gpr[gprn]);
     tcg_temp_free_i32(t0);
 }
@@ -247,7 +248,7 @@ static void spr_write_ibatl (void *opaque, int sprn, int gprn)
 
 static void spr_write_ibatl_h (void *opaque, int sprn, int gprn)
 {
-    TCGv_i32 t0 = tcg_const_i32(((sprn - SPR_IBAT4L) / 2) + 4);
+    TCGv_i32 t0 = tcg_const_i32((sprn - SPR_IBAT4L) / 2);
     gen_helper_store_ibatl(t0, cpu_gpr[gprn]);
     tcg_temp_free_i32(t0);
 }
@@ -447,23 +448,6 @@ static void spr_write_pir (void *opaque, int sprn, int gprn)
 }
 #endif
 
-/* SPE specific registers */
-static void spr_read_spefscr (void *opaque, int gprn, int sprn)
-{
-    TCGv_i32 t0 = tcg_temp_new_i32();
-    tcg_gen_ld_i32(t0, cpu_env, offsetof(CPUState, spe_fscr));
-    tcg_gen_extu_i32_tl(cpu_gpr[gprn], t0);
-    tcg_temp_free_i32(t0);
-}
-
-static void spr_write_spefscr (void *opaque, int sprn, int gprn)
-{
-    TCGv_i32 t0 = tcg_temp_new_i32();
-    tcg_gen_trunc_tl_i32(t0, cpu_gpr[gprn]);
-    tcg_gen_st_i32(t0, cpu_env, offsetof(CPUState, spe_fscr));
-    tcg_temp_free_i32(t0);
-}
-
 #if !defined(CONFIG_USER_ONLY)
 /* Callback used to write the exception vector base */
 static void spr_write_excp_prefix (void *opaque, int sprn, int gprn)
@@ -473,7 +457,6 @@ static void spr_write_excp_prefix (void *opaque, int sprn, int gprn)
     tcg_gen_and_tl(t0, t0, cpu_gpr[gprn]);
     tcg_gen_st_tl(t0, cpu_env, offsetof(CPUState, excp_prefix));
     gen_store_spr(sprn, t0);
-    tcg_temp_free(t0);
 }
 
 static void spr_write_excp_vector (void *opaque, int sprn, int gprn)
@@ -543,8 +526,8 @@ static inline void spr_register (CPUPPCState *env, int num,
         exit(1);
     }
 #if defined(PPC_DEBUG_SPR)
-    printf("*** register spr %d (%03x) %s val " TARGET_FMT_lx "\n", num, num,
-           name, initial_value);
+    printf("*** register spr %d (%03x) %s val " ADDRX "\n", num, num, name,
+           initial_value);
 #endif
     spr->name = name;
     spr->uea_read = uea_read;
@@ -2582,6 +2565,7 @@ static void gen_spr_8xx (CPUPPCState *env)
  * HSRR1   => SPR 315 (Power 2.04 hypv)
  * LPCR    => SPR 316 (970)
  * LPIDR   => SPR 317 (970)
+ * SPEFSCR => SPR 512 (Power 2.04 emb)
  * EPR     => SPR 702 (Power 2.04 emb)
  * perf    => 768-783 (Power 2.04)
  * perf    => 784-799 (Power 2.04)
@@ -2608,7 +2592,7 @@ static void init_excp_4xx_real (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_FIT]      = 0x00001010;
     env->excp_vectors[POWERPC_EXCP_WDT]      = 0x00001020;
     env->excp_vectors[POWERPC_EXCP_DEBUG]    = 0x00002000;
-    env->hreset_excp_prefix = 0x00000000UL;
+    env->excp_prefix = 0x00000000UL;
     env->ivor_mask = 0x0000FFF0UL;
     env->ivpr_mask = 0xFFFF0000UL;
     /* Hardware reset vector */
@@ -2633,7 +2617,7 @@ static void init_excp_4xx_softmmu (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_DTLB]     = 0x00001100;
     env->excp_vectors[POWERPC_EXCP_ITLB]     = 0x00001200;
     env->excp_vectors[POWERPC_EXCP_DEBUG]    = 0x00002000;
-    env->hreset_excp_prefix = 0x00000000UL;
+    env->excp_prefix = 0x00000000UL;
     env->ivor_mask = 0x0000FFF0UL;
     env->ivpr_mask = 0xFFFF0000UL;
     /* Hardware reset vector */
@@ -2659,7 +2643,7 @@ static void init_excp_MPC5xx (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_IABR]     = 0x00001C00;
     env->excp_vectors[POWERPC_EXCP_MEXTBR]   = 0x00001E00;
     env->excp_vectors[POWERPC_EXCP_NMEXTBR]  = 0x00001F00;
-    env->hreset_excp_prefix = 0x00000000UL;
+    env->excp_prefix = 0x00000000UL;
     env->ivor_mask = 0x0000FFF0UL;
     env->ivpr_mask = 0xFFFF0000UL;
     /* Hardware reset vector */
@@ -2691,7 +2675,7 @@ static void init_excp_MPC8xx (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_IABR]     = 0x00001C00;
     env->excp_vectors[POWERPC_EXCP_MEXTBR]   = 0x00001E00;
     env->excp_vectors[POWERPC_EXCP_NMEXTBR]  = 0x00001F00;
-    env->hreset_excp_prefix = 0x00000000UL;
+    env->excp_prefix = 0x00000000UL;
     env->ivor_mask = 0x0000FFF0UL;
     env->ivpr_mask = 0xFFFF0000UL;
     /* Hardware reset vector */
@@ -2719,7 +2703,7 @@ static void init_excp_G2 (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_DSTLB]    = 0x00001200;
     env->excp_vectors[POWERPC_EXCP_IABR]     = 0x00001300;
     env->excp_vectors[POWERPC_EXCP_SMI]      = 0x00001400;
-    env->hreset_excp_prefix = 0x00000000UL;
+    env->excp_prefix = 0x00000000UL;
     /* Hardware reset vector */
     env->hreset_vector = 0xFFFFFFFCUL;
 #endif
@@ -2748,7 +2732,7 @@ static void init_excp_e200 (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_SPEU]     = 0x00000000;
     env->excp_vectors[POWERPC_EXCP_EFPDI]    = 0x00000000;
     env->excp_vectors[POWERPC_EXCP_EFPRI]    = 0x00000000;
-    env->hreset_excp_prefix = 0x00000000UL;
+    env->excp_prefix = 0x00000000UL;
     env->ivor_mask = 0x0000FFF7UL;
     env->ivpr_mask = 0xFFFF0000UL;
     /* Hardware reset vector */
@@ -2775,7 +2759,7 @@ static void init_excp_BookE (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_DTLB]     = 0x00000000;
     env->excp_vectors[POWERPC_EXCP_ITLB]     = 0x00000000;
     env->excp_vectors[POWERPC_EXCP_DEBUG]    = 0x00000000;
-    env->hreset_excp_prefix = 0x00000000UL;
+    env->excp_prefix = 0x00000000UL;
     env->ivor_mask = 0x0000FFE0UL;
     env->ivpr_mask = 0xFFFF0000UL;
     /* Hardware reset vector */
@@ -2798,7 +2782,7 @@ static void init_excp_601 (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_IO]       = 0x00000A00;
     env->excp_vectors[POWERPC_EXCP_SYSCALL]  = 0x00000C00;
     env->excp_vectors[POWERPC_EXCP_RUNM]     = 0x00002000;
-    env->hreset_excp_prefix = 0xFFF00000UL;
+    env->excp_prefix = 0xFFF00000UL;
     /* Hardware reset vector */
     env->hreset_vector = 0x00000100UL;
 #endif
@@ -2826,7 +2810,7 @@ static void init_excp_602 (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_SMI]      = 0x00001400;
     env->excp_vectors[POWERPC_EXCP_WDT]      = 0x00001500;
     env->excp_vectors[POWERPC_EXCP_EMUL]     = 0x00001600;
-    env->hreset_excp_prefix = 0xFFF00000UL;
+    env->excp_prefix = 0xFFF00000UL;
     /* Hardware reset vector */
     env->hreset_vector = 0xFFFFFFFCUL;
 #endif
@@ -2851,7 +2835,7 @@ static void init_excp_603 (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_DSTLB]    = 0x00001200;
     env->excp_vectors[POWERPC_EXCP_IABR]     = 0x00001300;
     env->excp_vectors[POWERPC_EXCP_SMI]      = 0x00001400;
-    env->hreset_excp_prefix = 0x00000000UL;
+    env->excp_prefix = 0x00000000UL;
     /* Hardware reset vector */
     env->hreset_vector = 0xFFFFFFFCUL;
 #endif
@@ -2874,9 +2858,9 @@ static void init_excp_604 (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_PERFM]    = 0x00000F00;
     env->excp_vectors[POWERPC_EXCP_IABR]     = 0x00001300;
     env->excp_vectors[POWERPC_EXCP_SMI]      = 0x00001400;
-    env->hreset_excp_prefix = 0xFFF00000UL;
+    env->excp_prefix = 0x00000000UL;
     /* Hardware reset vector */
-    env->hreset_vector = 0x00000100UL;
+    env->hreset_vector = 0xFFFFFFFCUL;
 #endif
 }
 
@@ -2898,7 +2882,7 @@ static void init_excp_620 (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_PERFM]    = 0x00000F00;
     env->excp_vectors[POWERPC_EXCP_IABR]     = 0x00001300;
     env->excp_vectors[POWERPC_EXCP_SMI]      = 0x00001400;
-    env->hreset_excp_prefix = 0xFFF00000UL;
+    env->excp_prefix = 0xFFF00000UL;
     /* Hardware reset vector */
     env->hreset_vector = 0x0000000000000100ULL;
 #endif
@@ -2923,7 +2907,7 @@ static void init_excp_7x0 (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_IABR]     = 0x00001300;
     env->excp_vectors[POWERPC_EXCP_SMI]      = 0x00001400;
     env->excp_vectors[POWERPC_EXCP_THERM]    = 0x00001700;
-    env->hreset_excp_prefix = 0x00000000UL;
+    env->excp_prefix = 0x00000000UL;
     /* Hardware reset vector */
     env->hreset_vector = 0xFFFFFFFCUL;
 #endif
@@ -2946,7 +2930,7 @@ static void init_excp_750cl (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_PERFM]    = 0x00000F00;
     env->excp_vectors[POWERPC_EXCP_IABR]     = 0x00001300;
     env->excp_vectors[POWERPC_EXCP_SMI]      = 0x00001400;
-    env->hreset_excp_prefix = 0x00000000UL;
+    env->excp_prefix = 0x00000000UL;
     /* Hardware reset vector */
     env->hreset_vector = 0xFFFFFFFCUL;
 #endif
@@ -2969,7 +2953,7 @@ static void init_excp_750cx (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_PERFM]    = 0x00000F00;
     env->excp_vectors[POWERPC_EXCP_IABR]     = 0x00001300;
     env->excp_vectors[POWERPC_EXCP_THERM]    = 0x00001700;
-    env->hreset_excp_prefix = 0x00000000UL;
+    env->excp_prefix = 0x00000000UL;
     /* Hardware reset vector */
     env->hreset_vector = 0xFFFFFFFCUL;
 #endif
@@ -2997,7 +2981,7 @@ static void init_excp_7x5 (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_IABR]     = 0x00001300;
     env->excp_vectors[POWERPC_EXCP_SMI]      = 0x00001400;
     env->excp_vectors[POWERPC_EXCP_THERM]    = 0x00001700;
-    env->hreset_excp_prefix = 0x00000000UL;
+    env->excp_prefix = 0x00000000UL;
     /* Hardware reset vector */
     env->hreset_vector = 0xFFFFFFFCUL;
 #endif
@@ -3023,7 +3007,7 @@ static void init_excp_7400 (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_SMI]      = 0x00001400;
     env->excp_vectors[POWERPC_EXCP_VPUA]     = 0x00001600;
     env->excp_vectors[POWERPC_EXCP_THERM]    = 0x00001700;
-    env->hreset_excp_prefix = 0x00000000UL;
+    env->excp_prefix = 0x00000000UL;
     /* Hardware reset vector */
     env->hreset_vector = 0xFFFFFFFCUL;
 #endif
@@ -3051,7 +3035,7 @@ static void init_excp_7450 (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_IABR]     = 0x00001300;
     env->excp_vectors[POWERPC_EXCP_SMI]      = 0x00001400;
     env->excp_vectors[POWERPC_EXCP_VPUA]     = 0x00001600;
-    env->hreset_excp_prefix = 0x00000000UL;
+    env->excp_prefix = 0x00000000UL;
     /* Hardware reset vector */
     env->hreset_vector = 0xFFFFFFFCUL;
 #endif
@@ -3081,7 +3065,7 @@ static void init_excp_970 (CPUPPCState *env)
     env->excp_vectors[POWERPC_EXCP_MAINT]    = 0x00001600;
     env->excp_vectors[POWERPC_EXCP_VPUA]     = 0x00001700;
     env->excp_vectors[POWERPC_EXCP_THERM]    = 0x00001800;
-    env->hreset_excp_prefix = 0x00000000FFF00000ULL;
+    env->excp_prefix   = 0x00000000FFF00000ULL;
     /* Hardware reset vector */
     env->hreset_vector = 0x0000000000000100ULL;
 #endif
@@ -3380,7 +3364,7 @@ static void init_proc_405 (CPUPPCState *env)
                               PPC_DCR | PPC_WRTEE | PPC_RFMCI |               \
                               PPC_CACHE | PPC_CACHE_ICBI |                    \
                               PPC_CACHE_DCBZ | PPC_CACHE_DCBA |               \
-                              PPC_MEM_TLBSYNC | PPC_MFTB |                    \
+                              PPC_MEM_TLBSYNC |                               \
                               PPC_BOOKE | PPC_4xx_COMMON | PPC_405_MAC |      \
                               PPC_440_SPEC)
 #define POWERPC_MSRM_440EP   (0x000000000006D630ULL)
@@ -3460,7 +3444,7 @@ static void init_proc_440EP (CPUPPCState *env)
                               PPC_DCR | PPC_DCRX | PPC_WRTEE | PPC_MFAPIDI |  \
                               PPC_CACHE | PPC_CACHE_ICBI |                    \
                               PPC_CACHE_DCBZ | PPC_CACHE_DCBA |               \
-                              PPC_MEM_TLBSYNC | PPC_TLBIVA | PPC_MFTB |       \
+                              PPC_MEM_TLBSYNC | PPC_TLBIVA |                  \
                               PPC_BOOKE | PPC_4xx_COMMON | PPC_405_MAC |      \
                               PPC_440_SPEC)
 #define POWERPC_MSRM_440GP   (0x000000000006FF30ULL)
@@ -3522,7 +3506,7 @@ static void init_proc_440GP (CPUPPCState *env)
                               PPC_DCR | PPC_WRTEE |                           \
                               PPC_CACHE | PPC_CACHE_ICBI |                    \
                               PPC_CACHE_DCBZ | PPC_CACHE_DCBA |               \
-                              PPC_MEM_TLBSYNC | PPC_MFTB |                    \
+                              PPC_MEM_TLBSYNC |                               \
                               PPC_BOOKE | PPC_4xx_COMMON | PPC_405_MAC |      \
                               PPC_440_SPEC)
 #define POWERPC_MSRM_440x4   (0x000000000006FF30ULL)
@@ -3584,7 +3568,7 @@ static void init_proc_440x4 (CPUPPCState *env)
                               PPC_DCR | PPC_WRTEE | PPC_RFMCI |               \
                               PPC_CACHE | PPC_CACHE_ICBI |                    \
                               PPC_CACHE_DCBZ | PPC_CACHE_DCBA |               \
-                              PPC_MEM_TLBSYNC | PPC_MFTB |                    \
+                              PPC_MEM_TLBSYNC |                               \
                               PPC_BOOKE | PPC_4xx_COMMON | PPC_405_MAC |      \
                               PPC_440_SPEC)
 #define POWERPC_MSRM_440x5   (0x000000000006FF30ULL)
@@ -3662,7 +3646,7 @@ static void init_proc_440x5 (CPUPPCState *env)
 /* PowerPC 460 (guessed)                                                     */
 #define POWERPC_INSNS_460    (PPC_INSNS_BASE | PPC_STRING |                   \
                               PPC_DCR | PPC_DCRX  | PPC_DCRUX |               \
-                              PPC_WRTEE | PPC_MFAPIDI | PPC_MFTB |            \
+                              PPC_WRTEE | PPC_MFAPIDI |                       \
                               PPC_CACHE | PPC_CACHE_ICBI |                    \
                               PPC_CACHE_DCBZ | PPC_CACHE_DCBA |               \
                               PPC_MEM_TLBSYNC | PPC_TLBIVA |                  \
@@ -3749,7 +3733,7 @@ static void init_proc_460 (CPUPPCState *env)
 #define POWERPC_INSNS_460F   (PPC_INSNS_BASE | PPC_STRING |                   \
                               PPC_FLOAT | PPC_FLOAT_FRES | PPC_FLOAT_FSEL |   \
                               PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |           \
-                              PPC_FLOAT_STFIWX | PPC_MFTB |                   \
+                              PPC_FLOAT_STFIWX |                              \
                               PPC_DCR | PPC_DCRX | PPC_DCRUX |                \
                               PPC_WRTEE | PPC_MFAPIDI |                       \
                               PPC_CACHE | PPC_CACHE_ICBI |                    \
@@ -4037,8 +4021,8 @@ static void init_proc_e200 (CPUPPCState *env)
     gen_spr_BookE(env, 0x000000070000FFFFULL);
     /* XXX : not implemented */
     spr_register(env, SPR_BOOKE_SPEFSCR, "SPEFSCR",
-                 &spr_read_spefscr, &spr_write_spefscr,
-                 &spr_read_spefscr, &spr_write_spefscr,
+                 SPR_NOACCESS, SPR_NOACCESS,
+                 &spr_read_generic, &spr_write_generic,
                  0x00000000);
     /* Memory management */
     gen_spr_BookE_FSL(env, 0x0000005D);
@@ -4166,14 +4150,8 @@ static void init_proc_e300 (CPUPPCState *env)
                  SPR_NOACCESS, SPR_NOACCESS,
                  &spr_read_generic, &spr_write_generic,
                  0x00000000);
-    /* XXX : not implemented */
-    spr_register(env, SPR_HID2, "HID2",
-                 SPR_NOACCESS, SPR_NOACCESS,
-                 &spr_read_generic, &spr_write_generic,
-                 0x00000000);
     /* Memory management */
     gen_low_BATs(env);
-    gen_high_BATs(env);
     gen_6xx_7xx_soft_tlb(env, 64, 2);
     init_excp_603(env);
     env->dcache_line_size = 32;
@@ -4232,8 +4210,8 @@ static void init_proc_e500 (CPUPPCState *env)
                  0x00000000);
     /* XXX : not implemented */
     spr_register(env, SPR_BOOKE_SPEFSCR, "SPEFSCR",
-                 &spr_read_spefscr, &spr_write_spefscr,
-                 &spr_read_spefscr, &spr_write_spefscr,
+                 SPR_NOACCESS, SPR_NOACCESS,
+                 &spr_read_generic, &spr_write_generic,
                  0x00000000);
     /* Memory management */
 #if !defined(CONFIG_USER_ONLY)
@@ -6065,20 +6043,8 @@ static void init_proc_970FX (CPUPPCState *env)
                  SPR_NOACCESS, SPR_NOACCESS,
                  &spr_read_hior, &spr_write_hior,
                  0x00000000);
-    spr_register(env, SPR_CTRL, "SPR_CTRL",
-                 SPR_NOACCESS, SPR_NOACCESS,
-                 &spr_read_generic, &spr_write_generic,
-                 0x00000000);
-    spr_register(env, SPR_UCTRL, "SPR_UCTRL",
-                 SPR_NOACCESS, SPR_NOACCESS,
-                 &spr_read_generic, &spr_write_generic,
-                 0x00000000);
-    spr_register(env, SPR_VRSAVE, "SPR_VRSAVE",
-                 &spr_read_generic, &spr_write_generic,
-                 &spr_read_generic, &spr_write_generic,
-                 0x00000000);
 #if !defined(CONFIG_USER_ONLY)
-    env->slb_nr = 64;
+    env->slb_nr = 32;
 #endif
     init_excp_970(env);
     env->dcache_line_size = 128;
@@ -6725,12 +6691,36 @@ enum {
     CPU_POWERPC_e300c3             = 0x00850010,
     CPU_POWERPC_e300c4             = 0x00860010,
     /* MPC83xx microcontrollers */
-#define CPU_POWERPC_MPC831x          CPU_POWERPC_e300c3
-#define CPU_POWERPC_MPC832x          CPU_POWERPC_e300c2
-#define CPU_POWERPC_MPC834x          CPU_POWERPC_e300c1
-#define CPU_POWERPC_MPC835x          CPU_POWERPC_e300c1
-#define CPU_POWERPC_MPC836x          CPU_POWERPC_e300c1
-#define CPU_POWERPC_MPC837x          CPU_POWERPC_e300c4
+#define CPU_POWERPC_MPC8313          CPU_POWERPC_e300c3
+#define CPU_POWERPC_MPC8313E         CPU_POWERPC_e300c3
+#define CPU_POWERPC_MPC8314          CPU_POWERPC_e300c3
+#define CPU_POWERPC_MPC8314E         CPU_POWERPC_e300c3
+#define CPU_POWERPC_MPC8315          CPU_POWERPC_e300c3
+#define CPU_POWERPC_MPC8315E         CPU_POWERPC_e300c3
+#define CPU_POWERPC_MPC8321          CPU_POWERPC_e300c2
+#define CPU_POWERPC_MPC8321E         CPU_POWERPC_e300c2
+#define CPU_POWERPC_MPC8323          CPU_POWERPC_e300c2
+#define CPU_POWERPC_MPC8323E         CPU_POWERPC_e300c2
+#define CPU_POWERPC_MPC8343A         CPU_POWERPC_e300c1
+#define CPU_POWERPC_MPC8343EA        CPU_POWERPC_e300c1
+#define CPU_POWERPC_MPC8347A         CPU_POWERPC_e300c1
+#define CPU_POWERPC_MPC8347AT        CPU_POWERPC_e300c1
+#define CPU_POWERPC_MPC8347AP        CPU_POWERPC_e300c1
+#define CPU_POWERPC_MPC8347EA        CPU_POWERPC_e300c1
+#define CPU_POWERPC_MPC8347EAT       CPU_POWERPC_e300c1
+#define CPU_POWERPC_MPC8347EAP       CPU_POWERPC_e300c1
+#define CPU_POWERPC_MPC8349          CPU_POWERPC_e300c1
+#define CPU_POWERPC_MPC8349A         CPU_POWERPC_e300c1
+#define CPU_POWERPC_MPC8349E         CPU_POWERPC_e300c1
+#define CPU_POWERPC_MPC8349EA        CPU_POWERPC_e300c1
+#define CPU_POWERPC_MPC8358E         CPU_POWERPC_e300c1
+#define CPU_POWERPC_MPC8360E         CPU_POWERPC_e300c1
+#define CPU_POWERPC_MPC8377          CPU_POWERPC_e300c4
+#define CPU_POWERPC_MPC8377E         CPU_POWERPC_e300c4
+#define CPU_POWERPC_MPC8378          CPU_POWERPC_e300c4
+#define CPU_POWERPC_MPC8378E         CPU_POWERPC_e300c4
+#define CPU_POWERPC_MPC8379          CPU_POWERPC_e300c4
+#define CPU_POWERPC_MPC8379E         CPU_POWERPC_e300c4
     /* e500 family */
     /* e500 cores  */
 #define CPU_POWERPC_e500             CPU_POWERPC_e500v2_v22
@@ -7091,19 +7081,11 @@ enum {
 #if 0
     POWERPC_SVR_8323E              = xxx,
 #endif
-    POWERPC_SVR_8343               = 0x80570010,
     POWERPC_SVR_8343A              = 0x80570030,
-    POWERPC_SVR_8343E              = 0x80560010,
     POWERPC_SVR_8343EA             = 0x80560030,
-#define POWERPC_SVR_8347             POWERPC_SVR_8347T
-    POWERPC_SVR_8347P              = 0x80550010, /* PBGA package */
-    POWERPC_SVR_8347T              = 0x80530010, /* TBGA package */
 #define POWERPC_SVR_8347A            POWERPC_SVR_8347AT
     POWERPC_SVR_8347AP             = 0x80550030, /* PBGA package */
     POWERPC_SVR_8347AT             = 0x80530030, /* TBGA package */
-#define POWERPC_SVR_8347E            POWERPC_SVR_8347ET
-    POWERPC_SVR_8347EP             = 0x80540010, /* PBGA package */
-    POWERPC_SVR_8347ET             = 0x80520010, /* TBGA package */
 #define POWERPC_SVR_8347EA            POWERPC_SVR_8347EAT
     POWERPC_SVR_8347EAP            = 0x80540030, /* PBGA package */
     POWERPC_SVR_8347EAT            = 0x80520030, /* TBGA package */
@@ -7982,141 +7964,117 @@ static const ppc_def_t ppc_defs[] = {
 #if defined (TODO)
     /* MPC8313                                                               */
     POWERPC_DEF_SVR("MPC8313",
-                    CPU_POWERPC_MPC831x,      POWERPC_SVR_8313,      e300),
+                    CPU_POWERPC_MPC8313,      POWERPC_SVR_8313,      e300),
 #endif
 #if defined (TODO)
     /* MPC8313E                                                              */
     POWERPC_DEF_SVR("MPC8313E",
-                    CPU_POWERPC_MPC831x,      POWERPC_SVR_8313E,     e300),
+                    CPU_POWERPC_MPC8313E,     POWERPC_SVR_8313E,     e300),
 #endif
 #if defined (TODO)
     /* MPC8314                                                               */
     POWERPC_DEF_SVR("MPC8314",
-                    CPU_POWERPC_MPC831x,      POWERPC_SVR_8314,      e300),
+                    CPU_POWERPC_MPC8314,      POWERPC_SVR_8314,      e300),
 #endif
 #if defined (TODO)
     /* MPC8314E                                                              */
     POWERPC_DEF_SVR("MPC8314E",
-                    CPU_POWERPC_MPC831x,      POWERPC_SVR_8314E,     e300),
+                    CPU_POWERPC_MPC8314E,     POWERPC_SVR_8314E,     e300),
 #endif
 #if defined (TODO)
     /* MPC8315                                                               */
     POWERPC_DEF_SVR("MPC8315",
-                    CPU_POWERPC_MPC831x,      POWERPC_SVR_8315,      e300),
+                    CPU_POWERPC_MPC8315,      POWERPC_SVR_8315,      e300),
 #endif
 #if defined (TODO)
     /* MPC8315E                                                              */
     POWERPC_DEF_SVR("MPC8315E",
-                    CPU_POWERPC_MPC831x,      POWERPC_SVR_8315E,     e300),
+                    CPU_POWERPC_MPC8315E,     POWERPC_SVR_8315E,     e300),
 #endif
 #if defined (TODO)
     /* MPC8321                                                               */
     POWERPC_DEF_SVR("MPC8321",
-                    CPU_POWERPC_MPC832x,      POWERPC_SVR_8321,      e300),
+                    CPU_POWERPC_MPC8321,      POWERPC_SVR_8321,      e300),
 #endif
 #if defined (TODO)
     /* MPC8321E                                                              */
     POWERPC_DEF_SVR("MPC8321E",
-                    CPU_POWERPC_MPC832x,      POWERPC_SVR_8321E,     e300),
+                    CPU_POWERPC_MPC8321E,     POWERPC_SVR_8321E,     e300),
 #endif
 #if defined (TODO)
     /* MPC8323                                                               */
     POWERPC_DEF_SVR("MPC8323",
-                    CPU_POWERPC_MPC832x,      POWERPC_SVR_8323,      e300),
+                    CPU_POWERPC_MPC8323,      POWERPC_SVR_8323,      e300),
 #endif
 #if defined (TODO)
     /* MPC8323E                                                              */
     POWERPC_DEF_SVR("MPC8323E",
-                    CPU_POWERPC_MPC832x,      POWERPC_SVR_8323E,     e300),
+                    CPU_POWERPC_MPC8323E,     POWERPC_SVR_8323E,     e300),
 #endif
-    /* MPC8343                                                               */
-    POWERPC_DEF_SVR("MPC8343",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8343,      e300),
     /* MPC8343A                                                              */
     POWERPC_DEF_SVR("MPC8343A",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8343A,     e300),
-    /* MPC8343E                                                              */
-    POWERPC_DEF_SVR("MPC8343E",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8343E,     e300),
+                    CPU_POWERPC_MPC8343A,     POWERPC_SVR_8343A,     e300),
     /* MPC8343EA                                                             */
     POWERPC_DEF_SVR("MPC8343EA",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8343EA,    e300),
-    /* MPC8347                                                               */
-    POWERPC_DEF_SVR("MPC8347",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8347,      e300),
-    /* MPC8347T                                                              */
-    POWERPC_DEF_SVR("MPC8347T",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8347T,     e300),
-    /* MPC8347P                                                              */
-    POWERPC_DEF_SVR("MPC8347P",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8347P,     e300),
+                    CPU_POWERPC_MPC8343EA,    POWERPC_SVR_8343EA,    e300),
     /* MPC8347A                                                              */
     POWERPC_DEF_SVR("MPC8347A",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8347A,     e300),
+                    CPU_POWERPC_MPC8347A,     POWERPC_SVR_8347A,     e300),
     /* MPC8347AT                                                             */
     POWERPC_DEF_SVR("MPC8347AT",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8347AT,    e300),
+                    CPU_POWERPC_MPC8347AT,    POWERPC_SVR_8347AT,    e300),
     /* MPC8347AP                                                             */
     POWERPC_DEF_SVR("MPC8347AP",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8347AP,    e300),
-    /* MPC8347E                                                              */
-    POWERPC_DEF_SVR("MPC8347E",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8347E,     e300),
-    /* MPC8347ET                                                             */
-    POWERPC_DEF_SVR("MPC8347ET",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8347ET,    e300),
-    /* MPC8343EP                                                             */
-    POWERPC_DEF_SVR("MPC8347EP",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8347EP,    e300),
+                    CPU_POWERPC_MPC8347AP,    POWERPC_SVR_8347AP,    e300),
     /* MPC8347EA                                                             */
     POWERPC_DEF_SVR("MPC8347EA",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8347EA,    e300),
+                    CPU_POWERPC_MPC8347EA,    POWERPC_SVR_8347EA,    e300),
     /* MPC8347EAT                                                            */
     POWERPC_DEF_SVR("MPC8347EAT",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8347EAT,   e300),
+                    CPU_POWERPC_MPC8347EAT,   POWERPC_SVR_8347EAT,   e300),
     /* MPC8343EAP                                                            */
     POWERPC_DEF_SVR("MPC8347EAP",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8347EAP,   e300),
+                    CPU_POWERPC_MPC8347EAP,   POWERPC_SVR_8347EAP,   e300),
     /* MPC8349                                                               */
     POWERPC_DEF_SVR("MPC8349",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8349,      e300),
+                    CPU_POWERPC_MPC8349,      POWERPC_SVR_8349,      e300),
     /* MPC8349A                                                              */
     POWERPC_DEF_SVR("MPC8349A",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8349A,     e300),
+                    CPU_POWERPC_MPC8349A,     POWERPC_SVR_8349A,     e300),
     /* MPC8349E                                                              */
     POWERPC_DEF_SVR("MPC8349E",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8349E,     e300),
+                    CPU_POWERPC_MPC8349E,     POWERPC_SVR_8349E,     e300),
     /* MPC8349EA                                                             */
     POWERPC_DEF_SVR("MPC8349EA",
-                    CPU_POWERPC_MPC834x,      POWERPC_SVR_8349EA,    e300),
+                    CPU_POWERPC_MPC8349EA,    POWERPC_SVR_8349EA,    e300),
 #if defined (TODO)
     /* MPC8358E                                                              */
     POWERPC_DEF_SVR("MPC8358E",
-                    CPU_POWERPC_MPC835x,      POWERPC_SVR_8358E,     e300),
+                    CPU_POWERPC_MPC8358E,     POWERPC_SVR_8358E,     e300),
 #endif
 #if defined (TODO)
     /* MPC8360E                                                              */
     POWERPC_DEF_SVR("MPC8360E",
-                    CPU_POWERPC_MPC836x,      POWERPC_SVR_8360E,     e300),
+                    CPU_POWERPC_MPC8360E,     POWERPC_SVR_8360E,     e300),
 #endif
     /* MPC8377                                                               */
     POWERPC_DEF_SVR("MPC8377",
-                    CPU_POWERPC_MPC837x,      POWERPC_SVR_8377,      e300),
+                    CPU_POWERPC_MPC8377,      POWERPC_SVR_8377,      e300),
     /* MPC8377E                                                              */
     POWERPC_DEF_SVR("MPC8377E",
-                    CPU_POWERPC_MPC837x,      POWERPC_SVR_8377E,     e300),
+                    CPU_POWERPC_MPC8377E,     POWERPC_SVR_8377E,     e300),
     /* MPC8378                                                               */
     POWERPC_DEF_SVR("MPC8378",
-                    CPU_POWERPC_MPC837x,      POWERPC_SVR_8378,      e300),
+                    CPU_POWERPC_MPC8378,      POWERPC_SVR_8378,      e300),
     /* MPC8378E                                                              */
     POWERPC_DEF_SVR("MPC8378E",
-                    CPU_POWERPC_MPC837x,      POWERPC_SVR_8378E,     e300),
+                    CPU_POWERPC_MPC8378E,     POWERPC_SVR_8378E,     e300),
     /* MPC8379                                                               */
     POWERPC_DEF_SVR("MPC8379",
-                    CPU_POWERPC_MPC837x,      POWERPC_SVR_8379,      e300),
+                    CPU_POWERPC_MPC8379,      POWERPC_SVR_8379,      e300),
     /* MPC8379E                                                              */
     POWERPC_DEF_SVR("MPC8379E",
-                    CPU_POWERPC_MPC837x,      POWERPC_SVR_8379E,     e300),
+                    CPU_POWERPC_MPC8379E,     POWERPC_SVR_8379E,     e300),
     /* e500 family                                                           */
     /* PowerPC e500 core                                                     */
     POWERPC_DEF("e500",          CPU_POWERPC_e500v2_v22,             e500v2),
@@ -8905,7 +8863,7 @@ static void init_ppc_proc (CPUPPCState *env, const ppc_def_t *def)
     /* Set all exception vectors to an invalid address */
     for (i = 0; i < POWERPC_EXCP_NB; i++)
         env->excp_vectors[i] = (target_ulong)(-1ULL);
-    env->hreset_excp_prefix = 0x00000000;
+    env->excp_prefix = 0x00000000;
     env->ivor_mask = 0x00000000;
     env->ivpr_mask = 0x00000000;
     /* Default MMU definitions */
@@ -8916,13 +8874,7 @@ static void init_ppc_proc (CPUPPCState *env, const ppc_def_t *def)
     /* Register SPR common to all PowerPC implementations */
     gen_spr_generic(env);
     spr_register(env, SPR_PVR, "PVR",
-                 /* Linux permits userspace to read PVR */
-#if defined(CONFIG_LINUX_USER)
-                 &spr_read_generic,
-#else
-                 SPR_NOACCESS,
-#endif
-                 SPR_NOACCESS,
+                 SPR_NOACCESS, SPR_NOACCESS,
                  &spr_read_generic, SPR_NOACCESS,
                  def->pvr);
     /* Register SVR if it's defined to anything else than POWERPC_SVR_NONE */
@@ -8941,9 +8893,6 @@ static void init_ppc_proc (CPUPPCState *env, const ppc_def_t *def)
     }
     /* PowerPC implementation specific initialisations (SPRs, timers, ...) */
     (*def->init_proc)(env);
-#if !defined(CONFIG_USER_ONLY)
-    env->excp_prefix = env->hreset_excp_prefix;
-#endif
     /* MSR bits & flags consistency checks */
     if (env->msr_mask & (1 << 25)) {
         switch (env->flags & (POWERPC_FLAG_SPE | POWERPC_FLAG_VRE)) {
@@ -9279,10 +9228,17 @@ static void fix_opcode_tables (opc_handler_t **ppc_opcodes)
 /*****************************************************************************/
 static int create_ppc_opcodes (CPUPPCState *env, const ppc_def_t *def)
 {
-    opcode_t *opc;
+    opcode_t *opc, *start, *end;
 
     fill_new_table(env->opcodes, 0x40);
-    for (opc = opcodes; opc < &opcodes[ARRAY_SIZE(opcodes)]; opc++) {
+    if (&opc_start < &opc_end) {
+        start = &opc_start;
+        end = &opc_end;
+    } else {
+        start = &opc_end;
+        end = &opc_start;
+    }
+    for (opc = start + 1; opc != end; opc++) {
         if ((opc->handler.type & def->insns_flags) != 0) {
             if (register_insn(env->opcodes, opc) < 0) {
                 printf("*** ERROR initializing PowerPC instruction "
@@ -9402,7 +9358,7 @@ static int gdb_set_float_reg(CPUState *env, uint8_t *mem_buf, int n)
 static int gdb_get_avr_reg(CPUState *env, uint8_t *mem_buf, int n)
 {
     if (n < 32) {
-#ifdef HOST_WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
         stq_p(mem_buf, env->avr[n].u64[0]);
         stq_p(mem_buf+8, env->avr[n].u64[1]);
 #else
@@ -9411,11 +9367,11 @@ static int gdb_get_avr_reg(CPUState *env, uint8_t *mem_buf, int n)
 #endif
         return 16;
     }
-    if (n == 32) {
+    if (n == 33) {
         stl_p(mem_buf, env->vscr);
         return 4;
     }
-    if (n == 33) {
+    if (n == 34) {
         stl_p(mem_buf, (uint32_t)env->spr[SPR_VRSAVE]);
         return 4;
     }
@@ -9425,7 +9381,7 @@ static int gdb_get_avr_reg(CPUState *env, uint8_t *mem_buf, int n)
 static int gdb_set_avr_reg(CPUState *env, uint8_t *mem_buf, int n)
 {
     if (n < 32) {
-#ifdef HOST_WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
         env->avr[n].u64[0] = ldq_p(mem_buf);
         env->avr[n].u64[1] = ldq_p(mem_buf+8);
 #else
@@ -9434,11 +9390,11 @@ static int gdb_set_avr_reg(CPUState *env, uint8_t *mem_buf, int n)
 #endif
         return 16;
     }
-    if (n == 32) {
+    if (n == 33) {
         env->vscr = ldl_p(mem_buf);
         return 4;
     }
-    if (n == 33) {
+    if (n == 34) {
         env->spr[SPR_VRSAVE] = (target_ulong)ldl_p(mem_buf);
         return 4;
     }
@@ -9455,12 +9411,13 @@ static int gdb_get_spe_reg(CPUState *env, uint8_t *mem_buf, int n)
 #endif
         return 4;
     }
-    if (n == 32) {
+    if (n == 33) {
         stq_p(mem_buf, env->spe_acc);
         return 8;
     }
-    if (n == 33) {
-        stl_p(mem_buf, env->spe_fscr);
+    if (n == 34) {
+        /* SPEFSCR not implemented */
+        memset(mem_buf, 0, 4);
         return 4;
     }
     return 0;
@@ -9478,12 +9435,12 @@ static int gdb_set_spe_reg(CPUState *env, uint8_t *mem_buf, int n)
 #endif
         return 4;
     }
-    if (n == 32) {
+    if (n == 33) {
         env->spe_acc = ldq_p(mem_buf);
         return 8;
     }
-    if (n == 33) {
-        env->spe_fscr = ldl_p(mem_buf);
+    if (n == 34) {
+        /* SPEFSCR not implemented */
         return 4;
     }
     return 0;
@@ -9495,7 +9452,6 @@ int cpu_ppc_register_internal (CPUPPCState *env, const ppc_def_t *def)
     env->mmu_model = def->mmu_model;
     env->excp_model = def->excp_model;
     env->bus_model = def->bus_model;
-    env->insns_flags = def->insns_flags;
     env->flags = def->flags;
     env->bfd_mach = def->bfd_mach;
     env->check_pow = def->check_pow;

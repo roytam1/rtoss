@@ -15,9 +15,7 @@
 #define _QEMU_VIRTIO_H
 
 #include "hw.h"
-#include "net.h"
-#include "qdev.h"
-#include "sysemu.h"
+#include "pci.h"
 
 /* from Linux's linux/virtio_config.h */
 
@@ -31,11 +29,9 @@
 /* We've given up on this device. */
 #define VIRTIO_CONFIG_S_FAILED          0x80
 
-/* We notify when the ring is completely used, even if the guest is suppressing
+/* We notify when the ring is completely used, even if the guest is supressing
  * callbacks */
 #define VIRTIO_F_NOTIFY_ON_EMPTY        24
-/* We support indirect buffer descriptors */
-#define VIRTIO_RING_F_INDIRECT_DESC     28
 /* A guest should never accept this.  It implies negotiation is broken. */
 #define VIRTIO_F_BAD_FEATURE		30
 
@@ -45,8 +41,6 @@
 #define VRING_DESC_F_NEXT       1
 /* This marks a buffer as write-only (otherwise read-only). */
 #define VRING_DESC_F_WRITE      2
-/* This means the buffer contains a list of buffer descriptors. */
-#define VRING_DESC_F_INDIRECT  4
 
 /* This means don't notify other side when buffer added. */
 #define VRING_USED_F_NO_NOTIFY  1
@@ -76,29 +70,19 @@ typedef struct VirtQueueElement
     struct iovec out_sg[VIRTQUEUE_MAX_SIZE];
 } VirtQueueElement;
 
-typedef struct {
-    void (*notify)(void * opaque, uint16_t vector);
-    void (*save_config)(void * opaque, QEMUFile *f);
-    void (*save_queue)(void * opaque, int n, QEMUFile *f);
-    int (*load_config)(void * opaque, QEMUFile *f);
-    int (*load_queue)(void * opaque, int n, QEMUFile *f);
-} VirtIOBindings;
-
 #define VIRTIO_PCI_QUEUE_MAX 16
-
-#define VIRTIO_NO_VECTOR 0xffff
 
 struct VirtIODevice
 {
+    PCIDevice pci_dev;
     const char *name;
+    uint32_t addr;
     uint8_t status;
     uint8_t isr;
     uint16_t queue_sel;
     uint32_t features;
     size_t config_len;
     void *config;
-    uint16_t config_vector;
-    int nvectors;
     uint32_t (*get_features)(VirtIODevice *vdev);
     uint32_t (*bad_features)(VirtIODevice *vdev);
     void (*set_features)(VirtIODevice *vdev, uint32_t val);
@@ -106,10 +90,13 @@ struct VirtIODevice
     void (*set_config)(VirtIODevice *vdev, const uint8_t *config);
     void (*reset)(VirtIODevice *vdev);
     VirtQueue *vq;
-    const VirtIOBindings *binding;
-    void *binding_opaque;
-    uint16_t device_id;
 };
+
+VirtIODevice *virtio_init_pci(PCIBus *bus, const char *name,
+                              uint16_t vendor, uint16_t device,
+                              uint16_t subvendor, uint16_t subdevice,
+                              uint16_t class_code, uint8_t pif,
+                              size_t config_size, size_t struct_size);
 
 VirtQueue *virtio_add_queue(VirtIODevice *vdev, int queue_size,
                             void (*handle_output)(VirtIODevice *,
@@ -128,7 +115,7 @@ void virtio_notify(VirtIODevice *vdev, VirtQueue *vq);
 
 void virtio_save(VirtIODevice *vdev, QEMUFile *f);
 
-int virtio_load(VirtIODevice *vdev, QEMUFile *f);
+void virtio_load(VirtIODevice *vdev, QEMUFile *f);
 
 void virtio_cleanup(VirtIODevice *vdev);
 
@@ -139,35 +126,5 @@ void virtio_queue_set_notification(VirtQueue *vq, int enable);
 int virtio_queue_ready(VirtQueue *vq);
 
 int virtio_queue_empty(VirtQueue *vq);
-
-/* Host binding interface.  */
-
-VirtIODevice *virtio_common_init(const char *name, uint16_t device_id,
-                                 size_t config_size, size_t struct_size);
-uint32_t virtio_config_readb(VirtIODevice *vdev, uint32_t addr);
-uint32_t virtio_config_readw(VirtIODevice *vdev, uint32_t addr);
-uint32_t virtio_config_readl(VirtIODevice *vdev, uint32_t addr);
-void virtio_config_writeb(VirtIODevice *vdev, uint32_t addr, uint32_t data);
-void virtio_config_writew(VirtIODevice *vdev, uint32_t addr, uint32_t data);
-void virtio_config_writel(VirtIODevice *vdev, uint32_t addr, uint32_t data);
-void virtio_queue_set_addr(VirtIODevice *vdev, int n, target_phys_addr_t addr);
-target_phys_addr_t virtio_queue_get_addr(VirtIODevice *vdev, int n);
-int virtio_queue_get_num(VirtIODevice *vdev, int n);
-void virtio_queue_notify(VirtIODevice *vdev, int n);
-uint16_t virtio_queue_vector(VirtIODevice *vdev, int n);
-void virtio_queue_set_vector(VirtIODevice *vdev, int n, uint16_t vector);
-void virtio_reset(void *opaque);
-void virtio_update_irq(VirtIODevice *vdev);
-
-void virtio_bind_device(VirtIODevice *vdev, const VirtIOBindings *binding,
-                        void *opaque);
-
-/* Base devices.  */
-VirtIODevice *virtio_blk_init(DeviceState *dev, DriveInfo *dinfo);
-VirtIODevice *virtio_net_init(DeviceState *dev, NICConf *conf);
-VirtIODevice *virtio_console_init(DeviceState *dev);
-VirtIODevice *virtio_balloon_init(DeviceState *dev);
-
-void virtio_net_exit(VirtIODevice *vdev);
 
 #endif

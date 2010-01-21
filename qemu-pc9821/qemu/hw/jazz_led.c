@@ -131,13 +131,13 @@ static void led_writel(void *opaque, target_phys_addr_t addr, uint32_t val)
 #endif
 }
 
-static CPUReadMemoryFunc * const led_read[3] = {
+static CPUReadMemoryFunc *led_read[3] = {
     led_readb,
     led_readw,
     led_readl,
 };
 
-static CPUWriteMemoryFunc * const led_write[3] = {
+static CPUWriteMemoryFunc *led_write[3] = {
     led_writeb,
     led_writew,
     led_writel,
@@ -307,7 +307,7 @@ void jazz_led_init(target_phys_addr_t base)
 
     s->state = REDRAW_SEGMENTS | REDRAW_BACKGROUND;
 
-    io = cpu_register_io_memory(led_read, led_write, s);
+    io = cpu_register_io_memory(0, led_read, led_write, s);
     cpu_register_physical_memory(base, 1, io);
 
     s->ds = graphic_console_init(jazz_led_update_display,

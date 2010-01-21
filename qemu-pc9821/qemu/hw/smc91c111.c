@@ -7,7 +7,7 @@
  * This code is licenced under the GPL
  */
 
-#include "sysbus.h"
+#include "hw.h"
 #include "net.h"
 #include "devices.h"
 /* For crc32 */
@@ -17,9 +17,7 @@
 #define NUM_PACKETS 4
 
 typedef struct {
-    SysBusDevice busdev;
     VLANClientState *vc;
-    NICConf conf;
     uint16_t tcr;
     uint16_t rcr;
     uint16_t cr;
@@ -43,6 +41,7 @@ typedef struct {
     uint8_t data[NUM_PACKETS][2048];
     uint8_t int_level;
     uint8_t int_mask;
+    uint8_t macaddr[6];
     int mmio_index;
 } smc91c111_state;
 
@@ -414,7 +413,8 @@ static void smc91c111_writeb(void *opaque, target_phys_addr_t offset,
         }
         break;
     }
-    hw_error("smc91c111_write: Bad reg %d:%x\n", s->bank, (int)offset);
+    cpu_abort (cpu_single_env, "smc91c111_write: Bad reg %d:%x\n",
+               s->bank, (int)offset);
 }
 
 static uint32_t smc91c111_readb(void *opaque, target_phys_addr_t offset)
@@ -474,7 +474,7 @@ static uint32_t smc91c111_readb(void *opaque, target_phys_addr_t offset)
             /* Not implemented.  */
             return 0;
         case 4: case 5: case 6: case 7: case 8: case 9: /* IA */
-            return s->conf.macaddr.a[offset - 4];
+            return s->macaddr[offset - 4];
         case 10: /* General Purpose */
             return s->gpr & 0xff;
         case 11:
@@ -554,7 +554,8 @@ static uint32_t smc91c111_readb(void *opaque, target_phys_addr_t offset)
         }
         break;
     }
-    hw_error("smc91c111_read: Bad reg %d:%x\n", s->bank, (int)offset);
+    cpu_abort (cpu_single_env, "smc91c111_read: Bad reg %d:%x\n",
+               s->bank, (int)offset);
     return 0;
 }
 
@@ -591,9 +592,9 @@ static uint32_t smc91c111_readl(void *opaque, target_phys_addr_t offset)
     return val;
 }
 
-static int smc91c111_can_receive(VLANClientState *vc)
+static int smc91c111_can_receive(void *opaque)
 {
-    smc91c111_state *s = vc->opaque;
+    smc91c111_state *s = (smc91c111_state *)opaque;
 
     if ((s->rcr & RCR_RXEN) == 0 || (s->rcr & RCR_SOFT_RST))
         return 1;
@@ -602,9 +603,9 @@ static int smc91c111_can_receive(VLANClientState *vc)
     return 1;
 }
 
-static ssize_t smc91c111_receive(VLANClientState *vc, const uint8_t *buf, size_t size)
+static void smc91c111_receive(void *opaque, const uint8_t *buf, int size)
 {
-    smc91c111_state *s = vc->opaque;
+    smc91c111_state *s = (smc91c111_state *)opaque;
     int status;
     int packetsize;
     uint32_t crc;
@@ -612,7 +613,7 @@ static ssize_t smc91c111_receive(VLANClientState *vc, const uint8_t *buf, size_t
     uint8_t *p;
 
     if ((s->rcr & RCR_RXEN) == 0 || (s->rcr & RCR_SOFT_RST))
-        return -1;
+        return;
     /* Short packets are padded with zeros.  Receiving a packet
        < 64 bytes long is considered an error condition.  */
     if (size < 64)
@@ -625,10 +626,10 @@ static ssize_t smc91c111_receive(VLANClientState *vc, const uint8_t *buf, size_t
         packetsize += 4;
     /* TODO: Flag overrun and receive errors.  */
     if (packetsize > 2048)
-        return -1;
+        return;
     packetnum = smc91c111_allocate_packet(s);
     if (packetnum == 0x80)
-        return -1;
+        return;
     s->rx_fifo[s->rx_fifo_len++] = packetnum;
 
     p = &s->data[packetnum][0];
@@ -676,17 +677,15 @@ static ssize_t smc91c111_receive(VLANClientState *vc, const uint8_t *buf, size_t
     /* TODO: Raise early RX interrupt?  */
     s->int_level |= INT_RCV;
     smc91c111_update(s);
-
-    return size;
 }
 
-static CPUReadMemoryFunc * const smc91c111_readfn[] = {
+static CPUReadMemoryFunc *smc91c111_readfn[] = {
     smc91c111_readb,
     smc91c111_readw,
     smc91c111_readl
 };
 
-static CPUWriteMemoryFunc * const smc91c111_writefn[] = {
+static CPUWriteMemoryFunc *smc91c111_writefn[] = {
     smc91c111_writeb,
     smc91c111_writew,
     smc91c111_writel
@@ -696,60 +695,28 @@ static void smc91c111_cleanup(VLANClientState *vc)
 {
     smc91c111_state *s = vc->opaque;
 
-    s->vc = NULL;
+    cpu_unregister_io_memory(s->mmio_index);
+    qemu_free(s);
 }
 
-static int smc91c111_init1(SysBusDevice *dev)
+void smc91c111_init(NICInfo *nd, uint32_t base, qemu_irq irq)
 {
-    smc91c111_state *s = FROM_SYSBUS(smc91c111_state, dev);
+    smc91c111_state *s;
 
-    s->mmio_index = cpu_register_io_memory(smc91c111_readfn,
+    qemu_check_nic_model(nd, "smc91c111");
+
+    s = (smc91c111_state *)qemu_mallocz(sizeof(smc91c111_state));
+    s->mmio_index = cpu_register_io_memory(0, smc91c111_readfn,
                                            smc91c111_writefn, s);
-    sysbus_init_mmio(dev, 16, s->mmio_index);
-    sysbus_init_irq(dev, &s->irq);
-    qemu_macaddr_default_if_unset(&s->conf.macaddr);
+    cpu_register_physical_memory(base, 16, s->mmio_index);
+    s->irq = irq;
+    memcpy(s->macaddr, nd->macaddr, 6);
 
     smc91c111_reset(s);
 
-    s->vc = qemu_new_vlan_client(NET_CLIENT_TYPE_NIC,
-                                 s->conf.vlan, s->conf.peer,
-                                 dev->qdev.info->name, dev->qdev.id,
-                                 smc91c111_can_receive, smc91c111_receive, NULL,
-                                 NULL, smc91c111_cleanup, s);
-    qemu_format_nic_info_str(s->vc, s->conf.macaddr.a);
+    s->vc = qemu_new_vlan_client(nd->vlan, nd->model, nd->name,
+                                 smc91c111_receive, smc91c111_can_receive,
+                                 smc91c111_cleanup, s);
+    qemu_format_nic_info_str(s->vc, s->macaddr);
     /* ??? Save/restore.  */
-    return 0;
 }
-
-static SysBusDeviceInfo smc91c111_info = {
-    .init = smc91c111_init1,
-    .qdev.name  = "smc91c111",
-    .qdev.size  = sizeof(smc91c111_state),
-    .qdev.props = (Property[]) {
-        DEFINE_NIC_PROPERTIES(smc91c111_state, conf),
-        DEFINE_PROP_END_OF_LIST(),
-    }
-};
-
-static void smc91c111_register_devices(void)
-{
-    sysbus_register_withprop(&smc91c111_info);
-}
-
-/* Legacy helper function.  Should go away when machine config files are
-   implemented.  */
-void smc91c111_init(NICInfo *nd, uint32_t base, qemu_irq irq)
-{
-    DeviceState *dev;
-    SysBusDevice *s;
-
-    qemu_check_nic_model(nd, "smc91c111");
-    dev = qdev_create(NULL, "smc91c111");
-    qdev_set_nic_properties(dev, nd);
-    qdev_init_nofail(dev);
-    s = sysbus_from_qdev(dev);
-    sysbus_mmio_map(s, 0, base);
-    sysbus_connect_irq(s, 0, irq);
-}
-
-device_init(smc91c111_register_devices)

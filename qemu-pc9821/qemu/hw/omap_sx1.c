@@ -23,7 +23,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along
- * with this program; if not, see <http://www.gnu.org/licenses/>.
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 #include "hw.h"
 #include "sysemu.h"
@@ -88,13 +89,13 @@ static void static_write(void *opaque, target_phys_addr_t offset,
 #endif
 }
 
-static CPUReadMemoryFunc * const static_readfn[] = {
+static CPUReadMemoryFunc *static_readfn[] = {
     static_readb,
     static_readh,
     static_readw,
 };
 
-static CPUWriteMemoryFunc * const static_writefn[] = {
+static CPUWriteMemoryFunc *static_writefn[] = {
     static_write,
     static_write,
     static_write,
@@ -114,7 +115,7 @@ static struct arm_boot_info sx1_binfo = {
     .board_id = 0x265,
 };
 
-static void sx1_init(ram_addr_t ram_size,
+static void sx1_init(ram_addr_t ram_size, int vga_ram_size,
                 const char *boot_device,
                 const char *kernel_filename, const char *kernel_cmdline,
                 const char *initrd_filename, const char *cpu_model,
@@ -127,7 +128,7 @@ static void sx1_init(ram_addr_t ram_size,
     static uint32_t cs2val = 0x00001139;
     static uint32_t cs3val = 0x00001139;
     ram_addr_t phys_flash;
-    DriveInfo *dinfo;
+    int index;
     int fl_idx;
     uint32_t flash_size = flash0_size;
 
@@ -141,19 +142,19 @@ static void sx1_init(ram_addr_t ram_size,
     cpu_register_physical_memory(OMAP_CS0_BASE, flash_size,
                     (phys_flash = qemu_ram_alloc(flash_size)) | IO_MEM_ROM);
 
-    io = cpu_register_io_memory(static_readfn, static_writefn, &cs0val);
+    io = cpu_register_io_memory(0, static_readfn, static_writefn, &cs0val);
     cpu_register_physical_memory(OMAP_CS0_BASE + flash_size,
                     OMAP_CS0_SIZE - flash_size, io);
-    io = cpu_register_io_memory(static_readfn, static_writefn, &cs2val);
+    io = cpu_register_io_memory(0, static_readfn, static_writefn, &cs2val);
     cpu_register_physical_memory(OMAP_CS2_BASE, OMAP_CS2_SIZE, io);
-    io = cpu_register_io_memory(static_readfn, static_writefn, &cs3val);
+    io = cpu_register_io_memory(0, static_readfn, static_writefn, &cs3val);
     cpu_register_physical_memory(OMAP_CS3_BASE, OMAP_CS3_SIZE, io);
 
     fl_idx = 0;
 
-    if ((dinfo = drive_get(IF_PFLASH, 0, fl_idx)) != NULL) {
+    if ((index = drive_get_index(IF_PFLASH, 0, fl_idx)) > -1) {
         if (!pflash_cfi01_register(OMAP_CS0_BASE, qemu_ram_alloc(flash_size),
-            dinfo->bdrv, sector_size, flash_size / sector_size,
+            drives_table[index].bdrv, sector_size, flash_size / sector_size,
             4, 0, 0, 0, 0)) {
             fprintf(stderr, "qemu: Error registering flash memory %d.\n",
                            fl_idx);
@@ -162,23 +163,23 @@ static void sx1_init(ram_addr_t ram_size,
     }
 
     if ((version == 1) &&
-            (dinfo = drive_get(IF_PFLASH, 0, fl_idx)) != NULL) {
+            (index = drive_get_index(IF_PFLASH, 0, fl_idx)) > -1) {
         cpu_register_physical_memory(OMAP_CS1_BASE, flash1_size,
                         (phys_flash = qemu_ram_alloc(flash1_size)) |
                         IO_MEM_ROM);
-        io = cpu_register_io_memory(static_readfn, static_writefn, &cs1val);
+        io = cpu_register_io_memory(0, static_readfn, static_writefn, &cs1val);
         cpu_register_physical_memory(OMAP_CS1_BASE + flash1_size,
                         OMAP_CS1_SIZE - flash1_size, io);
 
         if (!pflash_cfi01_register(OMAP_CS1_BASE, qemu_ram_alloc(flash1_size),
-            dinfo->bdrv, sector_size, flash1_size / sector_size,
+            drives_table[index].bdrv, sector_size, flash1_size / sector_size,
             4, 0, 0, 0, 0)) {
             fprintf(stderr, "qemu: Error registering flash memory %d.\n",
                            fl_idx);
         }
         fl_idx++;
     } else {
-        io = cpu_register_io_memory(static_readfn, static_writefn, &cs1val);
+        io = cpu_register_io_memory(0, static_readfn, static_writefn, &cs1val);
         cpu_register_physical_memory(OMAP_CS1_BASE, OMAP_CS1_SIZE, io);
     }
 
@@ -204,40 +205,34 @@ static void sx1_init(ram_addr_t ram_size,
     //~ qemu_console_resize(ds, 640, 480);
 }
 
-static void sx1_init_v1(ram_addr_t ram_size,
+static void sx1_init_v1(ram_addr_t ram_size, int vga_ram_size,
                 const char *boot_device,
                 const char *kernel_filename, const char *kernel_cmdline,
                 const char *initrd_filename, const char *cpu_model)
 {
-    sx1_init(ram_size, boot_device, kernel_filename,
+    sx1_init(ram_size, vga_ram_size, boot_device, kernel_filename,
                 kernel_cmdline, initrd_filename, cpu_model, 1);
 }
 
-static void sx1_init_v2(ram_addr_t ram_size,
+static void sx1_init_v2(ram_addr_t ram_size, int vga_ram_size,
                 const char *boot_device,
                 const char *kernel_filename, const char *kernel_cmdline,
                 const char *initrd_filename, const char *cpu_model)
 {
-    sx1_init(ram_size, boot_device, kernel_filename,
+    sx1_init(ram_size, vga_ram_size, boot_device, kernel_filename,
                 kernel_cmdline, initrd_filename, cpu_model, 2);
 }
 
-static QEMUMachine sx1_machine_v2 = {
+QEMUMachine sx1_machine_v2 = {
     .name = "sx1",
     .desc = "Siemens SX1 (OMAP310) V2",
     .init = sx1_init_v2,
+    .ram_require = total_ram_v2 | RAMSIZE_FIXED,
 };
 
-static QEMUMachine sx1_machine_v1 = {
+QEMUMachine sx1_machine_v1 = {
     .name = "sx1-v1",
     .desc = "Siemens SX1 (OMAP310) V1",
     .init = sx1_init_v1,
+    .ram_require = total_ram_v1 | RAMSIZE_FIXED,
 };
-
-static void sx1_machine_init(void)
-{
-    qemu_register_machine(&sx1_machine_v2);
-    qemu_register_machine(&sx1_machine_v1);
-}
-
-machine_init(sx1_machine_init);

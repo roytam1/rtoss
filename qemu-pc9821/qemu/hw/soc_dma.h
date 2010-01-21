@@ -15,7 +15,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along
- * with this program; if not, see <http://www.gnu.org/licenses/>.
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 struct soc_dma_s;
@@ -109,5 +110,5 @@ static inline void soc_dma_port_add_fifo_out(struct soc_dma_s *dma,
 static inline void soc_dma_port_add_mem_ram(struct soc_dma_s *dma,
                 ram_addr_t offset, target_phys_addr_t virt_base, size_t size)
 {
-    return soc_dma_port_add_mem(dma, qemu_get_ram_ptr(offset), virt_base, size);
+    return soc_dma_port_add_mem(dma, phys_ram_base + offset, virt_base, size);
 }

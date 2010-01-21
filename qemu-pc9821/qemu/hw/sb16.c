@@ -25,9 +25,7 @@
 #include "audiodev.h"
 #include "audio/audio.h"
 #include "isa.h"
-#include "qdev.h"
 #include "qemu-timer.h"
-#include "host-utils.h"
 
 #define dolog(...) AUD_log ("sb16", __VA_ARGS__)
 
@@ -47,15 +45,23 @@
 
 static const char e3[] = "COPYRIGHT (C) CREATIVE TECHNOLOGY LTD, 1992.";
 
+static struct {
+    int ver_lo;
+    int ver_hi;
+    int irq;
+    int dma;
+    int hdma;
+    int port;
+} conf = {5, 4, 5, 1, 5, 0x220};
+
 typedef struct SB16State {
-    ISADevice dev;
     QEMUSoundCard card;
-    qemu_irq pic;
-    uint32_t irq;
-    uint32_t dma;
-    uint32_t hdma;
-    uint32_t port;
-    uint32_t ver;
+    qemu_irq *pic;
+    int irq;
+    int dma;
+    int hdma;
+    int port;
+    int ver;
 
     int in_index;
     int out_data_len;
@@ -184,7 +190,7 @@ static void aux_timer (void *opaque)
 {
     SB16State *s = opaque;
     s->can_write = 1;
-    qemu_irq_raise (s->pic);
+    qemu_irq_raise (s->pic[s->irq]);
 }
 
 #define DMA8_AUTO 1
@@ -592,7 +598,7 @@ static void command (SB16State *s, uint8_t cmd)
         case 0xf3:
             dsp_out_data (s, 0xaa);
             s->mixer_regs[0x82] |= (cmd == 0xf2) ? 1 : 2;
-            qemu_irq_raise (s->pic);
+            qemu_irq_raise (s->pic[s->irq]);
             break;
 
         case 0xf9:
@@ -758,9 +764,9 @@ static void complete (SB16State *s)
                 freq = s->freq > 0 ? s->freq : 11025;
                 samples = dsp_get_lohi (s) + 1;
                 bytes = samples << s->fmt_stereo << (s->fmt_bits == 16);
-                ticks = muldiv64 (bytes, get_ticks_per_sec (), freq);
-                if (ticks < get_ticks_per_sec () / 1024) {
-                    qemu_irq_raise (s->pic);
+                ticks = (bytes * ticks_per_sec) / freq;
+                if (ticks < ticks_per_sec / 1024) {
+                    qemu_irq_raise (s->pic[s->irq]);
                 }
                 else {
                     if (s->aux_ts) {
@@ -852,10 +858,10 @@ static void legacy_reset (SB16State *s)
 
 static void reset (SB16State *s)
 {
-    qemu_irq_lower (s->pic);
+    qemu_irq_lower (s->pic[s->irq]);
     if (s->dma_auto) {
-        qemu_irq_raise (s->pic);
-        qemu_irq_lower (s->pic);
+        qemu_irq_raise (s->pic[s->irq]);
+        qemu_irq_lower (s->pic[s->irq]);
     }
 
     s->mixer_regs[0x82] = 0;
@@ -870,7 +876,7 @@ static void reset (SB16State *s)
     s->v2x6 = 0;
     s->cmd = -1;
 
-    dsp_out_data (s, 0xaa);
+    dsp_out_data(s, 0xaa);
     speaker (s, 0);
     control (s, 0);
     legacy_reset (s);
@@ -891,7 +897,7 @@ static IO_WRITE_PROTO (dsp_write)
             if (s->v2x6 == 1) {
                 if (0 && s->highspeed) {
                     s->highspeed = 0;
-                    qemu_irq_lower (s->pic);
+                    qemu_irq_lower (s->pic[s->irq]);
                     control (s, 0);
                 }
                 else {
@@ -1002,7 +1008,7 @@ static IO_READ_PROTO (dsp_read)
         if (s->mixer_regs[0x82] & 1) {
             ack = 1;
             s->mixer_regs[0x82] &= 1;
-            qemu_irq_lower (s->pic);
+            qemu_irq_lower (s->pic[s->irq]);
         }
         break;
 
@@ -1011,7 +1017,7 @@ static IO_READ_PROTO (dsp_read)
         if (s->mixer_regs[0x82] & 2) {
             ack = 1;
             s->mixer_regs[0x82] &= 2;
-            qemu_irq_lower (s->pic);
+            qemu_irq_lower (s->pic[s->irq]);
         }
         break;
 
@@ -1060,14 +1066,14 @@ static void reset_mixer (SB16State *s)
     }
 }
 
-static IO_WRITE_PROTO (mixer_write_indexb)
+static IO_WRITE_PROTO(mixer_write_indexb)
 {
     SB16State *s = opaque;
     (void) nport;
     s->mixer_nreg = val;
 }
 
-static IO_WRITE_PROTO (mixer_write_datab)
+static IO_WRITE_PROTO(mixer_write_datab)
 {
     SB16State *s = opaque;
 
@@ -1093,8 +1099,8 @@ static IO_WRITE_PROTO (mixer_write_datab)
         {
             int dma, hdma;
 
-            dma = ctz32 (val & 0xf);
-            hdma = ctz32 (val & 0xf0);
+            dma = lsbindex (val & 0xf);
+            hdma = lsbindex (val & 0xf0);
             if (dma != s->dma || hdma != s->hdma) {
                 dolog (
                     "attempt to change DMA "
@@ -1123,13 +1129,13 @@ static IO_WRITE_PROTO (mixer_write_datab)
     s->mixer_regs[s->mixer_nreg] = val;
 }
 
-static IO_WRITE_PROTO (mixer_write_indexw)
+static IO_WRITE_PROTO(mixer_write_indexw)
 {
     mixer_write_indexb (opaque, nport, val & 0xff);
     mixer_write_datab (opaque, nport, (val >> 8) & 0xff);
 }
 
-static IO_READ_PROTO (mixer_read)
+static IO_READ_PROTO(mixer_read)
 {
     SB16State *s = opaque;
 
@@ -1225,7 +1231,7 @@ static int SB_read_DMA (void *opaque, int nchan, int dma_pos, int dma_len)
 
     if (s->left_till_irq <= 0) {
         s->mixer_regs[0x82] |= (nchan & 4) ? 2 : 1;
-        qemu_irq_raise (s->pic);
+        qemu_irq_raise (s->pic[s->irq]);
         if (0 == s->dma_auto) {
             control (s, 0);
             speaker (s, 0);
@@ -1392,17 +1398,27 @@ static int SB_load (QEMUFile *f, void *opaque, int version_id)
     return 0;
 }
 
-static int sb16_initfn (ISADevice *dev)
+int SB16_init (AudioState *audio, qemu_irq *pic)
 {
-    static const uint8_t dsp_write_ports[] = {0x6, 0xc};
-    static const uint8_t dsp_read_ports[] = {0x6, 0xa, 0xc, 0xd, 0xe, 0xf};
     SB16State *s;
     int i;
+    static const uint8_t dsp_write_ports[] = {0x6, 0xc};
+    static const uint8_t dsp_read_ports[] = {0x6, 0xa, 0xc, 0xd, 0xe, 0xf};
 
-    s = DO_UPCAST (SB16State, dev, dev);
+    if (!audio) {
+        dolog ("No audio state\n");
+        return -1;
+    }
+
+    s = qemu_mallocz (sizeof (*s));
 
     s->cmd = -1;
-    isa_init_irq (dev, &s->pic, s->irq);
+    s->pic = pic;
+    s->irq = conf.irq;
+    s->dma = conf.dma;
+    s->hdma = conf.hdma;
+    s->port = conf.port;
+    s->ver = conf.ver_lo | (conf.ver_hi << 8);
 
     s->mixer_regs[0x80] = magic_of_irq (s->irq);
     s->mixer_regs[0x81] = (1 << s->dma) | (1 << s->hdma);
@@ -1435,33 +1451,6 @@ static int sb16_initfn (ISADevice *dev)
     s->can_write = 1;
 
     register_savevm ("sb16", 0, 1, SB_save, SB_load, s);
-    AUD_register_card ("sb16", &s->card);
+    AUD_register_card (audio, "sb16", &s->card);
     return 0;
 }
-
-int SB16_init (qemu_irq *pic)
-{
-    isa_create_simple ("sb16");
-    return 0;
-}
-
-static ISADeviceInfo sb16_info = {
-    .qdev.name     = "sb16",
-    .qdev.desc     = "Creative Sound Blaster 16",
-    .qdev.size     = sizeof (SB16State),
-    .init          = sb16_initfn,
-    .qdev.props    = (Property[]) {
-        DEFINE_PROP_HEX32  ("version", SB16State, ver,  0x0405), /* 4.5 */
-        DEFINE_PROP_HEX32  ("iobase",  SB16State, port, 0x220),
-        DEFINE_PROP_UINT32 ("irq",     SB16State, irq,  5),
-        DEFINE_PROP_UINT32 ("dma",     SB16State, dma,  1),
-        DEFINE_PROP_UINT32 ("dma16",   SB16State, hdma, 5),
-        DEFINE_PROP_END_OF_LIST (),
-    },
-};
-
-static void sb16_register (void)
-{
-    isa_qdev_register (&sb16_info);
-}
-device_init (sb16_register)

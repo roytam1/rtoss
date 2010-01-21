@@ -42,16 +42,6 @@ static uint8_t *tb_ret_addr;
 #define ADDEND_OFFSET 4
 #endif
 
-#ifndef GUEST_BASE
-#define GUEST_BASE 0
-#endif
-
-#ifdef CONFIG_USE_GUEST_BASE
-#define TCG_GUEST_BASE_REG 30
-#else
-#define TCG_GUEST_BASE_REG 0
-#endif
-
 #ifndef NDEBUG
 static const char * const tcg_target_reg_names[TCG_TARGET_NB_REGS] = {
     "r0",
@@ -122,6 +112,9 @@ static const int tcg_target_reg_alloc_order[] = {
 #ifndef __linux__
     TCG_REG_R13,
 #endif
+    TCG_REG_R0,
+    TCG_REG_R1,
+    TCG_REG_R2,
     TCG_REG_R24,
     TCG_REG_R25,
     TCG_REG_R26,
@@ -367,7 +360,7 @@ static int tcg_target_const_match(tcg_target_long val,
 #define NEG    XO31(104)
 
 #define LBZX   XO31( 87)
-#define LHZX   XO31(279)
+#define LHZX   XO31(276)
 #define LHAX   XO31(343)
 #define LWZX   XO31( 23)
 #define STBX   XO31(215)
@@ -381,6 +374,9 @@ static int tcg_target_const_match(tcg_target_long val,
 #define SLW    XO31( 24)
 #define SRW    XO31(536)
 #define SRAW   XO31(792)
+
+#define LMW    OPCD(46)
+#define STMW   OPCD(47)
 
 #define TW     XO31(4)
 #define TRAP   (TW | TO (31))
@@ -472,9 +468,9 @@ static void tcg_out_b (TCGContext *s, int mask, tcg_target_long target)
     }
 }
 
+#ifdef _AIX
 static void tcg_out_call (TCGContext *s, tcg_target_long arg, int const_arg)
 {
-#ifdef _AIX
     int reg;
 
     if (const_arg) {
@@ -487,16 +483,8 @@ static void tcg_out_call (TCGContext *s, tcg_target_long arg, int const_arg)
     tcg_out32 (s, MTSPR | RA (0) | CTR);
     tcg_out32 (s, LWZ | RT (2) | RA (reg) | 4);
     tcg_out32 (s, BCCTR | BO_ALWAYS | LK);
-#else
-    if (const_arg) {
-        tcg_out_b (s, LK, arg);
-    }
-    else {
-        tcg_out32 (s, MTSPR | RS (arg) | LR);
-        tcg_out32 (s, BCLR | BO_ALWAYS | LK);
-    }
-#endif
 }
+#endif
 
 #if defined(CONFIG_SOFTMMU)
 
@@ -519,7 +507,7 @@ static void *qemu_st_helpers[4] = {
 
 static void tcg_out_qemu_ld (TCGContext *s, const TCGArg *args, int opc)
 {
-    int addr_reg, data_reg, data_reg2, r0, r1, rbase, mem_index, s_bits, bswap;
+    int addr_reg, data_reg, data_reg2, r0, r1, mem_index, s_bits, bswap;
 #ifdef CONFIG_SOFTMMU
     int r2;
     void *label1_ptr, *label2_ptr;
@@ -544,7 +532,6 @@ static void tcg_out_qemu_ld (TCGContext *s, const TCGArg *args, int opc)
     r0 = 3;
     r1 = 4;
     r2 = 0;
-    rbase = 0;
 
     tcg_out32 (s, (RLWINM
                    | RA (r0)
@@ -592,7 +579,11 @@ static void tcg_out_qemu_ld (TCGContext *s, const TCGArg *args, int opc)
     tcg_out_movi (s, TCG_TYPE_I32, 5, mem_index);
 #endif
 
+#ifdef _AIX
     tcg_out_call (s, (tcg_target_long) qemu_ld_helpers[s_bits], 1);
+#else
+    tcg_out_b (s, LK, (tcg_target_long) qemu_ld_helpers[s_bits]);
+#endif
     switch (opc) {
     case 0|4:
         tcg_out32 (s, EXTSB | RA (data_reg) | RS (3));
@@ -646,7 +637,6 @@ static void tcg_out_qemu_ld (TCGContext *s, const TCGArg *args, int opc)
 #else  /* !CONFIG_SOFTMMU */
     r0 = addr_reg;
     r1 = 3;
-    rbase = GUEST_BASE ? TCG_GUEST_BASE_REG : 0;
 #endif
 
 #ifdef TARGET_WORDS_BIGENDIAN
@@ -654,47 +644,37 @@ static void tcg_out_qemu_ld (TCGContext *s, const TCGArg *args, int opc)
 #else
     bswap = 1;
 #endif
-
     switch (opc) {
     default:
     case 0:
-        tcg_out32 (s, LBZX | TAB (data_reg, rbase, r0));
+        tcg_out32 (s, LBZ | RT (data_reg) | RA (r0));
         break;
     case 0|4:
-        tcg_out32 (s, LBZX | TAB (data_reg, rbase, r0));
+        tcg_out32 (s, LBZ | RT (data_reg) | RA (r0));
         tcg_out32 (s, EXTSB | RA (data_reg) | RS (data_reg));
         break;
     case 1:
-        if (bswap)
-            tcg_out32 (s, LHBRX | TAB (data_reg, rbase, r0));
-        else
-            tcg_out32 (s, LHZX | TAB (data_reg, rbase, r0));
+        if (bswap) tcg_out32 (s, LHBRX | RT (data_reg) | RB (r0));
+        else tcg_out32 (s, LHZ | RT (data_reg) | RA (r0));
         break;
     case 1|4:
         if (bswap) {
-            tcg_out32 (s, LHBRX | TAB (data_reg, rbase, r0));
+            tcg_out32 (s, LHBRX | RT (data_reg) | RB (r0));
             tcg_out32 (s, EXTSH | RA (data_reg) | RS (data_reg));
         }
-        else tcg_out32 (s, LHAX | TAB (data_reg, rbase, r0));
+        else tcg_out32 (s, LHA | RT (data_reg) | RA (r0));
         break;
     case 2:
-        if (bswap)
-            tcg_out32 (s, LWBRX | TAB (data_reg, rbase, r0));
-        else
-            tcg_out32 (s, LWZX | TAB (data_reg, rbase, r0));
+        if (bswap) tcg_out32 (s, LWBRX | RT (data_reg) | RB (r0));
+        else tcg_out32 (s, LWZ | RT (data_reg)| RA (r0));
         break;
     case 3:
         if (bswap) {
-            tcg_out32 (s, ADDI | RT (r1) | RA (r0) | 4);
-            tcg_out32 (s, LWBRX | TAB (data_reg, rbase, r0));
-            tcg_out32 (s, LWBRX | TAB (data_reg2, rbase, r1));
+            tcg_out32 (s, ADDI | RT (r1) | RA (r0) |  4);
+            tcg_out32 (s, LWBRX | RT (data_reg) | RB (r0));
+            tcg_out32 (s, LWBRX | RT (data_reg2) | RB (r1));
         }
         else {
-#ifdef CONFIG_USE_GUEST_BASE
-            tcg_out32 (s, ADDI | RT (r1) | RA (r0) | 4);
-            tcg_out32 (s, LWZX | TAB (data_reg2, rbase, r0));
-            tcg_out32 (s, LWZX | TAB (data_reg, rbase, r1));
-#else
             if (r0 == data_reg2) {
                 tcg_out32 (s, LWZ | RT (0) | RA (r0));
                 tcg_out32 (s, LWZ | RT (data_reg) | RA (r0) | 4);
@@ -704,7 +684,6 @@ static void tcg_out_qemu_ld (TCGContext *s, const TCGArg *args, int opc)
                 tcg_out32 (s, LWZ | RT (data_reg2) | RA (r0));
                 tcg_out32 (s, LWZ | RT (data_reg) | RA (r0) | 4);
             }
-#endif
         }
         break;
     }
@@ -716,7 +695,7 @@ static void tcg_out_qemu_ld (TCGContext *s, const TCGArg *args, int opc)
 
 static void tcg_out_qemu_st (TCGContext *s, const TCGArg *args, int opc)
 {
-    int addr_reg, r0, r1, data_reg, data_reg2, mem_index, bswap, rbase;
+    int addr_reg, r0, r1, data_reg, data_reg2, mem_index, bswap;
 #ifdef CONFIG_SOFTMMU
     int r2, ir;
     void *label1_ptr, *label2_ptr;
@@ -740,7 +719,6 @@ static void tcg_out_qemu_st (TCGContext *s, const TCGArg *args, int opc)
     r0 = 3;
     r1 = 4;
     r2 = 0;
-    rbase = 0;
 
     tcg_out32 (s, (RLWINM
                    | RA (r0)
@@ -823,7 +801,11 @@ static void tcg_out_qemu_st (TCGContext *s, const TCGArg *args, int opc)
     ir++;
 
     tcg_out_movi (s, TCG_TYPE_I32, ir, mem_index);
+#ifdef _AIX
     tcg_out_call (s, (tcg_target_long) qemu_st_helpers[opc], 1);
+#else
+    tcg_out_b (s, LK, (tcg_target_long) qemu_st_helpers[opc]);
+#endif
     label2_ptr = s->code_ptr;
     tcg_out32 (s, B);
 
@@ -843,9 +825,8 @@ static void tcg_out_qemu_st (TCGContext *s, const TCGArg *args, int opc)
     /* r0 = env->tlb_table[mem_index][index].addend + addr */
 
 #else  /* !CONFIG_SOFTMMU */
-    r0 = addr_reg;
     r1 = 3;
-    rbase = GUEST_BASE ? TCG_GUEST_BASE_REG : 0;
+    r0 = addr_reg;
 #endif
 
 #ifdef TARGET_WORDS_BIGENDIAN
@@ -855,35 +836,25 @@ static void tcg_out_qemu_st (TCGContext *s, const TCGArg *args, int opc)
 #endif
     switch (opc) {
     case 0:
-        tcg_out32 (s, STBX | SAB (data_reg, rbase, r0));
+        tcg_out32 (s, STB | RS (data_reg) | RA (r0));
         break;
     case 1:
-        if (bswap)
-            tcg_out32 (s, STHBRX | SAB (data_reg, rbase, r0));
-        else
-            tcg_out32 (s, STHX | SAB (data_reg, rbase, r0));
+        if (bswap) tcg_out32 (s, STHBRX | RS (data_reg) | RA (0) | RB (r0));
+        else tcg_out32 (s, STH | RS (data_reg) | RA (r0));
         break;
     case 2:
-        if (bswap)
-            tcg_out32 (s, STWBRX | SAB (data_reg, rbase, r0));
-        else
-            tcg_out32 (s, STWX | SAB (data_reg, rbase, r0));
+        if (bswap) tcg_out32 (s, STWBRX | RS (data_reg) | RA (0) | RB (r0));
+        else tcg_out32 (s, STW | RS (data_reg) | RA (r0));
         break;
     case 3:
         if (bswap) {
             tcg_out32 (s, ADDI | RT (r1) | RA (r0) | 4);
-            tcg_out32 (s, STWBRX | SAB (data_reg,  rbase, r0));
-            tcg_out32 (s, STWBRX | SAB (data_reg2, rbase, r1));
+            tcg_out32 (s, STWBRX | RS (data_reg) | RA (0) | RB (r0));
+            tcg_out32 (s, STWBRX | RS (data_reg2) | RA (0) | RB (r1));
         }
         else {
-#ifdef CONFIG_USE_GUEST_BASE
-            tcg_out32 (s, STWX | SAB (data_reg2, rbase, r0));
-            tcg_out32 (s, ADDI | RT (r1) | RA (r0) | 4);
-            tcg_out32 (s, STWX | SAB (data_reg,  rbase, r1));
-#else
             tcg_out32 (s, STW | RS (data_reg2) | RA (r0));
             tcg_out32 (s, STW | RS (data_reg) | RA (r0) | 4);
-#endif
         }
         break;
     }
@@ -924,10 +895,6 @@ void tcg_target_qemu_prologue (TCGContext *s)
                        )
             );
     tcg_out32 (s, STW | RS (0) | RA (1) | (frame_size + LR_OFFSET));
-
-#ifdef CONFIG_USE_GUEST_BASE
-    tcg_out_movi (s, TCG_TYPE_I32, TCG_GUEST_BASE_REG, GUEST_BASE);
-#endif
 
     tcg_out32 (s, MTSPR | RS (3) | CTR);
     tcg_out32 (s, BCCTR | BO_ALWAYS);
@@ -1188,7 +1155,17 @@ static void tcg_out_op(TCGContext *s, int opc, const TCGArg *args,
         }
         break;
     case INDEX_op_call:
+#ifdef _AIX
         tcg_out_call (s, args[0], const_args[0]);
+#else
+        if (const_args[0]) {
+            tcg_out_b (s, LK, args[0]);
+        }
+        else {
+            tcg_out32 (s, MTSPR | RS (args[0]) | LR);
+            tcg_out32 (s, BCLR | BO_ALWAYS | LK);
+        }
+#endif
         break;
     case INDEX_op_jmp:
         if (const_args[0]) {
@@ -1243,60 +1220,14 @@ static void tcg_out_op(TCGContext *s, int opc, const TCGArg *args,
 
     case INDEX_op_and_i32:
         if (const_args[2]) {
-            uint32_t c;
-
-            c = args[2];
-
-            if (!c) {
-                tcg_out_movi (s, TCG_TYPE_I32, args[0], 0);
-                break;
-            }
-#ifdef __PPU__
-            uint32_t t, n;
-            int mb, me;
-
-            n = c ^ -(c & 1);
-            t = n + (n & -n);
-
-            if ((t & (t - 1)) == 0) {
-                int lzc, tzc;
-
-                if ((c & 0x80000001) == 0x80000001) {
-                    lzc = clz32 (n);
-                    tzc = ctz32 (n);
-
-                    mb = 32 - tzc;
-                    me = lzc - 1;
-                }
-                else {
-                    lzc = clz32 (c);
-                    tzc = ctz32 (c);
-
-                    mb = lzc;
-                    me = 31 - tzc;
-                }
-
-                tcg_out32 (s, (RLWINM
-                               | RA (args[0])
-                               | RS (args[1])
-                               | SH (0)
-                               | MB (mb)
-                               | ME (me)
-                               )
-                    );
-            }
-            else
-#endif /* !__PPU__ */
-            {
-                if ((c & 0xffff) == c)
-                    tcg_out32 (s, ANDI | RS (args[1]) | RA (args[0]) | c);
-                else if ((c & 0xffff0000) == c)
-                    tcg_out32 (s, ANDIS | RS (args[1]) | RA (args[0])
-                               | ((c >> 16) & 0xffff));
-                else {
-                    tcg_out_movi (s, TCG_TYPE_I32, 0, c);
-                    tcg_out32 (s, AND | SAB (args[1], args[0], 0));
-                }
+            if ((args[2] & 0xffff) == args[2])
+                tcg_out32 (s, ANDI | RS (args[1]) | RA (args[0]) | args[2]);
+            else if ((args[2] & 0xffff0000) == args[2])
+                tcg_out32 (s, ANDIS | RS (args[1]) | RA (args[0])
+                           | ((args[2] >> 16) & 0xffff));
+            else {
+                tcg_out_movi (s, TCG_TYPE_I32, 0, args[2]);
+                tcg_out32 (s, AND | SAB (args[1], args[0], 0));
             }
         }
         else
@@ -1606,9 +1537,6 @@ void tcg_target_init(TCGContext *s)
 #endif
 #ifdef __linux__
     tcg_regset_set_reg(s->reserved_regs, TCG_REG_R13);
-#endif
-#ifdef CONFIG_USE_GUEST_BASE
-    tcg_regset_set_reg(s->reserved_regs, TCG_GUEST_BASE_REG);
 #endif
 
     tcg_add_target_add_op_defs(ppc_op_defs);

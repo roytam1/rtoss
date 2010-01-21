@@ -16,7 +16,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along
- * with this program; if not, see <http://www.gnu.org/licenses/>.
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 #include "hw.h"
@@ -27,8 +28,9 @@
 
 #define VERBOSE 1
 
-typedef struct {
+struct menelaus_s {
     i2c_slave i2c;
+    qemu_irq irq;
 
     int firstbyte;
     uint8_t reg;
@@ -60,38 +62,37 @@ typedef struct {
         int alm_sec;
         int next_comp;
     } rtc;
-    uint16_t rtc_next_vmstate;
-    qemu_irq out[4];
+    qemu_irq handler[3];
     qemu_irq *in;
-    uint8_t pwrbtn_state;
+    int pwrbtn_state;
     qemu_irq pwrbtn;
-} MenelausState;
+};
 
-static inline void menelaus_update(MenelausState *s)
+static inline void menelaus_update(struct menelaus_s *s)
 {
-    qemu_set_irq(s->out[3], s->status & ~s->mask);
+    qemu_set_irq(s->irq, s->status & ~s->mask);
 }
 
-static inline void menelaus_rtc_start(MenelausState *s)
+static inline void menelaus_rtc_start(struct menelaus_s *s)
 {
-    s->rtc.next += qemu_get_clock(rt_clock);
+    s->rtc.next =+ qemu_get_clock(rt_clock);
     qemu_mod_timer(s->rtc.hz_tm, s->rtc.next);
 }
 
-static inline void menelaus_rtc_stop(MenelausState *s)
+static inline void menelaus_rtc_stop(struct menelaus_s *s)
 {
     qemu_del_timer(s->rtc.hz_tm);
-    s->rtc.next -= qemu_get_clock(rt_clock);
+    s->rtc.next =- qemu_get_clock(rt_clock);
     if (s->rtc.next < 1)
         s->rtc.next = 1;
 }
 
-static void menelaus_rtc_update(MenelausState *s)
+static void menelaus_rtc_update(struct menelaus_s *s)
 {
     qemu_get_timedate(&s->rtc.tm, s->rtc.sec_offset);
 }
 
-static void menelaus_alm_update(MenelausState *s)
+static void menelaus_alm_update(struct menelaus_s *s)
 {
     if ((s->rtc.ctrl & 3) == 3)
         s->rtc.alm_sec = qemu_timedate_diff(&s->rtc.alm) - s->rtc.sec_offset;
@@ -99,7 +100,7 @@ static void menelaus_alm_update(MenelausState *s)
 
 static void menelaus_rtc_hz(void *opaque)
 {
-    MenelausState *s = (MenelausState *) opaque;
+    struct menelaus_s *s = (struct menelaus_s *) opaque;
 
     s->rtc.next_comp --;
     s->rtc.alm_sec --;
@@ -129,7 +130,7 @@ static void menelaus_rtc_hz(void *opaque)
 
 static void menelaus_reset(i2c_slave *i2c)
 {
-    MenelausState *s = (MenelausState *) i2c;
+    struct menelaus_s *s = (struct menelaus_s *) i2c;
     s->reg = 0x00;
 
     s->vcore[0] = 0x0c;	/* XXX: X-loader needs 0x8c? check!  */
@@ -195,7 +196,7 @@ static inline int from_bcd(uint8_t val)
 
 static void menelaus_gpio_set(void *opaque, int line, int level)
 {
-    MenelausState *s = (MenelausState *) opaque;
+    struct menelaus_s *s = (struct menelaus_s *) opaque;
 
     /* No interrupt generated */
     s->inputs &= ~(1 << line);
@@ -204,7 +205,7 @@ static void menelaus_gpio_set(void *opaque, int line, int level)
 
 static void menelaus_pwrbtn_set(void *opaque, int line, int level)
 {
-    MenelausState *s = (MenelausState *) opaque;
+    struct menelaus_s *s = (struct menelaus_s *) opaque;
 
     if (!s->pwrbtn_state && level) {
         s->status |= 1 << 11;					/* PSHBTN */
@@ -274,7 +275,7 @@ static void menelaus_pwrbtn_set(void *opaque, int line, int level)
 
 static uint8_t menelaus_read(void *opaque, uint8_t addr)
 {
-    MenelausState *s = (MenelausState *) opaque;
+    struct menelaus_s *s = (struct menelaus_s *) opaque;
     int reg = 0;
 
     switch (addr) {
@@ -420,7 +421,7 @@ static uint8_t menelaus_read(void *opaque, uint8_t addr)
 
 static void menelaus_write(void *opaque, uint8_t addr, uint8_t value)
 {
-    MenelausState *s = (MenelausState *) opaque;
+    struct menelaus_s *s = (struct menelaus_s *) opaque;
     int line;
     int reg = 0;
     struct tm tm;
@@ -539,20 +540,18 @@ static void menelaus_write(void *opaque, uint8_t addr, uint8_t value)
         break;
 
     case MENELAUS_GPIO_CTRL:
-        for (line = 0; line < 3; line ++) {
-            if (((s->dir ^ value) >> line) & 1) {
-                qemu_set_irq(s->out[line],
-                             ((s->outputs & ~s->dir) >> line) & 1);
-            }
-        }
+        for (line = 0; line < 3; line ++)
+            if (((s->dir ^ value) >> line) & 1)
+                if (s->handler[line])
+                    qemu_set_irq(s->handler[line],
+                                    ((s->outputs & ~s->dir) >> line) & 1);
         s->dir = value & 0x67;
         break;
     case MENELAUS_GPIO_OUT:
-        for (line = 0; line < 3; line ++) {
-            if ((((s->outputs ^ value) & ~s->dir) >> line) & 1) {
-                qemu_set_irq(s->out[line], (s->outputs >> line) & 1);
-            }
-        }
+        for (line = 0; line < 3; line ++)
+            if ((((s->outputs ^ value) & ~s->dir) >> line) & 1)
+                if (s->handler[line])
+                    qemu_set_irq(s->handler[line], (s->outputs >> line) & 1);
         s->outputs = value & 0x07;
         break;
 
@@ -722,7 +721,7 @@ static void menelaus_write(void *opaque, uint8_t addr, uint8_t value)
 
 static void menelaus_event(i2c_slave *i2c, enum i2c_event event)
 {
-    MenelausState *s = (MenelausState *) i2c;
+    struct menelaus_s *s = (struct menelaus_s *) i2c;
 
     if (event == I2C_START_SEND)
         s->firstbyte = 1;
@@ -730,7 +729,7 @@ static void menelaus_event(i2c_slave *i2c, enum i2c_event event)
 
 static int menelaus_tx(i2c_slave *i2c, uint8_t data)
 {
-    MenelausState *s = (MenelausState *) i2c;
+    struct menelaus_s *s = (struct menelaus_s *) i2c;
     /* Interpret register address byte */
     if (s->firstbyte) {
         s->reg = data;
@@ -743,144 +742,174 @@ static int menelaus_tx(i2c_slave *i2c, uint8_t data)
 
 static int menelaus_rx(i2c_slave *i2c)
 {
-    MenelausState *s = (MenelausState *) i2c;
+    struct menelaus_s *s = (struct menelaus_s *) i2c;
 
     return menelaus_read(s, s->reg ++);
 }
 
-/* Save restore 32 bit int as uint16_t
-   This is a Big hack, but it is how the old state did it.
-   Or we broke compatibility in the state, or we can't use struct tm
- */
-
-static int get_int32_as_uint16(QEMUFile *f, void *pv, size_t size)
-{
-    int *v = pv;
-    *v = qemu_get_be16(f);
-    return 0;
+static void tm_put(QEMUFile *f, struct tm *tm) {
+    qemu_put_be16(f, tm->tm_sec);
+    qemu_put_be16(f, tm->tm_min);
+    qemu_put_be16(f, tm->tm_hour);
+    qemu_put_be16(f, tm->tm_mday);
+    qemu_put_be16(f, tm->tm_min);
+    qemu_put_be16(f, tm->tm_year);
 }
 
-static void put_int32_as_uint16(QEMUFile *f, void *pv, size_t size)
-{
-    int *v = pv;
-    qemu_put_be16(f, *v);
+static void tm_get(QEMUFile *f, struct tm *tm) {
+    tm->tm_sec = qemu_get_be16(f);
+    tm->tm_min = qemu_get_be16(f);
+    tm->tm_hour = qemu_get_be16(f);
+    tm->tm_mday = qemu_get_be16(f);
+    tm->tm_min = qemu_get_be16(f);
+    tm->tm_year = qemu_get_be16(f);
 }
 
-const VMStateInfo vmstate_hack_int32_as_uint16 = {
-    .name = "int32_as_uint16",
-    .get  = get_int32_as_uint16,
-    .put  = put_int32_as_uint16,
-};
-
-#define VMSTATE_UINT16_HACK(_f, _s)                                  \
-    VMSTATE_SINGLE(_f, _s, 0, vmstate_hack_int32_as_uint16, int32_t)
-
-
-static const VMStateDescription vmstate_menelaus_tm = {
-    .name = "menelaus_tm",
-    .version_id = 0,
-    .minimum_version_id = 0,
-    .minimum_version_id_old = 0,
-    .fields      = (VMStateField []) {
-        VMSTATE_UINT16_HACK(tm_sec, struct tm),
-        VMSTATE_UINT16_HACK(tm_min, struct tm),
-        VMSTATE_UINT16_HACK(tm_hour, struct tm),
-        VMSTATE_UINT16_HACK(tm_mday, struct tm),
-        VMSTATE_UINT16_HACK(tm_min, struct tm),
-        VMSTATE_UINT16_HACK(tm_year, struct tm),
-        VMSTATE_END_OF_LIST()
-    }
-};
-
-static void menelaus_pre_save(void *opaque)
+static void menelaus_save(QEMUFile *f, void *opaque)
 {
-    MenelausState *s = opaque;
+    struct menelaus_s *s = (struct menelaus_s *) opaque;
+
+    qemu_put_be32(f, s->firstbyte);
+    qemu_put_8s(f, &s->reg);
+
+    qemu_put_8s(f, &s->vcore[0]);
+    qemu_put_8s(f, &s->vcore[1]);
+    qemu_put_8s(f, &s->vcore[2]);
+    qemu_put_8s(f, &s->vcore[3]);
+    qemu_put_8s(f, &s->vcore[4]);
+    qemu_put_8s(f, &s->dcdc[3]);
+    qemu_put_8s(f, &s->dcdc[3]);
+    qemu_put_8s(f, &s->dcdc[3]);
+    qemu_put_8s(f, &s->ldo[0]);
+    qemu_put_8s(f, &s->ldo[1]);
+    qemu_put_8s(f, &s->ldo[2]);
+    qemu_put_8s(f, &s->ldo[3]);
+    qemu_put_8s(f, &s->ldo[4]);
+    qemu_put_8s(f, &s->ldo[5]);
+    qemu_put_8s(f, &s->ldo[6]);
+    qemu_put_8s(f, &s->ldo[7]);
+    qemu_put_8s(f, &s->sleep[0]);
+    qemu_put_8s(f, &s->sleep[1]);
+    qemu_put_8s(f, &s->osc);
+    qemu_put_8s(f, &s->detect);
+    qemu_put_be16s(f, &s->mask);
+    qemu_put_be16s(f, &s->status);
+    qemu_put_8s(f, &s->dir);
+    qemu_put_8s(f, &s->inputs);
+    qemu_put_8s(f, &s->outputs);
+    qemu_put_8s(f, &s->bbsms);
+    qemu_put_8s(f, &s->pull[0]);
+    qemu_put_8s(f, &s->pull[1]);
+    qemu_put_8s(f, &s->pull[2]);
+    qemu_put_8s(f, &s->pull[3]);
+    qemu_put_8s(f, &s->mmc_ctrl[0]);
+    qemu_put_8s(f, &s->mmc_ctrl[1]);
+    qemu_put_8s(f, &s->mmc_ctrl[2]);
+    qemu_put_8s(f, &s->mmc_debounce);
+    qemu_put_8s(f, &s->rtc.ctrl);
+    qemu_put_be16s(f, &s->rtc.comp);
     /* Should be <= 1000 */
-    s->rtc_next_vmstate =  s->rtc.next - qemu_get_clock(rt_clock);
+    qemu_put_be16(f, s->rtc.next - qemu_get_clock(rt_clock));
+    tm_put(f, &s->rtc.new);
+    tm_put(f, &s->rtc.alm);
+    qemu_put_byte(f, s->pwrbtn_state);
+
+    i2c_slave_save(f, &s->i2c);
 }
 
-static int menelaus_post_load(void *opaque, int version_id)
+static int menelaus_load(QEMUFile *f, void *opaque, int version_id)
 {
-    MenelausState *s = opaque;
+    struct menelaus_s *s = (struct menelaus_s *) opaque;
+
+    s->firstbyte = qemu_get_be32(f);
+    qemu_get_8s(f, &s->reg);
 
     if (s->rtc.ctrl & 1)					/* RTC_EN */
         menelaus_rtc_stop(s);
-
-    s->rtc.next = s->rtc_next_vmstate;
-
+    qemu_get_8s(f, &s->vcore[0]);
+    qemu_get_8s(f, &s->vcore[1]);
+    qemu_get_8s(f, &s->vcore[2]);
+    qemu_get_8s(f, &s->vcore[3]);
+    qemu_get_8s(f, &s->vcore[4]);
+    qemu_get_8s(f, &s->dcdc[3]);
+    qemu_get_8s(f, &s->dcdc[3]);
+    qemu_get_8s(f, &s->dcdc[3]);
+    qemu_get_8s(f, &s->ldo[0]);
+    qemu_get_8s(f, &s->ldo[1]);
+    qemu_get_8s(f, &s->ldo[2]);
+    qemu_get_8s(f, &s->ldo[3]);
+    qemu_get_8s(f, &s->ldo[4]);
+    qemu_get_8s(f, &s->ldo[5]);
+    qemu_get_8s(f, &s->ldo[6]);
+    qemu_get_8s(f, &s->ldo[7]);
+    qemu_get_8s(f, &s->sleep[0]);
+    qemu_get_8s(f, &s->sleep[1]);
+    qemu_get_8s(f, &s->osc);
+    qemu_get_8s(f, &s->detect);
+    qemu_get_be16s(f, &s->mask);
+    qemu_get_be16s(f, &s->status);
+    qemu_get_8s(f, &s->dir);
+    qemu_get_8s(f, &s->inputs);
+    qemu_get_8s(f, &s->outputs);
+    qemu_get_8s(f, &s->bbsms);
+    qemu_get_8s(f, &s->pull[0]);
+    qemu_get_8s(f, &s->pull[1]);
+    qemu_get_8s(f, &s->pull[2]);
+    qemu_get_8s(f, &s->pull[3]);
+    qemu_get_8s(f, &s->mmc_ctrl[0]);
+    qemu_get_8s(f, &s->mmc_ctrl[1]);
+    qemu_get_8s(f, &s->mmc_ctrl[2]);
+    qemu_get_8s(f, &s->mmc_debounce);
+    qemu_get_8s(f, &s->rtc.ctrl);
+    qemu_get_be16s(f, &s->rtc.comp);
+    s->rtc.next = qemu_get_be16(f);
+    tm_get(f, &s->rtc.new);
+    tm_get(f, &s->rtc.alm);
+    s->pwrbtn_state = qemu_get_byte(f);
     menelaus_alm_update(s);
     menelaus_update(s);
     if (s->rtc.ctrl & 1)					/* RTC_EN */
         menelaus_rtc_start(s);
+
+    i2c_slave_load(f, &s->i2c);
     return 0;
 }
 
-static const VMStateDescription vmstate_menelaus = {
-    .name = "menelaus",
-    .version_id = 0,
-    .minimum_version_id = 0,
-    .minimum_version_id_old = 0,
-    .pre_save = menelaus_pre_save,
-    .post_load = menelaus_post_load,
-    .fields      = (VMStateField []) {
-        VMSTATE_INT32(firstbyte, MenelausState),
-        VMSTATE_UINT8(reg, MenelausState),
-        VMSTATE_UINT8_ARRAY(vcore, MenelausState, 5),
-        VMSTATE_UINT8_ARRAY(dcdc, MenelausState, 3),
-        VMSTATE_UINT8_ARRAY(ldo, MenelausState, 8),
-        VMSTATE_UINT8_ARRAY(sleep, MenelausState, 2),
-        VMSTATE_UINT8(osc, MenelausState),
-        VMSTATE_UINT8(detect, MenelausState),
-        VMSTATE_UINT16(mask, MenelausState),
-        VMSTATE_UINT16(status, MenelausState),
-        VMSTATE_UINT8(dir, MenelausState),
-        VMSTATE_UINT8(inputs, MenelausState),
-        VMSTATE_UINT8(outputs, MenelausState),
-        VMSTATE_UINT8(bbsms, MenelausState),
-        VMSTATE_UINT8_ARRAY(pull, MenelausState, 4),
-        VMSTATE_UINT8_ARRAY(mmc_ctrl, MenelausState, 3),
-        VMSTATE_UINT8(mmc_debounce, MenelausState),
-        VMSTATE_UINT8(rtc.ctrl, MenelausState),
-        VMSTATE_UINT16(rtc.comp, MenelausState),
-        VMSTATE_UINT16(rtc_next_vmstate, MenelausState),
-        VMSTATE_STRUCT(rtc.new, MenelausState, 0, vmstate_menelaus_tm,
-                       struct tm),
-        VMSTATE_STRUCT(rtc.alm, MenelausState, 0, vmstate_menelaus_tm,
-                       struct tm),
-        VMSTATE_UINT8(pwrbtn_state, MenelausState),
-        VMSTATE_I2C_SLAVE(i2c, MenelausState),
-        VMSTATE_END_OF_LIST()
-    }
-};
-
-static int twl92230_init(i2c_slave *i2c)
+i2c_slave *twl92230_init(i2c_bus *bus, qemu_irq irq)
 {
-    MenelausState *s = FROM_I2C_SLAVE(MenelausState, i2c);
+    struct menelaus_s *s = (struct menelaus_s *)
+            i2c_slave_init(bus, 0, sizeof(struct menelaus_s));
 
+    s->i2c.event = menelaus_event;
+    s->i2c.recv = menelaus_rx;
+    s->i2c.send = menelaus_tx;
+
+    s->irq = irq;
     s->rtc.hz_tm = qemu_new_timer(rt_clock, menelaus_rtc_hz, s);
-    /* Three output pins plus one interrupt pin.  */
-    qdev_init_gpio_out(&i2c->qdev, s->out, 4);
-    qdev_init_gpio_in(&i2c->qdev, menelaus_gpio_set, 3);
+    s->in = qemu_allocate_irqs(menelaus_gpio_set, s, 3);
     s->pwrbtn = qemu_allocate_irqs(menelaus_pwrbtn_set, s, 1)[0];
 
     menelaus_reset(&s->i2c);
 
-    vmstate_register(-1, &vmstate_menelaus, s);
-    return 0;
+    register_savevm("menelaus", -1, 0, menelaus_save, menelaus_load, s);
+
+    return &s->i2c;
 }
 
-static I2CSlaveInfo twl92230_info = {
-    .qdev.name ="twl92230",
-    .qdev.size = sizeof(MenelausState),
-    .init = twl92230_init,
-    .event = menelaus_event,
-    .recv = menelaus_rx,
-    .send = menelaus_tx
-};
-
-static void twl92230_register_devices(void)
+qemu_irq *twl92230_gpio_in_get(i2c_slave *i2c)
 {
-    i2c_register_slave(&twl92230_info);
+    struct menelaus_s *s = (struct menelaus_s *) i2c;
+
+    return s->in;
 }
 
-device_init(twl92230_register_devices)
+void twl92230_gpio_out_set(i2c_slave *i2c, int line, qemu_irq handler)
+{
+    struct menelaus_s *s = (struct menelaus_s *) i2c;
+
+    if (line >= 3 || line < 0) {
+        fprintf(stderr, "%s: No GPO line %i\n", __FUNCTION__, line);
+        exit(-1);
+    }
+    s->handler[line] = handler;
+}

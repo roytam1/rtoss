@@ -14,7 +14,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 
 #ifndef _EXEC_ALL_H_
@@ -34,10 +35,10 @@
 typedef struct TranslationBlock TranslationBlock;
 
 /* XXX: make safe guess about sizes */
-#define MAX_OP_PER_INSTR 96
+#define MAX_OP_PER_INSTR 64
 /* A Call op needs up to 6 + 2N parameters (N = number of arguments).  */
 #define MAX_OPC_PARAM 10
-#define OPC_BUF_SIZE 640
+#define OPC_BUF_SIZE 512
 #define OPC_MAX_SIZE (OPC_BUF_SIZE - MAX_OP_PER_INSTR)
 
 /* Maximum size a TCG op can expand to.  This is complicated because a
@@ -114,7 +115,10 @@ static inline int tlb_set_page(CPUState *env1, target_ulong vaddr,
 #define CODE_GEN_AVG_BLOCK_SIZE 64
 #endif
 
-#if defined(_ARCH_PPC) || defined(__x86_64__) || defined(__arm__) || defined(__i386__)
+#if defined(_ARCH_PPC) || defined(__x86_64__) || defined(__arm__)
+#define USE_DIRECT_JUMP
+#endif
+#if defined(__i386__) && !defined(_WIN32)
 #define USE_DIRECT_JUMP
 #endif
 
@@ -208,9 +212,7 @@ static inline void tb_set_jmp_target1(unsigned long jmp_addr, unsigned long addr
 #endif
 
     /* we could use a ldr pc, [pc, #-4] kind of branch and avoid the flush */
-    *(uint32_t *)jmp_addr =
-        (*(uint32_t *)jmp_addr & ~0xffffff)
-        | (((addr - (jmp_addr + 8)) >> 2) & 0xffffff);
+    *(uint32_t *)jmp_addr |= ((addr - (jmp_addr + 8)) >> 2) & 0xffffff;
 
 #if QEMU_GNUC_PREREQ(4, 1)
     __clear_cache((char *) jmp_addr, (char *) jmp_addr + 4);
@@ -314,7 +316,6 @@ static inline target_ulong get_phys_addr_code(CPUState *env1, target_ulong addr)
 static inline target_ulong get_phys_addr_code(CPUState *env1, target_ulong addr)
 {
     int mmu_idx, page_index, pd;
-    void *p;
 
     page_index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
     mmu_idx = cpu_mmu_index(env1);
@@ -330,9 +331,7 @@ static inline target_ulong get_phys_addr_code(CPUState *env1, target_ulong addr)
         cpu_abort(env1, "Trying to execute code outside RAM or ROM at 0x" TARGET_FMT_lx "\n", addr);
 #endif
     }
-    p = (void *)(unsigned long)addr
-        + env1->tlb_table[mmu_idx][page_index].addend;
-    return qemu_ram_addr_from_host(p);
+    return addr + env1->tlb_table[mmu_idx][page_index].addend - (unsigned long)phys_ram_base;
 }
 
 /* Deterministic execution requires that IO only be performed on the last
@@ -350,11 +349,39 @@ static inline int can_do_io(CPUState *env)
 }
 #endif
 
+#ifdef USE_KQEMU
+#define KQEMU_MODIFY_PAGE_MASK (0xff & ~(VGA_DIRTY_FLAG | CODE_DIRTY_FLAG))
+
+#define MSR_QPI_COMMBASE 0xfabe0010
+
+int kqemu_init(CPUState *env);
+int kqemu_cpu_exec(CPUState *env);
+void kqemu_flush_page(CPUState *env, target_ulong addr);
+void kqemu_flush(CPUState *env, int global);
+void kqemu_set_notdirty(CPUState *env, ram_addr_t ram_addr);
+void kqemu_modify_page(CPUState *env, ram_addr_t ram_addr);
+void kqemu_set_phys_mem(uint64_t start_addr, ram_addr_t size, 
+                        ram_addr_t phys_offset);
+void kqemu_cpu_interrupt(CPUState *env);
+void kqemu_record_dump(void);
+
+extern uint32_t kqemu_comm_base;
+
+static inline int kqemu_is_ok(CPUState *env)
+{
+    return(env->kqemu_enabled &&
+           (env->cr[0] & CR0_PE_MASK) &&
+           !(env->hflags & HF_INHIBIT_IRQ_MASK) &&
+           (env->eflags & IF_MASK) &&
+           !(env->eflags & VM_MASK) &&
+           (env->kqemu_enabled == 2 ||
+            ((env->hflags & HF_CPL_MASK) == 3 &&
+             (env->eflags & IOPL_MASK) != IOPL_MASK)));
+}
+
+#endif
+
 typedef void (CPUDebugExcpHandler)(CPUState *env);
 
 CPUDebugExcpHandler *cpu_set_debug_excp_handler(CPUDebugExcpHandler *handler);
-
-/* vl.c */
-extern int singlestep;
-
 #endif

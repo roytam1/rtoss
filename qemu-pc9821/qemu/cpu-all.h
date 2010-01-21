@@ -14,20 +14,24 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 #ifndef CPU_ALL_H
 #define CPU_ALL_H
 
 #include "qemu-common.h"
-#include "cpu-common.h"
+
+#if defined(__arm__) || defined(__sparc__) || defined(__mips__) || defined(__hppa__)
+#define WORDS_ALIGNED
+#endif
 
 /* some important defines:
  *
  * WORDS_ALIGNED : if defined, the host cpu can only make word aligned
  * memory accesses.
  *
- * HOST_WORDS_BIGENDIAN : if defined, the host cpu is big endian and
+ * WORDS_BIGENDIAN : if defined, the host cpu is big endian and
  * otherwise little endian.
  *
  * (TARGET_WORDS_ALIGNED : same for target cpu (not supported yet))
@@ -35,9 +39,10 @@
  * TARGET_WORDS_BIGENDIAN : same for target cpu
  */
 
+#include "bswap.h"
 #include "softfloat.h"
 
-#if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
+#if defined(WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
 #define BSWAP_NEEDED
 #endif
 
@@ -123,7 +128,7 @@ typedef union {
    endian ! */
 typedef union {
     float64 d;
-#if defined(HOST_WORDS_BIGENDIAN) \
+#if defined(WORDS_BIGENDIAN) \
     || (defined(__arm__) && !defined(__VFP_FP__) && !defined(CONFIG_SOFTFLOAT))
     struct {
         uint32_t upper;
@@ -141,7 +146,7 @@ typedef union {
 #ifdef TARGET_SPARC
 typedef union {
     float128 q;
-#if defined(HOST_WORDS_BIGENDIAN) \
+#if defined(WORDS_BIGENDIAN) \
     || (defined(__arm__) && !defined(__VFP_FP__) && !defined(CONFIG_SOFTFLOAT))
     struct {
         uint32_t upmost;
@@ -221,7 +226,7 @@ static inline void stb_p(void *ptr, int v)
 /* NOTE: on arm, putting 2 in /proc/sys/debug/alignment so that the
    kernel handles unaligned load/stores may give better results, but
    it is a system wide setting : bad */
-#if defined(HOST_WORDS_BIGENDIAN) || defined(WORDS_ALIGNED)
+#if defined(WORDS_BIGENDIAN) || defined(WORDS_ALIGNED)
 
 /* conservative code for little endian unaligned accesses */
 static inline int lduw_le_p(const void *ptr)
@@ -398,7 +403,7 @@ static inline void stfq_le_p(void *ptr, float64 v)
 }
 #endif
 
-#if !defined(HOST_WORDS_BIGENDIAN) || defined(WORDS_ALIGNED)
+#if !defined(WORDS_BIGENDIAN) || defined(WORDS_ALIGNED)
 
 static inline int lduw_be_p(const void *ptr)
 {
@@ -624,13 +629,8 @@ static inline void stfq_be_p(void *ptr, float64 v)
 /* On some host systems the guest address space is reserved on the host.
  * This allows the guest address space to be offset to a convenient location.
  */
-#if defined(CONFIG_USE_GUEST_BASE)
-extern unsigned long guest_base;
-extern int have_guest_base;
-#define GUEST_BASE guest_base
-#else
-#define GUEST_BASE 0ul
-#endif
+//#define GUEST_BASE 0x20000000
+#define GUEST_BASE 0
 
 /* All direct uses of g2h and h2g need to go away for usermode softmmu.  */
 #define g2h(x) ((void *)((unsigned long)(x) + GUEST_BASE))
@@ -739,15 +739,12 @@ extern unsigned long qemu_host_page_mask;
 #define PAGE_RESERVED  0x0020
 
 void page_dump(FILE *f);
-int walk_memory_regions(void *,
-    int (*fn)(void *, unsigned long, unsigned long, unsigned long));
 int page_get_flags(target_ulong address);
 void page_set_flags(target_ulong start, target_ulong end, int flags);
 int page_check_range(target_ulong start, target_ulong len, int flags);
 
 void cpu_exec_init_all(unsigned long tb_size);
 CPUState *cpu_copy(CPUState *env);
-CPUState *qemu_get_cpu(int cpu);
 
 void cpu_dump_state(CPUState *env, FILE *f,
                     int (*cpu_fprintf)(FILE *f, const char *fmt, ...),
@@ -763,6 +760,7 @@ extern CPUState *cpu_single_env;
 extern int64_t qemu_icount;
 extern int use_icount;
 
+#define CPU_INTERRUPT_EXIT   0x01 /* wants exit from main loop */
 #define CPU_INTERRUPT_HARD   0x02 /* hardware interrupt pending */
 #define CPU_INTERRUPT_EXITTB 0x04 /* exit the current TB (use for x86 a20 case) */
 #define CPU_INTERRUPT_TIMER  0x08 /* internal timer exception pending */
@@ -772,16 +770,9 @@ extern int use_icount;
 #define CPU_INTERRUPT_DEBUG  0x80 /* Debug event occured.  */
 #define CPU_INTERRUPT_VIRQ   0x100 /* virtual interrupt pending.  */
 #define CPU_INTERRUPT_NMI    0x200 /* NMI pending. */
-#define CPU_INTERRUPT_INIT   0x400 /* INIT pending. */
-#define CPU_INTERRUPT_SIPI   0x800 /* SIPI pending. */
-#define CPU_INTERRUPT_MCE    0x1000 /* (x86 only) MCE pending. */
 
 void cpu_interrupt(CPUState *s, int mask);
 void cpu_reset_interrupt(CPUState *env, int mask);
-
-void cpu_exit(CPUState *s);
-
-int qemu_cpu_has_work(CPUState *env);
 
 /* Breakpoint/watchpoint flags */
 #define BP_MEM_READ           0x01
@@ -841,14 +832,32 @@ void cpu_set_log_filename(const char *filename);
 int cpu_str_to_log_mask(const char *str);
 
 /* IO ports API */
-#include "ioport.h"
+
+/* NOTE: as these functions may be even used when there is an isa
+   brige on non x86 targets, we always defined them */
+#ifndef NO_CPU_IO_DEFS
+void cpu_outb(CPUState *env, int addr, int val);
+void cpu_outw(CPUState *env, int addr, int val);
+void cpu_outl(CPUState *env, int addr, int val);
+int cpu_inb(CPUState *env, int addr);
+int cpu_inw(CPUState *env, int addr);
+int cpu_inl(CPUState *env, int addr);
+#endif
+
+/* address in the RAM (different from a physical address) */
+#ifdef USE_KQEMU
+typedef uint32_t ram_addr_t;
+#else
+typedef unsigned long ram_addr_t;
+#endif
 
 /* memory API */
 
+extern ram_addr_t phys_ram_size;
 extern int phys_ram_fd;
+extern uint8_t *phys_ram_base;
 extern uint8_t *phys_ram_dirty;
 extern ram_addr_t ram_size;
-extern ram_addr_t last_ram_offset;
 
 /* physical memory access */
 
@@ -856,7 +865,18 @@ extern ram_addr_t last_ram_offset;
    3 flags.  The ROMD code stores the page ram offset in iotlb entry, 
    so only a limited number of ids are avaiable.  */
 
+#define IO_MEM_SHIFT       3
 #define IO_MEM_NB_ENTRIES  (1 << (TARGET_PAGE_BITS  - IO_MEM_SHIFT))
+
+#define IO_MEM_RAM         (0 << IO_MEM_SHIFT) /* hardcoded offset */
+#define IO_MEM_ROM         (1 << IO_MEM_SHIFT) /* hardcoded offset */
+#define IO_MEM_UNASSIGNED  (2 << IO_MEM_SHIFT)
+#define IO_MEM_NOTDIRTY    (3 << IO_MEM_SHIFT)
+
+/* Acts like a ROM when read and like a device when written.  */
+#define IO_MEM_ROMD        (1)
+#define IO_MEM_SUBPAGE     (2)
+#define IO_MEM_SUBWIDTH    (4)
 
 /* Flags stored in the low bits of the TLB virtual address.  These are
    defined so that fast path ram access is all zeros.  */
@@ -868,11 +888,70 @@ extern ram_addr_t last_ram_offset;
 /* Set if TLB entry is an IO callback.  */
 #define TLB_MMIO        (1 << 5)
 
+typedef void CPUWriteMemoryFunc(void *opaque, target_phys_addr_t addr, uint32_t value);
+typedef uint32_t CPUReadMemoryFunc(void *opaque, target_phys_addr_t addr);
+
+void cpu_register_physical_memory_offset(target_phys_addr_t start_addr,
+                                         ram_addr_t size,
+                                         ram_addr_t phys_offset,
+                                         ram_addr_t region_offset);
+static inline void cpu_register_physical_memory(target_phys_addr_t start_addr,
+                                                ram_addr_t size,
+                                                ram_addr_t phys_offset)
+{
+    cpu_register_physical_memory_offset(start_addr, size, phys_offset, 0);
+}
+
+ram_addr_t cpu_get_physical_page_desc(target_phys_addr_t addr);
+ram_addr_t qemu_ram_alloc(ram_addr_t);
+void qemu_ram_free(ram_addr_t addr);
+int cpu_register_io_memory(int io_index,
+                           CPUReadMemoryFunc **mem_read,
+                           CPUWriteMemoryFunc **mem_write,
+                           void *opaque);
+void cpu_unregister_io_memory(int table_address);
+CPUWriteMemoryFunc **cpu_get_io_memory_write(int io_index);
+CPUReadMemoryFunc **cpu_get_io_memory_read(int io_index);
+
+void cpu_physical_memory_rw(target_phys_addr_t addr, uint8_t *buf,
+                            int len, int is_write);
+static inline void cpu_physical_memory_read(target_phys_addr_t addr,
+                                            uint8_t *buf, int len)
+{
+    cpu_physical_memory_rw(addr, buf, len, 0);
+}
+static inline void cpu_physical_memory_write(target_phys_addr_t addr,
+                                             const uint8_t *buf, int len)
+{
+    cpu_physical_memory_rw(addr, (uint8_t *)buf, len, 1);
+}
+void *cpu_physical_memory_map(target_phys_addr_t addr,
+                              target_phys_addr_t *plen,
+                              int is_write);
+void cpu_physical_memory_unmap(void *buffer, target_phys_addr_t len,
+                               int is_write, target_phys_addr_t access_len);
+void *cpu_register_map_client(void *opaque, void (*callback)(void *opaque));
+void cpu_unregister_map_client(void *cookie);
+
+uint32_t ldub_phys(target_phys_addr_t addr);
+uint32_t lduw_phys(target_phys_addr_t addr);
+uint32_t ldl_phys(target_phys_addr_t addr);
+uint64_t ldq_phys(target_phys_addr_t addr);
+void stl_phys_notdirty(target_phys_addr_t addr, uint32_t val);
+void stq_phys_notdirty(target_phys_addr_t addr, uint64_t val);
+void stb_phys(target_phys_addr_t addr, uint32_t val);
+void stw_phys(target_phys_addr_t addr, uint32_t val);
+void stl_phys(target_phys_addr_t addr, uint32_t val);
+void stq_phys(target_phys_addr_t addr, uint64_t val);
+
+void cpu_physical_memory_write_rom(target_phys_addr_t addr,
+                                   const uint8_t *buf, int len);
 int cpu_memory_rw_debug(CPUState *env, target_ulong addr,
                         uint8_t *buf, int len, int is_write);
 
 #define VGA_DIRTY_FLAG       0x01
 #define CODE_DIRTY_FLAG      0x02
+#define KQEMU_DIRTY_FLAG     0x04
 #define MIGRATION_DIRTY_FLAG 0x08
 
 /* read dirty bit (return 0 or 1) */
@@ -900,8 +979,7 @@ int cpu_physical_memory_set_dirty_tracking(int enable);
 
 int cpu_physical_memory_get_dirty_tracking(void);
 
-int cpu_physical_sync_dirty_bitmap(target_phys_addr_t start_addr,
-                                   target_phys_addr_t end_addr);
+void cpu_physical_sync_dirty_bitmap(target_phys_addr_t start_addr, target_phys_addr_t end_addr);
 
 void dump_exec_info(FILE *f,
                     int (*cpu_fprintf)(FILE *f, const char *fmt, ...));
@@ -1021,7 +1099,7 @@ static inline int64_t cpu_get_real_ticks (void)
 
 static inline int64_t cpu_get_real_ticks(void)
 {
-#if defined(__mips_isa_rev) && __mips_isa_rev >= 2
+#if __mips_isa_rev >= 2
     uint32_t count;
     static uint32_t cyc_per_count = 0;
 
@@ -1055,12 +1133,14 @@ static inline int64_t profile_getclock(void)
     return cpu_get_real_ticks();
 }
 
+extern int64_t kqemu_time, kqemu_time_start;
 extern int64_t qemu_time, qemu_time_start;
 extern int64_t tlb_flush_time;
+extern int64_t kqemu_exec_count;
 extern int64_t dev_time;
+extern int64_t kqemu_ret_int_count;
+extern int64_t kqemu_ret_excp_count;
+extern int64_t kqemu_ret_intr_count;
 #endif
-
-void cpu_inject_x86_mce(CPUState *cenv, int bank, uint64_t status,
-                        uint64_t mcg_status, uint64_t addr, uint64_t misc);
 
 #endif /* CPU_ALL_H */

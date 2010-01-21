@@ -15,13 +15,15 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+#include <assert.h>
 
 #include "config.h"
 #include "cpu.h"
@@ -1245,7 +1247,7 @@ DISAS_INSN(byterev)
     TCGv reg;
 
     reg = DREG(insn, 0);
-    tcg_gen_bswap32_i32(reg, reg);
+    tcg_gen_bswap_i32(reg, reg);
 }
 
 DISAS_INSN(move)
@@ -2999,8 +3001,8 @@ gen_intermediate_code_internal(CPUState *env, TranslationBlock *tb,
     do {
         pc_offset = dc->pc - pc_start;
         gen_throws_exception = NULL;
-        if (unlikely(!QTAILQ_EMPTY(&env->breakpoints))) {
-            QTAILQ_FOREACH(bp, &env->breakpoints, entry) {
+        if (unlikely(!TAILQ_EMPTY(&env->breakpoints))) {
+            TAILQ_FOREACH(bp, &env->breakpoints, entry) {
                 if (bp->pc == dc->pc) {
                     gen_exception(dc, dc->pc, EXCP_DEBUG);
                     dc->is_jmp = DISAS_JUMP;
@@ -3029,7 +3031,6 @@ gen_intermediate_code_internal(CPUState *env, TranslationBlock *tb,
         num_insns++;
     } while (!dc->is_jmp && gen_opc_ptr < gen_opc_end &&
              !env->singlestep_enabled &&
-             !singlestep &&
              (pc_offset) < (TARGET_PAGE_SIZE - 32) &&
              num_insns < max_insns);
 

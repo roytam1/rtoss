@@ -15,7 +15,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along
- * with this program; if not, see <http://www.gnu.org/licenses/>.
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 #include "qemu-common.h"
@@ -27,7 +28,7 @@
 
 typedef void (*blizzard_fn_t)(uint8_t *, const uint8_t *, unsigned int);
 
-typedef struct {
+struct blizzard_s {
     uint8_t reg;
     uint32_t addr;
     int swallow;
@@ -119,7 +120,7 @@ typedef struct {
         int pitch;
         blizzard_fn_t line_fn;
     } data;
-} BlizzardState;
+};
 
 /* Bytes(!) per pixel */
 static const int blizzard_iformat_bpp[0x10] = {
@@ -143,7 +144,7 @@ static inline void blizzard_rgb2yuv(int r, int g, int b,
     *v = 0x80 + ((0xe0e * r - 0x0bc7 * g - 0x247 * b) >> 13);
 }
 
-static void blizzard_window(BlizzardState *s)
+static void blizzard_window(struct blizzard_s *s)
 {
     uint8_t *src, *dst;
     int bypp[2];
@@ -174,7 +175,7 @@ static void blizzard_window(BlizzardState *s)
         fn(dst, src, bypl[2]);
 }
 
-static int blizzard_transfer_setup(BlizzardState *s)
+static int blizzard_transfer_setup(struct blizzard_s *s)
 {
     if (s->source > 3 || !s->bpp ||
                     s->ix[1] < s->ix[0] || s->iy[1] < s->iy[0])
@@ -198,7 +199,7 @@ static int blizzard_transfer_setup(BlizzardState *s)
     return 1;
 }
 
-static void blizzard_reset(BlizzardState *s)
+static void blizzard_reset(struct blizzard_s *s)
 {
     s->reg = 0;
     s->swallow = 0;
@@ -279,14 +280,14 @@ static void blizzard_reset(BlizzardState *s)
 }
 
 static inline void blizzard_invalidate_display(void *opaque) {
-    BlizzardState *s = (BlizzardState *) opaque;
+    struct blizzard_s *s = (struct blizzard_s *) opaque;
 
     s->invalidate = 1;
 }
 
 static uint16_t blizzard_reg_read(void *opaque, uint8_t reg)
 {
-    BlizzardState *s = (BlizzardState *) opaque;
+    struct blizzard_s *s = (struct blizzard_s *) opaque;
 
     switch (reg) {
     case 0x00:	/* Revision Code */
@@ -489,7 +490,7 @@ static uint16_t blizzard_reg_read(void *opaque, uint8_t reg)
 
 static void blizzard_reg_write(void *opaque, uint8_t reg, uint16_t value)
 {
-    BlizzardState *s = (BlizzardState *) opaque;
+    struct blizzard_s *s = (struct blizzard_s *) opaque;
 
     switch (reg) {
     case 0x04:	/* PLL M-Divider */
@@ -830,7 +831,7 @@ static void blizzard_reg_write(void *opaque, uint8_t reg, uint16_t value)
 
 uint16_t s1d13745_read(void *opaque, int dc)
 {
-    BlizzardState *s = (BlizzardState *) opaque;
+    struct blizzard_s *s = (struct blizzard_s *) opaque;
     uint16_t value = blizzard_reg_read(s, s->reg);
 
     if (s->swallow -- > 0)
@@ -843,7 +844,7 @@ uint16_t s1d13745_read(void *opaque, int dc)
 
 void s1d13745_write(void *opaque, int dc, uint16_t value)
 {
-    BlizzardState *s = (BlizzardState *) opaque;
+    struct blizzard_s *s = (struct blizzard_s *) opaque;
 
     if (s->swallow -- > 0)
         return;
@@ -859,7 +860,7 @@ void s1d13745_write(void *opaque, int dc, uint16_t value)
 void s1d13745_write_block(void *opaque, int dc,
                 void *buf, size_t len, int pitch)
 {
-    BlizzardState *s = (BlizzardState *) opaque;
+    struct blizzard_s *s = (struct blizzard_s *) opaque;
 
     while (len > 0) {
         if (s->reg == 0x90 && dc &&
@@ -885,7 +886,7 @@ void s1d13745_write_block(void *opaque, int dc,
 
 static void blizzard_update_display(void *opaque)
 {
-    BlizzardState *s = (BlizzardState *) opaque;
+    struct blizzard_s *s = (struct blizzard_s *) opaque;
     int y, bypp, bypl, bwidth;
     uint8_t *src, *dst;
 
@@ -934,7 +935,7 @@ static void blizzard_update_display(void *opaque)
 }
 
 static void blizzard_screen_dump(void *opaque, const char *filename) {
-    BlizzardState *s = (BlizzardState *) opaque;
+    struct blizzard_s *s = (struct blizzard_s *) opaque;
 
     blizzard_update_display(opaque);
     if (s && ds_get_data(s->state))
@@ -954,7 +955,7 @@ static void blizzard_screen_dump(void *opaque, const char *filename) {
 
 void *s1d13745_init(qemu_irq gpio_int)
 {
-    BlizzardState *s = (BlizzardState *) qemu_mallocz(sizeof(*s));
+    struct blizzard_s *s = (struct blizzard_s *) qemu_mallocz(sizeof(*s));
 
     s->fb = qemu_malloc(0x180000);
 

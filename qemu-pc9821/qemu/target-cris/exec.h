@@ -15,7 +15,8 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 #include "dyngen-exec.h"
 
@@ -38,11 +39,6 @@ static inline void regs_to_env(void)
 
 void cpu_cris_flush_flags(CPUCRISState *env, int cc_op);
 void helper_movec(CPUCRISState *env, int reg, uint32_t val);
-
-static inline int cpu_has_work(CPUState *env)
-{
-    return (env->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_NMI));
-}
 
 static inline int cpu_halted(CPUState *env) {
 	if (!env->halted)

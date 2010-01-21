@@ -15,11 +15,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 #if SHIFT == 0
 #define Reg MMXReg
-#define XMM_ONLY(...)
+#define XMM_ONLY(x...)
 #define B(n) MMX_B(n)
 #define W(n) MMX_W(n)
 #define L(n) MMX_L(n)
@@ -27,7 +28,7 @@
 #define SUFFIX _mmx
 #else
 #define Reg XMMReg
-#define XMM_ONLY(...) __VA_ARGS__
+#define XMM_ONLY(x...) x
 #define B(n) XMM_B(n)
 #define W(n) XMM_W(n)
 #define L(n) XMM_L(n)
@@ -802,50 +803,6 @@ void helper_rcpss(XMMReg *d, XMMReg *s)
     d->XMM_S(0) = approx_rcp(s->XMM_S(0));
 }
 
-static inline uint64_t helper_extrq(uint64_t src, int shift, int len)
-{
-    uint64_t mask;
-
-    if (len == 0) {
-        mask = ~0LL;
-    } else {
-        mask = (1ULL << len) - 1;
-    }
-    return (src >> shift) & mask;
-}
-
-void helper_extrq_r(XMMReg *d, XMMReg *s)
-{
-    d->XMM_Q(0) = helper_extrq(d->XMM_Q(0), s->XMM_B(1), s->XMM_B(0));
-}
-
-void helper_extrq_i(XMMReg *d, int index, int length)
-{
-    d->XMM_Q(0) = helper_extrq(d->XMM_Q(0), index, length);
-}
-
-static inline uint64_t helper_insertq(uint64_t src, int shift, int len)
-{
-    uint64_t mask;
-
-    if (len == 0) {
-        mask = ~0ULL;
-    } else {
-        mask = (1ULL << len) - 1;
-    }
-    return (src & ~(mask << shift)) | ((src & mask) << shift);
-}
-
-void helper_insertq_r(XMMReg *d, XMMReg *s)
-{
-    d->XMM_Q(0) = helper_insertq(s->XMM_Q(0), s->XMM_B(9), s->XMM_B(8));
-}
-
-void helper_insertq_i(XMMReg *d, int index, int length)
-{
-    d->XMM_Q(0) = helper_insertq(d->XMM_Q(0), index, length);
-}
-
 void helper_haddps(XMMReg *d, XMMReg *s)
 {
     XMMReg r;
@@ -939,7 +896,7 @@ SSE_HELPER_CMP(cmpnlt, FPU_CMPNLT)
 SSE_HELPER_CMP(cmpnle, FPU_CMPNLE)
 SSE_HELPER_CMP(cmpord, FPU_CMPORD)
 
-static const int comis_eflags[4] = {CC_C, CC_Z, 0, CC_Z | CC_P | CC_C};
+const int comis_eflags[4] = {CC_C, CC_Z, 0, CC_Z | CC_P | CC_C};
 
 void helper_ucomiss(Reg *d, Reg *s)
 {

@@ -35,9 +35,6 @@
 #include "fw_cfg.h"
 #include "escc.h"
 #include "openpic.h"
-#include "ide.h"
-#include "loader.h"
-#include "elf.h"
 
 #define MAX_IDE_BUS 2
 #define VGA_BIOS_SIZE 65536
@@ -47,10 +44,10 @@
 //#define DEBUG_UNIN
 
 #ifdef DEBUG_UNIN
-#define UNIN_DPRINTF(fmt, ...)                                  \
-    do { printf("UNIN: " fmt , ## __VA_ARGS__); } while (0)
+#define UNIN_DPRINTF(fmt, args...) \
+do { printf("UNIN: " fmt , ##args); } while (0)
 #else
-#define UNIN_DPRINTF(fmt, ...)
+#define UNIN_DPRINTF(fmt, args...)
 #endif
 
 /* UniN device */
@@ -69,26 +66,20 @@ static uint32_t unin_readl (void *opaque, target_phys_addr_t addr)
     return value;
 }
 
-static CPUWriteMemoryFunc * const unin_write[] = {
+static CPUWriteMemoryFunc *unin_write[] = {
     &unin_writel,
     &unin_writel,
     &unin_writel,
 };
 
-static CPUReadMemoryFunc * const unin_read[] = {
+static CPUReadMemoryFunc *unin_read[] = {
     &unin_readl,
     &unin_readl,
     &unin_readl,
 };
-
-static int fw_cfg_boot_set(void *opaque, const char *boot_device)
-{
-    fw_cfg_add_i16(opaque, FW_CFG_BOOT_DEVICE, boot_device[0]);
-    return 0;
-}
 
 /* PowerPC Mac99 hardware initialisation */
-static void ppc_core99_init (ram_addr_t ram_size,
+static void ppc_core99_init (ram_addr_t ram_size, int vga_ram_size,
                              const char *boot_device,
                              const char *kernel_filename,
                              const char *kernel_cmdline,
@@ -96,11 +87,11 @@ static void ppc_core99_init (ram_addr_t ram_size,
                              const char *cpu_model)
 {
     CPUState *env = NULL, *envs[MAX_CPUS];
-    char *filename;
+    char buf[1024];
     qemu_irq *pic, **openpic_irqs;
     int unin_memory;
     int linux_boot, i;
-    ram_addr_t ram_offset, bios_offset, vga_bios_offset;
+    ram_addr_t ram_offset, vga_ram_offset, bios_offset, vga_bios_offset;
     uint32_t kernel_base, kernel_size, initrd_base, initrd_size;
     PCIBus *pci_bus;
     MacIONVRAMState *nvr;
@@ -109,10 +100,10 @@ static void ppc_core99_init (ram_addr_t ram_size,
     qemu_irq *dummy_irq;
     int pic_mem_index, dbdma_mem_index, cuda_mem_index, escc_mem_index;
     int ppc_boot_device;
-    DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+    int index;
+    BlockDriverState *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
     void *fw_cfg;
     void *dbdma;
-    uint8_t *vga_bios_ptr;
 
     linux_boot = (kernel_filename != NULL);
 
@@ -138,96 +129,60 @@ static void ppc_core99_init (ram_addr_t ram_size,
     ram_offset = qemu_ram_alloc(ram_size);
     cpu_register_physical_memory(0, ram_size, ram_offset);
 
+    /* allocate VGA RAM */
+    vga_ram_offset = qemu_ram_alloc(vga_ram_size);
+
     /* allocate and load BIOS */
     bios_offset = qemu_ram_alloc(BIOS_SIZE);
     if (bios_name == NULL)
         bios_name = PROM_FILENAME;
-    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+    snprintf(buf, sizeof(buf), "%s/%s", bios_dir, bios_name);
     cpu_register_physical_memory(PROM_ADDR, BIOS_SIZE, bios_offset | IO_MEM_ROM);
 
     /* Load OpenBIOS (ELF) */
-    if (filename) {
-        bios_size = load_elf(filename, 0, NULL, NULL, NULL, 1, ELF_MACHINE, 0);
-
-        qemu_free(filename);
-    } else {
-        bios_size = -1;
-    }
+    bios_size = load_elf(buf, 0, NULL, NULL, NULL);
     if (bios_size < 0 || bios_size > BIOS_SIZE) {
-        hw_error("qemu: could not load PowerPC bios '%s'\n", bios_name);
+        cpu_abort(env, "qemu: could not load PowerPC bios '%s'\n", buf);
         exit(1);
     }
 
     /* allocate and load VGA BIOS */
     vga_bios_offset = qemu_ram_alloc(VGA_BIOS_SIZE);
-    vga_bios_ptr = qemu_get_ram_ptr(vga_bios_offset);
-    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, VGABIOS_FILENAME);
-    if (filename) {
-        vga_bios_size = load_image(filename, vga_bios_ptr + 8);
-        qemu_free(filename);
-    } else {
-        vga_bios_size = -1;
-    }
+    snprintf(buf, sizeof(buf), "%s/%s", bios_dir, VGABIOS_FILENAME);
+    vga_bios_size = load_image(buf, phys_ram_base + vga_bios_offset + 8);
     if (vga_bios_size < 0) {
         /* if no bios is present, we can still work */
-        fprintf(stderr, "qemu: warning: could not load VGA bios '%s'\n",
-                VGABIOS_FILENAME);
+        fprintf(stderr, "qemu: warning: could not load VGA bios '%s'\n", buf);
         vga_bios_size = 0;
     } else {
         /* set a specific header (XXX: find real Apple format for NDRV
            drivers) */
-        vga_bios_ptr[0] = 'N';
-        vga_bios_ptr[1] = 'D';
-        vga_bios_ptr[2] = 'R';
-        vga_bios_ptr[3] = 'V';
-        cpu_to_be32w((uint32_t *)(vga_bios_ptr + 4), vga_bios_size);
+        phys_ram_base[vga_bios_offset] = 'N';
+        phys_ram_base[vga_bios_offset + 1] = 'D';
+        phys_ram_base[vga_bios_offset + 2] = 'R';
+        phys_ram_base[vga_bios_offset + 3] = 'V';
+        cpu_to_be32w((uint32_t *)(phys_ram_base + vga_bios_offset + 4),
+                     vga_bios_size);
         vga_bios_size += 8;
-
-        /* Round to page boundary */
-        vga_bios_size = (vga_bios_size + TARGET_PAGE_SIZE - 1) &
-            TARGET_PAGE_MASK;
     }
 
     if (linux_boot) {
-        uint64_t lowaddr = 0;
-        int bswap_needed;
-
-#ifdef BSWAP_NEEDED
-        bswap_needed = 1;
-#else
-        bswap_needed = 0;
-#endif
         kernel_base = KERNEL_LOAD_ADDR;
-
-        /* Now we can load the kernel. The first step tries to load the kernel
-           supposing PhysAddr = 0x00000000. If that was wrong the kernel is
-           loaded again, the new PhysAddr being computed from lowaddr. */
-        kernel_size = load_elf(kernel_filename, kernel_base, NULL, &lowaddr, NULL,
-                               1, ELF_MACHINE, 0);
-        if (kernel_size > 0 && lowaddr != KERNEL_LOAD_ADDR) {
-            kernel_size = load_elf(kernel_filename, (2 * kernel_base) - lowaddr,
-                                   NULL, NULL, NULL, 1, ELF_MACHINE, 0);
-        }
-        if (kernel_size < 0)
-            kernel_size = load_aout(kernel_filename, kernel_base,
-                                    ram_size - kernel_base, bswap_needed,
-                                    TARGET_PAGE_SIZE);
-        if (kernel_size < 0)
-            kernel_size = load_image_targphys(kernel_filename,
-                                              kernel_base,
-                                              ram_size - kernel_base);
+        /* now we can load the kernel */
+        kernel_size = load_image(kernel_filename, phys_ram_base + kernel_base);
         if (kernel_size < 0) {
-            hw_error("qemu: could not load kernel '%s'\n", kernel_filename);
+            cpu_abort(env, "qemu: could not load kernel '%s'\n",
+                      kernel_filename);
             exit(1);
         }
         /* load initrd */
         if (initrd_filename) {
             initrd_base = INITRD_LOAD_ADDR;
-            initrd_size = load_image_targphys(initrd_filename, initrd_base,
-                                              ram_size - initrd_base);
+            initrd_size = load_image(initrd_filename,
+                                     phys_ram_base + initrd_base);
             if (initrd_size < 0) {
-                hw_error("qemu: could not load initial ram disk '%s'\n",
-                         initrd_filename);
+                cpu_abort(env, "qemu: could not load initial ram disk '%s'\n",
+                          initrd_filename);
                 exit(1);
             }
         } else {
@@ -262,7 +217,7 @@ static void ppc_core99_init (ram_addr_t ram_size,
     isa_mmio_init(0xf2000000, 0x00800000);
 
     /* UniN init */
-    unin_memory = cpu_register_io_memory(unin_read, unin_write, NULL);
+    unin_memory = cpu_register_io_memory(0, unin_read, unin_write, NULL);
     cpu_register_physical_memory(0xf8000000, 0x00001000, unin_memory);
 
     openpic_irqs = qemu_mallocz(smp_cpus * sizeof(qemu_irq *));
@@ -304,14 +259,16 @@ static void ppc_core99_init (ram_addr_t ram_size,
             break;
 #endif /* defined(TARGET_PPC64) */
         default:
-            hw_error("Bus model not supported on mac99 machine\n");
+            cpu_abort(env, "Bus model not supported on mac99 machine\n");
             exit(1);
         }
     }
     pic = openpic_init(NULL, &pic_mem_index, smp_cpus, openpic_irqs, NULL);
     pci_bus = pci_pmac_init(pic);
     /* init basic PC hardware */
-    pci_vga_init(pci_bus, vga_bios_offset, vga_bios_size);
+    pci_vga_init(pci_bus, phys_ram_base + vga_ram_offset,
+                 vga_ram_offset, vga_ram_size,
+                 vga_bios_offset, vga_bios_size);
 
     /* XXX: suppress that */
     dummy_irq = i8259_init(NULL);
@@ -320,14 +277,18 @@ static void ppc_core99_init (ram_addr_t ram_size,
                                serial_hds[0], serial_hds[1], ESCC_CLOCK, 4);
 
     for(i = 0; i < nb_nics; i++)
-        pci_nic_init_nofail(&nd_table[i], "ne2k_pci", NULL);
+        pci_nic_init(pci_bus, &nd_table[i], -1, "ne2k_pci");
 
     if (drive_get_max_bus(IF_IDE) >= MAX_IDE_BUS) {
         fprintf(stderr, "qemu: too many IDE bus\n");
         exit(1);
     }
     for(i = 0; i < MAX_IDE_BUS * MAX_IDE_DEVS; i++) {
-        hd[i] = drive_get(IF_IDE, i / MAX_IDE_DEVS, i % MAX_IDE_DEVS);
+        index = drive_get_index(IF_IDE, i / MAX_IDE_DEVS, i % MAX_IDE_DEVS);
+        if (index != -1)
+            hd[i] = drives_table[index].bdrv;
+        else
+            hd[i] = NULL;
     }
     dbdma = DBDMA_init(&dbdma_mem_index);
     pci_cmd646_ide_init(pci_bus, hd, 0);
@@ -344,7 +305,7 @@ static void ppc_core99_init (ram_addr_t ram_size,
                escc_mem_index);
 
     if (usb_enabled) {
-        usb_ohci_init_pci(pci_bus, -1);
+        usb_ohci_init_pci(pci_bus, 3, -1);
     }
 
     if (graphic_depth != 15 && graphic_depth != 32 && graphic_depth != 8)
@@ -360,35 +321,12 @@ static void ppc_core99_init (ram_addr_t ram_size,
     fw_cfg_add_i32(fw_cfg, FW_CFG_ID, 1);
     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
     fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, ARCH_MAC99);
-    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, kernel_base);
-    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, kernel_size);
-    if (kernel_cmdline) {
-        fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, CMDLINE_ADDR);
-        pstrcpy_targphys("cmdline", CMDLINE_ADDR, TARGET_PAGE_SIZE, kernel_cmdline);
-    } else {
-        fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, 0);
-    }
-    fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, initrd_base);
-    fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
-    fw_cfg_add_i16(fw_cfg, FW_CFG_BOOT_DEVICE, ppc_boot_device);
-
-    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_WIDTH, graphic_width);
-    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_HEIGHT, graphic_height);
-    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_DEPTH, graphic_depth);
-
-    qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
 }
 
-static QEMUMachine core99_machine = {
+QEMUMachine core99_machine = {
     .name = "mac99",
     .desc = "Mac99 based PowerMAC",
     .init = ppc_core99_init,
+    .ram_require = BIOS_SIZE + VGA_BIOS_SIZE + VGA_RAM_SIZE,
     .max_cpus = MAX_CPUS,
 };
-
-static void core99_machine_init(void)
-{
-    qemu_register_machine(&core99_machine);
-}
-
-machine_init(core99_machine_init);

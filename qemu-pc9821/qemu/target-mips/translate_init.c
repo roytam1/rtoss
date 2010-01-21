@@ -15,7 +15,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
  */
 
 /* CPU / CPU family specific config register values. */
@@ -455,10 +456,10 @@ static void r4k_mmu_init (CPUMIPSState *env, const mips_def_t *def)
 {
     env->tlb->nb_tlb = 1 + ((def->CP0_Config1 >> CP0C1_MMU) & 63);
     env->tlb->map_address = &r4k_map_address;
-    env->tlb->helper_tlbwi = r4k_helper_tlbwi;
-    env->tlb->helper_tlbwr = r4k_helper_tlbwr;
-    env->tlb->helper_tlbp = r4k_helper_tlbp;
-    env->tlb->helper_tlbr = r4k_helper_tlbr;
+    env->tlb->do_tlbwi = r4k_do_tlbwi;
+    env->tlb->do_tlbwr = r4k_do_tlbwr;
+    env->tlb->do_tlbp = r4k_do_tlbp;
+    env->tlb->do_tlbr = r4k_do_tlbr;
 }
 
 static void mmu_init (CPUMIPSState *env, const mips_def_t *def)

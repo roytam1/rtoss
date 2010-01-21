@@ -13,22 +13,24 @@
 //#define DEBUG_PCALL
 
 #ifdef DEBUG_MMU
-#define DPRINTF_MMU(fmt, ...)                                   \
-    do { printf("MMU: " fmt , ## __VA_ARGS__); } while (0)
+#define DPRINTF_MMU(fmt, args...) \
+do { printf("MMU: " fmt , ##args); } while (0)
 #else
-#define DPRINTF_MMU(fmt, ...) do {} while (0)
+#define DPRINTF_MMU(fmt, args...) do {} while (0)
 #endif
 
 #ifdef DEBUG_MXCC
-#define DPRINTF_MXCC(fmt, ...)                                  \
-    do { printf("MXCC: " fmt , ## __VA_ARGS__); } while (0)
+#define DPRINTF_MXCC(fmt, args...) \
+do { printf("MXCC: " fmt , ##args); } while (0)
 #else
-#define DPRINTF_MXCC(fmt, ...) do {} while (0)
+#define DPRINTF_MXCC(fmt, args...) do {} while (0)
 #endif
 
 #ifdef DEBUG_ASI
-#define DPRINTF_ASI(fmt, ...)                                   \
-    do { printf("ASI: " fmt , ## __VA_ARGS__); } while (0)
+#define DPRINTF_ASI(fmt, args...) \
+do { printf("ASI: " fmt , ##args); } while (0)
+#else
+#define DPRINTF_ASI(fmt, args...) do {} while (0)
 #endif
 
 #ifdef TARGET_SPARC64
@@ -37,155 +39,6 @@
 #else
 #define AM_CHECK(env1) (1)
 #endif
-#endif
-
-#if defined(TARGET_SPARC64) && !defined(CONFIG_USER_ONLY)
-// Calculates TSB pointer value for fault page size 8k or 64k
-static uint64_t ultrasparc_tsb_pointer(uint64_t tsb_register,
-                                       uint64_t tag_access_register,
-                                       int page_size)
-{
-    uint64_t tsb_base = tsb_register & ~0x1fffULL;
-    int tsb_split = (tsb_register & 0x1000ULL) ? 1 : 0;
-    int tsb_size  = tsb_register & 0xf;
-
-    // discard lower 13 bits which hold tag access context
-    uint64_t tag_access_va = tag_access_register & ~0x1fffULL;
-
-    // now reorder bits
-    uint64_t tsb_base_mask = ~0x1fffULL;
-    uint64_t va = tag_access_va;
-
-    // move va bits to correct position
-    if (page_size == 8*1024) {
-        va >>= 9;
-    } else if (page_size == 64*1024) {
-        va >>= 12;
-    }
-
-    if (tsb_size) {
-        tsb_base_mask <<= tsb_size;
-    }
-
-    // calculate tsb_base mask and adjust va if split is in use
-    if (tsb_split) {
-        if (page_size == 8*1024) {
-            va &= ~(1ULL << (13 + tsb_size));
-        } else if (page_size == 64*1024) {
-            va |= (1ULL << (13 + tsb_size));
-        }
-        tsb_base_mask <<= 1;
-    }
-
-    return ((tsb_base & tsb_base_mask) | (va & ~tsb_base_mask)) & ~0xfULL;
-}
-
-// Calculates tag target register value by reordering bits
-// in tag access register
-static uint64_t ultrasparc_tag_target(uint64_t tag_access_register)
-{
-    return ((tag_access_register & 0x1fff) << 48) | (tag_access_register >> 22);
-}
-
-static void replace_tlb_entry(SparcTLBEntry *tlb,
-                              uint64_t tlb_tag, uint64_t tlb_tte,
-                              CPUState *env1)
-{
-    target_ulong mask, size, va, offset;
-
-    // flush page range if translation is valid
-    if (TTE_IS_VALID(tlb->tte)) {
-
-        mask = 0xffffffffffffe000ULL;
-        mask <<= 3 * ((tlb->tte >> 61) & 3);
-        size = ~mask + 1;
-
-        va = tlb->tag & mask;
-
-        for (offset = 0; offset < size; offset += TARGET_PAGE_SIZE) {
-            tlb_flush_page(env1, va + offset);
-        }
-    }
-
-    tlb->tag = tlb_tag;
-    tlb->tte = tlb_tte;
-}
-
-static void demap_tlb(SparcTLBEntry *tlb, target_ulong demap_addr,
-                      const char* strmmu, CPUState *env1)
-{
-    unsigned int i;
-    target_ulong mask;
-
-    for (i = 0; i < 64; i++) {
-        if (TTE_IS_VALID(tlb[i].tte)) {
-
-            mask = 0xffffffffffffe000ULL;
-            mask <<= 3 * ((tlb[i].tte >> 61) & 3);
-
-            if ((demap_addr & mask) == (tlb[i].tag & mask)) {
-                replace_tlb_entry(&tlb[i], 0, 0, env1);
-#ifdef DEBUG_MMU
-                DPRINTF_MMU("%s demap invalidated entry [%02u]\n", strmmu, i);
-                dump_mmu(env1);
-#endif
-            }
-            //return;
-        }
-    }
-
-}
-
-static void replace_tlb_1bit_lru(SparcTLBEntry *tlb,
-                                 uint64_t tlb_tag, uint64_t tlb_tte,
-                                 const char* strmmu, CPUState *env1)
-{
-    unsigned int i, replace_used;
-
-    // Try replacing invalid entry
-    for (i = 0; i < 64; i++) {
-        if (!TTE_IS_VALID(tlb[i].tte)) {
-            replace_tlb_entry(&tlb[i], tlb_tag, tlb_tte, env1);
-#ifdef DEBUG_MMU
-            DPRINTF_MMU("%s lru replaced invalid entry [%i]\n", strmmu, i);
-            dump_mmu(env1);
-#endif
-            return;
-        }
-    }
-
-    // All entries are valid, try replacing unlocked entry
-
-    for (replace_used = 0; replace_used < 2; ++replace_used) {
-
-        // Used entries are not replaced on first pass
-
-        for (i = 0; i < 64; i++) {
-            if (!TTE_IS_LOCKED(tlb[i].tte) && !TTE_IS_USED(tlb[i].tte)) {
-
-                replace_tlb_entry(&tlb[i], tlb_tag, tlb_tte, env1);
-#ifdef DEBUG_MMU
-                DPRINTF_MMU("%s lru replaced unlocked %s entry [%i]\n",
-                            strmmu, (replace_used?"used":"unused"), i);
-                dump_mmu(env1);
-#endif
-                return;
-            }
-        }
-
-        // Now reset used bit and search for unused entries again
-
-        for (i = 0; i < 64; i++) {
-            TTE_SET_UNUSED(tlb[i].tte);
-        }
-    }
-
-#ifdef DEBUG_MMU
-    DPRINTF_MMU("%s lru replacement failed: no entries available\n", strmmu);
-#endif
-    // error state?
-}
-
 #endif
 
 static inline void address_mask(CPUState *env1, target_ulong *addr)
@@ -385,7 +238,7 @@ void helper_faligndata(void)
     *((uint64_t *)&DT0) = tmp;
 }
 
-#ifdef HOST_WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 #define VIS_B64(n) b[7 - (n)]
 #define VIS_W64(n) w[3 - (n)]
 #define VIS_SW64(n) sw[3 - (n)]
@@ -845,441 +698,6 @@ GEN_FCMP(fcmped, float64, DT0, DT1, 0, 1);
 GEN_FCMP(fcmpq, float128, QT0, QT1, 0, 0);
 GEN_FCMP(fcmpeq, float128, QT0, QT1, 0, 1);
 
-static uint32_t compute_all_flags(void)
-{
-    return env->psr & PSR_ICC;
-}
-
-static uint32_t compute_C_flags(void)
-{
-    return env->psr & PSR_CARRY;
-}
-
-static inline uint32_t get_NZ_icc(target_ulong dst)
-{
-    uint32_t ret = 0;
-
-    if (!(dst & 0xffffffffULL))
-        ret |= PSR_ZERO;
-    if ((int32_t) (dst & 0xffffffffULL) < 0)
-        ret |= PSR_NEG;
-    return ret;
-}
-
-#ifdef TARGET_SPARC64
-static uint32_t compute_all_flags_xcc(void)
-{
-    return env->xcc & PSR_ICC;
-}
-
-static uint32_t compute_C_flags_xcc(void)
-{
-    return env->xcc & PSR_CARRY;
-}
-
-static inline uint32_t get_NZ_xcc(target_ulong dst)
-{
-    uint32_t ret = 0;
-
-    if (!dst)
-        ret |= PSR_ZERO;
-    if ((int64_t)dst < 0)
-        ret |= PSR_NEG;
-    return ret;
-}
-#endif
-
-static inline uint32_t get_V_div_icc(target_ulong src2)
-{
-    uint32_t ret = 0;
-
-    if (src2 != 0)
-        ret |= PSR_OVF;
-    return ret;
-}
-
-static uint32_t compute_all_div(void)
-{
-    uint32_t ret;
-
-    ret = get_NZ_icc(CC_DST);
-    ret |= get_V_div_icc(CC_SRC2);
-    return ret;
-}
-
-static uint32_t compute_C_div(void)
-{
-    return 0;
-}
-
-static inline uint32_t get_C_add_icc(target_ulong dst, target_ulong src1)
-{
-    uint32_t ret = 0;
-
-    if ((dst & 0xffffffffULL) < (src1 & 0xffffffffULL))
-        ret |= PSR_CARRY;
-    return ret;
-}
-
-static inline uint32_t get_V_add_icc(target_ulong dst, target_ulong src1,
-                                         target_ulong src2)
-{
-    uint32_t ret = 0;
-
-    if (((src1 ^ src2 ^ -1) & (src1 ^ dst)) & (1ULL << 31))
-        ret |= PSR_OVF;
-    return ret;
-}
-
-static uint32_t compute_all_add(void)
-{
-    uint32_t ret;
-
-    ret = get_NZ_icc(CC_DST);
-    ret |= get_C_add_icc(CC_DST, CC_SRC);
-    ret |= get_V_add_icc(CC_DST, CC_SRC, CC_SRC2);
-    return ret;
-}
-
-static uint32_t compute_C_add(void)
-{
-    return get_C_add_icc(CC_DST, CC_SRC);
-}
-
-#ifdef TARGET_SPARC64
-static inline uint32_t get_C_add_xcc(target_ulong dst, target_ulong src1)
-{
-    uint32_t ret = 0;
-
-    if (dst < src1)
-        ret |= PSR_CARRY;
-    return ret;
-}
-
-static inline uint32_t get_V_add_xcc(target_ulong dst, target_ulong src1,
-                                         target_ulong src2)
-{
-    uint32_t ret = 0;
-
-    if (((src1 ^ src2 ^ -1) & (src1 ^ dst)) & (1ULL << 63))
-        ret |= PSR_OVF;
-    return ret;
-}
-
-static uint32_t compute_all_add_xcc(void)
-{
-    uint32_t ret;
-
-    ret = get_NZ_xcc(CC_DST);
-    ret |= get_C_add_xcc(CC_DST, CC_SRC);
-    ret |= get_V_add_xcc(CC_DST, CC_SRC, CC_SRC2);
-    return ret;
-}
-
-static uint32_t compute_C_add_xcc(void)
-{
-    return get_C_add_xcc(CC_DST, CC_SRC);
-}
-#endif
-
-static uint32_t compute_all_addx(void)
-{
-    uint32_t ret;
-
-    ret = get_NZ_icc(CC_DST);
-    ret |= get_C_add_icc(CC_DST - CC_SRC2, CC_SRC);
-    ret |= get_C_add_icc(CC_DST, CC_SRC);
-    ret |= get_V_add_icc(CC_DST, CC_SRC, CC_SRC2);
-    return ret;
-}
-
-static uint32_t compute_C_addx(void)
-{
-    uint32_t ret;
-
-    ret = get_C_add_icc(CC_DST - CC_SRC2, CC_SRC);
-    ret |= get_C_add_icc(CC_DST, CC_SRC);
-    return ret;
-}
-
-#ifdef TARGET_SPARC64
-static uint32_t compute_all_addx_xcc(void)
-{
-    uint32_t ret;
-
-    ret = get_NZ_xcc(CC_DST);
-    ret |= get_C_add_xcc(CC_DST - CC_SRC2, CC_SRC);
-    ret |= get_C_add_xcc(CC_DST, CC_SRC);
-    ret |= get_V_add_xcc(CC_DST, CC_SRC, CC_SRC2);
-    return ret;
-}
-
-static uint32_t compute_C_addx_xcc(void)
-{
-    uint32_t ret;
-
-    ret = get_C_add_xcc(CC_DST - CC_SRC2, CC_SRC);
-    ret |= get_C_add_xcc(CC_DST, CC_SRC);
-    return ret;
-}
-#endif
-
-static inline uint32_t get_V_tag_icc(target_ulong src1, target_ulong src2)
-{
-    uint32_t ret = 0;
-
-    if ((src1 | src2) & 0x3)
-        ret |= PSR_OVF;
-    return ret;
-}
-
-static uint32_t compute_all_tadd(void)
-{
-    uint32_t ret;
-
-    ret = get_NZ_icc(CC_DST);
-    ret |= get_C_add_icc(CC_DST, CC_SRC);
-    ret |= get_V_add_icc(CC_DST, CC_SRC, CC_SRC2);
-    ret |= get_V_tag_icc(CC_SRC, CC_SRC2);
-    return ret;
-}
-
-static uint32_t compute_C_tadd(void)
-{
-    return get_C_add_icc(CC_DST, CC_SRC);
-}
-
-static uint32_t compute_all_taddtv(void)
-{
-    uint32_t ret;
-
-    ret = get_NZ_icc(CC_DST);
-    ret |= get_C_add_icc(CC_DST, CC_SRC);
-    return ret;
-}
-
-static uint32_t compute_C_taddtv(void)
-{
-    return get_C_add_icc(CC_DST, CC_SRC);
-}
-
-static inline uint32_t get_C_sub_icc(target_ulong src1, target_ulong src2)
-{
-    uint32_t ret = 0;
-
-    if ((src1 & 0xffffffffULL) < (src2 & 0xffffffffULL))
-        ret |= PSR_CARRY;
-    return ret;
-}
-
-static inline uint32_t get_V_sub_icc(target_ulong dst, target_ulong src1,
-                                     target_ulong src2)
-{
-    uint32_t ret = 0;
-
-    if (((src1 ^ src2) & (src1 ^ dst)) & (1ULL << 31))
-        ret |= PSR_OVF;
-    return ret;
-}
-
-static uint32_t compute_all_sub(void)
-{
-    uint32_t ret;
-
-    ret = get_NZ_icc(CC_DST);
-    ret |= get_C_sub_icc(CC_SRC, CC_SRC2);
-    ret |= get_V_sub_icc(CC_DST, CC_SRC, CC_SRC2);
-    return ret;
-}
-
-static uint32_t compute_C_sub(void)
-{
-    return get_C_sub_icc(CC_SRC, CC_SRC2);
-}
-
-#ifdef TARGET_SPARC64
-static inline uint32_t get_C_sub_xcc(target_ulong src1, target_ulong src2)
-{
-    uint32_t ret = 0;
-
-    if (src1 < src2)
-        ret |= PSR_CARRY;
-    return ret;
-}
-
-static inline uint32_t get_V_sub_xcc(target_ulong dst, target_ulong src1,
-                                     target_ulong src2)
-{
-    uint32_t ret = 0;
-
-    if (((src1 ^ src2) & (src1 ^ dst)) & (1ULL << 63))
-        ret |= PSR_OVF;
-    return ret;
-}
-
-static uint32_t compute_all_sub_xcc(void)
-{
-    uint32_t ret;
-
-    ret = get_NZ_xcc(CC_DST);
-    ret |= get_C_sub_xcc(CC_SRC, CC_SRC2);
-    ret |= get_V_sub_xcc(CC_DST, CC_SRC, CC_SRC2);
-    return ret;
-}
-
-static uint32_t compute_C_sub_xcc(void)
-{
-    return get_C_sub_xcc(CC_SRC, CC_SRC2);
-}
-#endif
-
-static uint32_t compute_all_subx(void)
-{
-    uint32_t ret;
-
-    ret = get_NZ_icc(CC_DST);
-    ret |= get_C_sub_icc(CC_DST - CC_SRC2, CC_SRC);
-    ret |= get_C_sub_icc(CC_DST, CC_SRC2);
-    ret |= get_V_sub_icc(CC_DST, CC_SRC, CC_SRC2);
-    return ret;
-}
-
-static uint32_t compute_C_subx(void)
-{
-    uint32_t ret;
-
-    ret = get_C_sub_icc(CC_DST - CC_SRC2, CC_SRC);
-    ret |= get_C_sub_icc(CC_DST, CC_SRC2);
-    return ret;
-}
-
-#ifdef TARGET_SPARC64
-static uint32_t compute_all_subx_xcc(void)
-{
-    uint32_t ret;
-
-    ret = get_NZ_xcc(CC_DST);
-    ret |= get_C_sub_xcc(CC_DST - CC_SRC2, CC_SRC);
-    ret |= get_C_sub_xcc(CC_DST, CC_SRC2);
-    ret |= get_V_sub_xcc(CC_DST, CC_SRC, CC_SRC2);
-    return ret;
-}
-
-static uint32_t compute_C_subx_xcc(void)
-{
-    uint32_t ret;
-
-    ret = get_C_sub_xcc(CC_DST - CC_SRC2, CC_SRC);
-    ret |= get_C_sub_xcc(CC_DST, CC_SRC2);
-    return ret;
-}
-#endif
-
-static uint32_t compute_all_tsub(void)
-{
-    uint32_t ret;
-
-    ret = get_NZ_icc(CC_DST);
-    ret |= get_C_sub_icc(CC_DST, CC_SRC);
-    ret |= get_V_sub_icc(CC_DST, CC_SRC, CC_SRC2);
-    ret |= get_V_tag_icc(CC_SRC, CC_SRC2);
-    return ret;
-}
-
-static uint32_t compute_C_tsub(void)
-{
-    return get_C_sub_icc(CC_DST, CC_SRC);
-}
-
-static uint32_t compute_all_tsubtv(void)
-{
-    uint32_t ret;
-
-    ret = get_NZ_icc(CC_DST);
-    ret |= get_C_sub_icc(CC_DST, CC_SRC);
-    return ret;
-}
-
-static uint32_t compute_C_tsubtv(void)
-{
-    return get_C_sub_icc(CC_DST, CC_SRC);
-}
-
-static uint32_t compute_all_logic(void)
-{
-    return get_NZ_icc(CC_DST);
-}
-
-static uint32_t compute_C_logic(void)
-{
-    return 0;
-}
-
-#ifdef TARGET_SPARC64
-static uint32_t compute_all_logic_xcc(void)
-{
-    return get_NZ_xcc(CC_DST);
-}
-#endif
-
-typedef struct CCTable {
-    uint32_t (*compute_all)(void); /* return all the flags */
-    uint32_t (*compute_c)(void);  /* return the C flag */
-} CCTable;
-
-static const CCTable icc_table[CC_OP_NB] = {
-    /* CC_OP_DYNAMIC should never happen */
-    [CC_OP_FLAGS] = { compute_all_flags, compute_C_flags },
-    [CC_OP_DIV] = { compute_all_div, compute_C_div },
-    [CC_OP_ADD] = { compute_all_add, compute_C_add },
-    [CC_OP_ADDX] = { compute_all_addx, compute_C_addx },
-    [CC_OP_TADD] = { compute_all_tadd, compute_C_tadd },
-    [CC_OP_TADDTV] = { compute_all_taddtv, compute_C_taddtv },
-    [CC_OP_SUB] = { compute_all_sub, compute_C_sub },
-    [CC_OP_SUBX] = { compute_all_subx, compute_C_subx },
-    [CC_OP_TSUB] = { compute_all_tsub, compute_C_tsub },
-    [CC_OP_TSUBTV] = { compute_all_tsubtv, compute_C_tsubtv },
-    [CC_OP_LOGIC] = { compute_all_logic, compute_C_logic },
-};
-
-#ifdef TARGET_SPARC64
-static const CCTable xcc_table[CC_OP_NB] = {
-    /* CC_OP_DYNAMIC should never happen */
-    [CC_OP_FLAGS] = { compute_all_flags_xcc, compute_C_flags_xcc },
-    [CC_OP_DIV] = { compute_all_logic_xcc, compute_C_logic },
-    [CC_OP_ADD] = { compute_all_add_xcc, compute_C_add_xcc },
-    [CC_OP_ADDX] = { compute_all_addx_xcc, compute_C_addx_xcc },
-    [CC_OP_TADD] = { compute_all_add_xcc, compute_C_add_xcc },
-    [CC_OP_TADDTV] = { compute_all_add_xcc, compute_C_add_xcc },
-    [CC_OP_SUB] = { compute_all_sub_xcc, compute_C_sub_xcc },
-    [CC_OP_SUBX] = { compute_all_subx_xcc, compute_C_subx_xcc },
-    [CC_OP_TSUB] = { compute_all_sub_xcc, compute_C_sub_xcc },
-    [CC_OP_TSUBTV] = { compute_all_sub_xcc, compute_C_sub_xcc },
-    [CC_OP_LOGIC] = { compute_all_logic_xcc, compute_C_logic },
-};
-#endif
-
-void helper_compute_psr(void)
-{
-    uint32_t new_psr;
-
-    new_psr = icc_table[CC_OP].compute_all();
-    env->psr = new_psr;
-#ifdef TARGET_SPARC64
-    new_psr = xcc_table[CC_OP].compute_all();
-    env->xcc = new_psr;
-#endif
-    CC_OP = CC_OP_FLAGS;
-}
-
-uint32_t helper_compute_C_icc(void)
-{
-    uint32_t ret;
-
-    ret = icc_table[CC_OP].compute_c() >> PSR_CARRY_SHIFT;
-    return ret;
-}
-
 #ifdef TARGET_SPARC64
 GEN_FCMPS(fcmps_fcc1, float32, 22, 0);
 GEN_FCMP(fcmpd_fcc1, float64, DT0, DT1, 22, 0);
@@ -1311,14 +729,11 @@ GEN_FCMP(fcmpeq_fcc3, float128, QT0, QT1, 26, 1);
     defined(DEBUG_MXCC)
 static void dump_mxcc(CPUState *env)
 {
-    printf("mxccdata: %016" PRIx64 " %016" PRIx64 " %016" PRIx64 " %016" PRIx64
-           "\n",
+    printf("mxccdata: %016llx %016llx %016llx %016llx\n",
            env->mxccdata[0], env->mxccdata[1],
            env->mxccdata[2], env->mxccdata[3]);
-    printf("mxccregs: %016" PRIx64 " %016" PRIx64 " %016" PRIx64 " %016" PRIx64
-           "\n"
-           "          %016" PRIx64 " %016" PRIx64 " %016" PRIx64 " %016" PRIx64
-           "\n",
+    printf("mxccregs: %016llx %016llx %016llx %016llx\n"
+           "          %016llx %016llx %016llx %016llx\n",
            env->mxccregs[0], env->mxccregs[1],
            env->mxccregs[2], env->mxccregs[3],
            env->mxccregs[4], env->mxccregs[5],
@@ -1557,8 +972,7 @@ uint64_t helper_ld_asi(target_ulong addr, int asi, int size, int sign)
                 env->mmubpregs[reg] = 0ULL;
                 break;
             }
-            DPRINTF_MMU("read breakpoint reg[%d] 0x%016" PRIx64 "\n", reg,
-                        ret);
+            DPRINTF_MMU("read breakpoint reg[%d] 0x%016llx\n", reg, ret);
         }
         break;
     case 8: /* User code access, XXX */
@@ -1911,7 +1325,7 @@ void helper_st_asi(target_ulong addr, uint64_t val, int asi, int size)
                 env->mmubpregs[reg] = (val & 0xfULL);
                 break;
             }
-            DPRINTF_MMU("write breakpoint reg[%d] 0x%016x\n", reg,
+            DPRINTF_MMU("write breakpoint reg[%d] 0x%016llx\n", reg,
                         env->mmuregs[reg]);
         }
         break;
@@ -2052,13 +1466,13 @@ void helper_st_asi(target_ulong addr, target_ulong val, int asi, int size)
     case 0x89: // Secondary LE
         switch(size) {
         case 2:
-            val = bswap16(val);
+            addr = bswap16(addr);
             break;
         case 4:
-            val = bswap32(val);
+            addr = bswap32(addr);
             break;
         case 8:
-            val = bswap64(val);
+            addr = bswap64(addr);
             break;
         default:
             break;
@@ -2111,8 +1525,6 @@ uint64_t helper_ld_asi(target_ulong addr, int asi, int size, int sign)
 #if defined(DEBUG_ASI)
     target_ulong last_addr = addr;
 #endif
-
-    asi &= 0xff;
 
     if ((asi < 0x80 && (env->pstate & PS_PRIV) == 0)
         || ((env->def->features & CPU_FEATURE_HYPV)
@@ -2242,85 +1654,46 @@ uint64_t helper_ld_asi(target_ulong addr, int asi, int size, int sign)
         {
             int reg = (addr >> 3) & 0xf;
 
-            if (reg == 0) {
-                // I-TSB Tag Target register
-                ret = ultrasparc_tag_target(env->immu.tag_access);
-            } else {
-                ret = env->immuregs[reg];
-            }
-
+            ret = env->immuregs[reg];
             break;
         }
     case 0x51: // I-MMU 8k TSB pointer
-        {
-            // env->immuregs[5] holds I-MMU TSB register value
-            // env->immuregs[6] holds I-MMU Tag Access register value
-            ret = ultrasparc_tsb_pointer(env->immu.tsb, env->immu.tag_access,
-                                         8*1024);
-            break;
-        }
     case 0x52: // I-MMU 64k TSB pointer
-        {
-            // env->immuregs[5] holds I-MMU TSB register value
-            // env->immuregs[6] holds I-MMU Tag Access register value
-            ret = ultrasparc_tsb_pointer(env->immu.tsb, env->immu.tag_access,
-                                         64*1024);
-            break;
-        }
+        // XXX
+        break;
     case 0x55: // I-MMU data access
         {
             int reg = (addr >> 3) & 0x3f;
 
-            ret = env->itlb[reg].tte;
+            ret = env->itlb_tte[reg];
             break;
         }
     case 0x56: // I-MMU tag read
         {
             int reg = (addr >> 3) & 0x3f;
 
-            ret = env->itlb[reg].tag;
+            ret = env->itlb_tag[reg];
             break;
         }
     case 0x58: // D-MMU regs
         {
             int reg = (addr >> 3) & 0xf;
 
-            if (reg == 0) {
-                // D-TSB Tag Target register
-                ret = ultrasparc_tag_target(env->dmmu.tag_access);
-            } else {
-                ret = env->dmmuregs[reg];
-            }
-            break;
-        }
-    case 0x59: // D-MMU 8k TSB pointer
-        {
-            // env->dmmuregs[5] holds D-MMU TSB register value
-            // env->dmmuregs[6] holds D-MMU Tag Access register value
-            ret = ultrasparc_tsb_pointer(env->dmmu.tsb, env->dmmu.tag_access,
-                                         8*1024);
-            break;
-        }
-    case 0x5a: // D-MMU 64k TSB pointer
-        {
-            // env->dmmuregs[5] holds D-MMU TSB register value
-            // env->dmmuregs[6] holds D-MMU Tag Access register value
-            ret = ultrasparc_tsb_pointer(env->dmmu.tsb, env->dmmu.tag_access,
-                                         64*1024);
+            ret = env->dmmuregs[reg];
             break;
         }
     case 0x5d: // D-MMU data access
         {
             int reg = (addr >> 3) & 0x3f;
 
-            ret = env->dtlb[reg].tte;
+            ret = env->dtlb_tte[reg];
             break;
         }
     case 0x5e: // D-MMU tag read
         {
             int reg = (addr >> 3) & 0x3f;
 
-            ret = env->dtlb[reg].tag;
+            ret = env->dtlb_tag[reg];
             break;
         }
     case 0x46: // D-cache data
@@ -2336,6 +1709,8 @@ uint64_t helper_ld_asi(target_ulong addr, int asi, int size, int sign)
     case 0x76: // E-cache tag
     case 0x7e: // E-cache tag
         break;
+    case 0x59: // D-MMU 8k TSB pointer
+    case 0x5a: // D-MMU 64k TSB pointer
     case 0x5b: // D-MMU data pointer
     case 0x48: // Interrupt dispatch, RO
     case 0x49: // Interrupt data receive
@@ -2408,9 +1783,6 @@ void helper_st_asi(target_ulong addr, target_ulong val, int asi, int size)
 #ifdef DEBUG_ASI
     dump_asi("write", addr, asi, size, val);
 #endif
-
-    asi &= 0xff;
-
     if ((asi < 0x80 && (env->pstate & PS_PRIV) == 0)
         || ((env->def->features & CPU_FEATURE_HYPV)
             && asi >= 0x30 && asi < 0x80
@@ -2429,13 +1801,13 @@ void helper_st_asi(target_ulong addr, target_ulong val, int asi, int size)
     case 0x89: // Secondary LE
         switch(size) {
         case 2:
-            val = bswap16(val);
+            addr = bswap16(addr);
             break;
         case 4:
-            val = bswap32(val);
+            addr = bswap32(addr);
             break;
         case 8:
-            val = bswap64(val);
+            addr = bswap64(addr);
             break;
         default:
             break;
@@ -2566,34 +1938,25 @@ void helper_st_asi(target_ulong addr, target_ulong val, int asi, int size)
             oldreg = env->immuregs[reg];
             switch(reg) {
             case 0: // RO
+            case 4:
                 return;
             case 1: // Not in I-MMU
             case 2:
+            case 7:
+            case 8:
                 return;
             case 3: // SFSR
                 if ((val & 1) == 0)
                     val = 0; // Clear SFSR
-                env->immu.sfsr = val;
                 break;
-            case 4: // RO
-                return;
             case 5: // TSB access
-                DPRINTF_MMU("immu TSB write: 0x%016" PRIx64 " -> 0x%016"
-                            PRIx64 "\n", env->immu.tsb, val);
-                env->immu.tsb = val;
-                break;
             case 6: // Tag access
-                env->immu.tag_access = val;
-                break;
-            case 7:
-            case 8:
-                return;
             default:
                 break;
             }
-
+            env->immuregs[reg] = val;
             if (oldreg != env->immuregs[reg]) {
-                DPRINTF_MMU("immu change reg[%d]: 0x%016" PRIx64 " -> 0x%016"
+                DPRINTF_MMU("mmu change reg[%d]: 0x%08" PRIx64 " -> 0x%08"
                             PRIx64 "\n", reg, oldreg, env->immuregs[reg]);
             }
 #ifdef DEBUG_MMU
@@ -2602,24 +1965,55 @@ void helper_st_asi(target_ulong addr, target_ulong val, int asi, int size)
             return;
         }
     case 0x54: // I-MMU data in
-        replace_tlb_1bit_lru(env->itlb, env->immu.tag_access, val, "immu", env);
-        return;
+        {
+            unsigned int i;
+
+            // Try finding an invalid entry
+            for (i = 0; i < 64; i++) {
+                if ((env->itlb_tte[i] & 0x8000000000000000ULL) == 0) {
+                    env->itlb_tag[i] = env->immuregs[6];
+                    env->itlb_tte[i] = val;
+                    return;
+                }
+            }
+            // Try finding an unlocked entry
+            for (i = 0; i < 64; i++) {
+                if ((env->itlb_tte[i] & 0x40) == 0) {
+                    env->itlb_tag[i] = env->immuregs[6];
+                    env->itlb_tte[i] = val;
+                    return;
+                }
+            }
+            // error state?
+            return;
+        }
     case 0x55: // I-MMU data access
         {
             // TODO: auto demap
 
             unsigned int i = (addr >> 3) & 0x3f;
 
-            replace_tlb_entry(&env->itlb[i], env->immu.tag_access, val, env);
-
-#ifdef DEBUG_MMU
-            DPRINTF_MMU("immu data access replaced entry [%i]\n", i);
-            dump_mmu(env);
-#endif
+            env->itlb_tag[i] = env->immuregs[6];
+            env->itlb_tte[i] = val;
             return;
         }
     case 0x57: // I-MMU demap
-        demap_tlb(env->itlb, val, "immu", env);
+        {
+            unsigned int i;
+
+            for (i = 0; i < 64; i++) {
+                if ((env->itlb_tte[i] & 0x8000000000000000ULL) != 0) {
+                    target_ulong mask = 0xffffffffffffe000ULL;
+
+                    mask <<= 3 * ((env->itlb_tte[i] >> 61) & 3);
+                    if ((val & mask) == (env->itlb_tag[i] & mask)) {
+                        env->itlb_tag[i] = 0;
+                        env->itlb_tte[i] = 0;
+                    }
+                    return;
+                }
+            }
+        }
         return;
     case 0x58: // D-MMU regs
         {
@@ -2634,33 +2028,22 @@ void helper_st_asi(target_ulong addr, target_ulong val, int asi, int size)
             case 3: // SFSR
                 if ((val & 1) == 0) {
                     val = 0; // Clear SFSR, Fault address
-                    env->dmmu.sfar = 0;
+                    env->dmmuregs[4] = 0;
                 }
-                env->dmmu.sfsr = val;
+                env->dmmuregs[reg] = val;
                 break;
             case 1: // Primary context
-                env->dmmu.mmu_primary_context = val;
-                break;
             case 2: // Secondary context
-                env->dmmu.mmu_secondary_context = val;
-                break;
             case 5: // TSB access
-                DPRINTF_MMU("dmmu TSB write: 0x%016" PRIx64 " -> 0x%016"
-                            PRIx64 "\n", env->dmmu.tsb, val);
-                env->dmmu.tsb = val;
-                break;
             case 6: // Tag access
-                env->dmmu.tag_access = val;
-                break;
             case 7: // Virtual Watchpoint
             case 8: // Physical Watchpoint
             default:
-                env->dmmuregs[reg] = val;
                 break;
             }
-
+            env->dmmuregs[reg] = val;
             if (oldreg != env->dmmuregs[reg]) {
-                DPRINTF_MMU("dmmu change reg[%d]: 0x%016" PRIx64 " -> 0x%016"
+                DPRINTF_MMU("mmu change reg[%d]: 0x%08" PRIx64 " -> 0x%08"
                             PRIx64 "\n", reg, oldreg, env->dmmuregs[reg]);
             }
 #ifdef DEBUG_MMU
@@ -2669,22 +2052,53 @@ void helper_st_asi(target_ulong addr, target_ulong val, int asi, int size)
             return;
         }
     case 0x5c: // D-MMU data in
-        replace_tlb_1bit_lru(env->dtlb, env->dmmu.tag_access, val, "dmmu", env);
-        return;
+        {
+            unsigned int i;
+
+            // Try finding an invalid entry
+            for (i = 0; i < 64; i++) {
+                if ((env->dtlb_tte[i] & 0x8000000000000000ULL) == 0) {
+                    env->dtlb_tag[i] = env->dmmuregs[6];
+                    env->dtlb_tte[i] = val;
+                    return;
+                }
+            }
+            // Try finding an unlocked entry
+            for (i = 0; i < 64; i++) {
+                if ((env->dtlb_tte[i] & 0x40) == 0) {
+                    env->dtlb_tag[i] = env->dmmuregs[6];
+                    env->dtlb_tte[i] = val;
+                    return;
+                }
+            }
+            // error state?
+            return;
+        }
     case 0x5d: // D-MMU data access
         {
             unsigned int i = (addr >> 3) & 0x3f;
 
-            replace_tlb_entry(&env->dtlb[i], env->dmmu.tag_access, val, env);
-
-#ifdef DEBUG_MMU
-            DPRINTF_MMU("dmmu data access replaced entry [%i]\n", i);
-            dump_mmu(env);
-#endif
+            env->dtlb_tag[i] = env->dmmuregs[6];
+            env->dtlb_tte[i] = val;
             return;
         }
     case 0x5f: // D-MMU demap
-        demap_tlb(env->dtlb, val, "dmmu", env);
+        {
+            unsigned int i;
+
+            for (i = 0; i < 64; i++) {
+                if ((env->dtlb_tte[i] & 0x8000000000000000ULL) != 0) {
+                    target_ulong mask = 0xffffffffffffe000ULL;
+
+                    mask <<= 3 * ((env->dtlb_tte[i] >> 61) & 3);
+                    if ((val & mask) == (env->dtlb_tag[i] & mask)) {
+                        env->dtlb_tag[i] = 0;
+                        env->dtlb_tte[i] = 0;
+                    }
+                    return;
+                }
+            }
+        }
         return;
     case 0x49: // Interrupt data receive
         // XXX
@@ -3291,14 +2705,8 @@ static inline void change_pstate(uint64_t new_pstate)
     uint64_t pstate_regs, new_pstate_regs;
     uint64_t *src, *dst;
 
-    if (env->def->features & CPU_FEATURE_GL) {
-        // PS_AG is not implemented in this case
-        new_pstate &= ~PS_AG;
-    }
-
     pstate_regs = env->pstate & 0xc01;
     new_pstate_regs = new_pstate & 0xc01;
-
     if (new_pstate_regs != pstate_regs) {
         // Switch global register bank
         src = get_gregset(new_pstate_regs);
@@ -3311,33 +2719,32 @@ static inline void change_pstate(uint64_t new_pstate)
 
 void helper_wrpstate(target_ulong new_state)
 {
-    change_pstate(new_state & 0xf3f);
+    if (!(env->def->features & CPU_FEATURE_GL))
+        change_pstate(new_state & 0xf3f);
 }
 
 void helper_done(void)
 {
-    trap_state* tsptr = cpu_tsptr(env);
-
-    env->pc = tsptr->tnpc;
-    env->npc = tsptr->tnpc + 4;
-    PUT_CCR(env, tsptr->tstate >> 32);
-    env->asi = (tsptr->tstate >> 24) & 0xff;
-    change_pstate((tsptr->tstate >> 8) & 0xf3f);
-    PUT_CWP64(env, tsptr->tstate & 0xff);
+    env->pc = env->tsptr->tpc;
+    env->npc = env->tsptr->tnpc + 4;
+    PUT_CCR(env, env->tsptr->tstate >> 32);
+    env->asi = (env->tsptr->tstate >> 24) & 0xff;
+    change_pstate((env->tsptr->tstate >> 8) & 0xf3f);
+    PUT_CWP64(env, env->tsptr->tstate & 0xff);
     env->tl--;
+    env->tsptr = &env->ts[env->tl & MAXTL_MASK];
 }
 
 void helper_retry(void)
 {
-    trap_state* tsptr = cpu_tsptr(env);
-
-    env->pc = tsptr->tpc;
-    env->npc = tsptr->tnpc;
-    PUT_CCR(env, tsptr->tstate >> 32);
-    env->asi = (tsptr->tstate >> 24) & 0xff;
-    change_pstate((tsptr->tstate >> 8) & 0xf3f);
-    PUT_CWP64(env, tsptr->tstate & 0xff);
+    env->pc = env->tsptr->tpc;
+    env->npc = env->tsptr->tnpc;
+    PUT_CCR(env, env->tsptr->tstate >> 32);
+    env->asi = (env->tsptr->tstate >> 24) & 0xff;
+    change_pstate((env->tsptr->tstate >> 8) & 0xf3f);
+    PUT_CWP64(env, env->tsptr->tstate & 0xff);
     env->tl--;
+    env->tsptr = &env->ts[env->tl & MAXTL_MASK];
 }
 
 void helper_set_softint(uint64_t value)
@@ -3399,15 +2806,9 @@ static const char * const excp_names[0x80] = {
 };
 #endif
 
-trap_state* cpu_tsptr(CPUState* env)
-{
-    return &env->ts[env->tl & MAXTL_MASK];
-}
-
 void do_interrupt(CPUState *env)
 {
     int intno = env->exception_index;
-    trap_state* tsptr;
 
 #ifdef DEBUG_PCALL
     if (qemu_loglevel_mask(CPU_LOG_INT)) {
@@ -3464,31 +2865,30 @@ void do_interrupt(CPUState *env)
         if (env->tl < env->maxtl)
             env->tl++;
     }
-    tsptr = cpu_tsptr(env);
-
-    tsptr->tstate = ((uint64_t)GET_CCR(env) << 32) |
+    env->tsptr = &env->ts[env->tl & MAXTL_MASK];
+    env->tsptr->tstate = ((uint64_t)GET_CCR(env) << 32) |
         ((env->asi & 0xff) << 24) | ((env->pstate & 0xf3f) << 8) |
         GET_CWP64(env);
-    tsptr->tpc = env->pc;
-    tsptr->tnpc = env->npc;
-    tsptr->tt = intno;
-
-    switch (intno) {
-    case TT_IVEC:
-        change_pstate(PS_PEF | PS_PRIV | PS_IG);
-        break;
-    case TT_TFAULT:
-    case TT_TMISS:
-    case TT_DFAULT:
-    case TT_DMISS:
-    case TT_DPROT:
-        change_pstate(PS_PEF | PS_PRIV | PS_MG);
-        break;
-    default:
-        change_pstate(PS_PEF | PS_PRIV | PS_AG);
-        break;
+    env->tsptr->tpc = env->pc;
+    env->tsptr->tnpc = env->npc;
+    env->tsptr->tt = intno;
+    if (!(env->def->features & CPU_FEATURE_GL)) {
+        switch (intno) {
+        case TT_IVEC:
+            change_pstate(PS_PEF | PS_PRIV | PS_IG);
+            break;
+        case TT_TFAULT:
+        case TT_TMISS:
+        case TT_DFAULT:
+        case TT_DMISS:
+        case TT_DPROT:
+            change_pstate(PS_PEF | PS_PRIV | PS_MG);
+            break;
+        default:
+            change_pstate(PS_PEF | PS_PRIV | PS_AG);
+            break;
+        }
     }
-
     if (intno == TT_CLRWIN)
         cpu_set_cwp(env, cpu_cwp_dec(env, env->cwp - 1));
     else if ((intno & 0x1c0) == TT_SPILL)

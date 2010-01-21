@@ -5,8 +5,6 @@
 
 #define ELF_MACHINE	EM_MIPS
 
-#define CPUState struct CPUMIPSState
-
 #include "config.h"
 #include "mips-defs.h"
 #include "cpu-defs.h"
@@ -14,7 +12,7 @@
 
 // uint_fast8_t and uint_fast16_t not in <sys/int_types.h>
 // XXX: move that elsewhere
-#if defined(CONFIG_SOLARIS) && CONFIG_SOLARIS_VERSION < 10
+#if defined(HOST_SOLARIS) && HOST_SOLARIS < 10
 typedef unsigned char           uint_fast8_t;
 typedef unsigned int            uint_fast16_t;
 #endif
@@ -41,10 +39,10 @@ struct CPUMIPSTLBContext {
     uint32_t nb_tlb;
     uint32_t tlb_in_use;
     int (*map_address) (struct CPUMIPSState *env, target_ulong *physical, int *prot, target_ulong address, int rw, int access_type);
-    void (*helper_tlbwi) (void);
-    void (*helper_tlbwr) (void);
-    void (*helper_tlbp) (void);
-    void (*helper_tlbr) (void);
+    void (*do_tlbwi) (void);
+    void (*do_tlbwr) (void);
+    void (*do_tlbp) (void);
+    void (*do_tlbr) (void);
     union {
         struct {
             r4k_tlb_t tlb[MIPS_TLB_MAX];
@@ -62,7 +60,7 @@ union fpr_t {
 /* define FP_ENDIAN_IDX to access the same location
  * in the fpr_t union regardless of the host endianess
  */
-#if defined(HOST_WORDS_BIGENDIAN)
+#if defined(WORDS_BIGENDIAN)
 #  define FP_ENDIAN_IDX 1
 #else
 #  define FP_ENDIAN_IDX 0
@@ -375,9 +373,6 @@ struct CPUMIPSState {
     int32_t CP0_Config7;
     /* XXX: Maybe make LLAddr per-TC? */
     target_ulong CP0_LLAddr;
-    target_ulong llval;
-    target_ulong llnewval;
-    target_ulong llreg;
     target_ulong CP0_WatchLo[8];
     int32_t CP0_WatchHi[8];
     target_ulong CP0_XContext;
@@ -446,7 +441,7 @@ struct CPUMIPSState {
 #define MIPS_HFLAG_BL     0x0C00 /* Likely branch                      */
 #define MIPS_HFLAG_BR     0x1000 /* branch to register (can't link TB) */
     target_ulong btarget;        /* Jump / branch target               */
-    target_ulong bcond;          /* Branch condition (if needed)       */
+    int bcond;                   /* Branch condition (if needed)       */
 
     int SYNCI_Step; /* Address step size for SYNCI */
     int CCRes; /* Cycle count resolution/divisor */
@@ -469,15 +464,16 @@ int fixed_mmu_map_address (CPUMIPSState *env, target_ulong *physical, int *prot,
                            target_ulong address, int rw, int access_type);
 int r4k_map_address (CPUMIPSState *env, target_ulong *physical, int *prot,
                      target_ulong address, int rw, int access_type);
-void r4k_helper_tlbwi (void);
-void r4k_helper_tlbwr (void);
-void r4k_helper_tlbp (void);
-void r4k_helper_tlbr (void);
+void r4k_do_tlbwi (void);
+void r4k_do_tlbwr (void);
+void r4k_do_tlbp (void);
+void r4k_do_tlbr (void);
 void mips_cpu_list (FILE *f, int (*cpu_fprintf)(FILE *f, const char *fmt, ...));
 
 void do_unassigned_access(target_phys_addr_t addr, int is_write, int is_exec,
                           int unused, int size);
 
+#define CPUState CPUMIPSState
 #define cpu_init cpu_mips_init
 #define cpu_exec cpu_mips_exec
 #define cpu_gen_code cpu_mips_gen_code
@@ -562,8 +558,6 @@ enum {
 
     EXCP_LAST = EXCP_CACHE,
 };
-/* Dummy exception for conditional stores.  */
-#define EXCP_SC 0x100
 
 int cpu_mips_exec(CPUMIPSState *s);
 CPUMIPSState *cpu_mips_init(const char *cpu_model);
@@ -584,7 +578,6 @@ void cpu_mips_update_irq (CPUState *env);
 /* helper.c */
 int cpu_mips_handle_mmu_fault (CPUState *env, target_ulong address, int rw,
                                int mmu_idx, int is_softmmu);
-#define cpu_handle_mmu_fault cpu_mips_handle_mmu_fault
 void do_interrupt (CPUState *env);
 void r4k_invalidate_tlb (CPUState *env, int idx, int use_extra);
 
@@ -601,11 +594,6 @@ static inline void cpu_get_tb_cpu_state(CPUState *env, target_ulong *pc,
     *pc = env->active_tc.PC;
     *cs_base = 0;
     *flags = env->hflags & (MIPS_HFLAG_TMASK | MIPS_HFLAG_BMASK);
-}
-
-static inline void cpu_set_tls(CPUState *env, target_ulong newtls)
-{
-    env->tls_value = newtls;
 }
 
 #endif /* !defined (__MIPS_CPU_H__) */

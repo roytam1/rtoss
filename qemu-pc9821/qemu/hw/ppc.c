@@ -27,7 +27,6 @@
 #include "sysemu.h"
 #include "nvram.h"
 #include "qemu-log.h"
-#include "loader.h"
 
 //#define PPC_DEBUG_IRQ
 //#define PPC_DEBUG_TB
@@ -394,11 +393,11 @@ struct ppc_tb_t {
     void *opaque;
 };
 
-static inline uint64_t cpu_ppc_get_tb(ppc_tb_t *tb_env, uint64_t vmclk,
-                                      int64_t tb_offset)
+static always_inline uint64_t cpu_ppc_get_tb (ppc_tb_t *tb_env, uint64_t vmclk,
+                                              int64_t tb_offset)
 {
     /* TB time in tb periods */
-    return muldiv64(vmclk, tb_env->tb_freq, get_ticks_per_sec()) + tb_offset;
+    return muldiv64(vmclk, tb_env->tb_freq, ticks_per_sec) + tb_offset;
 }
 
 uint32_t cpu_ppc_load_tbl (CPUState *env)
@@ -412,7 +411,7 @@ uint32_t cpu_ppc_load_tbl (CPUState *env)
     return tb & 0xFFFFFFFF;
 }
 
-static inline uint32_t _cpu_ppc_load_tbu(CPUState *env)
+static always_inline uint32_t _cpu_ppc_load_tbu (CPUState *env)
 {
     ppc_tb_t *tb_env = env->tb_env;
     uint64_t tb;
@@ -428,10 +427,11 @@ uint32_t cpu_ppc_load_tbu (CPUState *env)
     return _cpu_ppc_load_tbu(env);
 }
 
-static inline void cpu_ppc_store_tb(ppc_tb_t *tb_env, uint64_t vmclk,
-                                    int64_t *tb_offsetp, uint64_t value)
+static always_inline void cpu_ppc_store_tb (ppc_tb_t *tb_env, uint64_t vmclk,
+                                            int64_t *tb_offsetp,
+                                            uint64_t value)
 {
-    *tb_offsetp = value - muldiv64(vmclk, tb_env->tb_freq, get_ticks_per_sec());
+    *tb_offsetp = value - muldiv64(vmclk, tb_env->tb_freq, ticks_per_sec);
     LOG_TB("%s: tb %016" PRIx64 " offset %08" PRIx64 "\n",
                 __func__, value, *tb_offsetp);
 }
@@ -447,7 +447,7 @@ void cpu_ppc_store_tbl (CPUState *env, uint32_t value)
                      &tb_env->tb_offset, tb | (uint64_t)value);
 }
 
-static inline void _cpu_ppc_store_tbu(CPUState *env, uint32_t value)
+static always_inline void _cpu_ppc_store_tbu (CPUState *env, uint32_t value)
 {
     ppc_tb_t *tb_env = env->tb_env;
     uint64_t tb;
@@ -550,17 +550,18 @@ static void cpu_ppc_tb_start (CPUState *env)
     }
 }
 
-static inline uint32_t _cpu_ppc_load_decr(CPUState *env, uint64_t next)
+static always_inline uint32_t _cpu_ppc_load_decr (CPUState *env,
+                                                  uint64_t *next)
 {
     ppc_tb_t *tb_env = env->tb_env;
     uint32_t decr;
     int64_t diff;
 
-    diff = next - qemu_get_clock(vm_clock);
+    diff = tb_env->decr_next - qemu_get_clock(vm_clock);
     if (diff >= 0)
-        decr = muldiv64(diff, tb_env->decr_freq, get_ticks_per_sec());
+        decr = muldiv64(diff, tb_env->decr_freq, ticks_per_sec);
     else
-        decr = -muldiv64(-diff, tb_env->decr_freq, get_ticks_per_sec());
+        decr = -muldiv64(-diff, tb_env->decr_freq, ticks_per_sec);
     LOG_TB("%s: %08" PRIx32 "\n", __func__, decr);
 
     return decr;
@@ -570,14 +571,14 @@ uint32_t cpu_ppc_load_decr (CPUState *env)
 {
     ppc_tb_t *tb_env = env->tb_env;
 
-    return _cpu_ppc_load_decr(env, tb_env->decr_next);
+    return _cpu_ppc_load_decr(env, &tb_env->decr_next);
 }
 
 uint32_t cpu_ppc_load_hdecr (CPUState *env)
 {
     ppc_tb_t *tb_env = env->tb_env;
 
-    return _cpu_ppc_load_decr(env, tb_env->hdecr_next);
+    return _cpu_ppc_load_decr(env, &tb_env->hdecr_next);
 }
 
 uint64_t cpu_ppc_load_purr (CPUState *env)
@@ -587,20 +588,20 @@ uint64_t cpu_ppc_load_purr (CPUState *env)
 
     diff = qemu_get_clock(vm_clock) - tb_env->purr_start;
 
-    return tb_env->purr_load + muldiv64(diff, tb_env->tb_freq, get_ticks_per_sec());
+    return tb_env->purr_load + muldiv64(diff, tb_env->tb_freq, ticks_per_sec);
 }
 
 /* When decrementer expires,
  * all we need to do is generate or queue a CPU exception
  */
-static inline void cpu_ppc_decr_excp(CPUState *env)
+static always_inline void cpu_ppc_decr_excp (CPUState *env)
 {
     /* Raise it */
     LOG_TB("raise decrementer exception\n");
     ppc_set_irq(env, PPC_INTERRUPT_DECR, 1);
 }
 
-static inline void cpu_ppc_hdecr_excp(CPUState *env)
+static always_inline void cpu_ppc_hdecr_excp (CPUState *env)
 {
     /* Raise it */
     LOG_TB("raise decrementer exception\n");
@@ -619,7 +620,7 @@ static void __cpu_ppc_store_decr (CPUState *env, uint64_t *nextp,
     LOG_TB("%s: %08" PRIx32 " => %08" PRIx32 "\n", __func__,
                 decr, value);
     now = qemu_get_clock(vm_clock);
-    next = now + muldiv64(value, get_ticks_per_sec(), tb_env->decr_freq);
+    next = now + muldiv64(value, ticks_per_sec, tb_env->decr_freq);
     if (is_excp)
         next += *nextp - now;
     if (next == now)
@@ -634,8 +635,8 @@ static void __cpu_ppc_store_decr (CPUState *env, uint64_t *nextp,
         (*raise_excp)(env);
 }
 
-static inline void _cpu_ppc_store_decr(CPUState *env, uint32_t decr,
-                                       uint32_t value, int is_excp)
+static always_inline void _cpu_ppc_store_decr (CPUState *env, uint32_t decr,
+                                               uint32_t value, int is_excp)
 {
     ppc_tb_t *tb_env = env->tb_env;
 
@@ -653,8 +654,8 @@ static void cpu_ppc_decr_cb (void *opaque)
     _cpu_ppc_store_decr(opaque, 0x00000000, 0xFFFFFFFF, 1);
 }
 
-static inline void _cpu_ppc_store_hdecr(CPUState *env, uint32_t hdecr,
-                                        uint32_t value, int is_excp)
+static always_inline void _cpu_ppc_store_hdecr (CPUState *env, uint32_t hdecr,
+                                                uint32_t value, int is_excp)
 {
     ppc_tb_t *tb_env = env->tb_env;
 
@@ -789,16 +790,16 @@ static void cpu_4xx_fit_cb (void *opaque)
         /* Cannot occur, but makes gcc happy */
         return;
     }
-    next = now + muldiv64(next, get_ticks_per_sec(), tb_env->tb_freq);
+    next = now + muldiv64(next, ticks_per_sec, tb_env->tb_freq);
     if (next == now)
         next++;
     qemu_mod_timer(ppcemb_timer->fit_timer, next);
     env->spr[SPR_40x_TSR] |= 1 << 26;
     if ((env->spr[SPR_40x_TCR] >> 23) & 0x1)
         ppc_set_irq(env, PPC_INTERRUPT_FIT, 1);
-    LOG_TB("%s: ir %d TCR " TARGET_FMT_lx " TSR " TARGET_FMT_lx "\n", __func__,
-           (int)((env->spr[SPR_40x_TCR] >> 23) & 0x1),
-           env->spr[SPR_40x_TCR], env->spr[SPR_40x_TSR]);
+    LOG_TB("%s: ir %d TCR " ADDRX " TSR " ADDRX "\n", __func__,
+                (int)((env->spr[SPR_40x_TCR] >> 23) & 0x1),
+                env->spr[SPR_40x_TCR], env->spr[SPR_40x_TSR]);
 }
 
 /* Programmable interval timer */
@@ -819,7 +820,7 @@ static void start_stop_pit (CPUState *env, ppc_tb_t *tb_env, int is_excp)
                     __func__, ppcemb_timer->pit_reload);
         now = qemu_get_clock(vm_clock);
         next = now + muldiv64(ppcemb_timer->pit_reload,
-                              get_ticks_per_sec(), tb_env->decr_freq);
+                              ticks_per_sec, tb_env->decr_freq);
         if (is_excp)
             next += tb_env->decr_next - now;
         if (next == now)
@@ -842,12 +843,12 @@ static void cpu_4xx_pit_cb (void *opaque)
     if ((env->spr[SPR_40x_TCR] >> 26) & 0x1)
         ppc_set_irq(env, PPC_INTERRUPT_PIT, 1);
     start_stop_pit(env, tb_env, 1);
-    LOG_TB("%s: ar %d ir %d TCR " TARGET_FMT_lx " TSR " TARGET_FMT_lx " "
-           "%016" PRIx64 "\n", __func__,
-           (int)((env->spr[SPR_40x_TCR] >> 22) & 0x1),
-           (int)((env->spr[SPR_40x_TCR] >> 26) & 0x1),
-           env->spr[SPR_40x_TCR], env->spr[SPR_40x_TSR],
-           ppcemb_timer->pit_reload);
+    LOG_TB("%s: ar %d ir %d TCR " ADDRX " TSR " ADDRX " "
+                "%016" PRIx64 "\n", __func__,
+                (int)((env->spr[SPR_40x_TCR] >> 22) & 0x1),
+                (int)((env->spr[SPR_40x_TCR] >> 26) & 0x1),
+                env->spr[SPR_40x_TCR], env->spr[SPR_40x_TSR],
+                ppcemb_timer->pit_reload);
 }
 
 /* Watchdog timer */
@@ -879,11 +880,11 @@ static void cpu_4xx_wdt_cb (void *opaque)
         /* Cannot occur, but makes gcc happy */
         return;
     }
-    next = now + muldiv64(next, get_ticks_per_sec(), tb_env->decr_freq);
+    next = now + muldiv64(next, ticks_per_sec, tb_env->decr_freq);
     if (next == now)
         next++;
-    LOG_TB("%s: TCR " TARGET_FMT_lx " TSR " TARGET_FMT_lx "\n", __func__,
-           env->spr[SPR_40x_TCR], env->spr[SPR_40x_TSR]);
+    LOG_TB("%s: TCR " ADDRX " TSR " ADDRX "\n", __func__,
+                env->spr[SPR_40x_TCR], env->spr[SPR_40x_TSR]);
     switch ((env->spr[SPR_40x_TSR] >> 30) & 0x3) {
     case 0x0:
     case 0x1:
@@ -925,7 +926,7 @@ void store_40x_pit (CPUState *env, target_ulong val)
 
     tb_env = env->tb_env;
     ppcemb_timer = tb_env->opaque;
-    LOG_TB("%s val" TARGET_FMT_lx "\n", __func__, val);
+    LOG_TB("%s val" ADDRX "\n", __func__, val);
     ppcemb_timer->pit_reload = val;
     start_stop_pit(env, tb_env, 0);
 }
@@ -937,7 +938,7 @@ target_ulong load_40x_pit (CPUState *env)
 
 void store_booke_tsr (CPUState *env, target_ulong val)
 {
-    LOG_TB("%s: val " TARGET_FMT_lx "\n", __func__, val);
+    LOG_TB("%s: val " ADDRX "\n", __func__, val);
     env->spr[SPR_40x_TSR] &= ~(val & 0xFC000000);
     if (val & 0x80000000)
         ppc_set_irq(env, PPC_INTERRUPT_PIT, 0);
@@ -948,7 +949,7 @@ void store_booke_tcr (CPUState *env, target_ulong val)
     ppc_tb_t *tb_env;
 
     tb_env = env->tb_env;
-    LOG_TB("%s: val " TARGET_FMT_lx "\n", __func__, val);
+    LOG_TB("%s: val " ADDRX "\n", __func__, val);
     env->spr[SPR_40x_TCR] = val & 0xFFC00000;
     start_stop_pit(env, tb_env, 1);
     cpu_4xx_wdt_cb(env);
@@ -1256,7 +1257,7 @@ int PPC_NVRAM_set_params (nvram_t *nvram, uint16_t NVRAM_size,
     NVRAM_set_lword(nvram,  0x3C, kernel_size);
     if (cmdline) {
         /* XXX: put the cmdline in NVRAM too ? */
-        pstrcpy_targphys("cmdline", CMDLINE_ADDR, RAM_size - CMDLINE_ADDR, cmdline);
+        strcpy((char *)(phys_ram_base + CMDLINE_ADDR), cmdline);
         NVRAM_set_lword(nvram,  0x40, CMDLINE_ADDR);
         NVRAM_set_lword(nvram,  0x44, strlen(cmdline));
     } else {
