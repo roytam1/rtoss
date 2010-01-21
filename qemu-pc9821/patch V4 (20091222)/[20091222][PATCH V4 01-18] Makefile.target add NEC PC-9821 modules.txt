@@ -1,0 +1,21 @@
+Signed-off-by: TAKEDA, toshiya <t-takeda@m1.interq.or.jp>
+---
+ Makefile.target |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/Makefile.target b/Makefile.target
+index 7c1f30c..18c8428 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -195,6 +195,7 @@ obj-i386-y += cirrus_vga.o apic.o ioapic.o parallel.o acpi.o piix_pci.o
+ obj-i386-y += usb-uhci.o vmmouse.o vmport.o vmware_vga.o hpet.o
+ obj-i386-y += device-hotplug.o pci-hotplug.o smbios.o wdt_ib700.o
+ obj-i386-y += ne2000-isa.o
++obj-i386-y += ide/pc98.o pc98kbd.o pc98mouse.o pc98sys.o pc98vga.o pc98mem.o pc98.o
+ 
+ # shared objects
+ obj-ppc-y = ppc.o ide/core.o ide/qdev.o ide/isa.o ide/pci.o ide/macio.o
+-- 
+1.6.4
+
+

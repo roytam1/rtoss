@@ -1,0 +1,107 @@
+Signed-off-by: TAKEDA, toshiya <t-takeda@m1.interq.or.jp>
+---
+ sysemu.h |    3 +++
+ vl.c     |   32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 35 insertions(+), 0 deletions(-)
+
+diff --git a/sysemu.h b/sysemu.h
+index 9d80bb2..51c7ac8 100644
+--- a/sysemu.h
++++ b/sysemu.h
+@@ -45,13 +45,16 @@ void cpu_enable_ticks(void);
+ void cpu_disable_ticks(void);
+ 
+ void qemu_system_reset_request(void);
++void qemu_cpu_reset_request(void);
+ void qemu_system_shutdown_request(void);
+ void qemu_system_powerdown_request(void);
+ int qemu_shutdown_requested(void);
+ int qemu_reset_requested(void);
++int qemu_cpu_reset_requested(void);
+ int qemu_powerdown_requested(void);
+ extern qemu_irq qemu_system_powerdown;
+ void qemu_system_reset(void);
++void qemu_cpu_reset(void);
+ 
+ void do_savevm(Monitor *mon, const QDict *qdict);
+ int load_vmstate(Monitor *mon, const char *name);
+diff --git a/vl.c b/vl.c
+index e606903..565dae4 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3261,6 +3261,7 @@ typedef struct QEMUResetEntry {
+ static QTAILQ_HEAD(reset_handlers, QEMUResetEntry) reset_handlers =
+     QTAILQ_HEAD_INITIALIZER(reset_handlers);
+ static int reset_requested;
++static int cpu_reset_requested;
+ static int shutdown_requested;
+ static int powerdown_requested;
+ static int debug_requested;
+@@ -3280,6 +3281,13 @@ int qemu_reset_requested(void)
+     return r;
+ }
+ 
++int qemu_cpu_reset_requested(void)
++{
++    int r = cpu_reset_requested;
++    cpu_reset_requested = 0;
++    return r;
++}
++
+ int qemu_powerdown_requested(void)
+ {
+     int r = powerdown_requested;
+@@ -3343,6 +3351,16 @@ void qemu_system_reset(void)
+     }
+ }
+ 
++void qemu_cpu_reset(void)
++{
++    CPUState *env;
++
++    /* reset all cpus */
++    for(env = first_cpu; env != NULL; env = env->next_cpu) {
++        cpu_reset(env);
++    }
++}
++
+ void qemu_system_reset_request(void)
+ {
+     if (no_reboot) {
+@@ -3353,6 +3371,12 @@ void qemu_system_reset_request(void)
+     qemu_notify_event();
+ }
+ 
++void qemu_cpu_reset_request(void)
++{
++    cpu_reset_requested = 1;
++    qemu_notify_event();
++}
++
+ void qemu_system_shutdown_request(void)
+ {
+     shutdown_requested = 1;
+@@ -4129,6 +4153,8 @@ static int vm_can_run(void)
+         return 0;
+     if (reset_requested)
+         return 0;
++    if (cpu_reset_requested)
++        return 0;
+     if (shutdown_requested)
+         return 0;
+     if (debug_requested)
+@@ -4182,6 +4208,12 @@ static void main_loop(void)
+             qemu_system_reset();
+             resume_all_vcpus();
+         }
++        if (qemu_cpu_reset_requested()) {
++            monitor_protocol_event(QEVENT_RESET, NULL);
++            pause_all_vcpus();
++            qemu_cpu_reset();
++            resume_all_vcpus();
++        }
+         if (qemu_powerdown_requested()) {
+             monitor_protocol_event(QEVENT_POWERDOWN, NULL);
+             qemu_irq_raise(qemu_system_powerdown);
+-- 
+1.6.4

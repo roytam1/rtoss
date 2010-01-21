@@ -1,0 +1,53 @@
+Signed-off-by: TAKEDA, toshiya <t-takeda@m1.interq.or.jp>
+---
+ hw/ide/core.c     |   13 +++++++++++--
+ hw/ide/internal.h |    1 +
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 76c3820..4c77415 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -1801,8 +1801,10 @@ void ide_ioport_write(void *opaque, uint32_t addr, uint32_t val)
+         break;
+     case 6:
+ 	/* FIXME: HOB readback uses bit 7 */
+-        bus->ifs[0].select = (val & ~0x10) | 0xa0;
+-        bus->ifs[1].select = (val | 0x10) | 0xa0;
++        bus->ifs[0].select = (val & ~0x10) |
++                             (bus->ifs[0].support_chs ? 0x80 : 0xa0);
++        bus->ifs[1].select = (val | 0x10) |
++                             (bus->ifs[1].support_chs ? 0x80 : 0xa0);
+         /* select drive */
+         bus->unit = (val >> 4) & 1;
+         break;
+@@ -1839,6 +1841,13 @@ void ide_ioport_write(void *opaque, uint32_t addr, uint32_t val)
+             ide_set_irq(s->bus);
+             break;
+         case WIN_SPECIFY:
++            if (s->support_chs && !(s->select & 0x40)) {
++                uint64_t sectors;
++                bdrv_get_geometry(s->bs, &sectors);
++                s->heads = (s->select & 0xf) + 1;
++                s->sectors = s->nsector;
++                s->cylinders = sectors / (s->heads * s->sectors);
++            }
+         case WIN_RECAL:
+             s->error = 0;
+             s->status = READY_STAT | SEEK_STAT;
+diff --git a/hw/ide/internal.h b/hw/ide/internal.h
+index eb5b404..bf26c52 100644
+--- a/hw/ide/internal.h
++++ b/hw/ide/internal.h
+@@ -396,6 +396,7 @@ struct IDEState {
+ 
+     /* set for lba48 access */
+     uint8_t lba48;
++    uint8_t support_chs;
+     BlockDriverState *bs;
+     /* ATAPI specific */
+     uint8_t sense_key;
+-- 
+1.6.4
+
+
