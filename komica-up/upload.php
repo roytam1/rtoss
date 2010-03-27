@@ -82,7 +82,7 @@ if(!($act=='get' && $_SERVER['REQUEST_METHOD'] == 'POST')) htmlheader();
 $foot = <<<FOOT
 
 <h2>著作権表示</h2>
-<p id="link"><a href="http://php.s3.to/">レッツPHP!</a> + <a href="http://utu.under.jp">Wastepaper Basket</a> + <a href="http://scrappedblog.blogspot.com/">Roytam1</a>(k-up SQL 20091103)</p>
+<p id="link"><a href="http://php.s3.to/">レッツPHP!</a> + <a href="http://utu.under.jp">Wastepaper Basket</a> + <a href="http://scrappedblog.blogspot.com/">Roytam1</a>(k-up SQL 20100327)</p>
 
 </body>
 </html>
@@ -146,6 +146,35 @@ function expire($id) {
 	sqlRun($qry);
 }
 
+/* 封鎖 IP / Hostname */
+function BanIPHostCheck($IP, $HOST,$list){
+	// IP/Hostname Check
+	$HOST = strtolower($HOST);
+	$checkTwice = ($IP != $HOST); // 是否需檢查第二次
+	$IsBanned = false;
+	foreach($list as $pattern){
+		$slash = substr_count($pattern, '/');
+		if($slash==2){ // RegExp
+			$pattern .= 'i';
+		}elseif($slash==1){ // CIDR Notation
+			if(matchCIDR($IP, $pattern)){ $IsBanned = true; break; }
+			continue;
+		}elseif(strpos($pattern, '*')!==false || strpos($pattern, '?')!==false){ // Wildcard
+			$pattern = '/^'.str_replace(array('.', '*', '?'), array('\.', '.*', '.?'), $pattern).'$/i';
+		}else{ // Full-text
+			if($IP==$pattern || ($checkTwice && $HOST==strtolower($pattern))){ $IsBanned = true; break; }
+			continue;
+		}
+		if(preg_match($pattern, $HOST) || ($checkTwice && preg_match($pattern, $IP))){ $IsBanned = true; break; }
+	}
+	if($IsBanned){ $baninfo = 'ip banned'; return true; }
+
+	return false;
+}
+function matchCIDR($addr, $cidr) {
+	list($ip, $mask) = explode('/', $cidr);
+	return (ip2long($addr) >> (32 - $mask) == ip2long($ip.str_repeat('.0', 3 - substr_count($ip, '.'))) >> (32 - $mask));
+}
 /* start */
 $limitb = $limitk * 1024;
 $host = @gethostbyaddr($REMOTE_ADDR);
@@ -153,11 +182,9 @@ if(!$upcook) $upcook=@implode(",",array($f_act,$f_dlcnt,$f_com,$f_size,$f_mime,$
 list($c_act,$c_dlcnt,$c_com,$c_size,$c_mime,$c_date,$c_dlim,$c_orig)=explode(',',$upcook);
 
 /* アクセス制限 */
-if(is_array($denylist)){
-	foreach($denylist as $line){
-		if(strstr($host, $line)) error('<h2>錯誤</h2>
+if(isset($GLOBALS['denylist'])&&is_array($denylist)){
+	if(BanIPHostCheck($REMOTE_ADDR,$host,$denylist)) error('<h2>錯誤</h2>
 <p class="error">存取限制：您沒有使用權限</p>');
-	}
 }
 /* 削除実行 */
 if($delid && $delpass!=''){
@@ -304,6 +331,11 @@ error($txt);
 }
 /* アプロード書き込み処理 */
 if(file_exists($upfile) && $com && $upfile_size > 0){
+/* うｐアクセス制限 */
+if(isset($GLOBALS['denyuplist'])&&is_array($denyuplist)){
+	if(BanIPHostCheck($REMOTE_ADDR,$host,$denyuplist)) error('<h2>錯誤</h2>
+<p class="error">存取限制：您沒有上傳權限</p>');
+}
 	if(isset($com{$commax+1})) error('<h2>錯誤</h2>
 <p class="error">上傳錯誤:備註過長</p>
 ');
@@ -354,7 +386,17 @@ if(file_exists($upfile) && $com && $upfile_size > 0){
 	$pwd = ($pass) ? substr(md5($pass), 2, 7) : '*';	//パスっ作成（無いなら*）
 	$dpwd = ($downpass) ? substr(md5($downpass), 2, 7) : '*';	//パスっ作成（無いなら*）
 	if($noorig) $upfile_name = '*'.$upfile_name;
-	
+
+	if($no_same_file) {
+		$qry = 'SELECT id FROM upload WHERE upfile_name=\''.sqlite_escape_string($upfile_name).'\' AND upfile_size='.$upfile_size.' AND dpwd=\''.sqlite_escape_string($dpwd).'\' AND pwd=\''.sqlite_escape_string($pwd).'\' ORDER BY utime desc LIMIT 1';
+		$rs = sqlite_query($conn,$qry);
+		$row = sqlite_fetch_array($rs);
+		if($row) {
+			error('<h2>錯誤</h2>
+<p class="error">連續上傳限制:禁止上傳同一檔案('.$prefix.padNum($row['id']).')。</p>');
+		}
+	}
+
 	$qry=sprintf("INSERT INTO upload (ext,com,host,now,upfile_size,upfile_type,pwd,upfile_name,dpwd,utime,tlim,dlim) VALUES ('%s','%s','%s','%s',%s,'%s','%s','%s','%s',%s,%s,%s)",sqlite_escape_string($ext),sqlite_escape_string($com),$host,$now,$upfile_size,sqlite_escape_string($upfile_type),$pwd,sqlite_escape_string($upfile_name),$dpwd,$utime,intval($tlim),intval($dlim));
 	sqlRun($qry,$qerr);
 	$id = sqlite_last_insert_rowid($conn);

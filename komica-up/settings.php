@@ -13,13 +13,15 @@
   $countnumbers	= 6;	// count format number
   $admin	= "del";	//削除管理パス
   $auto_link	= 1;		//コメントの自動リンク（Yes=1;No=0);
-  $denylist	= array('192.168.0.1','sex.com','annony');	//アクセス拒否ホスト
+  $denylist	= array('annony');	//アクセス拒否ホスト
+  $denyuplist	= array('annony');	//うｐ拒否ホスト
   $arrowext	= array('7z','zip','lzh','rar','avi','mpg','wmv','mp3','wma','swf','txt','bmp','jpg','png','gif','psd','aac');	//許可拡張子 小文字（それ以外はエラー
   $denyupload	= array('annony');	//拒否ファイル
 
   $count_start	= "2009/10/30";	//カウンタ開始日
 
   $last_time	= 0;		//同一IPからの連続投稿許可する間隔（分）（0で無制限）
+  $no_same_file	= true;		//同一ファイルの連続投稿許可
 
   /* 項目表示（環境設定）の初期状態 (表示ならChecked 表示しないなら空) */
   $f_act  = 'checked="checked"';	//ACT（削除リンク）
