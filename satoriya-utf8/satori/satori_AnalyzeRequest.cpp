@@ -186,12 +186,18 @@ int	Satori::request(
 	sender << "--- Operation ---" << endl;
 
 	int status_code;
-	if ( mRequestID=="ShioriEcho" ) {
-		string result = SentenceToSakuraScriptExec_with_PreProcess(mReferences);
-		if ( result.length() ) {
-			//Translate(result); - Translateは後でかかる
-			mResponseMap["Value"] = result;
-			status_code = 200;
+	if ( mRequestID=="ShioriEcho" && ! words.is_exist("ShioriEcho") && ! talks.is_exist("ShioriEcho") ) {
+		if ( secure_flag ) {
+			string result = SentenceToSakuraScriptExec_with_PreProcess(mReferences);
+			if ( result.length() ) {
+				//Translate(result); - Translateは後でかかる
+				mResponseMap["Value"] = result;
+				status_code = 200;
+			}
+			else {
+			sender << "local/Localでないので蹴りました: ShioriEcho" << endl;
+			status_code = 403;
+			}
 		}
 		else {
 			status_code = 204;
