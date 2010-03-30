@@ -13,7 +13,7 @@ const char* gSatoriName = "Satori";
 const char* gSatoriNameW = "里々";
 const char* gSatoriCraftman = "Yagi Kushigahama/The Maintenance Shop";
 const char* gSatoriCraftmanW = "櫛ヶ浜やぎ/整備班";
-const char* gSatoriVersion = "phase Mc147-2";
+const char* gSatoriVersion = "phase Mc147-3";
 const char* gShioriVersion = "3.0";
 const char* gSaoriVersion = "1.0";
 
