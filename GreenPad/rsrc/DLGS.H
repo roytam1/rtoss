@@ -234,8 +234,9 @@ Abstract:
 #define NEWOBJECTOPENORD 1548
 #endif /* WINVER >= 0x400) */
 
-
-
+#ifndef BYTE
+#define BYTE char
+#endif
 
 //
 //  Typedef Declarations.

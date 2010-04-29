@@ -132,6 +132,42 @@ struct rUtf32 : public rUCS<qbyte>
 };
 
 
+//-------------------------------------------------------------------------
+// UTF-1
+//-------------------------------------------------------------------------
+struct rUtf1 : public rBasicUTF
+{
+	rUtf1( const uchar* b, ulong s )
+		: fb( b )
+		, fe( b+s ) {}
+
+	const uchar *fb, *fe;
+
+	inline byte conv( uchar x )
+	{
+		if( x<=0x20 )      return x + 0xBE;
+		else if( x<=0x7E ) return x - 0x21;
+		else if( x<=0x9F ) return x + 0x60;
+		else               return x - 0x42;
+	}
+
+	bool Eof() { return fb==fe; }
+	void Skip()
+	{
+		if( *fb >= 0xFC && *fb <= 0xFF )      { fb+=5; }
+		else if( *fb >= 0xF6 && *fb <= 0xFB ) { fb+=3; }
+		else if( *fb >= 0xA0 && *fb <= 0xF5 ) { fb+=2; }
+		else /*if( *fb <= 0x9F )*/            {  ++fb; }
+	}
+	unicode PeekC()
+	{
+		if( *fb <= 0x9F )                         { return (unicode)(*fb); }
+		else if( *fb == 0xA0 )                    { return (unicode)(*(fb+1)); }
+		else if( *fb >= 0xA1 && *fb <= 0xF5 )     { return (unicode)((*fb-0xA1) * 0xBE + conv(*(fb+1)) + 0x100); }
+		else if( *fb >= 0xF6 && *fb <= 0xFB )     { return (unicode)((*fb-0xF6) * 0x8D04 + conv(*(fb+1)) * 0xBE + conv(*(fb+2)) + 0x4016); }
+		else /*if( *fb >= 0xFC && *fb <= 0xFF )*/ { return (unicode)((*fb-0xFC) * 0x4DAD6810 + conv(*(fb+1)) * 0x68A8F8 + conv(*(fb+2)) * 0x8D04 + conv(*(fb+3)) * 0xBE + conv(*(fb+4)) + 0x38E2E); }
+	}
+};
 
 //-------------------------------------------------------------------------
 // UTF-5
@@ -636,6 +672,7 @@ bool TextFileR::Open( const TCHAR* fname )
 	case UTF32BE: impl_ = new rUtf32(buf,siz,true); break;
 	case UTF32l:
 	case UTF32LE: impl_ = new rUtf32(buf,siz,false); break;
+	case UTF1:    impl_ = new rUtf1(buf,siz); break;
 	case UTF5:    impl_ = new rUtf5(buf,siz); break;
 	case UTF7:    impl_ = new rUtf7(buf,siz); break;
 	case EucJP:   impl_ = new rIso2022(buf,siz,true,false,ASCII,JIS,KANA); break;
@@ -881,6 +918,39 @@ struct wWest : public TextFileWPimpl
 {
 	wWest( FileW& w ) : TextFileWPimpl(w) {}
 	void WriteChar( unicode ch ) { fp_.WriteC(ch>0xff ? '?' : (uchar)ch); }
+};
+
+struct wUtf1 : public TextFileWPimpl
+{
+	wUtf1( FileW& w ) : TextFileWPimpl(w) {}
+	inline qbyte conv ( qbyte x )
+	{
+		if( x<=0x5D )      return x + 0x21;
+		else if( x<=0xBD ) return x + 0x42;
+		else if( x<=0xDE ) return x - 0xBE;
+		else               return x - 0x60;
+	}
+	void WriteChar( unicode ch )
+	{
+		if( ch <= 0x9f )
+			fp_.WriteC( static_cast<uchar>(ch) );
+		else if( ch <= 0xff )
+			fp_.WriteC( 0xA0 ),
+			fp_.WriteC( static_cast<uchar>(ch) );
+		else if( ch <= 0x4015 )
+			fp_.WriteC( static_cast<uchar>(0xA1 + (ch - 0x100) / 0xBE) ),
+			fp_.WriteC( static_cast<uchar>(conv((ch - 0x100) % 0xBE)) );
+		else if( ch <= 0x38E2D )
+			fp_.WriteC( static_cast<uchar>(0xF6 + (ch - 0x4016) / (0xBE*0xBE))  ),
+			fp_.WriteC( static_cast<uchar>(conv((ch - 0x4016) / 0xBE % 0xBE)) ),
+			fp_.WriteC( static_cast<uchar>(conv((ch - 0x4016) % 0xBE)) );
+		else
+			fp_.WriteC( static_cast<uchar>(0xFC + (ch - 0x38E2E) / (0xBE*0xBE*0xBE*0xBE))  ),
+			fp_.WriteC( static_cast<uchar>(conv((ch - 0x38E2E) / (0xBE*0xBE*0xBE) % 0xBE)) ),
+			fp_.WriteC( static_cast<uchar>(conv((ch - 0x38E2E) / (0xBE*0xBE) % 0xBE)) ),
+			fp_.WriteC( static_cast<uchar>(conv((ch - 0x38E2E) / 0xBE % 0xBE)) ),
+			fp_.WriteC( static_cast<uchar>(conv((ch - 0x38E2E) % 0xBE)) );
+	}
 };
 
 struct wUtf5 : public TextFileWPimpl
@@ -1361,6 +1431,7 @@ bool TextFileW::Open( const TCHAR* fname )
 	switch( cs_ )
 	{
 	case Western: impl_ = new wWest( fp_ ); break;
+	case UTF1:    impl_ = new wUtf1( fp_ ); break;
 	case UTF5:    impl_ = new wUtf5( fp_ ); break;
 	case UTF16l:
 	case UTF16LE: impl_ = new wUtf16LE( fp_, cs_==UTF16l ); break;

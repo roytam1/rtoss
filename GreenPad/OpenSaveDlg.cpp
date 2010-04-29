@@ -18,20 +18,6 @@ CharSetList::CharSetList()
 		TEXT("日本語(ShiftJIS)"),
 		TEXT("日本語(EUC)"),
 		TEXT("日本語(ISO-2022-JP)"),
-		TEXT("UTF-5"),
-		TEXT("UTF-7"),
-		TEXT("UTF-8"),
-		TEXT("UTF-8N"),
-		TEXT("UTF-16BE(BOM)"),
-		TEXT("UTF-16LE(BOM)"),
-		TEXT("UTF-16BE"),
-		TEXT("UTF-16LE"),
-		TEXT("UTF-32BE(BOM)"),
-		TEXT("UTF-32LE(BOM)"),
-		TEXT("UTF-32BE"),
-		TEXT("UTF-32LE"),
-		TEXT("欧米"),
-		TEXT("中欧"),
 		TEXT("韓国語(EUC-KR)"),
 		TEXT("韓国語(ISO-2022-KR)"),
 		TEXT("韓国語(Johab)"),
@@ -39,21 +25,7 @@ CharSetList::CharSetList()
 		TEXT("中国語(ISO-2022-CN)"),
 		TEXT("中国語(HZ)"),
 		TEXT("中国語(Big5)"),
-		TEXT("キリル語(Windows)"),
-		TEXT("キリル語(KOI8-R)"),
-		TEXT("キリル語(KOI8-U)"),
-		TEXT("タイ語"),
-		TEXT("トルコ語"),
-		TEXT("バルト語"),
-		TEXT("ベトナム語"),
-		TEXT("ギリシャ語"),
-		TEXT("MSDOS(us)")
-	};
-	static const TCHAR* const lnmEn[] = {
-		TEXT("AutoDetect"),
-		TEXT("Japanese(ShiftJIS)"),
-		TEXT("Japanese(EUC)"),
-		TEXT("Japanese(ISO-2022-JP)"),
+		TEXT("UTF-1"),
 		TEXT("UTF-5"),
 		TEXT("UTF-7"),
 		TEXT("UTF-8"),
@@ -66,8 +38,40 @@ CharSetList::CharSetList()
 		TEXT("UTF-32LE(BOM)"),
 		TEXT("UTF-32BE"),
 		TEXT("UTF-32LE"),
-		TEXT("Latin-1"),
-		TEXT("Latin-2"),
+		TEXT("欧米(DOS)"),
+		TEXT("欧米"),
+		TEXT("中欧(DOS)"),
+		TEXT("中欧"),
+		TEXT("キリル語(IBM)"),
+		TEXT("キリル語(MS-DOS)"),
+		TEXT("キリル語(Windows)"),
+		TEXT("キリル語(KOI8-R)"),
+		TEXT("キリル語(KOI8-U)"),
+		TEXT("タイ語"),
+		TEXT("トルコ語(DOS)"),
+		TEXT("トルコ語"),
+		TEXT("バルト語(IBM)"),
+		TEXT("バルト語"),
+		TEXT("ベトナム語"),
+		TEXT("ギリシャ語(IBM)"),
+		TEXT("ギリシャ語(MS-DOS)"),
+		TEXT("ギリシャ語"),
+		TEXT("アラビア語(IBM)"),
+		TEXT("アラビア語(MS-DOS)"),
+		TEXT("アラビア語"),
+		TEXT("ヘブライ語(DOS)"),
+		TEXT("ヘブライ語"),
+		TEXT("ポルトガル語(DOS)"),
+		TEXT("アイスランド語(DOS)"),
+		TEXT("フランス語(カナダ)(DOS)"),
+		TEXT("MSDOS(北欧)"),
+		TEXT("MSDOS(us)")
+	};
+	static const TCHAR* const lnmEn[] = {
+		TEXT("AutoDetect"),
+		TEXT("Japanese(ShiftJIS)"),
+		TEXT("Japanese(EUC)"),
+		TEXT("Japanese(ISO-2022-JP)"),
 		TEXT("Korean(EUC-KR)"),
 		TEXT("Korean(ISO-2022-KR)"),
 		TEXT("Korean(Johab)"),
@@ -75,14 +79,46 @@ CharSetList::CharSetList()
 		TEXT("Chinese(ISO-2022-CN)"),
 		TEXT("Chinese(HZ)"),
 		TEXT("Chinese(Big5)"),
+		TEXT("UTF-1"),
+		TEXT("UTF-5"),
+		TEXT("UTF-7"),
+		TEXT("UTF-8"),
+		TEXT("UTF-8N"),
+		TEXT("UTF-16BE(BOM)"),
+		TEXT("UTF-16LE(BOM)"),
+		TEXT("UTF-16BE"),
+		TEXT("UTF-16LE"),
+		TEXT("UTF-32BE(BOM)"),
+		TEXT("UTF-32LE(BOM)"),
+		TEXT("UTF-32BE"),
+		TEXT("UTF-32LE"),
+		TEXT("Latin-1(DOS)"),
+		TEXT("Latin-1"),
+		TEXT("Latin-2(DOS)"),
+		TEXT("Latin-2"),
+		TEXT("Cyrillic(IBM)"),
+		TEXT("Cyrillic(MS-DOS)"),
 		TEXT("Cyrillic(Windows)"),
 		TEXT("Cyrillic(KOI8-R)"),
 		TEXT("Cyrillic(KOI8-U)"),
 		TEXT("Thai"),
+		TEXT("Turkish(DOS)"),
 		TEXT("Turkish"),
+		TEXT("Baltic(IBM)"),
 		TEXT("Baltic"),
 		TEXT("Vietnamese"),
+		TEXT("Greek(IBM)"),
+		TEXT("Greek(MS-DOS)"),
 		TEXT("Greek"),
+		TEXT("Arabic(IBM)"),
+		TEXT("Arabic(MS-DOS)"),
+		TEXT("Arabic"),
+		TEXT("Hebrew(DOS)"),
+		TEXT("Hebrew"),
+		TEXT("Portuguese(DOS)"),
+		TEXT("Icelandic(DOS)"),
+		TEXT("Canadian French(DOS)"),
+		TEXT("MSDOS(Nodic)"),
 		TEXT("MSDOS(us)")
 	};
 	static const TCHAR* const snm[] = {
@@ -90,6 +126,14 @@ CharSetList::CharSetList()
 		TEXT("SJIS"),
 		TEXT("EUC"),
 		TEXT("JIS"),
+		TEXT("UHC"),
+		TEXT("I2KR"),
+		TEXT("Jhb"),
+		TEXT("GBK"),
+		TEXT("I2CN"),
+		TEXT("HZ"),
+		TEXT("BIG5"),
+		TEXT("UTF1"),
 		TEXT("UTF5"),
 		TEXT("UTF7"),
 		TEXT("UTF8"),
@@ -102,23 +146,33 @@ CharSetList::CharSetList()
 		TEXT("U32L"),
 		TEXT("U32B"),
 		TEXT("U32L"),
+		TEXT("LN1D"),
 		TEXT("LTN1"),
+		TEXT("LN2D"),
 		TEXT("LTN2"),
-		TEXT("UHC"),
-		TEXT("I2KR"),
-		TEXT("Jhb"),
-		TEXT("GBK"),
-		TEXT("I2CN"),
-		TEXT("HZ"),
-		TEXT("BIG5"),
+		TEXT("CYRI"),
+		TEXT("CYRD"),
 		TEXT("CYRL"),
 		TEXT("KO8R"),
 		TEXT("KO8U"),
 		TEXT("THAI"),
+		TEXT("TRKD"),
 		TEXT("TRK"),
+		TEXT("BALI"),
 		TEXT("BALT"),
 		TEXT("VTNM"),
+		TEXT("GRKI"),
+		TEXT("GRKD"),
 		TEXT("GRK"),
+		TEXT("ARAI"),
+		TEXT("ARAD"),
+		TEXT("ARA"),
+		TEXT("HEBD"),
+		TEXT("HEB"),
+		TEXT("PRT"),
+		TEXT("ICE"),
+		TEXT("CFR"),
+		TEXT("NOD"),
 		TEXT("DOS")
 	};
 
@@ -138,40 +192,58 @@ CharSetList::CharSetList()
 		cs.type=LOAD,         list_.Add( cs )
 
 	// 適宜登録
-	                               EnrollL( AutoDetect,0 );
-	if( ::IsValidCodePage(932) )   Enroll(  SJIS,      1 ),
-	                               Enroll(  EucJP,     2 ),
-	                               Enroll(  IsoJP,     3 );
-	/* if( always ) */             Enroll(  UTF5,      4 );
-	                               Enroll(  UTF7,      5 );
-	                               Enroll(  UTF8,      6 );
-	                               EnrollS( UTF8N,     7 );
-	                               EnrollS( UTF16b,    8 );
-	                               EnrollS( UTF16l,    9 );
-	                               Enroll(  UTF16BE,  10 );
-	                               Enroll(  UTF16LE,  11 );
-	                               EnrollS( UTF32b,   12 );
-	                               EnrollS( UTF32l,   13 );
-	                               Enroll(  UTF32BE,  14 );
-	                               Enroll(  UTF32LE,  15 );
-	                               Enroll(  Western,  16 );
-	if( ::IsValidCodePage(28592) ) Enroll(  Central,  17 );
-	if( ::IsValidCodePage(949) )   Enroll(  UHC,      18 ),
-	                               Enroll(  IsoKR,    19 );
-	if( ::IsValidCodePage(1361) )  Enroll(  Johab,    20 );
-	if( ::IsValidCodePage(936) )   Enroll(  GBK,      21 ),
-	                               Enroll(  IsoCN,    22 ),
-	                               Enroll(  HZ   ,    23 );
-	if( ::IsValidCodePage(950) )   Enroll(  Big5 ,    24 );
-	if( ::IsValidCodePage(28595) ) Enroll(  Cyrillic, 25 );
-	if( ::IsValidCodePage(20866) ) Enroll(  Koi8R,    26 );
-	if( ::IsValidCodePage(21866) ) Enroll(  Koi8U,    27 );
-	if( ::IsValidCodePage(874) )   Enroll(  Thai,     28 );
-	if( ::IsValidCodePage(1254) )  Enroll(  Turkish,  29 );
-	if( ::IsValidCodePage(1257) )  Enroll(  Baltic,   30 );
-	if( ::IsValidCodePage(1258) )  Enroll( Vietnamese,31 );
-	if( ::IsValidCodePage(28597) ) Enroll(  Greek,    32 );
-	                               Enroll(  DOSUS,    33 );
+	                               EnrollL( AutoDetect,      0 );
+	if( ::IsValidCodePage(932) )   Enroll(  SJIS,            1 ),
+	                               Enroll(  EucJP,           2 ),
+	                               Enroll(  IsoJP,           3 );
+	if( ::IsValidCodePage(949) )   Enroll(  UHC,             4 ),
+	                               Enroll(  IsoKR,           5 );
+	if( ::IsValidCodePage(1361) )  Enroll(  Johab,           6 );
+	if( ::IsValidCodePage(936) )   Enroll(  GBK,             7 ),
+	                               Enroll(  IsoCN,           8 ),
+	                               Enroll(  HZ   ,           9 );
+	if( ::IsValidCodePage(950) )   Enroll(  Big5 ,          10 );
+	/* if( always ) */             Enroll(  UTF1,           11 );
+	                               Enroll(  UTF5,           12 );
+	                               Enroll(  UTF7,           13 );
+	                               Enroll(  UTF8,           14 );
+	                               EnrollS( UTF8N,          15 );
+	                               EnrollS( UTF16b,         16 );
+	                               EnrollS( UTF16l,         17 );
+	                               Enroll(  UTF16BE,        18 );
+	                               Enroll(  UTF16LE,        19 );
+	                               EnrollS( UTF32b,         20 );
+	                               EnrollS( UTF32l,         21 );
+	                               Enroll(  UTF32BE,        22 );
+	                               Enroll(  UTF32LE,        23 );
+	if( ::IsValidCodePage(850) )   Enroll(  WesternDOS,     24 );
+	                               Enroll(  Western,        25 );
+	if( ::IsValidCodePage(852) )   Enroll(  CentralDOS,     26 );
+	if( ::IsValidCodePage(28592) ) Enroll(  Central,        27 );
+	if( ::IsValidCodePage(855) )   Enroll(  CyrillicIBM,    28 );
+	if( ::IsValidCodePage(866) )   Enroll(  CyrillicDOS,    29 );
+	if( ::IsValidCodePage(28595) ) Enroll(  Cyrillic,       30 );
+	if( ::IsValidCodePage(20866) ) Enroll(  Koi8R,          31 );
+	if( ::IsValidCodePage(21866) ) Enroll(  Koi8U,          32 );
+	if( ::IsValidCodePage(874) )   Enroll(  Thai,           33 );
+	if( ::IsValidCodePage(857) )   Enroll(  TurkishDOS,     34 );
+	if( ::IsValidCodePage(1254) )  Enroll(  Turkish,        35 );
+	if( ::IsValidCodePage(775) )   Enroll(  BalticIBM,      36 );
+	if( ::IsValidCodePage(1257) )  Enroll(  Baltic,         37 );
+	if( ::IsValidCodePage(1258) )  Enroll( Vietnamese,      38 );
+	if( ::IsValidCodePage(737) )   Enroll(  GreekIBM,       39 );
+	if( ::IsValidCodePage(869) )   Enroll(  GreekMSDOS,     40 );
+	if( ::IsValidCodePage(28597) ) Enroll(  Greek,          41 );
+	if( ::IsValidCodePage(720) )   Enroll(  ArabicIBM,      42 );
+	if( ::IsValidCodePage(864) )   Enroll(  ArabicMSDOS,    43 );
+	if( ::IsValidCodePage(1256) )  Enroll(  Arabic,         44 );
+	if( ::IsValidCodePage(862) )   Enroll(  HebrewDOS,      45 );
+	if( ::IsValidCodePage(1255) )  Enroll(  Hebrew,         46 );
+	if( ::IsValidCodePage(860) )   Enroll(  Portuguese,     47 );
+	if( ::IsValidCodePage(861) )   Enroll(  Icelandic,      48 );
+	if( ::IsValidCodePage(863) )   Enroll(  CanadianFrench, 49 );
+	if( ::IsValidCodePage(865) )   Enroll(  Nordic,         50 );
+	                               Enroll(  DOSUS,          51 );
 
 	// 終了
 	#undef Enroll
@@ -230,11 +302,38 @@ OpenFileDlg* OpenFileDlg::pThis;
 bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 {
 	CurrentDirRecovery cdr;
+	TCHAR filepath_[MAX_PATH];
 
 	if( fnm == NULL )
+	{
 		filename_[0] = TEXT('\0');
+		filepath_[0] = TEXT('\0');
+	}
 	else
-		::lstrcpy( filename_, fnm );
+	{
+		::lstrcpy(filepath_, fnm);
+		::lstrcpy(filename_, fnm);
+		
+		int i = 0;
+		int j = -1;
+		
+		while(filepath_[i] != TEXT('\0'))
+		{
+			if(filepath_[i] == TEXT('\\'))
+			{
+				j = i;
+			}
+			i++;
+		}
+		
+		int x = 0;
+		for (i = j+1; filepath_[i] != TEXT('\0'); i++)
+		{
+			filename_[x++] = filepath_[i];
+		}
+		filename_[x++] = TEXT('\0');
+		filepath_[j+1] = TEXT('\0');
+	}
 
 	DWORD dwVersion, bNewShell;
 
@@ -247,6 +346,7 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	ofn.lpstrFilter    = fltr;
 	ofn.lpstrFile      = filename_;
 	ofn.nMaxFile       = countof(filename_);
+    ofn.lpstrInitialDir= filepath_;
 	ofn.lpfnHook       = OfnHook;
 	ofn.Flags = OFN_FILEMUSTEXIST |
 				OFN_HIDEREADONLY  |
@@ -271,7 +371,7 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	return ( ::GetOpenFileName(&ofn) != 0 );
 }
 
-UINT_PTR CALLBACK OpenFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM, LPARAM lp )
+UINT_PTR CALLBACK OpenFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM wp, LPARAM lp )
 {
 
 	if( msg==WM_INITDIALOG )
@@ -284,10 +384,10 @@ UINT_PTR CALLBACK OpenFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM, LPARAM lp )
 				cb.Add( csl[i].longName );
 		cb.Select( csl[0].longName );
 	}
-	else if( msg==WM_NOTIFY )
+	else if( msg==WM_NOTIFY ||( msg==WM_COMMAND && LOWORD(wp)==1 ))
 	{
 		// OKが押されたら、文字コードの選択状況を記録
-		if( reinterpret_cast<NMHDR*>(lp)->code==CDN_FILEOK )
+		if(( msg==WM_COMMAND && LOWORD(wp)==1 ) || ((LPOFNOTIFY)lp)->hdr.code==CDN_FILEOK )
 		{
 			ulong j=0, i=ComboBox(dlg,IDC_CODELIST).GetCurSel();
 			for(;;++j,--i)
@@ -300,6 +400,7 @@ UINT_PTR CALLBACK OpenFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM, LPARAM lp )
 			pThis->csIndex_ = j;
 		}
 	}
+
 	return FALSE;
 }
 
@@ -314,11 +415,38 @@ SaveFileDlg* SaveFileDlg::pThis;
 bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 {
 	CurrentDirRecovery cdr;
+	TCHAR filepath_[MAX_PATH];
 
 	if( fnm == NULL )
+	{
 		filename_[0] = TEXT('\0');
+		filepath_[0] = TEXT('\0');
+	}
 	else
-		::lstrcpy( filename_, fnm );
+	{
+		::lstrcpy(filepath_, fnm);
+		::lstrcpy(filename_, fnm);
+		
+		int i = 0;
+		int j = -1;
+		
+		while(filepath_[i] != TEXT('\0'))
+		{
+			if(filepath_[i] == TEXT('\\'))
+			{
+				j = i;
+			}
+			i++;
+		}
+		
+		int x = 0;
+		for (i = j+1; filepath_[i] != TEXT('\0'); i++)
+		{
+			filename_[x++] = filepath_[i];
+		}
+		filename_[x++] = TEXT('\0');
+		filepath_[j+1] = TEXT('\0');
+	}
 
 	DWORD dwVersion, bNewShell;
 
@@ -331,6 +459,8 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
     ofn.lpstrFilter    = fltr;
     ofn.lpstrFile      = filename_;
     ofn.nMaxFile       = countof(filename_);
+    ofn.lpstrTitle     = TEXT("Save File As");
+    ofn.lpstrInitialDir= filepath_;
 	ofn.lpfnHook       = OfnHook;
     ofn.Flags = OFN_HIDEREADONLY    |
 				OFN_PATHMUSTEXIST   |
@@ -356,7 +486,7 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	return ( ::GetSaveFileName(&ofn) != 0 );
 }
 
-UINT_PTR CALLBACK SaveFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM, LPARAM lp )
+UINT_PTR CALLBACK SaveFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM wp, LPARAM lp )
 {
 	if( msg==WM_INITDIALOG )
 	{
@@ -383,9 +513,9 @@ UINT_PTR CALLBACK SaveFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM, LPARAM lp )
 			cb.Select( lbList[pThis->lb_] );
 		}
 	}
-	else if( msg==WM_NOTIFY )
+	else if( msg==WM_NOTIFY ||( msg==WM_COMMAND && LOWORD(wp)==1 ))
 	{
-		if( reinterpret_cast<NMHDR*>(lp)->code==CDN_FILEOK )
+		if(( msg==WM_COMMAND && LOWORD(wp)==1 ) || ((LPOFNOTIFY)lp)->hdr.code==CDN_FILEOK )
 		{
 			// OKが押されたら、文字コードの選択状況を記録
 			ulong j=0, i=ComboBox(dlg,IDC_CODELIST).GetCurSel();

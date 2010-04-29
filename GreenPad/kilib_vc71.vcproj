@@ -38,7 +38,7 @@
 				EnableFunctionLevelLinking="TRUE"
 				TreatWChar_tAsBuiltInType="TRUE"
 				RuntimeTypeInfo="FALSE"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="1"
 				PrecompiledHeaderThrough="stdafx.h"
 				PrecompiledHeaderFile=".\OBJ/vc71/reluni/kilib.pch"
 				AssemblerListingLocation=".\OBJ/vc71/reluni/"
@@ -106,9 +106,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32,_DEBUG,_WINDOWS,SUPERTINY,USEGLOBALIME"
+				AdditionalIncludeDirectories="kilib"
+				PreprocessorDefinitions="WIN32,_DEBUG,_WINDOWS,SUPERTINY,USEGLOBALIME,UNICODE"
+				StringPooling="FALSE"
+				ExceptionHandling="FALSE"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="2"
+				TreatWChar_tAsBuiltInType="TRUE"
+				UsePrecompiledHeader="1"
 				PrecompiledHeaderThrough="stdafx.h"
 				PrecompiledHeaderFile=".\OBJ/vc71/debug/kilib.pch"
 				AssemblerListingLocation=".\OBJ/vc71/debug/"
@@ -117,7 +121,8 @@
 				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="4"/>
+				DebugInformationFormat="4"
+				CallingConvention="2"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
