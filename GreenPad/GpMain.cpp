@@ -64,7 +64,7 @@ int GpStBar::AutoResize( bool maximized )
 	SIZE s;
 	if( ::GetTextExtentPoint32( dc, TEXT("BBBBM"), 5, &s ) )
 		w[1] = w[2] - s.cx;
-	if( ::GetTextExtentPoint32( dc, TEXT("BBBBB"), 5, &s ) )
+	if( ::GetTextExtentPoint32( dc, TEXT("BBBWW"), 5, &s ) )
 		w[0] = w[1] - s.cx;
 	::ReleaseDC( hwnd(), dc );
 
@@ -142,6 +142,13 @@ LRESULT GreenPadWnd::on_message( UINT msg, WPARAM wp, LPARAM lp )
 	// MRU
 	case GPM_MRUCHANGED:
 		SetupMRUMenu();
+		break;
+
+	// NOTIFY
+	case WM_NOTIFY:
+		if( ((NMHDR*)lp)->code == NM_DBLCLK )
+			if( wp == 1787 ) // Status Bar ID 
+				on_reopenfile();
 		break;
 
 	// ‚»‚Ì‘¼

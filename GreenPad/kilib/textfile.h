@@ -28,16 +28,31 @@ enum charset {
 					   // UTF5/UTF8/UTF8N/UTF16b/UTF16l/UTF32b/UTF32l
 					   // を判定する。他は知らない。(^^;
 
+	WesternDOS = 850,  // 欧米      (CP850 != ISO-8859-1)
 	Western    = 1252, // 欧米      (Windows1252 >> ISO-8859-1)
+	TurkishDOS = 857,  // トルコ語   (CP857 != ISO-8859-9)
 	Turkish    = 1254, // トルコ語  (Windows1254 >> ISO-8859-9)
+	HebrewDOS  = 862,  // ヘブライ語(CP862 !=> ISO-8859-8)
 	Hebrew     = 1255, // ヘブライ語(Windows1255 >> ISO-8859-8)
+	ArabicIBM  = 720,  // アラビア語(CP720 != ISO-8859-6)
+	ArabicMSDOS= 864,  // アラビア語(CP864 != ISO-8859-6)
 	Arabic     = 1256, // アラビア語(Windows1256 ～ ISO-8859-6)
+	BalticIBM  = 775,  // バルト語  (CP775 != ISO-8859-13)
 	Baltic     = 1257, // バルト語  (Windows1257 >> ISO-8859-13)
 	Vietnamese = 1258, // ベトナム語(Windows1258 != VISCII)
+	CentralDOS = 852,  // 中央ﾖｰﾛｯﾊﾟ(CP852 != ISO-8859-2)
 	Central    = 1250, // 中央ﾖｰﾛｯﾊﾟ(Windows1250 ～ ISO-8859-2)
+	GreekIBM   = 737,  // ギリシャ語(CP737 = ISO-8859-7 ?)
+	GreekMSDOS = 869,  // ギリシャ語(CP869 != ISO-8859-7)
 	Greek      = 1253, // ギリシャ語(Windows1253 ～ ISO-8859-7)
 	Thai       = 874,  // タイ語
+	Portuguese = 860,  // ポルトガル語 (CP860)
+	Icelandic  = 861,  // アイスランド語 (CP861)
+	CanadianFrench= 863, // フランス語(カナダ) (CP863)
+	Nordic     = 865, // MS-DOS 北欧 (CP865)
 
+	CyrillicIBM= 855,  // キリル語(IBM) (CP855 = ISO-8859-5 ?)
+	CyrillicDOS= 866,  // キリル語(MS-DOS) (CP866 != ISO-8859-5)
 	Cyrillic   = 1251, // キリル語(Windows1251 != ISO-8859-5)
 	Koi8R      = 20866,// キリル語(KOI8-R)
 	Koi8U      = 21866,// キリル語(KOI8-U ウクライナ系)
@@ -55,6 +70,7 @@ enum charset {
 	EucJP      = -932, // 日本語２ (日本語EUC)
 	IsoJP      = -933, // 日本語３ (ISO-2022-JP)
 
+	UTF1       = -1,   // Unicode  (UTF-1)   : BOM無し
 	UTF5       = -2,   // Unicode  (UTF-5)   : BOM無し
 	UTF7       = 65000,// Unicode  (UTF-7)   : BOM無し
 	UTF8       =-65001,// Unicode  (UTF-8)   : BOM有り
