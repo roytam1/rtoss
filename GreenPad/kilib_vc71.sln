@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kilib", "kilib_vc71.vcproj", "{910E868F-4E52-4D55-9C4E-4563F5934517}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+		Unicode Release = Unicode Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{910E868F-4E52-4D55-9C4E-4563F5934517}.Debug.ActiveCfg = Debug|Win32
+		{910E868F-4E52-4D55-9C4E-4563F5934517}.Debug.Build.0 = Debug|Win32
+		{910E868F-4E52-4D55-9C4E-4563F5934517}.Release.ActiveCfg = Release|Win32
+		{910E868F-4E52-4D55-9C4E-4563F5934517}.Release.Build.0 = Release|Win32
+		{910E868F-4E52-4D55-9C4E-4563F5934517}.Unicode Release.ActiveCfg = Unicode Release|Win32
+		{910E868F-4E52-4D55-9C4E-4563F5934517}.Unicode Release.Build.0 = Unicode Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+		Unicode Release|Win32 = Unicode Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{910E868F-4E52-4D55-9C4E-4563F5934517}.Debug|Win32.ActiveCfg = Debug|Win32
+		{910E868F-4E52-4D55-9C4E-4563F5934517}.Debug|Win32.Build.0 = Debug|Win32
+		{910E868F-4E52-4D55-9C4E-4563F5934517}.Release|Win32.ActiveCfg = Release|Win32
+		{910E868F-4E52-4D55-9C4E-4563F5934517}.Release|Win32.Build.0 = Release|Win32
+		{910E868F-4E52-4D55-9C4E-4563F5934517}.Unicode Release|Win32.ActiveCfg = Unicode Release|Win32
+		{910E868F-4E52-4D55-9C4E-4563F5934517}.Unicode Release|Win32.Build.0 = Unicode Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
