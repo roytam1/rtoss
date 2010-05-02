@@ -14,8 +14,10 @@
 #endif	// for
 #endif	// _MSC_VER
 
+#include	<cstdlib>
 #include	<iostream>
 #include	<string>
+#include	<cstring>
 #include	<map>
 #include	<set>
 #include	<vector>
@@ -24,6 +26,7 @@
 #include	<deque>
 #include	<cassert>
 #include    <stdio.h>
+#include    <limits.h>
 using namespace std;
 
 
