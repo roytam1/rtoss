@@ -170,6 +170,36 @@ struct rUtf1 : public rBasicUTF
 };
 
 //-------------------------------------------------------------------------
+// UTF-9 (draft-abela-utf9-00)
+//-------------------------------------------------------------------------
+struct rUtf9 : public rBasicUTF
+{
+	rUtf9( const uchar* b, ulong s )
+		: fb( b )
+		, fe( b+s ) {}
+
+	const uchar *fb, *fe;
+
+	bool Eof() { return fb==fe; }
+	void Skip()
+	{
+		if( *fb >= 0x98 && *fb <= 0x9F )      { fb+=5; }
+		else if( *fb >= 0x94 && *fb <= 0x97 ) { fb+=4; }
+		else if( *fb >= 0x90 && *fb <= 0x93 ) { fb+=3; }
+		else if( *fb >= 0x80 && *fb <= 0x8F ) { fb+=2; }
+		else /* 0~0x7F,0xA0~0xFF */           {  ++fb; }
+	}
+	unicode PeekC()
+	{
+		if( *fb >= 0x98 && *fb <= 0x9F )      { return (unicode)(((*fb & 0x07) << 28) + ((*(fb+1) & 0x7F) << 21) + ((*(fb+2) & 0x7F) << 14) + ((*(fb+3) & 0x7F) << 7) + (*(fb+4) & 0x7F)); }
+		else if( *fb >= 0x94 && *fb <= 0x97 ) { return (unicode)(((*fb & 0x03) << 21) + ((*(fb+1) & 0x7F) << 14) + ((*(fb+2) & 0x7F) << 7) + (*(fb+3) & 0x7F)); }
+		else if( *fb >= 0x90 && *fb <= 0x93 ) { return (unicode)(((*fb & 0x03) << 14) + ((*(fb+1) & 0x7F) << 7) + (*(fb+2) & 0x7F)); }
+		else if( *fb >= 0x80 && *fb <= 0x8F ) { return (unicode)(((*fb & 0x7F) << 7) + (*(fb+1) & 0x7F)); }
+		else /* 0~0x7F,0xA0~0xFF */           { return (unicode)(*fb); }
+	}
+};
+
+//-------------------------------------------------------------------------
 // UTF-5
 //     0-  F : 1bbbb
 //    10- FF : 1bbbb 0bbbb
@@ -675,6 +705,7 @@ bool TextFileR::Open( const TCHAR* fname )
 	case UTF1:    impl_ = new rUtf1(buf,siz); break;
 	case UTF5:    impl_ = new rUtf5(buf,siz); break;
 	case UTF7:    impl_ = new rUtf7(buf,siz); break;
+	case UTF9:    impl_ = new rUtf9(buf,siz); break;
 	case EucJP:   impl_ = new rIso2022(buf,siz,true,false,ASCII,JIS,KANA); break;
 	case IsoJP:   impl_ = new rIso2022(buf,siz,false,false,ASCII,KANA); break;
 	case IsoKR:   impl_ = new rIso2022(buf,siz,true,false,ASCII,KSX); break;
@@ -950,6 +981,34 @@ struct wUtf1 : public TextFileWPimpl
 			fp_.WriteC( static_cast<uchar>(conv((ch - 0x38E2E) / (0xBE*0xBE) % 0xBE)) ),
 			fp_.WriteC( static_cast<uchar>(conv((ch - 0x38E2E) / 0xBE % 0xBE)) ),
 			fp_.WriteC( static_cast<uchar>(conv((ch - 0x38E2E) % 0xBE)) );
+	}
+};
+
+struct wUtf9 : public TextFileWPimpl
+{
+	wUtf9( FileW& w ) : TextFileWPimpl(w) {}
+	void WriteChar( unicode ch )
+	{
+		if( ch <= 0x7F || (ch >= 0xA0 && ch <= 0xFF ))
+			fp_.WriteC( static_cast<uchar>(ch) );
+		else if( ch <= 0x07FF )
+			fp_.WriteC( static_cast<uchar>(0x80 | (ch >> 7)) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (ch & 0x7F)) );
+		else if( ch <= 0xFFFF )
+			fp_.WriteC( static_cast<uchar>(0x90 | (ch >> 14)) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (ch >> 7) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (ch & 0x7F)) );
+		else if( ch <= 0x7FFFFF )
+			fp_.WriteC( static_cast<uchar>(0x94 | (ch >> 21)) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (ch >> 14) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (ch >> 7) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (ch & 0x7F)) );
+		else
+			fp_.WriteC( static_cast<uchar>(0x98 | (ch >> 28) & 0x07) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (ch >> 21) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (ch >> 14) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (ch >> 7) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (ch & 0x7F)) );
 	}
 };
 
@@ -1433,6 +1492,7 @@ bool TextFileW::Open( const TCHAR* fname )
 	case Western: impl_ = new wWest( fp_ ); break;
 	case UTF1:    impl_ = new wUtf1( fp_ ); break;
 	case UTF5:    impl_ = new wUtf5( fp_ ); break;
+	case UTF9:    impl_ = new wUtf9( fp_ ); break;
 	case UTF16l:
 	case UTF16LE: impl_ = new wUtf16LE( fp_, cs_==UTF16l ); break;
 	case UTF16b:
