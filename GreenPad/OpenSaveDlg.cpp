@@ -30,6 +30,7 @@ CharSetList::CharSetList()
 		TEXT("UTF-7"),
 		TEXT("UTF-8"),
 		TEXT("UTF-8N"),
+		TEXT("UTF-9(1998)"),
 		TEXT("UTF-16BE(BOM)"),
 		TEXT("UTF-16LE(BOM)"),
 		TEXT("UTF-16BE"),
@@ -84,6 +85,7 @@ CharSetList::CharSetList()
 		TEXT("UTF-7"),
 		TEXT("UTF-8"),
 		TEXT("UTF-8N"),
+		TEXT("UTF-9(1998)"),
 		TEXT("UTF-16BE(BOM)"),
 		TEXT("UTF-16LE(BOM)"),
 		TEXT("UTF-16BE"),
@@ -138,6 +140,7 @@ CharSetList::CharSetList()
 		TEXT("UTF7"),
 		TEXT("UTF8"),
 		TEXT("UTF8"),
+		TEXT("UTF9"),
 		TEXT("U16B"),
 		TEXT("U16L"),
 		TEXT("U16B"),
@@ -208,42 +211,43 @@ CharSetList::CharSetList()
 	                               Enroll(  UTF7,           13 );
 	                               Enroll(  UTF8,           14 );
 	                               EnrollS( UTF8N,          15 );
-	                               EnrollS( UTF16b,         16 );
-	                               EnrollS( UTF16l,         17 );
-	                               Enroll(  UTF16BE,        18 );
-	                               Enroll(  UTF16LE,        19 );
-	                               EnrollS( UTF32b,         20 );
-	                               EnrollS( UTF32l,         21 );
-	                               Enroll(  UTF32BE,        22 );
-	                               Enroll(  UTF32LE,        23 );
-	if( ::IsValidCodePage(850) )   Enroll(  WesternDOS,     24 );
-	                               Enroll(  Western,        25 );
-	if( ::IsValidCodePage(852) )   Enroll(  CentralDOS,     26 );
-	if( ::IsValidCodePage(28592) ) Enroll(  Central,        27 );
-	if( ::IsValidCodePage(855) )   Enroll(  CyrillicIBM,    28 );
-	if( ::IsValidCodePage(866) )   Enroll(  CyrillicDOS,    29 );
-	if( ::IsValidCodePage(28595) ) Enroll(  Cyrillic,       30 );
-	if( ::IsValidCodePage(20866) ) Enroll(  Koi8R,          31 );
-	if( ::IsValidCodePage(21866) ) Enroll(  Koi8U,          32 );
-	if( ::IsValidCodePage(874) )   Enroll(  Thai,           33 );
-	if( ::IsValidCodePage(857) )   Enroll(  TurkishDOS,     34 );
-	if( ::IsValidCodePage(1254) )  Enroll(  Turkish,        35 );
-	if( ::IsValidCodePage(775) )   Enroll(  BalticIBM,      36 );
-	if( ::IsValidCodePage(1257) )  Enroll(  Baltic,         37 );
-	if( ::IsValidCodePage(1258) )  Enroll( Vietnamese,      38 );
-	if( ::IsValidCodePage(737) )   Enroll(  GreekIBM,       39 );
-	if( ::IsValidCodePage(869) )   Enroll(  GreekMSDOS,     40 );
-	if( ::IsValidCodePage(28597) ) Enroll(  Greek,          41 );
-	if( ::IsValidCodePage(720) )   Enroll(  ArabicIBM,      42 );
-	if( ::IsValidCodePage(864) )   Enroll(  ArabicMSDOS,    43 );
-	if( ::IsValidCodePage(1256) )  Enroll(  Arabic,         44 );
-	if( ::IsValidCodePage(862) )   Enroll(  HebrewDOS,      45 );
-	if( ::IsValidCodePage(1255) )  Enroll(  Hebrew,         46 );
-	if( ::IsValidCodePage(860) )   Enroll(  Portuguese,     47 );
-	if( ::IsValidCodePage(861) )   Enroll(  Icelandic,      48 );
-	if( ::IsValidCodePage(863) )   Enroll(  CanadianFrench, 49 );
-	if( ::IsValidCodePage(865) )   Enroll(  Nordic,         50 );
-	                               Enroll(  DOSUS,          51 );
+	                               Enroll(  UTF9,           16 );
+	                               EnrollS( UTF16b,         17 );
+	                               EnrollS( UTF16l,         18 );
+	                               Enroll(  UTF16BE,        19 );
+	                               Enroll(  UTF16LE,        20 );
+	                               EnrollS( UTF32b,         21 );
+	                               EnrollS( UTF32l,         22 );
+	                               Enroll(  UTF32BE,        23 );
+	                               Enroll(  UTF32LE,        24 );
+	if( ::IsValidCodePage(850) )   Enroll(  WesternDOS,     25 );
+	                               Enroll(  Western,        26 );
+	if( ::IsValidCodePage(852) )   Enroll(  CentralDOS,     27 );
+	if( ::IsValidCodePage(28592) ) Enroll(  Central,        28 );
+	if( ::IsValidCodePage(855) )   Enroll(  CyrillicIBM,    29 );
+	if( ::IsValidCodePage(866) )   Enroll(  CyrillicDOS,    30 );
+	if( ::IsValidCodePage(28595) ) Enroll(  Cyrillic,       31 );
+	if( ::IsValidCodePage(20866) ) Enroll(  Koi8R,          32 );
+	if( ::IsValidCodePage(21866) ) Enroll(  Koi8U,          33 );
+	if( ::IsValidCodePage(874) )   Enroll(  Thai,           34 );
+	if( ::IsValidCodePage(857) )   Enroll(  TurkishDOS,     35 );
+	if( ::IsValidCodePage(1254) )  Enroll(  Turkish,        36 );
+	if( ::IsValidCodePage(775) )   Enroll(  BalticIBM,      37 );
+	if( ::IsValidCodePage(1257) )  Enroll(  Baltic,         38 );
+	if( ::IsValidCodePage(1258) )  Enroll( Vietnamese,      39 );
+	if( ::IsValidCodePage(737) )   Enroll(  GreekIBM,       40 );
+	if( ::IsValidCodePage(869) )   Enroll(  GreekMSDOS,     41 );
+	if( ::IsValidCodePage(28597) ) Enroll(  Greek,          42 );
+	if( ::IsValidCodePage(720) )   Enroll(  ArabicIBM,      43 );
+	if( ::IsValidCodePage(864) )   Enroll(  ArabicMSDOS,    44 );
+	if( ::IsValidCodePage(1256) )  Enroll(  Arabic,         45 );
+	if( ::IsValidCodePage(862) )   Enroll(  HebrewDOS,      46 );
+	if( ::IsValidCodePage(1255) )  Enroll(  Hebrew,         47 );
+	if( ::IsValidCodePage(860) )   Enroll(  Portuguese,     48 );
+	if( ::IsValidCodePage(861) )   Enroll(  Icelandic,      49 );
+	if( ::IsValidCodePage(863) )   Enroll(  CanadianFrench, 50 );
+	if( ::IsValidCodePage(865) )   Enroll(  Nordic,         51 );
+	                               Enroll(  DOSUS,          52 );
 
 	// èIóπ
 	#undef Enroll

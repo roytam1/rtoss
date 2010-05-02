@@ -83,6 +83,7 @@ enum charset {
 	UTF32l     = -8,   // Unicode  (UTF-32)  : BOM—L‚è LE
 	UTF32BE    = -9,   // Unicode  (UTF-32BE): BOM–³‚µ
 	UTF32LE    = -10,  // Unicode  (UTF-32LE): BOM–³‚µ
+	UTF9       = -11,  // Unicode  (UTF-9)   : BOM–³‚µ
 
 	DOSUS      = 437   // DOSLatinUS (CP437)
 };
