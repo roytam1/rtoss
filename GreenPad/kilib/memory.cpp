@@ -40,6 +40,7 @@ using namespace ki;
 
 	#endif
 
+	#if _MSC_VER >= 1300
 	extern "C"
 	void* __cdecl memset( void* buf, int ch, size_t n )
 	{
@@ -50,6 +51,7 @@ using namespace ki;
 		for(;n;--n,++ptr) *ptr = v;
 		return buf;
 	}
+	#endif
 
 	void* __cdecl memmove( void* dst, const void* src, size_t cnt )
 	{

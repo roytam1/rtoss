@@ -417,7 +417,7 @@ struct rMBCS : public TextFileRPimpl
 				state = EOL;
 				break;
 			}
-			else if( (*p) & 0x80 )
+			else if( (*p) & 0x80 && p+1<end )
 			{
 				p = next(cp,p,0);
 			}
@@ -632,7 +632,9 @@ struct rIso2022 : public TextFileRPimpl
 					++p; if( *p==0x7D ){ GL = &G[0]; break; }
 					else if( *p==0x7B ){ GL = &G[1]; break; }
 				} // fall through...
-			default:   DoOutput( buf, p ); gWhat=1; break;
+			default:
+				if( p+1>=end ) goto outofloop;
+				DoOutput( buf, p ); gWhat=1; break;
 			}
 		outofloop:
 
