@@ -123,7 +123,7 @@ LRESULT GreenPadWnd::on_message( UINT msg, WPARAM wp, LPARAM lp )
 			::TrackPopupMenu(
 				::GetSubMenu( ::GetMenu(hwnd()), 1 ), // 編集メニュー表示
 				TPM_LEFTALIGN|TPM_TOPALIGN|TPM_LEFTBUTTON|TPM_RIGHTBUTTON,
-				LOWORD(lp), HIWORD(lp), 0, hwnd(), NULL );
+				static_cast<SHORT>(LOWORD(lp)), static_cast<SHORT>(HIWORD(lp)), 0, hwnd(), NULL );
 		else
 			return WndImpl::on_message( msg, wp, lp );
 		break;
