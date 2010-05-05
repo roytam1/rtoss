@@ -2,8 +2,6 @@
 #define AFX_NSEARCH_H__8336E133_90C5_4059_8605_6066BD37D042__INCLUDED_
 #include "Search.h"
 
-
-
 //=========================================================================
 //@{ @pkg Gp.Search //@}
 // BM法検索用ポリシーs
@@ -34,7 +32,6 @@ struct IgnoreCase
 //	BM法による普通の正方向検索
 //@}
 //=========================================================================
-
 template<class ComparisonPolicy> class BMSearch
 {
 public:

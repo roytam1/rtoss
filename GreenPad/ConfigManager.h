@@ -82,6 +82,9 @@ public:
 	bool showStatusBar() const;
 	void ShowStatusBarSwitch();
 
+	//@{ 日付 //@}
+	const ki::String& dateFormat() const;
+
 public:
 	//@{ 新規ファイルの文字コードindex //@}
 	int GetNewfileCsi() const;
@@ -126,6 +129,10 @@ private:
 	bool       showStatusBar_;
 	bool       rememberWindowSize_;
 	bool       rememberWindowPlace_;
+
+	ki::String dateFormat_;
+//	ki::String timeFormat_;
+//	bool datePrior_;
 
 	// ウインドウサイズ記憶
 	bool wndM_; // maximized?
@@ -225,6 +232,9 @@ inline int ConfigManager::GetNewfileCsi() const
 
 inline ki::lbcode ConfigManager::GetNewfileLB() const
 	{ return newfileLB_; }
+
+inline const ki::String& ConfigManager::dateFormat() const
+	{ return dateFormat_; }
 
 inline int ConfigManager::GetWndX() const
 	{ return rememberWindowPlace_ ? wndX_ : CW_USEDEFAULT; }

@@ -658,6 +658,8 @@ void ConfigManager::LoadIni()
 	countbyunicode_ = ini_.GetBool( TEXT("CountUni"), false );
 	showStatusBar_ = ini_.GetBool( TEXT("StatusBar"), true );
 
+	dateFormat_   = ini_.GetStr( TEXT("DateFormat"), TEXT("HH:mm yyyy/MM/dd") );
+
 	// wnd
 	rememberWindowSize_  = ini_.GetBool( TEXT("RememberWindowSize"), false );
 	rememberWindowPlace_ = ini_.GetBool( TEXT("RememberWindowPos"), false );
@@ -726,6 +728,8 @@ void ConfigManager::SaveIni()
 	ini_.PutBool( TEXT("OpenSame"), openSame_ );
 	ini_.PutBool( TEXT("CountUni"), countbyunicode_ );
 	ini_.PutBool( TEXT("StatusBar"), showStatusBar_ );
+
+	ini_.PutStr( TEXT("DateFormat"), dateFormat_.c_str() );
 
 	// Wnd
 	ini_.PutBool( TEXT("RememberWindowSize"), rememberWindowSize_ );
