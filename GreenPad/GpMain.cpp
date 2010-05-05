@@ -400,13 +400,13 @@ void GreenPadWnd::on_grep()
 
 void GreenPadWnd::on_datetime()
 {
+	String g = cfg_.dateFormat();
 	TCHAR buf[255], tmp[255];
 	::GetTimeFormat
-		( LOCALE_USER_DEFAULT, 0, NULL, TEXT("HH:mm "), buf, countof(buf));
+		( LOCALE_USER_DEFAULT, 0, NULL, g.len()?const_cast<TCHAR*>(g.c_str()):TEXT("HH:mm yyyy/MM/dd"), buf, countof(buf));
 	::GetDateFormat
-		( LOCALE_USER_DEFAULT, 0, NULL, TEXT("yy/MM/dd"),tmp,countof(tmp));
-	::lstrcat( buf, tmp );
-	edit_.getCursor().Input( buf, ::lstrlen(buf) );
+		( LOCALE_USER_DEFAULT, 0, NULL, buf, tmp,countof(tmp));
+	edit_.getCursor().Input( tmp, ::lstrlen(tmp) );
 }
 
 void GreenPadWnd::on_doctype( int no )

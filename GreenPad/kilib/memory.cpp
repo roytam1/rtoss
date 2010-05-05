@@ -388,7 +388,9 @@ MemoryManager* MemoryManager::pUniqueInstance_;
 
 MemoryManager::MemoryManager()
 {
+#ifdef SUPERTINY
 	g_heap = ::GetProcessHeap();
+#endif
 
 	// メモリプールをZEROクリア
 	mem00( pools_, sizeof(pools_) );
@@ -464,7 +466,9 @@ MemoryManager* MemoryManager::pUniqueInstance_;
 
 MemoryManager::MemoryManager()
 {
+#ifdef SUPERTINY
 	g_heap = ::GetProcessHeap();
+#endif
 
 	// 唯一のインスタンスは私です
 	pUniqueInstance_ = this;
