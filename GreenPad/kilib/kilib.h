@@ -1,6 +1,7 @@
 #ifndef _KILIB_KILIB_H_
 #define _KILIB_KILIB_H_
 
+#include "stdafx.h"
 #include "types.h"
 #include "app.h"
 #include "thread.h"

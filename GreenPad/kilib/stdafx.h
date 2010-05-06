@@ -37,7 +37,6 @@
 #endif
 #ifndef IMR_RECONVERTSTRING
 #define IMR_RECONVERTSTRING             0x0004
-#define IMR_CONFIRMRECONVERTSTRING      0x0005
 typedef struct tagRECONVERTSTRING {
     DWORD dwSize;
     DWORD dwVersion;
@@ -48,6 +47,9 @@ typedef struct tagRECONVERTSTRING {
     DWORD dwTargetStrLen;
     DWORD dwTargetStrOffset;
 } RECONVERTSTRING, *PRECONVERTSTRING, NEAR *NPRECONVERTSTRING, FAR *LPRECONVERTSTRING;
+#endif
+#ifndef IMR_CONFIRMRECONVERTSTRING
+#define IMR_CONFIRMRECONVERTSTRING      0x0005
 #endif
 #ifndef WM_IME_REQUEST
 #define WM_IME_REQUEST                  0x0288

@@ -13,9 +13,9 @@ Abstract:
 --*/
 
 
-#ifndef _DLGSH_INCLUDED_
-#define _DLGSH_INCLUDED_
-
+#if !defined(_DLGSH_INCLUDED_) && !defined(_DLGS_H)
+# define _DLGSH_INCLUDED_
+# define _DLGS_H
 
 //
 //  Constant Declarations.
@@ -249,5 +249,11 @@ typedef struct tagCRGB
     BYTE    bExtra;
 } CRGB;           /* RGB Color */
 
-
+#else
+# ifndef _DLGSH_INCLUDED_
+#  define _DLGSH_INCLUDED_
+# endif
+# ifndef _DLGS_H
+#  define _DLGS_H
+# endif
 #endif // _DLGSH_INCLUDED_

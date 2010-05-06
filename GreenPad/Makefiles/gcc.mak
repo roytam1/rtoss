@@ -56,13 +56,13 @@ PRE:
 RES = $(INTDIR)/gp_rsrc.o
 
 VPATH    = editwing:kilib
-CXXFLAGS = -mno-cygwin -O2 -idirafter kilib -c --input-charset=cp932
+CXXFLAGS = -mno-cygwin -O2 -idirafter kilib -c
 LOPT     = -mwindows -mno-cygwin
 
 $(TARGET) : $(OBJS) $(RES)
 	g++ $(LOPT) -o$(TARGET) $(OBJS) $(RES) $(LIBS)
 	strip -s $(TARGET)
 $(INTDIR)/%.o: rsrc/%.rc
-	windres -l=0x411 -I rsrc $< $@
+	windres -l=0x411 -I rsrc $< -O coff -o$@
 $(INTDIR)/%.o: %.cpp
 	g++ $(CXXFLAGS) -o$@ $<
