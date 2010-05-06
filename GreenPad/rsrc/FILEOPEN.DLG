@@ -188,4 +188,3 @@ BEGIN
     PUSHBUTTON      "&Help", pshHelp, 212, 46, 50, 14, WS_GROUP
     AUTOCHECKBOX    "&Read only", chx1, 212, 68, 50, 12, WS_TABSTOP | WS_GROUP
 END
-
