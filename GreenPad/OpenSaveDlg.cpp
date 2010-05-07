@@ -463,7 +463,6 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
     ofn.lpstrFilter    = fltr;
     ofn.lpstrFile      = filename_;
     ofn.nMaxFile       = countof(filename_);
-    ofn.lpstrTitle     = TEXT("Save File As");
     ofn.lpstrInitialDir= filepath_;
 	ofn.lpfnHook       = OfnHook;
     ofn.Flags = OFN_HIDEREADONLY    |
@@ -482,6 +481,7 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	}
 	else
 	{
+	    ofn.lpstrTitle     = TEXT("Save File As");
 		// Running under Windows NT, use the old look template.
 		ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
 	}
