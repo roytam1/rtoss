@@ -849,7 +849,7 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 		cs = detectEnc.nCodePage;
 
 # ifdef MLANG_DEBUG
-		wchar_t tmp[10];
+		TCHAR tmp[10];
 		wsprintf(tmp,TEXT("%d"),cs);
 		::MessageBox(NULL,tmp,TEXT("MLangDetect"),0);
 # endif
