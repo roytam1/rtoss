@@ -25,6 +25,10 @@
 #include <dimm.h>
 #endif
 
+#ifndef NO_MLANG
+#include <mlang.h>
+#endif
+
 #ifdef SUPERTINY
   #undef memset
 #endif
