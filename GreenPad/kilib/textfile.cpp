@@ -838,6 +838,7 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 	}
 
 
+#ifndef NO_MLANG
 	app().InitModule( App::OLE );
 	IMultiLanguage2 *lang = NULL;
 	if( S_OK == ::CoCreateInstance(CLSID_CMultiLanguage, NULL, CLSCTX_ALL, IID_IMultiLanguage2, (LPVOID*)&lang ) )
@@ -848,17 +849,18 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 		lang->DetectInputCodepage(MLDETECTCP_DBCS, 0, in_cstr, (INT *)(&siz), &detectEnc, &detectEncCount);
 		cs = detectEnc.nCodePage;
 
+# ifdef MLANG_DEBUG
+		wchar_t tmp[10];
+		wsprintf(tmp,L"%d",cs);
+		::MessageBox(NULL,tmp,L"MLangDetect",0);
+# endif
+
 		if (cs == 20127 || !cs) cs = defCs; // 20127 == ASCII, 0 = unknown
 
 		if (lang)
 			lang->Release();
-
-#ifdef MLANG_DEBUG
-		wchar_t tmp[10];
-		wsprintf(tmp,L"%d",cs);
-		::MessageBox(NULL,tmp,L"LangDetect",0);
-#endif
 	}
+#endif
 
 //-- ”»’èŒ‹‰Ê
 
