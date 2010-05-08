@@ -837,6 +837,29 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 		}
 	}
 
+
+	app().InitModule( App::OLE );
+	IMultiLanguage2 *lang = NULL;
+	if( S_OK == ::CoCreateInstance(CLSID_CMultiLanguage, NULL, CLSCTX_ALL, IID_IMultiLanguage2, (LPVOID*)&lang ) )
+	{
+		int detectEncCount = 1;
+		CHAR *in_cstr =  (char *)(ptr);
+		DetectEncodingInfo detectEnc;
+		lang->DetectInputCodepage(MLDETECTCP_DBCS, 0, in_cstr, (INT *)(&siz), &detectEnc, &detectEncCount);
+		cs = detectEnc.nCodePage;
+
+		if (cs == 20127 || !cs) cs = defCs; // 20127 == ASCII, 0 = unknown
+
+		if (lang)
+			lang->Release();
+
+#ifdef MLANG_DEBUG
+		wchar_t tmp[10];
+		wsprintf(tmp,L"%d",cs);
+		::MessageBox(NULL,tmp,L"LangDetect",0);
+#endif
+	}
+
 //-- ”»’èŒ‹‰Ê
 
 	return cs;
