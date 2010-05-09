@@ -339,11 +339,6 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 		filepath_[j+1] = TEXT('\0');
 	}
 
-	DWORD dwVersion, bNewShell;
-
-	dwVersion = GetVersion();
-	bNewShell = (LOBYTE(LOWORD(dwVersion))) > 3;
-
 	OPENFILENAME ofn = {sizeof(ofn)};
 	ofn.hwndOwner      = wnd;
 	ofn.hInstance      = app().hinst();
@@ -358,7 +353,7 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 				OFN_ENABLESIZING  |
 				OFN_ENABLETEMPLATE;
 
-	if (bNewShell)
+	if (app().isNewShell())
 	{
 		// Include the OFN_EXPLORER flag to get the new look.
 		ofn.Flags |= OFN_EXPLORER;
@@ -452,11 +447,6 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 		filepath_[j+1] = TEXT('\0');
 	}
 
-	DWORD dwVersion, bNewShell;
-
-	dwVersion = GetVersion();
-	bNewShell = (LOBYTE(LOWORD(dwVersion))) > 3;
-
 	OPENFILENAME ofn = {sizeof(ofn)};
     ofn.hwndOwner      = wnd;
     ofn.hInstance      = app().hinst();
@@ -472,7 +462,7 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 				OFN_ENABLETEMPLATE  |
 				OFN_OVERWRITEPROMPT;
 
-	if (bNewShell)
+	if (app().isNewShell())
 	{
 		// Include the OFN_EXPLORER flag to get the new look.
 		ofn.Flags |= OFN_EXPLORER;

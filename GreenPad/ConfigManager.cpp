@@ -881,50 +881,101 @@ void ConfigManager::SetDocTypeMenu( HMENU m, UINT idstart )
 	// ëSçÄñ⁄ÇçÌèú
 	while( ::DeleteMenu( m, 0, MF_BYPOSITION ) );
 
-	// èáÇ…í«â¡
-	MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
-	mi.fMask = MIIM_ID | MIIM_STATE | MIIM_TYPE;
-	mi.fType = MFT_STRING | MFT_RADIOCHECK;
-
-	DtList::iterator i=dtList_.begin(), e=dtList_.end();
-	for( int ct=0; i!=e; ++i, ++ct )
+	if(app().isNewShell())
 	{
-		mi.wID        = idstart + ct;
-		mi.fState     = (i==curDt_ ? MFS_CHECKED : MFS_UNCHECKED);
-		mi.dwTypeData = const_cast<TCHAR*>(i->name.c_str());
-		mi.cch        = i->name.len();
-		::InsertMenuItem( m, ct, MF_BYPOSITION, &mi );
+		// èáÇ…í«â¡
+		MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
+		mi.fMask = MIIM_ID | MIIM_STATE | MIIM_TYPE;
+		mi.fType = MFT_STRING | MFT_RADIOCHECK;
+
+		DtList::iterator i=dtList_.begin(), e=dtList_.end();
+		for( int ct=0; i!=e; ++i, ++ct )
+		{
+			mi.wID        = idstart + ct;
+			mi.fState     = (i==curDt_ ? MFS_CHECKED : MFS_UNCHECKED);
+			mi.dwTypeData = const_cast<TCHAR*>(i->name.c_str());
+			mi.cch        = i->name.len();
+			::InsertMenuItem( m, ct, MF_BYPOSITION, &mi );
+		}
+	}
+	else
+	{
+		DtList::iterator i=dtList_.begin(), e=dtList_.end();
+		for( int ct=0; i!=e; ++i, ++ct )
+		{
+			::InsertMenu( m, ct, MF_BYPOSITION|(i==curDt_ ? MFS_CHECKED : MFS_UNCHECKED), idstart + ct, const_cast<TCHAR*>(i->name.c_str()) );
+		}
 	}
 }
 
 void ConfigManager::SetDocTypeByMenu( int pos, HMENU m )
 {
-	MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
-	mi.fMask  = MIIM_STATE;
-
-	DtList::iterator i=dtList_.begin(), e=dtList_.end();
-	for( int ct=0; i!=e; ++i, ++ct )
+	if(app().isNewShell())
 	{
-		mi.fState     = (ct==pos ? MFS_CHECKED : MFS_UNCHECKED);
-		::SetMenuItemInfo( m, ct, MF_BYPOSITION, &mi );
-		if( ct == pos )
+		MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
+		mi.fMask  = MIIM_STATE;
+
+		DtList::iterator i=dtList_.begin(), e=dtList_.end();
+		for( int ct=0; i!=e; ++i, ++ct )
 		{
-			curDt_ = i;
-			LoadLayout( &*curDt_ );
+			mi.fState     = (ct==pos ? MFS_CHECKED : MFS_UNCHECKED);
+			::SetMenuItemInfo( m, ct, MF_BYPOSITION, &mi );
+			if( ct == pos )
+			{
+				curDt_ = i;
+				LoadLayout( &*curDt_ );
+			}
+		}
+	}
+	else
+	{
+		int ct=0;
+		DtList::iterator i=dtList_.begin(), e=dtList_.end();
+		for( ; i!=e; ++i, ++ct )
+		{
+			if( ct == pos )
+			{
+				curDt_ = i;
+				LoadLayout( &*curDt_ );
+				::CheckMenuItem( m, ct, MF_BYPOSITION|MF_CHECKED);
+			}
+			else
+			{
+				::CheckMenuItem( m, ct, MF_BYPOSITION|MF_UNCHECKED);
+			}
 		}
 	}
 }
 
 void ConfigManager::CheckMenu( HMENU m, int pos )
 {
-	MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
-	mi.fMask  = MIIM_STATE;
-
-	DtList::iterator i=dtList_.begin(), e=dtList_.end();
-	for( int ct=0; i!=e; ++i, ++ct )
+	if(app().isNewShell())
 	{
-		mi.fState     = (ct==pos ? MFS_CHECKED : MFS_UNCHECKED);
-		::SetMenuItemInfo( m, ct, MF_BYPOSITION, &mi );
+		MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
+		mi.fMask  = MIIM_STATE;
+
+		DtList::iterator i=dtList_.begin(), e=dtList_.end();
+		for( int ct=0; i!=e; ++i, ++ct )
+		{
+			mi.fState     = (ct==pos ? MFS_CHECKED : MFS_UNCHECKED);
+			::SetMenuItemInfo( m, ct, MF_BYPOSITION, &mi );
+		}
+	}
+	else
+	{
+		int ct=0;
+		DtList::iterator i=dtList_.begin(), e=dtList_.end();
+		for( ; i!=e; ++i, ++ct )
+		{
+			if( ct == pos )
+			{
+				::CheckMenuItem( m, ct, MF_BYPOSITION|MF_CHECKED);
+			}
+			else
+			{
+				::CheckMenuItem( m, ct, MF_BYPOSITION|MF_UNCHECKED);
+			}
+		}
 	}
 }
 
