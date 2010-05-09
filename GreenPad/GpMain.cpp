@@ -564,7 +564,7 @@ void GreenPadWnd::UpdateWindowName()
 	name += String(IDS_APPNAME).c_str();
 
 	SetText( name.c_str() );
-	stb_.SetCsText( charSets_[csi_].shortName );
+	stb_.SetCsText( csi_==0xffffffff?TEXT("UNKN"):charSets_[csi_].shortName );
 	stb_.SetLbText( lb_ );
 }
 
