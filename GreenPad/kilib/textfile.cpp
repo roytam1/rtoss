@@ -850,7 +850,7 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 
 # ifdef MLANG_DEBUG
 		TCHAR tmp[10];
-		wsprintf(tmp,TEXT("%d"),cs);
+		::wsprintf(tmp,TEXT("%d"),cs);
 		::MessageBox(NULL,tmp,TEXT("MLangDetect"),0);
 # endif
 
