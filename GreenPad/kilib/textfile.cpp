@@ -848,7 +848,7 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 		lang->DetectInputCodepage(MLDETECTCP_DBCS, 0, (char *)(ptr), (INT *)(&siz), detectEnc, &detectEncCount); // 2 ugly C-cast here
 
 		// MLang fine tunes
-		if ( detectEncCount > 1 && detectEnc[0].nCodePage == 1252 ) // something it gives multiple results with 1252 in the first
+		if ( detectEncCount > 1 && detectEnc[0].nCodePage == 1252 ) // sometimes it gives multiple results with 1252 in the first
 		{
 			if ( detectEncCount == 2 && detectEnc[1].nCodePage == 850 ) // seems to be wrongly detected
 			{
