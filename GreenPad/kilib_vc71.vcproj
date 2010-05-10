@@ -107,12 +107,22 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				InlineFunctionExpansion="0"
+				EnableIntrinsicFunctions="FALSE"
+				FavorSizeOrSpeed="0"
+				OmitFramePointers="FALSE"
+				EnableFiberSafeOptimizations="FALSE"
+				WholeProgramOptimization="FALSE"
 				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32,_DEBUG,_WINDOWS,SUPERTINY,USEGLOBALIME,UNICODE"
 				StringPooling="FALSE"
 				ExceptionHandling="FALSE"
 				RuntimeLibrary="1"
+				StructMemberAlignment="0"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="FALSE"
 				TreatWChar_tAsBuiltInType="TRUE"
+				RuntimeTypeInfo="FALSE"
 				UsePrecompiledHeader="1"
 				PrecompiledHeaderThrough="stdafx.h"
 				PrecompiledHeaderFile=".\OBJ/vc71/debug/kilib.pch"
@@ -183,7 +193,7 @@
 				OmitFramePointers="TRUE"
 				EnableFiberSafeOptimizations="TRUE"
 				WholeProgramOptimization="FALSE"
-				AdditionalIncludeDirectories="kilib"
+				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32,NDEBUG,_WINDOWS,SUPERTINY,USE_ORIGINAL_MEMMAN,USEGLOBALIME"
 				StringPooling="TRUE"
 				ExceptionHandling="FALSE"
@@ -191,6 +201,7 @@
 				StructMemberAlignment="0"
 				BufferSecurityCheck="FALSE"
 				EnableFunctionLevelLinking="TRUE"
+				TreatWChar_tAsBuiltInType="TRUE"
 				RuntimeTypeInfo="FALSE"
 				UsePrecompiledHeader="1"
 				PrecompiledHeaderThrough="stdafx.h"
@@ -200,7 +211,6 @@
 				ProgramDataBaseFileName=".\OBJ/vc71/rel/"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
-				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
 				CallingConvention="1"/>
 			<Tool
@@ -355,11 +365,19 @@
 							WholeProgramOptimization="FALSE"/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							EnableIntrinsicFunctions="FALSE"
+							WholeProgramOptimization="FALSE"/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Win32">
 						<Tool
 							Name="VCCLCompilerTool"
 							Optimization="1"
-							EnableIntrinsicFunctions="FALSE"/>
+							EnableIntrinsicFunctions="FALSE"
+							WholeProgramOptimization="FALSE"/>
 					</FileConfiguration>
 				</File>
 				<File
@@ -381,12 +399,14 @@
 						Name="Debug|Win32">
 						<Tool
 							Name="VCCLCompilerTool"
+							EnableIntrinsicFunctions="TRUE"
 							UsePrecompiledHeader="1"/>
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|Win32">
 						<Tool
 							Name="VCCLCompilerTool"
+							EnableIntrinsicFunctions="TRUE"
 							UsePrecompiledHeader="1"/>
 					</FileConfiguration>
 				</File>
