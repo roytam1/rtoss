@@ -443,11 +443,11 @@ void ConfigManager::LoadLayout( ConfigManager::DocType* dt )
 		dt->wrapWidth = ref->wrapWidth;
 		dt->wrapType  = ref->wrapType;
 		dt->showLN    = ref->showLN;
+		dt->fontCS    = ref->fontCS;
 	}
 	else
 	{
 		// 組み込みのデフォルト設定をロード
-		dt->vc.SetFont( TEXT("FixedSys"), 14 );
 		dt->vc.SetTabStep( 4 );
 		dt->vc.color[TXT] = RGB(0,0,0);
 		dt->vc.color[KWD] = RGB(0,90,230);
@@ -460,6 +460,8 @@ void ConfigManager::LoadLayout( ConfigManager::DocType* dt )
 		dt->wrapWidth  = 80;
 		dt->wrapType   = -1;
 		dt->showLN     = false;
+		dt->fontCS     = DEFAULT_CHARSET;
+		dt->vc.SetFont( TEXT("FixedSys"), 14, dt->fontCS );
 	}
 
   // ２．*.layファイルからの読み込み
@@ -507,6 +509,9 @@ void ConfigManager::LoadLayout( ConfigManager::DocType* dt )
 			case 0x0073007A: // sz: SIZE
 				fontsize = GetInt(ptr);
 				break;
+			case 0x00630073: // cs: FONT-CHAR-SET
+				dt->fontCS = GetInt(ptr);
+				break;
 			case 0x00740062: // tb: TAB
 				dt->vc.SetTabStep( GetInt(ptr) );
 				break;
@@ -533,7 +538,7 @@ void ConfigManager::LoadLayout( ConfigManager::DocType* dt )
 		if( !clfound )
 			dt->vc.color[LN] = dt->vc.color[TXT];
 		if( fontname.len()!=0 && fontsize!=0 )
-			dt->vc.SetFont( fontname.c_str(), fontsize );
+			dt->vc.SetFont( fontname.c_str(), fontsize, dt->fontCS );
 	}
 }
 
