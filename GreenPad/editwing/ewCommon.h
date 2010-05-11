@@ -172,6 +172,10 @@ struct VConfig : public ki::Object
 	//@{ ÉtÉHÉìÉgä÷åWê›íË //@}
 	void SetFont( const TCHAR* fnam, int fsiz )
 	{
+		SetFont( fnam,fsiz,DEFAULT_CHARSET );
+	}
+	void SetFont( const TCHAR* fnam, int fsiz, char fontCS )
+	{
 		fontsize              = fsiz;
 		font.lfWidth          = 0;
 		font.lfEscapement     = 0;
@@ -184,7 +188,7 @@ struct VConfig : public ki::Object
 		font.lfClipPrecision  = CLIP_DEFAULT_PRECIS;
 		font.lfQuality        = DEFAULT_QUALITY;
 		font.lfPitchAndFamily = VARIABLE_PITCH|FF_DONTCARE;
-		font.lfCharSet        = DEFAULT_CHARSET;
+		font.lfCharSet        = fontCS;
 
 		::lstrcpy( font.lfFaceName, fnam );
 

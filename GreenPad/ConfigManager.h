@@ -152,6 +152,7 @@ private:
 		int               wrapType;
 		int               wrapWidth;
 		bool              showLN;
+		char              fontCS;
 	};
 	typedef ki::olist<DocType> DtList;
 
