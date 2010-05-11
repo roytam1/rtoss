@@ -821,29 +821,48 @@ void ConfigManager::SetUpMRUMenu( HMENU m, UINT id )
 	while( ::DeleteMenu( m, 0, MF_BYPOSITION ) );
 
 	// ÉÅÉjÉÖÅ[ç\íz
-	MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
-	mi.fMask = MIIM_ID | MIIM_TYPE;
-	mi.fType = MFT_STRING;
-	for( int i=0; i<countof(mru_); ++i )
+	if(app().isNewShell())
 	{
-		if( i>=mrus_ || mru_[i].len()==0 )
+		MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
+		mi.fMask = MIIM_ID | MIIM_TYPE;
+		mi.fType = MFT_STRING;
+		for( int i=0; i<countof(mru_); ++i )
 		{
-			if( i==0 )
+			if( i>=mrus_ || mru_[i].len()==0 )
 			{
-				mi.fMask     |= MIIM_STATE;
-				mi.wID        = id;
-				mi.fState     = MFS_DISABLED;
-				mi.dwTypeData = TEXT("no files");
-				mi.cch        = 0;
-				::InsertMenuItem( m, 0, MF_BYPOSITION, &mi );
+				if( i==0 )
+				{
+					mi.fMask     |= MIIM_STATE;
+					mi.wID        = id;
+					mi.fState     = MFS_DISABLED;
+					mi.dwTypeData = TEXT("no files");
+					mi.cch        = 0;
+					::InsertMenuItem( m, 0, MF_BYPOSITION, &mi );
+				}
+				break;
 			}
-			break;
+			String cpt = mru_[i].CompactIfPossible(60);
+			mi.wID        = id + i;
+			mi.dwTypeData = const_cast<TCHAR*>(cpt.c_str());
+			mi.cch        = cpt.len();
+			::InsertMenuItem( m, i, MF_BYPOSITION, &mi );
 		}
-		String cpt = mru_[i].CompactIfPossible(60);
-		mi.wID        = id + i;
-		mi.dwTypeData = const_cast<TCHAR*>(cpt.c_str());
-		mi.cch        = cpt.len();
-		::InsertMenuItem( m, i, MF_BYPOSITION, &mi );
+	}
+	else
+	{
+		for( int i=0; i<countof(mru_); ++i )
+		{
+			if( i>=mrus_ || mru_[i].len()==0 )
+			{
+				if( i==0 )
+				{
+					::InsertMenu( m, i, MF_BYPOSITION|MF_GRAYED, id, TEXT("no files") );
+				}
+				break;
+			}
+			String cpt = mru_[i].CompactIfPossible(60);
+			::InsertMenu( m, i, MF_BYPOSITION, id + i, const_cast<TCHAR*>(cpt.c_str()) );
+		}
 	}
 }
 
