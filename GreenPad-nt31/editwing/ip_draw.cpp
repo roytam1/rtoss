@@ -221,7 +221,11 @@ Painter::Painter( HDC hdc, const VConfig& vc )
 
 	// 文字幅テーブル初期化（ASCII範囲の文字以外は遅延処理）
 	memFF( widthTable_, 65536*sizeof(int) );
+#ifdef WIN32S
+	::GetCharWidthA( dc_, ' ', '~', widthTable_+' ' );
+#else
 	::GetCharWidthW( dc_, L' ', L'~', widthTable_+L' ' );
+#endif
 	widthTable_[L'\t'] = W() * Max(1,vc.tabstep);
 	// 下位サロゲートは文字幅ゼロ
 	mem00( widthTable_+0xDC00, (0xE000 - 0xDC00)*sizeof(int) );
@@ -255,13 +259,39 @@ Painter::~Painter()
 
 inline void Painter::CharOut( unicode ch, int x, int y )
 {
+#ifdef WIN32S
+	DWORD dwNum = WideCharToMultiByte(CP_ACP,NULL,&ch,-1,NULL,0,NULL,FALSE);
+	char *psText;
+	psText = new char[dwNum];
+	if(!psText)
+	{
+	delete []psText;
+	}
+	WideCharToMultiByte(CP_ACP,NULL,&ch,-1,psText,dwNum,NULL,FALSE);
+	::TextOutA( dc_, x, y, psText, 1 );
+	delete []psText;
+#else
 	::TextOutW( dc_, x, y, &ch, 1 );
+#endif
 }
 
 inline void Painter::StringOut
 	( const unicode* str, int len, int x, int y )
 {
+#ifdef WIN32S
+	DWORD dwNum = WideCharToMultiByte(CP_ACP,NULL,str,-1,NULL,0,NULL,FALSE);
+	char *psText;
+	psText = new char[dwNum];
+	if(!psText)
+	{
+	delete []psText;
+	}
+	WideCharToMultiByte(CP_ACP,NULL,str,-1,psText,dwNum,NULL,FALSE);
+	::TextOutA( dc_, x, y, psText, dwNum );
+	delete []psText;
+#else
 	::TextOutW( dc_, x, y, str, len );
+#endif
 }
 
 inline void Painter::SetColor( int i )
