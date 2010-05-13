@@ -347,6 +347,85 @@
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
+		<Configuration
+			Name="Win32s Debug|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="1">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				InlineFunctionExpansion="0"
+				EnableIntrinsicFunctions="FALSE"
+				FavorSizeOrSpeed="0"
+				OmitFramePointers="FALSE"
+				EnableFiberSafeOptimizations="FALSE"
+				WholeProgramOptimization="FALSE"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="WIN32,_DEBUG,_WINDOWS,SUPERTINY,WIN32S"
+				StringPooling="FALSE"
+				ExceptionHandling="FALSE"
+				RuntimeLibrary="1"
+				StructMemberAlignment="0"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="FALSE"
+				TreatWChar_tAsBuiltInType="TRUE"
+				RuntimeTypeInfo="FALSE"
+				UsePrecompiledHeader="1"
+				PrecompiledHeaderThrough="stdafx.h"
+				PrecompiledHeaderFile=".\OBJ/vc71/debug/kilib.pch"
+				AssemblerListingLocation=".\OBJ/vc71/debug/"
+				ObjectFile=".\OBJ/vc71/debug/"
+				ProgramDataBaseFileName=".\OBJ/vc71/debug/"
+				BrowseInformation="1"
+				WarningLevel="3"
+				SuppressStartupBanner="TRUE"
+				DebugInformationFormat="4"
+				CallingConvention="2"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386 /SUBSYSTEM:WINDOWS,3.10 /FIXED:NO"
+				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib imm32.lib uuid.lib"
+				OutputFile="OBJ/GreenPad.exe"
+				LinkIncremental="2"
+				SuppressStartupBanner="TRUE"
+				IgnoreAllDefaultLibraries="TRUE"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile=".\OBJ/GreenPad.pdb"
+				SubSystem="0"/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="TRUE"
+				SuppressStartupBanner="TRUE"
+				TargetEnvironment="1"
+				TypeLibraryName=".\OBJ/kilib.tlb"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1041"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -473,6 +552,13 @@
 							EnableIntrinsicFunctions="FALSE"
 							WholeProgramOptimization="FALSE"/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Win32s Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							EnableIntrinsicFunctions="FALSE"
+							WholeProgramOptimization="FALSE"/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\kilib\path.cpp">
@@ -505,6 +591,13 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Win32s Release|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							EnableIntrinsicFunctions="TRUE"
+							UsePrecompiledHeader="1"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Win32s Debug|Win32">
 						<Tool
 							Name="VCCLCompilerTool"
 							EnableIntrinsicFunctions="TRUE"

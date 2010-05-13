@@ -265,11 +265,14 @@ inline void Painter::CharOut( unicode ch, int x, int y )
 	psText = new char[dwNum];
 	if(!psText)
 	{
-	delete []psText;
+		delete []psText;
 	}
-	WideCharToMultiByte(CP_ACP,NULL,&ch,-1,psText,dwNum,NULL,FALSE);
-	::TextOutA( dc_, x, y, psText, 1 );
-	delete []psText;
+	else
+	{
+		WideCharToMultiByte(CP_ACP,NULL,&ch,-1,psText,dwNum,NULL,FALSE);
+		::TextOutA( dc_, x, y, psText, dwNum-1 );
+		delete []psText;
+	}
 #else
 	::TextOutW( dc_, x, y, &ch, 1 );
 #endif
@@ -284,11 +287,14 @@ inline void Painter::StringOut
 	psText = new char[dwNum];
 	if(!psText)
 	{
-	delete []psText;
+		delete []psText;
 	}
-	WideCharToMultiByte(CP_ACP,NULL,str,-1,psText,dwNum,NULL,FALSE);
-	::TextOutA( dc_, x, y, psText, dwNum );
-	delete []psText;
+	else
+	{
+		WideCharToMultiByte(CP_ACP,NULL,str,-1,psText,dwNum,NULL,FALSE);
+		::TextOutA( dc_, x, y, psText, dwNum-1 );
+		delete []psText;
+	}
 #else
 	::TextOutW( dc_, x, y, str, len );
 #endif
