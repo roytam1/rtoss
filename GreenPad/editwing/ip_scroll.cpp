@@ -401,7 +401,7 @@ void ViewImpl::ScrollView( int dx, int dy, bool update )
 	cur_.on_scroll_end();
 }
 
-void ViewImpl::on_hscroll( int code )
+void ViewImpl::on_hscroll( int code, int pos )
 {
 	// •Ï‰»—Ê‚ðŒvŽZ
 	int dx;
@@ -412,13 +412,13 @@ void ViewImpl::on_hscroll( int code )
 	case SB_LINERIGHT: dx= +cvs_.getPainter().W(); break;
 	case SB_PAGELEFT:  dx= -(cx()>>1); break;
 	case SB_PAGERIGHT: dx= +(cx()>>1); break;
-	case SB_THUMBTRACK:
-		{
+	case SB_THUMBTRACK: dx = pos - rlScr_.nPos; break;
+		/*{
 			SCROLLINFO si = { sizeof(SCROLLINFO), SIF_TRACKPOS };
 			::GetScrollInfo( hwnd_, SB_HORZ, &si );
 			dx = si.nTrackPos - rlScr_.nPos;
 			break;
-		}
+		}*/
 	case SB_LEFT:    dx = -rlScr_.nPos; break;
 	case SB_RIGHT:   dx = rlScr_.nMax+1-(signed)rlScr_.nPage-rlScr_.nPos; break;
 	}
@@ -427,7 +427,7 @@ void ViewImpl::on_hscroll( int code )
 	ScrollView( dx, 0, code!=SB_THUMBTRACK );
 }
 
-void ViewImpl::on_vscroll( int code )
+void ViewImpl::on_vscroll( int code, int pos )
 {
 	// •Ï‰»—Ê‚ðŒvŽZ
 	int dy;
@@ -438,13 +438,13 @@ void ViewImpl::on_vscroll( int code )
 	case SB_LINEDOWN: dy= +1; break;
 	case SB_PAGEUP:   dy= -(cy() / cvs_.getPainter().H()); break;
 	case SB_PAGEDOWN: dy= +(cy() / cvs_.getPainter().H()); break;
-	case SB_THUMBTRACK:
-		{
+	case SB_THUMBTRACK: dy = pos - udScr_.nPos; break;
+		/*{
 			SCROLLINFO si = { sizeof(SCROLLINFO), SIF_TRACKPOS };
 			::GetScrollInfo( hwnd_, SB_VERT, &si );
 			dy = si.nTrackPos - udScr_.nPos;
 			break;
-		}
+		}*/
 	case SB_TOP:      dy = -udScr_.nPos; break;
 	case SB_BOTTOM:   dy = udScr_.nMax+1-(signed)udScr_.nPage-udScr_.nPos; break;
 	}
