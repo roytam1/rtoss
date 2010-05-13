@@ -322,8 +322,8 @@ public:
 	const Painter& fnt() const { return cvs_.getPainter(); }
 
 
-	void on_hscroll( int code );
-	void on_vscroll( int code );
+	void on_hscroll( int code, int pos );
+	void on_vscroll( int code, int pos );
 	void on_wheel( short delta );
 
 	void GetVPos( int x, int y, VPos* vp, bool linemode=false ) const;

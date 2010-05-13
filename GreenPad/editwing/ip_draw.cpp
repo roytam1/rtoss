@@ -110,11 +110,11 @@ LRESULT View::on_message( UINT msg, WPARAM wp, LPARAM lp )
 		break;
 
 	case WM_HSCROLL:
-		impl_->on_hscroll( LOWORD(wp) );
+		impl_->on_hscroll( LOWORD(wp), HIWORD(wp) );
 		break;
 
 	case WM_VSCROLL:
-		impl_->on_vscroll( LOWORD(wp) );
+		impl_->on_vscroll( LOWORD(wp), HIWORD(wp) );
 		break;
 
 	case WM_MOUSEWHEEL:
