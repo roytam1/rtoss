@@ -9,6 +9,7 @@ Global
 		Debug = Debug
 		Release = Release
 		Unicode Release = Unicode Release
+		Win32s Debug = Win32s Debug
 		Win32s Release = Win32s Release
 	EndGlobalSection
 	GlobalSection(ProjectDependencies) = postSolution
@@ -20,6 +21,8 @@ Global
 		{910E868F-4E52-4D55-9C4E-4563F5934517}.Release.Build.0 = Release|Win32
 		{910E868F-4E52-4D55-9C4E-4563F5934517}.Unicode Release.ActiveCfg = Unicode Release|Win32
 		{910E868F-4E52-4D55-9C4E-4563F5934517}.Unicode Release.Build.0 = Unicode Release|Win32
+		{910E868F-4E52-4D55-9C4E-4563F5934517}.Win32s Debug.ActiveCfg = Win32s Debug|Win32
+		{910E868F-4E52-4D55-9C4E-4563F5934517}.Win32s Debug.Build.0 = Win32s Debug|Win32
 		{910E868F-4E52-4D55-9C4E-4563F5934517}.Win32s Release.ActiveCfg = Win32s Release|Win32
 		{910E868F-4E52-4D55-9C4E-4563F5934517}.Win32s Release.Build.0 = Win32s Release|Win32
 	EndGlobalSection
