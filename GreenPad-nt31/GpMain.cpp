@@ -862,7 +862,7 @@ void GreenPadWnd::on_create( CREATESTRUCT* cs )
 	LOGGER("GreenPadWnd::on_create edit created");
 	edit_.getDoc().AddHandler( this );
 	edit_.getCursor().AddHandler( this );
-	stb_.SetStatusBarVisible( cfg_.showStatusBar() );
+	stb_.SetStatusBarVisible( false );
 
 	LOGGER("GreenPadWnd::on_create halfway");
 
