@@ -318,10 +318,13 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 		(cfg_.grepExe().len()>0 ? MFS_ENABLED : MFS_DISABLED);
 	SetMenuItemInfo( menu, ID_CMD_GREP, FALSE, &mi );
 
-	UINT id = (wrap_==-1 ? ID_CMD_NOWRAP
+/*	UINT id = (wrap_==-1 ? ID_CMD_NOWRAP
 		: (wrap_>0 ? ID_CMD_WRAPWIDTH : ID_CMD_WRAPWINDOW));
 	::CheckMenuRadioItem(
-		menu, ID_CMD_NOWRAP, ID_CMD_WRAPWINDOW, id, MF_BYCOMMAND );
+		menu, ID_CMD_NOWRAP, ID_CMD_WRAPWINDOW, id, MF_BYCOMMAND );*/
+	::CheckMenuItem( menu, ID_CMD_NOWRAP, MF_BYCOMMAND|(wrap_==-1?MF_CHECKED:MFS_UNCHECKED));
+	::CheckMenuItem( menu, ID_CMD_WRAPWIDTH, MF_BYCOMMAND|(wrap_>0?MF_CHECKED:MFS_UNCHECKED));
+	::CheckMenuItem( menu, ID_CMD_WRAPWINDOW, MF_BYCOMMAND|(wrap_==0?MF_CHECKED:MFS_UNCHECKED));
 
 	::CheckMenuItem( menu, ID_CMD_STATUSBAR,
 		cfg_.showStatusBar()?MFS_CHECKED:MFS_UNCHECKED );

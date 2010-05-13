@@ -191,8 +191,18 @@ ulong ViewImpl::tl2vl( ulong tl ) const
 
 void ViewImpl::UpdateScrollBar()
 {
-	::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
-	::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
+	if(app().isNewShell())
+	{
+		::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
+		::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
+	}
+	else
+	{
+		::SetScrollRange( hwnd_, SB_HORZ, rlScr_.nMin, rlScr_.nMax, FALSE );
+		::SetScrollPos( hwnd_, SB_HORZ, rlScr_.nPos, TRUE );
+		::SetScrollRange( hwnd_, SB_VERT, udScr_.nMin, udScr_.nMax, FALSE );
+		::SetScrollPos( hwnd_, SB_VERT, udScr_.nPos, TRUE );
+	}
 }
 
 ReDrawType ViewImpl::TextUpdate_ScrollBar
@@ -347,7 +357,14 @@ void ViewImpl::ScrollView( int dx, int dy, bool update )
 			dx = rlScr_.nMax-rlScr_.nPage-rlScr_.nPos+1;
 
 		rlScr_.nPos += dx;
-		::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
+		if(app().isNewShell())
+		{
+			::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
+		}
+		else
+		{
+			::SetScrollPos( hwnd_, SB_HORZ, rlScr_.nPos, TRUE );
+		}
 		dx = -dx;
 	}
 	if( dy != 0 )
@@ -355,7 +372,14 @@ void ViewImpl::ScrollView( int dx, int dy, bool update )
 		// 範囲チェック…は前処理で終わってる。
 
 		udScr_.nPos += dy;
-		::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
+		if(app().isNewShell())
+		{
+			::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
+		}
+		else
+		{
+			::SetScrollPos( hwnd_, SB_VERT, udScr_.nPos, TRUE );
+		}
 		dy *= -H;
 	}
 	if( dx!=0 || dy!=0 )
@@ -401,7 +425,7 @@ void ViewImpl::ScrollView( int dx, int dy, bool update )
 	cur_.on_scroll_end();
 }
 
-void ViewImpl::on_hscroll( int code )
+void ViewImpl::on_hscroll( int code, int pos )
 {
 	// 変化量を計算
 	int dx;
@@ -412,13 +436,13 @@ void ViewImpl::on_hscroll( int code )
 	case SB_LINERIGHT: dx= +cvs_.getPainter().W(); break;
 	case SB_PAGELEFT:  dx= -(cx()>>1); break;
 	case SB_PAGERIGHT: dx= +(cx()>>1); break;
-	case SB_THUMBTRACK:
-		{
+	case SB_THUMBTRACK: dx = pos - rlScr_.nPos; break;
+		/*{
 			SCROLLINFO si = { sizeof(SCROLLINFO), SIF_TRACKPOS };
 			::GetScrollInfo( hwnd_, SB_HORZ, &si );
 			dx = si.nTrackPos - rlScr_.nPos;
 			break;
-		}
+		}*/
 	case SB_LEFT:    dx = -rlScr_.nPos; break;
 	case SB_RIGHT:   dx = rlScr_.nMax+1-(signed)rlScr_.nPage-rlScr_.nPos; break;
 	}
@@ -427,7 +451,7 @@ void ViewImpl::on_hscroll( int code )
 	ScrollView( dx, 0, code!=SB_THUMBTRACK );
 }
 
-void ViewImpl::on_vscroll( int code )
+void ViewImpl::on_vscroll( int code, int pos )
 {
 	// 変化量を計算
 	int dy;
@@ -438,13 +462,13 @@ void ViewImpl::on_vscroll( int code )
 	case SB_LINEDOWN: dy= +1; break;
 	case SB_PAGEUP:   dy= -(cy() / cvs_.getPainter().H()); break;
 	case SB_PAGEDOWN: dy= +(cy() / cvs_.getPainter().H()); break;
-	case SB_THUMBTRACK:
-		{
+	case SB_THUMBTRACK: dy = pos - udScr_.nPos; break;
+		/*{
 			SCROLLINFO si = { sizeof(SCROLLINFO), SIF_TRACKPOS };
 			::GetScrollInfo( hwnd_, SB_VERT, &si );
 			dy = si.nTrackPos - udScr_.nPos;
 			break;
-		}
+		}*/
 	case SB_TOP:      dy = -udScr_.nPos; break;
 	case SB_BOTTOM:   dy = udScr_.nMax+1-(signed)udScr_.nPage-udScr_.nPos; break;
 	}
