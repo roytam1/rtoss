@@ -15,9 +15,6 @@
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
-// ì˙ñ{åÍ resources
-
-/////////////////////////////////////////////////////////////////////////////
 //
 // RT_MANIFEST
 //
@@ -78,7 +75,7 @@ IDR_MAIN                ICON                    "exefile.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
-// âpåÍ (ïƒçë) resources
+// English (US) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
@@ -239,7 +236,7 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,71,43,33,14
 END
 
-IDD_CONFIG DIALOGEX 0, 0, 287, 236
+IDD_CONFIG DIALOG 0, 0, 287, 236
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Config"
 FONT 9, "MS Sans Serif"
