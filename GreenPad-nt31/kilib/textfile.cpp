@@ -396,7 +396,7 @@ struct rMBCS : public TextFileRPimpl
 		, fe( reinterpret_cast<const char*>(b+s) )
 		, cp( c==UTF8 ? UTF8N : c )
 		//, next( cp==UTF8N ?   CharNextUtf8 : CharNextExA )
-		, conv( cp==UTF8N && app().isWin95()
+		, conv( cp==UTF8N && (app().isWin95()||!app().isNewShell())
 		                  ? Utf8ToWideChar : MultiByteToWideChar )
 	{
 		if( cp==UTF8N && fe-fb>=3
@@ -427,10 +427,18 @@ struct rMBCS : public TextFileRPimpl
 			}
 
 		// Unicodeへ変換
+		ulong len;
 #ifndef _UNICODE
-		ulong len = conv( cp, 0, fb, p-fb, buf, siz );
+		len = conv( cp, 0, fb, p-fb, buf, siz );
 #else
-		ulong len = ::MultiByteToWideChar( cp, 0, fb, int(p-fb), buf, siz );
+		if(!app().isNewShell())
+		{
+			len = conv( cp, 0, fb, p-fb, buf, siz );
+		}
+		else
+		{
+			len = ::MultiByteToWideChar( cp, 0, fb, int(p-fb), buf, siz );
+		}
 #endif
 		// 改行コードスキップ処理
 		if( state == EOL )
@@ -1104,7 +1112,7 @@ struct wUtf5 : public TextFileWPimpl
 //-------------------------------------------------------------------------
 // Win95対策の自前UTF8/UTF7処理
 //-------------------------------------------------------------------------
-#ifndef _UNICODE
+//#ifndef _UNICODE
 
 struct wUTF8 : public TextFileWPimpl
 {
@@ -1222,7 +1230,7 @@ struct wUTF7 : public TextFileWPimpl
 
 
 
-#endif
+//#endif
 //-------------------------------------------------------------------------
 // Windows頼りの変換
 //-------------------------------------------------------------------------
@@ -1564,9 +1572,15 @@ bool TextFileW::Open( const TCHAR* fname )
 	case UTF8N:
 	default:
 #ifndef _UNICODE
-		if( app().isWin95() && (cs_==UTF8 || cs_==UTF8N) )
+		if( /*app().isWin95() &&*/ (cs_==UTF8 || cs_==UTF8N) )
 			impl_ = new wUTF8( fp_, cs_ );
-		else if( app().isWin95() && cs_==UTF7 )
+		else if( /*app().isWin95() &&*/ cs_==UTF7 )
+			impl_ = new wUTF7( fp_ );
+		else
+#else
+		if( !app().isNewShell() && (cs_==UTF8 || cs_==UTF8N) )
+			impl_ = new wUTF8( fp_, cs_ );
+		else if( !app().isNewShell() && cs_==UTF7 )
 			impl_ = new wUTF7( fp_ );
 		else
 #endif
