@@ -260,15 +260,11 @@ Painter::~Painter()
 inline void Painter::CharOut( unicode ch, int x, int y )
 {
 #ifdef WIN32S
-	DWORD dwNum = WideCharToMultiByte(CP_ACP,NULL,&ch,-1,NULL,0,NULL,FALSE);
+	DWORD dwNum;
 	char *psText;
-	psText = new char[dwNum];
-	if(!psText)
+	if(dwNum = WideCharToMultiByte(CP_ACP,NULL,&ch,-1,NULL,0,NULL,FALSE))
 	{
-		delete []psText;
-	}
-	else
-	{
+		psText = new char[dwNum];
 		WideCharToMultiByte(CP_ACP,NULL,&ch,-1,psText,dwNum,NULL,FALSE);
 		::TextOutA( dc_, x, y, psText, dwNum-1 );
 		delete []psText;
@@ -282,15 +278,11 @@ inline void Painter::StringOut
 	( const unicode* str, int len, int x, int y )
 {
 #ifdef WIN32S
-	DWORD dwNum = WideCharToMultiByte(CP_ACP,NULL,str,-1,NULL,0,NULL,FALSE);
+	DWORD dwNum;
 	char *psText;
-	psText = new char[dwNum];
-	if(!psText)
+	if(dwNum = WideCharToMultiByte(CP_ACP,NULL,str,-1,NULL,0,NULL,FALSE))
 	{
-		delete []psText;
-	}
-	else
-	{
+		psText = new char[dwNum];
 		WideCharToMultiByte(CP_ACP,NULL,str,-1,psText,dwNum,NULL,FALSE);
 		::TextOutA( dc_, x, y, psText, dwNum-1 );
 		delete []psText;
