@@ -26,10 +26,12 @@ inline App::App()
 App::~App()
 {
 	// ƒ[ƒhÏ‚Ýƒ‚ƒWƒ…[ƒ‹‚ª‚ ‚ê‚Î•Â‚¶‚Ä‚¨‚­
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	if( loadedModule_ & COM )
 		::CoUninitialize();
 	if( loadedModule_ & OLE )
 		::OleUninitialize();
+#endif
 
 	// I`—¹`
 	::ExitProcess( exitcode_ );
@@ -48,8 +50,10 @@ void App::InitModule( imflag what )
 		switch( what )
 		{
 		case CTL: ::InitCommonControls(); break;
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 		case COM: ::CoInitialize( NULL ); break;
 		case OLE: ::OleInitialize( NULL );break;
+#endif
 		}
 
 	// ¡‰ñ‰Šú‰»‚µ‚½ƒ‚ƒm‚ð‹L‰¯
@@ -76,7 +80,32 @@ const OSVERSIONINFO& App::osver()
 	{
 		// ‰‰ñ‚¾‚¯‚Íî•ñŽæ“¾
 		s_osVer.dwOSVersionInfoSize = sizeof( s_osVer );
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 		::GetVersionEx( &s_osVer );
+#else
+		DWORD dwVersion = ::GetVersion();
+
+		s_osVer.dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
+		s_osVer.dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
+		if (dwVersion < 0x80000000)              
+				s_osVer.dwBuildNumber = (DWORD)(HIWORD(dwVersion));
+
+		if(s_osVer.dwMajorVersion == 3) s_osVer.dwPlatformId=VER_PLATFORM_WIN32_NT;
+		else if(s_osVer.dwMajorVersion == 4)
+		{
+			if(s_osVer.dwMinorVersion == 0)
+			{
+				if(s_osVer.dwBuildNumber <= 950 || s_osVer.dwBuildNumber == 1111 || s_osVer.dwBuildNumber == 1214)
+					s_osVer.dwPlatformId=VER_PLATFORM_WIN32_WINDOWS;
+				else s_osVer.dwPlatformId=VER_PLATFORM_WIN32_NT;
+			}
+			else
+			{
+				s_osVer.dwPlatformId=VER_PLATFORM_WIN32_WINDOWS;
+			}
+		}
+		else s_osVer.dwPlatformId=VER_PLATFORM_WIN32_NT;
+#endif
 	}
 	return s_osVer;
 }

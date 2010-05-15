@@ -14,17 +14,6 @@
 #define IDC_STATIC (-1)
 #endif
 
-#if !defined(TARGET_VER) || TARGET_VER>310
-/////////////////////////////////////////////////////////////////////////////
-// “ú–{Œê resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
-#ifdef _WIN32
-LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
-#pragma code_page(932)
-#endif //_WIN32
-
-#endif //TARGET_VER
 /////////////////////////////////////////////////////////////////////////////
 //
 // RT_MANIFEST
@@ -79,7 +68,16 @@ END
 // remains consistent on all systems.
 IDR_MAIN                ICON                    "exefile.ico"
 
-#if !defined(TARGET_VER) || TARGET_VER>310
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+/////////////////////////////////////////////////////////////////////////////
+// “ú–{Œê resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
@@ -558,7 +556,11 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,71,43,33,14
 END
 
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 IDD_CONFIG DIALOGEX 0, 0, 287, 236
+#else
+IDD_CONFIG DIALOG 0, 0, 287, 236
+#endif
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Config"
 FONT 9, "MS Sans Serif"

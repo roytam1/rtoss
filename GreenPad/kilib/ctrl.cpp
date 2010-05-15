@@ -14,9 +14,13 @@ StatusBar::StatusBar()
 
 bool StatusBar::Create( HWND parent )
 {
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	HWND h = ::CreateStatusWindow(
 		WS_CHILD|WS_VISIBLE|SBARS_SIZEGRIP,
 		TEXT(""), parent, 1787 );
+#else
+	HWND h = NULL;
+#endif
 	if( h == NULL )
 		return false;
 

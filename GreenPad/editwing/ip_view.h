@@ -74,7 +74,11 @@ public:
 	int Wc( unicode ch ) const
 		{
 			if( widthTable_[ ch ] == -1 )
+#ifdef WIN32S
+				::GetCharWidthA( dc_, ch, ch, widthTable_+ch );
+#else
 				::GetCharWidthW( dc_, ch, ch, widthTable_+ch );
+#endif
 			return widthTable_[ ch ];
 		}
 	int W( const unicode* pch ) const // 1.08 サロゲートペア回避
@@ -88,10 +92,18 @@ public:
 					if( ::GetTextExtentPoint32W( dc_, pch, 2, &sz ) )
 						return sz.cx;
 					int w = 0;
+#ifdef WIN32S
+					::GetCharWidthA( dc_, ch, ch, &w );
+#else
 					::GetCharWidthW( dc_, ch, ch, &w );
+#endif
 					return w;
 				}
+#ifdef WIN32S
+				::GetCharWidthA( dc_, ch, ch, widthTable_+ch );
+#else
 				::GetCharWidthW( dc_, ch, ch, widthTable_+ch );
+#endif
 			}
 			return widthTable_[ ch ];
 		}
