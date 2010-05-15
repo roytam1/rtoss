@@ -862,7 +862,11 @@ GreenPadWnd::GreenPadWnd()
 {
 	LOGGER( "GreenPadWnd::Construct begin" );
 
+#if !defined(TARGET_VER) || TARGET_VER>350
 	static WNDCLASSEX wc;
+#else
+	static WNDCLASS wc;
+#endif
 	wc.hIcon         = app().LoadIcon( IDR_MAIN );
 	wc.hCursor       = app().LoadOemCursor( IDC_ARROW );
 	wc.lpszMenuName  = MAKEINTRESOURCE( IDR_MAIN );

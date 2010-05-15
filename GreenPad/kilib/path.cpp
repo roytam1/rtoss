@@ -21,12 +21,14 @@ Path& Path::BeSpecialPath( int nPATH, bool bs )
 	default:
 		*buf = TEXT('\0');
 		{
+#if !defined(TARGET_VER) || TARGET_VER>350
 			LPITEMIDLIST il;
 			if( NOERROR==::SHGetSpecialFolderLocation( NULL, nPATH, &il ) )
 			{
 				::SHGetPathFromIDList( il, buf );
 				::CoTaskMemFree( il );
 			}
+#endif
 		}
 	}
 
