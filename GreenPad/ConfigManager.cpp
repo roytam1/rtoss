@@ -661,7 +661,11 @@ void ConfigManager::LoadIni()
 	grepExe_   = ini_.GetStr( TEXT("GrepExe"), TEXT("") );
 	openSame_  = ini_.GetBool( TEXT("OpenSame"), false );
 	countbyunicode_ = ini_.GetBool( TEXT("CountUni"), false );
+#if defined(TARGET_VER) && TARGET_VER==310
+	showStatusBar_ = false;
+#else
 	showStatusBar_ = ini_.GetBool( TEXT("StatusBar"), true );
+#endif
 
 	dateFormat_   = ini_.GetStr( TEXT("DateFormat"), TEXT("HH:mm yyyy/MM/dd") );
 
@@ -821,7 +825,7 @@ void ConfigManager::SetUpMRUMenu( HMENU m, UINT id )
 	while( ::DeleteMenu( m, 0, MF_BYPOSITION ) );
 
 	// メニュー構築
-	if(app().isNewShell())
+	/*if(app().isNewShell())
 	{
 		MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
 		mi.fMask = MIIM_ID | MIIM_TYPE;
@@ -849,7 +853,7 @@ void ConfigManager::SetUpMRUMenu( HMENU m, UINT id )
 		}
 	}
 	else
-	{
+	{*/
 		for( int i=0; i<countof(mru_); ++i )
 		{
 			if( i>=mrus_ || mru_[i].len()==0 )
@@ -863,7 +867,7 @@ void ConfigManager::SetUpMRUMenu( HMENU m, UINT id )
 			String cpt = mru_[i].CompactIfPossible(60);
 			::InsertMenu( m, i, MF_BYPOSITION, id + i, const_cast<TCHAR*>(cpt.c_str()) );
 		}
-	}
+	//}
 }
 
 Path ConfigManager::GetMRU( int no ) const
@@ -905,7 +909,7 @@ void ConfigManager::SetDocTypeMenu( HMENU m, UINT idstart )
 	// 全項目を削除
 	while( ::DeleteMenu( m, 0, MF_BYPOSITION ) );
 
-	if(app().isNewShell())
+	/*if(app().isNewShell())
 	{
 		// 順に追加
 		MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
@@ -923,18 +927,18 @@ void ConfigManager::SetDocTypeMenu( HMENU m, UINT idstart )
 		}
 	}
 	else
-	{
+	{*/
 		DtList::iterator i=dtList_.begin(), e=dtList_.end();
 		for( int ct=0; i!=e; ++i, ++ct )
 		{
 			::InsertMenu( m, ct, MF_BYPOSITION|(i==curDt_ ? MFS_CHECKED : MFS_UNCHECKED), idstart + ct, const_cast<TCHAR*>(i->name.c_str()) );
 		}
-	}
+	//}
 }
 
 void ConfigManager::SetDocTypeByMenu( int pos, HMENU m )
 {
-	if(app().isNewShell())
+	/*if(app().isNewShell())
 	{
 		MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
 		mi.fMask  = MIIM_STATE;
@@ -952,7 +956,7 @@ void ConfigManager::SetDocTypeByMenu( int pos, HMENU m )
 		}
 	}
 	else
-	{
+	{*/
 		int ct=0;
 		DtList::iterator i=dtList_.begin(), e=dtList_.end();
 		for( ; i!=e; ++i, ++ct )
@@ -968,12 +972,12 @@ void ConfigManager::SetDocTypeByMenu( int pos, HMENU m )
 				::CheckMenuItem( m, ct, MF_BYPOSITION|MF_UNCHECKED);
 			}
 		}
-	}
+	//}
 }
 
 void ConfigManager::CheckMenu( HMENU m, int pos )
 {
-	if(app().isNewShell())
+	/*if(app().isNewShell())
 	{
 		MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
 		mi.fMask  = MIIM_STATE;
@@ -986,7 +990,7 @@ void ConfigManager::CheckMenu( HMENU m, int pos )
 		}
 	}
 	else
-	{
+	{*/
 		int ct=0;
 		DtList::iterator i=dtList_.begin(), e=dtList_.end();
 		for( ; i!=e; ++i, ++ct )
@@ -1000,6 +1004,6 @@ void ConfigManager::CheckMenu( HMENU m, int pos )
 				::CheckMenuItem( m, ct, MF_BYPOSITION|MF_UNCHECKED);
 			}
 		}
-	}
+	//}
 }
 

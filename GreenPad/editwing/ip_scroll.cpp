@@ -191,14 +191,15 @@ ulong ViewImpl::tl2vl( ulong tl ) const
 
 void ViewImpl::UpdateScrollBar()
 {
-#if defined(TARGET_VER) && TARGET_VER<=350
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
+	::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
+	::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
+#elif defined(TARGET_VER) && TARGET_VER<=350 && TARGET_VER>310
 	if(app().isNewShell())
-#endif
 	{
 		::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
 		::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
 	}
-#if defined(TARGET_VER) && TARGET_VER<=350
 	else
 	{
 		::SetScrollRange( hwnd_, SB_HORZ, rlScr_.nMin, rlScr_.nMax, FALSE );
@@ -206,6 +207,11 @@ void ViewImpl::UpdateScrollBar()
 		::SetScrollRange( hwnd_, SB_VERT, udScr_.nMin, udScr_.nMax, FALSE );
 		::SetScrollPos( hwnd_, SB_VERT, udScr_.nPos, TRUE );
 	}
+#else
+	::SetScrollRange( hwnd_, SB_HORZ, rlScr_.nMin, rlScr_.nMax, FALSE );
+	::SetScrollPos( hwnd_, SB_HORZ, rlScr_.nPos, TRUE );
+	::SetScrollRange( hwnd_, SB_VERT, udScr_.nMin, udScr_.nMax, FALSE );
+	::SetScrollPos( hwnd_, SB_VERT, udScr_.nPos, TRUE );
 #endif
 }
 
@@ -361,17 +367,19 @@ void ViewImpl::ScrollView( int dx, int dy, bool update )
 			dx = rlScr_.nMax-rlScr_.nPage-rlScr_.nPos+1;
 
 		rlScr_.nPos += dx;
-#if defined(TARGET_VER) && TARGET_VER<=350
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
+		::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
+#elif defined(TARGET_VER) && TARGET_VER<=350 && TARGET_VER>310
 		if(app().isNewShell())
-#endif
 		{
 			::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
 		}
-#if defined(TARGET_VER) && TARGET_VER<=350
 		else
 		{
 			::SetScrollPos( hwnd_, SB_HORZ, rlScr_.nPos, TRUE );
 		}
+#else
+		::SetScrollPos( hwnd_, SB_HORZ, rlScr_.nPos, TRUE );
 #endif
 		dx = -dx;
 	}
@@ -380,17 +388,19 @@ void ViewImpl::ScrollView( int dx, int dy, bool update )
 		// 範囲チェック…は前処理で終わってる。
 
 		udScr_.nPos += dy;
-#if defined(TARGET_VER) && TARGET_VER<=350
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
+		::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
+#elif defined(TARGET_VER) && TARGET_VER<=350 && TARGET_VER>310
 		if(app().isNewShell())
-#endif
 		{
 			::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
 		}
-#if defined(TARGET_VER) && TARGET_VER<=350
 		else
 		{
 			::SetScrollPos( hwnd_, SB_VERT, udScr_.nPos, TRUE );
 		}
+#else
+		::SetScrollPos( hwnd_, SB_VERT, udScr_.nPos, TRUE );
 #endif
 		dy *= -H;
 	}

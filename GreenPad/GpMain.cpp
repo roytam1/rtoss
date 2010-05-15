@@ -283,6 +283,7 @@ void GreenPadWnd::on_exit()
 
 void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 {
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	LOGGER("GreenPadWnd::ReloadConfig on_initmenu begin");
 	if(app().isNewShell())
 	{
@@ -326,6 +327,7 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 			menu, ID_CMD_NOWRAP, ID_CMD_WRAPWINDOW, id, MF_BYCOMMAND );
 	}
 	else
+#endif
 	{
 		::EnableMenuItem( menu, ID_CMD_CUT, MF_BYCOMMAND|(edit_.getCursor().isSelected() ? MF_ENABLED : MF_GRAYED) );
 		::EnableMenuItem( menu, ID_CMD_COPY, MF_BYCOMMAND|(edit_.getCursor().isSelected() ? MF_ENABLED : MF_GRAYED) );
@@ -348,8 +350,12 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 		::CheckMenuItem( menu, ID_CMD_WRAPWINDOW, MF_BYCOMMAND|(wrap_==0?MF_CHECKED:MF_UNCHECKED));
 	}
 
+#if defined(TARGET_VER) && TARGET_VER==310
+	::EnableMenuItem( menu, ID_CMD_STATUSBAR, MF_BYCOMMAND|MF_GRAYED );
+#else
 	::CheckMenuItem( menu, ID_CMD_STATUSBAR,
 		cfg_.showStatusBar()?MF_CHECKED:MF_UNCHECKED );
+#endif
 	LOGGER("GreenPadWnd::ReloadConfig on_initmenu end");
 }
 
@@ -462,6 +468,7 @@ static inline void MyShowWnd( HWND wnd )
 
 void GreenPadWnd::on_nextwnd()
 {
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	if( HWND next = ::FindWindowEx( NULL, hwnd(), className_, NULL ) )
 	{
 		HWND last=next, pos;
@@ -472,10 +479,12 @@ void GreenPadWnd::on_nextwnd()
 				0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE|SWP_SHOWWINDOW );
 		MyShowWnd( next );
 	}
+#endif
 }
 
 void GreenPadWnd::on_prevwnd()
 {
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	HWND pos=NULL, next=::FindWindowEx( NULL,NULL,className_,NULL );
 	if( next==hwnd() )
 	{
@@ -491,6 +500,7 @@ void GreenPadWnd::on_prevwnd()
 		if( next!=NULL )
 			MyShowWnd( pos );
 	}
+#endif
 }
 
 void GreenPadWnd::on_statusBar()
@@ -754,8 +764,10 @@ bool GreenPadWnd::OpenByMyself( const ki::Path& fn, int cs, bool needReConf )
 	// [最近使ったファイル]へ追加
 	cfg_.AddMRU( filename_ );
 	HWND wnd = NULL;
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	while( NULL!=(wnd=::FindWindowEx( NULL, wnd, className_, NULL )) )
 		SendMessage( wnd, GPM_MRUCHANGED, 0, 0 );
+#endif
 
 	return true;
 }
@@ -835,8 +847,10 @@ bool GreenPadWnd::Save()
 		// [最近使ったファイル]更新
 		cfg_.AddMRU( filename_ );
 		HWND wnd = NULL;
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 		while( NULL!=(wnd=::FindWindowEx( NULL, wnd, className_, NULL )) )
 			SendMessage( wnd, GPM_MRUCHANGED, 0, 0 );
+#endif
 		return true;
 	}
 
@@ -888,7 +902,11 @@ void GreenPadWnd::on_create( CREATESTRUCT* cs )
 	LOGGER("GreenPadWnd::on_create edit created");
 	edit_.getDoc().AddHandler( this );
 	edit_.getCursor().AddHandler( this );
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	stb_.SetStatusBarVisible( cfg_.showStatusBar() );
+#elif defined(TARGET_VER) && TARGET_VER==310
+	stb_.SetStatusBarVisible( false );
+#endif
 
 	LOGGER("GreenPadWnd::on_create halfway");
 

@@ -121,9 +121,11 @@ void IMEManager::SetFont( HWND wnd, const LOGFONT& lf )
 	else
 	#endif
 	{
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 		ime = ::ImmGetContext( wnd );
 		::ImmSetCompositionFont( ime, plf );
 		::ImmReleaseContext( wnd, ime );
+#endif
 	}
 }
 
@@ -145,9 +147,11 @@ void IMEManager::SetPos( HWND wnd, int x, int y )
 	else
 	#endif
 	{
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 		ime = ::ImmGetContext( wnd );
 		::ImmSetCompositionWindow( ime, &cf );
 		::ImmReleaseContext( wnd, ime );
+#endif
 	}
 }
 
@@ -169,6 +173,7 @@ void IMEManager::GetString( HWND wnd, unicode** str, ulong* len )
 	else
 	#endif
 	{
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 		ime = ::ImmGetContext( wnd );
 		long s = ::ImmGetCompositionStringW( ime,GCS_RESULTSTR,NULL,0 );
 
@@ -194,6 +199,7 @@ void IMEManager::GetString( HWND wnd, unicode** str, ulong* len )
 			}
 
 		::ImmReleaseContext( wnd, ime );
+#endif
 	}
 }
 

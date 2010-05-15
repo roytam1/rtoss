@@ -395,7 +395,9 @@ struct rMBCS : public TextFileRPimpl
 		: fb( reinterpret_cast<const char*>(b) )
 		, fe( reinterpret_cast<const char*>(b+s) )
 		, cp( c==UTF8 ? UTF8N : c )
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 		, next( cp==UTF8N ?   CharNextUtf8 : CharNextExA )
+#endif
 		, conv( cp==UTF8N && (app().isWin95()||!app().isNewShell())
 		                  ? Utf8ToWideChar : MultiByteToWideChar )
 	{
@@ -417,7 +419,7 @@ struct rMBCS : public TextFileRPimpl
 				state = EOL;
 				break;
 			}
-#if !defined(TARGET_VER) || TARGET_VER>350
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
 			else if( (*p) & 0x80 && p+1<end )
 			{
 				p = next(cp,p,0);
@@ -848,6 +850,7 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 	}
 
 
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 #ifndef NO_MLANG
 	app().InitModule( App::OLE );
 	IMultiLanguage2 *lang = NULL;
@@ -897,7 +900,8 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 		if (lang)
 			lang->Release();
 	}
-#endif
+#endif //NO_MLANG
+#endif //TARGET_VER
 
 //-- ”»’èŒ‹‰Ê
 
@@ -1574,9 +1578,9 @@ bool TextFileW::Open( const TCHAR* fname )
 	case UTF8N:
 	default:
 #ifndef _UNICODE
-		if( app().isWin95() && (cs_==UTF8 || cs_==UTF8N) )
+		if( /*app().isWin95() &&*/ (cs_==UTF8 || cs_==UTF8N) )
 			impl_ = new wUTF8( fp_, cs_ );
-		else if( app().isWin95() && cs_==UTF7 )
+		else if( /*app().isWin95() &&*/ cs_==UTF7 )
 			impl_ = new wUTF7( fp_ );
 		else
 #else
