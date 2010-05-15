@@ -417,10 +417,12 @@ struct rMBCS : public TextFileRPimpl
 				state = EOL;
 				break;
 			}
+#if !defined(TARGET_VER) || TARGET_VER>350
 			else if( (*p) & 0x80 && p+1<end )
 			{
 				p = next(cp,p,0);
 			}
+#endif
 			else
 			{
 				++p;
