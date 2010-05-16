@@ -4,7 +4,15 @@
 #include "ktlarray.h"
 using namespace ki;
 
+#ifndef NO_CHARDET
 
+#define CHARDET_RESULT_OK		    0
+#define CHARDET_RESULT_NOMEMORY		    (-1)
+#define CHARDET_RESULT_INVALID_DETECTOR	    (-2)
+
+typedef void* chardet_t;
+
+#endif //NO_CHARDET
 
 //=========================================================================
 // テキストファイル読み出し共通インターフェイス
@@ -849,6 +857,64 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 		}
 	}
 
+#ifndef NO_CHARDET
+	// function calls
+	int (__cdecl*chardet_create)(chardet_t*) = 0;
+	void (__cdecl*chardet_destroy)(chardet_t) = 0;
+	int (__cdecl*chardet_handle_data)(chardet_t, const char*, unsigned int) = 0;
+	int (__cdecl*chardet_data_end)(chardet_t) = 0;
+	int (__cdecl*chardet_get_charset)(chardet_t, char*, unsigned int) = 0;
+	//int (__cdecl*chardet_reset)(chardet_t) = 0;
+	HINSTANCE hIL;
+
+	chardet_t pdet = NULL;
+	char charset[128];
+
+# define STR2CP(a,b) if(0 == ::lstrcmpA(charset,a)) { \
+					chardet_destroy(pdet); \
+					::FreeLibrary(hIL); \
+					return b; \
+				}
+
+
+	if(hIL = ::LoadLibrary(TEXT("chardet.dll")))
+	{
+		chardet_create = (int(__cdecl*)(chardet_t*))::GetProcAddress(hIL, "chardet_create");
+		chardet_destroy = (void(__cdecl*)(chardet_t))::GetProcAddress(hIL, "chardet_destroy");
+		chardet_handle_data = (int(__cdecl*)(chardet_t, const char*, unsigned int))::GetProcAddress(hIL, "chardet_handle_data");
+		chardet_data_end = (int(__cdecl*)(chardet_t))::GetProcAddress(hIL, "chardet_data_end");
+		chardet_get_charset = (int(__cdecl*)(chardet_t, char*, unsigned int))::GetProcAddress(hIL, "chardet_get_charset");
+		//chardet_reset = (int(__cdecl*)(chardet_t))::GetProcAddress(hIL, "chardet_reset");
+
+	    if( (chardet_create && chardet_destroy && chardet_handle_data && chardet_data_end && chardet_get_charset) && 0 == chardet_create(&pdet) )
+	    {
+			if(siz == 16384) siz-=1; // prevert off-by-one error
+			if(0 == chardet_handle_data(pdet, (const char *)ptr, siz))
+			{
+				chardet_data_end(pdet);
+				chardet_get_charset(pdet, charset, 128);
+
+				STR2CP("Shift_JIS",SJIS)
+				STR2CP("EUC-JP",EucJP)
+				STR2CP("EUC-KR",UHC)
+				STR2CP("Big5",Big5)
+				STR2CP("gb18030",GBK)
+				STR2CP("UTF-8",UTF8)
+				STR2CP("windows-1253",Greek)
+				STR2CP("KOI8-R",Koi8R)
+				STR2CP("windows-1251",Cyrillic)
+				STR2CP("IBM866",CyrillicDOS)
+				STR2CP("IBM855",CyrillicIBM)
+				STR2CP("windows-1255",Hebrew)
+				STR2CP("windows-1250",Central)
+				STR2CP("TIS-620",Thai)
+
+			}
+		}
+
+	}
+# undef STR2CP
+#endif //NO_CHARDET
 
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 #ifndef NO_MLANG
