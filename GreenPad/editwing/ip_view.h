@@ -75,7 +75,15 @@ public:
 		{
 			if( widthTable_[ ch ] == -1 )
 #ifdef WIN32S
-				::GetCharWidthA( dc_, ch, ch, widthTable_+ch );
+				if(ch > 0x100)
+				{
+					::GetCharWidthA( dc_, 'x', 'x', widthTable_+ch );
+					widthTable_[ ch ] *= 2;
+				}
+				else
+				{
+					::GetCharWidthA( dc_, ch, ch, widthTable_+ch );
+				}
 #else
 				::GetCharWidthW( dc_, ch, ch, widthTable_+ch );
 #endif
@@ -93,14 +101,30 @@ public:
 						return sz.cx;
 					int w = 0;
 #ifdef WIN32S
-					::GetCharWidthA( dc_, ch, ch, &w );
+					if(ch > 0x100)
+					{
+						::GetCharWidthA( dc_, 'x', 'x', &w );
+						w *= 2;
+					}
+					else
+					{
+						::GetCharWidthA( dc_, ch, ch, &w );
+					}
 #else
 					::GetCharWidthW( dc_, ch, ch, &w );
 #endif
 					return w;
 				}
 #ifdef WIN32S
-				::GetCharWidthA( dc_, ch, ch, widthTable_+ch );
+				if(ch > 0x100)
+				{
+					::GetCharWidthA( dc_, 'x', 'x', widthTable_+ch );
+					widthTable_[ ch ] *= 2;
+				}
+				else
+				{
+					::GetCharWidthA( dc_, ch, ch, widthTable_+ch );
+				}
 #else
 				::GetCharWidthW( dc_, ch, ch, widthTable_+ch );
 #endif
