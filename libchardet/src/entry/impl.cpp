@@ -105,7 +105,7 @@ int chardet_create(chardet_t* pdet)
 {
     if (!pdet) return CHARDET_RESULT_NOMEMORY;
 
-    *pdet = reinterpret_cast<chardet_t>(new DllDetector);
+    *pdet = (chardet_t)(new DllDetector);
     if (*pdet) {
 	return CHARDET_RESULT_OK;
     } else {
@@ -118,7 +118,7 @@ CHARDET_IMEXPORT
 void chardet_destroy(chardet_t det)
 {
     if (det) {
-	delete reinterpret_cast<DllDetector*>(det);
+	delete (DllDetector*)(det);
     }
 }
 
@@ -127,7 +127,7 @@ CHARDET_IMEXPORT
 int chardet_handle_data(chardet_t det, const char* data, unsigned int len)
 {
     if (det) {
-	nsresult ret = reinterpret_cast<DllDetector*>(det)->HandleData(data, (PRUint32)len);
+	nsresult ret = ((DllDetector*)det)->HandleData(data, (PRUint32)len);
 	if (ret == NS_OK) {
 	    return CHARDET_RESULT_OK;
 	} else {
@@ -143,7 +143,7 @@ CHARDET_IMEXPORT
 int chardet_data_end(chardet_t det)
 {
     if (det) {
-	reinterpret_cast<DllDetector*>(det)->DataEnd();
+	((DllDetector*)det)->DataEnd();
 	return CHARDET_RESULT_OK;
     } else {
 	return CHARDET_RESULT_INVALID_DETECTOR;
@@ -155,7 +155,7 @@ CHARDET_IMEXPORT
 int chardet_reset(chardet_t det)
 {
     if (det) {
-	reinterpret_cast<DllDetector*>(det)->Reset();
+	((DllDetector*)det)->Reset();
 	return CHARDET_RESULT_OK;
     } else {
 	return CHARDET_RESULT_INVALID_DETECTOR;
@@ -169,7 +169,7 @@ int chardet_get_charset(chardet_t det, char* namebuf, unsigned int buflen)
     if (det) {
 	if (!namebuf) return CHARDET_RESULT_NOMEMORY;
 
-	const char* name = reinterpret_cast<DllDetector*>(det)->GetCharset();
+	const char* name = ((DllDetector*)det)->GetCharset();
 	if (name == NULL || *name == 0) {
 	    // could not detect encoding
 	    if (buflen > 0) {
