@@ -37,6 +37,12 @@
 #ifndef nsDummyCore_h__
 #define nsDummyCore_h__
 
+#if defined(_MSC_VER) && _MSC_VER < 1100
+typedef int bool;
+#define true 1
+#define false 0
+#endif
+
 typedef bool PRBool;
 typedef int PRInt32;
 typedef unsigned int PRUint32;
