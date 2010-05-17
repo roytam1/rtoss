@@ -35,8 +35,6 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#pragma GCC visibility push(hidden)
-
 #include "nsHebrewProber.h"
 #include <stdio.h>
 
@@ -194,6 +192,3 @@ void  nsHebrewProber::DumpStatus()
   printf("  HEB: %d - %d [Logical-Visual score]\r\n", mFinalCharLogicalScore, mFinalCharVisualScore);
 }
 #endif
-
-#pragma GCC visibility pop
-

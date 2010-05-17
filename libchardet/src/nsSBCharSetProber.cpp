@@ -35,9 +35,6 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
-
-#pragma GCC visibility push(hidden)
-
 #include <stdio.h>
 #include "nsSBCharSetProber.h"
 
@@ -127,6 +124,3 @@ void nsSingleByteCharSetProber::DumpStatus()
   printf("  SBCS: %1.3f [%s]\r\n", GetConfidence(), GetCharSetName());
 }
 #endif
-
-#pragma GCC visibility pop
-

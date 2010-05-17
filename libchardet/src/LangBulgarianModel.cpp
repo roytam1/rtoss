@@ -35,8 +35,6 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#pragma GCC visibility push(hidden)
-
 #include "nsSBCharSetProber.h"
 /****************************************************************
 255: Control characters that usually does not exist in any text
@@ -245,6 +243,3 @@ SequenceModel Win1251BulgarianModel =
   PR_FALSE,
   "windows-1251"
 };
-
-#pragma GCC visibility pop
-
