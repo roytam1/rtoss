@@ -35,8 +35,6 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#pragma GCC visibility push(hidden)
-
 #include "nsSBCharSetProber.h"
 
 
@@ -355,6 +353,3 @@ SequenceModel Ibm855Model =
   PR_FALSE,
   "IBM855"
 };
-
-#pragma GCC visibility pop
-

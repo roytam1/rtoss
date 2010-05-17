@@ -44,6 +44,7 @@ typedef int bool;
 #endif
 
 typedef bool PRBool;
+typedef unsigned char PRUint8;
 typedef int PRInt32;
 typedef unsigned int PRUint32;
 typedef short PRInt16;

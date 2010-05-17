@@ -34,9 +34,6 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
-
-#pragma GCC visibility push(hidden)
-
 #include "nsCodingStateMachine.h"
 
 static PRUint32 HZ_cls[ 256 / 8 ] = {
@@ -263,6 +260,4 @@ SMModel ISO2022KRSMModel = {
   ISO2022KRCharLenTable,
   "ISO-2022-KR",
 };
-
-#pragma GCC visibility pop
 
