@@ -38,10 +38,13 @@ struct ki::TextFileRPimpl : public Object
 
 struct rBasicUTF : public ki::TextFileRPimpl
 {
+	inline rBasicUTF() : FOF(true) {}
 	virtual unicode PeekC() = 0;
 	virtual unicode GetC() {unicode ch=PeekC(); Skip(); return ch;}
 	virtual void Skip() = 0;
 	virtual bool Eof() = 0;
+
+	bool FOF;
 
 	size_t ReadLine( unicode* buf, ulong siz )
 	{
@@ -52,16 +55,18 @@ struct rBasicUTF : public ki::TextFileRPimpl
 		while( !Eof() )
 		{
 			*w = GetC();
+			if(FOF && *w!=0xfeff) FOF = false;
 			if( *w==L'\r' || *w==L'\n' )
 			{
 				state = EOL;
 				break;
 			}
-			else if( *w!=0xfeff && ++w==e )
+			else if( !FOF && ++w==e )
 			{
 				state = EOB;
 				break;
 			}
+			if(FOF) FOF = false;
 		}
 
 		// 改行コードスキップ処理
@@ -69,6 +74,7 @@ struct rBasicUTF : public ki::TextFileRPimpl
 			if( *w==L'\r' && !Eof() && PeekC()==L'\n' )
 				Skip();
 
+		if(FOF) FOF = false;
 		// 読んだ文字数
 		return w-buf;
 	}
@@ -724,9 +730,11 @@ bool TextFileR::Open( const TCHAR* fname )
 	case UTF32BE: impl_ = new rUtf32(buf,siz,true); break;
 	case UTF32l:
 	case UTF32LE: impl_ = new rUtf32(buf,siz,false); break;
+	case UTF1Y:
 	case UTF1:    impl_ = new rUtf1(buf,siz); break;
 	case UTF5:    impl_ = new rUtf5(buf,siz); break;
 	case UTF7:    impl_ = new rUtf7(buf,siz); break;
+	case UTF9Y:
 	case UTF9:    impl_ = new rUtf9(buf,siz); break;
 	case EucJP:   impl_ = new rIso2022(buf,siz,true,false,ASCII,JIS,KANA); break;
 	case IsoJP:   impl_ = new rIso2022(buf,siz,false,false,ASCII,KANA); break;
@@ -792,7 +800,9 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 
 	bool Jp = ::IsValidCodePage(932)!=FALSE;
 
-	if( (bom4>>8) == 0xefbbbf )   cs = UTF8;
+	if( (bom4>>8) == 0xefbbbf )      cs = UTF8;
+	else if( (bom4>>8) == 0xf7644c ) cs = UTF1Y;
+	else if( (bom4>>8) == 0x93fdff ) cs = UTF9Y;
 	else if( bom4 == 0x0000feff ) cs = UTF32b;
 	else if( bom4 == 0xfffe0000 ) cs = UTF32l;
 	else if( bom2 == 0xfeff )     cs = UTF16b;
@@ -1112,7 +1122,11 @@ struct wWest : public TextFileWPimpl
 
 struct wUtf1 : public TextFileWPimpl
 {
-	wUtf1( FileW& w ) : TextFileWPimpl(w) {}
+	wUtf1( FileW& w, bool bom ) : TextFileWPimpl(w) 
+	{
+		if( bom ) // BOM書き込み
+			fp_.Write( "\xF7\x64\x4C", 3 );
+	}
 	inline qbyte conv ( qbyte x )
 	{
 		if( x<=0x5D )      return x + 0x21;
@@ -1145,7 +1159,11 @@ struct wUtf1 : public TextFileWPimpl
 
 struct wUtf9 : public TextFileWPimpl
 {
-	wUtf9( FileW& w ) : TextFileWPimpl(w) {}
+	wUtf9( FileW& w, bool bom ) : TextFileWPimpl(w)
+	{
+		if( bom ) // BOM書き込み
+			fp_.Write( "\x93\xFD\xFF", 3 );
+	}
 	void WriteChar( unicode ch )
 	{
 		if( ch <= 0x7F || (ch >= 0xA0 && ch <= 0xFF ))
@@ -1649,9 +1667,11 @@ bool TextFileW::Open( const TCHAR* fname )
 	switch( cs_ )
 	{
 	case Western: impl_ = new wWest( fp_ ); break;
-	case UTF1:    impl_ = new wUtf1( fp_ ); break;
+	case UTF1Y:
+	case UTF1:    impl_ = new wUtf1( fp_, cs_==UTF1Y ); break;
 	case UTF5:    impl_ = new wUtf5( fp_ ); break;
-	case UTF9:    impl_ = new wUtf9( fp_ ); break;
+	case UTF9:
+	case UTF9Y:    impl_ = new wUtf9( fp_, cs_==UTF9Y ); break;
 	case UTF16l:
 	case UTF16LE: impl_ = new wUtf16LE( fp_, cs_==UTF16l ); break;
 	case UTF16b:
