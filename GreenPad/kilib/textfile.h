@@ -164,6 +164,8 @@ private:
 private:
 
 	int AutoDetection( int cs, const uchar* ptr, ulong siz );
+	int MLangAutoDetection( const uchar* ptr, ulong siz );
+	int chardetAutoDetection( const uchar* ptr, ulong siz );
 
 private:
 
