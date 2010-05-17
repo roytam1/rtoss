@@ -812,9 +812,25 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 	if( siz == u5sum )
 		return UTF5;
 
-//-- 暫定版 UTF-8 / 日本語EUC チェック
+//-- chardet and MLang detection
+	if( app().isNewShell() )
+	{ // chardet works better when size > 64
+		if( siz > 80 )
+		{
+			cs = chardetAutoDetection( ptr, siz );
+			if( cs ) return cs;
+		}
+		cs = MLangAutoDetection( ptr, siz );
+		if( cs ) return cs;
+	}
+	else
+	{ // chardet is the only auto detection method
+		cs = chardetAutoDetection( ptr, siz );
+		if( cs ) return cs;
+	}
 
-	cs = defCs;
+// last resort
+//-- 暫定版 UTF-8 / 日本語EUC チェック
 
 	// 改行コードがLFか、ある程度の大きさか、でないと
 	// 無条件で ANSI-CP と見なしてしまう。
@@ -823,7 +839,7 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 	{
 		// UHCやGBKはEUC-JPと非常に混同しやすいので、そっちがデフォルトの場合は
 		// EUC-JP自動判定を切る
-		if( Jp && ::GetACP()!=UHC && ::GetACP()!=GBK && ::GetACP()!=Big5 )
+		if( Jp && defCs==SJIS )
 		{
 			// EUCとしておかしい値が無いかチェック
 			bool be=true;
@@ -857,6 +873,73 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 		}
 	}
 
+
+//-- 判定結果
+
+	return cs ? cs : defCs;
+}
+
+int TextFileR::MLangAutoDetection( const uchar* ptr, ulong siz )
+{
+	int cs = 0;
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+#ifndef NO_MLANG
+	app().InitModule( App::OLE );
+	IMultiLanguage2 *lang = NULL;
+	if( S_OK == ::CoCreateInstance(CLSID_CMultiLanguage, NULL, CLSCTX_ALL, IID_IMultiLanguage2, (LPVOID*)&lang ) )
+	{
+		int detectEncCount = 5;
+		DetectEncodingInfo detectEnc[5];
+		lang->DetectInputCodepage(MLDETECTCP_DBCS, 0, (char *)(ptr), (INT *)(&siz), detectEnc, &detectEncCount); // 2 ugly C-cast here
+
+		// MLang fine tunes
+		if ( detectEncCount > 1 && detectEnc[0].nCodePage == 1252 ) // sometimes it gives multiple results with 1252 in the first
+		{
+			if ( detectEncCount == 2 && detectEnc[1].nCodePage == 850 ) // seems to be wrongly detected
+			{
+				cs = 0;
+			}
+			else
+			{
+				cs =  detectEnc[detectEncCount-1].nCodePage; // always use last one
+			}
+		}
+		else if ( detectEncCount > 1 && detectEnc[0].nCodePage > 950 ) // non asian codepage in first
+		{
+			int highestConfidence = 0;
+			for(int x=0;x<detectEncCount;x++)
+			{
+				if(highestConfidence < detectEnc[x].nConfidence)
+				{
+					highestConfidence = detectEnc[x].nConfidence; // use codepage with highest Confidence
+					cs = detectEnc[x].nCodePage;
+				}
+			}
+		}
+		else
+		{
+			cs =  detectEnc[0].nCodePage;
+		}
+
+# ifdef MLANG_DEBUG
+		TCHAR tmp[10];
+		::wsprintf(tmp,TEXT("%d"),cs);
+		::MessageBox(NULL,tmp,TEXT("MLangDetect"),0);
+# endif
+
+		if (cs == 20127) cs = 0; // 20127 == ASCII, 0 = unknown
+
+		if (lang)
+			lang->Release();
+	}
+#endif //NO_MLANG
+#endif //TARGET_VER
+	return cs;
+}
+
+int TextFileR::chardetAutoDetection( const uchar* ptr, ulong siz )
+{
+	int cs = 0;
 #ifndef NO_CHARDET
 	// function calls
 	int (__cdecl*chardet_create)(chardet_t*) = 0;
@@ -915,66 +998,8 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 	}
 # undef STR2CP
 #endif //NO_CHARDET
-
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-#ifndef NO_MLANG
-	app().InitModule( App::OLE );
-	IMultiLanguage2 *lang = NULL;
-	if( S_OK == ::CoCreateInstance(CLSID_CMultiLanguage, NULL, CLSCTX_ALL, IID_IMultiLanguage2, (LPVOID*)&lang ) )
-	{
-		int detectEncCount = 5;
-		DetectEncodingInfo detectEnc[5];
-		lang->DetectInputCodepage(MLDETECTCP_DBCS, 0, (char *)(ptr), (INT *)(&siz), detectEnc, &detectEncCount); // 2 ugly C-cast here
-
-		// MLang fine tunes
-		if ( detectEncCount > 1 && detectEnc[0].nCodePage == 1252 ) // sometimes it gives multiple results with 1252 in the first
-		{
-			if ( detectEncCount == 2 && detectEnc[1].nCodePage == 850 ) // seems to be wrongly detected
-			{
-				cs = defCs;
-			}
-			else
-			{
-				cs =  detectEnc[detectEncCount-1].nCodePage; // always use last one
-			}
-		}
-		else if ( detectEncCount > 1 && detectEnc[0].nCodePage > 950 ) // non asian codepage in first
-		{
-			int highestConfidence = 0;
-			for(int x=0;x<detectEncCount;x++)
-			{
-				if(highestConfidence < detectEnc[x].nConfidence)
-				{
-					highestConfidence = detectEnc[x].nConfidence; // use codepage with highest Confidence
-					cs = detectEnc[x].nCodePage;
-				}
-			}
-		}
-		else
-		{
-			cs =  detectEnc[0].nCodePage;
-		}
-
-# ifdef MLANG_DEBUG
-		TCHAR tmp[10];
-		::wsprintf(tmp,TEXT("%d"),cs);
-		::MessageBox(NULL,tmp,TEXT("MLangDetect"),0);
-# endif
-
-		if (cs == 20127 || !cs) cs = defCs; // 20127 == ASCII, 0 = unknown
-
-		if (lang)
-			lang->Release();
-	}
-#endif //NO_MLANG
-#endif //TARGET_VER
-
-//-- 判定結果
-
 	return cs;
 }
-
-
 
 //=========================================================================
 // テキストファイル出力共通インターフェイス
