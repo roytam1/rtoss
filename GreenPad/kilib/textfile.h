@@ -65,6 +65,12 @@ enum charset {
 	IsoCN      = -936, // ’†‘Œê‚Q (ŠÈ‘Ìš ISO-2022-CN)
 	HZ         = -937, // ’†‘Œê‚R (ŠÈ‘Ìš HZ-GB2312)
 	Big5       = 950,  // ’†‘Œê‚S (”É‘Ìš Big5)
+	CNS        = 20000,// ’†‘Œê‚T (”É‘Ìš EUC-TW/CNS)
+	TCA        = 20001,// ’†‘Œê‚U (”É‘Ìš TCA)
+	ETen       = 20002,// ’†‘Œê‚V (”É‘Ìš ETen)
+	IBM5550    = 20003,// ’†‘Œê‚W (”É‘Ìš IBM5550)
+	Teletext   = 20004,// ’†‘Œê‚X (”É‘Ìš Teletext)
+	Wang       = 20005,// ’†‘Œê‚P‚O (”É‘Ìš Wang)
 
 	SJIS       = 932,  // “ú–{Œê‚P (Shift_JIS)
 	EucJP      = -932, // “ú–{Œê‚Q (“ú–{ŒêEUC)
@@ -168,6 +174,10 @@ private:
 	int AutoDetection( int cs, const uchar* ptr, ulong siz );
 	int MLangAutoDetection( const uchar* ptr, ulong siz );
 	int chardetAutoDetection( const uchar* ptr, ulong siz );
+
+	bool TextFileR::IsNonUnicodeRange(qbyte u);
+	bool TextFileR::IsAscii(uchar c);
+	bool TextFileR::IsSurrogateLead(qbyte w);
 
 private:
 

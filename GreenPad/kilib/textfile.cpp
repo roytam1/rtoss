@@ -822,6 +822,130 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 	if( siz == u5sum )
 		return UTF5;
 
+//-- UTF-16/32 detection
+	if( freq[ 0 ] ) // nulls in content?
+	{ // then it may be UTF-16/32 without BOM
+# ifdef UTF_DEBUG
+		TCHAR utfTmp[80];
+# endif
+		// detect for UTF-16 LE
+		ulong x; ulong u2size=siz/2;
+		qbyte uchr;
+		ulong u16le_confidence = 0, u16le_unconfidence = 0;
+		int u16le_impossible = 0;
+		for( x=0; x < u2size; x++ )
+		{
+			uchr = ptr[x*2] | ptr[x*2+1]<<8;
+			if( IsNonUnicodeRange(uchr) || uchr==0 ) // \0\0 maybe a part of UTF-32
+			{
+				u16le_impossible = 1;
+				break;
+			}
+			if((0x00 <= uchr && uchr < 0x80)) u16le_confidence+=2; // unicode ASCII
+			else if(IsAscii(ptr[x*2]) && IsAscii(ptr[x*2+1])) // both char are ASCII
+			{
+				++u16le_confidence;
+				++u16le_unconfidence;
+			}
+			else if(IsSurrogateLead(uchr)) ++u16le_unconfidence; // Surrogate pairs are less-used
+			else ++u16le_confidence; // other Unicode chars
+		}
+		if( !u16le_impossible )
+		{
+# ifdef UTF_DEBUG
+		::wsprintf(utfTmp,TEXT("usize=%d, confidence=%d, unconfidence=%d"),u2size,u16le_confidence,u16le_unconfidence);
+		::MessageBox(NULL,utfTmp,TEXT("UTF16LEDetect"),0);
+# endif
+			if( (u16le_confidence-u16le_unconfidence) > u2size ) return UTF16LE;
+		}
+
+		// detect for UTF-16 BE
+		ulong u16be_confidence = 0, u16be_unconfidence = 0;
+		int u16be_impossible = 0;
+		for( x=0; x < u2size; x++ )
+		{
+			uchr = ptr[x*2+1] | ptr[x*2]<<8;
+			if( IsNonUnicodeRange(uchr) || uchr==0 ) // \0\0 maybe a part of UTF-32
+			{
+				u16be_impossible = 1;
+				break;
+			}
+			if((0x00 <= uchr && uchr < 0x80)) u16be_confidence+=2; // unicode ASCII
+			else if(IsAscii(ptr[x*2]) && IsAscii(ptr[x*2+1])) // both char are ASCII
+			{
+				++u16be_confidence;
+				++u16be_unconfidence;
+			}
+			else if(IsSurrogateLead(uchr)) ++u16be_unconfidence; // Surrogate pairs are less-used
+			else ++u16be_confidence; // other Unicode chars
+		}
+		if( !u16be_impossible )
+		{
+# ifdef UTF_DEBUG
+		::wsprintf(utfTmp,TEXT("usize=%d, confidence=%d, unconfidence=%d"),u2size,u16be_confidence,u16be_unconfidence);
+		::MessageBox(NULL,utfTmp,TEXT("UTF16BEDetect"),0);
+# endif
+			if( (u16be_confidence-u16be_unconfidence) > u2size ) return UTF16BE;
+		}
+
+		// detect for UTF-32 LE
+		ulong u4size=siz/4;
+		ulong u32le_confidence = 0, u32le_unconfidence = 0;
+		int u32le_impossible = 0;
+		for( x=0; x < u4size; x++ )
+		{
+			uchr = ptr[x*4] | ptr[x*4+1]<<8 | ptr[x*4+2]<<16 | ptr[x*4+3]<<24;
+			if( IsNonUnicodeRange(uchr) )
+			{
+				u32le_impossible = 1;
+				break;
+			}
+			if((0x00 <= uchr && uchr < 0x80)) ++u32le_confidence+=2; // unicode ASCII
+			else ++u32le_confidence; // other Unicode chars
+			if(ptr[x*4] == 0) 
+			{
+				++u32le_unconfidence;
+				if(ptr[x*4+1] > 0x10) u32le_unconfidence+=2;
+			}
+		}
+		if( !u32le_impossible )
+		{
+# ifdef UTF_DEBUG
+		::wsprintf(utfTmp,TEXT("usize=%d, confidence=%d, unconfidence=%d"),u4size,u32le_confidence,u32le_unconfidence);
+		::MessageBox(NULL,utfTmp,TEXT("UTF32LEDetect"),0);
+# endif
+			if( u32le_confidence-u32le_unconfidence > u4size ) return UTF32LE;
+		}
+
+		// detect for UTF-32 BE
+		ulong u32be_confidence = 0, u32be_unconfidence = 0;
+		int u32be_impossible = 0;
+		for( x=0; x < u4size; x++ )
+		{
+			uchr = ptr[x*4+3] | ptr[x*4+2]<<8 | ptr[x*4+1]<<16 | ptr[x*4]<<24;
+			if( IsNonUnicodeRange(uchr) )
+			{
+				u32be_impossible = 1;
+				break;
+			}
+			if((0x00 <= uchr && uchr < 0x80)) ++u32be_confidence+=2; // unicode ASCII
+			else ++u32be_confidence; // other Unicode chars
+			if(ptr[x*4+3] == 0) 
+			{
+				++u32be_unconfidence;
+				if(ptr[x*4+2] > 0x10) u32be_unconfidence+=2;
+			}
+		}
+		if( !u32be_impossible )
+		{
+# ifdef UTF_DEBUG
+		::wsprintf(utfTmp,TEXT("usize=%d, confidence=%d, unconfidence=%d"),u4size,u32be_confidence,u32be_unconfidence);
+		::MessageBox(NULL,utfTmp,TEXT("UTF32BEDetect"),0);
+# endif
+			if( u32be_confidence-u32be_unconfidence > u4size ) return UTF32BE;
+		}
+	}
+
 //-- chardet and MLang detection
 	if( app().isNewShell() )
 	{ // chardet works better when size > 64
@@ -990,6 +1114,7 @@ int TextFileR::chardetAutoDetection( const uchar* ptr, ulong siz )
 				STR2CP("Shift_JIS",SJIS)
 				STR2CP("EUC-JP",EucJP)
 				STR2CP("EUC-KR",UHC)
+				STR2CP("x-euc-tw",CNS)
 				STR2CP("Big5",Big5)
 				STR2CP("gb18030",GBK)
 				STR2CP("UTF-8",UTF8)
@@ -1010,6 +1135,52 @@ int TextFileR::chardetAutoDetection( const uchar* ptr, ulong siz )
 #endif //NO_CHARDET
 	return cs;
 }
+
+// functions for detecting BOM-less UTF-16/32
+bool TextFileR::IsNonUnicodeRange(qbyte u)
+{ // Unicode 5.2 based
+			return	(0x000840 <= u && u < 0x000900) ||
+					//(0x0018B0 <= u && u < 0x001900) ||	// U+18B0-18FF : Unified	Canadian Aboriginal Syllabics Extended
+					(0x001AB0 <= u && u < 0x001B00) ||
+					(0x001BC0 <= u && u < 0x001C00) ||
+					(0x001C80 <= u && u < 0x001CD0) ||
+					//(0x002C60 <= u && u < 0x002C80) ||	// U+2C60-2C7F : Latin Extended-C
+					//(0x002DE0 <= u && u < 0x002E00) ||	// U+2DE0-2DFF : Cyrillic Extended-A
+					(0x002FE0 <= u && u < 0x002FF0) ||
+					//(0x00A4D0 <= u && u < 0x00A700) ||	// U+A4D0-A4FF,A500-A63F,A640-A69F,A6A0-A6FF : Lisu, Vai, Cyrillic Extended-B, Bamum
+					//(0x00A720 <= u && u < 0x00A800) ||	// U+A720-A7FF : Latin Extended-D
+					(0x00A9E0 <= u && u < 0x00AA00) ||	//
+					(0x00AAE0 <= u && u < 0x00ABC0) ||
+					//(0x00D7B0 <= u && u < 0x00D800) ||	// U+D7B0-D7FF : Hangul Jamo Extended-B
+					(0x010200 <= u && u < 0x01027F) ||	// U+10280-1029F,102A0-102DF : Lycian, Carian
+					(0x0102E0 <= u && u < 0x010300) ||	// U+10300-1032F,10330-1034F : Old Italic, Gothic
+					(0x010350 <= u && u < 0x010380) ||	// U+10380-1039F,103A0-103DF : Ugaritic, Old Persian
+					(0x0103E0 <= u && u < 0x010400) ||	// U+10400-1044F,10450-1047F,10480-104AF : Deseret, Shavian, Osmanya
+					(0x0104B0 <= u && u < 0x010800) ||	// U+10800-1083F,10840-1085F : Cypriot Syllabary, Imperial Aramaic
+					(0x010860 <= u && u < 0x0108FF) ||	// U+10900-1091F,10920-1093F : Phoenician, Lydian
+					(0x010940 <= u && u < 0x010A00) ||	// U+10A00-10A5F,10A60-10A7F : Kharoshthi, Old South Arabian
+					(0x010A80 <= u && u < 0x010AFF) ||	// U+10B00-10B3F,10B40-10B5F,10B60-10B7F : Avestan, Inscriptional Parthian, Inscriptional Pahlavi
+					(0x010B80 <= u && u < 0x010BFF) ||	// U+10C00-10C4F : Old Turkic
+					(0x010C50 <= u && u < 0x010E5F) ||	// U+10E60-10E7F : Rumi Numeral Symbols
+					(0x010E80 <= u && u < 0x01107F) ||	// U+11080-110CF : Kaithi
+					(0x0110D0 <= u && u < 0x011FFF) ||	// U+12000-123FF,12400-1247F : Cuneiform, Cuneiform Numbers and Punctuation
+					(0x012480 <= u && u < 0x012FFF) ||	// U+13000-1342F : Egyption Ideographs
+					(0x013430 <= u && u < 0x01D000) ||	// U+1D000-1D0FF,1D100-1D1FF,1D200-1D24F : Byzantine Musical Symbols, Musical Symbols, Ancient Greek Musical Notation
+					(0x01D250 <= u && u < 0x01D300) ||	// U+1D300-1D35F,1D360-1D37F : Tai Xuan Jing Symbols, Counting Rod Numerals
+					(0x01D380 <= u && u < 0x01D400) ||	// U+1D400-1D7FF : Mathematical Alphanumeric Symbols
+					(0x01D800 <= u && u < 0x01F000) ||	// U+1F000-1F02F,1F030-1F09F : Mahjong Tiles, Domino Tiles
+					(0x01F0A0 <= u && u < 0x01F0FF) ||	// U+1F100-1F1FF,1F200-1F2FF : Enclosed Alphanumeric Supplement, Enclosed Ideographic Supplement
+					(0x01F300 <= u && u < 0x020000) ||	// U+20000-2A6DF : CJK Unified Ideographs Extension B
+					(0x02A6E0 <= u && u < 0x02A700) ||	// U+2A700-2B73F : CJK Unified Ideographs Extension C
+					(0x02B740 <= u && u < 0x02F800) ||	// U+2F800-2FA1F : CJK Compatibility Ideographs Supplement
+					(0x02FA20 <= u && u < 0x0E0000) ||	// U+E0000-E007F : Tags
+					(0x0E0080 <= u && u < 0x0E0100) ||	// U+E0100-E01EF : Variation Selectors Supplement
+					(0x0E01F0 <= u && u < 0x0F0000) ||	// U+F0000-FFFFD : Supplementary Private Use Area A
+					(0x110000 <= u); // U+100000-10FFFD : Supplementary Private Use Area B , U+110000-FFFFFFFF non-used
+}
+bool TextFileR::IsAscii(uchar c) { return 0x20 <= c && c < 0x80; }
+bool TextFileR::IsSurrogateLead(qbyte w) { return 0xD800 <= w && w <= 0xDBFF; }
+
 
 //=========================================================================
 // テキストファイル出力共通インターフェイス
