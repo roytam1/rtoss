@@ -38,13 +38,13 @@ struct ki::TextFileRPimpl : public Object
 
 struct rBasicUTF : public ki::TextFileRPimpl
 {
-	inline rBasicUTF() : FOF(true) {}
+	inline rBasicUTF() : BOF(true) {}
 	virtual unicode PeekC() = 0;
 	virtual unicode GetC() {unicode ch=PeekC(); Skip(); return ch;}
 	virtual void Skip() = 0;
 	virtual bool Eof() = 0;
 
-	bool FOF;
+	bool BOF;
 
 	size_t ReadLine( unicode* buf, ulong siz )
 	{
@@ -55,18 +55,18 @@ struct rBasicUTF : public ki::TextFileRPimpl
 		while( !Eof() )
 		{
 			*w = GetC();
-			if(FOF && *w!=0xfeff) FOF = false;
+			if(BOF && *w!=0xfeff) BOF = false;
 			if( *w==L'\r' || *w==L'\n' )
 			{
 				state = EOL;
 				break;
 			}
-			else if( !FOF && ++w==e )
+			else if( !BOF && ++w==e )
 			{
 				state = EOB;
 				break;
 			}
-			if(FOF) FOF = false;
+			if(BOF) BOF = false;
 		}
 
 		// 改行コードスキップ処理
@@ -74,7 +74,7 @@ struct rBasicUTF : public ki::TextFileRPimpl
 			if( *w==L'\r' && !Eof() && PeekC()==L'\n' )
 				Skip();
 
-		if(FOF) FOF = false;
+		if(BOF) BOF = false;
 		// 読んだ文字数
 		return w-buf;
 	}
@@ -779,8 +779,8 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 
 //-- 明示指定がある場合はここで終了
 
-	ulong bom4 = (ptr[0]<<24) + (ptr[1]<<16) + (ptr[2]<<8) + (ptr[3]);
-	ulong bom2 = (ptr[0]<<8)  + (ptr[1]);
+	ulong bom4 = (ptr[0]<<24) | (ptr[1]<<16) | (ptr[2]<<8) | (ptr[3]);
+	ulong bom2 = (ptr[0]<<8)  | (ptr[1]);
 
 	if( cs==UTF8 || cs==UTF8N )
 		cs = (bom4>>8==0xefbbbf ? UTF8 : UTF8N);
@@ -825,125 +825,10 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 //-- UTF-16/32 detection
 	if( freq[ 0 ] ) // nulls in content?
 	{ // then it may be UTF-16/32 without BOM
-# ifdef UTF_DEBUG
-		TCHAR utfTmp[80];
-# endif
-		// detect for UTF-16 LE
-		ulong x; ulong u2size=siz/2;
-		qbyte uchr;
-		ulong u16le_confidence = 0, u16le_unconfidence = 0;
-		int u16le_impossible = 0;
-		for( x=0; x < u2size; x++ )
-		{
-			uchr = ptr[x*2] | ptr[x*2+1]<<8;
-			if( IsNonUnicodeRange(uchr) || uchr==0 ) // \0\0 maybe a part of UTF-32
-			{
-				u16le_impossible = 1;
-				break;
-			}
-			if((0x00 <= uchr && uchr < 0x80)) u16le_confidence+=2; // unicode ASCII
-			else if(IsAscii(ptr[x*2]) && IsAscii(ptr[x*2+1])) // both char are ASCII
-			{
-				++u16le_confidence;
-				++u16le_unconfidence;
-			}
-			else if(IsSurrogateLead(uchr)) ++u16le_unconfidence; // Surrogate pairs are less-used
-			else ++u16le_confidence; // other Unicode chars
-		}
-		if( !u16le_impossible )
-		{
-# ifdef UTF_DEBUG
-		::wsprintf(utfTmp,TEXT("usize=%d, confidence=%d, unconfidence=%d"),u2size,u16le_confidence,u16le_unconfidence);
-		::MessageBox(NULL,utfTmp,TEXT("UTF16LEDetect"),0);
-# endif
-			if( (u16le_confidence-u16le_unconfidence) > u2size ) return UTF16LE;
-		}
-
-		// detect for UTF-16 BE
-		ulong u16be_confidence = 0, u16be_unconfidence = 0;
-		int u16be_impossible = 0;
-		for( x=0; x < u2size; x++ )
-		{
-			uchr = ptr[x*2+1] | ptr[x*2]<<8;
-			if( IsNonUnicodeRange(uchr) || uchr==0 ) // \0\0 maybe a part of UTF-32
-			{
-				u16be_impossible = 1;
-				break;
-			}
-			if((0x00 <= uchr && uchr < 0x80)) u16be_confidence+=2; // unicode ASCII
-			else if(IsAscii(ptr[x*2]) && IsAscii(ptr[x*2+1])) // both char are ASCII
-			{
-				++u16be_confidence;
-				++u16be_unconfidence;
-			}
-			else if(IsSurrogateLead(uchr)) ++u16be_unconfidence; // Surrogate pairs are less-used
-			else ++u16be_confidence; // other Unicode chars
-		}
-		if( !u16be_impossible )
-		{
-# ifdef UTF_DEBUG
-		::wsprintf(utfTmp,TEXT("usize=%d, confidence=%d, unconfidence=%d"),u2size,u16be_confidence,u16be_unconfidence);
-		::MessageBox(NULL,utfTmp,TEXT("UTF16BEDetect"),0);
-# endif
-			if( (u16be_confidence-u16be_unconfidence) > u2size ) return UTF16BE;
-		}
-
-		// detect for UTF-32 LE
-		ulong u4size=siz/4;
-		ulong u32le_confidence = 0, u32le_unconfidence = 0;
-		int u32le_impossible = 0;
-		for( x=0; x < u4size; x++ )
-		{
-			uchr = ptr[x*4] | ptr[x*4+1]<<8 | ptr[x*4+2]<<16 | ptr[x*4+3]<<24;
-			if( IsNonUnicodeRange(uchr) )
-			{
-				u32le_impossible = 1;
-				break;
-			}
-			if((0x00 <= uchr && uchr < 0x80)) ++u32le_confidence+=2; // unicode ASCII
-			else ++u32le_confidence; // other Unicode chars
-			if(ptr[x*4] == 0) 
-			{
-				++u32le_unconfidence;
-				if(ptr[x*4+1] > 0x10) u32le_unconfidence+=2;
-			}
-		}
-		if( !u32le_impossible )
-		{
-# ifdef UTF_DEBUG
-		::wsprintf(utfTmp,TEXT("usize=%d, confidence=%d, unconfidence=%d"),u4size,u32le_confidence,u32le_unconfidence);
-		::MessageBox(NULL,utfTmp,TEXT("UTF32LEDetect"),0);
-# endif
-			if( u32le_confidence-u32le_unconfidence > u4size ) return UTF32LE;
-		}
-
-		// detect for UTF-32 BE
-		ulong u32be_confidence = 0, u32be_unconfidence = 0;
-		int u32be_impossible = 0;
-		for( x=0; x < u4size; x++ )
-		{
-			uchr = ptr[x*4+3] | ptr[x*4+2]<<8 | ptr[x*4+1]<<16 | ptr[x*4]<<24;
-			if( IsNonUnicodeRange(uchr) )
-			{
-				u32be_impossible = 1;
-				break;
-			}
-			if((0x00 <= uchr && uchr < 0x80)) ++u32be_confidence+=2; // unicode ASCII
-			else ++u32be_confidence; // other Unicode chars
-			if(ptr[x*4+3] == 0) 
-			{
-				++u32be_unconfidence;
-				if(ptr[x*4+2] > 0x10) u32be_unconfidence+=2;
-			}
-		}
-		if( !u32be_impossible )
-		{
-# ifdef UTF_DEBUG
-		::wsprintf(utfTmp,TEXT("usize=%d, confidence=%d, unconfidence=%d"),u4size,u32be_confidence,u32be_unconfidence);
-		::MessageBox(NULL,utfTmp,TEXT("UTF32BEDetect"),0);
-# endif
-			if( u32be_confidence-u32be_unconfidence > u4size ) return UTF32BE;
-		}
+		if(CheckUTFConfidence(ptr,siz,sizeof(dbyte),true)) return UTF16LE;
+		if(CheckUTFConfidence(ptr,siz,sizeof(dbyte),false)) return UTF16BE;
+		if(CheckUTFConfidence(ptr,siz,sizeof(qbyte),true)) return UTF32LE;
+		if(CheckUTFConfidence(ptr,siz,sizeof(qbyte),false)) return UTF32BE;
 	}
 
 //-- chardet and MLang detection
@@ -1181,6 +1066,50 @@ bool TextFileR::IsNonUnicodeRange(qbyte u)
 bool TextFileR::IsAscii(uchar c) { return 0x20 <= c && c < 0x80; }
 bool TextFileR::IsSurrogateLead(qbyte w) { return 0xD800 <= w && w <= 0xDBFF; }
 
+bool TextFileR::CheckUTFConfidence(const uchar* ptr, ulong siz, unsigned int uChrSize, bool LE)
+{
+	qbyte uchr;
+	ulong usize = siz / uChrSize, x = 0;
+	ulong unconfidence = 0, confidence = 0;
+	bool impossible = false, prevIsNull = false;
+	for( x=0; x < usize; x++ )
+	{
+		if(uChrSize == 2 && LE == true)
+			uchr = ptr[x*2] | ptr[x*2+1]<<8;
+		else if(uChrSize == 2 && LE == false)
+			uchr = ptr[x*2+1] | ptr[x*2]<<8;
+		else if(uChrSize == 4 && LE == true)
+			uchr = ptr[x*4] | ptr[x*4+1]<<8 | ptr[x*4+2]<<16 | ptr[x*4+3]<<24;
+		else if(uChrSize == 4 && LE == false)
+			uchr = ptr[x*4+3] | ptr[x*4+2]<<8 | ptr[x*4+1]<<16 | ptr[x*4]<<24;
+
+		if( IsNonUnicodeRange(uchr) || (uChrSize==2 && uchr==0) ) // \0\0 maybe a part of UTF-32
+		{
+			impossible = true;
+			break;
+		}
+		if((0x00 <= uchr && uchr < 0x80)) confidence+=4; // unicode ASCII
+		else if(uChrSize==2 && IsAscii(ptr[x*2]) && IsAscii(ptr[x*2+1])) // both char are ASCII
+		{
+			confidence+=2;
+			++unconfidence;
+		}
+		else if(uChrSize==2 && IsSurrogateLead(uchr)) ++unconfidence; // Surrogate pairs are less-used
+		else ++confidence; // other Unicode chars
+		if(uChrSize == 2 && prevIsNull && (LE ? !ptr[x*2] : !ptr[x*2+1])) ++unconfidence; // assume successive U+xx00 is less chance appeared
+
+		if(uChrSize == 2)
+			prevIsNull = LE ? !ptr[x*2] : !ptr[x*2+1];
+	}
+# ifdef UTF_DEBUG
+	TCHAR utfTmp[80];
+	::wsprintf(utfTmp,TEXT("uChrSize=%d,LE=%d,usize=%d, confidence=%d, unconfidence=%d, result=%d"),uChrSize,LE,usize,confidence,unconfidence,(impossible?0:(confidence-unconfidence > usize)));
+	::MessageBox(NULL,utfTmp,TEXT("UTFDetect"),0);
+# endif
+
+	if( impossible ) return false;
+	else return (confidence-unconfidence > usize);
+}
 
 //=========================================================================
 // テキストファイル出力共通インターフェイス

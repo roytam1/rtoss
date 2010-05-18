@@ -175,9 +175,10 @@ private:
 	int MLangAutoDetection( const uchar* ptr, ulong siz );
 	int chardetAutoDetection( const uchar* ptr, ulong siz );
 
-	bool TextFileR::IsNonUnicodeRange(qbyte u);
-	bool TextFileR::IsAscii(uchar c);
-	bool TextFileR::IsSurrogateLead(qbyte w);
+	bool IsNonUnicodeRange(qbyte u);
+	bool IsAscii(uchar c);
+	bool IsSurrogateLead(qbyte w);
+	bool CheckUTFConfidence(const uchar* ptr, ulong siz, unsigned int uChrSize, bool LE);
 
 private:
 
