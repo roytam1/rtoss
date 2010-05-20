@@ -386,7 +386,7 @@ struct rUtf7 : public rBasicUTF
 //-------------------------------------------------------------------------
 namespace 
 {
-	static const int win[256]={
+	static const int SCSU_win[256]={
 	0x0000, 0x0080, 0x0100, 0x0180, 0x0200, 0x0280, 0x0300, 0x0380,
 	0x0400, 0x0480, 0x0500, 0x0580, 0x0600, 0x0680, 0x0700, 0x0780,
 	0x0800, 0x0880, 0x0900, 0x0980, 0x0A00, 0x0A80, 0x0B00, 0x0B80,
@@ -420,8 +420,8 @@ namespace
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x00C0, 0x0250, 0x0370, 0x0530, 0x3040, 0x30A0, 0xFF60};
 
-	static int start[8]={0x0000,0x0080,0x0100,0x0300,0x2000,0x2080,0x2100,0x3000},
-	slide[8]={0x0080,0x00C0,0x0400,0x0600,0x0900,0x3040,0x30A0,0xFF00};
+	static int SCSU_start[8]={0x0000,0x0080,0x0100,0x0300,0x2000,0x2080,0x2100,0x3000},
+	SCSU_slide[8]={0x0080,0x00C0,0x0400,0x0600,0x0900,0x3040,0x30A0,0xFF00};
 }
 struct rSCSU : public rBasicUTF
 {
@@ -445,7 +445,7 @@ struct rSCSU : public rBasicUTF
 		c = GetChar();
 		if (c >= 0x80)
 		{
-			return (c - 0x80 + slide[active]);
+			return (c - 0x80 + SCSU_slide[active]);
 		}
 		else if (c >= 0x20 && c <= 0x7F)
 		{
@@ -458,7 +458,7 @@ struct rSCSU : public rBasicUTF
 		else if (c >= 0x1 && c <= 0x8) /* SQn */
 		{ // single quote
 			d = GetChar();
-			return (d < 0x80 ? d + start [c - 0x1] : d - 0x80 + slide[c - 0x1]);
+			return (d < 0x80 ? d + SCSU_start[c - 0x1] : d - 0x80 + SCSU_slide[c - 0x1]);
 		}
 		else if (c >= 0x10 && c <= 0x17) /* SCn */
 		{ // change window
@@ -470,7 +470,7 @@ struct rSCSU : public rBasicUTF
 		else if (c >= 0x18 && c <= 0x1F) /* SDn */
 		{ // define window
 			active = c - 0x18;
-			slide[active] = win[GetChar()];
+			SCSU_slide[active] = SCSU_win[GetChar()];
 
 			Skip();
 			return PeekC();
@@ -478,7 +478,7 @@ struct rSCSU : public rBasicUTF
 		else if (c == 0xB) /* SDX */
 		{
 			c = GetChar(); d = GetChar();
-			slide[active = c>>5] = 0x10000 + (((c & 0x1F) << 8 | d) << 7);
+			SCSU_slide[active = c>>5] = 0x10000 + (((c & 0x1F) << 8 | d) << 7);
 
 			Skip();
 			return PeekC();
@@ -514,7 +514,7 @@ struct rSCSU : public rBasicUTF
 				}
 				else if (c >= 0xE8 && c <= 0xEF) /* UDn */
 				{
-					slide[active=c-0xE8] = win[GetChar()]; mode = 0;
+					SCSU_slide[active=c-0xE8] = SCSU_win[GetChar()]; mode = 0;
 
 					Skip();
 					return PeekC();
@@ -522,7 +522,7 @@ struct rSCSU : public rBasicUTF
 				else if (c == 0xF1) /* UDX */
 				{
 					c = GetChar(); d = GetChar();
-					slide [active = c>>5] = 0x10000 + (((c & 0x1F) << 8 | d) << 7); mode = 0;
+					SCSU_slide[active = c>>5] = 0x10000 + (((c & 0x1F) << 8 | d) << 7); mode = 0;
 
 					Skip();
 					return PeekC();
@@ -995,6 +995,7 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 	if( (bom4>>8) == 0xefbbbf )      cs = UTF8;
 	else if( (bom4>>8) == 0xf7644c ) cs = UTF1Y;
 	else if( (bom4>>8) == 0x93fdff ) cs = UTF9Y;
+	else if( (bom4>>8) == 0x0efeff ) cs = SCSU;
 	else if( bom4 == 0x0000feff ) cs = UTF32b;
 	else if( bom4 == 0xfffe0000 ) cs = UTF32l;
 	else if( bom2 == 0xfeff )     cs = UTF16b;
@@ -1544,6 +1545,173 @@ struct wUtf5 : public TextFileWPimpl
 	}
 };
 
+//-------------------------------------------------------------------------
+// SCSU Encoder
+// Code portion from http://unicode.org/Public/PROGRAMS/SCSUMini/scsumini.c
+// created by: Markus W. Scherer
+//-------------------------------------------------------------------------
+
+namespace {
+	static const ulong SCSU_offsets[16]={
+		/* initial offsets for the 8 dynamic (sliding) windows */
+		0x0080, /* Latin-1 */
+		0x00C0, /* Latin Extended A */
+		0x0400, /* Cyrillic */
+		0x0600, /* Arabic */
+		0x0900, /* Devanagari */
+		0x3040, /* Hiragana */
+		0x30A0, /* Katakana */
+		0xFF00, /* Fullwidth ASCII */
+
+		/* offsets for the 8 static windows */
+		0x0000, /* ASCII for quoted tags */
+		0x0080, /* Latin - 1 Supplement (for access to punctuation) */
+		0x0100, /* Latin Extended-A */
+		0x0300, /* Combining Diacritical Marks */
+		0x2000, /* General Punctuation */
+		0x2080, /* Currency Symbols */
+		0x2100, /* Letterlike Symbols and Number Forms */
+		0x3000  /* CJK Symbols and punctuation */
+	};
+}
+struct wSCSU : public TextFileWPimpl
+{
+	/* SCSU command byte values */
+	enum {
+		SQ0=0x01, /* Quote from window pair 0 */
+		SQU=0x0E, /* Quote a single Unicode character */
+		SCU=0x0F, /* Change to Unicode mode */
+		SC0=0x10, /* Select window 0 */
+
+		UC0=0xE0, /* Select window 0 */
+		UQU=0xF0  /* Quote a single Unicode character */
+	};
+
+	wSCSU( FileW& w ) : TextFileWPimpl(w), isUnicodeMode(0), win(0)
+	{
+		WriteChar( 0xfeff ); // Write BOM
+	}
+
+    char isUnicodeMode, win;
+
+	char isInWindow(ulong offset, ulong c)
+	{
+		return (char)(offset<=c && c<=(offset+0x7f));
+	}
+
+	// get the index of the static/dynamic window that contains c; -1 if none
+	int getWindow(ulong c)
+	{
+		int i;
+
+		for(i=0; i<16; ++i) {
+			if(isInWindow(SCSU_offsets[i], c)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	void WriteChar( unicode c )
+	{
+		char window; // dynamic window 0..7
+		int w;       // result of getWindow(), -1..7
+
+		if( c<0 || c>0x10ffff || (isUnicodeMode&~1)!=0 || (win&~7)!=0 )
+		{
+			return;
+		}
+
+		window=win;
+		if( !isUnicodeMode )
+		{
+			// single-byte mode
+			if(c<0x20)
+			{
+				/*
+				* Encode C0 control code:
+				* Check the code point against the bit mask 0010 0110 0000 0001
+				* which contains 1-bits at the bit positions corresponding to
+				* code points 0D 0A 09 00 (CR LF TAB NUL)
+				* which are encoded directly.
+				* All other C0 control codes are quoted with SQ0.
+				*/
+				if( c<=0xf && ((1<<c)&0x2601)==0 ) {
+					fp_.WriteC( static_cast<uchar>(SQ0) );
+				}
+				fp_.WriteC( static_cast<uchar>(c) );
+			}
+			else if( c<=0x7f )
+			{
+				// encode US-ASCII directly
+				fp_.WriteC( static_cast<uchar>(c) );
+			}
+			else if( isInWindow(SCSU_offsets[window], c) )
+			{
+				// use the current dynamic window
+				fp_.WriteC( static_cast<uchar>(0x80+(c-SCSU_offsets[window])) );
+			}
+			else if( (w=getWindow(c))>=0 )
+			{
+				if( w<=7 )
+				{
+					// switch to a dynamic window
+					fp_.WriteC( static_cast<uchar>(SC0+w) );
+					fp_.WriteC( static_cast<uchar>(0x80+(c-SCSU_offsets[w])) );
+					win=window=(char)w;
+				}
+				else
+				{
+					// quote from a static window
+					fp_.WriteC( static_cast<uchar>(SQ0+(w-8)) );
+					fp_.WriteC( static_cast<uchar>(c-SCSU_offsets[w]) );
+				}
+			}
+			else if( c==0xfeff )
+			{
+				// encode the signature character U+FEFF with SQU
+				fp_.WriteC( static_cast<uchar>(SQU) );
+				fp_.WriteC( static_cast<uchar>(0xfe) );
+				fp_.WriteC( static_cast<uchar>(0xff) );
+			}
+			else
+			{
+				// switch to Unicode mode
+				fp_.WriteC( static_cast<uchar>(SCU) );
+				isUnicodeMode=1;
+				WriteChar( c );
+			}
+		}
+		else
+		{
+			/* Unicode mode */
+			if( c<=0x7f )
+			{
+				// US-ASCII: switch to single-byte mode with the previous dynamic window
+				isUnicodeMode=0;
+				fp_.WriteC( static_cast<uchar>(UC0+window) );
+				WriteChar( c );
+			}
+			else if( (w=getWindow(c))>=0 && w<=7 )
+			{
+				// switch to single-byte mode with a matching dynamic window
+				fp_.WriteC( static_cast<uchar>(UC0+w) );
+				win=window=(char)w;
+				isUnicodeMode=0;
+				WriteChar( c );
+			}
+			else
+			{
+				if( 0xe000<=c && c<=0xf2ff )
+				{
+					fp_.WriteC( static_cast<uchar>(UQU) );
+				}
+				fp_.WriteC( static_cast<uchar>(c>>8) );
+				fp_.WriteC( static_cast<uchar>(c) );
+			}
+		}
+	}
+};
 
 
 //-------------------------------------------------------------------------
@@ -2002,6 +2170,7 @@ bool TextFileW::Open( const TCHAR* fname )
 	case UTF32LE: impl_ = new wUtf32LE( fp_, cs_==UTF32l ); break;
 	case UTF32b:
 	case UTF32BE: impl_ = new wUtf32BE( fp_, cs_==UTF32b ); break;
+	case SCSU:    impl_ = new wSCSU( fp_ ); break;
 	case EucJP:   impl_ = new wEucJp( fp_ ); break;
 	case IsoJP:   impl_ = new wIsoJp( fp_ ); break;
 	case IsoKR:   impl_ = new wIso2022( fp_, cs_ ); break;
