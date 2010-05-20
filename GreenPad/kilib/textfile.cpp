@@ -430,7 +430,9 @@ struct rSCSU : public rBasicUTF
 		, fe( b+s )
 		, active( 0 )
 		, mode( 0 )
-		, skip( 0 ) {}
+		, skip( 0 )
+		, c( 0 )
+		, d( 0 ) {}
 
 	const uchar *fb, *fe;
 	char active, mode, skip;
@@ -439,35 +441,35 @@ struct rSCSU : public rBasicUTF
 
 	void Skip() { fb+=skip; skip=0; }
 	bool Eof() { return fb==fe; }
-	uchar GetChar() { return *(fb+(++skip-1)); }
+	uchar GetChar() { return *(fb+(skip++)); }
 	unicode PeekC()
 	{
 		c = GetChar();
-		if (c >= 0x80)
+		if (!mode && c >= 0x80)
 		{
 			return (c - 0x80 + SCSU_slide[active]);
 		}
-		else if (c >= 0x20 && c <= 0x7F)
+		else if (!mode && c >= 0x20 && c <= 0x7F)
 		{
 			return c;
 		}
-		else if (c == 0x0 || c == 0x9 || c == 0xA || c == 0xC || c == 0xD) 
+		else if (!mode && c == 0x0 || c == 0x9 || c == 0xA || c == 0xC || c == 0xD) 
 		{
 			return c;
 		}
-		else if (c >= 0x1 && c <= 0x8) /* SQn */
+		else if (!mode && c >= 0x1 && c <= 0x8) /* SQn */
 		{ // single quote
 			d = GetChar();
 			return (d < 0x80 ? d + SCSU_start[c - 0x1] : d - 0x80 + SCSU_slide[c - 0x1]);
 		}
-		else if (c >= 0x10 && c <= 0x17) /* SCn */
+		else if (!mode && c >= 0x10 && c <= 0x17) /* SCn */
 		{ // change window
 			active = c - 0x10;
 
 			Skip();
 			return PeekC();
 		}
-		else if (c >= 0x18 && c <= 0x1F) /* SDn */
+		else if (!mode && c >= 0x18 && c <= 0x1F) /* SDn */
 		{ // define window
 			active = c - 0x18;
 			SCSU_slide[active] = SCSU_win[GetChar()];
@@ -475,7 +477,7 @@ struct rSCSU : public rBasicUTF
 			Skip();
 			return PeekC();
 		}
-		else if (c == 0xB) /* SDX */
+		else if (!mode && c == 0xB) /* SDX */
 		{
 			c = GetChar(); d = GetChar();
 			SCSU_slide[active = c>>5] = 0x10000 + (((c & 0x1F) << 8 | d) << 7);
@@ -483,50 +485,47 @@ struct rSCSU : public rBasicUTF
 			Skip();
 			return PeekC();
 		}
-		else if (c == 0xE) /* SQU */
+		else if (!mode && c == 0xE) /* SQU */
 		{
 			c = GetChar();
 			return (c << 8 | GetChar());
 		}
-		else if (*fb == 0xF) /* SCU */
+		else if (mode || c == 0xF) /* SCU */
 		{ // change to Unicode mode
+
+			if(!mode) c = GetChar();
 			mode = 1;
 
-			while (mode)
+			if (c <= 0xDF || c >= 0xF3)
+			{
+				return (c << 8 | GetChar());
+			}
+			else if (c == 0xF0) /* UQU */
 			{
 				c = GetChar();
-				if (c <= 0xDF || c >= 0xF3)
-				{
-					skip = 3;
-					return (c << 8 | GetChar());
-				}
-				else if (c == 0xF0) /* UQU */
-				{
-					c = GetChar();
-					return (c << 8 | GetChar());
-				}
-				else if (c >= 0xE0 && c <= 0xE7) /* UCn */
-				{
-					active = c - 0xE0; mode = 0;
+				return (c << 8 | GetChar());
+			}
+			else if (c >= 0xE0 && c <= 0xE7) /* UCn */
+			{
+				active = c - 0xE0; mode = 0;
 
-					Skip();
-					return PeekC();
-				}
-				else if (c >= 0xE8 && c <= 0xEF) /* UDn */
-				{
-					SCSU_slide[active=c-0xE8] = SCSU_win[GetChar()]; mode = 0;
+				Skip();
+				return PeekC();
+			}
+			else if (c >= 0xE8 && c <= 0xEF) /* UDn */
+			{
+				SCSU_slide[active=c-0xE8] = SCSU_win[GetChar()]; mode = 0;
 
-					Skip();
-					return PeekC();
-				}
-				else if (c == 0xF1) /* UDX */
-				{
-					c = GetChar(); d = GetChar();
-					SCSU_slide[active = c>>5] = 0x10000 + (((c & 0x1F) << 8 | d) << 7); mode = 0;
+				Skip();
+				return PeekC();
+			}
+			else if (c == 0xF1) /* UDX */
+			{
+				c = GetChar(); d = GetChar();
+				SCSU_slide[active = c>>5] = 0x10000 + (((c & 0x1F) << 8 | d) << 7); mode = 0;
 
-					Skip();
-					return PeekC();
-				}
+				Skip();
+				return PeekC();
 			}
 		}
 	}
