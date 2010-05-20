@@ -74,7 +74,8 @@ CharSetList::CharSetList()
 		TEXT("アイスランド語(DOS)"),
 		TEXT("フランス語(カナダ)(DOS)"),
 		TEXT("MSDOS(北欧)"),
-		TEXT("MSDOS(us)")
+		TEXT("MSDOS(us)"),
+		TEXT("SCSU")
 	};
 	static const TCHAR* const lnmEn[] = {
 		TEXT("AutoDetect"),
@@ -137,7 +138,8 @@ CharSetList::CharSetList()
 		TEXT("Icelandic(DOS)"),
 		TEXT("Canadian French(DOS)"),
 		TEXT("MSDOS(Nodic)"),
-		TEXT("MSDOS(us)")
+		TEXT("MSDOS(us)"),
+		TEXT("SCSU")
 	};
 	static const TCHAR* const snm[] = {
 		TEXT(""),
@@ -200,7 +202,8 @@ CharSetList::CharSetList()
 		TEXT("ICE"),
 		TEXT("CFR"),
 		TEXT("NOD"),
-		TEXT("DOS")
+		TEXT("DOS"),
+		TEXT("SCSU")
 	};
 
 	// 日本語環境なら日本語表示を選ぶ
@@ -279,7 +282,8 @@ CharSetList::CharSetList()
 	if( ::IsValidCodePage(861) )   Enroll(  Icelandic,      57 );
 	if( ::IsValidCodePage(863) )   Enroll(  CanadianFrench, 58 );
 	if( ::IsValidCodePage(865) )   Enroll(  Nordic,         59 );
-	                               Enroll(  DOSUS,          50 );
+	                               Enroll(  DOSUS,          60 );
+	                               Enroll( SCSU,            61 );
 
 	// 終了
 	#undef Enroll
