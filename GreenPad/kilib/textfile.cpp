@@ -167,7 +167,7 @@ struct rUtf1 : public rBasicUTF
 		else               return x - 0x42;
 	}
 
-	bool Eof() { return fb==fe; }
+	bool Eof() { return SurrogateLow ? false : fb==fe; }
 	void Skip()
 	{
 		if( SurrogateLow ) return; // don't go further if leftover exists
@@ -216,7 +216,7 @@ struct rUtf9 : public rBasicUTF
 	const uchar *fb, *fe;
 	qbyte SurrogateLow;
 
-	bool Eof() { return fb==fe; }
+	bool Eof() { return SurrogateLow ? false : fb==fe; }
 	void Skip()
 	{
 		if( SurrogateLow ) return; // don't go further if leftover exists
@@ -238,11 +238,11 @@ struct rUtf9 : public rBasicUTF
 			return (unicode)ch;
 		}
 
-		if( *fb >= 0x98 && *fb <= 0x9F )      { ch = (unicode)(((*fb & 0x07) << 28) + ((*(fb+1) & 0x7F) << 21) + ((*(fb+2) & 0x7F) << 14) + ((*(fb+3) & 0x7F) << 7) + (*(fb+4) & 0x7F)); }
-		else if( *fb >= 0x94 && *fb <= 0x97 ) { ch = (unicode)(((*fb & 0x03) << 21) + ((*(fb+1) & 0x7F) << 14) + ((*(fb+2) & 0x7F) << 7) + (*(fb+3) & 0x7F)); }
-		else if( *fb >= 0x90 && *fb <= 0x93 ) { ch = (unicode)(((*fb & 0x03) << 14) + ((*(fb+1) & 0x7F) << 7) + (*(fb+2) & 0x7F)); }
-		else if( *fb >= 0x80 && *fb <= 0x8F ) { ch = (unicode)(((*fb & 0x7F) << 7) + (*(fb+1) & 0x7F)); }
-		else /* 0~0x7F,0xA0~0xFF */           { ch = (unicode)(*fb); }
+		if( *fb >= 0x98 && *fb <= 0x9F )      { ch = (((*fb & 0x07) << 28) + ((*(fb+1) & 0x7F) << 21) + ((*(fb+2) & 0x7F) << 14) + ((*(fb+3) & 0x7F) << 7) + (*(fb+4) & 0x7F)); }
+		else if( *fb >= 0x94 && *fb <= 0x97 ) { ch = (((*fb & 0x03) << 21) + ((*(fb+1) & 0x7F) << 14) + ((*(fb+2) & 0x7F) << 7) + (*(fb+3) & 0x7F)); }
+		else if( *fb >= 0x90 && *fb <= 0x93 ) { ch = (((*fb & 0x03) << 14) + ((*(fb+1) & 0x7F) << 7) + (*(fb+2) & 0x7F)); }
+		else if( *fb >= 0x80 && *fb <= 0x8F ) { ch = (((*fb & 0x7F) << 7) + (*(fb+1) & 0x7F)); }
+		else /* 0~0x7F,0xA0~0xFF */           { ch = (*fb); }
 
 		if( ch > 0x10000 )
 		{
