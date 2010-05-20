@@ -435,9 +435,9 @@ struct rSCSU : public rBasicUTF
 		, d( 0 ) {}
 
 	const uchar *fb, *fe;
-	char active, mode, skip;
+	char active, mode;
+	ulong skip;
 	uchar c, d;
-
 
 	void Skip() { fb+=skip; skip=0; }
 	bool Eof() { return fb==fe; }
@@ -530,6 +530,147 @@ struct rSCSU : public rBasicUTF
 		}
 	}
 };
+
+//-------------------------------------------------------------------------
+// BOCU-1
+// code portion from BOCU1.pm by Naoya Tozuka
+//-------------------------------------------------------------------------
+namespace {
+	static const uchar bocu1_trail_to_byte[243] = {
+//   0 - 19 (0x0 - 0x13)
+          0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
+    0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,             0x1c, 0x1d, 0x1e, 0x1f,
+//   20 - 242 (0x14 - 0xf2)
+          0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
+    0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
+    0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f,
+    0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5a, 0x5b, 0x5c, 0x5d, 0x5e, 0x5f,
+    0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f,
+    0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f,
+    0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
+    0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f,
+    0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf,
+    0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf,
+    0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf,
+    0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
+    0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7, 0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xef,
+	0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff };
+
+	static const uchar bocu1_byte_to_trail[256] = {
+//   0x00 - 0x20
+    -1,   0x00, 0x01, 0x02, 0x03, 0x04, 0x05, -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
+    0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, -1,   -1,   0x10, 0x11, 0x12, 0x13,
+    -1,
+//   0x21 - 0xff
+          0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22,
+    0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32,
+    0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f, 0x40, 0x41, 0x42,
+    0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x50, 0x51, 0x52,
+    0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5a, 0x5b, 0x5c, 0x5d, 0x5e, 0x5f, 0x60, 0x61, 0x62,
+    0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f, 0x70, 0x71, 0x72,
+    0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82,
+    0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, 0x92,
+    0x93, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f, 0xa0, 0xa1, 0xa2,
+    0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf, 0xb0, 0xb1, 0xb2,
+    0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, 0xc0, 0xc1, 0xc2,
+    0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1, 0xd2,
+    0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf, 0xe0, 0xe1, 0xe2,
+	0xe3, 0xe4, 0xe5, 0xe6, 0xe7, 0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xef, 0xf0, 0xf1, 0xf2 };
+}
+struct rBOCU1 : public rBasicUTF
+{
+	rBOCU1( const uchar* b, ulong s )
+		: fb( b )
+		, fe( b+s )
+		, skip( 0 )
+		, pc( 0x40 )
+		, cp( 0 ) {}
+
+	const uchar *fb, *fe;
+	ulong skip;
+	unicode cp, pc;
+
+	void Skip() { fb+=skip; skip=0; }
+	bool Eof() { return fb==fe; }
+	uchar GetChar() { return *(fb+(skip++)); }
+	unicode PeekC()
+	{
+		uchar c = GetChar();
+		long diff = 0;
+		uchar t1,t2,t3;
+
+        if (c <= 0x20) {
+            cp = c;
+        } else if (c == 0x21) { // 21 t1 t2 t3
+            t1 = bocu1_byte_to_trail[ GetChar() ];
+            t2 = bocu1_byte_to_trail[ GetChar() ];
+            t3 = bocu1_byte_to_trail[ GetChar() ];
+            //croak "illegal trail char" if t1 < 0 || t2 < 0 || t3 < 0;
+            diff = 14161247 + t1 * 59049 + t2 * 243 + t3;
+        } else if (c < 0x25) { // [22-24] t1 t2
+            t1 = bocu1_byte_to_trail[ GetChar() ];
+            t2 = bocu1_byte_to_trail[ GetChar() ];
+            //croak "illegal trail char" if t1 < 0 || t2 < 0;
+            diff = -2195326 + c * 59049 + t1 * 243 + t2;
+        } else if (c < 0x50) { // [25-4F] t1
+            t1 = bocu1_byte_to_trail[ GetChar() ];
+            //croak "illegal trail char" if t1 < 0;
+            diff = -19504 + c * 243 + t1;
+        } else if (c < 0xd0) { // [50-CF]
+            diff = c - 0x90;
+        } else if (c < 0xfb) { // [D0-FA] t1
+            t1 = bocu1_byte_to_trail[ GetChar() ];
+            //croak "illegal trail char" if t1 < 0;
+            diff = -50480 + c * 243 + t1;
+        } else if (c < 0xfe) { // [FB-FD] t1 t2
+            t1 = bocu1_byte_to_trail[ GetChar() ];
+            t2 = bocu1_byte_to_trail[ GetChar() ];
+            //croak "illegal trail char" if t1 < 0 || t2 < 0;
+            diff = -14810786 + c * 59049 + t1 * 243 + t2;
+        } else if (c == 0xfe) { // FE t1 t2 t3
+            t1 = bocu1_byte_to_trail[ GetChar() ];
+            t2 = bocu1_byte_to_trail[ GetChar() ];
+            t3 = bocu1_byte_to_trail[ GetChar() ];
+            //croak "illegal trail char" if t1 < 0 || t2 < 0 || t3 < 0;
+            diff = 187660 + t1 * 59049 + t2 * 243 + t3;
+        } else if (c == 0xff) {
+            // reset
+            cp = 0;
+            diff = 0;
+        }
+
+        // codepoint, next pc
+        if (c <= 0x20) {
+            if (c < 0x20) pc = 0x40;
+            //push(@codepoints,c);
+			return c;
+        } else if (c < 0xff) {
+            cp = (unicode)(pc + diff);
+            if (pc + diff < 0) cp = 0;
+            //push(@codepoints,cp);
+            if (cp < 0x20) {
+                pc = 0x40;
+            } else if (cp == 0x20) {
+                // keep pc
+            } else if (0x3040 <= cp && cp <= 0x309f) {
+                pc = 0x3070;
+            } else if (0x4e00 <= cp && cp <= 0x9fa5) {
+                pc = 0x7711;
+            } else if (0xac00 <= cp && cp <= 0xd7a3) {
+                pc = 0xc1d1;
+            } else {
+                pc = (cp & ~0x7f) + 0x40;
+            }
+			return cp;
+        } else { // 0xff : reset
+            pc = 0x40;
+
+			Skip();
+			return PeekC();
+        }
+	}
+};
+
 
 //-------------------------------------------------------------------------
 // UTF8/MBCS
@@ -927,6 +1068,7 @@ bool TextFileR::Open( const TCHAR* fname )
 	case UTF9Y:
 	case UTF9:    impl_ = new rUtf9(buf,siz); break;
 	case SCSU:    impl_ = new rSCSU(buf,siz); break;
+	case BOCU1:   impl_ = new rBOCU1(buf,siz); break;
 	case EucJP:   impl_ = new rIso2022(buf,siz,true,false,ASCII,JIS,KANA); break;
 	case IsoJP:   impl_ = new rIso2022(buf,siz,false,false,ASCII,KANA); break;
 	case IsoKR:   impl_ = new rIso2022(buf,siz,true,false,ASCII,KSX); break;
@@ -995,6 +1137,7 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 	else if( (bom4>>8) == 0xf7644c ) cs = UTF1Y;
 	else if( (bom4>>8) == 0x93fdff ) cs = UTF9Y;
 	else if( (bom4>>8) == 0x0efeff ) cs = SCSU;
+	else if( (bom4>>8) == 0xfbee28 ) cs = BOCU1;
 	else if( bom4 == 0x0000feff ) cs = UTF32b;
 	else if( bom4 == 0xfffe0000 ) cs = UTF32l;
 	else if( bom2 == 0xfeff )     cs = UTF16b;
@@ -1711,6 +1854,92 @@ struct wSCSU : public TextFileWPimpl
 		}
 	}
 };
+//-------------------------------------------------------------------------
+// BOCU-1
+// code portion from BOCU1.pm by Naoya Tozuka
+//-------------------------------------------------------------------------
+struct wBOCU1 : public TextFileWPimpl
+{
+	wBOCU1( FileW& w ) : TextFileWPimpl(w), pc ( 0x40 ), cp ( 0 ), diff( 0 )
+	{ // write BOM
+		fp_.WriteC( static_cast<uchar>(0xfb) );
+		fp_.WriteC( static_cast<uchar>(0xee) );
+		fp_.WriteC( static_cast<uchar>(0x28) );
+	}
+
+	unicode cp, pc;
+	long diff;
+
+	void WriteChar( unicode ch )
+	{
+		uchar t1,t2,t3;
+
+		if (ch <= 0x20) {
+            if(ch != 0x20) pc = 0x40;
+			fp_.WriteC( static_cast<uchar>(ch) );
+        } else {
+            diff = ch - pc;
+            if (diff < -187660) { // [...,-187660) : 21
+                diff -= -14536567;
+                t3 = (uchar)(diff % 243); diff/=243;
+                t2 = (uchar)(diff % 243); diff/=243;
+                t1 = (uchar)(diff % 243); diff/=243;
+				fp_.WriteC( static_cast<uchar>(0x21) );
+				fp_.WriteC( static_cast<uchar>(bocu1_trail_to_byte[ t1 ]) );
+				fp_.WriteC( static_cast<uchar>(bocu1_trail_to_byte[ t2 ]) );
+				fp_.WriteC( static_cast<uchar>(bocu1_trail_to_byte[ t3 ]) );
+            } else if (diff < -10513) { // [-187660,-10513) : 22-24
+                diff -= -187660;
+                t2 = (uchar)(diff % 243); diff/=243;
+                t1 = (uchar)(diff % 243); diff/=243;
+				fp_.WriteC( static_cast<uchar>(0x22 + diff) );
+				fp_.WriteC( static_cast<uchar>(bocu1_trail_to_byte[ t1 ]) );
+				fp_.WriteC( static_cast<uchar>(bocu1_trail_to_byte[ t2 ]) );
+            } else if (diff < -64) { // [-10513,-64) : 25-4F
+                diff -= -10513;
+                t1 = (uchar)(diff % 243); diff/=243;
+				fp_.WriteC( static_cast<uchar>(0x25 + diff) );
+				fp_.WriteC( static_cast<uchar>(bocu1_trail_to_byte[ t1 ]) );
+            } else if (diff < 64) { // [-64,63) : 50-CF
+                diff -= -64;
+				fp_.WriteC( static_cast<uchar>(0x50 + diff) );
+            } else if (diff < 10513) { // [64,10513) : D0-FA
+                diff -= 64;
+                t1 = (uchar)(diff % 243); diff/=243;
+				fp_.WriteC( static_cast<uchar>(0xd0 + diff) );
+				fp_.WriteC( static_cast<uchar>(bocu1_trail_to_byte[ t1 ]) );
+            } else if (diff < 187660) { // [10513,187660) : FB-FD
+                diff -= 10513;
+                t2 = (uchar)(diff % 243); diff/=243;
+                t1 = (uchar)(diff % 243); diff/=243;
+				fp_.WriteC( static_cast<uchar>(0xfb + diff) );
+				fp_.WriteC( static_cast<uchar>(bocu1_trail_to_byte[ t1 ]) );
+				fp_.WriteC( static_cast<uchar>(bocu1_trail_to_byte[ t2 ]) );
+            } else { // [187660,...) : FE
+                diff -= 187660;
+                t3 = (uchar)(diff % 243); diff/=243;
+                t2 = (uchar)(diff % 243); diff/=243;
+                t1 = (uchar)(diff % 243); diff/=243;
+				fp_.WriteC( static_cast<uchar>(0xfe) );
+				fp_.WriteC( static_cast<uchar>(bocu1_trail_to_byte[ t1 ]) );
+				fp_.WriteC( static_cast<uchar>(bocu1_trail_to_byte[ t2 ]) );
+				fp_.WriteC( static_cast<uchar>(bocu1_trail_to_byte[ t3 ]) );
+            }
+
+            // next pc
+            if (0x3040 <= ch && ch <= 0x309f) {
+                pc = 0x3070;
+            } else if (0x4e00 <= ch && ch <= 0x9fa5) {
+                pc = 0x7711;
+            } else if (0xac00 <= ch && ch <= 0xd7a3) {
+                pc = 0xc1d1;
+            } else {
+                pc = ch & ~0x7f | 0x40;
+            }
+		}
+
+	}
+};
 
 
 //-------------------------------------------------------------------------
@@ -2170,6 +2399,7 @@ bool TextFileW::Open( const TCHAR* fname )
 	case UTF32b:
 	case UTF32BE: impl_ = new wUtf32BE( fp_, cs_==UTF32b ); break;
 	case SCSU:    impl_ = new wSCSU( fp_ ); break;
+	case BOCU1:   impl_ = new wBOCU1( fp_ ); break;
 	case EucJP:   impl_ = new wEucJp( fp_ ); break;
 	case IsoJP:   impl_ = new wIsoJp( fp_ ); break;
 	case IsoKR:   impl_ = new wIso2022( fp_, cs_ ); break;
