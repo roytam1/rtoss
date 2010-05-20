@@ -93,7 +93,9 @@ enum charset {
 	UTF1Y      =-64999,// Unicode  (UTF-1)   : BOM—L‚è
 	UTF9Y      =-65002,// Unicode  (UTF-9)   : BOM—L‚è
 
-	DOSUS      = 437   // DOSLatinUS (CP437)
+	DOSUS      = 437,  // DOSLatinUS (CP437)
+
+	SCSU       = -60000 // Standard Compression Scheme for Unicode
 };
 
 //=========================================================================

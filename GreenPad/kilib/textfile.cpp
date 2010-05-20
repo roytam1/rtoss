@@ -153,9 +153,11 @@ struct rUtf1 : public rBasicUTF
 {
 	rUtf1( const uchar* b, ulong s )
 		: fb( b )
-		, fe( b+s ) {}
+		, fe( b+s )
+		, SurrogateLow( 0 ) {}
 
 	const uchar *fb, *fe;
+	qbyte SurrogateLow;
 
 	inline byte conv( uchar x )
 	{
@@ -168,6 +170,8 @@ struct rUtf1 : public rBasicUTF
 	bool Eof() { return fb==fe; }
 	void Skip()
 	{
+		if( SurrogateLow ) return; // don't go further if leftover exists
+
 		if( *fb >= 0xFC && *fb <= 0xFF )      { fb+=5; }
 		else if( *fb >= 0xF6 && *fb <= 0xFB ) { fb+=3; }
 		else if( *fb >= 0xA0 && *fb <= 0xF5 ) { fb+=2; }
@@ -175,11 +179,27 @@ struct rUtf1 : public rBasicUTF
 	}
 	unicode PeekC()
 	{
-		if( *fb <= 0x9F )                         { return (unicode)(*fb); }
-		else if( *fb == 0xA0 )                    { return (unicode)(*(fb+1)); }
-		else if( *fb >= 0xA1 && *fb <= 0xF5 )     { return (unicode)((*fb-0xA1) * 0xBE + conv(*(fb+1)) + 0x100); }
-		else if( *fb >= 0xF6 && *fb <= 0xFB )     { return (unicode)((*fb-0xF6) * 0x8D04 + conv(*(fb+1)) * 0xBE + conv(*(fb+2)) + 0x4016); }
-		else /*if( *fb >= 0xFC && *fb <= 0xFF )*/ { return (unicode)((*fb-0xFC) * 0x4DAD6810 + conv(*(fb+1)) * 0x68A8F8 + conv(*(fb+2)) * 0x8D04 + conv(*(fb+3)) * 0xBE + conv(*(fb+4)) + 0x38E2E); }
+		qbyte ch;
+
+		if( SurrogateLow )
+		{
+			ch = SurrogateLow;
+			SurrogateLow = 0;
+			return (unicode)ch;
+		}
+
+		if( *fb <= 0x9F )                         { ch = (*fb); }
+		else if( *fb == 0xA0 )                    { ch = (*(fb+1)); }
+		else if( *fb >= 0xA1 && *fb <= 0xF5 )     { ch = ((*fb-0xA1) * 0xBE + conv(*(fb+1)) + 0x100); }
+		else if( *fb >= 0xF6 && *fb <= 0xFB )     { ch = ((*fb-0xF6) * 0x8D04 + conv(*(fb+1)) * 0xBE + conv(*(fb+2)) + 0x4016); }
+		else /*if( *fb >= 0xFC && *fb <= 0xFF )*/ { ch = ((*fb-0xFC) * 0x4DAD6810 + conv(*(fb+1)) * 0x68A8F8 + conv(*(fb+2)) * 0x8D04 + conv(*(fb+3)) * 0xBE + conv(*(fb+4)) + 0x38E2E); }
+
+		if( ch > 0x10000 )
+		{
+			SurrogateLow = (0xDC00 + (((ch-0x10000)    )&0x3ff));
+			ch = (0xD800 + (((ch-0x10000)>>10)&0x3ff));
+		}
+		return (unicode)ch;
 	}
 };
 
@@ -190,13 +210,17 @@ struct rUtf9 : public rBasicUTF
 {
 	rUtf9( const uchar* b, ulong s )
 		: fb( b )
-		, fe( b+s ) {}
+		, fe( b+s )
+		, SurrogateLow( 0 ) {}
 
 	const uchar *fb, *fe;
+	qbyte SurrogateLow;
 
 	bool Eof() { return fb==fe; }
 	void Skip()
 	{
+		if( SurrogateLow ) return; // don't go further if leftover exists
+
 		if( *fb >= 0x98 && *fb <= 0x9F )      { fb+=5; }
 		else if( *fb >= 0x94 && *fb <= 0x97 ) { fb+=4; }
 		else if( *fb >= 0x90 && *fb <= 0x93 ) { fb+=3; }
@@ -205,11 +229,27 @@ struct rUtf9 : public rBasicUTF
 	}
 	unicode PeekC()
 	{
-		if( *fb >= 0x98 && *fb <= 0x9F )      { return (unicode)(((*fb & 0x07) << 28) + ((*(fb+1) & 0x7F) << 21) + ((*(fb+2) & 0x7F) << 14) + ((*(fb+3) & 0x7F) << 7) + (*(fb+4) & 0x7F)); }
-		else if( *fb >= 0x94 && *fb <= 0x97 ) { return (unicode)(((*fb & 0x03) << 21) + ((*(fb+1) & 0x7F) << 14) + ((*(fb+2) & 0x7F) << 7) + (*(fb+3) & 0x7F)); }
-		else if( *fb >= 0x90 && *fb <= 0x93 ) { return (unicode)(((*fb & 0x03) << 14) + ((*(fb+1) & 0x7F) << 7) + (*(fb+2) & 0x7F)); }
-		else if( *fb >= 0x80 && *fb <= 0x8F ) { return (unicode)(((*fb & 0x7F) << 7) + (*(fb+1) & 0x7F)); }
-		else /* 0~0x7F,0xA0~0xFF */           { return (unicode)(*fb); }
+		qbyte ch;
+
+		if( SurrogateLow )
+		{
+			ch = SurrogateLow;
+			SurrogateLow = 0;
+			return (unicode)ch;
+		}
+
+		if( *fb >= 0x98 && *fb <= 0x9F )      { ch = (unicode)(((*fb & 0x07) << 28) + ((*(fb+1) & 0x7F) << 21) + ((*(fb+2) & 0x7F) << 14) + ((*(fb+3) & 0x7F) << 7) + (*(fb+4) & 0x7F)); }
+		else if( *fb >= 0x94 && *fb <= 0x97 ) { ch = (unicode)(((*fb & 0x03) << 21) + ((*(fb+1) & 0x7F) << 14) + ((*(fb+2) & 0x7F) << 7) + (*(fb+3) & 0x7F)); }
+		else if( *fb >= 0x90 && *fb <= 0x93 ) { ch = (unicode)(((*fb & 0x03) << 14) + ((*(fb+1) & 0x7F) << 7) + (*(fb+2) & 0x7F)); }
+		else if( *fb >= 0x80 && *fb <= 0x8F ) { ch = (unicode)(((*fb & 0x7F) << 7) + (*(fb+1) & 0x7F)); }
+		else /* 0~0x7F,0xA0~0xFF */           { ch = (unicode)(*fb); }
+
+		if( ch > 0x10000 )
+		{
+			SurrogateLow = (0xDC00 + (((ch-0x10000)    )&0x3ff));
+			ch = (0xD800 + (((ch-0x10000)>>10)&0x3ff));
+		}
+		return (unicode)ch;
 	}
 };
 
@@ -339,7 +379,158 @@ struct rUtf7 : public rBasicUTF
 	}
 };
 
+//-------------------------------------------------------------------------
+// SCSU (UTR #6)
+// Code portion is taken from:
+// http://czyborra.com/scsu/scsu.c written by Roman Czyborra@dds.nl
+//-------------------------------------------------------------------------
+namespace 
+{
+	static const int win[256]={
+	0x0000, 0x0080, 0x0100, 0x0180, 0x0200, 0x0280, 0x0300, 0x0380,
+	0x0400, 0x0480, 0x0500, 0x0580, 0x0600, 0x0680, 0x0700, 0x0780,
+	0x0800, 0x0880, 0x0900, 0x0980, 0x0A00, 0x0A80, 0x0B00, 0x0B80,
+	0x0C00, 0x0C80, 0x0D00, 0x0D80, 0x0E00, 0x0E80, 0x0F00, 0x0F80,
+	0x1000, 0x1080, 0x1100, 0x1180, 0x1200, 0x1280, 0x1300, 0x1380,
+	0x1400, 0x1480, 0x1500, 0x1580, 0x1600, 0x1680, 0x1700, 0x1780,
+	0x1800, 0x1880, 0x1900, 0x1980, 0x1A00, 0x1A80, 0x1B00, 0x1B80,
+	0x1C00, 0x1C80, 0x1D00, 0x1D80, 0x1E00, 0x1E80, 0x1F00, 0x1F80,
+	0x2000, 0x2080, 0x2100, 0x2180, 0x2200, 0x2280, 0x2300, 0x2380,
+	0x2400, 0x2480, 0x2500, 0x2580, 0x2600, 0x2680, 0x2700, 0x2780,
+	0x2800, 0x2880, 0x2900, 0x2980, 0x2A00, 0x2A80, 0x2B00, 0x2B80,
+	0x2C00, 0x2C80, 0x2D00, 0x2D80, 0x2E00, 0x2E80, 0x2F00, 0x2F80,
+	0x3000, 0x3080, 0x3100, 0x3180, 0x3200, 0x3280, 0x3300, 0x3800,
+	0xE000, 0xE080, 0xE100, 0xE180, 0xE200, 0xE280, 0xE300, 0xE380,
+	0xE400, 0xE480, 0xE500, 0xE580, 0xE600, 0xE680, 0xE700, 0xE780,
+	0xE800, 0xE880, 0xE900, 0xE980, 0xEA00, 0xEA80, 0xEB00, 0xEB80,
+	0xEC00, 0xEC80, 0xED00, 0xED80, 0xEE00, 0xEE80, 0xEF00, 0xEF80,
+	0xF000, 0xF080, 0xF100, 0xF180, 0xF200, 0xF280, 0xF300, 0xF380,
+	0xF400, 0xF480, 0xF500, 0xF580, 0xF600, 0xF680, 0xF700, 0xF780,
+	0xF800, 0xF880, 0xF900, 0xF980, 0xFA00, 0xFA80, 0xFB00, 0xFB80,
+	0xFC00, 0xFC80, 0xFD00, 0xFD80, 0xFE00, 0xFE80, 0xFF00, 0xFF80,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x00C0, 0x0250, 0x0370, 0x0530, 0x3040, 0x30A0, 0xFF60};
 
+	static int start[8]={0x0000,0x0080,0x0100,0x0300,0x2000,0x2080,0x2100,0x3000},
+	slide[8]={0x0080,0x00C0,0x0400,0x0600,0x0900,0x3040,0x30A0,0xFF00};
+}
+struct rSCSU : public rBasicUTF
+{
+	rSCSU( const uchar* b, ulong s )
+		: fb( b )
+		, fe( b+s )
+		, active( 0 )
+		, mode( 0 )
+		, skip( 0 ) {}
+
+	const uchar *fb, *fe;
+	char active, mode, skip;
+	uchar c, d;
+
+
+	void Skip() { fb+=skip; skip=0; }
+	bool Eof() { return fb==fe; }
+	uchar GetChar() { return *(fb+(++skip-1)); }
+	unicode PeekC()
+	{
+		c = GetChar();
+		if (c >= 0x80)
+		{
+			return (c - 0x80 + slide[active]);
+		}
+		else if (c >= 0x20 && c <= 0x7F)
+		{
+			return c;
+		}
+		else if (c == 0x0 || c == 0x9 || c == 0xA || c == 0xC || c == 0xD) 
+		{
+			return c;
+		}
+		else if (c >= 0x1 && c <= 0x8) /* SQn */
+		{ // single quote
+			d = GetChar();
+			return (d < 0x80 ? d + start [c - 0x1] : d - 0x80 + slide[c - 0x1]);
+		}
+		else if (c >= 0x10 && c <= 0x17) /* SCn */
+		{ // change window
+			active = c - 0x10;
+
+			Skip();
+			return PeekC();
+		}
+		else if (c >= 0x18 && c <= 0x1F) /* SDn */
+		{ // define window
+			active = c - 0x18;
+			slide[active] = win[GetChar()];
+
+			Skip();
+			return PeekC();
+		}
+		else if (c == 0xB) /* SDX */
+		{
+			c = GetChar(); d = GetChar();
+			slide[active = c>>5] = 0x10000 + (((c & 0x1F) << 8 | d) << 7);
+
+			Skip();
+			return PeekC();
+		}
+		else if (c == 0xE) /* SQU */
+		{
+			c = GetChar();
+			return (c << 8 | GetChar());
+		}
+		else if (*fb == 0xF) /* SCU */
+		{ // change to Unicode mode
+			mode = 1;
+
+			while (mode)
+			{
+				c = GetChar();
+				if (c <= 0xDF || c >= 0xF3)
+				{
+					skip = 3;
+					return (c << 8 | GetChar());
+				}
+				else if (c == 0xF0) /* UQU */
+				{
+					c = GetChar();
+					return (c << 8 | GetChar());
+				}
+				else if (c >= 0xE0 && c <= 0xE7) /* UCn */
+				{
+					active = c - 0xE0; mode = 0;
+
+					Skip();
+					return PeekC();
+				}
+				else if (c >= 0xE8 && c <= 0xEF) /* UDn */
+				{
+					slide[active=c-0xE8] = win[GetChar()]; mode = 0;
+
+					Skip();
+					return PeekC();
+				}
+				else if (c == 0xF1) /* UDX */
+				{
+					c = GetChar(); d = GetChar();
+					slide [active = c>>5] = 0x10000 + (((c & 0x1F) << 8 | d) << 7); mode = 0;
+
+					Skip();
+					return PeekC();
+				}
+			}
+		}
+	}
+};
 
 //-------------------------------------------------------------------------
 // UTF8/MBCS
@@ -736,6 +927,7 @@ bool TextFileR::Open( const TCHAR* fname )
 	case UTF7:    impl_ = new rUtf7(buf,siz); break;
 	case UTF9Y:
 	case UTF9:    impl_ = new rUtf9(buf,siz); break;
+	case SCSU:    impl_ = new rSCSU(buf,siz); break;
 	case EucJP:   impl_ = new rIso2022(buf,siz,true,false,ASCII,JIS,KANA); break;
 	case IsoJP:   impl_ = new rIso2022(buf,siz,false,false,ASCII,KANA); break;
 	case IsoKR:   impl_ = new rIso2022(buf,siz,true,false,ASCII,KSX); break;
@@ -1222,11 +1414,14 @@ struct wWest : public TextFileWPimpl
 
 struct wUtf1 : public TextFileWPimpl
 {
-	wUtf1( FileW& w, bool bom ) : TextFileWPimpl(w) 
+	wUtf1( FileW& w, bool bom ) : TextFileWPimpl(w), SurrogateHi(0)
 	{
 		if( bom ) // BOMèëÇ´çûÇ›
 			fp_.Write( "\xF7\x64\x4C", 3 );
 	}
+
+	qbyte SurrogateHi;
+
 	inline qbyte conv ( qbyte x )
 	{
 		if( x<=0x5D )      return x + 0x21;
@@ -1236,56 +1431,83 @@ struct wUtf1 : public TextFileWPimpl
 	}
 	void WriteChar( unicode ch )
 	{
-		if( ch <= 0x9f )
-			fp_.WriteC( static_cast<uchar>(ch) );
-		else if( ch <= 0xff )
+		qbyte c = ch;
+		if( 0xD800<=ch&&ch<=0xDBFF )
+		{
+			SurrogateHi = c; return;
+		}
+		else if( 0xDC00<=ch&&ch<=0xDFFF )
+			if( SurrogateHi )
+				c = 0x10000 + (((SurrogateHi-0xD800)&0x3ff)<<10) + ((c-0xDC00)&0x3ff), SurrogateHi = 0;
+			else return; // find Surrogate Low part only, discard it
+		else // find Surrogate Hi part only, discard it
+			SurrogateHi = 0;
+
+		if( c <= 0x9f )
+			fp_.WriteC( static_cast<uchar>(c) );
+		else if( c <= 0xff )
 			fp_.WriteC( 0xA0 ),
-			fp_.WriteC( static_cast<uchar>(ch) );
-		else if( ch <= 0x4015 )
-			fp_.WriteC( static_cast<uchar>(0xA1 + (ch - 0x100) / 0xBE) ),
-			fp_.WriteC( static_cast<uchar>(conv((ch - 0x100) % 0xBE)) );
-		else if( ch <= 0x38E2D )
-			fp_.WriteC( static_cast<uchar>(0xF6 + (ch - 0x4016) / (0xBE*0xBE))  ),
-			fp_.WriteC( static_cast<uchar>(conv((ch - 0x4016) / 0xBE % 0xBE)) ),
-			fp_.WriteC( static_cast<uchar>(conv((ch - 0x4016) % 0xBE)) );
+			fp_.WriteC( static_cast<uchar>(c) );
+		else if( c <= 0x4015 )
+			fp_.WriteC( static_cast<uchar>(0xA1 + (c - 0x100) / 0xBE) ),
+			fp_.WriteC( static_cast<uchar>(conv((c - 0x100) % 0xBE)) );
+		else if( c <= 0x38E2D )
+			fp_.WriteC( static_cast<uchar>(0xF6 + (c - 0x4016) / (0xBE*0xBE))  ),
+			fp_.WriteC( static_cast<uchar>(conv((c - 0x4016) / 0xBE % 0xBE)) ),
+			fp_.WriteC( static_cast<uchar>(conv((c - 0x4016) % 0xBE)) );
 		else
-			fp_.WriteC( static_cast<uchar>(0xFC + (ch - 0x38E2E) / (0xBE*0xBE*0xBE*0xBE))  ),
-			fp_.WriteC( static_cast<uchar>(conv((ch - 0x38E2E) / (0xBE*0xBE*0xBE) % 0xBE)) ),
-			fp_.WriteC( static_cast<uchar>(conv((ch - 0x38E2E) / (0xBE*0xBE) % 0xBE)) ),
-			fp_.WriteC( static_cast<uchar>(conv((ch - 0x38E2E) / 0xBE % 0xBE)) ),
-			fp_.WriteC( static_cast<uchar>(conv((ch - 0x38E2E) % 0xBE)) );
+			fp_.WriteC( static_cast<uchar>(0xFC + (c - 0x38E2E) / (0xBE*0xBE*0xBE*0xBE))  ),
+			fp_.WriteC( static_cast<uchar>(conv((c - 0x38E2E) / (0xBE*0xBE*0xBE) % 0xBE)) ),
+			fp_.WriteC( static_cast<uchar>(conv((c - 0x38E2E) / (0xBE*0xBE) % 0xBE)) ),
+			fp_.WriteC( static_cast<uchar>(conv((c - 0x38E2E) / 0xBE % 0xBE)) ),
+			fp_.WriteC( static_cast<uchar>(conv((c - 0x38E2E) % 0xBE)) );
 	}
 };
 
 struct wUtf9 : public TextFileWPimpl
 {
-	wUtf9( FileW& w, bool bom ) : TextFileWPimpl(w)
+	wUtf9( FileW& w, bool bom ) : TextFileWPimpl(w), SurrogateHi(0)
 	{
 		if( bom ) // BOMèëÇ´çûÇ›
 			fp_.Write( "\x93\xFD\xFF", 3 );
 	}
+
+	qbyte SurrogateHi;
+
 	void WriteChar( unicode ch )
 	{
-		if( ch <= 0x7F || (ch >= 0xA0 && ch <= 0xFF ))
-			fp_.WriteC( static_cast<uchar>(ch) );
-		else if( ch <= 0x07FF )
-			fp_.WriteC( static_cast<uchar>(0x80 | (ch >> 7)) ),
-			fp_.WriteC( static_cast<uchar>(0x80 | (ch & 0x7F)) );
-		else if( ch <= 0xFFFF )
-			fp_.WriteC( static_cast<uchar>(0x90 | (ch >> 14)) ),
-			fp_.WriteC( static_cast<uchar>(0x80 | (ch >> 7) & 0x7F) ),
-			fp_.WriteC( static_cast<uchar>(0x80 | (ch & 0x7F)) );
-		else if( ch <= 0x7FFFFF )
-			fp_.WriteC( static_cast<uchar>(0x94 | (ch >> 21)) ),
-			fp_.WriteC( static_cast<uchar>(0x80 | (ch >> 14) & 0x7F) ),
-			fp_.WriteC( static_cast<uchar>(0x80 | (ch >> 7) & 0x7F) ),
-			fp_.WriteC( static_cast<uchar>(0x80 | (ch & 0x7F)) );
+		qbyte c = ch;
+		if( 0xD800<=ch&&ch<=0xDBFF )
+		{
+			SurrogateHi = c; return;
+		}
+		else if( 0xDC00<=ch&&ch<=0xDFFF )
+			if( SurrogateHi )
+				c = 0x10000 + (((SurrogateHi-0xD800)&0x3ff)<<10) + ((c-0xDC00)&0x3ff), SurrogateHi = 0;
+			else return; // find Surrogate Low part only, discard it
+		else // find Surrogate Hi part only, discard it
+			SurrogateHi = 0;
+
+		if( c <= 0x7F || (c >= 0xA0 && c <= 0xFF ))
+			fp_.WriteC( static_cast<uchar>(c) );
+		else if( c <= 0x07FF )
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 7)) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c & 0x7F)) );
+		else if( c <= 0xFFFF )
+			fp_.WriteC( static_cast<uchar>(0x90 | (c >> 14)) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 7) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c & 0x7F)) );
+		else if( c <= 0x7FFFFF )
+			fp_.WriteC( static_cast<uchar>(0x94 | (c >> 21)) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 14) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 7) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c & 0x7F)) );
 		else
-			fp_.WriteC( static_cast<uchar>(0x98 | (ch >> 28) & 0x07) ),
-			fp_.WriteC( static_cast<uchar>(0x80 | (ch >> 21) & 0x7F) ),
-			fp_.WriteC( static_cast<uchar>(0x80 | (ch >> 14) & 0x7F) ),
-			fp_.WriteC( static_cast<uchar>(0x80 | (ch >> 7) & 0x7F) ),
-			fp_.WriteC( static_cast<uchar>(0x80 | (ch & 0x7F)) );
+			fp_.WriteC( static_cast<uchar>(0x98 | (c >> 28) & 0x07) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 21) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 14) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 7) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c & 0x7F)) );
 	}
 };
 
