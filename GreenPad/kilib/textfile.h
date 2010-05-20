@@ -95,7 +95,8 @@ enum charset {
 
 	DOSUS      = 437,  // DOSLatinUS (CP437)
 
-	SCSU       = -60000 // Standard Compression Scheme for Unicode
+	SCSU       = -60000,// Standard Compression Scheme for Unicode
+	BOCU1      = -60001 // Binary Ordered Compression for Unicode-1
 };
 
 //=========================================================================
