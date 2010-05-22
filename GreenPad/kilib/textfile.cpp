@@ -441,7 +441,7 @@ struct rSCSU : public rBasicUTF
 
 	void Skip() { fb+=skip; skip=0; }
 	bool Eof() { return fb==fe; }
-	uchar GetChar() { return *(fb+(skip++)); }
+	uchar GetChar() { return fb+skip>fe ? 0 : *(fb+(skip++)); }
 	unicode PeekC()
 	{
 		c = GetChar();
@@ -527,6 +527,16 @@ struct rSCSU : public rBasicUTF
 				Skip();
 				return PeekC();
 			}
+			else
+			{
+				Skip();
+				return PeekC();
+			}
+		}
+		else
+		{
+			Skip();
+			return PeekC();
 		}
 	}
 };
