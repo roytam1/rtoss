@@ -40,9 +40,16 @@ IMEManager::~IMEManager()
 {
 	#ifdef USEGLOBALIME
 		if( immMsg_ != NULL )
+		{
 			immMsg_->Release();
+			immMsg_ = NULL;
+		}
 		if( immApp_ != NULL )
+		{
+			immApp_->Deactivate();
 			immApp_->Release();
+			immApp_ = NULL;
+		}
 	#endif
 }
 
