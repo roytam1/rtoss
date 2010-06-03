@@ -1,7 +1,7 @@
 <?php
 // Settings
 $excludes_order = array('detail');
-$includes_order = array('waren','kaberen','moeren','kabeura','moeura');
+$includes_order = array('/\d{8}(_p\d+)?','/waren','/kaberen','/moeren','/kabeura','/moeura');
 $deselects = array('this-one-needs-duplicate');
 $normal_depth = 2;
 
@@ -49,8 +49,8 @@ function mysort($a, $b) { // row(md5,size,path) $a,$b
 	
 	// include
 	foreach($includes_order as $incl) {
-		$a_include = !!strstr($a['path'],$incl);
-		$b_include = !!strstr($b['path'],$incl);
+		$a_include = preg_match('|'.$incl.'|i',$a['path']);
+		$b_include = preg_match('|'.$incl.'|i',$b['path']);
 		if($a_include + $b_include) {
 			if($a_include == $b_include) return strnatcmp(basename($a['path']), basename($b['path']));
 			else return $a_include ? -1 : 1;
@@ -78,8 +78,10 @@ function read_and_sort($file, &$ary,$names_only=false) {
 }
 
 function hdr() {
+//	header('Content-Type: text/html; charset=big5');
 	echo '<html>
 <head>
+<meta http-equiv="content-type" content="text/html; charset=big5"/>
 <title>Dup Selector</title>
 </head>
 <body>';
