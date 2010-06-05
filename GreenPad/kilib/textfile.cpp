@@ -733,7 +733,7 @@ struct rMBCS : public TextFileRPimpl
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 		, next( cp==UTF8N ?   CharNextUtf8 : CharNextExA )
 #endif
-		, conv( cp==UTF8N && (app().isWin95()||!app().isNewShell())
+		, conv( cp==UTF8N && (app().isWin95()||!::IsValidCodePage(65001))
 		                  ? Utf8ToWideChar : MultiByteToWideChar )
 	{
 		if( cp==UTF8N && fe-fb>=3
@@ -2426,9 +2426,9 @@ bool TextFileW::Open( const TCHAR* fname )
 			impl_ = new wUTF7( fp_ );
 		else
 #else
-		if( !app().isNewShell() && (cs_==UTF8 || cs_==UTF8N) )
+		if( !::IsValidCodePage(65001) && (cs_==UTF8 || cs_==UTF8N) )
 			impl_ = new wUTF8( fp_, cs_ );
-		else if( !app().isNewShell() && cs_==UTF7 )
+		else if( !::IsValidCodePage(65000) && cs_==UTF7 )
 			impl_ = new wUTF7( fp_ );
 		else
 #endif
