@@ -2426,9 +2426,9 @@ bool TextFileW::Open( const TCHAR* fname )
 			impl_ = new wUTF7( fp_ );
 		else
 #else
-		if( !::IsValidCodePage(65001) && (cs_==UTF8 || cs_==UTF8N) )
+		if( (cs_==UTF8 || cs_==UTF8N) && !::IsValidCodePage(65001) )
 			impl_ = new wUTF8( fp_, cs_ );
-		else if( !::IsValidCodePage(65000) && cs_==UTF7 )
+		else if( cs_==UTF7 && !::IsValidCodePage(65000) )
 			impl_ = new wUTF7( fp_ );
 		else
 #endif
