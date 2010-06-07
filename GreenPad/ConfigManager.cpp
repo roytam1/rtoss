@@ -685,6 +685,7 @@ void ConfigManager::LoadIni()
 	// 新規ファイル関係
 	newfileCharset_ = ini_.GetInt( TEXT("NewfileCharset"), charSets_.defaultCs() );
 	if(newfileCharset_ == -1) newfileCharset_ = 1252; // 1.07.4 bugfix
+	if(!::IsValidCodePage(newfileCharset_)) newfileCharset_ = ::GetACP();
 	newfileDoctype_ = ini_.GetStr( TEXT("NewfileDoctype"), String() );
 	newfileLB_      = (lbcode) ini_.GetInt( TEXT("NewfileLB"), CRLF );
 
