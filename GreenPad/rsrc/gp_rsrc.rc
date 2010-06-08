@@ -219,54 +219,58 @@ BEGIN
     LTEXT           "行目へ",IDC_STATIC,61,15,22,8
 END
 
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
 IDD_CONFIG DIALOGEX 0, 0, 287, 236
+#else
+IDD_CONFIG DIALOG 0, 0, 287, 236
+#endif
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "エディタ設定"
 FONT 9, "ＭＳ Ｐゴシック"
 BEGIN
     GROUPBOX        "共通設定",IDC_STATIC,7,11,273,102
-    LTEXT           "[元に戻す]上限(&U):",IDC_STATIC,24,24,56,8
+    RTEXT           "[元に戻す]上限(&U):",IDC_STATIC,24,24,56,8
     CONTROL         "無限",IDC_UNDOLIM1,"Button",BS_AUTORADIOBUTTON | 
                     WS_GROUP | WS_TABSTOP,86,23,33,10
     CONTROL         "",IDC_UNDOLIM2,"Button",BS_AUTORADIOBUTTON,122,23,11,8
     EDITTEXT        IDC_UNDO_CT,134,21,24,12,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "回",IDC_STATIC,162,24,8,8
-    LTEXT           "横位置の表示(&L):",IDC_STATIC,29,37,51,8
+    RTEXT           "横位置の表示(&L):",IDC_STATIC,29,37,51,8
     CONTROL         "文字数",IDC_COUNTBYLETTER,"Button",BS_AUTORADIOBUTTON | 
                     WS_GROUP | WS_TABSTOP,86,36,33,10
     CONTROL         "表示位置",IDC_COUNTBYLETTER2,"Button",
-                    BS_AUTORADIOBUTTON | WS_TABSTOP,122,35,38,10
-    LTEXT           "ファイル履歴件数(&H):",IDC_STATIC,19,50,62,8
+                    BS_AUTORADIOBUTTON | WS_TABSTOP,122,36,42,10
+    RTEXT           "ﾌｧｲﾙ履歴件数(&H):",IDC_STATIC,19,50,62,8
     EDITTEXT        IDC_LATEST_NUM,86,48,32,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "ファイル・フィルタ(&F):",IDC_STATIC,21,66,60,8
+    RTEXT           "ﾌｧｲﾙ･ﾌｨﾙﾀ(&F):",IDC_STATIC,21,65,60,8
     EDITTEXT        IDC_TXTFILT,86,63,182,12,ES_AUTOHSCROLL
-    LTEXT           "外部Grep(&G):",IDC_STATIC,42,81,39,8
+    RTEXT           "外部Grep(&G):",IDC_STATIC,21,80,60,8
     EDITTEXT        IDC_EXTGREP,86,78,182,12,ES_AUTOHSCROLL
-    LTEXT           "新規ファイルのモード(&N):",IDC_STATIC,9,95,73,8
+    RTEXT           "新規ﾌｧｲﾙのﾓｰﾄﾞ(&N):",IDC_STATIC,9,94,73,8
     COMBOBOX        IDC_NEWCS,86,92,76,162,CBS_DROPDOWNLIST | WS_VSCROLL | 
                     WS_TABSTOP
     COMBOBOX        IDC_NEWLB,164,92,39,162,CBS_DROPDOWNLIST | WS_VSCROLL | 
                     WS_TABSTOP
     COMBOBOX        IDC_NEWDT,204,92,65,164,CBS_DROPDOWNLIST | WS_VSCROLL | 
                     WS_TABSTOP
-    CONTROL         "同じウインドウで開く(&R)",IDC_OPENSAME,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,181,25,83,10
-    CONTROL         "ウインドウサイズを記憶(&S)",IDC_REMSIZE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,181,35,92,10
-    CONTROL         "ウインドウ位置を記憶(&P)",IDC_REMPLACE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,181,45,86,10
-    GROUPBOX        "文書タイプ別設定",IDC_STATIC,7,118,274,92
+    CONTROL         "同じｳｲﾝﾄﾞｳで開く(&R)",IDC_OPENSAME,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,181,25,90,10
+    CONTROL         "ｳｲﾝﾄﾞｳｻｲｽﾞを記憶(&S)",IDC_REMSIZE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,181,35,96,10
+    CONTROL         "ｳｲﾝﾄﾞｳ位置を記憶(&P)",IDC_REMPLACE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,181,45,94,10
+    GROUPBOX        "文書ﾀｲﾌﾟ別設定",IDC_STATIC,7,118,274,92
     LISTBOX         IDC_DOCTYPELIST,15,133,88,53,LBS_NOINTEGRALHEIGHT | 
                     WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "追加",IDC_NEWDOCTYPE,17,191,29,14
     PUSHBUTTON      "削除",IDC_DELDOCTYPE,48,191,29,14
-    LTEXT           "パターン:",IDC_STATIC,114,138,27,8
+    RTEXT           "ﾊﾟﾀｰﾝ:",IDC_STATIC,114,138,27,8
     EDITTEXT        IDC_DT_PAT,146,135,127,12,ES_AUTOHSCROLL
-    LTEXT           "キーワード:",IDC_STATIC,108,155,34,8
+    RTEXT           "ｷｰﾜｰﾄﾞ:",IDC_STATIC,108,155,34,8
     COMBOBOX        IDC_PAT_KWD,146,152,75,172,CBS_DROPDOWNLIST | CBS_SORT | 
                     CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "編集",IDC_EDITKWD,231,152,19,14
-    LTEXT           "レイアウト:",IDC_STATIC,111,172,31,8
+    RTEXT           "ﾚｲｱｳﾄ:",IDC_STATIC,111,172,31,8
     COMBOBOX        IDC_PAT_LAY,146,169,75,172,CBS_DROPDOWNLIST | CBS_SORT | 
                     CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "編集",IDC_EDITLAY,231,169,19,14
@@ -556,7 +560,7 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,71,43,33,14
 END
 
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
 IDD_CONFIG DIALOGEX 0, 0, 287, 236
 #else
 IDD_CONFIG DIALOG 0, 0, 287, 236
@@ -566,24 +570,24 @@ CAPTION "Config"
 FONT 9, "MS Sans Serif"
 BEGIN
     GROUPBOX        "Common",IDC_STATIC,7,7,273,106
-    LTEXT           "&Undo:",IDC_STATIC,62,21,25,8
+    RTEXT           "&Undo:",IDC_STATIC,62,21,25,8
     CONTROL         "Infinite",IDC_UNDOLIM1,"Button",BS_AUTORADIOBUTTON | 
                     WS_GROUP | WS_TABSTOP,88,20,33,10
     CONTROL         "",IDC_UNDOLIM2,"Button",BS_AUTORADIOBUTTON,124,20,11,8
     EDITTEXT        IDC_UNDO_CT,135,18,24,12,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "times",IDC_STATIC,163,21,17,8
-    LTEXT           "&Column by:",IDC_STATIC,46,33,40,8
+    RTEXT           "&Column by:",IDC_STATIC,46,33,40,8
     CONTROL         "Letters",IDC_COUNTBYLETTER,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP | WS_TABSTOP,88,32,33,10
+                    WS_GROUP | WS_TABSTOP,88,33,33,10
     CONTROL         "Positions",IDC_COUNTBYLETTER2,"Button",
-                    BS_AUTORADIOBUTTON | WS_TABSTOP,124,32,49,10
-    LTEXT           "M&RU File Num:",IDC_STATIC,34,45,52,8
+                    BS_AUTORADIOBUTTON | WS_TABSTOP,124,33,49,10
+    RTEXT           "M&RU File Num:",IDC_STATIC,34,45,52,8
     EDITTEXT        IDC_LATEST_NUM,88,43,32,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "TextFile &Filter:",IDC_STATIC,36,63,44,8
+    RTEXT           "TextFile &Filter:",IDC_STATIC,36,61,51,8
     EDITTEXT        IDC_TXTFILT,88,59,176,12,ES_AUTOHSCROLL
-    LTEXT           "Extrenal &Grep Program:",IDC_STATIC,12,77,77,8
+    RTEXT           "Extrenal &Grep Program:",IDC_STATIC,10,77,76,8
     EDITTEXT        IDC_EXTGREP,88,75,176,12,ES_AUTOHSCROLL
-    LTEXT           "&New File Mode:",IDC_STATIC,34,93,53,8
+    RTEXT           "&New File Mode:",IDC_STATIC,34,92,53,8
     COMBOBOX        IDC_NEWCS,88,90,76,167,CBS_DROPDOWNLIST | WS_VSCROLL | 
                     WS_TABSTOP
     COMBOBOX        IDC_NEWLB,166,90,39,166,CBS_DROPDOWNLIST | WS_VSCROLL | 
@@ -591,23 +595,23 @@ BEGIN
     COMBOBOX        IDC_NEWDT,206,90,65,165,CBS_DROPDOWNLIST | WS_VSCROLL | 
                     WS_TABSTOP
     CONTROL         "Open in Same &Window",IDC_OPENSAME,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,186,17,90,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,186,19,90,10
     CONTROL         "Remember Window &Size",IDC_REMSIZE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,186,27,92,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,186,31,92,10
     CONTROL         "Remember Window &Pos",IDC_REMPLACE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,186,38,90,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,186,43,90,10
     GROUPBOX        "Document Types",IDC_STATIC,6,118,274,92
     LISTBOX         IDC_DOCTYPELIST,14,133,89,53,LBS_NOINTEGRALHEIGHT | 
                     WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Add",IDC_NEWDOCTYPE,17,191,29,14
     PUSHBUTTON      "Del",IDC_DELDOCTYPE,50,191,29,14
-    LTEXT           "Pattern:",IDC_STATIC,117,138,23,8
+    RTEXT           "Pattern:",IDC_STATIC,117,138,27,8
     EDITTEXT        IDC_DT_PAT,149,135,123,12,ES_AUTOHSCROLL
-    LTEXT           "Keyword:",IDC_STATIC,114,155,27,8
+    RTEXT           "Keyword:",IDC_STATIC,114,155,31,8
     COMBOBOX        IDC_PAT_KWD,149,152,72,172,CBS_DROPDOWNLIST | CBS_SORT | 
                     CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "edit",IDC_EDITKWD,229,151,19,14
-    LTEXT           "Layout: ",IDC_STATIC,118,172,24,8
+    RTEXT           "Layout:",IDC_STATIC,118,172,28,8
     COMBOBOX        IDC_PAT_LAY,149,169,72,172,CBS_DROPDOWNLIST | CBS_SORT | 
                     CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "edit",IDC_EDITLAY,229,169,19,14
