@@ -730,7 +730,7 @@ struct rMBCS : public TextFileRPimpl
 		: fb( reinterpret_cast<const char*>(b) )
 		, fe( reinterpret_cast<const char*>(b+s) )
 		, cp( c==UTF8 ? UTF8N : c )
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
 		, next( cp==UTF8N ?   CharNextUtf8 : CharNextExA )
 #endif
 		, conv( cp==UTF8N && (app().isWin95()||!::IsValidCodePage(65001))
