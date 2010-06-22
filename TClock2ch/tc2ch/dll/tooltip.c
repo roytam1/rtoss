@@ -102,9 +102,9 @@ static void TooltipApplySetting(void)
 	case TOOLTIPTYPE_BALLOON:
 		if(hwndTooltip)
 		{
-			LONG exstyle;
-			exstyle = GetWindowLong(hwndTooltip, GWL_EXSTYLE) & ~WS_EX_COMPOSITED;
-			SetWindowLong(hwndTooltip, GWL_EXSTYLE, exstyle | (bTooltipEnableDoubleBuffering ? WS_EX_COMPOSITED : 0));
+			LONG_PTR exstyle;
+			exstyle = GetWindowLongPtr(hwndTooltip, GWL_EXSTYLE) & ~WS_EX_COMPOSITED;
+			SetWindowLongPtr(hwndTooltip, GWL_EXSTYLE, exstyle | (bTooltipEnableDoubleBuffering ? WS_EX_COMPOSITED : 0));
 			if (hFonTooltip) SendMessage(hwndTooltip, WM_SETFONT, (WPARAM)hFonTooltip, TRUE);
 			SendMessage(hwndTooltip, TTM_SETTIPBKCOLOR, tcolb, 0);
 			SendMessage(hwndTooltip, TTM_SETTIPTEXTCOLOR, tcolf, 0);
@@ -115,9 +115,9 @@ static void TooltipApplySetting(void)
 	case TOOLTIPTYPE_IECOMPO:
 		if(hwndHTMLParent)
 		{
-			LONG exstyle;
-			exstyle = GetWindowLong(hwndHTMLParent, GWL_EXSTYLE) & ~WS_EX_COMPOSITED;
-			SetWindowLong(hwndHTMLParent, GWL_EXSTYLE, exstyle | (bTooltipEnableDoubleBuffering ? WS_EX_COMPOSITED : 0));
+			LONG_PTR exstyle;
+			exstyle = GetWindowLongPtr(hwndHTMLParent, GWL_EXSTYLE) & ~WS_EX_COMPOSITED;
+			SetWindowLongPtr(hwndHTMLParent, GWL_EXSTYLE, exstyle | (bTooltipEnableDoubleBuffering ? WS_EX_COMPOSITED : 0));
 			if(bWin2000) SetLayeredWindow(hwndHTMLParent,(INT)(25500-255*alphaTooltip)/100, colTooltipBack);
 		}
 		break;
@@ -154,8 +154,11 @@ static ATOM MyWindowRegisterClass(void)
 	wndcls.cbClsExtra    = 0;
 	wndcls.cbWndExtra    = 0;
 	wndcls.hInstance     = GetModuleHandleA(NULL);
+#pragma warning(push)
+#pragma warning(disable: 4305)	// '型キャスト' : 'LPSTR' から 'WORD' へ切り詰めます。
 	wndcls.hIcon         = LoadIcon(NULL, MAKEINTRESOURCE(IDI_APPLICATION));
 	wndcls.hCursor       = LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW));
+#pragma warning(pop)
 	wndcls.hbrBackground = NULL;
 	wndcls.lpszMenuName  = NULL;
 	wndcls.lpszClassName = cszWindowClassName;
@@ -186,7 +189,7 @@ void TooltipInit(HWND hwnd)
 		SetWindowPos(hwndTooltip, HWND_TOPMOST, 0, 0, 0, 0,
 			SWP_NOSIZE|SWP_NOMOVE|SWP_NOACTIVATE);
 
-		bTooltipBalloon = (GetWindowLong(hwndTooltip, GWL_STYLE) & TTS_BALLOON) != 0;
+		bTooltipBalloon = (GetWindowLongPtr(hwndTooltip, GWL_STYLE) & TTS_BALLOON) != 0;
 
 		ti.cbSize = sizeof(TOOLINFO);
 		ti.hwnd = hwnd;
@@ -297,7 +300,7 @@ static BOOL GetTooltipText(PSTR pszText)
 	char	szFilePath[MAX_PATH];	//	テキストファイルのパス
 	DWORD	dwReadSize;
 	DWORD	dwFileSize;
-	DWORD	len;
+	size_t	len;
 	BOOL	bAbsPath;
 
 //	{
@@ -389,7 +392,7 @@ static BOOL GetTooltipText(PSTR pszText)
 static void TooltipUpdate(HDC hdc, LPRECT lprcDraw, LPRECT lprect, UINT uDrawFlags)
 {
 	HGDIOBJ hOldFont;
-	HBRUSH hBrushTooltipBack, hBrushTooltipText;
+	HBRUSH hBrushTooltipBack = NULL, hBrushTooltipText = NULL;
 	RECT rc, rcall;
 	LPSTR pszText;
 	int maxwidth, width, height, len;
@@ -525,13 +528,11 @@ static void TooltipUpdate(HDC hdc, LPRECT lprcDraw, LPRECT lprect, UINT uDrawFla
 static void TooltipUpdateTitle(void)
 {
 	if (!hwndTooltip) return;
-	/*InterlockedIncrement(&lLockTooltipTextUpdate);*/
 	if (bTooltipHasTitle || *titleTooltip)
 	{
-		bTooltipHasTitle = SendMessage(hwndTooltip, TTM_SETTITLE,nTooltipIcon,(LPARAM)(LPCTSTR)(char*)titleTooltip);
+		bTooltipHasTitle = (BOOL)SendMessage(hwndTooltip, TTM_SETTITLE,nTooltipIcon,(LPARAM)(LPCTSTR)(char*)titleTooltip);
 		if (!*titleTooltip) bTooltipHasTitle = FALSE;
 	}
-	/*InterlockedDecrement(&lLockTooltipTextUpdate);*/
 }
 
 /*------------------------------------------------

@@ -4,9 +4,15 @@
 -------------------------------------------------------*/
 
 #include <windows.h>
+#include <tchar.h>
 
-#pragma comment(linker, "/subsystem:windows,5.0")
-#pragma comment(linker, "/base:0x63060000")
+#ifdef _WIN64
+# pragma comment(linker, "/base:0x0000070066060000")
+#else
+# pragma comment(linker,         "/base:0x63060000")
+#endif // _WIN64
+
+
 #if defined(NDEBUG)
 # pragma comment(linker, "/entry:\"DllMain\"")
 # pragma comment(linker, "/nodefaultlib:libcmt.lib")

@@ -22,7 +22,7 @@ static char sMon[11];  //
 static char *pCustomFormat = NULL;
 extern int confNo;
 
-BOOL CALLBACK DlgProcFormat2(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK DlgProcFormat2(HWND, UINT, WPARAM, LPARAM);
 
 __inline void SendPSChanged(HWND hDlg)
 {
@@ -71,7 +71,7 @@ BOOL CALLBACK PageFormatProc(HWND hDlg, UINT message,
 			// "detail..."
 			case IDC_FORMATDETAIL:
 				{
-				int r;
+				INT_PTR r;
 				r = DialogBoxParam(GetLangModule(),
 					MAKEINTRESOURCE(IDD_FORMAT2),
 					g_hwndPropDlg, DlgProcFormat2, (LPARAM)ilang);

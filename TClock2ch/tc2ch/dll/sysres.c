@@ -7,6 +7,14 @@
 ---------------------------------------------------------------------------*/
 
 #include <windows.h>
+
+#if defined(_DEBUG)
+# include <crtdbg.h>
+#else
+# define _ASSERTE(expr) ((void)0)
+#endif
+
+
 #define MAX_PROCESSOR               8
 
 /* for old Platform SDK */
@@ -40,12 +48,20 @@ typedef enum {
 } POWER_INFORMATION_LEVEL;
 #endif
 
-HINSTANCE (WINAPI *LoadLibrary16)(LPCSTR) = NULL;
-void (WINAPI *FreeLibrary16)(HINSTANCE) = NULL;
-DWORD (WINAPI *GetProcAddress16)(HINSTANCE, LPCSTR) = NULL;
-void (WINAPI *QT_Thunk)(DWORD) = NULL;
-BOOL (WINAPI *pGetSystemPowerStatus)(LPSYSTEM_POWER_STATUS) = NULL;
-ULONG (WINAPI *pCallNtPowerInformation)(POWER_INFORMATION_LEVEL, PVOID, ULONG, PVOID, ULONG) = NULL;
+typedef HINSTANCE (WINAPI *pfnLoadLibrary16)(LPCSTR);
+typedef void (WINAPI *pfnFreeLibrary16)(HINSTANCE);
+typedef DWORD (WINAPI *pfnGetProcAddress16)(HINSTANCE, LPCSTR);
+typedef void (WINAPI *pfnQT_Thunk)(DWORD);
+
+pfnLoadLibrary16 LoadLibrary16 = NULL;
+pfnFreeLibrary16 FreeLibrary16 = NULL;
+pfnGetProcAddress16 GetProcAddress16 = NULL;
+pfnQT_Thunk QT_Thunk = NULL;
+
+typedef BOOL (WINAPI *pfnGetSystemPowerStatus)(LPSYSTEM_POWER_STATUS);
+typedef ULONG (WINAPI *pfnCallNtPowerInformation)(POWER_INFORMATION_LEVEL, PVOID, ULONG, PVOID, ULONG);
+pfnGetSystemPowerStatus pGetSystemPowerStatus = NULL;
+pfnCallNtPowerInformation pCallNtPowerInformation = NULL;
 
 static BOOL bInitSysres = FALSE;
 static HMODULE hmodKERNEL32 = NULL;
@@ -78,6 +94,13 @@ typedef struct _PROCESSOR_POWER_INFORMATION {
 --------------------------------------------------*/
 FARPROC GetProcAddressByOrdinal(HMODULE hModule, int ord)
 {
+#ifdef _WIN64
+	UNREFERENCED_PARAMETER(hModule);
+	UNREFERENCED_PARAMETER(ord);
+	_ASSERTE(0);
+	return 0;
+
+#else
 	IMAGE_NT_HEADERS *hdr;
 	IMAGE_EXPORT_DIRECTORY *exp;
 	DWORD *AddrFunc;
@@ -93,14 +116,16 @@ FARPROC GetProcAddressByOrdinal(HMODULE hModule, int ord)
 	if (*pw != PEMAGIC) return 0;
 	hdr = (IMAGE_NT_HEADERS *) pw;
 
-	exp = (IMAGE_EXPORT_DIRECTORY *) (((DWORD) moddb) +
-		((DWORD) GET_DIR(IMAGE_DIRECTORY_ENTRY_EXPORT)));
+	exp = (IMAGE_EXPORT_DIRECTORY *) (((DWORD_PTR) moddb) +
+		((DWORD_PTR) GET_DIR(IMAGE_DIRECTORY_ENTRY_EXPORT)));
 	AddrFunc = (DWORD *) (moddb + (DWORD) exp->AddressOfFunctions);
 
 	ord--;
 	if ((DWORD)ord < exp->NumberOfFunctions)
-		return ((FARPROC) (moddb + AddrFunc[ord]));
+		return (FARPROC)( (ULONG_PTR)(moddb + AddrFunc[ord]) );
 	else return 0;
+
+#endif _WIN64
 }
 
 /*----------------------------------------------------
@@ -113,16 +138,17 @@ void InitSysres(void)
 
 	bInitSysres = TRUE;
 
+	// if (VERSION != 9x) return;
 	if(!(GetVersion() & 0x80000000)) return;
 
 	if(hmodKERNEL32 == NULL)
 		hmodKERNEL32 = LoadLibrary("KERNEL32.dll");
 	if(hmodKERNEL32 == NULL) return;
 
-	(FARPROC)LoadLibrary16 = GetProcAddressByOrdinal(hmodKERNEL32, 35);
-	(FARPROC)FreeLibrary16 = GetProcAddressByOrdinal(hmodKERNEL32, 36);
-	(FARPROC)GetProcAddress16 = GetProcAddressByOrdinal(hmodKERNEL32, 37);
-	(FARPROC)QT_Thunk = GetProcAddress(hmodKERNEL32, "QT_Thunk");
+	LoadLibrary16 = (pfnLoadLibrary16)GetProcAddressByOrdinal(hmodKERNEL32, 35);
+	FreeLibrary16 = (pfnFreeLibrary16)GetProcAddressByOrdinal(hmodKERNEL32, 36);
+	GetProcAddress16 = (pfnGetProcAddress16)GetProcAddressByOrdinal(hmodKERNEL32, 37);
+	QT_Thunk = (pfnQT_Thunk)GetProcAddress(hmodKERNEL32, "QT_Thunk");
 	if(LoadLibrary16 == NULL || FreeLibrary16 == NULL ||
 		GetProcAddress16 == NULL || QT_Thunk == NULL)
 	{
@@ -159,6 +185,12 @@ void EndSysres(void)
 ------------------------------------------------------*/
 int GetFreeSystemResources(WORD wSysRes)
 {
+#ifdef _WIN64 
+	UNREFERENCED_PARAMETER(wSysRes);
+	_ASSERTE(0);
+	return 0;
+
+#else 
 	volatile char dummy[64];
 	WORD wTmp;
 
@@ -179,8 +211,11 @@ int GetFreeSystemResources(WORD wSysRes)
 		extern WORD asm_QT_Thunk(WORD p1);
 		wTmp = asm_QT_Thunk(wSysRes);
 	}
-#endif
+#endif // _MSC_VER
+
 	return (int)wTmp;
+
+#endif // _WIN64
 }
 
 void InitBatteryLife(void)
@@ -195,7 +230,7 @@ void InitBatteryLife(void)
 		hmodKERNEL32 = LoadLibrary("KERNEL32.dll");
 	if(hmodKERNEL32 == NULL) return;
 
-	(FARPROC)pGetSystemPowerStatus =
+	pGetSystemPowerStatus = (pfnGetSystemPowerStatus)
 		GetProcAddress(hmodKERNEL32, "GetSystemPowerStatus");
 }
 
@@ -256,7 +291,7 @@ void InitCpuClock(void)
 		hmodPowrprof = LoadLibrary("Powrprof.dll");
 	if(hmodPowrprof == NULL) return;
 
-	(FARPROC)pCallNtPowerInformation =
+	pCallNtPowerInformation = (pfnCallNtPowerInformation)
 		GetProcAddress(hmodPowrprof, "CallNtPowerInformation");
 
 	GetSystemInfo(&si);

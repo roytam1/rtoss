@@ -16,8 +16,8 @@ HMIXER		g_hMixer=NULL;
 MIXERCAPS	g_mxcaps;
 DWORD		g_dwMinimum,g_dwMaximum;
 DWORD		g_cChannels;
-DWORD		g_dwVolumeControlID=-1;
-DWORD		g_dwMuteControlID=-1;
+DWORD		g_dwVolumeControlID=(DWORD)-1;
+DWORD		g_dwMuteControlID=(DWORD)-1;
 
 typedef struct{
 	MIXERCONTROLDETAILS_UNSIGNED	Volume[MAXCHANNEL];
@@ -30,7 +30,7 @@ BOOL InitMixer(void)
 {
 	if(g_hMixer) return TRUE;
 	if(mixerOpen(&g_hMixer,0,0,0,MIXER_OBJECTF_MIXER)!=MMSYSERR_NOERROR) return FALSE;
-	if(mixerGetDevCaps((UINT)g_hMixer, &g_mxcaps, sizeof(MIXERCAPS))!=MMSYSERR_NOERROR) return FALSE;
+	if(mixerGetDevCaps((UINT_PTR)g_hMixer, &g_mxcaps, sizeof(MIXERCAPS))!=MMSYSERR_NOERROR) return FALSE;
 	return	TRUE;
 }
 
@@ -38,8 +38,8 @@ void ReleaseMixer(void)
 {
 	if(g_hMixer) mixerClose(g_hMixer);
 	g_hMixer=NULL;
-	g_dwVolumeControlID=-1;
-	g_dwMuteControlID=-1;
+	g_dwVolumeControlID=(DWORD)-1;
+	g_dwMuteControlID=(DWORD)-1;
 }
 
 //-----------------------------------------------------------------------------

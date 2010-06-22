@@ -38,22 +38,21 @@ void CpuMoni_start(void);
 int CpuMoni_get(void);
 void CpuMoni_end(void);
 
-typedef struct
+
+typedef struct _SYSTEM_BASIC_INFORMATION
 {
-    DWORD   dwUnknown1;
-    ULONG   uKeMaximumIncrement;
-    ULONG   uPageSize;
-    ULONG   uMmNumberOfPhysicalPages;
-    ULONG   uMmLowestPhysicalPage;
-    ULONG   uMmHighestPhysicalPage;
-    ULONG   uAllocationGranularity;
-    PVOID   pLowestUserAddress;
-    PVOID   pMmHighestUserAddress;
-    ULONG   uKeActiveProcessors;
-    BYTE    bKeNumberProcessors;
-    BYTE    bUnknown2;
-    WORD    wUnknown3;
-} SYSTEM_BASIC_INFORMATION;
+    ULONG Reserved;
+    ULONG TimerResolution;
+    ULONG PageSize;
+    ULONG NumberOfPhysicalPages;
+    ULONG LowestPhysicalPageNumber;
+    ULONG HighestPhysicalPageNumber;
+    ULONG AllocationGranularity;
+    ULONG_PTR MinimumUserModeAddress;
+    ULONG_PTR MaximumUserModeAddress;
+    KAFFINITY ActiveProcessorsAffinityMask;
+    CCHAR NumberOfProcessors;
+} SYSTEM_BASIC_INFORMATION, *PSYSTEM_BASIC_INFORMATION;
 
 typedef struct
 {
@@ -78,16 +77,19 @@ static SYSTEM_BASIC_INFORMATION SysBaseInfo;
 extern BOOL bWinNT;
 extern LONG GetRegLong(HKEY rootkey, char*subkey, char* entry, LONG defval);
 
+// permon.c
+extern int totalCPUUsage;
+
 void CpuMoni_start(void)
 {
+	long status;
 	if(bWinNT) // WinNT4, 2000
 	{
 		pNtQuerySystemInformation = (PROCNTQSI)GetProcAddress(
 										GetModuleHandle("ntdll.dll"),
 										"NtQuerySystemInformation");
 		if (pNtQuerySystemInformation == NULL) return;
-
-		pNtQuerySystemInformation(SystemBasicInformation, &SysBaseInfo, sizeof(SysBaseInfo), NULL);
+		status = pNtQuerySystemInformation(SystemBasicInformation, &SysBaseInfo, sizeof(SysBaseInfo), NULL);
 	}
 	else // Win95,98,Me
 	{
@@ -100,6 +102,8 @@ int CpuMoni_get(void)
 {
 	if(bWinNT)
 	{
+		return totalCPUUsage;
+		/*
 		SYSTEM_PERFORMANCE_INFORMATION SysPerfInfo;
 		SYSTEM_TIME_INFORMATION SysTimeInfo;
 		double dbIdleTime;
@@ -130,7 +134,7 @@ int CpuMoni_get(void)
 			dbIdleTime = dbIdleTime / dbSystemTime;
 
 			// CurrentCpuUsage% = 100 - (CurrentCpuIdle * 100) / NumberOfProcessors
-			dbIdleTime = 100.0 - dbIdleTime * 100.0 / (double)SysBaseInfo.bKeNumberProcessors + 0.5;
+			dbIdleTime = 100.0 - dbIdleTime * 100.0 / (double)SysBaseInfo.NumberOfProcessors + 0.5;
 		}
 
 		// store new CPU's idle and system time
@@ -138,6 +142,7 @@ int CpuMoni_get(void)
 		liOldSystemTime.QuadPart = SysTimeInfo.liKeSystemTime.QuadPart;
 
 		return (int)dbIdleTime;
+		*/
 	}
 	else
 	{

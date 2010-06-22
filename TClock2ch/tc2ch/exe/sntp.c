@@ -47,13 +47,15 @@ static int nMinuteDif = 0;
 static DWORD dwTickCount = 0;
 static DWORD dwTickCountOnGetHost = 0;
 static DWORD dwTickCountOnSend = 0;
-DWORD (WINAPI *RasEnumConnections)(LPRASCONN, LPDWORD, LPDWORD);
-DWORD (WINAPI *RasGetConnectStatus)(HRASCONN, LPRASCONNSTATUS);
+typedef DWORD (WINAPI *pfnRasEnumConnections)(LPRASCONN, LPDWORD, LPDWORD);
+typedef DWORD (WINAPI *pfnRasGetConnectStatus)(HRASCONN, LPRASCONNSTATUS);
+pfnRasEnumConnections RasEnumConnections;
+pfnRasGetConnectStatus RasGetConnectStatus;
 static HMODULE hRASAPI = NULL;
 
 static char* g_pGetHost = NULL; // buffer of host entry
 static HANDLE g_hGetHost;       // task handle of WSAAsyncGetHostByName()
-static int g_socket;   // socket
+static SOCKET g_socket;   // socket
 static int g_port;     // port numer
 
 struct NTP_Packet {          // NTP packet
@@ -84,7 +86,7 @@ BOOL InitSyncTime(HWND hwndParent)
 	int  nErrorStatus;
 	WSADATA wsaData;
 
-	g_socket = -1;
+	g_socket = (SOCKET)-1;
 	g_hGetHost = NULL;
 
 	// initialize WinSock
@@ -103,9 +105,9 @@ BOOL InitSyncTime(HWND hwndParent)
 		hRASAPI = LoadLibrary("RASAPI32.dll");
 		if(hRASAPI)
 		{
-			(FARPROC)RasEnumConnections =
+			RasEnumConnections = (pfnRasEnumConnections)
 				GetProcAddress(hRASAPI, "RasEnumConnectionsA");
-			(FARPROC)RasGetConnectStatus =
+			RasGetConnectStatus = (pfnRasGetConnectStatus)
 				GetProcAddress(hRASAPI, "RasGetConnectStatusA");
 			if(RasEnumConnections == NULL || RasGetConnectStatus == NULL)
 			{
@@ -378,7 +380,7 @@ void SNTPStart(HWND hwnd, char *buf)
 	if(g_socket == INVALID_SOCKET)
 	{
 		Log("socket() failed");
-		g_socket = -1; return;
+		g_socket = (SOCKET)-1; return;
 	}
 
 	serveraddr = inet_addr((char*)servername);
@@ -623,7 +625,7 @@ void SocketClose(HWND hwnd, const char *msgbuf)
 		// close socket
 		closesocket(g_socket);
 	}
-	g_socket = -1;
+	g_socket = (SOCKET)-1;
 	bSendingData = FALSE;
 
 	if(msgbuf) Log(msgbuf);

@@ -452,6 +452,7 @@ void OnMeasureItem(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	HFONT hFont, hOldFont;
 	PODMENUITEM ptMenuItem = g_ptODMenuItem;
 
+	UNREFERENCED_PARAMETER(wParam);
 	hDC = GetDC(hwnd);
 	hFont = CreateFontIndirect(&g_tODMenuState.tLogFont);
 	hOldFont = (HFONT)SelectObject(hDC, hFont);
@@ -481,6 +482,8 @@ void OnDrawItem(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	HBRUSH hBrush;
 	PODMENUITEM ptMenuItem = g_ptODMenuItem;
 
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(hwnd);
 	tRect = ptDrawItem->rcItem;
 	hDC = ptDrawItem->hDC;
 
@@ -517,7 +520,7 @@ void OnMenuRButtonUp(HWND hwnd, WPARAM wParam, LPARAM lParam)
 {
 	PLISTIDL  pIDScan   = g_ptListIDL;
 	PUSERMENU pMenuScan = g_ptUserMenu;
-	UINT uID = wParam;
+	UINT uID = (UINT)wParam;
 	BOOL bmainMenu = TRUE;
 	char path[MAX_PATH];
 
@@ -665,6 +668,7 @@ void OnInitMenuPopup(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	PUSERMENU pScan = g_ptUserMenu;
 	LPMALLOC pMalloc;
 
+	UNREFERENCED_PARAMETER(lParam);
 	while(pScan != NULL)
 	{
 		if (pScan->hMenu == (HMENU)wParam && !pScan->flg)
@@ -687,6 +691,7 @@ void showUserMenu(HWND hwnd, HWND hwndClicked, int xPos, int yPos, int btn, int 
 {
 	LPMALLOC pMalloc;
 
+	UNREFERENCED_PARAMETER(hwndClicked);
 	if(SHGetMalloc(&pMalloc) == NOERROR)
 	{
 		HMENU hMenu;

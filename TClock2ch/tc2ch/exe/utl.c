@@ -39,7 +39,7 @@ void r_memcpy(void *d, const void *s, size_t l)
 void r_memset(void *d, int c, size_t l)
 {
 	size_t i;
-	for (i = 0; i < l; i++) ((char *)d)[i] = c;
+	for (i = 0; i < l; i++) ((char *)d)[i] = (char)c;
 }
 
 int r_atoi(const char *p)
@@ -308,7 +308,6 @@ int MyMessageBox(HWND hwnd, char* msg, char* title, UINT uType, UINT uBeep)
 {
 	MSGBOXPARAMS mbp;
 
-	memset(&mbp, 0, sizeof(MSGBOXPARAMS));
 	mbp.cbSize = sizeof(MSGBOXPARAMS);
 	mbp.hwndOwner = hwnd;
 	mbp.hInstance = g_hInst;
@@ -316,6 +315,8 @@ int MyMessageBox(HWND hwnd, char* msg, char* title, UINT uType, UINT uBeep)
 	mbp.lpszCaption = title;
 	mbp.dwStyle = MB_USERICON | uType;
 	mbp.lpszIcon = MAKEINTRESOURCE(IDI_ICON1);
+	mbp.dwContextHelpId = 0;
+	mbp.lpfnMsgBoxCallback = NULL;
 	mbp.dwLanguageId = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
 	if(uBeep != 0xFFFFFFFF)
 		MessageBeep(uBeep);
@@ -354,7 +355,7 @@ DWORDLONG M32x32to64(DWORD a, DWORD b)
 {
 	TC_UINT64 r;
 	DWORD *p1, *p2, *p3;
-	memset(&r, 0, 8);
+	r.QuadPart = 0;
 	p1 = &r.u.LowPart;
 	p2 = (DWORD*)((BYTE*)p1 + 2);
 	p3 = (DWORD*)((BYTE*)p2 + 2);
@@ -409,9 +410,11 @@ void WriteDebug(const char* s)
 }
 
 //TClock用のレジストリのキー
-char mykey[] = "Software\\Kazubon\\TClock";
-char mykey2[] = "Software\\Kazubon";
-
+//char mykey[] = "Software\\Kazubon\\TClock";
+//char mykey2[] = "Software\\Kazubon";
+#define mykey "Software\\Kazubon\\TClock"
+#define mykey2 "Software\\Kazubon"
+/*----------------------------------------------
 /*------------------------------------------------
 　自分のレジストリから文字列を得る
 --------------------------------------------------*/
@@ -423,7 +426,7 @@ int GetMyRegStr(char* section, char* entry, char* val, int cbData,
 	DWORD regtype;
 	DWORD size;
 	BOOL b;
-	int r;
+	int r = 0;
 
 	if(g_bIniSetting) key[0] = 0;
 	else strcpy(key, mykey);
@@ -480,7 +483,7 @@ int GetMyRegStrEx(char* section, char* entry, char* val, int cbData,
 	DWORD regtype;
 	DWORD size;
 	BOOL b;
-	int r;
+	int r = 0;
 
 	if(g_bIniSetting) key[0] = 0;
 	else strcpy(key, mykey);
@@ -558,7 +561,7 @@ LONG GetMyRegLong(char* section, char* entry, LONG defval)
 	DWORD regtype;
 	DWORD size;
 	BOOL b;
-	LONG r;
+	LONG r = 0;
 
 	if(g_bIniSetting) key[0] = 0;
 	else strcpy(key, mykey);
@@ -606,7 +609,7 @@ LONG GetMyRegLongEx(char* section, char* entry, LONG defval, int confno)
 	DWORD regtype;
 	DWORD size;
 	BOOL b;
-	LONG r;
+	LONG r = 0;
 
 	if(g_bIniSetting) key[0] = 0;
 	else strcpy(key, mykey);
@@ -674,7 +677,7 @@ LONG GetRegLong(HKEY rootkey, char*subkey, char* entry, LONG defval)
 	DWORD regtype;
 	DWORD size;
 	BOOL b;
-	int r;
+	int r = 0;
 
 	b = FALSE;
 	if(RegOpenKey(rootkey, subkey, &hkey) == 0)
@@ -701,7 +704,7 @@ int GetRegStr(HKEY rootkey, char*subkey, char* entry,
 	DWORD regtype;
 	DWORD size;
 	BOOL b;
-	int r;
+	int r = 0;
 
 	b = FALSE;
 	if(RegOpenKey(rootkey, subkey, &hkey) == 0)
@@ -882,7 +885,7 @@ BOOL SetMyRegStrEx(char* section, char* entry, char* val, int confno)
 BOOL SetRegStr(HKEY rootkey, char* subkey, char* entry, char* val)
 {
 	HKEY hkey;
-	BOOL r;
+	BOOL r = FALSE;
 
 	if(RegCreateKey(rootkey, subkey, &hkey) == 0)
 	{

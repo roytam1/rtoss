@@ -56,15 +56,20 @@ typedef struct _BLENDFUNCTION
 #endif
 
 HMODULE hmodMSIMG32 = NULL;
-BOOL (WINAPI *pGradientFill)(HDC,PTRIVERTEX,ULONG,PVOID,ULONG,ULONG) = NULL;
-BOOL (WINAPI *pAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION) = NULL;
-BOOL (WINAPI *pTransparentBlt)(HDC,int,int,int,int,HDC,int,int,int,int,UINT) = NULL;
+typedef BOOL (WINAPI *pfnGradientFill)(HDC,PTRIVERTEX,ULONG,PVOID,ULONG,ULONG);
+typedef BOOL (WINAPI *pfnAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
+typedef BOOL (WINAPI *pfnTransparentBlt)(HDC,int,int,int,int,HDC,int,int,int,int,UINT);
+pfnGradientFill pGradientFill = NULL;
+pfnAlphaBlend pAlphaBlend = NULL;
+pfnTransparentBlt pTransparentBlt = NULL;
 
 HMODULE hmodUSER32 = NULL;
-BOOL (WINAPI *pSetLayeredWindowAttributes)(HWND,COLORREF,BYTE,DWORD) = NULL;
+typedef BOOL (WINAPI *pfnSetLayeredWindowAttributes)(HWND,COLORREF,BYTE,DWORD);
+pfnSetLayeredWindowAttributes pSetLayeredWindowAttributes = NULL;
 
 HMODULE hmodUXTHEME = NULL;
-HRESULT (WINAPI *pDrawThemeParentBackground)(HWND,HDC,RECT*) = NULL;
+typedef HRESULT (WINAPI *pfnDrawThemeParentBackground)(HWND,HDC,RECT*);
+pfnDrawThemeParentBackground pDrawThemeParentBackground = NULL;
 
 static BOOL bInitGradientFill = FALSE;
 static BOOL bInitAlphaBlend = FALSE;
@@ -84,7 +89,7 @@ void InitGradientFill(void)
 	hmodMSIMG32 = LoadLibrary("msimg32.dll");
 	if(hmodMSIMG32 != NULL)
 	{
-		(FARPROC)pGradientFill = GetProcAddress(hmodMSIMG32, "GradientFill");
+		pGradientFill = (pfnGradientFill)GetProcAddress(hmodMSIMG32, "GradientFill");
 		if(pGradientFill == NULL)
 		{
 			FreeLibrary(hmodMSIMG32); hmodMSIMG32 = NULL;
@@ -100,7 +105,7 @@ void InitAlphaBlend(void)
 	hmodMSIMG32 = LoadLibrary("msimg32.dll");
 	if(hmodMSIMG32 != NULL)
 	{
-		(FARPROC)pAlphaBlend = GetProcAddress(hmodMSIMG32, "AlphaBlend");
+		pAlphaBlend = (pfnAlphaBlend)GetProcAddress(hmodMSIMG32, "AlphaBlend");
 		if(pAlphaBlend == NULL)
 		{
 			FreeLibrary(hmodMSIMG32); hmodMSIMG32 = NULL;
@@ -116,7 +121,7 @@ void InitTransparentBlt(void)
 	hmodMSIMG32 = LoadLibrary("msimg32.dll");
 	if(hmodMSIMG32 != NULL)
 	{
-		(FARPROC)pTransparentBlt = GetProcAddress(hmodMSIMG32, "TransparentBlt");
+		pTransparentBlt = (pfnTransparentBlt)GetProcAddress(hmodMSIMG32, "TransparentBlt");
 		if(pTransparentBlt == NULL)
 		{
 			FreeLibrary(hmodMSIMG32); hmodMSIMG32 = NULL;
@@ -132,7 +137,7 @@ void InitLayeredWindow(void)
 	hmodUSER32 = LoadLibrary("user32.dll");
 	if(hmodUSER32 != NULL)
 	{
-		(FARPROC)pSetLayeredWindowAttributes =
+		pSetLayeredWindowAttributes = (pfnSetLayeredWindowAttributes)
 			GetProcAddress(hmodUSER32, "SetLayeredWindowAttributes");
 		if(pSetLayeredWindowAttributes == NULL)
 		{
@@ -149,7 +154,7 @@ void InitDrawTheme(void)
 	hmodUXTHEME = LoadLibrary("uxtheme.dll");
 	if(hmodUXTHEME != NULL)
 	{
-		(FARPROC)pDrawThemeParentBackground =
+		pDrawThemeParentBackground = (pfnDrawThemeParentBackground)
 			GetProcAddress(hmodUXTHEME, "DrawThemeParentBackground");
 		if(pDrawThemeParentBackground == NULL)
 		{
@@ -170,14 +175,14 @@ void EndNewAPI(HWND hwndClock)
 	if(pSetLayeredWindowAttributes)
 	{
 		HWND hwnd;
-		LONG exstyle;
+		LONG_PTR exstyle;
 
 		hwnd = GetParent(GetParent(hwndClock));
-		exstyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+		exstyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
 		if(exstyle & WS_EX_LAYERED)
 		{
 			exstyle &= ~WS_EX_LAYERED;
-			SetWindowLong(hwnd, GWL_EXSTYLE, exstyle);
+			SetWindowLongPtr(hwnd, GWL_EXSTYLE, exstyle);
 			RefreshRebar(hwnd);
 		}
 
@@ -216,7 +221,7 @@ void GradientFillClock(HDC hdc, RECT* prc, COLORREF col1, COLORREF col2, DWORD g
 
 void SetLayeredTaskbar(HWND hwndClock)
 {
-	LONG exstyle;
+	LONG_PTR exstyle;
 	HWND hwnd;
 	int alpha;
 
@@ -229,10 +234,10 @@ void SetLayeredTaskbar(HWND hwndClock)
 
 	hwnd = GetParent(GetParent(hwndClock));
 
-	exstyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+	exstyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
 	if(alpha < 255) exstyle |= WS_EX_LAYERED;
 	else exstyle &= ~WS_EX_LAYERED;
-	SetWindowLong(hwnd, GWL_EXSTYLE, exstyle);
+	SetWindowLongPtr(hwnd, GWL_EXSTYLE, exstyle);
 
 	RefreshRebar(hwnd);
 
@@ -255,7 +260,7 @@ void InitLayeredStartMenu(HWND hwndClock)
 void EndLayeredStartMenu(HWND hwndClock)
 {
 	HWND hwnd;
-	LONG exstyle;
+	LONG_PTR exstyle;
 	char classname[80];
 
 	nAlphaStartMenu = 255;
@@ -270,11 +275,11 @@ void EndLayeredStartMenu(HWND hwndClock)
 			GetWindowThreadProcessId(hwnd, NULL) ==
 				GetWindowThreadProcessId(hwndClock, NULL))
 		{
-			exstyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+			exstyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
 			if(exstyle & WS_EX_LAYERED)
 			{
 				exstyle &= ~WS_EX_LAYERED;
-				SetWindowLong(hwnd, GWL_EXSTYLE, exstyle);
+				SetWindowLongPtr(hwnd, GWL_EXSTYLE, exstyle);
 			}
 		}
 		hwnd = GetWindow(hwnd, GW_HWNDNEXT);
@@ -283,15 +288,15 @@ void EndLayeredStartMenu(HWND hwndClock)
 
 void SetLayeredWindow(HWND hwnd, INT alphaTip, COLORREF colBack)
 {
-	LONG exstyle;
+	LONG_PTR exstyle;
 
 	if(!pSetLayeredWindowAttributes) InitLayeredWindow();
 	if(!pSetLayeredWindowAttributes) return;
 
-	exstyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+	exstyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
 	if(!(exstyle & WS_EX_LAYERED))
 	{
-		SetWindowLong(hwnd, GWL_EXSTYLE, exstyle|WS_EX_LAYERED);
+		SetWindowLongPtr(hwnd, GWL_EXSTYLE, exstyle|WS_EX_LAYERED);
 	}
 	if(alphaTip == 0)
 		pSetLayeredWindowAttributes(hwnd, colBack, 0, LWA_COLORKEY);

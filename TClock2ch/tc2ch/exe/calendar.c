@@ -6,9 +6,7 @@
 
 #include "tclock.h"
 
-BOOL bShowedVistaCalendar = FALSE;
-
-BOOL CALLBACK DlgProcCalender(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK DlgProcCalender(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 // propsheet.c
 void SetMyDialgPos(HWND hwnd);
@@ -20,16 +18,17 @@ void DialogCalender(HWND hwnd)
 {
 	INITCOMMONCONTROLSEX icc;
 
+	UNREFERENCED_PARAMETER(hwnd);
 	if(g_hDlgCalender && IsWindow(g_hDlgCalender))
 		;
 	else
 	{
 		OSVERSIONINFO os;
 		os.dwOSVersionInfoSize = sizeof(os);
-		if (GetVersionEx(&os) && os.dwMajorVersion >= 6)
+		if (GetVersionEx(&os) && os.dwMajorVersion >= 6)	// isVista or later
 		{
-			PostMessage(g_hwndClock, CLOCKM_VISTACALENDAR, 1, 0);
-			bShowedVistaCalendar = !bShowedVistaCalendar;
+			if (!FindVistaCalenderWindow())
+				PostMessage(g_hwndClock, CLOCKM_VISTACALENDAR, 1, 0);
 		}
 		else
 		{
@@ -37,7 +36,7 @@ void DialogCalender(HWND hwnd)
 			icc.dwICC = ICC_DATE_CLASSES;
 			InitCommonControlsEx(&icc);
 			g_hDlgCalender = CreateDialog(GetLangModule(), MAKEINTRESOURCE(IDD_CALENDAR),
-				NULL, (DLGPROC)DlgProcCalender);
+				NULL, DlgProcCalender);
 		}
 	}
 	SetForegroundWindow98(g_hDlgCalender);
@@ -46,8 +45,9 @@ void DialogCalender(HWND hwnd)
 /*------------------------------------------------
    dialog procedure of "Calender" dialog
 --------------------------------------------------*/
-BOOL CALLBACK DlgProcCalender(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DlgProcCalender(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
 	switch(message)
 	{
 		case WM_INITDIALOG:
@@ -70,3 +70,12 @@ BOOL CALLBACK DlgProcCalender(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPa
 	}
 	return FALSE;
 }
+
+
+
+// Vistaのカレンダーが表示されていればそのハンドルを返す
+HWND FindVistaCalenderWindow(void)
+{
+	return FindWindowEx(FindWindow("ClockFlyoutWindow", NULL), NULL, "DirectUIHWND", "");
+}
+

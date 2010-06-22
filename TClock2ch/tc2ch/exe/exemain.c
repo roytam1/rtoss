@@ -70,6 +70,8 @@ static void CheckRegistry(void);
 static void InitDesktopIconText(void);
 static void EndDesktopIconText(void);
 void SetDesktopIconTextBk(BOOL bNoTrans);
+static BOOL IsUserAdmin(void);
+static BOOL IsWow64(void);
 static BOOL ImmDisableIME(DWORD idThread);
 static BOOL AddMessageFilters(void);
 
@@ -87,9 +89,6 @@ extern HMENU g_hMenu;
 
 // alarm.c
 extern BOOL bPlayingNonstop;
-
-// calendar.c
-extern BOOL bShowedVistaCalendar;
 
 
 /*-------------------------------------------------------
@@ -182,8 +181,15 @@ static UINT WINAPI TclockExeMain(void)
 	WNDCLASS wndclass;
 	HWND hwnd;
 
-	if (IsUserAdmin())
-		AddMessageFilters();
+	// check wow64
+	if (IsWow64()) { 
+		MessageBox(NULL, "64bit環境ではx64バイナリを使用する必要があります。",
+			NULL, MB_ICONERROR);
+		return 1; 
+	}
+
+	// for Vista 
+	if (IsUserAdmin()) { AddMessageFilters(); }
 
 	// not to execute the program twice
 	hwnd = FindWindow(szClassName, szWindowText);
@@ -242,7 +248,7 @@ static UINT WINAPI TclockExeMain(void)
 	//UpdateWindow(hwnd);
 
 	if(OleInitialize(NULL) != S_OK){
-		MessageBox(NULL,"OLEの初期化に失敗しました。","Error",MB_OK | MB_ICONERROR);
+		MessageBox(NULL,"OLEの初期化に失敗しました。", NULL, MB_ICONERROR);
 	}
 
 	g_hwndMain = hwnd;
@@ -273,7 +279,7 @@ static UINT WINAPI TclockExeMain(void)
 
 	UnregisterClass(szClassName, g_hInst);	/* for TTBASE */
 
-	return msg.wParam;
+	return (UINT)msg.wParam;
 }
 
 /*-------------------------------------------
@@ -283,7 +289,9 @@ static UINT WINAPI TclockExeMain(void)
 ---------------------------------------------*/
 void CheckCommandLine(HWND hwnd)
 {
-#if !defined(TCLOCK2CH_TTBASE)
+#if defined(TCLOCK2CH_TTBASE)
+	UNREFERENCED_PARAMETER(hwnd);
+#else
 	char *p;
 	p = GetCommandLine();
 	while(*p)
@@ -375,7 +383,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,	UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			else if(wParam == IDTIMER_CREATE)
 			{
-			  SetTimer(hwnd, IDTIMER_CREATE, 60000, NULL);
+				SetTimer(hwnd, IDTIMER_CREATE, 60000, NULL);
 				DO_WS_AGGRESSIVE();
 			}
 			return 0;
@@ -432,7 +440,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,	UINT message, WPARAM wParam, LPARAM lParam)
 			return 0;
 		case (WM_USER+1):   // error
 			nCountFindingClock = -1;
-			InitError(lParam);
+			InitError((int)lParam);
 			PostMessage(hwnd, WM_CLOSE, 0, 0);
 			return 0;
 		case (WM_USER+2):   // exit
@@ -452,15 +460,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,	UINT message, WPARAM wParam, LPARAM lParam)
 			StopFile();
 			return 0;
 		case WM_WININICHANGE:
-		/*
-		{
-			char s[160];
-			strcpy(s, "WM_WININICHANGE ");
-			if(lParam) strcat(s, (char*)lParam);
-			else strcat(s, "(null)");
-			WriteDebug(s);
-		}
-		*/
 		{
 			char *p;
 			BOOL b;
@@ -520,11 +519,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,	UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_RBUTTONDOWN:
 		case WM_MBUTTONDOWN:
 		case WM_XBUTTONDOWN:
-			if(bShowedVistaCalendar)
+			if(FindVistaCalenderWindow())
 			{
-				DWORD dw = 0;
+				DWORD_PTR dw = 0;
 				SendMessageTimeout(g_hwndClock, CLOCKM_VISTACALENDAR, 1, 0, SMTO_BLOCK | SMTO_ABORTIFHUNG, 5000, &dw);
-				bShowedVistaCalendar = FALSE;
 			}
 			if(!bPlayingNonstop)
 				PostMessage(hwnd, WM_USER+3, 0, 0);
@@ -536,11 +534,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,	UINT message, WPARAM wParam, LPARAM lParam)
 			OnMouseMsg(hwnd, message, wParam, lParam); // mouse.c
 			return 0;
 		case WM_ENTERMENULOOP:
-			if(bShowedVistaCalendar)
+			if(FindVistaCalenderWindow())
 			{
-				DWORD dw = 0;
+				DWORD_PTR dw = 0;
 				SendMessageTimeout(g_hwndClock, CLOCKM_VISTACALENDAR, 1, 0, SMTO_BLOCK | SMTO_ABORTIFHUNG, 5000, &dw);
-				bShowedVistaCalendar = FALSE;
 			}
 			bMenuOpened = TRUE;
 			break;
@@ -548,7 +545,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,	UINT message, WPARAM wParam, LPARAM lParam)
 			bMenuOpened = FALSE;
 			break;
 		case WM_HOTKEY:
-			OnHotkey(hwnd, wParam);
+			OnHotkey(hwnd, (int)wParam);
 			break;
 		case WM_MEASUREITEM:
 			OnMeasureItem(hwnd, wParam, lParam); // filelist.c
@@ -565,7 +562,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,	UINT message, WPARAM wParam, LPARAM lParam)
 	}
 
 	if(message == s_uTaskbarRestart) // When Explorer is hung up,
-	{                                // and the taskbar is recreated.
+	{								 // and the taskbar is recreated.
 		HookEnd();
 		SetTimer(hwnd, IDTIMER_START, 1000, NULL);
 		bStartTimer = TRUE;
@@ -582,7 +579,7 @@ void InitError(int n)
 	char s[160];
 
 	wsprintf(s, "%s: %d", MyString(IDS_NOTFOUNDCLOCK), n);
-	MyMessageBox(NULL, s, "Error", MB_OK, MB_ICONEXCLAMATION);
+	MyMessageBox(NULL, s, NULL, MB_OK, MB_ICONEXCLAMATION);
 }
 
 /*-------------------------------------------------------
@@ -665,7 +662,7 @@ HINSTANCE LoadLanguageDLL(char *langdllname)
 
 	if(hInst == NULL)
 		MyMessageBox(NULL, "Can't load a language module.",
-			"Error", MB_OK, MB_ICONEXCLAMATION);
+			NULL, MB_OK, MB_ICONEXCLAMATION);
 	else strcpy(langdllname, fname);
 	return hInst;
 }
@@ -721,7 +718,7 @@ BOOL CheckDLL(char *fname)
 		strcpy(msg, "Invalid file version: ");
 		get_title(msg + strlen(msg), fname);
 		MyMessageBox(NULL, msg,
-			"Error", MB_OK, MB_ICONEXCLAMATION);
+			NULL, MB_OK, MB_ICONEXCLAMATION);
 	}
 	return br;
 }
@@ -878,7 +875,7 @@ void SetDesktopIconTextBk(BOOL bNoTrans)
 {
 	BOOL b,bt;
 	HWND hwnd;
-	COLORREF col, colText;
+	COLORREF col, colText = 0;
 
 	bt = GetMyRegLong(NULL, "UseDesktopTextColor", FALSE);
 	b = GetMyRegLong(NULL, "DesktopTextBk", FALSE);
@@ -921,57 +918,60 @@ void SetDesktopIconTextBk(BOOL bNoTrans)
 	if(bt == TRUE) ListView_SetTextColor(hwnd, colText);
 	if(b == TRUE)  ListView_SetTextBkColor(hwnd, col);
 	InvalidateRect(hwnd, NULL, TRUE);
-
-//	ListView_RedrawItems(hwnd, 0, ListView_GetItemCount(hwnd));
-//	hwnd = GetParent(hwnd);
-//	hwnd = GetWindow(hwnd, GW_CHILD);
-//	while(hwnd)
-//	{
-//		InvalidateRect(hwnd, NULL, TRUE);
-//		hwnd = GetWindow(hwnd, GW_HWNDNEXT);
-//	}
 }
 
 
-
-//void ShowExeDir()
-//{
-//	ShellExecute(g_hwndMain, NULL, g_mydir, NULL, NULL, SW_SHOWNORMAL);
-//}
-
 // IsUserAnAdmin shell32.dll@680
 // http://msdn2.microsoft.com/en-us/library/aa376389.aspx
-BOOL IsUserAdmin(void)
+static BOOL IsUserAdmin(void)
 {
-  SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
-  PSID AdministratorsGroup;
-  BOOL b = AllocateAndInitializeSid(&NtAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID,
-                                    DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0,
-                                    &AdministratorsGroup);
-  if (b)
-  {
-    if (!CheckTokenMembership(NULL, AdministratorsGroup, &b))
-    {
-      b = FALSE;
-    }
-    FreeSid(AdministratorsGroup);
-  }
-  return b;
+	SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
+	PSID AdministratorsGroup;
+	BOOL b = AllocateAndInitializeSid(&NtAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID,
+																		DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0,
+																		&AdministratorsGroup);
+	if (b)
+	{
+		if (!CheckTokenMembership(NULL, AdministratorsGroup, &b))
+		{
+			b = FALSE;
+		}
+		FreeSid(AdministratorsGroup);
+	}
+	return b;
+}
+
+
+static BOOL IsWow64(void)
+{
+	BOOL bIsWow64 = FALSE;
+
+	typedef BOOL (WINAPI* LPFN_ISWOW64PROCESS)(HANDLE hProcess, PBOOL Wow64Process);
+	LPFN_ISWOW64PROCESS IsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(
+		GetModuleHandle(TEXT("kernel32")), "IsWow64Process");
+	if(IsWow64Process)
+	{
+		if(!IsWow64Process(GetCurrentProcess(), &bIsWow64))
+		{
+			bIsWow64 = FALSE;
+		}
+	}
+	return bIsWow64;
 }
 
 
 static BOOL ImmDisableIME(DWORD idThread)
 {
-  typedef BOOL (WINAPI* FImmDisableIME)(DWORD);
+	typedef BOOL (WINAPI* FImmDisableIME)(DWORD);
 
-  BOOL ret = FALSE;
-  HMODULE hDll = LoadLibrary("Imm32.dll");
-  FImmDisableIME fImmDisableIME = (FImmDisableIME)GetProcAddress(hDll, "ImmDisableIME");
-  if (fImmDisableIME) {
-    ret = fImmDisableIME(idThread);
-  }
-  FreeLibrary(hDll);
-  return ret;
+	BOOL ret = FALSE;
+	HMODULE hDll = LoadLibrary("Imm32.dll");
+	FImmDisableIME fImmDisableIME = (FImmDisableIME)GetProcAddress(hDll, "ImmDisableIME");
+	if (fImmDisableIME) {
+		ret = fImmDisableIME(idThread);
+	}
+	FreeLibrary(hDll);
+	return ret;
 }
 
 
@@ -1015,6 +1015,7 @@ static BOOL AddMessageFilters(void)
 }
 
 
+
 #if !defined(TCLOCK2CH_TTBASE)
 /*-------------------------------------------
   entry point of program
@@ -1024,14 +1025,20 @@ static BOOL AddMessageFilters(void)
 #pragma comment(linker, "/subsystem:windows")
 #pragma message("entry WinMainCRTStartup")
 void __cdecl WinMainCRTStartup(void)
+{
 #else
 #pragma message("entry WinMain")
 int WINAPI WinMain(HINSTANCE hinst,HINSTANCE hinstPrev,LPSTR lpszCmdLine, int nShow)
-#endif
 {
+	UNREFERENCED_PARAMETER(hinst);
+	UNREFERENCED_PARAMETER(hinstPrev);
+	UNREFERENCED_PARAMETER(lpszCmdLine);
+	UNREFERENCED_PARAMETER(nShow);
+#endif
+
 	g_hInst = GetModuleHandle(NULL);
 
-	SetProcessShutdownParameters(0x3FF, 0);
+	SetProcessShutdownParameters(0x1FF, 0); // 最後の方でシャットダウンするアプリケーション
 	ImmDisableIME((DWORD)-1);
 
 	ExitProcess(TclockExeMain());
@@ -1039,27 +1046,33 @@ int WINAPI WinMain(HINSTANCE hinst,HINSTANCE hinstPrev,LPSTR lpszCmdLine, int nS
 
 #else /* defined(TCLOCK2CH_TTBASE) */
 
-#pragma comment(linker, "/subsystem:windows,5.0")
-#pragma comment(linker, "/base:0x66660000")
+#ifdef _WIN64
+# error TCLOCK2CH_TTBASE is not supported on x64
+# pragma comment(linker, "/base:0x0000070066660000")
+#else
+# pragma comment(linker,         "/base:0x66660000")
+#endif // _WIN64
 
 #ifndef _DEBUG
-#pragma message("entry _DllMainCRTStartup")
-BOOL WINAPI _DllMainCRTStartup(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
-#else
-#pragma message("entry DllMain")
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+# pragma comment(linker, "/entry:\"DllMain\"")
 #endif
+
+# pragma message("entry DllMain")
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+
 {
+	UNREFERENCED_PARAMETER(fdwReason);
+	UNREFERENCED_PARAMETER(lpvReserved);
 	g_hInst = hinstDLL;
-	DisableThreadLibraryCalls(hinstDLL);
 	return TRUE;
 }
 static DWORD WINAPI TTBaseThreadFunc(LPVOID param)
 {
+	UNREFERENCED_PARAMETER(param);
 	return TclockExeMain();
 }
 
-#include "ttbasesdk.h"
+#include "ttbase/ttbasesdk.h"
 #define	PLUGIN_NAME	"TClock2ch for TTBase"
 #define	PLUGIN_TYPE	ptAlwaysLoad
 
@@ -1071,7 +1084,6 @@ static int TTBPImplementGetCommandInfoStart(void)
 	char temp[MAX_PATH];
 	hInstResource = LoadLanguageDLL(temp);
 	return GetMouseFuncCount() - 1;
-
 }
 static void TTBPImplementGetCommandInfo(int id, PLUGIN_COMMAND_INFO *pi)
 {
@@ -1131,6 +1143,7 @@ static void TTBPImplementUnload(void)
 // --------------------------------------------------------
 static BOOL TTBPImplementExecute(int CmdId, HWND hWnd)
 {
+	UNREFERENCED_PARAMETER(hWnd);
 	if (g_hwndMain && IsWindow(g_hwndMain))
 		PostMessage(g_hwndMain, WM_COMMAND, MAKELPARAM(IDC_HOTKEY0, GetMouseFuncList()[CmdId + 1].mousefunc), 0);
 	return TRUE;
@@ -1141,8 +1154,11 @@ static BOOL TTBPImplementExecute(int CmdId, HWND hWnd)
 // --------------------------------------------------------
 static void TTBPImplementHook(UINT Msg, DWORD wParam, DWORD lParam)
 {
+	UNREFERENCED_PARAMETER(Msg);
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
 }
 
-#include "ttbasesdk.c"
+#include "ttbase/ttbasesdk.c"
 
 #endif

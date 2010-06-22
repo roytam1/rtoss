@@ -313,6 +313,7 @@ void OnApply(HWND hDlg)
 --------------------------------------------------*/
 void OnDestroy(HWND hDlg)
 {
+	UNREFERENCED_PARAMETER(hDlg);
 	if(pData) free(pData);
 }
 

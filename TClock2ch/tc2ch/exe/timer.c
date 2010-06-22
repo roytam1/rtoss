@@ -27,7 +27,7 @@ typedef struct _tagTimerStruct2
 } TIMERSTRUCT2;
 typedef TIMERSTRUCT2* PTIMERSTRUCT2;
 
-BOOL CALLBACK DlgProcTimer(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK DlgProcTimer(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 static void OnInit(HWND hDlg);
 static void OnDestroy(HWND hDlg);
 static void OnOK(HWND hDlg);
@@ -50,20 +50,23 @@ void DialogTimer(HWND hwnd)
 {
 	HWND hwndTray;
 
+	UNREFERENCED_PARAMETER(hwnd);
+
 	hwndTray = FindWindow("Shell_TrayWnd", NULL);
 	if(g_hDlgTimer && IsWindow(g_hDlgTimer))
 		;
 	else
 		g_hDlgTimer = CreateDialog(GetLangModule(), MAKEINTRESOURCE(IDD_TIMER),
-			NULL, (DLGPROC)DlgProcTimer);
+			NULL, DlgProcTimer);
 	SetForegroundWindow98(g_hDlgTimer);
 }
 
 /*------------------------------------------------
    dialog procedure of "Timer" dialog
 --------------------------------------------------*/
-BOOL CALLBACK DlgProcTimer(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DlgProcTimer(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
 	switch(message)
 	{
 		case WM_INITDIALOG:
@@ -376,6 +379,7 @@ void OnTimerTimer(HWND hwnd, SYSTEMTIME* st)
 	int i;
 	DWORD tick;
 
+	UNREFERENCED_PARAMETER(st);
 	if(nTimerCount == 0) return;
 	tick = GetTickCount();
 	for(i = 0; i < nTimerCount; i++)
@@ -453,6 +457,7 @@ void StopTimer(HWND hwnd, int tostop)
 	PTIMERSTRUCT2 temp;
 	int i, j;
 
+	UNREFERENCED_PARAMETER(hwnd);
 	if(tostop >= nTimerCount) return;
 
 	temp = pTimersWorking;

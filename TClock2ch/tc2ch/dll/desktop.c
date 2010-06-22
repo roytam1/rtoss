@@ -10,7 +10,7 @@
 #endif
 
 static HWND hwndDesktop = NULL;
-static LONG oldstyle = 0;
+static LONG_PTR oldstyle = 0;
 
 static VOID CALLBACK ScreenFlush(HWND hWnd, UINT uMsg, UINT_PTR nIDEvent, DWORD dwTime)
 {
@@ -28,7 +28,7 @@ void SetDesktopIcons(void)
 {
 	BOOL b;
 	HWND hwnd;
-	LONG s;
+	LONG_PTR s;
 
 	b = GetMyRegLong(NULL, "DesktopIconList", FALSE);
 	if (!b) {
@@ -47,13 +47,13 @@ void SetDesktopIcons(void)
 	//LVS_ICON, LVS_LIST, LVS_REPORT, LVS_SMALLICON
 //	s = SendMessage(hwndDesktop, LVM_GETEXTENDEDLISTVIEWSTYLE, 0, 0);
 //	s = SendMessage(hwndDesktop, LVM_SETEXTENDEDLISTVIEWSTYLE, mask, s | mask);
-	s = GetWindowLong(hwndDesktop, GWL_STYLE);
+	s = GetWindowLongPtr(hwndDesktop, GWL_STYLE);
 	if ((s & LVS_REPORT) == 0) {
-		SetWindowLong(hwndDesktop, GWL_STYLE, s | LVS_REPORT);
+		SetWindowLongPtr(hwndDesktop, GWL_STYLE, s | LVS_REPORT);
 		oldstyle = s;
 	}
 #else
-	s = GetWindowLong(hwndDesktop, GWL_STYLE);
+	s = GetWindowLongPtr(hwndDesktop, GWL_STYLE);
 	if (b == 1)
 	{
 		if ((s & LVS_REPORT) != 0) {
@@ -62,7 +62,7 @@ void SetDesktopIcons(void)
 		if ((s & LVS_SMALLICON) == 0) {
 			//s ^= LVS_NOSCROLL;
 			//s ^= LVS_NOCOLUMNHEADER;
-			SetWindowLong(hwndDesktop, GWL_STYLE, s | LVS_SMALLICON);
+			SetWindowLongPtr(hwndDesktop, GWL_STYLE, s | LVS_SMALLICON);
 			oldstyle = s;
 		}
 	}
@@ -75,13 +75,7 @@ void SetDesktopIcons(void)
 		if ((s & LVS_REPORT) == 0) {
 			oldstyle = s;
 			s |= LVS_REPORT;
-			//s ^= LVS_NOSCROLL;
-			//s ^= LVS_NOCOLUMNHEADER;
-			//s ^= LVS_SORTASCENDING;
-			//s ^= LVS_SORTDESCENDING;
-			//s ^= LVS_NOSORTHEADER;
-			//s ^= LVS_OWNERDRAWFIXED;
-			SetWindowLong(hwndDesktop, GWL_STYLE, s);
+			SetWindowLongPtr(hwndDesktop, GWL_STYLE, s);
 			SetTimer(NULL, 0, 10, ScreenFlush);
 		}
 	}	
@@ -110,14 +104,14 @@ void SetDesktopIcons(void)
 		hwnd = FindWindowEx(hwnd, NULL, "SysListView32", NULL);
 		if(!hwnd) return;
 		hwndDesktop = hwnd;
-		oldstyle = GetWindowLong(hwndDesktop, GWL_STYLE);
-		SetWindowLong(hwndDesktop, GWL_STYLE, oldstyle|LVS_SMALLICON);
+		oldstyle = GetWindowLongPtr(hwndDesktop, GWL_STYLE);
+		SetWindowLongPtr(hwndDesktop, GWL_STYLE, oldstyle|LVS_SMALLICON);
 	}
 
-	if (!(GetWindowLong(hwndDesktop, GWL_STYLE)&LVS_SMALLICON))
+	if (!(GetWindowLongPtr(hwndDesktop, GWL_STYLE)&LVS_SMALLICON))
 	{
-		oldstyle = GetWindowLong(hwndDesktop, GWL_STYLE);
-		SetWindowLong(hwndDesktop, GWL_STYLE, oldstyle|LVS_SMALLICON);
+		oldstyle = GetWindowLongPtr(hwndDesktop, GWL_STYLE);
+		SetWindowLongPtr(hwndDesktop, GWL_STYLE, oldstyle|LVS_SMALLICON);
 	}
 }
 #endif	// modify by 505
@@ -129,7 +123,7 @@ void EndDesktopIcons(void)
 {
 	if(hwndDesktop)
 	{
-		SetWindowLong(hwndDesktop, GWL_STYLE, oldstyle);
+		SetWindowLongPtr(hwndDesktop, GWL_STYLE, oldstyle);
 	}
 	hwndDesktop = NULL;
 }

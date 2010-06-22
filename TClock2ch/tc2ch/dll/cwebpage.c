@@ -25,8 +25,12 @@
  * For the release (ie, not debug) version, then you should set your linker to
  * ignore the default libraries. This will reduce code size.
  */
-#pragma warning(push, 0)
-#pragma message("set 'pragma warning(push, 0)'")
+#pragma warning(push)
+#pragma warning(disable: 4201)	// 非標準の拡張機能が使用されています : 無名の構造体または共用体です。
+#pragma warning(disable: 4057)	// 'x' で使われているポインタ式は 'y' と基本型が異なっています。
+#pragma warning(disable: 4028)	// パラメータの型 n が関数宣言と一致しません。
+#pragma warning(disable: 4100)	// 引数は関数の本体部で 1 度も参照されません。
+
 #include <windows.h>
 #include <exdisp.h>		/* Defines of stuff like IWebBrowser2. This is an include file with Visual C 6 and above */
 #include <mshtml.h>		/* Defines of stuff like IHTMLDocument2. This is an include file with Visual C 6 and above */
@@ -596,7 +600,7 @@ void WINAPI UnEmbedBrowserObject(HWND hwnd)
 
 	// Retrieve the browser object's pointer we stored in our window's GWL_USERDATA when
 	// we initially attached the browser object to this window.
-	if ((browserHandle = (IOleObject **)SetWindowLong(hwnd, GWL_USERDATA, 0)))
+	if (NULL != (browserHandle = (IOleObject **)SetWindowLongPtr(hwnd, GWLP_USERDATA, 0)))
 	{
 		// Unembed the browser object, and release its resources.
 		browserObject = *browserHandle;
@@ -649,7 +653,7 @@ long WINAPI DisplayHTMLStr(HWND hwnd, LPCTSTR string)
 
 	// Retrieve the browser object's pointer we stored in our window's GWL_USERDATA when
 	// we initially attached the browser object to this window.
-	browserObject = *((IOleObject **)GetWindowLong(hwnd, GWL_USERDATA));
+	browserObject = *((IOleObject **)GetWindowLongPtr(hwnd, GWLP_USERDATA));
 	if (!browserObject) return(-1);
 
 	// We want to get the base address (ie, a pointer) to the IWebBrowser2 object embedded within the browser
@@ -754,7 +758,7 @@ long WINAPI DisplayHTMLPage(HWND hwnd, LPCTSTR webPageName)
 
 	// Retrieve the browser object's pointer we stored in our window's GWL_USERDATA when
 	// we initially attached the browser object to this window.
-	browserObject = *((IOleObject **)GetWindowLong(hwnd, GWL_USERDATA));
+	browserObject = *((IOleObject **)GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
 	// We want to get the base address (ie, a pointer) to the IWebBrowser2 object embedded within the browser
 	// object, so we can call some of the functions in the former's table.
@@ -787,7 +791,7 @@ long WINAPI DisplayHTMLPage(HWND hwnd, LPCTSTR webPageName)
 		DWORD		size;
 
 		size = MultiByteToWideChar(CP_ACP, 0, webPageName, -1, 0, 0);
-		if (!(buffer = (wchar_t *)GlobalAlloc(GMEM_FIXED, sizeof(wchar_t) * size))) goto badalloc;
+		if (NULL == (buffer = (wchar_t *)GlobalAlloc(GMEM_FIXED, sizeof(wchar_t) * size))) goto badalloc;
 		MultiByteToWideChar(CP_ACP, 0, webPageName, -1, buffer, size);
 		myURL.bstrVal = SysAllocString(buffer);
 		GlobalFree(buffer);
@@ -873,7 +877,7 @@ long WINAPI EmbedBrowserObject(HWND hwnd)
 	// we're giving it the plain old IOleClientSite, IOleInPlaceSite, and IOleInPlaceFrame.
 	//
 	// One final thing. We're going to allocate extra room to store the pointer to the browser object.
-	if (!(ptr = (char *)GlobalAlloc(GMEM_FIXED, sizeof(IOleInPlaceFrameEx) + sizeof(_IOleClientSiteEx) + sizeof(IOleObject *))))
+	if (NULL == (ptr = (char *)GlobalAlloc(GMEM_FIXED, sizeof(IOleInPlaceFrameEx) + sizeof(_IOleClientSiteEx) + sizeof(IOleObject *))))
 		return(-1);
 
 	// Initialize our IOleInPlaceFrame object with a pointer to our IOleInPlaceFrame VTable.
@@ -928,7 +932,7 @@ long WINAPI EmbedBrowserObject(HWND hwnd)
 				// call EmbedBrowserObject() for each one, and easily associate the appropriate browser object with
 				// its matching window and its own objects containing per-window data.
 				*((IOleObject **)ptr) = browserObject;
-				SetWindowLong(hwnd, GWL_USERDATA, (LONG)ptr);
+				SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)ptr);
 
 				// We can now call the browser object's SetHostNames function. SetHostNames lets the browser object know our
 				// application's name and the name of the document in which we're embedding the browser. (Since we have no

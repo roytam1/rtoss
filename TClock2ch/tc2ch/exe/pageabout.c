@@ -23,7 +23,7 @@ static HCURSOR hCurHand = NULL;
 　「バージョン情報」ページ用ダイアログプロシージャ
 --------------------------------------------------*/
 
-BOOL CALLBACK PageAboutProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK PageAboutProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch(message)
 	{
@@ -39,7 +39,7 @@ BOOL CALLBACK PageAboutProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 			{
 				SetTextColor(hdc, RGB(0,0,255));
 				SetBkMode(hdc, TRANSPARENT);
-				return (int)GetStockObject(NULL_BRUSH);
+				return (INT_PTR)GetStockObject(NULL_BRUSH);
 			}
 			break;
 		}
@@ -115,13 +115,10 @@ static void OnInit(HWND hDlg)
 	SendDlgItemMessage(hDlg, IDC_HOMEPAGE, WM_SETFONT, (WPARAM)hfontLink, 0);
 	if(hCurHand == NULL)
 		hCurHand = LoadCursor(g_hInst, MAKEINTRESOURCE(IDC_HAND));
-	oldLabProc = (WNDPROC)GetWindowLong(GetDlgItem(hDlg, IDC_MAILTO),
-		GWL_WNDPROC);
-	SetWindowLong(GetDlgItem(hDlg, IDC_MAILTO),
-		GWL_WNDPROC, (LONG)LabLinkProc);
-	SetWindowLong(GetDlgItem(hDlg, IDC_HOMEPAGE),
-		GWL_WNDPROC, (LONG)LabLinkProc);
-
+	oldLabProc = (WNDPROC)GetWindowLongPtr(GetDlgItem(hDlg, IDC_MAILTO),
+		GWLP_WNDPROC);
+	SubclassWindow(GetDlgItem(hDlg, IDC_MAILTO), LabLinkProc);
+	SubclassWindow(GetDlgItem(hDlg, IDC_HOMEPAGE), LabLinkProc);
 	//hbrback = CreateSolidBrush(GetSysColor(COLOR_3DFACE));
 
 	GetMyRegStr("", "HelpURL", s, MAX_PATH, MyString(IDS_HELPURL));

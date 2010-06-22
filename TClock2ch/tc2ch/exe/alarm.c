@@ -468,6 +468,8 @@ BOOL ExecFile(HWND hwnd, char* command)
 {
 	char fname[MAX_PATH], fpath[MAX_PATH], *opt;
 	SHELLEXECUTEINFO sei;
+	
+	UNREFERENCED_PARAMETER(hwnd);
 	if(*command == 0) return FALSE;
 
 	opt = malloc(strlen(command));
@@ -484,7 +486,7 @@ BOOL ExecFile(HWND hwnd, char* command)
 	ShellExecuteEx(&sei);
 	free(opt);
 
-	return ((int)sei.hInstApp > 32);
+	return (sei.hInstApp > (HINSTANCE)32);
 }
 
 /*------------------------------------------------
@@ -500,7 +502,7 @@ void PlayWavePre(HWND hwnd, char *fname)
 
 	if(hWaveOut != NULL) return;
 
-	if(!(hmmio = mmioOpen(fname, NULL, MMIO_READ | MMIO_ALLOCBUF)))
+	if(NULL == (hmmio = mmioOpen(fname, NULL, MMIO_READ | MMIO_ALLOCBUF)))
 		return;
 
 	mmckinfoParent.fccType = mmioFOURCC('W', 'A', 'V', 'E');
@@ -555,7 +557,7 @@ void PlayWavePre(HWND hwnd, char *fname)
 	mmckinfoSubchunk.ckid = mmioFOURCC('d', 'a', 't', 'a');
 	if(mmioDescend(hmmio, &mmckinfoSubchunk, &mmckinfoParent,
 		MMIO_FINDCHUNK))
-    {
+	{
 		free(pFormat); pFormat = NULL;
 		mmioClose(hmmio, 0);
 		return;
@@ -563,7 +565,7 @@ void PlayWavePre(HWND hwnd, char *fname)
 
 	lDataSize = mmckinfoSubchunk.cksize;
 	if(lDataSize == 0)
-    {
+	{
 		free(pFormat); pFormat = NULL;
 		mmioClose(hmmio, 0);
 		return;
@@ -586,10 +588,10 @@ void PlayWavePre(HWND hwnd, char *fname)
 	}
 	mmioClose(hmmio, 0);
 
-	if(waveOutOpen((LPHWAVEOUT)&hWaveOut, (UINT)WAVE_MAPPER,
-		(LPWAVEFORMATEX)pFormat, (UINT)hwnd, 0,
+	if(waveOutOpen((LPHWAVEOUT)&hWaveOut, WAVE_MAPPER,
+		(LPWAVEFORMATEX)pFormat, (DWORD_PTR)hwnd, 0,
 		(DWORD)CALLBACK_WINDOW))
-    {
+	{
 		free(pFormat); pFormat = NULL;
 		free(pData); pData = NULL;
 		return;
@@ -627,7 +629,7 @@ BOOL PlayWave(HWND hwnd, char *fname, DWORD dwLoops)
 
 	if(hWaveOut != NULL) return FALSE;
 
-	if(!(hmmio = mmioOpen(fname, NULL, MMIO_READ | MMIO_ALLOCBUF)))
+	if(NULL == (hmmio = mmioOpen(fname, NULL, MMIO_READ | MMIO_ALLOCBUF)))
 		return FALSE;
 
 	mmckinfoParent.fccType = mmioFOURCC('W', 'A', 'V', 'E');
@@ -682,7 +684,7 @@ BOOL PlayWave(HWND hwnd, char *fname, DWORD dwLoops)
 	mmckinfoSubchunk.ckid = mmioFOURCC('d', 'a', 't', 'a');
 	if(mmioDescend(hmmio, &mmckinfoSubchunk, &mmckinfoParent,
 		MMIO_FINDCHUNK))
-    {
+	{
 		free(pFormat); pFormat = NULL;
 		mmioClose(hmmio, 0);
 		return FALSE;
@@ -690,7 +692,7 @@ BOOL PlayWave(HWND hwnd, char *fname, DWORD dwLoops)
 
 	lDataSize = mmckinfoSubchunk.cksize;
 	if(lDataSize == 0)
-    {
+	{
 		free(pFormat); pFormat = NULL;
 		mmioClose(hmmio, 0);
 		return FALSE;
@@ -713,10 +715,10 @@ BOOL PlayWave(HWND hwnd, char *fname, DWORD dwLoops)
 	}
 	mmioClose(hmmio, 0);
 
-	if(waveOutOpen((LPHWAVEOUT)&hWaveOut, (UINT)WAVE_MAPPER,
-		(LPWAVEFORMATEX)pFormat, (UINT)hwnd, 0,
+	if(waveOutOpen((LPHWAVEOUT)&hWaveOut, WAVE_MAPPER,
+		(LPWAVEFORMATEX)pFormat, (DWORD_PTR)hwnd, 0,
 		(DWORD)CALLBACK_WINDOW))
-    {
+	{
 		free(pFormat); pFormat = NULL;
 		free(pData); pData = NULL;
 		return FALSE;

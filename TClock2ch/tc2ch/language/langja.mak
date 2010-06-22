@@ -19,7 +19,7 @@ LIBS=kernel32.lib user32.lib gdi32.lib advapi32.lib shell32.lib
 CC=icl
 LINK=xilink
 RC=rc
-COPT=/c /W3 /Os /nologo /Fo /DNDEBUG 
+COPT=/c /W3 /Os /nologo /DNDEBUG /Fo
 LOPT=/SUBSYSTEM:WINDOWS /OPT:NOWIN98 /DLL /entry:DllMain 
 
 $(DLLFILE): $(OBJS) $(RESFILE)
