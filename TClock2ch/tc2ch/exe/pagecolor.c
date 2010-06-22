@@ -183,8 +183,8 @@ void OnInit(HWND hDlg)
 
 	dwVer = GetVersion();
 	if(((dwVer & 0x80000000) && // 98/Me/2000
-	       LOBYTE(LOWORD(dwVer)) >= 4 && HIBYTE(LOWORD(dwVer)) >= 10) ||
-	   (!(dwVer & 0x80000000) && LOBYTE(LOWORD(dwVer)) >= 5))
+		LOBYTE(LOWORD(dwVer)) >= 4 && HIBYTE(LOWORD(dwVer)) >= 10) ||
+		(!(dwVer & 0x80000000) && LOBYTE(LOWORD(dwVer)) >= 5))
 	{
 		UseGrad = TRUE;
 	}
@@ -250,17 +250,17 @@ void OnApply(HWND hDlg)
 	//背景色の保存
 	SetMyRegLongEx("", "UseBackColor",
 		IsDlgButtonChecked(hDlg, IDC_CHKCOLOR), confNo);
-	dw = CBGetItemData(hDlg, IDC_COLBACK, CBGetCurSel(hDlg, IDC_COLBACK));
+	dw = (DWORD)CBGetItemData(hDlg, IDC_COLBACK, CBGetCurSel(hDlg, IDC_COLBACK));
 	SetMyRegLongEx("", "BackColor", dw, confNo);
 
 	SetMyRegLongEx("", "UseBackColor2",
 		IsDlgButtonChecked(hDlg, IDC_CHKCOLOR2), confNo);
-	dw = CBGetItemData(hDlg, IDC_COLBACK2, CBGetCurSel(hDlg, IDC_COLBACK2));
+	dw = (DWORD)CBGetItemData(hDlg, IDC_COLBACK2, CBGetCurSel(hDlg, IDC_COLBACK2));
 	SetMyRegLongEx("", "BackColor2", dw, confNo);
 	SetMyRegLongEx("", "GradDir", IsDlgButtonChecked(hDlg, IDC_CHKCOLORV), confNo);
 
 	//文字色の保存
-	dw = CBGetItemData(hDlg, IDC_COLFORE, CBGetCurSel(hDlg, IDC_COLFORE));
+	dw = (DWORD)CBGetItemData(hDlg, IDC_COLFORE, CBGetCurSel(hDlg, IDC_COLFORE));
 	SetMyRegLongEx("", "ForeColor", dw, confNo);
 
 	//影の保存
@@ -268,7 +268,7 @@ void OnApply(HWND hDlg)
 		IsDlgButtonChecked(hDlg, IDC_CHKCLKSHADOW), confNo);
 	SetMyRegLongEx("", "UseClockBORDER",
 		IsDlgButtonChecked(hDlg, IDC_CHKCLKBORDER), confNo);
-	dw = CBGetItemData(hDlg, IDC_COLCLKSHADOW, CBGetCurSel(hDlg, IDC_COLCLKSHADOW));
+	dw = (DWORD)CBGetItemData(hDlg, IDC_COLCLKSHADOW, CBGetCurSel(hDlg, IDC_COLCLKSHADOW));
 	SetMyRegLongEx("", "ShadowColor", dw, confNo);
 	SetMyRegLongEx("", "ClockShadowRange",
 		SendDlgItemMessage(hDlg, IDC_SPINCLKSHADOW, UDM_GETPOS, 0, 0), confNo);
@@ -415,7 +415,7 @@ void InitComboFont(HWND hDlg)
 	// Enumerate fonts and set in the combo box
 	memset(&lf, 0, sizeof(LOGFONT));
 	hcombo = GetDlgItem(hDlg, IDC_FONT);
-	lf.lfCharSet = GetTextCharset(hdc);  // MS UI Gothic, ...
+	lf.lfCharSet = (BYTE)GetTextCharset(hdc);  // MS UI Gothic, ...
 	EnumFontFamiliesEx(hdc, &lf,
 		(FONTENUMPROC)EnumFontFamExProc, (LPARAM)hcombo, 0);
 	lf.lfCharSet = OEM_CHARSET;   // Small Fonts, Terminal...
@@ -500,6 +500,9 @@ void SetComboFontSize(HWND hDlg, BOOL bInit)
 BOOL CALLBACK EnumFontFamExProc(ENUMLOGFONTEX* pelf,
 	NEWTEXTMETRICEX* lpntm, int FontType, LPARAM hCombo)
 {
+	UNREFERENCED_PARAMETER(lpntm);
+	UNREFERENCED_PARAMETER(FontType);
+
 	// if(FontType & RASTER_FONTTYPE) return 1;
 	if(pelf->elfLogFont.lfFaceName[0] != '@' &&
 		SendMessage((HWND)hCombo, CB_FINDSTRINGEXACT, 0,
@@ -524,6 +527,7 @@ BOOL CALLBACK EnumSizeProcEx(ENUMLOGFONTEX* pelf,
 	char s[80];
 	int num, i, count;
 
+	UNREFERENCED_PARAMETER(pelf);
 	//トゥルータイプフォントまたは、
 	//トゥルータイプでもラスタフォントでもない場合
 	if((FontType & TRUETYPE_FONTTYPE) ||

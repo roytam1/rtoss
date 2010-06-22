@@ -55,7 +55,7 @@ static BOOL bNormalStartButton = FALSE;
 static BOOL bCursorOnStartButton = FALSE;
 static BOOL bHiddenGrippers = FALSE;
 static BOOL bIsRebar = FALSE;
-static LONG oldClassStyleStartButton = 0;
+static LONG_PTR oldClassStyleStartButton = 0;
 static COLORREF CoolStartColorHigh, CoolStartColorLow, CoolStartColorFace,
 			CoolStartColorHigh2, CoolStartColorLow2;
 
@@ -93,7 +93,7 @@ extern void GetDisplayTime(SYSTEMTIME* pt, int* beat100);
 static void GetFormatString(PSTR s, PSTR format)
 {
 	SYSTEMTIME t;
-	int beat100;
+	int beat100 = 0;
 
 	if (*format == '\0') {
 		*s = '\0';
@@ -283,6 +283,7 @@ void SetStartButton(HWND hwndClock)
 	hwnd = GetParent(hwndTray);      // Shell_TrayWnd
 	if(hwnd == NULL)
 		return;
+	//hwndStart = FindWindowEx(FindWindow("#32769", NULL), NULL, "Button", NULL);
 
 	hwnd = GetWindow(hwnd, GW_CHILD);
 	while(hwnd)
@@ -307,7 +308,7 @@ void SetStartButton(HWND hwndClock)
 		hwndStart = hwndTask = NULL; return;
 	}
 
-	oldClassStyleStartButton = GetClassLong(hwndStart, GCL_STYLE);
+	oldClassStyleStartButton = GetClassLongPtr(hwndStart, GCL_STYLE);
 
 	bCustStartButton = GetMyRegLong(NULL, "StartButton", FALSE);
 	bHideStartButton = GetMyRegLong(NULL, "StartButtonHide", FALSE);
@@ -339,15 +340,15 @@ void SetStartButton(HWND hwndClock)
 			CoolStartColorFace = GetSysColor(COLOR_3DFACE);
 		}
 
-		SetClassLong(hwndStart, GCL_STYLE,
+		SetClassLongPtr(hwndStart, GCL_STYLE,
 			oldClassStyleStartButton & ~(CS_HREDRAW|CS_VREDRAW));
 	}
 
 	// サブクラス化
-	oldWndProcStart = (WNDPROC)GetWindowLong(hwndStart, GWL_WNDPROC);
-	SetWindowLong(hwndStart, GWL_WNDPROC, (LONG)WndProcStart);
-	oldWndProcTask = (WNDPROC)GetWindowLong(hwndTask, GWL_WNDPROC);
-	SetWindowLong(hwndTask, GWL_WNDPROC, (LONG)WndProcTask);
+	oldWndProcStart = (WNDPROC)GetWindowLongPtr(hwndStart, GWLP_WNDPROC);
+	SubclassWindow(hwndStart, WndProcStart);
+	oldWndProcTask = (WNDPROC)GetWindowLongPtr(hwndTask, GWLP_WNDPROC);
+	SubclassWindow(hwndTask, WndProcTask);
 
 	if(bHideStartButton) // ボタンを隠す
 	{
@@ -396,14 +397,14 @@ void EndStartButton(void)
 				0, (LPARAM)hbmpstartold);
 			hbmpstartold = NULL;
 		}
-		SetClassLong(hwndStart, GCL_STYLE, oldClassStyleStartButton);
+		SetClassLongPtr(hwndStart, GCL_STYLE, oldClassStyleStartButton);
 
 #if ENABLE_CHECK_SUBCLASS_NESTING
-		if(oldWndProcStart && (WNDPROC)WndProcStart == (WNDPROC)GetWindowLong(hwndStart, GWL_WNDPROC))
+		if(oldWndProcStart && (WNDPROC)WndProcStart == (WNDPROC)GetWindowLongPtr(hwndStart, GWLP_WNDPROC))
 #else
 		if(oldWndProcStart)
 #endif
-			SetWindowLong(hwndStart, GWL_WNDPROC, (LONG)oldWndProcStart);
+			SubclassWindow(hwndStart, oldWndProcStart);
 		bStartTextDisable = FALSE;
 		SetWindowPos(hwndStart, NULL, 0, 0, 0, 0,
 			SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
@@ -417,11 +418,11 @@ void EndStartButton(void)
 	if(hwndTask && IsWindow(hwndTask))
 	{
 #if ENABLE_CHECK_SUBCLASS_NESTING
-		if(oldWndProcTask && (WNDPROC)WndProcTask == (WNDPROC)GetWindowLong(hwndTask, GWL_WNDPROC))
+		if(oldWndProcTask && (WNDPROC)WndProcTask == (WNDPROC)GetWindowLongPtr(hwndTask, GWLP_WNDPROC))
 #else
 		if(oldWndProcTask)
 #endif
-			SetWindowLong(hwndTask, GWL_WNDPROC, (LONG)oldWndProcTask);
+			SubclassWindow(hwndTask, oldWndProcTask);
 	}
 	oldWndProcTask = NULL; hwndTask = NULL;
 

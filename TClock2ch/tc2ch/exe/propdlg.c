@@ -8,26 +8,26 @@
 
 #define MAX_PAGE  14
 
-BOOL CALLBACK PropertyDialog(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK PropertyDialog(HWND, UINT, WPARAM, LPARAM);
 
 LRESULT CALLBACK SubclassProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 void SetMyDialgPos(HWND hwnd);
 
 // dialog procedures of each page
-BOOL CALLBACK PageColorProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK PageFormatProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK PageAlarmProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK PageMouseProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK PageTooltipProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK PageSkinProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK PageGraphProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK PageTaskbarProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK PageDesktopProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK PageSNTPProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK PageAutoExecProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK PageMiscProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK PageAboutProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK PageAnalogClockProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK PageColorProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK PageFormatProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK PageAlarmProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK PageMouseProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK PageTooltipProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK PageSkinProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK PageGraphProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK PageTaskbarProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK PageDesktopProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK PageSNTPProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK PageAutoExecProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK PageMiscProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK PageAboutProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK PageAnalogClockProc(HWND, UINT, WPARAM, LPARAM);
 
 void SetPropSheetPos(HWND hwnd);
 
@@ -109,7 +109,7 @@ static VOID CreatePageDialog(HWND hParent, HWND hDlg[], BOOL bDlgFlg[], int inde
 /*-------------------------------------------
   Property dialog
 ---------------------------------------------*/
-BOOL CALLBACK PropertyDialog(HWND hDwnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK PropertyDialog(HWND hDwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static HWND hTree;
 	static HWND hDlg[MAX_PAGE];
@@ -234,7 +234,7 @@ BOOL CALLBACK PropertyDialog(HWND hDwnd, UINT message, WPARAM wParam, LPARAM lPa
 				case TVN_SELCHANGED:
 					ShowWindow(*hNowDlg, SW_HIDE);
 					UpdateWindow(*hNowDlg);
-					nowDlg = pNMTV->itemNew.lParam;
+					nowDlg = (int)pNMTV->itemNew.lParam;
 					switch (nowDlg)
 					{
 						case 0:

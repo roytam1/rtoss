@@ -77,7 +77,7 @@ HFONT CreateMyFont(char* fontname, int fontsize,
 	hdc = GetDC(NULL);
 
 	// find a font named "fontname"
-	if(charset == 0) charset = GetTextCharset(hdc);
+	if(charset == 0) charset = (BYTE)GetTextCharset(hdc);
 	lf.lfCharSet = charset;
 	if(EnumFontFamiliesEx(hdc, &lf, (FONTENUMPROC)EnumFontFamExProc,
 		(LPARAM)fontname, 0))

@@ -4,12 +4,14 @@
 ---------------------------------------------*/
 
 #define _WIN32_IE 0x0500
-#define WINVER    0x400
+#define WINVER    0x0400
 
 #define _CRT_SECURE_NO_DEPRECATE
+
 #pragma warning(push, 0)
 # include <windows.h>
 # include <windowsx.h>
+# include <tchar.h>
 # include <winreg.h>
 # include <shellapi.h>
 # include <winnls.h>
@@ -17,11 +19,6 @@
 # include <shlwapi.h>
 # include <shlobj.h>
 #pragma warning(pop)
-
-//#if defined(NDEBUG)
-//# pragma comment(linker, "/entry:\"DllMain\"")
-//# pragma comment(linker, "/nodefaultlib:libcmt.lib")
-//#endif
 
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "gdi32.lib")
@@ -31,8 +28,23 @@
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "ole32.lib")
 #pragma comment(lib, "oleaut32.lib")
-#pragma comment(linker, "/subsystem:windows,5.0")
-#pragma comment(linker, "/base:0x66060000")
+
+#if defined(_DEBUG)
+# include <crtdbg.h>
+#else
+# define _ASSERTE(expr) ((void)0)
+#endif
+
+#ifdef _WIN64
+# pragma comment(linker, "/base:0x0000070066060000")
+#else
+# pragma comment(linker,         "/base:0x66060000")
+#endif // _WIN64
+
+//#if defined(NDEBUG)
+//# pragma comment(linker, "/entry:\"DllMain\"")
+//# pragma comment(linker, "/nodefaultlib:libcmt.lib")
+//#endif
 
 #define ENABLE_CHECK_SUBCLASS_NESTING 1
 

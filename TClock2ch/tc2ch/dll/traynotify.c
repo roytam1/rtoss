@@ -14,9 +14,9 @@ BOOL bFillTray = FALSE;
 BOOL bSkinTray = FALSE;
 static HWND hwndTrayNotify = NULL, hwndToolbar = NULL;
 static WNDPROC oldWndProcTrayNotify = NULL;
-static LONG oldClassStyleTrayNotify;
-static LONG oldStyleTrayNotify;
-static LONG oldExStyleTrayNotify;
+static LONG_PTR oldClassStyleTrayNotify;
+static LONG_PTR oldStyleTrayNotify;
+static LONG_PTR oldExStyleTrayNotify;
 static BOOL bFlatTray = TRUE;
 static HWND s_hwndClock;
 
@@ -80,23 +80,23 @@ void InitTrayNotify(HWND hwndClock)
 	{
 		s_hwndClock = hwndClock;
 
-		oldClassStyleTrayNotify = GetClassLong(hwndTrayNotify, GCL_STYLE);
-		SetClassLong(hwndTrayNotify, GCL_STYLE,
+		oldClassStyleTrayNotify = GetClassLongPtr(hwndTrayNotify, GCL_STYLE);
+		SetClassLongPtr(hwndTrayNotify, GCL_STYLE,
 			oldClassStyleTrayNotify|CS_HREDRAW|CS_VREDRAW);
 
 		oldWndProcTrayNotify =
-			(WNDPROC)GetWindowLong(hwndTrayNotify, GWL_WNDPROC);
-		SetWindowLong(hwndTrayNotify, GWL_WNDPROC, (LONG)WndProcTrayNotify);
+			(WNDPROC)GetWindowLongPtr(hwndTrayNotify, GWLP_WNDPROC);
+		SubclassWindow(hwndTrayNotify, WndProcTrayNotify);
 
-		oldStyleTrayNotify = GetWindowLong(hwndTrayNotify, GWL_STYLE);
-		SetWindowLong(hwndTrayNotify, GWL_STYLE,
+		oldStyleTrayNotify = GetWindowLongPtr(hwndTrayNotify, GWL_STYLE);
+		SetWindowLongPtr(hwndTrayNotify, GWL_STYLE,
 			oldStyleTrayNotify & ~(WS_CLIPCHILDREN|WS_CLIPSIBLINGS));
 	}
 
 	if(bFlatTray)
 	{
-		oldExStyleTrayNotify = GetWindowLong(hwndTrayNotify, GWL_EXSTYLE);
-		SetWindowLong(hwndTrayNotify, GWL_EXSTYLE,
+		oldExStyleTrayNotify = GetWindowLongPtr(hwndTrayNotify, GWL_EXSTYLE);
+		SetWindowLongPtr(hwndTrayNotify, GWL_EXSTYLE,
 			oldExStyleTrayNotify & ~WS_EX_STATICEDGE);
 		SetWindowPos(hwndTrayNotify, NULL, 0, 0, 0, 0,
 			SWP_DRAWFRAME|SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER);
@@ -118,9 +118,9 @@ void InitTrayNotify(HWND hwndClock)
 	{
 		RECT rc;
 		LONG style;
-		style = GetWindowLong(hwndTrayNotify, GWL_STYLE);
+		style = GetWindowLongPtr(hwndTrayNotify, GWL_STYLE);
 		style |= WS_POPUPWINDOW	| WS_CAPTION;
-		SetWindowLong(hwndTrayNotify, GWL_STYLE, style);
+		SetWindowLongPtr(hwndTrayNotify, GWL_STYLE, style);
 		GetWindowRect(hwndTrayNotify, &rc);
 		SetWindowPos(hwndTrayNotify, NULL, rc.left - 20, rc.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
 	}
@@ -134,12 +134,11 @@ void EndTrayNotify(void)
 {
 	if(bFillTray && hwndTrayNotify && IsWindow(hwndTrayNotify))
 	{
-		SetWindowLong(hwndTrayNotify, GWL_STYLE, oldStyleTrayNotify);
+		SetWindowLongPtr(hwndTrayNotify, GWL_STYLE, oldStyleTrayNotify);
 		if(oldWndProcTrayNotify)
-			SetWindowLong(hwndTrayNotify, GWL_WNDPROC,
-				(LONG)oldWndProcTrayNotify);
+			SubclassWindow(hwndTrayNotify, oldWndProcTrayNotify);
 
-		SetClassLong(hwndTrayNotify, GCL_STYLE, oldClassStyleTrayNotify);
+		SetClassLongPtr(hwndTrayNotify, GCL_STYLE, oldClassStyleTrayNotify);
 
 		InvalidateRect(hwndTrayNotify, NULL, TRUE);
 		SendMessage(hwndToolbar, WM_SYSCOLORCHANGE, 0, 0);
@@ -148,7 +147,7 @@ void EndTrayNotify(void)
 
 	if(bFlatTray && hwndTrayNotify && IsWindow(hwndTrayNotify))
 	{
-		SetWindowLong(hwndTrayNotify, GWL_EXSTYLE, oldExStyleTrayNotify);
+		SetWindowLongPtr(hwndTrayNotify, GWL_EXSTYLE, oldExStyleTrayNotify);
 		SetWindowPos(hwndTrayNotify, NULL, 0, 0, 0, 0,
 			SWP_DRAWFRAME|SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER);
 	}

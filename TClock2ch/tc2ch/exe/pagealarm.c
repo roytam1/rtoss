@@ -499,7 +499,7 @@ void OnDay(HWND hDlg)
 --------------------------------------------------*/
 void OnAlermJihou(HWND hDlg, WORD id)
 {
-	int s, e, i;
+	int s = 0, e = 0, i;
 	BOOL b;
 
 	switch(id){

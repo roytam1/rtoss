@@ -52,15 +52,15 @@ static WNDPROC oldWndProcTab = NULL;
 static HWND hwndTab = NULL;
 static HWND hwndBar = NULL;
 static HWND hwndTabTaskSwitch = NULL;
-static LONG oldstyle;
-static LONG oldBarStyle;
+static LONG_PTR oldstyle;
+static LONG_PTR oldBarStyle;
 static DWORD oldExstyle;
 static DWORD oldBarBtnSize = 0;
 static DWORD oldTBStyle;
 static BOOL bTaskSwitchFlat = FALSE;
 static BOOL bTaskSwitchIcons = FALSE;
 static BOOL bTBBorder = FALSE;
-static LONG OldTaskWidth;
+static WORD OldTaskWidth;
 
 /*--------------------------------------------------
    initialize
@@ -113,18 +113,18 @@ void InitTaskSwitch(HWND hwndClock)
 	hwndTab = GetWindow(hwndTaskSwitch, GW_CHILD);
 	if(hwndTab == NULL)
 		return;
-	oldstyle = GetWindowLong(hwndTab, GWL_STYLE);
+	oldstyle = GetWindowLongPtr(hwndTab, GWL_STYLE);
 	if (bTaskSwitchFlat)
 	{
 		if (bWinXP)
 		{
 			// WinXPはタブではなくツールバー
-			SetWindowLong(hwndTab, GWL_STYLE, oldstyle|TBSTYLE_FLAT);
+			SetWindowLongPtr(hwndTab, GWL_STYLE, oldstyle|TBSTYLE_FLAT);
 		}
 		else
 		{
-			SetWindowLong(hwndTab, GWL_STYLE, oldstyle|TCS_FLATBUTTONS|TCS_HOTTRACK);
-//			SetWindowLong(hwndTab, GWL_STYLE, (oldstyle&(~TCS_BUTTONS))|TCS_BOTTOM|TCS_HOTTRACK);
+			SetWindowLongPtr(hwndTab, GWL_STYLE, oldstyle|TCS_FLATBUTTONS|TCS_HOTTRACK);
+//			SetWindowLongPtr(hwndTab, GWL_STYLE, (oldstyle&(~TCS_BUTTONS))|TCS_BOTTOM|TCS_HOTTRACK);
 		}
 	}
 	oldExstyle = TabCtrl_GetExtendedStyle(hwndTab);
@@ -136,17 +136,16 @@ void InitTaskSwitch(HWND hwndClock)
 	{
 		if(!bWinXP)
 		{
-			OldTaskWidth = SendMessage(hwndTab, TCM_SETITEMSIZE, 0, MAKELPARAM(23, 23));
-			OldTaskWidth = LOWORD(OldTaskWidth);
+			OldTaskWidth = LOWORD(SendMessage(hwndTab, TCM_SETITEMSIZE, 0, MAKELPARAM(23, 23)));
 		}else
 		{
-			oldTBStyle = SendMessage(hwndTab, TB_GETEXTENDEDSTYLE, 0, 0);
+			oldTBStyle = (DWORD)SendMessage(hwndTab, TB_GETEXTENDEDSTYLE, 0, 0);
 			SendMessage(hwndTab, TB_SETEXTENDEDSTYLE, 0, oldTBStyle|TBSTYLE_EX_MIXEDBUTTONS);
 		}
 	}
 
-	oldWndProcTab = (WNDPROC)GetWindowLong(hwndTab, GWL_WNDPROC);
-	SetWindowLong(hwndTab, GWL_WNDPROC, (LONG)WndProcTab);
+	oldWndProcTab = (WNDPROC)GetWindowLongPtr(hwndTab, GWLP_WNDPROC);
+	SubclassWindow(hwndTab, WndProcTab);
 }
 
 /*--------------------------------------------------
@@ -157,13 +156,13 @@ void EndTaskSwitch(void)
 	if(hwndTab && IsWindow(hwndTab))
 	{
 #if ENABLE_CHECK_SUBCLASS_NESTING
-		if(oldWndProcTab && (WNDPROC)WndProcTab == (WNDPROC)GetWindowLong(hwndTab, GWL_WNDPROC))
+		if(oldWndProcTab && (WNDPROC)WndProcTab == (WNDPROC)GetWindowLongPtr(hwndTab, GWLP_WNDPROC))
 #else
 		if(oldWndProcTab)
 #endif
-			SetWindowLong(hwndTab, GWL_WNDPROC, (LONG)oldWndProcTab);
+			SubclassWindow(hwndTab, oldWndProcTab);
 		oldWndProcTab = NULL;
-		SetWindowLong(hwndTab, GWL_STYLE, oldstyle);
+		SetWindowLongPtr(hwndTab, GWL_STYLE, oldstyle);
 		TabCtrl_SetExtendedStyle(hwndTab, oldExstyle);
 		if(bTaskSwitchIcons)
 		{
@@ -270,14 +269,14 @@ void InitTaskBarBorder(HWND hwndClock)
 	hwndTabTaskSwitch = GetWindow(hwndTaskSwitch, GW_CHILD);
 	if(hwndTabTaskSwitch == NULL)
 		return;
-	oldBarStyle = GetWindowLong(hwndBar, GWL_STYLE);
-	SetWindowLong(hwndBar, GWL_STYLE, oldBarStyle&(~WS_THICKFRAME)&(~WS_BORDER));
+	oldBarStyle = GetWindowLongPtr(hwndBar, GWL_STYLE);
+	SetWindowLongPtr(hwndBar, GWL_STYLE, oldBarStyle&(~WS_THICKFRAME)&(~WS_BORDER));
 	if(bTBBorder)
 	{
 		if(oldBarBtnSize == 0)
 		{
 			if (bWinXP)
-				oldBarBtnSize = SendMessage(hwndTabTaskSwitch, TB_GETPADDING, 0, 0);
+				oldBarBtnSize = (DWORD)SendMessage(hwndTabTaskSwitch, TB_GETPADDING, 0, 0);
 			else
 				oldBarBtnSize = MAKELONG(3,8);
 		}
@@ -286,8 +285,8 @@ void InitTaskBarBorder(HWND hwndClock)
 		else
 			SendMessage(hwndTabTaskSwitch, TCM_SETPADDING, 0, MAKELPARAM(LOWORD(oldBarBtnSize),0));
 	}
-	ss.styleOld = oldBarStyle;
-	ss.styleNew = oldBarStyle&(~WS_THICKFRAME)&(~WS_BORDER);
+	ss.styleOld = (DWORD)oldBarStyle;
+	ss.styleNew = (DWORD)oldBarStyle&(~WS_THICKFRAME)&(~WS_BORDER);
 	SendMessage(hwndBar, WM_STYLECHANGED, (WPARAM)(GWL_STYLE|GWL_EXSTYLE), (LPARAM)&ss);
 	SendMessage(hwndBar, WM_SYSCOLORCHANGE, 0, 0);
 	SendMessage(hwndBar, WM_SIZE, SIZE_RESTORED, 0);
@@ -306,9 +305,9 @@ void EndTaskBarBorder(void)
 	if(hwndBar && IsWindow(hwndBar))
 	{
 		STYLESTRUCT ss;
-		SetWindowLong(hwndBar, GWL_STYLE, oldBarStyle);
-		ss.styleOld = oldBarStyle&(~WS_THICKFRAME)&(~WS_BORDER);
-		ss.styleNew = oldBarStyle;
+		SetWindowLongPtr(hwndBar, GWL_STYLE, oldBarStyle);
+		ss.styleOld = (DWORD)oldBarStyle&(~WS_THICKFRAME)&(~WS_BORDER);
+		ss.styleNew = (DWORD)oldBarStyle;
 		SendMessage(hwndBar, WM_STYLECHANGED, (WPARAM)(GWL_STYLE|GWL_EXSTYLE), (LPARAM)&ss);
 		SendMessage(hwndBar, WM_SYSCOLORCHANGE, 0, 0);
 		SendMessage(hwndBar, WM_SIZE, SIZE_RESTORED, 0);

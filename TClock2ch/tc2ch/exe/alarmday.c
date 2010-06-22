@@ -6,7 +6,7 @@
 
 #include "tclock.h"
 
-BOOL CALLBACK AlarmDayProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK AlarmDayProc(HWND, UINT, WPARAM, LPARAM);
 static void OnInit(HWND hDlg);
 static void OnOK(HWND hDlg);
 static void OnEveryDay(HWND hDlg);
@@ -28,9 +28,10 @@ int SetAlarmDay(HWND hDlg, int n)
 /*------------------------------------------------
   dialog procedure
 --------------------------------------------------*/
-BOOL CALLBACK AlarmDayProc(HWND hDlg, UINT message,
+INT_PTR CALLBACK AlarmDayProc(HWND hDlg, UINT message,
 	WPARAM wParam, LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
 	switch(message)
 	{
 		case WM_INITDIALOG:

@@ -22,6 +22,7 @@ BOOL ExecDeskcal(HWND hwnd)
 	PROCESS_INFORMATION pi;
 	PSTR path;
 
+	UNREFERENCED_PARAMETER(hwnd);
 	if(GetMyRegLong("", "Deskcal", FALSE) == FALSE) return TRUE;
 
 	if(hProcessDeskcal)
@@ -171,6 +172,7 @@ void OnTimerWatchWallpaper(HWND hwnd, SYSTEMTIME* pt)
 	HANDLE hfind;
 	BOOL b;
 
+	UNREFERENCED_PARAMETER(pt);
 	if(!wallpapername) return;
 
 	if(GetMyRegLong(NULL, "WatchWallpaper", FALSE) == FALSE)

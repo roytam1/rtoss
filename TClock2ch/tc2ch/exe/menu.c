@@ -20,18 +20,18 @@ void OnContextMenu(HWND hwnd, HWND hwndClicked, int xPos, int yPos)
 {
 	char s[80];
 
+	UNREFERENCED_PARAMETER(hwndClicked);
 	if(!g_hMenu)
 	{
 		g_hMenu = LoadMenu(GetLangModule(), MAKEINTRESOURCE(IDR_MENU));
 		hPopupMenu = GetSubMenu(g_hMenu, 0);
 		if (g_isTTBase)
 		{
-			//EnableMenuItem(hPopupMenu, IDC_EXIT, MF_BYCOMMAND | MF_DISABLED);
 			RemoveMenu(hPopupMenu, IDC_EXIT, MF_BYCOMMAND);
 		}
 		SetMenuDefaultItem(hPopupMenu, 408, FALSE);
 
-		if(GetVersion() & 0x80000000) // !NT
+		if(GetVersion() & 0x80000000) // == 9x
 		{
 			DeleteMenu(hPopupMenu, 7, MF_BYPOSITION);
 			DeleteMenu(hPopupMenu, 7, MF_BYPOSITION);
@@ -41,8 +41,8 @@ void OnContextMenu(HWND hwnd, HWND hwndClicked, int xPos, int yPos)
 	UpdateTimerMenu(hPopupMenu);
 
 	GetMyRegStr("SNTP", "Server", s, 80, "");
-	if (!s[0])// || (GetVersionEx(&os) && os.dwMajorVersion >= 6 && !IsUserAdmin())
-	{		
+	if (!s[0])
+	{
 		EnableMenuItem(hPopupMenu, IDC_SYNCTIME, MF_BYCOMMAND|MF_GRAYED);
 	}
 
@@ -93,7 +93,22 @@ void OnTClockCommand(HWND hwnd, WORD wID, WORD wCode)
 			HWND hwndTray;
 			hwndTray = FindWindow("Shell_TrayWnd", NULL);
 			if(hwndTray)
-				PostMessage(hwndTray, WM_COMMAND, (WPARAM)wID, 0);
+			{
+				// Vista / 2008‚Å‚Í[¶‰E‚É•À‚×‚é]‚Æ[ã‰º‚É•À‚×‚é]‹t“]‚µ‚Ä‚¢‚é‚Ì‚Å‘Î‰ž‚·‚é
+				OSVERSIONINFO os;
+				os.dwOSVersionInfoSize = sizeof(os);
+				if (GetVersionEx(&os) && os.dwMajorVersion >= 6)
+				{
+					if (wID == IDC_TILEHORZ)
+						PostMessage(hwndTray, WM_COMMAND, (WPARAM)IDC_TILEVERT, 0);
+					else if (wID == IDC_TILEVERT)
+						PostMessage(hwndTray, WM_COMMAND, (WPARAM)IDC_TILEHORZ, 0);
+					else
+						PostMessage(hwndTray, WM_COMMAND, (WPARAM)wID, 0);
+				}
+				else	// VistaˆÈ‘O
+					PostMessage(hwndTray, WM_COMMAND, (WPARAM)wID, 0);
+			}
 			return;
 		}
 		case IDC_HOTKEY0:

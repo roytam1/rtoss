@@ -257,11 +257,11 @@ void InitClock(HWND hwnd)
 
 	InitDaylightTimeTransition();
 	//サブクラス化
-	oldWndProc = (WNDPROC)GetWindowLong(hwndClock, GWL_WNDPROC);
-	SetWindowLong(hwndClock, GWL_WNDPROC, (LONG)WndProc);
+	oldWndProc = (WNDPROC)GetWindowLongPtr(hwndClock, GWLP_WNDPROC);
+	SubclassWindow(hwndClock, WndProc);
 	//ダブルクリック受け付けない
-	SetClassLong(hwndClock, GCL_STYLE,
-	  GetClassLong(hwndClock, GCL_STYLE) & ~CS_DBLCLKS);
+	SetClassLongPtr(hwndClock, GCL_STYLE,
+	  GetClassLongPtr(hwndClock, GCL_STYLE) & ~CS_DBLCLKS);
 
 	//デスクトップの初期化
 	SetDesktopIcons();
@@ -372,11 +372,11 @@ void EndClock(void)
 		if (hwndClock && IsWindow(hwndClock))
 		{
 #if ENABLE_CHECK_SUBCLASS_NESTING
-			if(oldWndProc && (WNDPROC)WndProc == (WNDPROC)GetWindowLong(hwndClock, GWL_WNDPROC))
+			if(oldWndProc && (WNDPROC)WndProc == (WNDPROC)GetWindowLongPtr(hwndClock, GWLP_WNDPROC))
 #else
 			if(oldWndProc)
 #endif
-				SetWindowLong(hwndClock, GWL_WNDPROC, (LONG)oldWndProc);
+				SubclassWindow(hwndClock, oldWndProc);
 		}
 		oldWndProc = NULL;
 	}
@@ -708,13 +708,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 	}
-	/*
-	{
-		char s[80];
-		wsprintf(s, "%X", message);
-		WriteDebug(s);
-	}
-	*/
 	return CallWindowProc(oldWndProc, hwnd, message, wParam, lParam);
 }
 
@@ -1107,7 +1100,7 @@ void GetDisplayTime(SYSTEMTIME* pt, int* beat100)
 void OnTimer(HWND hwnd)
 {
 	SYSTEMTIME t;
-	int beat100;
+	int beat100 = 0;
 	HDC hdc;
 	BOOL bRedraw;
 
@@ -1253,7 +1246,7 @@ void OnTimerUpperTaskbar(HWND hwnd)
 void DrawClock(HWND hwnd, HDC hdc)
 {
 	SYSTEMTIME t;
-	int beat100;
+	int beat100 = 0;
 
 	GetDisplayTime(&t, nDispBeat?(&beat100):NULL);
 	DrawClockSub(hwnd, hdc, &t, beat100);
@@ -2069,7 +2062,7 @@ void DrawClockSub(HWND hwnd, HDC hdc, SYSTEMTIME* pt, int beat100)
 	SIZE sz;
 	int xclock, yclock, wclock, hclock, xsrc, ysrc, wsrc, hsrc;
 	int xcenter;
-	HRGN hRgn, hOldRgn;
+	HRGN hRgn = NULL, hOldRgn = NULL;
 	COLORREF textcol, textshadow;
 
 	textcol = colfore;
@@ -2222,7 +2215,7 @@ void DrawClockSub(HWND hwnd, HDC hdc, SYSTEMTIME* pt, int beat100)
 		}
 		if(GetTextExtentPoint32(hdcClock, sp, strlen(sp), &sz) == 0)
 		{
-			sz.cx = strlen(sp) * tm.tmAveCharWidth;
+			sz.cx = (LONG)strlen(sp) * tm.tmAveCharWidth;
 			sz.cy = tm.tmHeight;
 		}
 		if(w < sz.cx) w = sz.cx;
@@ -2319,7 +2312,7 @@ void DrawClockSub(HWND hwnd, HDC hdc, SYSTEMTIME* pt, int beat100)
 void DrawGraph(HWND hwnd, HDC hdc, int xclock, int yclock, int wclock, int hclock)
 {
 	int i, x, y, d;
-	double one_dots, one_dotr;
+	double one_dots = 0, one_dotr = 0;
 	int graphSizeS;
 	int graphSizeR;
 
@@ -2703,16 +2696,16 @@ void FillClock(HWND hwnd, HDC hdc, RECT *prc, int nblink)
 LRESULT OnCalcRect(HWND hwnd)
 {
 	SYSTEMTIME t;
-	int beat100;
-	LRESULT w, h;
+	int beat100 = 0;
+	LONG w, h;
 	HDC hdc;
-	HGDIOBJ hOldFont;
+	HGDIOBJ hOldFont = NULL;
 	TEXTMETRIC tm;
 	char s[1024], *p, *sp;
 	SIZE sz;
 	int hf;
 
-	if(!(GetWindowLong(hwnd, GWL_STYLE)&WS_VISIBLE)) return 0;
+	if(!(GetWindowLongPtr(hwnd, GWL_STYLE) & WS_VISIBLE)) return 0;
 
 	hdc = GetDC(hwnd);
 
@@ -2730,7 +2723,7 @@ LRESULT OnCalcRect(HWND hwnd)
 		while(*p && *p != 0x0d) p++;
 		if(*p == 0x0d) { *p = 0; p += 2; }
 		if(GetTextExtentPoint32(hdc, sp, strlen(sp), &sz) == 0)
-			sz.cx = strlen(sp) * tm.tmAveCharWidth;
+			sz.cx = (LONG)strlen(sp) * tm.tmAveCharWidth;
 		if(w < sz.cx) w = sz.cx;
 		h += hf; if(*p) h += 2 + dlineheight;
 	}
@@ -2818,20 +2811,6 @@ void UpdateSysRes(HWND hwnd, BOOL bsysres, BOOL bbattery, BOOL bmem, BOOL bmb, B
 
 	UNREFERENCED_PARAMETER(hwnd);
 
-	if(bsysres)
-	{
-//		char s[10];
-
-		if(bWin95)
-		{
-			for(i = 0; i < 3; i++)
-				iFreeRes[i] = GetFreeSystemResources((WORD)i);
-		}
-		iCPUUsage = CpuMoni_get(); // cpu.c
-
-//		wsprintf(s, "%d", iCPUUsage);
-//		WriteDebug(s);
-	}
 	if((bWin95 || bWin2000) && bbattery)
 	{
 		iBatteryLife = GetBatteryLifePercent();
@@ -2870,6 +2849,15 @@ void UpdateSysRes(HWND hwnd, BOOL bsysres, BOOL bbattery, BOOL bmem, BOOL bmb, B
 	{
 		Hdd_get();
 	}
+	if(bsysres)
+	{
+		if(bWin95)
+		{
+			for(i = 0; i < 3; i++)
+				iFreeRes[i] = GetFreeSystemResources((WORD)i);
+		}
+		iCPUUsage = CpuMoni_get(); // cpu.c
+	}
 }
 
 int iHourTransition = -1, iMinuteTransition = -1;
@@ -2879,7 +2867,7 @@ int iHourTransition = -1, iMinuteTransition = -1;
 --------------------------------------------------*/
 void InitDaylightTimeTransition(void)
 {
-	SYSTEMTIME lt, *plt;
+	SYSTEMTIME lt, *plt = NULL;
 	TIME_ZONE_INFORMATION tzi;
 	DWORD dw;
 	BOOL b;

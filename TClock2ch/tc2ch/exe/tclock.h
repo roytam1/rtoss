@@ -4,23 +4,21 @@
 ---------------------------------------------*/
 
 #define _WIN32_IE 0x0500
-#define WINVER    0x400
+#define WINVER    0x0400
 
 #define _CRT_SECURE_NO_DEPRECATE
-#pragma warning(disable: 4100)  // 引数は関数の本体部で 1 度も参照されません。
-#pragma warning(disable: 4201)  // 非標準の拡張機能が使用されています : 無名の構造体または共用体です。
-#pragma warning(disable: 4996)  // 'name' が古い形式として宣言されました。
 
 #pragma warning(push, 0)
 # include <windows.h>
 # include <windowsx.h>
+# include <tchar.h>
 # include <mmsystem.h>
 # include <shlobj.h>
 #pragma warning(pop)
+
 #include "resource.h"
 #include "../language/resource.h"
 
-#pragma comment(lib, "kernel32.lib")
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "gdi32.lib")
 #pragma comment(lib, "shlwapi.lib")
@@ -32,31 +30,41 @@
 #pragma comment(lib, "comctl32.lib")
 #pragma comment(lib, "version.lib")
 #pragma comment(lib, "wsock32.lib")
-#if defined(_DEBUG)
-# pragma comment(lib, "../../debug/tcdll.lib")
+
+#ifdef _WIN64
+# if defined(_DEBUG)
+#  pragma comment(lib, "../../x64/debug/tcdll.lib")
+# else
+#  pragma comment(lib, "../../x64/release/tcdll.lib")
+# endif // _DEBUG
 #else
-# pragma comment(lib, "../../release/tcdll.lib")
-#endif
+# if defined(_DEBUG)
+#  pragma comment(lib, "../../debug/tcdll.lib")
+# else
+#  pragma comment(lib, "../../release/tcdll.lib")
+# endif // _DEBUG
+#endif  // _WIN64
+
 
 // replacement of standard library's functions
 #define malloc(s) HeapAlloc(GetProcessHeap(), 0, s)
 #define free(p)   HeapFree(GetProcessHeap(), 0, p);
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
-#pragma intrinsic(memcpy, memset, strlen, strcpy, strcat)
+# pragma intrinsic(memcpy, memset, strlen, strcpy, strcat)
 #else
-#undef memcpy
-#define memcpy(d,s,l) r_memcpy(d,s,l)
+# undef memcpy
+# define memcpy(d,s,l) r_memcpy(d,s,l)
+# undef memset
+# define memset(d,c,l) r_memset(d,c,l)
+# undef strlen
+# define strlen(s) lstrlen(s)
+# undef strcpy
+# define strcpy(d, s) lstrcpy(d, s)
+# undef strcat
+# define strcat(d, s) lstrcat(d, s)
 void r_memcpy(void *d, const void *s, size_t l);
-#undef memset
-#define memset(d,c,l) r_memset(d,c,l)
 void r_memset(void *d, int c, size_t l);
-#undef strlen
-#define strlen(s) lstrlen(s)
-#undef strcpy
-#define strcpy(d, s) lstrcpy(d, s)
-#undef strcat
-#define strcat(d, s) lstrcat(d, s)
 #endif
 
 #undef atoi
@@ -132,12 +140,12 @@ typedef struct{
 	char *ttbase_name;
 } MOUSE_FUNC_INFO;
 
-// main.c
+// exemain.c
 extern HINSTANCE g_hInst;           // instance handle
 extern HINSTANCE g_hInstResource;   // instance handle of language module
 extern HWND      g_hwndMain;        // main window
 extern HWND      g_hwndClock;       // clock window
-extern HWND      g_hwndPropDlg;       // property sheet window
+extern HWND      g_hwndPropDlg;     // property sheet window
 extern HWND      g_hDlgTimer;       // timer dialog
 extern HWND      g_hDlgCalender;    // calender dialog
 extern HICON     g_hIconTClock, g_hIconPlay, g_hIconStop, g_hIconDel;
@@ -152,7 +160,6 @@ HINSTANCE LoadLanguageDLL(char *fname); // load language dll
 HINSTANCE GetLangModule(void);      // instance handle of language dll
 void MyHelp(HWND hDlg, int id);     // show help
 void My2chHelp(HWND hDlg, int id);  // show 2ch help
-BOOL IsUserAdmin(void);
 
 // propsheet.c
 extern BOOL g_bApplyClock;
@@ -217,6 +224,7 @@ void EndWatchWallpaper(void);
 void OnTimerWatchWallpaper(HWND hwnd, SYSTEMTIME* pt);
 
 // calendar.c
+HWND FindVistaCalenderWindow(void);
 void DialogCalender(HWND hwnd);
 
 // timer.c

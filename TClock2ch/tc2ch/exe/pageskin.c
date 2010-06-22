@@ -210,7 +210,7 @@ void OnApply(HWND hDlg)
 	GetDlgItemText(hDlg, IDC_FILEMENU, s, 1024);
 	SetMyRegStr("", "StartMenuBmp", s);
 
-	dw = CBGetItemData(hDlg, IDC_COLMENU, CBGetCurSel(hDlg, IDC_COLMENU));
+	dw = (DWORD)CBGetItemData(hDlg, IDC_COLMENU, CBGetCurSel(hDlg, IDC_COLMENU));
 	SetMyRegLong("", "StartMenuCol", dw);
 
 	SetMyRegLong("", "StartMenuTile",
@@ -364,7 +364,7 @@ void SetColorFromBmp(HWND hDlg, int idCombo, char* fname)
 	int numColors;
 	BYTE pixel[3];
 	COLORREF col;
-	int i, index;
+	int i, index = 0;
 	HDC hdc;
 
 	hf = _lopen(fname, OF_READ);
@@ -453,7 +453,7 @@ void OnSkinTray(HWND hDlg)
 //------------------------------------------------------------------
 // 以下、アイコン選択ダイアログ
 
-BOOL CALLBACK DlgProcSelectIcon(HWND hDlg, UINT message,
+INT_PTR CALLBACK DlgProcSelectIcon(HWND hDlg, UINT message,
 	WPARAM wParam, LPARAM lParam);
 char* fname_SelectIcon;
 
@@ -481,7 +481,7 @@ static void OnSanshoSelectIcon(HWND hDlg);
 /*------------------------------------------------
 　アイコン選択ダイアログプロシージャ
 --------------------------------------------------*/
-BOOL CALLBACK DlgProcSelectIcon(HWND hDlg, UINT message,
+INT_PTR CALLBACK DlgProcSelectIcon(HWND hDlg, UINT message,
 	WPARAM wParam, LPARAM lParam)
 {
 	switch(message)
@@ -528,7 +528,11 @@ BOOL InitSelectIcon(HWND hDlg)
 	if(num[0] == 0) index = 0;
 	else index = atoi(num);
 
+#pragma warning(push)
+#pragma warning(disable: 4311)	// '型キャスト' : ポインタを 'HICON' から 'int' へ切り詰めます。
 	count = (int)ExtractIcon(g_hInst, fname, (UINT)-1);
+#pragma warning(pop)
+
 	if(count == 0)
 	{
 		strcpy(msg, MyString(IDS_NOICON));

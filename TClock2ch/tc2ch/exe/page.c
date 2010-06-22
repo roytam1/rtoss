@@ -103,7 +103,7 @@ void OnDrawItemColorCombo(LPARAM lParam, int maxcol)
 
 	if(IsWindowEnabled(pdis->hwndItem))
 	{
-		col = pdis->itemData;
+		col = (COLORREF)pdis->itemData;
 		if(col & 0x80000000) col = GetSysColor(col & 0x00ffffff);
 	}
 	else col = GetSysColor(COLOR_3DFACE);
@@ -157,7 +157,7 @@ void OnChooseColor(HWND hDlg, WORD id, int maxcol)
 	idCombo = id - 1;
 
 	//ç≈èâÇ…ëIÇŒÇÍÇƒÇ¢ÇÈêF
-	col = CBGetItemData(hDlg, idCombo, CBGetCurSel(hDlg, idCombo));
+	col = (COLORREF)CBGetItemData(hDlg, idCombo, CBGetCurSel(hDlg, idCombo));
 	if(col & 0x80000000) col = GetSysColor(col & 0x00ffffff);
 
 	for(i = 0; i < 16; i++) colarray[i] = RGB(255,255,255);

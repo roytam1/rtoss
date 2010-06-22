@@ -247,10 +247,11 @@ void SetNumFormat(char **dp, int n, int len, int slen, BOOL bComma)
 {
 	char *p;
 	int minlen,i,ii;
+	int int_max_value = 1000000000; // 10^nÇµÇΩÇ∆Ç´Ç…åÖÇ†Ç”ÇÍÇãNÇ±Ç≥Ç∏Ç…èàóùÇ≈Ç´ÇÈç≈ëÂíl
 
 	p = *dp;
 
-	for (i=10,minlen=1; i<10000000000; i*=10,minlen++)
+	for (i=10,minlen=1; i<int_max_value +1; i*=10,minlen++)
 		if (n < i) break;
 	if (bComma)
 	{
@@ -320,7 +321,6 @@ void MakeFormat(char* s, SYSTEMTIME* pt, int beat100, char* fmt)
 					sp++;
 				}
 
-				// for testing
 				else if(*sp == 'S' && *(sp + 1) == 'S' && *(sp + 2) == 'S')
 				{
 					SetNumFormat(&dp, (int)pt->wMilliseconds, 3, 0, FALSE);
@@ -547,14 +547,14 @@ void MakeFormat(char* s, SYSTEMTIME* pt, int beat100, char* fmt)
 				else if (*sp == '@' && *(sp + 1) == '@' && *(sp + 2) == '@')
 				{
 					*dp++ = '@';
-					*dp++ = beat100 / 10000 + '0';
-					*dp++ = (beat100 % 10000) / 1000 + '0';
-					*dp++ = (beat100 % 1000) / 100 + '0';
+					*dp++ = (char)( beat100 / 10000 + '0' );
+					*dp++ = (char)( (beat100 % 10000) / 1000 + '0' );
+					*dp++ = (char)( (beat100 % 1000) / 100 + '0' );
 					sp += 3;
 					if(*sp == '.' && *(sp + 1) == '@')
 					{
 						*dp++ = '.';
-						*dp++ = (beat100 % 100) / 10 + '0';
+						*dp++ = (char)(beat100 % 100) / 10 + '0';
 						sp += 2;
 					}
 				}
@@ -569,7 +569,7 @@ void MakeFormat(char* s, SYSTEMTIME* pt, int beat100, char* fmt)
 					}
 					for (;;)
 					{
-						*dp++ = (AltYear % n) / (n/10) + '0';
+						*dp++ = (char)( (AltYear % n) / (n/10) + '0' );
 						if(n == 10) break;
 						n /= 10;
 					}
@@ -721,7 +721,7 @@ void MakeFormat(char* s, SYSTEMTIME* pt, int beat100, char* fmt)
 					int len, slen;
 					DWORDLONG ms, mst;
 					BOOL bComma = FALSE;
-					ms = (DWORDLONG)-1;
+					ms = mst = (DWORDLONG)-1;
 					if(*(sp + 1) == 'K')
 					{
 						sp += 2;
@@ -798,7 +798,8 @@ void MakeFormat(char* s, SYSTEMTIME* pt, int beat100, char* fmt)
 					if(ms != -1)
 					{
 						if(GetNumFormat(&sp, 'x', ',', &len, &slen, &bComma) == FALSE) { len=1; slen=0; }
-						SetNumFormat(&dp, ms, len, slen, bComma);
+						_ASSERTE(ms <= INT_MAX);
+						SetNumFormat(&dp, (int)ms, len, slen, bComma);
 					}
 					else *dp++ = *sp++;
 				}
@@ -1115,8 +1116,7 @@ void MakeFormat(char* s, SYSTEMTIME* pt, int beat100, char* fmt)
 				{
 					int dv, dski, len, slen, i;
 					BOOL bComma = FALSE;
-				//	int dskp = -1;
-					double dsk;
+					double dsk = 0;
 					dv = *(sp + 2) - 'A';
 					if(*(sp + 1) == 'T')
 					{
@@ -1269,6 +1269,7 @@ DWORD FindFormat(char* fmt)
 				{
 					sp += 2;
 					ret |= FORMAT_SYSINFO;
+					ret |= FORMAT_PERMON;
 				}
 				else if(*sp == 'C' && *(sp + 1) == 'C')
 				{

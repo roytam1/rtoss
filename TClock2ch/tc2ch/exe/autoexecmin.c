@@ -6,7 +6,7 @@
 
 #include "tclock.h"
 
-BOOL CALLBACK AutoExecMinProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK AutoExecMinProc(HWND, UINT, WPARAM, LPARAM);
 static void OnInit(HWND hDlg);
 static void OnOK(HWND hDlg);
 static void OnEveryMin(HWND hDlg);
@@ -35,9 +35,10 @@ void SetAutoExecMin(HWND hDlg, int nOld1, int nOld2, int* nNew1, int* nNew2)
 /*------------------------------------------------
   dialog procedure
 --------------------------------------------------*/
-BOOL CALLBACK AutoExecMinProc(HWND hDlg, UINT message,
+INT_PTR CALLBACK AutoExecMinProc(HWND hDlg, UINT message,
 	WPARAM wParam, LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
 	switch(message)
 	{
 		case WM_INITDIALOG:

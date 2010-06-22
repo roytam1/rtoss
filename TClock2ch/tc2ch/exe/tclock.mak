@@ -8,7 +8,7 @@ SRCDIR=.
 
 EXEFILE=..\out\tclock.exe
 DLLFILE=..\out\tclock.dll
-DEFFILE=$(SRCDIR)\ttbasesdk.def
+DEFFILE=$(SRCDIR)\ttbase\ttbasesdk.def
 LANGID=0x411
 RCFILE=$(SRCDIR)\tclock.rc
 RESFILE=tclock.res
@@ -57,7 +57,7 @@ $(SRCDIR)\bccexe.pat: $(SRCDIR)\bccexe.nas
 
 !ENDIF
 
-ttbasemain.obj: $(SRCDIR)\exemain.c $(SRCDIR)\tclock.h $(RESOURCEH) $(SRCDIR)\ttbasesdk.c
+ttbasemain.obj: $(SRCDIR)\exemain.c $(SRCDIR)\tclock.h $(RESOURCEH) $(SRCDIR)\ttbase\ttbasesdk.c
     $(CC) -DTCLOCK2CH_TTBASE $(COPT)$@ $(SRCDIR)\exemain.c
 exemain.obj: $(SRCDIR)\exemain.c $(SRCDIR)\tclock.h $(RESOURCEH)
     $(CC) $(COPT)$@ $(SRCDIR)\exemain.c

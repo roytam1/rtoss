@@ -156,8 +156,8 @@
 // taskbar menu commands
 #define IDC_RUNAPP                      401
 #define IDC_CASCADE                     403
-#define IDC_TILEHORZ                    404
-#define IDC_TILEVERT                    405
+#define IDC_TILEVERT                    404
+#define IDC_TILEHORZ                    405
 #define IDC_DATETIME                    408
 #define IDC_TASKBARPROP                 413
 #define IDC_MINALL                      415

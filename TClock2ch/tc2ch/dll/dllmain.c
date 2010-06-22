@@ -47,7 +47,7 @@ int WINAPI DllMain(HANDLE hModule, DWORD dwFunction, LPVOID lpNot)
 void WINAPI HookStart(HWND hwnd)
 {
 	HWND hwndTray;
-	HANDLE hThread;
+	DWORD ThreadID;
 
 	hwndTClockMain = hwnd;
 
@@ -61,8 +61,8 @@ void WINAPI HookStart(HWND hwnd)
 
 	// get thread ID of taskbar (explorer)
 	// Specal thanks to T.Iwata.
-	hThread = (HANDLE)GetWindowThreadProcessId(hwndTaskbar, NULL);
-	if(!hThread)
+	ThreadID = GetWindowThreadProcessId(hwndTaskbar, NULL);
+	if(!ThreadID)
 	{
 		SendMessage(hwnd, WM_USER+1, 0, 2);
 		return;
@@ -70,8 +70,7 @@ void WINAPI HookStart(HWND hwnd)
 
 	// install an hook to thread of taskbar
 	bHookEnable = TRUE;
-	hhook = SetWindowsHookEx(WH_CALLWNDPROC, (HOOKPROC)CallWndProc, hmod,
-		(DWORD)hThread);
+	hhook = SetWindowsHookEx(WH_CALLWNDPROC, (HOOKPROC)CallWndProc, hmod, ThreadID);
 	if(!hhook)
 	{
 		SendMessage(hwnd, WM_USER+1, 0, 3);

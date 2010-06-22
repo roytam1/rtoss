@@ -136,13 +136,12 @@ void OnDrawItem(HWND hwnd, DRAWITEMSTRUCT* pdis)
 			DeleteObject(hbr);
 		}
 
-		if(hbmpMenuLeft)
-			GetObject(hbmpMenuLeft, sizeof(BITMAP), &bmp);
 
-		if(hbmpMenuLeft)
-		// && rcItem.bottom > rcBox.bottom - bmp.bmHeight)
+		if(hbmpMenuLeft) // && rcItem.bottom > rcBox.bottom - bmp.bmHeight)
 		{
 			int i, j;
+
+			GetObject(hbmpMenuLeft, sizeof(BITMAP), &bmp);
 			// ビットマップ描画
 			for(i = 0; ; i++)
 			{
@@ -198,8 +197,8 @@ void SetStartMenu(HWND hwndClock)
 	hwndBar = GetParent(hwndTray);   // Shell_TrayWnd
 	if(hwndBar == NULL)
 		return;
-	oldWndProcBar = (WNDPROC)GetWindowLong(hwndBar, GWL_WNDPROC);
-	SetWindowLong(hwndBar, GWL_WNDPROC, (LONG)WndProcBar);
+	oldWndProcBar = (WNDPROC)GetWindowLongPtr(hwndBar, GWLP_WNDPROC);
+	SubclassWindow(hwndBar, WndProcBar);
 
 	bStartMenu = GetMyRegLong(NULL, "StartMenu", FALSE);
 
@@ -248,11 +247,11 @@ void EndStartMenu(void)
 	if(hwndBar && IsWindow(hwndBar))
 	{
 #if ENABLE_CHECK_SUBCLASS_NESTING
-		if (oldWndProcBar && (WNDPROC)WndProcBar == (WNDPROC)GetWindowLong(hwndBar, GWL_WNDPROC))
+		if (oldWndProcBar && (WNDPROC)WndProcBar == (WNDPROC)GetWindowLongPtr(hwndBar, GWLP_WNDPROC))
 #else
 		if (oldWndProcBar)
 #endif
-			SetWindowLong(hwndBar, GWL_WNDPROC, (LONG)oldWndProcBar);
+			SubclassWindow(hwndBar, oldWndProcBar);
 	}
 	hwndBar = NULL; oldWndProcBar = NULL;
 
@@ -314,8 +313,7 @@ void InitStartMenuIE4(void)
 				GetClientRect(hwndChild, &rc2);
 				if(rc1.right - rc2.right == 21 || rc2.right == 0)
 				{
-					if(hwndFound == NULL
-						|| (int)hwndFound > (int)hwnd)
+					if(!hwndFound || hwndFound > hwnd)
 						hwndFound = hwnd;
 				}
 			}
@@ -325,8 +323,8 @@ void InitStartMenuIE4(void)
 	hwnd = hwndFound;
 	if(hwnd == NULL) return;
 	// サブクラス化
-	oldWndProcStartMenu = (WNDPROC)GetWindowLong(hwnd, GWL_WNDPROC);
-	SetWindowLong(hwnd, GWL_WNDPROC, (LONG)WndProcStartMenu);
+	oldWndProcStartMenu = (WNDPROC)GetWindowLongPtr(hwnd, GWLP_WNDPROC);
+	SubclassWindow(hwnd, WndProcStartMenu);
 	hwndStartMenu = hwnd;
 }
 
@@ -338,11 +336,11 @@ void ClearStartMenuIE4(void)
 	if(hwndStartMenu && IsWindow(hwndStartMenu))
 	{
 #if ENABLE_CHECK_SUBCLASS_NESTING
-		if (oldWndProcStartMenu && (WNDPROC)WndProcStartMenu == (WNDPROC)GetWindowLong(hwndStartMenu, GWL_WNDPROC))
+		if (oldWndProcStartMenu && (WNDPROC)WndProcStartMenu == (WNDPROC)GetWindowLongPtr(hwndStartMenu, GWLP_WNDPROC))
 #else
 		if (oldWndProcStartMenu)
 #endif
-			SetWindowLong(hwndStartMenu, GWL_WNDPROC, (LONG)oldWndProcStartMenu);
+			SubclassWindow(hwndStartMenu, oldWndProcStartMenu);
 	}
 	hwndStartMenu = NULL; oldWndProcStartMenu = NULL;
 }

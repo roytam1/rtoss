@@ -174,11 +174,11 @@ void OnApply(HWND hDlg)
 	char fname[MAX_PATH + 1];
 
 	//íZêjÇÃêF
-	dw = CBGetItemData(hDlg, IDC_COLHOUR, CBGetCurSel(hDlg, IDC_COLHOUR));
+	dw = (DWORD)CBGetItemData(hDlg, IDC_COLHOUR, CBGetCurSel(hDlg, IDC_COLHOUR));
 	SetMyRegLongEx("", "AClockHourHandColor", dw, confNo);
 
 	//í∑êjÇÃêF
-	dw = CBGetItemData(hDlg, IDC_COLMIN, CBGetCurSel(hDlg, IDC_COLMIN));
+	dw = (DWORD)CBGetItemData(hDlg, IDC_COLMIN, CBGetCurSel(hDlg, IDC_COLMIN));
 	SetMyRegLongEx("", "AClockMinHandColor", dw, confNo);
 
 	//íZêjÅAí∑êjÇÃëæÇ≥

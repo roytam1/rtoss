@@ -50,7 +50,7 @@ HBITMAP ReadBitmap(HWND hwnd, char* fname, BOOL b)
 	BITMAPINFOHEADER* pbmih;
 	BYTE* pDIBits;
 	HDC hdc;
-	BYTE index;
+	BYTE index = 0;
 	HBITMAP hBmp;
 
 	hf = _lopen(fname, OF_READ);

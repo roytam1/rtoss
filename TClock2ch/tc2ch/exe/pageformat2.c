@@ -12,7 +12,7 @@ static void OnOK(HWND hDlg);
 /*------------------------------------------------
    dialog procedure of "Detail of format"
 --------------------------------------------------*/
-BOOL CALLBACK DlgProcFormat2(HWND hDlg, UINT message,
+INT_PTR CALLBACK DlgProcFormat2(HWND hDlg, UINT message,
 	WPARAM wParam, LPARAM lParam)
 {
 	switch(message)

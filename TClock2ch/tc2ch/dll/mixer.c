@@ -31,8 +31,8 @@ BOOL InitMixer(void)
 {
 	if(g_hMixer) return TRUE;
 	if(mixerOpen(&g_hMixer,0,0,0,MIXER_OBJECTF_MIXER)!=MMSYSERR_NOERROR) return FALSE;
-	if(mixerGetDevCaps((UINT)g_hMixer, &g_mxcaps, sizeof(MIXERCAPS))!=MMSYSERR_NOERROR) return FALSE;
-	return	TRUE;
+	if(mixerGetDevCaps((UINT_PTR)g_hMixer, &g_mxcaps, sizeof(MIXERCAPS))!=MMSYSERR_NOERROR) return FALSE;
+	return TRUE;
 }
 
 void ReleaseMixer(void)

@@ -432,14 +432,14 @@ void OnMouseMsg(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	OnTimerMouse(hwnd);
 }
 
-BOOL CALLBACK doKyu(HWND handle,long height)
+BOOL CALLBACK doKyu(HWND handle,LPARAM height)
 {
 	RECT rect;
 
 	GetWindowRect(handle, &rect);
 
 	if(!IsZoomed(handle) && IsWindowVisible(handle) && (rect.top < height))
-		MoveWindow(handle,rect.left,height,rect.right-rect.left,rect.bottom-rect.top,1);
+		MoveWindow(handle,rect.left,(int)height,rect.right-rect.left,rect.bottom-rect.top,1);
 
 	return TRUE;
 }
@@ -461,7 +461,7 @@ void ExecuteMouseFunction(HWND hwnd, LONG fnc, int btn, int clk)
 		case MOUSEFUNC_RUNAPP:
 		case MOUSEFUNC_MINALL:
 		{
-			WPARAM wParam;
+			WPARAM wParam = 0;
 			HWND hwndTray;
 			if(fnc == MOUSEFUNC_DATETIME)
 				wParam = IDC_DATETIME;
@@ -647,7 +647,7 @@ void ExecuteMouseFunction(HWND hwnd, LONG fnc, int btn, int clk)
 				iDrv = 26;
 			if ( iDrv > 0 )
 			{
-				drv = 'A' - 1 + iDrv;
+				drv = (char)( 'A' - 1 + iDrv );
 				wsprintf(cmd,"open %c: type cdaudio alias cdromdrive",drv);
 				//ドライブ選択
 				mciSendString(cmd, NULL, 0, 0);
@@ -674,7 +674,7 @@ void ExecuteMouseFunction(HWND hwnd, LONG fnc, int btn, int clk)
 				iDrv = 26;
 			if ( iDrv > 0 )
 			{
-				drv = 'A' - 1 + iDrv;
+				drv = (char)( 'A' - 1 + iDrv );
 				wsprintf(cmd,"open %c: type cdaudio alias cdromdrive",drv);
 				//ドライブ選択
 				mciSendString(cmd, NULL, 0, 0);

@@ -369,9 +369,9 @@ void OnApply(HWND hDlg)
 	SetMyRegLong("Tooltip", "TipDispInterval", dw);
 
 
-	dw = CBGetItemData(hDlg, IDC_TFONCOL, CBGetCurSel(hDlg, IDC_TFONCOL));
+	dw = (DWORD)CBGetItemData(hDlg, IDC_TFONCOL, CBGetCurSel(hDlg, IDC_TFONCOL));
 	SetMyRegLongEx("", "TipFonColor", dw, confNo);
-	dw = CBGetItemData(hDlg, IDC_TBAKCOL, CBGetCurSel(hDlg, IDC_TBAKCOL));
+	dw = (DWORD)CBGetItemData(hDlg, IDC_TBAKCOL, CBGetCurSel(hDlg, IDC_TBAKCOL));
 	SetMyRegLongEx("", "TipBakColor", dw, confNo);
 
 	n = CBGetCurSel(hDlg, IDC_TICON);
@@ -390,6 +390,7 @@ void OnApply(HWND hDlg)
 --------------------------------------------------*/
 void OnDestroy(HWND hDlg)
 {
+	UNREFERENCED_PARAMETER(hDlg);
 	if(pData) free(pData);
 }
 
@@ -422,6 +423,7 @@ void OnSansho(HWND hDlg, WORD id)
 
 void OnTipSwitch(HWND hDlg, WORD id)
 {
+	UNREFERENCED_PARAMETER(id);
 	if(IsDlgButtonChecked(hDlg, IDC_TIP2))
 	{
 		EnableDlgItem(hDlg,IDC_TIP3,TRUE);
@@ -456,7 +458,7 @@ void InitComboFontTip(HWND hDlg)
 	// Enumerate fonts and set in the combo box
 	memset(&lf, 0, sizeof(LOGFONT));
 	hcombo = GetDlgItem(hDlg, IDC_TFONT);
-	lf.lfCharSet = GetTextCharset(hdc);  // MS UI Gothic, ...
+	lf.lfCharSet = (BYTE)GetTextCharset(hdc);  // MS UI Gothic, ...
 	EnumFontFamiliesEx(hdc, &lf,
 		(FONTENUMPROC)EnumFontFamExProc, (LPARAM)hcombo, 0);
 	lf.lfCharSet = OEM_CHARSET;   // Small Fonts, Terminal...

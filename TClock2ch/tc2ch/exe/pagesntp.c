@@ -201,6 +201,7 @@ void OnInit(HWND hDlg)
 
 void OnDestroy(HWND hDlg)
 {
+	UNREFERENCED_PARAMETER(hDlg);
 	SetParent(hwndSNTPLog, hwndSNTP);
 }
 
@@ -374,7 +375,7 @@ void CreateTip(HWND hDlg)
 	ti.uFlags = TTF_IDISHWND|TTF_SUBCLASS;
 	ti.hwnd = hDlg;
 	ti.hinst = GetLangModule();
-	ti.uId = (UINT)GetDlgItem(hDlg, IDC_SYNCNOW);
+	ti.uId = (UINT_PTR)GetDlgItem(hDlg, IDC_SYNCNOW);
 	ti.lpszText = (char*)IDS_SYNCNOW;
 
 	SendMessage(hwndTip, TTM_ADDTOOL, 0, (LPARAM) (LPTOOLINFO)&ti);

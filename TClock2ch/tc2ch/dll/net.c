@@ -17,8 +17,11 @@ static MIB_IFTABLE *ift;
 static int count;
 static int sec = 5;
 double net[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-static DWORD (WINAPI *pGetIfTable)(PMIB_IFTABLE, PULONG, BOOL);
-static DWORD (WINAPI *pGetIfEntry)(PMIB_IFROW);
+
+typedef DWORD (WINAPI *pfnGetIfTable)(PMIB_IFTABLE,PULONG,BOOL);
+typedef DWORD (WINAPI *pfnGetIfEntry)(PMIB_IFROW);
+static pfnGetIfTable pGetIfTable;
+static pfnGetIfEntry pGetIfEntry;
 
 extern LONG GetMyRegLong(char* section, char* entry, LONG defval);
 
@@ -36,8 +39,9 @@ void Net_start(void)
 	hmodIPHLP = LoadLibrary("iphlpapi.dll");
 	if(hmodIPHLP == NULL) return;
 
-	(FARPROC)pGetIfTable = GetProcAddress(hmodIPHLP, "GetIfTable");
-	(FARPROC)pGetIfEntry = GetProcAddress(hmodIPHLP, "GetIfEntry");
+	pGetIfTable = (pfnGetIfTable)GetProcAddress(hmodIPHLP, "GetIfTable");
+	pGetIfEntry = (pfnGetIfEntry)GetProcAddress(hmodIPHLP, "GetIfEntry");
+
 
 	if(pGetIfTable == NULL || pGetIfEntry == NULL)
 	{
