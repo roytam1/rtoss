@@ -98,6 +98,11 @@ void InitTaskSwitch(HWND hwndClock)
 					hwndTaskSwitch = hwnd;
 					break;
 				}
+				if(lstrcmpi(classname, "ToolbarWindow32") == 0)
+				{
+					hwndTaskSwitch = hwnd;
+					break;
+				}
 				hwnd = GetWindow(hwnd, GW_HWNDNEXT);
 			}
 		}
