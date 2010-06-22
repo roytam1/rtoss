@@ -1,0 +1,9 @@
+LIBRARY 	tclock.dll
+
+EXPORTS
+	TTBEvent_InitPluginInfo
+	TTBEvent_FreePluginInfo
+	TTBEvent_Init
+	TTBEvent_Unload
+	TTBEvent_Execute
+	TTBEvent_WindowsHook
