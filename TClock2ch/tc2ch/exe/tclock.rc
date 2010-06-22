@@ -1,0 +1,62 @@
+#include <windows.h>
+#include "resource.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 2,3,0,1
+ PRODUCTVERSION 2,3,0,1
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "Comments", "TClock\0"
+            VALUE "CompanyName", "Kazubon\0"
+            VALUE "FileDescription", "Customize Taskbar Ver.2.3.0\0"
+            VALUE "FileVersion", "2, 3, 0, 1\0"
+            VALUE "InternalName", "TClock\0"
+            VALUE "LegalCopyright", "Kazubon 1997-2001\0"
+            VALUE "OriginalFilename", "TClock.exe\0"
+            VALUE "ProductName", "TClock\0"
+            VALUE "ProductVersion", "2, 3, 0, 1\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+IDI_ICON1               ICON    DISCARDABLE     "icon2.ico"
+IDI_PLAY                ICON    DISCARDABLE     "play.ico"
+IDI_STOP                ICON    DISCARDABLE     "stop.ico"
+IDI_DEL                 ICON    DISCARDABLE     "del.ico"
+IDI_SNTP                ICON    DISCARDABLE     "sntp.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_HAND                CURSOR  DISCARDABLE     "hand.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// MANIFEST
+//
+//1                       24      DISCARDABLE     "tclock.manifest"
+

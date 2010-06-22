@@ -1,0 +1,1329 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resrc1.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+#include "resource.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU MENU DISCARDABLE
+BEGIN
+    POPUP "TClcok"
+    BEGIN
+        MENUITEM "日付と時刻の調整(&A)",        IDC_DATETIME
+        MENUITEM SEPARATOR
+        MENUITEM "重ねて表示(&C)",              IDC_CASCADE
+        MENUITEM "上下に並べて表示(&V)",        IDC_TILEVERT
+        MENUITEM "左右に並べて表示(&H)",        IDC_TILEHORZ
+        MENUITEM "全ウィンドウを最小化(&M)",    IDC_MINALL
+        MENUITEM SEPARATOR
+        MENUITEM "タスクマネージャ(&K)",        IDC_TASKMAN
+        MENUITEM SEPARATOR
+        MENUITEM "タイマー(&T)",                IDC_TIMER
+        MENUITEM "時刻の同期(&S)",              IDC_SYNCTIME
+        MENUITEM "カレンダー(&L)",              IDC_SHOWCALENDER
+        MENUITEM SEPARATOR
+        MENUITEM "TClockのフォルダを開く(&O)",  IDC_SHOWDIR
+        MENUITEM "TClockのヘルプ(&1)",          IDC_SHOWHELP
+        MENUITEM "TClock2chのヘルプ(&2)",       IDC_2CHHELP
+        MENUITEM SEPARATOR
+        MENUITEM "タスクバーのプロパティ(&R)",  IDC_TASKBARPROP
+        MENUITEM "TClockのプロパティ(&P)",      IDC_SHOWPROP
+        MENUITEM "TClockの終了(&X)",            IDC_EXIT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_PAGECOLOR DIALOG DISCARDABLE  0, 0, 210, 200
+STYLE DS_CONTROL | WS_CHILD
+FONT 9, "MS UI Gothic"
+BEGIN
+    CONTROL         "背景色1",IDC_CHKCOLOR,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,18,11,37,11
+    COMBOBOX        IDC_COLBACK,56,9,76,120,CBS_DROPDOWNLIST |
+                    CBS_OWNERDRAWFIXED | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_CHOOSECOLBACK,137,9,12,13
+    CONTROL         "背景色2",IDC_CHKCOLOR2,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,18,32,37,11
+    COMBOBOX        IDC_COLBACK2,56,31,76,120,CBS_DROPDOWNLIST |
+                    CBS_OWNERDRAWFIXED | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_CHOOSECOLBACK2,137,31,12,13
+    CONTROL         "縦グラデ",IDC_CHKCOLORV,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,159,31,37,11
+    RTEXT           "文字色",IDC_STATIC,20,53,29,11
+    COMBOBOX        IDC_COLFORE,56,52,76,120,CBS_DROPDOWNLIST |
+                    CBS_OWNERDRAWFIXED | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_CHOOSECOLFORE,137,52,12,13
+    CONTROL         "影",IDC_CHKCLKSHADOW,"Button",BS_AUTOCHECKBOX |
+                    BS_CENTER | WS_TABSTOP,18,69,37,11
+    CONTROL         "縁取り",IDC_CHKCLKBORDER,"Button",BS_AUTOCHECKBOX |
+                    BS_CENTER | WS_TABSTOP,18,79,37,11
+    COMBOBOX        IDC_COLCLKSHADOW,56,71,76,120,CBS_DROPDOWNLIST |
+                    CBS_OWNERDRAWFIXED | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_CHOOSECOLCLKSHADOW,137,71,12,13
+    RTEXT           "距離",IDC_STATICSHADOW,150,74,17,12
+    EDITTEXT        IDC_CLKSHADOWRANGE,171,72,28,13,ES_AUTOHSCROLL |
+                    ES_NUMBER
+    CONTROL         "",IDC_SPINCLKSHADOW,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,189,72,9,13
+    RTEXT           "フォント",IDC_STATIC,28,95,26,11
+    COMBOBOX        IDC_FONT,56,93,76,120,CBS_DROPDOWNLIST | CBS_SORT |
+                    WS_VSCROLL | WS_TABSTOP
+    RTEXT           "フォントサイズ",IDC_STATIC,15,115,39,11
+    COMBOBOX        IDC_FONTSIZE,56,113,38,66,CBS_DROPDOWN | WS_VSCROLL |
+                    WS_TABSTOP
+    RTEXT           "表示位置",IDC_STATIC,134,95,33,11
+    COMBOBOX        IDC_TEXTPOS,170,93,35,66,CBS_DROPDOWNLIST | WS_VSCROLL |
+                    WS_TABSTOP
+    CONTROL         "太字",IDC_BOLD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    113,114,33,11
+    CONTROL         "斜体",IDC_ITALIC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    154,114,33,11
+    LTEXT           "調整",IDC_STATIC,13,137,22,12
+    RTEXT           "時計の高さ",IDC_STATIC,16,153,35,12
+    EDITTEXT        IDC_CLOCKHEIGHT,55,151,28,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPINCHEIGHT,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,85,139,7,13
+    RTEXT           "時計の幅",IDC_STATIC,18,173,33,12
+    EDITTEXT        IDC_CLOCKWIDTH,55,171,28,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPINCWIDTH,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,85,165,7,13
+    RTEXT           "上下位置",IDC_STATIC,97,153,30,12
+    EDITTEXT        IDC_VERTPOS,131,151,28,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPINVPOS,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,163,139,7,13
+    RTEXT           "行間",IDC_STATIC,102,173,25,12
+    EDITTEXT        IDC_LINEHEIGHT,131,171,28,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPINLHEIGHT,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,163,165,7,13
+END
+
+IDD_PAGEFORMAT DIALOG DISCARDABLE  0, 0, 210, 200
+STYLE DS_CONTROL | WS_CHILD
+FONT 9, "MS UI Gothic"
+BEGIN
+    RTEXT           "地域",IDC_STATIC,11,12,25,11
+    COMBOBOX        IDC_LOCALE,41,10,86,125,CBS_DROPDOWNLIST | CBS_SORT |
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "年",IDC_YEAR4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,
+                    32,32,11
+    CONTROL         "年（2桁）",IDC_YEAR,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,51,32,41,11
+    CONTROL         "月",IDC_MONTHS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,97,
+                    32,30,11
+    CONTROL         "月(数字)",IDC_MONTH,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,138,32,54,11
+    CONTROL         "日",IDC_DAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,50,
+                    24,11
+    CONTROL         "曜日",IDC_WEEKDAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    51,50,34,11
+    CONTROL         "改行",IDC_KAIGYO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    10,68,30,11
+    CONTROL         "時",IDC_HOUR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,
+                    86,24,11
+    CONTROL         "分",IDC_MINUTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,51,
+                    86,24,11
+    CONTROL         "秒",IDC_SECOND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,97,
+                    86,24,11
+    CONTROL         "インターネットタイム",IDC_INTERNETTIME,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,104,72,11
+    CONTROL         "12時間制",IDC_12HOUR,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,10,122,48,11
+    CONTROL         "午前/午後",IDC_AMPM,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,64,122,48,11
+    PUSHBUTTON      "詳細...",IDC_FORMATDETAIL,129,119,50,15
+    CONTROL         "自分で書式を入力する",IDC_CUSTOM,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,139,136,11
+    EDITTEXT        IDC_FORMAT,10,153,185,18,ES_AUTOHSCROLL
+    RTEXT           "更新間隔",IDC_STATIC,10,178,29,8
+    EDITTEXT        IDC_SYSII,41,175,27,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SYSIISPIN,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,59,175,9,13
+END
+
+IDD_FORMAT2 DIALOG DISCARDABLE  0, 0, 162, 107
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "書式の詳細"
+FONT 9, "MS UI Gothic"
+BEGIN
+    RTEXT           "午前の記号",IDC_STATIC,8,16,38,8
+    COMBOBOX        IDC_AMSYMBOL,50,14,35,50,CBS_DROPDOWN | WS_VSCROLL |
+                    WS_TABSTOP
+    RTEXT           "午後の記号",IDC_STATIC,8,36,38,8
+    COMBOBOX        IDC_PMSYMBOL,50,34,35,50,CBS_DROPDOWN | WS_VSCROLL |
+                    WS_TABSTOP
+    CONTROL         "12時を0時と表示",IDC_ZERO,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,12,58,80,11
+    DEFPUSHBUTTON   "OK",IDOK,49,85,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,106,85,50,14
+END
+
+IDD_PAGEALARM DIALOG DISCARDABLE  0, 0, 210, 200
+STYLE DS_CONTROL | WS_CHILD
+FONT 9, "MS UI Gothic"
+BEGIN
+    RTEXT           "アラーム名",IDC_STATIC,5,18,35,11
+    COMBOBOX        IDC_COMBOALARM,45,16,77,78,CBS_DROPDOWN | WS_VSCROLL |
+                    WS_TABSTOP
+    PUSHBUTTON      "",IDC_DELALARM,124,15,13,14,BS_ICON
+    CONTROL         "有効",IDC_ALARM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    141,17,28,11
+    RTEXT           "時刻",IDC_LABTIMEALARM,16,38,24,12
+    EDITTEXT        IDC_HOURALARM,45,35,22,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPINHOUR,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,58,36,9,12
+    CTEXT           ":",IDC_LABCOLON,68,37,8,10
+    EDITTEXT        IDC_MINUTEALARM,77,35,22,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPINMINUTE,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,90,36,9,12
+    PUSHBUTTON      "曜日...",IDC_ALARMDAY,116,33,33,15
+    RTEXT           "ファイル",IDC_LABSOUNDALARM,15,55,28,13
+    LTEXT           "",IDC_HIDDENALARMDAY,13,52,29,11,NOT WS_VISIBLE
+    EDITTEXT        IDC_FILEALARM,45,52,105,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SANSHOALARM,153,53,12,12
+    RTEXT           "テスト",IDC_LABTESTALARM,18,71,23,11
+    PUSHBUTTON      "",IDC_TESTALARM,45,68,12,13,BS_ICON
+    CONTROL         "12時間制",IDC_12HOURALARM,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,62,69,42,11
+    CONTROL         "繰り返す",IDC_REPEATALARM,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,105,69,35,11
+    CONTROL         "点滅する",IDC_BLINKALARM,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,143,69,43,11
+    CONTROL         "時報を鳴らす",IDC_JIHOU,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,17,101,60,11
+    RTEXT           "ファイル",IDC_LABSOUNDJIHOU,13,121,28,11
+    EDITTEXT        IDC_FILEJIHOU,45,118,105,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SANSHOJIHOU,153,119,12,12
+    RTEXT           "テスト",IDC_LABTESTJIHOU,19,138,23,11
+    PUSHBUTTON      "",IDC_TESTJIHOU,45,135,12,14,BS_ICON
+    CONTROL         "繰り返す",IDC_REPEATJIHOU,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,62,136,35,11
+    CONTROL         "点滅する",IDC_BLINKJIHOU,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,105,136,37,11
+    EDITTEXT        IDC_JIHOUPRE,83,152,22,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPINJIHOUPRE,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,96,153,9,12
+    LTEXT           "秒前に",IDC_LABJIHOUPRE,107,156,24,8
+    EDITTEXT        IDC_JIHOUTIME,128,152,22,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPINJIHOUTIME,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,141,153,9,12
+    LTEXT           "秒間点滅",IDC_LABJIHOUTIME,151,156,30,8
+END
+
+IDD_ALARMDAY DIALOG DISCARDABLE  0, 0, 187, 115
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "アラームを鳴らす曜日"
+FONT 9, "MS UI Gothic"
+BEGIN
+    CONTROL         "毎日",IDC_ALARMDAY0,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,7,51,11
+    CONTROL         "",IDC_ALARMDAY1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    11,27,51,11
+    CONTROL         "",IDC_ALARMDAY2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    72,27,51,11
+    CONTROL         "",IDC_ALARMDAY3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    133,27,51,11
+    CONTROL         "",IDC_ALARMDAY4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    11,49,51,11
+    CONTROL         "",IDC_ALARMDAY5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    72,49,51,11
+    CONTROL         "",IDC_ALARMDAY6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    133,49,51,11
+    CONTROL         "",IDC_ALARMDAY7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    11,71,51,11
+    DEFPUSHBUTTON   "OK",IDOK,38,92,50,15
+    PUSHBUTTON      "キャンセル",IDCANCEL,99,92,50,15
+END
+
+IDD_PAGEMOUSE DIALOG DISCARDABLE  0, 0, 210, 200
+STYLE DS_CONTROL | WS_CHILD
+FONT 9, "MS UI Gothic"
+BEGIN
+    LTEXT           "ファイルのドロップ",IDC_STATIC,16,18,48,8
+    RTEXT           "機能",IDC_STATIC,11,32,27,8
+    COMBOBOX        IDC_DROPFILES,40,30,100,80,CBS_DROPDOWNLIST | WS_VSCROLL |
+                    WS_TABSTOP
+    RTEXT           "プログラム",IDC_LABDROPFILESAPP,7,51,31,8
+    EDITTEXT        IDC_DROPFILESAPP,40,49,111,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_DROPFILESAPPSANSHO,152,49,12,13
+    LTEXT           "ボタンクリック",IDC_LABMOUSEBUTTON,25,80,36,8
+    COMBOBOX        IDC_MOUSEBUTTON,62,77,57,61,CBS_DROPDOWNLIST |
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    CONTROL         "シングル",IDC_RADSINGLE,"Button",BS_AUTORADIOBUTTON |
+                    WS_GROUP | WS_TABSTOP,23,95,37,8
+    CONTROL         "ダブル",IDC_RADDOUBLE,"Button",BS_AUTORADIOBUTTON,72,95,
+                    36,8
+    CONTROL         "トリプル",IDC_RADTRIPLE,"Button",BS_AUTORADIOBUTTON,118,
+                    95,42,8
+    CONTROL         "4回",IDC_RADQUADRUPLE,"Button",BS_AUTORADIOBUTTON,167,
+                    95,31,8
+    RTEXT           "機能",IDC_STATIC,10,116,27,11
+    COMBOBOX        IDC_MOUSEFUNC,40,114,104,108,CBS_DROPDOWNLIST |
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    RTEXT           "ファイル",IDC_LABMOUSEFILE,1,137,35,21
+    EDITTEXT        IDC_MOUSEFILE,40,134,111,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_MOUSEFILESANSHO,152,134,12,13
+    EDITTEXT        IDC_VOL,40,134,32,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_VOLSPIN,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,62,134,9,13
+    CONTROL         "右クリックは設定を無視して右クリックメニュー",
+                    IDC_RCLICKMENU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,
+                    170,134,11
+    CONTROL         "HotKey1",IDC_HOTKEY,"msctls_hotkey32",WS_BORDER |
+                    WS_TABSTOP,125,77,80,14
+END
+
+IDD_PAGETOOLTIP DIALOG DISCARDABLE  0, 0, 210, 200
+STYLE DS_CONTROL | WS_CHILD
+FONT 9, "MS UI Gothic"
+BEGIN
+    RTEXT           "ツールチップ",IDC_STATIC,4,13,32,8
+    EDITTEXT        IDC_TOOLTIP,37,11,146,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SANSHOTIP,184,12,12,13
+    CONTROL         "",IDC_UPDATETIP1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    200,14,8,11
+    CONTROL         "",IDC_TIP2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,27,34,
+                    8,11
+    EDITTEXT        IDC_TOOLTIP2,37,31,146,14,ES_AUTOHSCROLL
+    CTEXT           "２分割指定",IDC_STATIC,8,29,18,16
+    PUSHBUTTON      "...",IDC_SANSHOTIP2,184,32,12,13
+    CONTROL         "",IDC_UPDATETIP2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    200,34,8,11
+    CONTROL         "",IDC_TIP3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,27,54,
+                    8,11
+    EDITTEXT        IDC_TOOLTIP3,37,51,146,14,ES_AUTOHSCROLL
+    CTEXT           "３分割指定",IDC_STATIC,8,50,18,27
+    PUSHBUTTON      "...",IDC_SANSHOTIP3,184,52,12,13
+    CONTROL         "",IDC_UPDATETIP3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    200,54,8,11
+    CONTROL         "縦方向に分割",IDC_TIPTATE,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,37,70,53,11
+    RTEXT           "更新間隔",IDC_STATIC,131,70,28,8
+    EDITTEXT        IDC_TINTERVAL,161,67,32,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_TINTERVALSPIN,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,181,69,9,13
+    CTEXT           "更新有効",IDC_STATIC,195,67,15,16
+    RTEXT           "タイトル",IDC_STATIC,17,90,21,8
+    EDITTEXT        IDC_TTITLE,40,88,105,13,ES_AUTOHSCROLL
+    RTEXT           "アイコン",IDC_STATIC,147,90,22,8
+    COMBOBOX        IDC_TICON,173,88,34,54,CBS_DROPDOWNLIST | WS_VSCROLL |
+                    WS_GROUP | WS_TABSTOP
+    RTEXT           "フォント",IDC_STATIC,18,112,20,8
+    COMBOBOX        IDC_TFONT,40,109,86,62,CBS_DROPDOWNLIST | WS_VSCROLL |
+                    WS_TABSTOP
+    RTEXT           "サイズ",IDC_STATIC,134,111,17,8
+    COMBOBOX        IDC_TFONTSIZE,155,109,34,39,CBS_DROPDOWN | WS_VSCROLL |
+                    WS_TABSTOP
+    CONTROL         "太字",IDC_TBOLD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    41,127,25,11
+    CONTROL         "斜体",IDC_TITALIC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    76,127,25,11
+    LTEXT           "表示形式",IDC_STATIC,107,127,28,8
+    COMBOBOX        IDC_BALLOONFLG,139,124,71,30,CBS_DROPDOWNLIST |
+                    WS_VSCROLL | WS_TABSTOP
+    RTEXT           "文字色",IDC_STATIC,12,144,26,9
+    COMBOBOX        IDC_TFONCOL,40,142,74,120,CBS_DROPDOWNLIST |
+                    CBS_OWNERDRAWFIXED | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_CHOOSETFONCOL,115,142,12,13
+    RTEXT           "背景色",IDC_STATIC,16,163,22,10
+    COMBOBOX        IDC_TBAKCOL,40,161,74,120,CBS_DROPDOWNLIST |
+                    CBS_OWNERDRAWFIXED | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_CHOOSETBAKCOL,115,161,12,13
+    RTEXT           "表示時間",IDC_STATIC,10,181,28,8
+    EDITTEXT        IDC_DISPT,40,179,32,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_DISPTSPIN,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,62,179,9,13
+    RTEXT           "透明度",IDC_STATIC,74,181,22,8
+    EDITTEXT        IDC_ALPHATIP,98,179,32,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_ALTIPSPIN,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,120,179,9,13
+    CONTROL         "ダブルバッファリング",IDC_ENABLEDOUBLEBUFFERING,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,133,164,77,11
+    RTEXT           "     (XP以降)",IDC_STATIC,133,176,77,11
+    CONTROL         "システムに描画させる",IDC_DISABLETIPCUSTOMDRAW,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,133,186,72,11
+    RTEXT           "IEコンポーネント表示サイズ",IDC_STATIC,129,139,74,11
+    EDITTEXT        IDC_HTMLSIZEX,149,148,22,13,ES_AUTOHSCROLL | ES_NUMBER
+    CTEXT           "×",IDC_STATIC,173,151,8,8
+    EDITTEXT        IDC_HTMLSIZEY,183,148,22,13,ES_AUTOHSCROLL | ES_NUMBER
+END
+
+IDD_PAGESKIN DIALOG DISCARDABLE  0, 0, 210, 200
+STYLE DS_CONTROL | WS_CHILD
+FONT 9, "MS UI Gothic"
+BEGIN
+    CONTROL         "スタートボタンを改造する",IDC_STARTBTN,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,8,78,11
+    RTEXT           "アイコン",IDC_LABFILESTART,14,23,33,8
+    EDITTEXT        IDC_FILESTART,49,20,107,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SANSHOSTART,157,20,12,13
+    RTEXT           "キャプション",IDC_LABCAPSTART,9,39,38,12
+    EDITTEXT        IDC_CAPTIONSTART,49,37,89,13,ES_AUTOHSCROLL
+    CONTROL         "書式展開する",IDC_CHK_ISFORMAT,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,142,40,54,11
+    CONTROL         "スタートメニューを改造する",IDC_STARTMENU,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,61,104,11
+    RTEXT           "ビットマップ",IDC_LABFILEMENU,8,77,38,8
+    EDITTEXT        IDC_FILEMENU,49,74,107,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SANSHOMENU,157,74,12,13
+    RTEXT           "色",IDC_LABCOLMENU,8,94,38,8
+    COMBOBOX        IDC_COLMENU,49,92,76,120,CBS_DROPDOWNLIST |
+                    CBS_OWNERDRAWFIXED | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_CHOOSECOLMENU,127,92,12,13
+    CONTROL         "並べる",IDC_TILEMENU,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,144,94,42,11
+    CONTROL         "時計の背景に画像を使用する",IDC_TRAYBG,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,115,96,11
+    RTEXT           "ビットマップ",IDC_LABTB1,9,133,38,8
+    EDITTEXT        IDC_FILETBG,49,131,107,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SANSHOTBG,157,131,12,13
+    RTEXT           "画像上端",IDC_LABTB2,22,153,29,8
+    EDITTEXT        IDC_TBGUP,55,151,28,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPINTBGU,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,83,151,9,13
+    RTEXT           "画像下端",IDC_LABTB3,96,153,31,8
+    EDITTEXT        IDC_TBGDOWN,131,151,28,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPINTBGD,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,159,151,9,13
+    RTEXT           "画像左端",IDC_LABTB4,21,173,30,8
+    EDITTEXT        IDC_TBGLEFT,55,171,28,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPINTBGL,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,83,171,9,13
+    RTEXT           "画像右端",IDC_LABTB5,98,173,29,8
+    EDITTEXT        IDC_TBGRIGHT,131,171,28,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPINTBGR,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,159,171,9,13
+END
+
+IDD_PAGEGRAPH DIALOG DISCARDABLE  0, 0, 210, 200
+STYLE DS_CONTROL | WS_CHILD
+FONT 9, "MS UI Gothic"
+BEGIN
+    CONTROL         "時計の背景にグラフを表示する",IDC_TRAYGRAPH,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,11,6,124,11
+    COMBOBOX        IDC_GRAPHMODE,51,20,76,80,CBS_DROPDOWNLIST | WS_VSCROLL |
+                    WS_TABSTOP
+    COMBOBOX        IDC_COLRECV,51,53,76,120,CBS_DROPDOWNLIST |
+                    CBS_OWNERDRAWFIXED | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_CHOOSECOLRECV,130,53,12,13
+    COMBOBOX        IDC_COLSR,51,73,76,120,CBS_DROPDOWNLIST |
+                    CBS_OWNERDRAWFIXED | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_CHOOSECOLSR,130,73,12,13
+    COMBOBOX        IDC_COLSEND,51,93,76,120,CBS_DROPDOWNLIST |
+                    CBS_OWNERDRAWFIXED | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_CHOOSECOLSEND,130,93,12,13
+    CONTROL         "対数表示にする",IDC_LOGGRAPH,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,148,44,57,11
+    CONTROL         "横方向にする",IDC_GPTATE,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,148,64,52,11
+    CONTROL         "逆方向にする",IDC_RVGRAPH,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,148,84,51,11
+    RTEXT           "グラフ種別",IDC_LABG1,14,23,34,8
+    RTEXT           "高負荷時の色",IDC_MODE21,7,56,42,8
+    RTEXT           "受信側の色",IDC_MODE11,11,56,38,8
+    RTEXT           "重複部分の色",IDC_MODE12,5,75,44,8
+    RTEXT           "低負荷時の色",IDC_MODE22,7,75,42,8
+    RTEXT           "送信側の色",IDC_MODE13,11,95,38,8
+    RTEXT           "受信グラフの最大値",IDC_MODE14,17,114,55,8
+    RTEXT           "CPU使用率が",IDC_MODE23,29,114,43,8
+    EDITTEXT        IDC_TBGGRAPHRATE,73,111,29,13,ES_RIGHT | ES_AUTOHSCROLL |
+                    ES_NUMBER
+    EDITTEXT        IDC_CPUHIGH,73,111,29,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_CPUHIGHSPIN,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,93,111,7,13
+    LTEXT           "KB/s",IDC_MODE15,103,116,47,8
+    LTEXT           "％以上の時、高負荷とする",IDC_MODE24,103,113,79,8
+    RTEXT           "送信グラフの最大値",IDC_MODE16,17,132,55,8
+    EDITTEXT        IDC_TBGGRAPHRATE2,73,129,29,13,ES_RIGHT | ES_AUTOHSCROLL |
+                    ES_NUMBER
+    LTEXT           "KB/s",IDC_MODE17,103,134,47,8
+    RTEXT           "更新間隔",IDC_LABG2,44,150,28,8
+    EDITTEXT        IDC_GINTERVAL,73,147,29,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_GINTERVALSPIN,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,96,147,7,13
+    LTEXT           "秒",IDC_LABG3,106,150,9,8
+    RTEXT           "表示位置",IDC_MODE26,20,168,29,8
+    RTEXT           "左から",IDC_MODE18,55,184,17,8
+    EDITTEXT        IDC_GRAPHLEFT,73,182,29,13,ES_RIGHT | ES_AUTOHSCROLL |
+                    ES_NUMBER
+    CONTROL         "",IDC_SPGRAPHLEFT,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,92,182,7,14
+    RTEXT           "上から",IDC_MODE19,53,168,18,8
+    EDITTEXT        IDC_GRAPHTOP,73,166,29,13,ES_RIGHT | ES_AUTOHSCROLL |
+                    ES_NUMBER
+    CONTROL         "",IDC_SPGRAPHTOP,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,95,166,7,14
+    RTEXT           "右から",IDC_MODE20,121,184,18,8
+    EDITTEXT        IDC_GRAPHRIGHT,141,182,29,13,ES_RIGHT | ES_AUTOHSCROLL |
+                    ES_NUMBER
+    CONTROL         "",IDC_SPGRAPHRIGHT,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,160,182,7,14
+    RTEXT           "下から",IDC_MODE25,121,169,18,8
+    EDITTEXT        IDC_GRAPHBOTTOM,141,167,29,13,ES_RIGHT | ES_AUTOHSCROLL |
+                    ES_NUMBER
+    CONTROL         "",IDC_SPGRAPHBOTTOM,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,163,167,7,14
+    COMBOBOX        IDC_GRAPHTYPE,51,33,76,80,CBS_DROPDOWNLIST | WS_VSCROLL |
+                    WS_TABSTOP
+END
+
+IDD_PAGETASKBAR DIALOG DISCARDABLE  0, 0, 210, 200
+STYLE DS_CONTROL | WS_CHILD
+FONT 9, "MS UI Gothic"
+BEGIN
+    CONTROL         "スタートボタンを隠す",IDC_STARTBTNHIDE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,13,8,80,11
+    CONTROL         "時計にスタートメニュー",IDC_STARTMENUCLOCK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,23,22,80,11
+    CONTROL         "平らなスタートボタン",IDC_STARTBTNFLAT,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,13,39,78,11
+    CONTROL         "平らなタスクスイッチ",IDC_TASKSWITCHFLAT,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,98,54,74,11
+    CONTROL         "タスクスイッチにアイコンのみ表示",IDC_TASKSWITCHICON,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,98,39,99,11
+    CONTROL         "平らなトレイ",IDC_FLATTRAY,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,13,54,79,11
+    CONTROL         "トレイを塗りつぶす",IDC_FILLTRAY,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,13,69,80,11
+    RTEXT           "タスクバーの透明度",IDC_CAPBARTRANS,16,129,61,12
+    EDITTEXT        IDC_BARTRANS,81,127,28,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPINBARTRANS,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,100,127,9,13
+    RTEXT           "スタートメニューの透明度",IDC_CAPMENUTRANS,4,148,73,12
+    EDITTEXT        IDC_MENUTRANS,81,146,28,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPINMENUTRANS,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,100,146,9,13
+    CONTROL         "区切りを入れる",IDC_TASKSWITCH_SEPARAT,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,109,69,63,11
+    CONTROL         "時計をタスクトレイにフィット表示する",IDC_FITCLOCK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,98,102,108,11
+    CONTROL         "取っ手を消す",IDC_RBHIDE,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,98,85,54,11
+    CONTROL         "タスクバーを少し細く",IDC_TBBORDER,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,13,85,67,11
+    CONTROL         "タスクバーをもっと細く",IDC_TBBORDEREX,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,23,101,69,11
+END
+
+IDD_PAGESNTP DIALOG DISCARDABLE  0, 0, 210, 200
+STYLE DS_CONTROL | WS_CHILD
+FONT 9, "MS UI Gothic"
+BEGIN
+    RTEXT           "サーバー",IDC_STATIC,7,12,31,12
+    COMBOBOX        IDC_NTPSERVER,42,9,91,76,CBS_DROPDOWN | CBS_AUTOHSCROLL |
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "",IDC_DELSERVER,137,9,13,14,BS_ICON
+    PUSHBUTTON      "",IDC_SYNCNOW,166,7,17,17,BS_ICON
+    CONTROL         "定期的に時刻を同期",IDC_SYNCTIMER,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,30,87,11
+    CONTROL         "1日1回",IDC_SYNCADAY,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,26,49,37,11
+    RTEXT           "",IDC_LABSYNCMIN1,128,61,28,12,NOT WS_VISIBLE
+    EDITTEXT        IDC_SYNCMIN,84,48,28,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SYNCMINSPIN,"msctls_updown32",UDS_SETBUDDYINT |
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS |
+                    UDS_NOTHOUSANDS,150,47,9,14
+    LTEXT           "分おき",IDC_LABSYNCMIN2,115,50,30,12
+    CONTROL         "ダイヤルアップ接続中のみ",IDC_SYNCNODIAL,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,26,68,101,11
+    RTEXT           "タイムアウト",IDC_STATIC,2,89,37,12
+    EDITTEXT        IDC_TIMEOUT,42,86,36,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_TIMEOUTSPIN,"msctls_updown32",UDS_SETBUDDYINT |
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS |
+                    UDS_NOTHOUSANDS,102,83,9,14
+    LTEXT           "ミリ秒",IDC_STATIC,81,89,24,10
+    CONTROL         "ログを残す",IDC_SNTPLOG,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,123,88,58,11
+    RTEXT           "サウンド",IDC_STATIC,10,113,28,12
+    EDITTEXT        IDC_SYNCSOUND,42,110,104,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SYNCSOUNDBROWSE,152,110,12,13
+    LTEXT           "結果",IDC_STATIC,11,133,32,10
+    LTEXT           "",IDC_SNTPLISTHERE,10,144,153,40,NOT WS_VISIBLE |
+                    WS_BORDER
+END
+
+IDD_PAGEMISC DIALOG DISCARDABLE  0, 0, 210, 200
+STYLE DS_CONTROL | WS_CHILD
+FONT 9, "MS UI Gothic"
+BEGIN
+    CONTROL         "時計を改造しない",IDC_NOCLOCK,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,12,5,74,11
+    CONTROL         "MCIでWAVEを鳴らす",IDC_MCIWAVE,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,108,5,85,11
+    LTEXT           "起動してから",IDC_STATIC,13,21,40,11
+    EDITTEXT        IDC_DELAYSTART,52,19,24,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Spin1",IDC_SPINDELAYSTART,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,66,19,9,12
+    LTEXT           "秒後に時計改造開始",IDC_STATIC,78,22,64,8
+    LTEXT           "起動してから",IDC_STATIC,13,37,40,11
+    EDITTEXT        IDC_DELAYNET,52,35,24,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Spin1",IDC_SPINDELAYNET,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,66,35,9,12
+    LTEXT           "秒後にネットワーク初期化",IDC_STATIC,78,37,73,8
+    CONTROL         "タスクバーとウインドウが重なったら押し戻す",
+                    IDC_TASKWNDCTRL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,
+                    52,127,11
+    CONTROL         "定期的に接続確認",IDC_CHECKNETWORK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,67,68,11
+    EDITTEXT        IDC_CHECKNETINTERVAL,79,66,24,12,ES_AUTOHSCROLL |
+                    ES_NUMBER
+    CONTROL         "",IDC_SPINCHECKNETINTERVAL,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,93,66,9,12
+    LTEXT           "秒ごと",IDC_NETCHECKSTATIC,104,69,36,8
+    CONTROL         "デスクトップカレンダーを自動更新",IDC_DESKCAL,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,81,132,11
+    RTEXT           "コマンド",IDC_LABDESKCAL,13,99,20,8
+    EDITTEXT        IDC_COMDESKCAL,37,97,107,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SANSHODESKCAL,146,97,12,13
+    CONTROL         "日付が変わったときだけ起動",IDC_ONLYDATECHANGED,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,37,115,110,11
+    CONTROL         "サスペンドから復帰後に起動",IDC_RESUMESUSPEND,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,37,128,110,11
+    CONTROL         "とにかく起動",IDC_TONIKAKU,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,37,141,61,11
+    CONTROL         "壁紙を監視",IDC_WATCHWALL,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,37,154,61,11
+    RTEXT           "設定切り替え可能数",IDC_STATIC,9,169,62,8
+    EDITTEXT        IDC_CONFMAX,75,166,32,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_CFMAXSPIN,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,97,166,9,13
+    PUSHBUTTON      "Windowsが起動するたびにTClockを起動",IDC_STARTUP,6,181,
+                    136,15
+    PUSHBUTTON      "レジストリ削除",IDC_DELREG,146,181,50,15
+END
+
+IDD_PAGEABOUT DIALOGEX 0, 0, 210, 200
+STYLE DS_CONTROL | WS_CHILD
+FONT 9, "MS UI Gothic"
+BEGIN
+    ICON            0,IDC_ABOUTICON,11,2,20,20
+    LTEXT           "TClock2ch-080614-analog",IDC_STATIC,40,10,100,8
+    LTEXT           "本ソフトウェアは以下のソースを元に2chの有志によって改造されたものです\n何か問題があれば、2chのTClockスレに書き込んでください",IDC_STATIC,11,30,200,16
+    LTEXT           "・TClock タスクバーの時計を改造 Ver2.3.1\n  by Kazubon 1997-2001",IDC_STATIC,11,50,200,16
+    LTEXT           "・TClock2ch part13 ver. 03.05.31",                                IDC_STATIC,11,70,200,8
+    LTEXT           "・TClock Light 改造版 Ver.kt071229\n  by K.Takata",               IDC_STATIC,11,80,200,16
+
+    RTEXT           "TClockはフリーソフトウェアです",IDC_STATIC,11,100,200,8
+    LTEXT           "ヘルプのページ",IDC_STATIC,11,111,43,11
+    EDITTEXT        IDC_HELPURL,11,121,142,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BROWSEHELP,159,122,11,13
+    LTEXT           "TClock2chヘルプ",IDC_STATIC,11,141,51,8
+    EDITTEXT        IDC_HELP2CH,11,151,142,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BROWSEHELP2CH,159,151,11,13
+    LTEXT           "言語モジュール",IDC_STATIC,11,171,45,8
+    EDITTEXT        IDC_LANGDLL,11,181,142,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BROWSELANGDLL,159,180,11,13
+END
+
+IDD_SELECTICON DIALOG DISCARDABLE  0, 0, 187, 95
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "アイコンの選択"
+FONT 9, "MS UI Gothic"
+BEGIN
+    CONTROL         "",IDC_FNAMEICON,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,6,
+                    12,168,12
+    LISTBOX         IDC_LISTICON,6,32,174,34,LBS_OWNERDRAWFIXED |
+                    LBS_NOINTEGRALHEIGHT | LBS_MULTICOLUMN |
+                    LBS_DISABLENOSCROLL | WS_HSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,32,74,45,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,83,74,45,14
+    PUSHBUTTON      "参照...",IDC_SANSHOICON,135,74,45,14
+END
+
+IDD_TESTSOUND DIALOG DISCARDABLE  0, 0, 183, 64
+STYLE DS_3DLOOK | DS_CONTROL | WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS
+FONT 9, "MS UI Gothic"
+BEGIN
+    LTEXT           "",1119,3,4,175,33
+    LTEXT           "テスト:",IDC_LABTESTSOUND,6,47,20,8
+    PUSHBUTTON      "",IDC_TESTSOUND,27,44,13,14,BS_ICON
+END
+
+IDD_TIMER DIALOG DISCARDABLE  0, 0, 187, 140
+STYLE DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_VISIBLE | WS_CAPTION |
+    WS_SYSMENU
+CAPTION "タイマー"
+FONT 9, "MS UI Gothic"
+BEGIN
+    RTEXT           "タイマー名",IDC_STATIC,7,10,38,8
+    COMBOBOX        IDC_TIMERNAME,50,8,108,76,CBS_DROPDOWN | WS_VSCROLL |
+                    WS_TABSTOP
+    PUSHBUTTON      "",IDC_TIMERDEL,162,8,13,14,BS_ICON
+    EDITTEXT        IDC_TIMERMINUTE,50,30,33,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Spin1",IDC_TIMERSPIN,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,133,31,23,12
+    LTEXT           "分",IDC_STATIC,88,33,13,11
+    RTEXT           "ファイル",IDC_STATIC,7,56,38,8
+    EDITTEXT        IDC_TIMERFILE,50,53,108,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_TIMERSANSHO,162,53,13,14
+    RTEXT           "テスト",IDC_TIMERLABTEST,7,77,38,8
+    PUSHBUTTON      "",IDC_TIMERTEST,50,74,13,14,BS_ICON
+    CONTROL         "繰り返す",IDC_TIMERREPEAT,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,83,95,40,11
+    CONTROL         "点滅する",IDC_TIMERBLINK,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,127,95,43,11
+    DEFPUSHBUTTON   "スタート",IDOK,12,120,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,69,120,50,14
+    PUSHBUTTON      "ヘルプ",IDC_TIMERHELP,126,120,50,14
+END
+
+IDD_CALENDAR DIALOG DISCARDABLE  0, 0, 160, 100
+STYLE DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_VISIBLE | WS_CAPTION |
+    WS_SYSMENU
+CAPTION "カレンダー"
+FONT 9, "MS UI Gothic"
+BEGIN
+    CONTROL         "MonthCalendar1",IDC_MONTHCALENDAR1,"SysMonthCal32",
+                    WS_TABSTOP,0,0,160,100,WS_EX_CLIENTEDGE
+END
+
+IDD_PAGEDESKTOP DIALOG DISCARDABLE  0, 0, 210, 200
+STYLE DS_CONTROL | WS_CHILD
+FONT 9, "MS UI Gothic"
+BEGIN
+    CONTROL         "デスクトップアイコンを小さいアイコン/リストビュー モードにする",
+                    IDC_DESKTOPICONLIST,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP | WS_DISABLED ,13,16,170,11
+    CONTROL         "デスクトップアイコンのテキストの背景を透明化",
+                    IDC_TRANSDESKTOPICONBK,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,13,76,135,11
+    COMBOBOX        IDC_COLDESKTOPICON,31,54,76,120,CBS_DROPDOWNLIST |
+                    CBS_OWNERDRAWFIXED | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "デスクトップアイコンのテキストの色を変える",
+                    IDC_DESKTOPICONCOLOR,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,13,34,131,11
+    PUSHBUTTON      "...",IDC_CHOOSECOLDESKTOPICON,118,53,12,13
+    CONTROL         "デスクトップアイコンを変更しない",IDC_RADDESKTOPICONNORMAL,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,13,100,170,11
+    CONTROL         "デスクトップアイコンを小さいアイコン/リストビュー モードにする",IDC_RADDESKTOPICONLIST,"Button",
+                    BS_AUTORADIOBUTTON,13,115,170,11
+    CONTROL         "デスクトップアイコンを小さいアイコン/詳細ビュー モードにする(試験的)",IDC_RADDESKTOPICONREPORT,"Button",
+                    BS_AUTORADIOBUTTON,13,130,200,11
+END
+
+IDD_PAGEAUTOEXEC DIALOG DISCARDABLE  0, 0, 210, 200
+STYLE DS_CONTROL | WS_CHILD
+FONT 9, "MS UI Gothic"
+BEGIN
+    RTEXT           "設定名",IDC_STATIC,8,25,35,11
+    COMBOBOX        IDC_COMBOAUTOEXEC,45,22,77,78,CBS_DROPDOWN | WS_VSCROLL |
+                    WS_TABSTOP
+    PUSHBUTTON      "",IDC_DELAUTOEXEC,124,21,13,14,BS_ICON
+    CONTROL         "有効",IDC_AUTOEXEC,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,141,23,28,11
+    PUSHBUTTON      "時",IDC_AUTOEXECHOUR,47,41,33,15
+    PUSHBUTTON      "分",IDC_AUTOEXECMIN,83,41,33,15
+    PUSHBUTTON      "曜日",IDC_AUTOEXECDAY,119,41,33,15
+    RTEXT           "ファイル",IDC_LABSOUNDAUTOEXEC,14,63,28,13
+    EDITTEXT        IDC_FILEAUTOEXEC,45,60,105,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SANSHOAUTOEXEC,153,61,12,12
+    RTEXT           "テスト",IDC_LABTESTAUTOEXEC,18,81,23,11
+    PUSHBUTTON      "",IDC_TESTAUTOEXEC,45,78,12,13,BS_ICON
+    CONTROL         "起動時に実行する",IDC_ONBOOTEXEC,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,63,80,66,11
+    LTEXT           "",IDC_HIDDENAUTOEXECDAY,168,43,29,11,NOT WS_VISIBLE
+    LTEXT           "",IDC_HIDDENAUTOEXECHOUR,170,45,29,11,NOT WS_VISIBLE
+    LTEXT           "",IDC_HIDDENAUTOEXECMIN1,169,44,29,11,NOT WS_VISIBLE
+    LTEXT           "",IDC_HIDDENAUTOEXECMIN2,169,45,29,11,NOT WS_VISIBLE
+END
+
+IDD_AUTOEXECHOUR DIALOG DISCARDABLE  0, 0, 175, 145
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "自動実行する時刻"
+FONT 9, "MS UI Gothic"
+BEGIN
+    CONTROL         "毎時",IDC_AUTOEXECHOURALL,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,7,51,11
+    CONTROL         "00時",IDC_AUTOEXECHOUR0,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,21,51,11
+    CONTROL         "01時",IDC_AUTOEXECHOUR1,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,33,51,11
+    CONTROL         "02時",IDC_AUTOEXECHOUR2,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,45,51,11
+    CONTROL         "03時",IDC_AUTOEXECHOUR3,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,57,51,11
+    CONTROL         "04時",IDC_AUTOEXECHOUR4,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,69,51,11
+    CONTROL         "05時",IDC_AUTOEXECHOUR5,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,81,51,11
+    CONTROL         "06時",IDC_AUTOEXECHOUR6,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,93,51,11
+    CONTROL         "07時",IDC_AUTOEXECHOUR7,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,105,51,11
+    CONTROL         "08時",IDC_AUTOEXECHOUR8,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,65,21,51,11
+    CONTROL         "09時",IDC_AUTOEXECHOUR9,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,65,33,51,11
+    CONTROL         "10時",IDC_AUTOEXECHOUR10,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,65,45,51,11
+    CONTROL         "11時",IDC_AUTOEXECHOUR11,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,65,57,51,11
+    CONTROL         "12時",IDC_AUTOEXECHOUR12,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,65,69,51,11
+    CONTROL         "13時",IDC_AUTOEXECHOUR13,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,65,81,51,11
+    CONTROL         "14時",IDC_AUTOEXECHOUR14,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,65,93,51,11
+    CONTROL         "15時",IDC_AUTOEXECHOUR15,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,65,105,51,11
+    CONTROL         "16時",IDC_AUTOEXECHOUR16,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,119,21,51,11
+    CONTROL         "17時",IDC_AUTOEXECHOUR17,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,119,33,51,11
+    CONTROL         "18時",IDC_AUTOEXECHOUR18,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,119,45,51,11
+    CONTROL         "19時",IDC_AUTOEXECHOUR19,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,119,57,51,11
+    CONTROL         "20時",IDC_AUTOEXECHOUR20,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,119,69,51,11
+    CONTROL         "21時",IDC_AUTOEXECHOUR21,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,119,81,51,11
+    CONTROL         "22時",IDC_AUTOEXECHOUR22,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,119,93,51,11
+    CONTROL         "23時",IDC_AUTOEXECHOUR23,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,119,105,51,11
+    DEFPUSHBUTTON   "OK",IDOK,29,123,50,15
+    PUSHBUTTON      "キャンセル",IDCANCEL,96,123,50,15
+END
+
+IDD_AUTOEXECMIN DIALOG DISCARDABLE  0, 0, 173, 231
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "自動実行する分"
+FONT 9, "MS UI Gothic"
+BEGIN
+    CONTROL         "毎分",IDC_AUTOEXECMINALL,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,7,38,11
+    CONTROL         "00分",IDC_AUTOEXECMIN0,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,19,36,11
+    CONTROL         "01分",IDC_AUTOEXECMIN1,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,31,36,11
+    CONTROL         "02分",IDC_AUTOEXECMIN2,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,43,36,11
+    CONTROL         "03分",IDC_AUTOEXECMIN3,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,55,36,11
+    CONTROL         "04分",IDC_AUTOEXECMIN4,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,67,36,11
+    CONTROL         "05分",IDC_AUTOEXECMIN5,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,79,36,11
+    CONTROL         "06分",IDC_AUTOEXECMIN6,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,91,36,11
+    CONTROL         "07分",IDC_AUTOEXECMIN7,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,103,36,11
+    CONTROL         "08分",IDC_AUTOEXECMIN8,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,115,36,11
+    CONTROL         "09分",IDC_AUTOEXECMIN9,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,127,36,11
+    CONTROL         "10分",IDC_AUTOEXECMIN10,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,139,36,11
+    CONTROL         "11分",IDC_AUTOEXECMIN11,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,151,36,11
+    CONTROL         "12分",IDC_AUTOEXECMIN12,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,163,36,11
+    CONTROL         "13分",IDC_AUTOEXECMIN13,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,175,36,11
+    CONTROL         "14分",IDC_AUTOEXECMIN14,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,187,36,11
+    CONTROL         "15分",IDC_AUTOEXECMIN15,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,52,19,36,11
+    CONTROL         "16分",IDC_AUTOEXECMIN16,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,52,31,36,11
+    CONTROL         "17分",IDC_AUTOEXECMIN17,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,52,43,36,11
+    CONTROL         "18分",IDC_AUTOEXECMIN18,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,52,55,36,11
+    CONTROL         "19分",IDC_AUTOEXECMIN19,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,52,67,36,11
+    CONTROL         "20分",IDC_AUTOEXECMIN20,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,52,79,36,11
+    CONTROL         "21分",IDC_AUTOEXECMIN21,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,52,91,36,11
+    CONTROL         "22分",IDC_AUTOEXECMIN22,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,52,103,36,11
+    CONTROL         "23分",IDC_AUTOEXECMIN23,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,52,115,36,11
+    CONTROL         "24分",IDC_AUTOEXECMIN24,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,52,127,36,11
+    CONTROL         "25分",IDC_AUTOEXECMIN25,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,52,139,36,11
+    CONTROL         "26分",IDC_AUTOEXECMIN26,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,52,151,36,11
+    CONTROL         "27分",IDC_AUTOEXECMIN27,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,52,163,36,11
+    CONTROL         "28分",IDC_AUTOEXECMIN28,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,52,175,36,11
+    CONTROL         "29分",IDC_AUTOEXECMIN29,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,52,187,36,11
+    CONTROL         "30分",IDC_AUTOEXECMIN30,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,93,19,36,11
+    CONTROL         "31分",IDC_AUTOEXECMIN31,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,93,31,36,11
+    CONTROL         "32分",IDC_AUTOEXECMIN32,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,93,43,36,11
+    CONTROL         "33分",IDC_AUTOEXECMIN33,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,93,55,36,11
+    CONTROL         "34分",IDC_AUTOEXECMIN34,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,93,67,36,11
+    CONTROL         "35分",IDC_AUTOEXECMIN35,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,93,79,36,11
+    CONTROL         "36分",IDC_AUTOEXECMIN36,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,93,91,36,11
+    CONTROL         "37分",IDC_AUTOEXECMIN37,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,93,103,36,11
+    CONTROL         "38分",IDC_AUTOEXECMIN38,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,93,115,36,11
+    CONTROL         "39分",IDC_AUTOEXECMIN39,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,93,127,36,11
+    CONTROL         "40分",IDC_AUTOEXECMIN40,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,93,139,36,11
+    CONTROL         "41分",IDC_AUTOEXECMIN41,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,93,151,36,11
+    CONTROL         "42分",IDC_AUTOEXECMIN42,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,93,163,36,11
+    CONTROL         "43分",IDC_AUTOEXECMIN43,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,93,175,36,11
+    CONTROL         "44分",IDC_AUTOEXECMIN44,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,93,187,36,11
+    CONTROL         "45分",IDC_AUTOEXECMIN45,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,134,19,36,11
+    CONTROL         "46分",IDC_AUTOEXECMIN46,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,134,31,36,11
+    CONTROL         "47分",IDC_AUTOEXECMIN47,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,134,43,36,11
+    CONTROL         "48分",IDC_AUTOEXECMIN48,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,134,55,36,11
+    CONTROL         "49分",IDC_AUTOEXECMIN49,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,134,67,36,11
+    CONTROL         "50分",IDC_AUTOEXECMIN50,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,134,79,36,11
+    CONTROL         "51分",IDC_AUTOEXECMIN51,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,134,91,36,11
+    CONTROL         "52分",IDC_AUTOEXECMIN52,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,134,103,36,11
+    CONTROL         "53分",IDC_AUTOEXECMIN53,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,134,115,36,11
+    CONTROL         "54分",IDC_AUTOEXECMIN54,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,134,127,36,11
+    CONTROL         "55分",IDC_AUTOEXECMIN55,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,134,139,36,11
+    CONTROL         "56分",IDC_AUTOEXECMIN56,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,134,151,36,11
+    CONTROL         "57分",IDC_AUTOEXECMIN57,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,134,163,36,11
+    CONTROL         "58分",IDC_AUTOEXECMIN58,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,134,175,36,11
+    CONTROL         "59分",IDC_AUTOEXECMIN59,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,134,187,36,11
+    DEFPUSHBUTTON   "OK",IDOK,26,207,50,15
+    PUSHBUTTON      "キャンセル",IDCANCEL,93,207,50,15
+END
+
+IDD_AUTOEXECDAY DIALOG DISCARDABLE  0, 0, 187, 115
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "自動実行する曜日"
+FONT 9, "MS UI Gothic"
+BEGIN
+    CONTROL         "毎日",IDC_AUTOEXECDAY0,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,7,51,11
+    CONTROL         "",IDC_AUTOEXECDAY1,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,27,51,11
+    CONTROL         "",IDC_AUTOEXECDAY2,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,72,27,51,11
+    CONTROL         "",IDC_AUTOEXECDAY3,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,133,27,51,11
+    CONTROL         "",IDC_AUTOEXECDAY4,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,49,51,11
+    CONTROL         "",IDC_AUTOEXECDAY5,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,72,49,51,11
+    CONTROL         "",IDC_AUTOEXECDAY6,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,133,49,51,11
+    CONTROL         "",IDC_AUTOEXECDAY7,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,11,71,51,11
+    DEFPUSHBUTTON   "OK",IDOK,38,92,50,15
+    PUSHBUTTON      "キャンセル",IDCANCEL,99,92,50,15
+END
+
+IDD_PROPERTY DIALOG DISCARDABLE  0, 0, 299, 235
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "TClockのプロパティ"
+FONT 9, "MS UI Gothic"
+BEGIN
+    CONTROL         "Tree1",IDC_TREE,"SysTreeView32",TVS_HASBUTTONS |
+                    TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS |
+                    WS_BORDER | WS_TABSTOP,5,5,70,225
+    DEFPUSHBUTTON   "OK",IDOK,80,215,50,14
+    PUSHBUTTON      "ｷｬﾝｾﾙ",IDCANCEL,135,215,50,14
+    DEFPUSHBUTTON   "適用(&A)",ID_APPLY,190,215,50,14
+    DEFPUSHBUTTON   "ヘルプ",ID_HELP,245,215,50,14
+END
+
+IDD_PAGEANALOG DIALOG DISCARDABLE  0, 0, 210, 200
+STYLE DS_CONTROL | WS_CHILD
+FONT 9, "MS UI Gothic"
+BEGIN
+    CONTROL         "アナログ時計を表示する",IDC_CHECK_ACLOCK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,11,11,81,11
+    RTEXT           "短針の色",IDC_STATIC,18,49,29,11
+    COMBOBOX        IDC_COLHOUR,56,47,76,120,CBS_DROPDOWNLIST |
+                    CBS_OWNERDRAWFIXED | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_CHOOSECOLHOUR,137,47,12,13
+    CONTROL         "太字",IDC_HOURHAND_BOLD,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,154,49,33,11
+    RTEXT           "長針の色",IDC_STATIC,18,66,29,11
+    COMBOBOX        IDC_COLMIN,56,66,76,120,CBS_DROPDOWNLIST |
+                    CBS_OWNERDRAWFIXED | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_CHOOSECOLMIN,137,65,12,13
+    CONTROL         "太字",IDC_MINHAND_BOLD,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,154,66,33,11
+    LTEXT           "位置調整",IDC_STATIC,11,97,34,10
+    COMBOBOX        IDC_ACLOCK_POS,56,93,76,66,CBS_DROPDOWNLIST | WS_VSCROLL |
+                    WS_TABSTOP
+    LTEXT           "サイズ",IDC_STATIC,33,115,18,8
+    EDITTEXT        IDC_EDIT_ACLOCK_SIZE,56,112,28,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPIN_ACLOCK_SIZE,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,86,110,9,13
+    RTEXT           "左右位置",IDC_STATIC,19,133,33,12
+    EDITTEXT        IDC_EDIT_ACLOCK_HPOS,56,131,28,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPIN_ACLOCK_HPOS,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,86,128,7,13
+    RTEXT           "上下位置",IDC_STATIC,98,133,30,12
+    EDITTEXT        IDC_EDIT_ACLOCK_VPOS,132,131,28,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPIN_ACLOCK_VPOS,"msctls_updown32",UDS_WRAP |
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY |
+                    UDS_ARROWKEYS,160,126,7,13
+    LTEXT           "スキン",IDC_STATIC,34,160,17,8
+    EDITTEXT        IDC_ACLOCKBMP,56,158,104,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_ACLOCKBMPBROWSE,166,158,12,13
+    CONTROL         "スタートボタンに描画(改造-スキン-スタートボタンが必須)",
+                    IDC_CHECK_TOSTARTBTN,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,18,30,166,11
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 2,3,0,1
+ PRODUCTVERSION 2,3,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041104b0"
+        BEGIN
+            VALUE "Comments", "TClock 言語DLL（日本語）\0"
+            VALUE "CompanyName", "Kazubon\0"
+            VALUE "FileDescription", "TClock 言語DLL（日本語） Ver.2.3.0\0"
+            VALUE "FileVersion", "2, 3, 0, 1\0"
+            VALUE "InternalName", "langja.dll\0"
+            VALUE "LegalCopyright", "Kazubon 1997-2001\0"
+            VALUE "OriginalFilename", "langja.dll\0"
+            VALUE "ProductName", "TClock\0"
+            VALUE "ProductVersion", "2, 3, 0, 1\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE MOVEABLE PURE
+BEGIN
+    "resrc1.h\0"
+END
+
+2 TEXTINCLUDE MOVEABLE PURE
+BEGIN
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""windows.h""\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""resource.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE MOVEABLE PURE
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE
+BEGIN
+    IDD_PROPERTY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 292
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 228
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_PROPERTY            "TClockのプロパティ"
+    IDS_BTNFACE             "ボタンの表面"
+    IDS_BTNSHADOW           "ボタンの影"
+    IDS_BTNLIGHT            "ボタンの明るい部分"
+    IDS_BTNTEXT             "ボタンの文字"
+    IDS_ADDALARM            "（追加）"
+    IDS_MMFILE              "メディアファイル (*.wav,*.mid,...)"
+    IDS_ALLFILE             "すべて (*.*)"
+    IDS_PROGRAMFILE         "プログラム (*.exe)"
+    IDS_NONE                "（なし）"
+    IDS_RECYCLE             "ごみ箱"
+    IDS_OPENBY              "プログラムで開く"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_COPYTO              "コピー"
+    IDS_MOVETO              "移動"
+    IDS_LABPROGRAM          "プログラム"
+    IDS_LABFOLDER           "フォルダ"
+    IDS_LEFTBUTTON          "左ボタン"
+    IDS_RIGHTBUTTON         "右ボタン"
+    IDS_MIDDLEBUTTON        "中央ボタン"
+    IDS_XBUTTON1            "サイドボタン1"
+    IDS_XBUTTON2            "サイドボタン2"
+    IDS_CLEFTBUTTON         "Ctrl+左"
+    IDS_CRIGHTBUTTON        "Ctrl+右"
+    IDS_CMIDDLEBUTTON       "Ctrl+中央"
+    IDS_CXBUTTON1           "Ctrl+サイド1"
+    IDS_CXBUTTON2           "Ctrl+サイド2"
+    IDS_SLEFTBUTTON         "Shift+左"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_SRIGHTBUTTON        "Shift+右"
+    IDS_SMIDDLEBUTTON       "Shift+中央"
+    IDS_SXBUTTON1           "Shift+サイド1"
+    IDS_SXBUTTON2           "Shift+サイド2"
+    IDS_HOTKEY              "ホットキー"
+    IDS_WHEEL1              "ホイール＋方向"
+    IDS_WHEEL2              "ホイール－方向"
+    IDS_CWHEEL1             "Ctrl+ホイール＋"
+    IDS_CWHEEL2             "Ctrl+ホイール－"
+    IDS_SWHEEL1             "Shift+ホイール＋"
+    IDS_SWHEEL2             "Shift+ホイール－"
+    IDS_PROPDATE            "日付と時刻のプロパティ"
+    IDS_EXITWIN             "Windowsの終了"
+    IDS_RUN                 "ファイル名を指定して実行"
+    IDS_ALLMIN              "全ウィンドウを最小化"
+    IDS_SYNCTIME            "時刻の同期"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_TIMER               "タイマー"
+    IDS_MOUSECOPY           "クリップボードにコピー"
+    IDS_SCREENSAVER         "スクリーンセーバー"
+    IDS_OPENFILE            "ファイルを開く"
+    IDS_FORMAT              "書式"
+    IDS_FILE                "ファイル"
+    IDS_VOL1                "設定する値"
+    IDS_VOL2                "上下する値"
+    IDS_MONOFFD             "遅延秒数"
+    IDS_CDDRV               "ドライブ\r1=A,2=B,…"
+    IDS_BMPFILE             "ビットマップ (*.bmp)"
+    IDS_BMPICONFILE         "ビットマップ、アイコン (*.bmp, *.ico)"
+    IDS_EXEDLLFILE          "プログラム (*.exe, *.dll)"
+    IDS_NOICON              "アイコンがありません"
+    IDS_START               "スタート"
+    IDS_SYNCNOW             "今すぐ同期"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_STARTUPLINK         "スタートアップにショートカットを作成しますか？"
+    IDS_HELPURL             "http://homepage1.nifty.com/kazubon/tclock/help/ja/"
+    IDS_HELP2CH             "http://tclock2ch.at.infoseek.co.jp/help2ch/index.html"
+    IDS_LANGDLLFILE         "TClock 言語モジュール (lang*.dll)"
+    IDS_NOTFOUNDCLOCK       "時計の改造に失敗しました。"
+    IDS_KYU                 "キュ！"
+    IDS_TEXTCENTER          "中央"
+    IDS_TEXTLEFT            "左寄せ"
+    IDS_TEXTRIGHT           "右寄せ"
+    IDS_DELRECDOCS          "最近使ったファイルを削除"
+    IDS_CALENDAR            "カレンダー"
+    IDS_VISTACALENDAR       "カレンダー(Vista以降)"
+    IDS_STARTMNU            "スタートメニュー"
+    IDS_TASKSW              "タスク切り替え"
+    IDS_SHOWDESK            "デスクトップ表示"
+    IDS_LOCKPC              "PCのロック(XP以降)"
+    IDS_MCMENU              "TClock右クリックメニュー"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_PROP_FORMAT         "書式"
+    IDS_PROP_ALARM          "アラーム"
+    IDS_PROP_MOUSE          "マウス操作"
+    IDS_PROP_TOOLTIP        "ツールチップ"
+    IDS_PROP_SKIN           "スキン"
+    IDS_PROP_GRAPH          "グラフ"
+    IDS_PROP_ANALOG         "アナログ時計"
+    IDS_PROP_TASKBAR        "タスクバー"
+    IDS_PROP_DESKTOP        "デスクトップ"
+    IDS_PROP_SYNC           "時刻あわせ"
+    IDS_PROP_AUTO           "自動実行"
+    IDS_PROP_MISC           "その他"
+    IDS_PROP_ABOUT          "バージョン情報"
+    IDS_ACLOCKLEFT          "左端に表示"
+    IDS_ACLOCKRIGHT         "右端に表示"
+    IDS_ACLOCKMIDDLE        "テキストに重ねて表示"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_CHANGECONF          "TClock設定切り替え"
+    IDS_VOLMUTE             "ミュート"
+    IDS_VOLSET              "ボリューム値設定"
+    IDS_VOLUD               "ボリューム値上下"
+    IDS_MONOFF              "モニターOFF"
+    IDS_CDOPEN              "CDドライブを開く"
+    IDS_CDCLOSE             "CDドライブを閉じる"
+    IDS_NETINIT             "ネットワーク初期化"
+    IDS_DELUS               "ユーザー文字列初期化"
+    IDS_FILELIST            "ファイルリスト"
+    IDS_TICONNO             "なし"
+    IDS_TICONINFO           "情報"
+    IDS_TICONWARN           "警告"
+    IDS_TICONERR            "エラー"
+    IDS_TIPFILEEXT          "ツールチップ書式テキスト(*.txt)"
+    IDS_GMNET               "Network送受信量"
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_GMCPU               "CPU使用率"
+    IDS_DELREGT             "レジストリ削除"
+    IDS_DELREGOK            "削除成功！"
+    IDS_DELREGNG            "削除に失敗しました。"
+    IDS_DELREGNGINI         "iniファイルを使用している時のみ実行できます。"
+    IDS_GTBAR               "棒グラフ"
+    IDS_GTLINE              "折れ線グラフ"
+    IDS_TIPTYPENORMAL       "通常"
+    IDS_TIPTYPEBALLOON      "バルーン"
+    IDS_TIPTYPEIECOMP       "IEコンポーネント"
+    IDS_CLOCK               "時計"
+    IDS_ALARM               "アラーム"
+    IDS_TOOLTIP             "ツールチップ"
+    IDS_TASKBAR             "改造"
+    IDS_MISC                "その他"
+    IDS_PROP_COLOR          "色とフォント"
+END
+
+#endif    // 日本語 resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

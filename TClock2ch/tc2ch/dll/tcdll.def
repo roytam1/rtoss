@@ -1,0 +1,8 @@
+LIBRARY 	tcdll.dll
+
+SECTIONS
+MYDATA    SHARED READ WRITE
+
+EXPORTS
+HookStart  @1
+HookEnd    @2
