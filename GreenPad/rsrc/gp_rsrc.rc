@@ -100,6 +100,7 @@ BEGIN
             MENUITEM "(no files)",                  ID_MENUITEM40029, GRAYED
         END
         MENUITEM SEPARATOR
+        MENUITEM "ï€ë∂ÇµÇƒèIóπ(&I)...\tCtrl+E", ID_CMD_SAVEEXIT
         MENUITEM "èIóπ(&X)",                    ID_CMD_EXIT
     END
     POPUP "ï“èW(&E)"
@@ -303,6 +304,7 @@ BEGIN
     "3",            ID_CMD_WRAPWINDOW,      VIRTKEY, CONTROL, NOINVERT
     "A",            ID_CMD_SELECTALL,       VIRTKEY, CONTROL, NOINVERT
     "C",            ID_CMD_COPY,            VIRTKEY, CONTROL, NOINVERT
+    "E",            ID_CMD_SAVEEXIT,        VIRTKEY, CONTROL, NOINVERT
     "F",            ID_CMD_FIND,            VIRTKEY, CONTROL, NOINVERT
     "G",            ID_CMD_GREP,            VIRTKEY, CONTROL, NOINVERT
     "H",            ID_CMD_FIND,            VIRTKEY, CONTROL, NOINVERT
@@ -428,6 +430,8 @@ BEGIN
         BEGIN
             MENUITEM "(no files)",                  ID_MENUITEM40030, GRAYED
         END
+        MENUITEM SEPARATOR
+        MENUITEM "Save and Ex&it...\tCtrl+E",   ID_CMD_SAVEEXIT
         MENUITEM "E&xit",                       ID_CMD_EXIT
     END
     POPUP "&Edit"

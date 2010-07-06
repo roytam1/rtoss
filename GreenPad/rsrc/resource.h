@@ -91,6 +91,7 @@
 #define ID_MENUITEM40029                40029
 #define ID_MENUITEM40030                40030
 #define ID_CMD_STATUSBAR                40032
+#define ID_CMD_SAVEEXIT                 40033
 #define ID_CMD_MRU                      40200
 #define ID_CMD_DOCTYPE                  40300
 
@@ -99,7 +100,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        113
-#define _APS_NEXT_COMMAND_VALUE         40033
+#define _APS_NEXT_COMMAND_VALUE         40034
 #define _APS_NEXT_CONTROL_VALUE         1029
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
