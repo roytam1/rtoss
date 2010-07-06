@@ -174,7 +174,7 @@ bool GreenPadWnd::on_command( UINT id, HWND ctrl )
 	case ID_CMD_SAVEFILE:   on_savefile();  break;
 	case ID_CMD_SAVEFILEAS: on_savefileas();break;
 	case ID_CMD_EXIT:       on_exit();      break;
-	case ID_CMD_SAVEEXIT:   on_savefile(); on_exit();  break;
+	case ID_CMD_SAVEEXIT:   if(Save_showDlgIfNeeded()) on_exit();  break;
 
 	// Edit
 	case ID_CMD_UNDO:       edit_.getDoc().Undo();              break;
