@@ -100,7 +100,8 @@ BEGIN
             MENUITEM "(no files)",                  ID_MENUITEM40029, GRAYED
         END
         MENUITEM SEPARATOR
-        MENUITEM "保存して終了(&I)...\tCtrl+E", ID_CMD_SAVEEXIT
+        MENUITEM "保存して終了(&I)\tCtrl+E", ID_CMD_SAVEEXIT
+        MENUITEM "保存せずに終了(&D)\tCtrl+Shift+E", ID_CMD_DISCARDEXIT
         MENUITEM "終了(&X)",                    ID_CMD_EXIT
     END
     POPUP "編集(&E)"
@@ -305,6 +306,7 @@ BEGIN
     "A",            ID_CMD_SELECTALL,       VIRTKEY, CONTROL, NOINVERT
     "C",            ID_CMD_COPY,            VIRTKEY, CONTROL, NOINVERT
     "E",            ID_CMD_SAVEEXIT,        VIRTKEY, CONTROL, NOINVERT
+    "E",            ID_CMD_DISCARDEXIT,     VIRTKEY, SHIFT, CONTROL, NOINVERT
     "F",            ID_CMD_FIND,            VIRTKEY, CONTROL, NOINVERT
     "G",            ID_CMD_GREP,            VIRTKEY, CONTROL, NOINVERT
     "H",            ID_CMD_FIND,            VIRTKEY, CONTROL, NOINVERT
@@ -431,7 +433,8 @@ BEGIN
             MENUITEM "(no files)",                  ID_MENUITEM40030, GRAYED
         END
         MENUITEM SEPARATOR
-        MENUITEM "Save and Ex&it...\tCtrl+E",   ID_CMD_SAVEEXIT
+        MENUITEM "Save and Ex&it\tCtrl+E",   ID_CMD_SAVEEXIT
+        MENUITEM "&Discard and Exit\tCtrl+Shift+E",   ID_CMD_DISCARDEXIT
         MENUITEM "E&xit",                       ID_CMD_EXIT
     END
     POPUP "&Edit"
