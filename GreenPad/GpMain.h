@@ -95,6 +95,7 @@ private:
 	void    on_reopenfile();
 	void    on_savefile();
 	void    on_savefileas();
+	void    on_print();
 	void    on_exit();
 	void    on_initmenu( HMENU menu, bool editmenu_only );
 	void    on_drop( HDROP hd );

@@ -173,8 +173,9 @@ bool GreenPadWnd::on_command( UINT id, HWND ctrl )
 	case ID_CMD_REOPENFILE: on_reopenfile();break;
 	case ID_CMD_SAVEFILE:   on_savefile();  break;
 	case ID_CMD_SAVEFILEAS: on_savefileas();break;
+	case ID_CMD_PRINT:      on_print();     break;
 	case ID_CMD_SAVEEXIT:   if(Save_showDlgIfNeeded()) on_exit();  break;
-	case ID_CMD_DISCARDEXIT: Destroy();      break;
+	case ID_CMD_DISCARDEXIT: Destroy();     break;
 	case ID_CMD_EXIT:       on_exit();      break;
 
 	// Edit
@@ -274,6 +275,121 @@ void GreenPadWnd::on_savefileas()
 		Save();
 		ReloadConfig(); // 文書タイプに応じて表示を更新
 	}
+}
+
+void GreenPadWnd::on_print()
+{
+	TCHAR tmp[128];
+
+	doc::Document& d = edit_.getDoc();
+	const unicode* buf;
+	ulong dpStart = 0, len = 0;
+	short procCopies = 0, totalCopies = 0;
+
+	PRINTDLG thePrintDlg = { sizeof(thePrintDlg) };
+	thePrintDlg.Flags = PD_RETURNDC | PD_NOPAGENUMS | PD_NOSELECTION | PD_HIDEPRINTTOFILE;
+	thePrintDlg.nCopies = 1;
+
+	if (PrintDlg(&thePrintDlg) == 0) {
+		// cancelled
+		return;
+	}
+
+	totalCopies = thePrintDlg.nCopies;
+
+	// タイトルに表示される文字列の調整
+	// FileName * - GreenPad
+	String name;
+	name += isUntitled() ? TEXT("untitled") : filename_.name();
+	if( edit_.getDoc().isModified() ) name += TEXT(" *");
+	name += TEXT(" - ");
+	name += String(IDS_APPNAME).c_str();
+
+	// Set DOCINFO structure
+	DOCINFO di = { sizeof(DOCINFO) };
+	di.lpszDocName = name.c_str();
+	di.lpszOutput = (LPTSTR) NULL;
+	di.lpszDatatype = (LPTSTR) NULL;
+	di.fwType = 0;
+	RECT rcPrinter = { 0, 0 };
+
+	int nError = ::StartDoc(thePrintDlg.hDC, &di);
+	if (nError == SP_ERROR)
+	{
+		::wsprintf(tmp,TEXT("StartDoc Error #%d - please check printer."),::GetLastError());
+		::MessageBox( NULL, tmp, String(IDS_APPNAME).c_str(), MB_OK|MB_TASKMODAL );
+		return;
+		// Handle the error intelligently
+	}
+	::StartPage(thePrintDlg.hDC);
+
+	// Get Printer Caps
+	int cWidthPels, cHeightPels, cLineHeight;
+	cWidthPels = ::GetDeviceCaps(thePrintDlg.hDC, HORZRES);
+	cHeightPels = ::GetDeviceCaps(thePrintDlg.hDC, VERTRES);
+
+	// Get Line height
+	rcPrinter.right = cWidthPels;
+	rcPrinter.bottom = cHeightPels;
+	::DrawTextW(thePrintDlg.hDC, L"#", 1, &rcPrinter, DT_CALCRECT|DT_LEFT|DT_WORDBREAK|DT_EXPANDTABS|DT_EDITCONTROL);
+	cLineHeight = rcPrinter.bottom-rcPrinter.top;
+
+	rcPrinter.top = 5;
+	rcPrinter.left = 5;
+	rcPrinter.right = cWidthPels - 10;
+	rcPrinter.bottom = cHeightPels - 10;
+
+	// Process with multiple copies
+	do {
+		if(procCopies) 
+		{
+			::StartPage(thePrintDlg.hDC);
+			rcPrinter.top = 5;
+			rcPrinter.left = 5;
+			rcPrinter.right = cWidthPels - 10;
+			rcPrinter.bottom = cHeightPels - 10;
+		}
+		// Print (Single Line)
+		for( ulong e=d.tln(), dpStart=0; dpStart<e; ++dpStart )
+		{
+			len = d.len(dpStart);
+			buf = d.tl(dpStart);
+			if(!len)
+			{	// Empty Line
+				rcPrinter.top += cLineHeight;
+			}
+			else
+			{
+				rcPrinter.top += ::DrawTextW(thePrintDlg.hDC, buf, len, &rcPrinter, DT_LEFT|DT_WORDBREAK|DT_EXPANDTABS|DT_EDITCONTROL);
+			}
+
+			// turn to new page
+			if( (dpStart<e) && (rcPrinter.top + cLineHeight + 5 > rcPrinter.bottom) )
+			{
+				::EndPage(thePrintDlg.hDC);
+				::StartPage(thePrintDlg.hDC);
+				rcPrinter.top = 5;
+				rcPrinter.left = 5;
+				rcPrinter.right = cWidthPels - 10;
+				rcPrinter.bottom = cHeightPels - 10;
+			}
+		}
+
+		::EndPage(thePrintDlg.hDC);
+	} while(++procCopies < totalCopies);
+
+	// Close Printer
+	::EndDoc(thePrintDlg.hDC);
+	::DeleteDC(thePrintDlg.hDC);
+
+	/*
+	::GlobalUnlock(thePrintDlg.hDevNames);
+	::GlobalUnlock(thePrintDlg.hDevMode);
+
+	// 解放する。
+	::GlobalFree(thePrintDlg.hDevNames);
+	::GlobalFree(thePrintDlg.hDevMode);
+	*/
 }
 
 void GreenPadWnd::on_exit()
