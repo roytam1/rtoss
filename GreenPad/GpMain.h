@@ -110,6 +110,8 @@ private:
 	void    on_prevwnd();
 	void    on_mru( int no );
 	void    on_statusBar();
+	void    on_reconv();
+	void    on_toggleime();
 	bool    PreTranslateMessage( MSG* msg );
 };
 

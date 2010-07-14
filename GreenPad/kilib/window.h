@@ -193,8 +193,20 @@ public:
 	//@{ 確定文字列ゲット。受け取ったら delete すること。 //@}
 	void GetString( HWND wnd, unicode** str, ulong* len );
 
+	//@{ 再変換 //@}
+	void SetString( HWND wnd, unicode* str, ulong len );
+
 	//@{ GlobalIMEを利用可能状態にする //@}
 	void EnableGlobalIME( bool enable );
+
+	//@{ IMEをON/OFFにする //@}
+	void SetState( HWND wnd, bool enable );
+
+	//@{ IME ON/OFF判定 //@}
+	BOOL GetState( HWND wnd );
+
+	//@{ IME判定 //@}
+	BOOL IsIME();
 
 	//@{ GlobalIMEを使えるWindowのリストを登録 //@}
 	void FilterWindows( ATOM* lst, UINT siz );

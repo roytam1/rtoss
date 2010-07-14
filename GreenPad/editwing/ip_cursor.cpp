@@ -747,6 +747,29 @@ void Cursor::MoveByMouse( int x, int y )
 }
 
 //-------------------------------------------------------------------------
+// IME
+//-------------------------------------------------------------------------
+
+void Cursor::Reconv()
+{
+	if( isSelected() && ime().IsIME() )
+	{
+		aarr<unicode> ub = getSelectedStr();
+		ulong len;
+		for(len=0; ub[len]; ++len);
+		ime().SetString( caret_->hwnd(), ub.get(), len);
+	}
+}
+
+void Cursor::ToggleIME()
+{
+	if( ime().IsIME() )
+	{
+		ime().SetState( caret_->hwnd(), !ime().GetState( caret_->hwnd() ) );
+	}
+}
+
+//-------------------------------------------------------------------------
 // çƒïœä∑
 //-------------------------------------------------------------------------
 
