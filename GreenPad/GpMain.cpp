@@ -189,6 +189,8 @@ bool GreenPadWnd::on_command( UINT id, HWND ctrl )
 	case ID_CMD_SELECTALL:  edit_.getCursor().Home(true,false);
 	                        edit_.getCursor().End(true,true);   break;
 	case ID_CMD_DATETIME:   on_datetime();                      break;
+	case ID_CMD_RECONV:     on_reconv();                        break;
+	case ID_CMD_TOGGLEIME:  on_toggleime();                     break;
 
 	// Search
 	case ID_CMD_FIND:       search_.ShowDlg();  break;
@@ -450,6 +452,13 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 		::SetMenuItemInfo( menu, ID_CMD_UNDO, FALSE, &mi );
 
 		mi.fState =
+			(edit_.getCursor().isSelected() && ime().IsIME() ? MFS_ENABLED : MFS_DISABLED);
+		::SetMenuItemInfo( menu, ID_CMD_RECONV, FALSE, &mi );
+		mi.fState =
+			(ime().IsIME() ? MFS_ENABLED : MFS_DISABLED);
+		::SetMenuItemInfo( menu, ID_CMD_TOGGLEIME, FALSE, &mi );
+
+		mi.fState =
 			(edit_.getDoc().isRedoAble() ? MFS_ENABLED : MFS_DISABLED);
 		::SetMenuItemInfo( menu, ID_CMD_REDO, FALSE, &mi );
 
@@ -484,6 +493,8 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 		::EnableMenuItem( menu, ID_CMD_DELETE, MF_BYCOMMAND|(edit_.getCursor().isSelected() ? MF_ENABLED : MF_GRAYED) );
 		::EnableMenuItem( menu, ID_CMD_UNDO, MF_BYCOMMAND|(edit_.getDoc().isUndoAble() ? MF_ENABLED : MF_GRAYED) );
 		::EnableMenuItem( menu, ID_CMD_REDO, MF_BYCOMMAND|(edit_.getDoc().isRedoAble() ? MF_ENABLED : MF_GRAYED) );
+		::EnableMenuItem( menu, ID_CMD_RECONV, MF_BYCOMMAND|(edit_.getCursor().isSelected() && ime().IsIME() ? MF_ENABLED : MF_GRAYED) );
+		::EnableMenuItem( menu, ID_CMD_TOGGLEIME, MF_BYCOMMAND|(ime().IsIME() ? MF_ENABLED : MF_GRAYED) );
 
 		if( editmenu_only )
 		{
@@ -717,7 +728,14 @@ void GreenPadWnd::on_move( const DPos& c, const DPos& s )
 	stb_.SetText( str.c_str() );
 }
 
-
+void GreenPadWnd::on_reconv()
+{
+	edit_.getCursor().Reconv();
+}
+void GreenPadWnd::on_toggleime()
+{
+	edit_.getCursor().ToggleIME();
+}
 
 //-------------------------------------------------------------------------
 // ユーティリティー

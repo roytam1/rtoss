@@ -62,6 +62,69 @@ void IMEManager::EnableGlobalIME( bool enable )
 	#endif
 }
 
+BOOL IMEManager::IsIME()
+{
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	HKL hKL = GetKeyboardLayout(GetCurrentThreadId());
+	#ifdef USEGLOBALIME
+		if( immApp_ )
+		{
+			return immApp_->IsIME( hKL );
+		}
+		else
+	#endif
+		{
+			return ::ImmIsIME( hKL );
+		}
+#else
+	return FALSE;
+#endif
+}
+
+BOOL IMEManager::GetState( HWND wnd )
+{
+	BOOL imeStatus = FALSE;
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	HIMC ime;
+	#ifdef USEGLOBALIME
+		if( immApp_ )
+		{
+			immApp_->GetContext( wnd, &ime );
+			imeStatus = immApp_->GetOpenStatus( ime );
+			immApp_->ReleaseContext( wnd, ime );
+		}
+		else
+	#endif
+		{
+			ime = ::ImmGetContext( wnd );
+			imeStatus = ::ImmGetOpenStatus(ime );
+			::ImmReleaseContext( wnd, ime );
+		}
+#endif
+	return imeStatus;
+}
+
+void IMEManager::SetState( HWND wnd, bool enable )
+{
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	HIMC ime;
+	#ifdef USEGLOBALIME
+		if( immApp_ )
+		{
+			immApp_->GetContext( wnd, &ime );
+			immApp_->SetOpenStatus( ime, (enable ? TRUE : FALSE) );
+			immApp_->ReleaseContext( wnd, ime );
+		}
+		else
+	#endif
+		{
+			ime = ::ImmGetContext( wnd );
+			::ImmSetOpenStatus(ime, (enable ? TRUE : FALSE) );
+			::ImmReleaseContext( wnd, ime );
+		}
+#endif
+}
+
 void IMEManager::FilterWindows( ATOM* lst, UINT siz )
 {
 	#ifdef USEGLOBALIME
@@ -111,6 +174,7 @@ inline void IMEManager::MsgLoopEnd()
 
 void IMEManager::SetFont( HWND wnd, const LOGFONT& lf )
 {
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	HIMC ime;
 	LOGFONT* plf = const_cast<LOGFONT*>(&lf);
 
@@ -128,16 +192,16 @@ void IMEManager::SetFont( HWND wnd, const LOGFONT& lf )
 	else
 	#endif
 	{
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 		ime = ::ImmGetContext( wnd );
 		::ImmSetCompositionFont( ime, plf );
 		::ImmReleaseContext( wnd, ime );
-#endif
 	}
+#endif
 }
 
 void IMEManager::SetPos( HWND wnd, int x, int y )
 {
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	HIMC ime;
 	COMPOSITIONFORM cf;
 	cf.dwStyle = CFS_POINT;
@@ -154,16 +218,16 @@ void IMEManager::SetPos( HWND wnd, int x, int y )
 	else
 	#endif
 	{
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 		ime = ::ImmGetContext( wnd );
 		::ImmSetCompositionWindow( ime, &cf );
 		::ImmReleaseContext( wnd, ime );
-#endif
 	}
+#endif
 }
 
 void IMEManager::GetString( HWND wnd, unicode** str, ulong* len )
 {
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	*str = NULL;
 	HIMC ime;
 
@@ -180,7 +244,6 @@ void IMEManager::GetString( HWND wnd, unicode** str, ulong* len )
 	else
 	#endif
 	{
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 		ime = ::ImmGetContext( wnd );
 		long s = ::ImmGetCompositionStringW( ime,GCS_RESULTSTR,NULL,0 );
 
@@ -206,8 +269,49 @@ void IMEManager::GetString( HWND wnd, unicode** str, ulong* len )
 			}
 
 		::ImmReleaseContext( wnd, ime );
-#endif
 	}
+#endif
+}
+
+void IMEManager::SetString( HWND wnd, unicode* str, ulong len )
+{
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	HIMC ime;
+
+	#ifdef USEGLOBALIME
+	if( immApp_ )
+	{
+		long s=0;
+		immApp_->GetContext( wnd, &ime );
+		immApp_->SetCompositionStringW( ime, SCS_SETSTR, str, len*sizeof(unicode), NULL, 0 );
+		immApp_->NotifyIME( ime, NI_COMPOSITIONSTR, CPS_CONVERT, 0 );
+		immApp_->NotifyIME( ime, NI_OPENCANDIDATE, 0, 0 );
+		immApp_->ReleaseContext( wnd, ime );
+	}
+	else
+	#endif
+	{
+		ime = ::ImmGetContext( wnd );
+		long s = ::ImmSetCompositionStringW( ime,SCS_SETSTR,str,len*sizeof(unicode),NULL,0 );
+
+		#ifndef _UNICODE
+			if( s == 0 )
+			{
+				len = ::WideCharToMultiByte( CP_ACP,MB_PRECOMPOSED,str,-1,NULL,NULL,TRUE );
+				char* tmp = new char[len];
+				
+				::WideCharToMultiByte( CP_ACP, MB_PRECOMPOSED, str, -1, tmp, &len,TRUE );
+				s = ::ImmSetCompositionStringA(ime,SCS_SETSTR,tmp,len,NULL,0);
+				delete [] tmp;
+			}
+			else
+		#endif
+
+		::ImmNotifyIME( ime, NI_COMPOSITIONSTR, CPS_CONVERT, 0); // 変換実行
+		::ImmNotifyIME( ime, NI_OPENCANDIDATE, 0, 0 ); // 変換候補リスト表示
+		::ImmReleaseContext( wnd, ime );
+	}
+#endif
 }
 
 

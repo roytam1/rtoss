@@ -119,6 +119,9 @@ BEGIN
         MENUITEM "ëSÇƒÇëIë(&A)\tCtrl+A",      ID_CMD_SELECTALL
         MENUITEM SEPARATOR
         MENUITEM "ì˙éûÇÃë}ì¸(&T)\tF5",          ID_CMD_DATETIME
+        MENUITEM SEPARATOR
+        MENUITEM "çƒïœä∑(&V)",              ID_CMD_RECONV
+        MENUITEM "IME On/Off(&I)",          ID_CMD_TOGGLEIME
     END
     POPUP "åüçı(&S)"
     BEGIN
@@ -455,6 +458,9 @@ BEGIN
         MENUITEM "Select &All\tCtrl+A",         ID_CMD_SELECTALL
         MENUITEM SEPARATOR
         MENUITEM "Insert Date&&&Time\tF5",      ID_CMD_DATETIME
+        MENUITEM SEPARATOR
+        MENUITEM "Recon&version",               ID_CMD_RECONV
+        MENUITEM "&IME On/Off",                 ID_CMD_TOGGLEIME
     END
     POPUP "&Search"
     BEGIN
