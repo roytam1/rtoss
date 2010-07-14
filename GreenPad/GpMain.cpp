@@ -311,7 +311,7 @@ void GreenPadWnd::on_print()
 	di.lpszOutput = (LPTSTR) NULL;
 	di.lpszDatatype = (LPTSTR) NULL;
 	di.fwType = 0;
-	RECT rcPrinter = { 0, 0 };
+	RECT rctmp = { 0, 0, 0, 0 };
 
 	int nError = ::StartDoc(thePrintDlg.hDC, &di);
 	if (nError == SP_ERROR)
@@ -329,15 +329,15 @@ void GreenPadWnd::on_print()
 	cHeightPels = ::GetDeviceCaps(thePrintDlg.hDC, VERTRES);
 
 	// Get Line height
-	rcPrinter.right = cWidthPels;
-	rcPrinter.bottom = cHeightPels;
-	::DrawTextW(thePrintDlg.hDC, L"#", 1, &rcPrinter, DT_CALCRECT|DT_LEFT|DT_WORDBREAK|DT_EXPANDTABS|DT_EDITCONTROL);
-	cLineHeight = rcPrinter.bottom-rcPrinter.top;
+	rctmp.right = cWidthPels;
+	rctmp.bottom = cHeightPels;
+	::DrawTextW(thePrintDlg.hDC, L"#", 1, &rctmp, DT_CALCRECT|DT_LEFT|DT_WORDBREAK|DT_EXPANDTABS|DT_EDITCONTROL);
+	cLineHeight = rctmp.bottom-rctmp.top;
 
-	rcPrinter.top = 5;
-	rcPrinter.left = 5;
-	rcPrinter.right = cWidthPels - 10;
-	rcPrinter.bottom = cHeightPels - 10;
+	RECT rcPrinter = { 5, 5, cWidthPels - 10, cHeightPels - 10 };
+
+	int nThisLineHeight, nChars = 0, nHi = 0, nLo = 0;
+	const unicode* uStart;
 
 	// Process with multiple copies
 	do {
@@ -349,18 +349,50 @@ void GreenPadWnd::on_print()
 			rcPrinter.right = cWidthPels - 10;
 			rcPrinter.bottom = cHeightPels - 10;
 		}
-		// Print (Single Line)
-		for( ulong e=d.tln(), dpStart=0; dpStart<e; ++dpStart )
+		// Print
+		for( ulong e=d.tln(), dpStart=0; dpStart<e; )
 		{
 			len = d.len(dpStart);
 			buf = d.tl(dpStart);
 			if(!len)
 			{	// Empty Line
 				rcPrinter.top += cLineHeight;
+				++dpStart;
 			}
 			else
 			{
-				rcPrinter.top += ::DrawTextW(thePrintDlg.hDC, buf, len, &rcPrinter, DT_LEFT|DT_WORDBREAK|DT_EXPANDTABS|DT_EDITCONTROL);
+				rctmp = rcPrinter;
+				nHi = len; 
+				nLo = 0;
+				if(!nChars)
+				{
+					uStart = buf;
+					nChars = len;
+				}
+				else
+				{
+					uStart += nChars;
+					nHi = nChars = len-nChars;
+				}
+
+				while (nLo < nHi) { // Find maximum number of chars can be printed
+					rctmp.top = rcPrinter.top;
+					nThisLineHeight = ::DrawTextW(thePrintDlg.hDC, uStart, nChars, &rctmp, DT_CALCRECT|DT_WORDBREAK|DT_NOCLIP|DT_EXPANDTABS|DT_NOPREFIX|DT_EDITCONTROL);
+					if (rcPrinter.top+nThisLineHeight < rcPrinter.bottom)
+						nLo = nChars;
+					if (rcPrinter.top+nThisLineHeight > rcPrinter.bottom)
+						nHi = nChars;
+					if (nLo == nHi - 1)
+						nChars = nHi = nLo;
+					if (nLo < nHi)
+						nChars = nLo + (nHi - nLo)/2;
+				}
+				rcPrinter.top += ::DrawTextW(thePrintDlg.hDC, uStart, nChars, &rcPrinter, DT_WORDBREAK|DT_NOCLIP|DT_EXPANDTABS|DT_NOPREFIX|DT_EDITCONTROL);
+				if(uStart+nChars == buf+len) // Line end
+				{
+					nChars = 0;
+					++dpStart;
+				}
 			}
 
 			// turn to new page
