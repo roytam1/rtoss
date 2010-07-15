@@ -81,6 +81,27 @@ BOOL IMEManager::IsIME()
 #endif
 }
 
+BOOL IMEManager::CanReconv()
+{
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	HKL hKL = GetKeyboardLayout(GetCurrentThreadId());
+	DWORD nImeProps = ImmGetProperty( GetKeyboardLayout( 0 ), IGP_SETCOMPSTR );
+	#ifdef USEGLOBALIME
+		if( immApp_ )
+		{
+			immApp_->GetProperty( hKL, IGP_SETCOMPSTR, &nImeProps );
+		}
+		else
+	#endif
+		{
+			nImeProps = ::ImmGetProperty( hKL, IGP_SETCOMPSTR );
+		}
+		return (nImeProps & SCS_CAP_SETRECONVERTSTRING) != 0;
+#else
+	return FALSE;
+#endif
+}
+
 BOOL IMEManager::GetState( HWND wnd )
 {
 	BOOL imeStatus = FALSE;
