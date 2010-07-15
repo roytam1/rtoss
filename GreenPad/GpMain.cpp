@@ -452,7 +452,7 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 		::SetMenuItemInfo( menu, ID_CMD_UNDO, FALSE, &mi );
 
 		mi.fState =
-			(edit_.getCursor().isSelected() && ime().IsIME() ? MFS_ENABLED : MFS_DISABLED);
+			(edit_.getCursor().isSelected() && ime().IsIME() && ime().CanReconv() ? MFS_ENABLED : MFS_DISABLED);
 		::SetMenuItemInfo( menu, ID_CMD_RECONV, FALSE, &mi );
 		mi.fState =
 			(ime().IsIME() ? MFS_ENABLED : MFS_DISABLED);
@@ -493,7 +493,7 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 		::EnableMenuItem( menu, ID_CMD_DELETE, MF_BYCOMMAND|(edit_.getCursor().isSelected() ? MF_ENABLED : MF_GRAYED) );
 		::EnableMenuItem( menu, ID_CMD_UNDO, MF_BYCOMMAND|(edit_.getDoc().isUndoAble() ? MF_ENABLED : MF_GRAYED) );
 		::EnableMenuItem( menu, ID_CMD_REDO, MF_BYCOMMAND|(edit_.getDoc().isRedoAble() ? MF_ENABLED : MF_GRAYED) );
-		::EnableMenuItem( menu, ID_CMD_RECONV, MF_BYCOMMAND|(edit_.getCursor().isSelected() && ime().IsIME() ? MF_ENABLED : MF_GRAYED) );
+		::EnableMenuItem( menu, ID_CMD_RECONV, MF_BYCOMMAND|(edit_.getCursor().isSelected() && ime().IsIME() && ime().CanReconv() ? MF_ENABLED : MF_GRAYED) );
 		::EnableMenuItem( menu, ID_CMD_TOGGLEIME, MF_BYCOMMAND|(ime().IsIME() ? MF_ENABLED : MF_GRAYED) );
 
 		if( editmenu_only )

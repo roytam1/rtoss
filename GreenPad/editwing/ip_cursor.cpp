@@ -752,7 +752,7 @@ void Cursor::MoveByMouse( int x, int y )
 
 void Cursor::Reconv()
 {
-	if( isSelected() && ime().IsIME() )
+	if( isSelected() && ime().IsIME() && ime().CanReconv() )
 	{
 		aarr<unicode> ub = getSelectedStr();
 		ulong len;

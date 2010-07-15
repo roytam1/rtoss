@@ -205,8 +205,11 @@ public:
 	//@{ IME ON/OFF判定 //@}
 	BOOL GetState( HWND wnd );
 
-	//@{ IME判定 //@}
+	//@{ IMEを持つかどうかを調べる //@}
 	BOOL IsIME();
+
+	//@{ 逆変換をサポートを調べる //@}
+	BOOL CanReconv();
 
 	//@{ GlobalIMEを使えるWindowのリストを登録 //@}
 	void FilterWindows( ATOM* lst, UINT siz );
