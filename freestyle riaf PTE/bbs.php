@@ -24,6 +24,39 @@ function getREMOTE_ADDR(){
 	return $_SERVER['REMOTE_ADDR'];
 }
 
+function reCAPTCHA($title,$desc) {
+	global $key,$FROM1,$mail,$subject,$MESSAGE,$c_pass;
+	require_once './recaptchalib.php';
+	$publickey = ""; // you got this from the signup page
+	$privatekey = ""; // (same as above)
+	$error = '';
+
+	if($_POST["recaptcha_response_field"]) {
+        $resp = recaptcha_check_answer ($privatekey,
+                                        $_SERVER["REMOTE_ADDR"],
+                                        $_POST["recaptcha_challenge_field"],
+                                        $_POST["recaptcha_response_field"]);
+
+        if ($resp->is_valid)
+        	return true;
+        else
+            $error = $resp->error;
+	}
+	echo '<html><head><title>'.$title.'</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<body>'.$desc.'
+<form method="post" action="'.$_SERVER['PHP_SELF'].'">
+<input type="hidden" name="key" value="'.$key.'"><input type="hidden" name="nick" value="'.$FROM1.'"><input type="hidden" name="mail" value="'.$mail.'"><br>
+<input type="hidden" name="subject" value="'.$subject.'">
+<input type="hidden" name="content" value="'.$MESSAGE.'"><input type="hidden" name="url" value="">
+<input type="hidden" name="delk" value="'.$c_pass.'">';
+	echo recaptcha_get_html($publickey, $error);
+	echo '<input type="submit" value="確認">
+</form>
+</body></html>';
+	return false;
+}
+
 $subject = CleanStr($_REQUEST['subject']);
 $FROM1 = $_REQUEST['nick'];
 $FROM = CleanStr($_REQUEST['nick']);
@@ -43,6 +76,12 @@ if ($key == "" && (ereg("^( |　|\t)*$", $subject))) {
 }
 if (!isset($_REQUEST['url']) || (isset($_REQUEST['url']) && $_REQUEST['url']!="")) {
 	error("投稿が禁止されています", $FROM, $mail, $HOST, $MESSAGE);
+}
+
+
+// reCAPTCHA
+if(!$key) {
+	if(reCAPTCHA('スレッド作成','スレッド作成のは CAPTCHA 認証が必要です。') === false) exit;
 }
 
 // ホスト、禁止ホスト
