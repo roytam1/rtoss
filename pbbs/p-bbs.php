@@ -121,11 +121,6 @@ $past_prefix = "past";
 $no_host_read = 0;
 
 // 禁止ホスト（正規表現可
-$no_host[] = 'dynamic.zoot.jp';
-$no_host[] = 'ap.yournet.ne.jp';
-$no_host[] = 'tkyo.nt.adsl.ppp.infoweb.ne.jp';
-$no_host[] = 's02.a013.ap.plala.or.jp';
-$no_host[] = 'kantei.go.jp';
 $no_host[] = 'anonymizer.com';
 
 // 使用禁止ワード
@@ -143,7 +138,7 @@ function externalIPQuery($addr) {
 	$flg=0;$cnt=0;
 	if($EXTIPQ && $addr != "127.0.0.1") {
 		$rev = implode('.', array_reverse(explode('.', $addr)));
-		$queries = array( 'bbx.2ch.net','dnsbl.ahbl.org','niku.2ch.net','sbl-xbl.spamhaus.org','bl.blbl.org','bl.spamcop.net','virus.rbl.jp','ircbl.ahbl.org','tor.ahbl.org' );
+		$queries = array( 'bbx.2ch.net','dnsbl.ahbl.org','niku.2ch.net','cbl.abuseat.org','sbl-xbl.spamhaus.org','bl.blbl.org','bl.spamcop.net','virus.rbl.jp','ircbl.ahbl.org','tor.ahbl.org' );
 		foreach ( $queries as $query ) {
 			$qres=gethostbyname($rev.'.'.$query);
 			if($rev.'.'.$query!=$qres){ $flg=1; break; }
@@ -154,16 +149,34 @@ function externalIPQuery($addr) {
 	return $flg;
 }
 
+function matchCIDR($addr, $cidr) {
+	list($ip, $mask) = explode('/', $cidr);
+	return (ip2long($addr) >> (32 - $mask) == ip2long($ip.str_repeat('.0', 3 - substr_count($ip, '.'))) >> (32 - $mask));
+}
+
 // 禁止ホスト
 function hostblock() {
 	global $no_host;
 	if (is_array($no_host)) {
-		$host = gethostbyaddr(getenv("REMOTE_ADDR"));
-		foreach ($no_host as $user) {
-			if(preg_match("/$user/i", $host) || externalIPQuery($_SERVER['REMOTE_ADDR'])){
-				die("403");
+		$HOST = strtolower(gethostbyaddr($IP=getenv("REMOTE_ADDR")));
+		$checkTwice = ($IP != $HOST);
+		$IsBanned = false;
+		foreach($no_host as $pattern){
+			$slash = substr_count($pattern, '/');
+			if($slash==2){ // RegExp
+				$pattern .= 'i';
+			}elseif($slash==1){ // CIDR Notation
+				if(matchCIDR($IP, $pattern)){ $IsBanned = true; break; }
+				continue;
+			}elseif(strpos($pattern, '*')!==false || strpos($pattern, '?')!==false){ // Wildcard
+				$pattern = '/^'.str_replace(array('.', '*', '?'), array('\.', '.*', '.?'), $pattern).'$/i';
+			}else{ // Full-text
+				if($IP==$pattern || ($checkTwice && $HOST==strtolower($pattern))){ $IsBanned = true; break; }
+				continue;
 			}
+			if(preg_match($pattern, $HOST) || ($checkTwice && preg_match($pattern, $IP))){ $IsBanned = true; break; }
 		}
+		if($IsBanned || externalIPQuery($IP)) die("403");
 	}
 }
 
@@ -570,7 +583,7 @@ function renewlog($arrline){//ログ更新	入力:配列
 	if(LOCKEY==1){ lock_dir(LOCK) or lock_error(); }
 	if(LOCKEY==3){ m_lock($logfile, true); m_lock($logfile) or lock_error(); }
 	$rp = $gzlog?gzopen($logfile, "w"):fopen($logfile, "w");
-	if(LOCKEY==2){ @flock($rp, 2); }
+	if(LOCKEY>=2){ @flock($rp, 2); }
 	set_file_buffer($rp, 0);
 	fputs($rp, implode("",$arrline));
 	@ftruncate($rp, ftell($rp));
