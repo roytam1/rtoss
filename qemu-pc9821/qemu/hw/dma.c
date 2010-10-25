@@ -675,25 +675,19 @@ static uint32_t pc98_read_port (void *opaque, uint32_t nport)
     return 0;
 }
 
-static void pc98_dma_reset(void *opaque)
-{
-    struct dma_cont *d = opaque;
-    int i;
-
-    for (i = 0; i < ARRAY_SIZE (d->regs); ++i) {
-        d->regs[i].bound = 0;
-    }
-    d->access_ctrl = 0xb4;
-    dma_reset(d);
-}
-
 void pc98_DMA_init (int high_page_enable)
 {
     struct dma_cont *d = &dma_controllers[0];
     int i;
 
     d->pc98 = 1;
+    for (i = 0; i < ARRAY_SIZE (d->regs); ++i) {
+        d->regs[i].bound = 0;
+    }
+    d->access_ctrl = 0; //0xb4
+
     d->dshift = 0;
+
     for (i = 0; i < 8; i++) {
         register_ioport_write (0x01 + (i << 1), 1, 1, pc98_write_port, d);
         register_ioport_read (0x01 + (i << 1), 1, 1, pc98_read_port, d);
@@ -712,8 +706,8 @@ void pc98_DMA_init (int high_page_enable)
             register_ioport_write (0xe05 + (i << 1), 1, 1, pc98_write_port, d);
         }
     }
-    qemu_register_reset(pc98_dma_reset, d);
-    pc98_dma_reset(d);
+    qemu_register_reset(dma_reset, d);
+    dma_reset(d);
     register_savevm ("dma", 0, 2, dma_save, dma_load, d);
 
     dma_bh = qemu_bh_new(DMA_run_bh, NULL);

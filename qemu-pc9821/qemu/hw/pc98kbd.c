@@ -90,6 +90,8 @@ struct KeyBoardState {
     /* sio */
     uint8_t mode;
     uint8_t status;
+    uint8_t rts;
+    uint8_t rst;
     uint8_t rxen;
     uint8_t txen;
     uint8_t recv_data;
@@ -108,10 +110,13 @@ typedef struct KeyBoardState KeyBoardState;
 
 /* keyboard */
 
-static void kbd_recv(void *opaque, uint8_t value)
+static void kbd_reset(KeyBoardState *s)
 {
-    KeyBoardState *s = opaque;
+    printf("pc98kbd: reset\n");
+}
 
+static void kbd_recv(KeyBoardState *s, uint8_t value)
+{
     if (s->recv_count < SIO_BUFFER_SIZE) {
         s->recv_buf[(s->recv_write++) & (SIO_BUFFER_SIZE - 1)] = value;
         s->recv_count++;
@@ -122,10 +127,8 @@ static void kbd_recv(void *opaque, uint8_t value)
     }
 }
 
-static void kbd_send(void *opaque, uint8_t value)
+static void kbd_send(KeyBoardState *s, uint8_t value)
 {
-    KeyBoardState *s = opaque;
-
     s->send_buf[(s->send_count++) & 1] = value;
 
     switch (s->send_buf[0]) {
@@ -259,6 +262,11 @@ static void sio_cmd_write(void *opaque, uint32_t addr, uint32_t value)
         if (value & 0x10) {
             s->status &= ~(SIO_STAT_PE | SIO_STAT_OE | SIO_STAT_FE);
         }
+        if (s->rst && !(value & 8)) {
+            kbd_reset(s);
+        }
+        s->rts = value & 0x20;
+        s->rst = value & 8;
         s->rxen = value & 4;
         s->txen = value & 1;
         break;
@@ -281,7 +289,7 @@ static void sio_timer_handler(void *opaque)
 {
     KeyBoardState *s = opaque;
 
-    if (s->recv_count > 0) {
+    if (s->recv_count > 0 && !s->rts) {
         uint8_t value = s->recv_buf[(s->recv_read++) & 0xff];
         s->recv_count--;
         if (s->rxen) {
@@ -312,6 +320,8 @@ static void pc98_kbd_reset(void *opaque)
 
     s->mode = SIO_MODE_CLEAR;
     s->status = (SIO_STAT_TXRDY | SIO_STAT_TXE);
+    s->rts = 1;
+    s->rst = 0;
     s->txen = s->rxen = 0;
     s->recv_data = 0xff;
     s->recv_count = s->recv_read = s->recv_write = 0;
@@ -325,6 +335,8 @@ static void pc98_kbd_save(QEMUFile *f, void *opaque)
     qemu_put_8s(f, &s->lock);
     qemu_put_8s(f, &s->mode);
     qemu_put_8s(f, &s->status);
+    qemu_put_8s(f, &s->rts);
+    qemu_put_8s(f, &s->rst);
     qemu_put_8s(f, &s->rxen);
     qemu_put_8s(f, &s->txen);
     qemu_put_8s(f, &s->recv_data);
@@ -343,6 +355,8 @@ static int pc98_kbd_load(QEMUFile *f, void *opaque, int version_id)
     qemu_get_8s(f, &s->lock);
     qemu_get_8s(f, &s->mode);
     qemu_get_8s(f, &s->status);
+    qemu_get_8s(f, &s->rts);
+    qemu_get_8s(f, &s->rst);
     qemu_get_8s(f, &s->rxen);
     qemu_get_8s(f, &s->txen);
     qemu_get_8s(f, &s->recv_data);

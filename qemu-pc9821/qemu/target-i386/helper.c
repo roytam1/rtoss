@@ -134,7 +134,7 @@ typedef struct x86_def_t {
 
 #define I486_FEATURES (CPUID_FP87 | CPUID_VME | CPUID_PSE)
 #define PENTIUM_FEATURES (I486_FEATURES | CPUID_DE | CPUID_TSC | \
-          CPUID_MSR | CPUID_MCE | CPUID_CX8 | CPUID_MMX)
+          CPUID_MSR | CPUID_MCE | CPUID_CX8 | CPUID_MMX | CPUID_APIC)
 #define PENTIUM2_FEATURES (PENTIUM_FEATURES | CPUID_PAE | CPUID_SEP | \
           CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV | CPUID_PAT | \
           CPUID_PSE36 | CPUID_FXSR)
@@ -249,7 +249,7 @@ static x86_def_t x86_defs[] = {
     },
     {
         .name = "486",
-        .level = 0,
+        .level = 1,
         .family = 4,
         .model = 0,
         .stepping = 0,
@@ -1600,7 +1600,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
         *ecx = env->cpuid_vendor3;
         break;
     case 0x80000001:
-        *eax = env->cpuid_features;
+        *eax = env->cpuid_version;
         *ebx = 0;
         *ecx = env->cpuid_ext3_features;
         *edx = env->cpuid_ext2_features;

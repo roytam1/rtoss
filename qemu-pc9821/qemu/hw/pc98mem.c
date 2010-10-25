@@ -37,24 +37,28 @@
 #define BANK_FILE_NAME  "pc98bank%d.bin"
 #define BANK_FILE_SIZE  0x8000
 
-#define PCI_ROM_BANK  0
-#define IDE_ROM_BANK  3
-#define ITF_ROM_BANK  4
-#define BIOS_ROM_BANK 5
-#define ROM_BANK_NUM  8
+#define PCI_ROM_BANK    0
+#define APIC_ROM_BANK   1
+#define IDE_ROM_BANK    3
+#define ITF_ROM_BANK    4
+#define BIOS_L_ROM_BANK 5
+#define BIOS_H_ROM_BANK 7
+#define ROM_BANK_NUM    8
 
-#define REQUIRED_ROM_BANK ((1 << ITF_ROM_BANK) | (7 << BIOS_ROM_BANK))
+#define REQUIRED_ROM_BANK ((1 << ITF_ROM_BANK) | (7 << BIOS_L_ROM_BANK))
 
 #define BANK_BITS 12
 /* (1 << BANK_BITS) */
 #define BANK_SIZE 0x1000
 
-#define PCI_BIOS_OFS   (BANK_FILE_SIZE * PCI_ROM_BANK)
-#define IDE_BIOS_OFS   (BANK_FILE_SIZE * IDE_ROM_BANK)
-#define ITF_OFS        (BANK_FILE_SIZE * ITF_ROM_BANK)
-#define BIOS_OFS       (BANK_FILE_SIZE * BIOS_ROM_BANK)
-#define NONE_OFS       (BANK_FILE_SIZE * ROM_BANK_NUM)
-#define TOTAL_ROM_SIZE (NONE_OFS + BANK_SIZE)
+#define PCI_BIOS_OFS    (BANK_FILE_SIZE * PCI_ROM_BANK)
+#define APIC_OFS        (BANK_FILE_SIZE * APIC_ROM_BANK)
+#define IDE_BIOS_OFS    (BANK_FILE_SIZE * IDE_ROM_BANK)
+#define ITF_OFS         (BANK_FILE_SIZE * ITF_ROM_BANK)
+#define BIOS_L_OFS      (BANK_FILE_SIZE * BIOS_L_ROM_BANK)
+#define BIOS_H_OFS      (BANK_FILE_SIZE * BIOS_H_ROM_BANK)
+#define NONE_OFS        (BANK_FILE_SIZE * ROM_BANK_NUM)
+#define TOTAL_ROM_SIZE  (NONE_OFS + BANK_SIZE)
 
 enum {
     D8000_BANK_IDE = 1,
@@ -76,11 +80,14 @@ struct MemoryState {
 
     uint8_t ram_window_map1;
     uint8_t ram_window_map2;
+
     uint8_t d8000_bank;
     uint8_t ide_bios_enabled;
     uint8_t ide_ram_selected;
+
+    uint8_t f8000_bank;
     uint8_t bios_ram_selected;
-    uint8_t itf_selected;
+
     uint8_t use_system_16mb;
 
     uint8_t ide_bios_loaded;
@@ -90,10 +97,9 @@ struct MemoryState {
 
 typedef struct MemoryState MemoryState;
 
-static void register_ram(void *opaque, target_phys_addr_t top, ram_addr_t size,
+static void register_ram(MemoryState *s, target_phys_addr_t top, ram_addr_t size,
                          ram_addr_t ofs)
 {
-    MemoryState *s = opaque;
     target_phys_addr_t addr;
     int smram_update = 0;
 
@@ -119,10 +125,9 @@ static void register_ram(void *opaque, target_phys_addr_t top, ram_addr_t size,
     }
 }
 
-static void register_rom(void *opaque, target_phys_addr_t top, ram_addr_t size,
+static void register_rom(MemoryState *s, target_phys_addr_t top, ram_addr_t size,
                          ram_addr_t ofs)
 {
-    MemoryState *s = opaque;
     target_phys_addr_t addr;
     int smram_update = 0;
 
@@ -151,10 +156,9 @@ static void register_rom(void *opaque, target_phys_addr_t top, ram_addr_t size,
     }
 }
 
-static void register_io_memory(void *opaque, target_phys_addr_t top, ram_addr_t size,
+static void register_io_memory(MemoryState *s, target_phys_addr_t top, ram_addr_t size,
                                ram_addr_t phys_offset)
 {
-    MemoryState *s = opaque;
     target_phys_addr_t addr;
     int smram_update = 0;
 
@@ -179,10 +183,8 @@ static void register_io_memory(void *opaque, target_phys_addr_t top, ram_addr_t 
     }
 }
 
-static void register_ide_rom(void *opaque)
+static void register_ide_rom(MemoryState *s)
 {
-    MemoryState *s = opaque;
-
     if (!s->ide_bios_enabled) {
         register_rom(s, 0xd8000, 0x8000, NONE_OFS);
     } else if (s->ide_ram_selected) {
@@ -195,30 +197,14 @@ static void register_ide_rom(void *opaque)
     }
 }
 
-static void register_pci_rom(void *opaque)
+static void register_pci_rom(MemoryState *s)
 {
-    register_rom(opaque, 0xd8000, 0x8000, PCI_BIOS_OFS);
+    register_rom(s, 0xd8000, 0x8000, PCI_BIOS_OFS);
 }
 
-static void register_pnp_rom(void *opaque)
+static void register_pnp_rom(MemoryState *s)
 {
     /* XXX: register plug&play bios at 0xd8000-0xdffff */
-}
-
-static void register_bios_rom(void *opaque)
-{
-    register_rom(opaque, 0xe8000, 0x18000, BIOS_OFS);
-}
-
-static void register_bios_ram(void *opaque)
-{
-    register_ram(opaque, 0xe8000, 0x18000, 0xe8000);
-}
-
-static void register_itf_rom(void *opaque)
-{
-    register_rom(opaque, 0xe8000, 0x10000, NONE_OFS);
-    register_rom(opaque, 0xf8000, 0x08000, ITF_OFS);
 }
 
 static void ioport_43b_write(void *opaque, uint32_t addr1, uint32_t data)
@@ -280,48 +266,94 @@ static void ioport_43d_write(void *opaque, uint32_t addr, uint32_t data)
     case 0x00:
     case 0x10:
     case 0x18:
-        if (!s->itf_selected) {
-            s->itf_selected = 1;
-            register_itf_rom(s);
+        if (s->f8000_bank != ITF_ROM_BANK) {
+            s->f8000_bank = ITF_ROM_BANK;
+            register_rom(s, 0xf8000, 0x08000, ITF_OFS);
         }
         break;
     case 0x02:
     case 0x12:
-        if (s->itf_selected) {
-            s->itf_selected = 0;
+        if (s->f8000_bank != BIOS_H_ROM_BANK) {
+            s->f8000_bank = BIOS_H_ROM_BANK;
             if (s->bios_ram_selected) {
                 uint8_t *buf = phys_ram_base + s->ram_addr;
                 /* protect memory size */
-#ifdef PC98_DONT_USE_16MB_MEM
-                buf[0x401] = 0x78;
-#else
-                buf[0x401] = 0x70;
-#endif
+                if (s->use_system_16mb) {
+                    buf[0x401] = 0x70;
+                } else {
+                    buf[0x401] = 0x78;
+                }
                 *(uint16_t *)(buf + 0x594) = ((s->ram_size - 0x1000000) >> 20);
                 /* printer interface */
                 buf[0x458] &= ~0x06;
                 buf[0x5b3] &= ~0xe0;
-                /* IDE BIOS patch */
+#if 0
+                /* cpu type: 486DX2,66MHz */
+                buf[0x45a] = 0x57;
+                buf[0x484] = 0x0e;
+                buf[0x486] = 0x35;	/* DL */
+                buf[0x487] = 0x04;	/* DH */
+                buf[0x596] = 0x00;	/* CPU CACHE ??? */
+#endif
+                /* sysem clock */
+#ifdef PC98_SYSCLOCK_5MHZ
+                buf[0x501] = 0x24;	/* 5MHz */
+#else
+                buf[0x501] = 0xa4;	/* 8MHz */
+#endif
+                /* IDE drives */
                 if (s->ide_bios_loaded && s->hd_connect) {
                     if (s->hd_connect & 1) {
-                        buf[0x457] = 0x90;
-                        buf[0x45d] |= 0x08;
-                        buf[0x55d] |= 0x01;
+                        buf[0x457] = 0x90;	/* sector size = 512bytes, variable cylinder numbers */
+                        buf[0x45d] |= 0x08;	/* fast ide */
+                        buf[0x55d] |= 0x01;	/* ide drive is connected */
+                        buf[0x5b0] = 0x00;	/* ide drive size */
                     } else {
-                        buf[0x457] = 0x38;
+                        buf[0x457] = 0x38;	/* no hard drive */
+                        buf[0x5b0] = 0x38;	/* no hard drive */
                     }
                     if (s->hd_connect & 2) {
-                        buf[0x457] |= 0x42;
-                        buf[0x45d] |= 0x10;
-                        buf[0x55d] |= 0x02;
+                        buf[0x457] |= 0x42;	/* sector size = 512bytes, variable cylinder numbers */
+                        buf[0x45d] |= 0x10;	/* fast ide */
+                        buf[0x55d] |= 0x02;	/* ide drive is connected */
                     } else {
-                        buf[0x457] |= 0x07;
+                        buf[0x457] |= 0x07;	/* no hard drive */
+                        buf[0x5b0] |= 0x07;	/* no hard drive */
+                    }
+                    if (s->hd_connect & 3) {
+                        buf[0x480] |= 0x80;	/* support new sence command */
                     }
                     buf[0xf8e90] |= (s->hd_connect & 0x0f);
                 }
-                register_bios_ram(s);
+                register_ram(s, 0xf8000, 0x8000, 0xf8000);
             } else {
-                register_bios_rom(s);
+                register_rom(s, 0xf8000, 0x8000, BIOS_H_OFS);
+            }
+        }
+        break;
+    }
+}
+
+static uint32_t ioport_43d_read(void *opaque, uint32_t addr)
+{
+    return 0x00; /* don't hit the cache */
+}
+
+static void ioport_43f_write(void *opaque, uint32_t addr, uint32_t data)
+{
+    MemoryState *s = opaque;
+
+    switch (data & 0xf0) {
+    case 0x20:
+        pc98_select_ems(data);
+        break;
+    case 0xe0:
+        if (s->f8000_bank != ((data >> 1) & 0x07)) {
+            s->f8000_bank = (data >> 1) & 0x07;
+            if (s->f8000_bank == BIOS_H_ROM_BANK && s->bios_ram_selected) {
+                register_ram(s, 0xf8000, 0x08000, 0xe8000);
+            } else {
+                register_rom(s, 0xf8000, 0x08000, s->f8000_bank * BANK_FILE_SIZE);
             }
         }
         break;
@@ -412,15 +444,17 @@ static void ioport_53d_write(void *opaque, uint32_t addr, uint32_t data)
     if (data & 0x02) {
         if (!s->bios_ram_selected) {
             s->bios_ram_selected = 1;
-            if (!s->itf_selected) {
-                register_bios_ram(s);
+            register_ram(s, 0xe8000, 0x10000, 0xe8000);
+            if (s->f8000_bank == BIOS_H_ROM_BANK) {
+                register_ram(s, 0xf8000, 0x08000, 0xf8000);
             }
         }
     } else {
         if (s->bios_ram_selected) {
             s->bios_ram_selected = 0;
-            if (!s->itf_selected) {
-                register_bios_rom(s);
+            register_rom(s, 0xe8000, 0x10000, BIOS_L_OFS);
+            if (s->f8000_bank == BIOS_H_ROM_BANK) {
+                register_rom(s, 0xf8000, 0x08000, BIOS_H_OFS);
             }
         }
     }
@@ -506,8 +540,8 @@ static void pc98_mem_save(QEMUFile *f, void *opaque)
     qemu_put_8s(f, &s->d8000_bank);
     qemu_put_8s(f, &s->ide_bios_enabled);
     qemu_put_8s(f, &s->ide_ram_selected);
+    qemu_put_8s(f, &s->f8000_bank);
     qemu_put_8s(f, &s->bios_ram_selected);
-    qemu_put_8s(f, &s->itf_selected);
     qemu_put_8s(f, &s->use_system_16mb);
 }
 
@@ -540,8 +574,8 @@ static int pc98_mem_load(QEMUFile *f, void *opaque, int version_id)
     qemu_get_8s(f, &s->d8000_bank);
     qemu_get_8s(f, &s->ide_bios_enabled);
     qemu_get_8s(f, &s->ide_ram_selected);
+    qemu_get_8s(f, &s->f8000_bank);
     qemu_get_8s(f, &s->bios_ram_selected);
-    qemu_get_8s(f, &s->itf_selected);
     qemu_get_8s(f, &s->use_system_16mb);
 
     /* restore memory bank */
@@ -576,12 +610,15 @@ static int pc98_mem_load(QEMUFile *f, void *opaque, int version_id)
     } else if (s->d8000_bank == D8000_BANK_PnP) {
         register_pnp_rom(s);
     }
-    if (s->itf_selected) {
-        register_itf_rom(s);
-    } else if (s->bios_ram_selected) {
-        register_bios_ram(s);
+    if (s->bios_ram_selected) {
+        register_ram(s, 0xe8000, 0x10000, 0xe8000);
     } else {
-        register_bios_rom(s);
+        register_rom(s, 0xe8000, 0x10000, BIOS_L_OFS);
+    }
+    if (s->f8000_bank == BIOS_H_ROM_BANK && s->bios_ram_selected) {
+        register_ram(s, 0xf8000, 0x08000, 0xe8000);
+    } else {
+        register_rom(s, 0xf8000, 0x08000, s->f8000_bank * BANK_FILE_SIZE);
     }
     if (s->use_system_16mb) {
         cpu_register_physical_memory(isa_mem_base + 0xf00000, 0xa0000,
@@ -640,22 +677,34 @@ static void pc98_mem_reset(void *opaque)
         s->ide_ram_selected = 1;
         register_ide_rom(s);
     }
-    if (!s->itf_selected) {
-        s->itf_selected = 1;
-        register_itf_rom(s);
+    if (s->bios_ram_selected) {
+        s->bios_ram_selected = 0;
+        register_rom(s, 0xe8000, 0x10000, BIOS_L_OFS);
     }
-    s->bios_ram_selected = 0;
+    if (s->f8000_bank != ITF_ROM_BANK) {
+        s->f8000_bank = ITF_ROM_BANK;
+        register_rom(s, 0xf8000, 0x08000, ITF_OFS);
+    }
 }
 
 static int patch_itf(uint8_t *buf, const char *msg)
 {
-    uint8_t op[12] = {
+    /* patch to PC-9801BX4 ITF */
+    uint8_t op1[12] = {
         0xbe, 0x00, 0x00, //     mov si,msg
         0xbd, 0x00, 0x00, //     mov bp,retaddr
         0xe9, 0x00, 0x00, //     jmp disp
                           // retaddr:
         0xf4,             //     hlt
         0xeb, 0xfe,       //     jmp $-2
+    };
+    uint8_t op2[13] = {
+        0xbe, 0x00, 0x00, //     mov si,msg
+        0x8b, 0xdd,       //     mov bx,bp
+        0xbd, 0x00, 0x00, //     mov bp,retaddr
+        0xe9, 0x00, 0x00, //     jmp disp
+                          // retaddr:
+        0x8b, 0xeb,       //     mov bp,bx
     };
     int len = strlen(msg);
     int i, a1, a2;
@@ -668,17 +717,32 @@ static int patch_itf(uint8_t *buf, const char *msg)
             }
         }
         if (i == len) {
-            op[1] = (a1 - 1) & 0xff;
-            op[2] = (a1 - 1) >> 8;
+            op1[1] = (a1 - 1) & 0xff;
+            op1[2] = (a1 - 1) >> 8;
             for (a2 = 0; a2 < 0x8000 - 12; a2++) {
-                op[4] = (a2 + 9) & 0xff;
-                op[5] = (a2 + 9) >> 8;
+                op1[4] = (a2 + 9) & 0xff;
+                op1[5] = (a2 + 9) >> 8;
                 for (i = 0; i < 12; i++) {
-                    if (!(op[i] == buf[a2 + i] || op[i] == 0x00)) {
+                    if (!(op1[i] == buf[a2 + i] || op1[i] == 0x00)) {
                         break;
                     }
                 }
                 if (i == 9 || i == 12) {
+                    memset(buf + a2, 0x90, i);
+                    ret = 1;
+                }
+            }
+            op2[1] = (a1 - 1) & 0xff;
+            op2[2] = (a1 - 1) >> 8;
+            for (a2 = 0; a2 < 0x8000 - 13; a2++) {
+                op2[6] = (a2 + 11) & 0xff;
+                op2[7] = (a2 + 11) >> 8;
+                for (i = 0; i < 13; i++) {
+                    if (!(op2[i] == buf[a2 + i] || op2[i] == 0x00)) {
+                        break;
+                    }
+                }
+                if (i == 13) {
                     memset(buf + a2, 0x90, i);
                     ret = 1;
                 }
@@ -724,13 +788,9 @@ void pc98_mem_init(ram_addr_t ram_size, uint8_t hd_connect)
     s->d8000_bank = D8000_BANK_IDE;
     s->ide_bios_enabled = 1;
     s->ide_ram_selected = 1;
+    s->f8000_bank = ITF_ROM_BANK;
     s->bios_ram_selected = 0;
-    s->itf_selected = 1;
-#ifdef PC98_DONT_USE_16MB_MEM
-    s->use_system_16mb = 0;
-#else
     s->use_system_16mb = 1;
-#endif
 
     /* allocate RAM & ROM */
     s->ram_addr = qemu_ram_alloc(ram_size);
@@ -759,14 +819,18 @@ void pc98_mem_init(ram_addr_t ram_size, uint8_t hd_connect)
         loaded |= (1 << ITF_ROM_BANK);
     }
     snprintf(filename, sizeof(filename), "%s/%s", bios_dir, BIOS_FILE_NAME);
-    if (load_image(filename, buf + BIOS_OFS) == BIOS_FILE_SIZE) {
-        loaded |= (7 << BIOS_ROM_BANK);
+    if (load_image(filename, buf + BIOS_L_OFS) == BIOS_FILE_SIZE) {
+        loaded |= (7 << BIOS_L_ROM_BANK);
     }
     if ((loaded & REQUIRED_ROM_BANK) == REQUIRED_ROM_BANK) {
         /* ITF: disable hardware check */
         static const char msg[][32] = {
+            "TIMER ERROR",
             "TIMER INTERRUPT ERROR",
-            "EXTENDED GVRAM ERROR",
+            "CACHE RAM ERROR",
+            "CACHE ERROR",
+            "2ND CACHE RAM ERROR",
+            "2ND CACHE ERROR",
             /* end of array */
             "",
         };
@@ -777,9 +841,22 @@ void pc98_mem_init(ram_addr_t ram_size, uint8_t hd_connect)
         if (patched) {
             update_check_sum(buf + ITF_OFS);
         }
+#if 0
+        /* APIC BIOS */
+        if (buf[APIC_OFS] == 0xe9) {
+            uint16_t ofs = *(uint16_t *)(buf + APIC_OFS + 1);
+            for (i = 1; i < 16; i++) {
+                ofs -= 3;
+                buf[APIC_OFS + i * 3 + 0] = 0xe9;
+                buf[APIC_OFS + i * 3 + 1] = (uint8_t)(ofs & 0xff);
+                buf[APIC_OFS + i * 3 + 2] = (uint8_t)(ofs >> 8);
+            }
+            update_check_sum(buf + APIC_OFS);
+        }
+#endif
         /* BIOS: disable PnP BIOS */
         for (addr = 0x8000; addr < 0x18000; addr += 0x10) {
-            uint8_t *p = buf + BIOS_OFS + addr;
+            uint8_t *p = buf + BIOS_L_OFS + addr;
             if (p[0] == 0x24 && p[1] == 'P' && p[2] == 'n' && p[3] == 'P') {
                 p[0] = 'n';
                 p[2] = 0x24;
@@ -800,24 +877,22 @@ void pc98_mem_init(ram_addr_t ram_size, uint8_t hd_connect)
         s->mem_bank[i] = -1;
     }
     register_ram(s, 0, 0xa0000, 0);
-#ifdef PC98_DONT_USE_16MB_MEM
-    cpu_register_physical_memory(0x100000, ram_size - 0x100000,
-                                 s->ram_addr + 0x100000);
-#else
     cpu_register_physical_memory(0x100000, 0xf00000 - 0x100000,
                                  s->ram_addr + 0x100000);
     if (ram_size > 0x1000000) {
         cpu_register_physical_memory(0x1000000, ram_size - 0x1000000,
                                      s->ram_addr + 0x1000000);
     }
-#endif
     register_rom(s, 0xc0000, 0x18000, NONE_OFS);
     register_ide_rom(s);
-    register_itf_rom(s);
+    register_rom(s, 0xe8000, 0x10000, BIOS_L_OFS);
+    register_rom(s, 0xf8000, 0x08000, ITF_OFS);
 
     register_ioport_write(0x43b, 1, 1, ioport_43b_write, s);
     register_ioport_read(0x43b, 1, 1, ioport_43b_read, s);
     register_ioport_write(0x43d, 1, 1, ioport_43d_write, s);
+    register_ioport_read(0x43d, 1, 1, ioport_43d_read, s);
+    register_ioport_write(0x43f, 1, 1, ioport_43f_write, s);
     register_ioport_write(0x461, 1, 1, ioport_461_write, s);
     register_ioport_read(0x461, 1, 1, ioport_461_read, s);
     register_ioport_write(0x463, 1, 1, ioport_463_write, s);
