@@ -1200,6 +1200,7 @@ QEMUMachine isapc_machine = {
 /* NEC PC-9821 */
 
 static void *pc98_sys;
+static void *pc98_vga;
 
 static void pc98_ioport_f2_write(void *opaque, uint32_t addr, uint32_t data)
 {
@@ -1228,6 +1229,13 @@ static uint32_t pc98_ioport_f6_read(void *opaque, uint32_t addr)
     return (ioport_get_a20() ^ 1) | 0x5e;
 }
 
+static void pc98_ioport_534_write(void *opaque, uint32_t addr, uint32_t data)
+{
+    if (data & 0x01) {
+        pc98_cpu_shutdown();
+    }
+}
+
 static uint32_t pc98_ioport_534_read(void *opaque, uint32_t addr)
 {
     return 0xec; /* cpu mode */
@@ -1250,6 +1258,11 @@ void pc98_cpu_shutdown(void)
     } else {
         qemu_cpu_reset_request();
     }
+}
+
+void pc98_select_ems(uint32_t value)
+{
+    pc98_vga_select_ems(pc98_vga, value);
 }
 
 #define PC98_NE2000_NB_MAX 2
@@ -1300,7 +1313,7 @@ static void pc98_init1(ram_addr_t ram_size,
 #ifdef TARGET_X86_64
         cpu_model = "qemu64";
 #else
-        cpu_model = "qemu32";
+        cpu_model = "486";
 #endif
     }
     sprintf(cpu_model_opt, "%s,+pc98_a20mask", cpu_model);
@@ -1376,6 +1389,7 @@ static void pc98_init1(ram_addr_t ram_size,
     register_ioport_read(0xf2, 1, 1, pc98_ioport_f2_read, NULL);
     register_ioport_write(0xf6, 1, 1, pc98_ioport_f6_write, NULL);
     register_ioport_read(0xf6, 1, 1, pc98_ioport_f6_read, NULL);
+    register_ioport_write(0x534, 1, 1, pc98_ioport_534_write, NULL);
     register_ioport_read(0x534, 1, 1, pc98_ioport_534_read, NULL);
     register_ioport_read(0x9894, 1, 1, pc98_ioport_9894_read, NULL);
     register_ioport_read(0xa460, 1, 1, pc98_ioport_a460_read, NULL);
@@ -1430,7 +1444,7 @@ static void pc98_init1(ram_addr_t ram_size,
     pc98_mouse_init(i8259[13]);
     pc98_serial_init(i8259[4]);
     pc98_sys = pc98_sys_init(i8259[15]);
-    pc98_vga_init(i8259[2]);
+    pc98_vga = pc98_vga_init(i8259[2]);
     pc98_mem_init(ram_size, hd_connect);
 
 //    if (pci_enabled && usb_enabled) {

@@ -1252,7 +1252,8 @@ void do_interrupt(int intno, int is_int, int error_code,
 }
 
 /* This should come from sysemu.h - if we could include it here... */
-void qemu_system_reset_request(void);
+/*void qemu_system_reset_request(void);*/
+void qemu_system_cpu_request(void);
 
 /*
  * Check nested exceptions and change to double or triple fault if
@@ -1277,7 +1278,8 @@ static int check_exception(int intno, int *error_code)
 
         qemu_log_mask(CPU_LOG_RESET, "Triple fault\n");
 
-        qemu_system_reset_request();
+        /*qemu_system_reset_request();*/
+        qemu_cpu_reset_request(); /* reset only cpu */
         return EXCP_HLT;
     }
 #endif
@@ -4317,6 +4319,10 @@ void helper_fxsave(target_ulong ptr, int data64)
     int fpus, fptag, i, nb_xmm_regs;
     CPU86_LDouble tmp;
     target_ulong addr;
+    /* The operand must be 16 byte aligned */
+    if (ptr & 0xf) {
+        raise_exception(EXCP0D_GPF);
+    }
 
     fpus = (env->fpus & ~0x3800) | (env->fpstt & 0x7) << 11;
     fptag = 0;
@@ -4373,6 +4379,10 @@ void helper_fxrstor(target_ulong ptr, int data64)
     int i, fpus, fptag, nb_xmm_regs;
     CPU86_LDouble tmp;
     target_ulong addr;
+    /* The operand must be 16 byte aligned */
+    if (ptr & 0xf) {
+        raise_exception(EXCP0D_GPF);
+    }
 
     env->fpuc = lduw(ptr);
     fpus = lduw(ptr + 2);
@@ -5185,7 +5195,7 @@ void helper_svm_check_intercept_param(uint32_t type, uint64_t param)
             switch((uint32_t)ECX) {
             case 0 ... 0x1fff:
                 t0 = (ECX * 2) % 8;
-                t1 = ECX / 8;
+                t1 = (ECX * 2) / 8;
                 break;
             case 0xc0000000 ... 0xc0001fff:
                 t0 = (8192 + ECX - 0xc0000000) * 2;

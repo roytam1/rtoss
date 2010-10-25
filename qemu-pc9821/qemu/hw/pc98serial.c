@@ -68,14 +68,12 @@ struct SerialPortState {
 
 typedef struct SerialPortState SerialPortState;
 
-static void serial_send(void *opaque, uint8_t value)
+static void serial_send(SerialPortState *s, uint8_t value)
 {
 }
 
-static void serial_recv(void *opaque, uint8_t value)
+static void serial_recv(SerialPortState *s, uint8_t value)
 {
-    SerialPortState *s = opaque;
-
     if (s->recv_count < SIO_BUFFER_SIZE) {
         s->recv_buf[(s->recv_write++) & (SIO_BUFFER_SIZE - 1)] = value;
         s->recv_count++;

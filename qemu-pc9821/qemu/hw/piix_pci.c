@@ -136,13 +136,13 @@ static void i440fx_write_config(PCIDevice *d,
     pci_default_write_config(d, address, val, len);
     if ((address >= 0x59 && address <= 0x5f) || address == 0x72) {
         i440fx_update_memory_mappings(d);
-    } else if (address >= 0x60 && address <= 0x67) {
-        if (drb) {
+    }
+    if (drb) {
+        for (address = 0x60; address < 0x68; address++) {
             d->config[address] = drb; /* DRB */
         }
-    } else if (address == 0x91) {
-        d->config[address] = 0x00; /* ERRSTS */
     }
+    d->config[0x91] = 0x00; /* ERRSTS */
 }
 
 static void i440fx_save(QEMUFile* f, void *opaque)
@@ -374,40 +374,6 @@ int piix4_init(PCIBus *bus, int devfn)
 
 /* NEC PC-9821 */
 
-static void pc98_piix3_reset(PCIDevice *d)
-{
-    static const struct {
-        int port;
-        uint32_t data;
-    } params[] = {
-        { 0x04, 0x3a000107 }, /* PC-9821Rv20 */
-        { 0x40, 0x00ef0010 },
-        { 0x44, 0xfffbfffa },
-        { 0x48, 0xfffefffe },
-        { 0x4c, 0x0000ffff },
-        { 0x50, 0x0f020100 },
-        { 0x54, 0x078a0504 },
-        { 0x58, 0x0b8a0908 },
-        { 0x5c, 0x8f0e0d8c },
-        { 0x60, 0x80808080 },
-        { 0x64, 0x18073f50 },
-        { 0x68, 0xac000000 },
-        { 0x6c, 0x00000000 },
-        { 0x70, 0x0000c00c },
-        { 0x78, 0x000fd9b2 },
-        { -1,   0xffffffff },
-    };
-    uint8_t *pci_conf = d->config;
-    int i;
-
-    for (i = 0; params[i].port != -1; i++) {
-        pci_conf[params[i].port + 0] = (params[i].data >>  0) & 0xff;
-        pci_conf[params[i].port + 1] = (params[i].data >>  8) & 0xff;
-        pci_conf[params[i].port + 2] = (params[i].data >> 16) & 0xff;
-        pci_conf[params[i].port + 3] = (params[i].data >> 24) & 0xff;
-    }
-}
-
 int pc98_piix3_init(PCIBus *bus)
 {
     PCIDevice *d;
@@ -436,17 +402,16 @@ int pc98_piix3_init(PCIBus *bus)
     pci_config_set_class(pci_conf, PCI_CLASS_BRIDGE_OTHER);
     pci_conf[0x0e] = 0x80; // header_type = PCI_multifunction, generic
 
-    pc98_piix3_reset(d);
     return d->devfn;
 }
 
 void pc98_i440fx_set_drb(PCIDevice *d, ram_addr_t ram_size)
 {
-    int i;
+    uint32_t address;
 
     drb = (uint8_t)(ram_size / (8 * 1024 * 1024));
 
-    for (i = 0; i < 8; i++) {
-        d->config[0x60 + i] = drb;
+    for (address = 0x60; address < 0x68; address++) {
+        d->config[address] = drb; /* DRB */
     }
 }

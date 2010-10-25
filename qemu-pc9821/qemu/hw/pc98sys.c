@@ -27,6 +27,8 @@
 #include "isa.h"
 #include "qemu-timer.h"
 
+#define SDIP_FILE_NAME "pc98sdip.bin"
+
 enum {
     RTC_STROBE = 0x08,
     RTC_CLOCK  = 0x10,
@@ -107,9 +109,8 @@ static inline uint8_t to_bcd(uint8_t val)
     return ((val / 10) << 4) | (val % 10);
 }
 
-static void rtc_read_time(void *opaque)
+static void rtc_read_time(SysPortState *s)
 {
-    SysPortState *s = opaque;
     struct tm tm;
 
     qemu_get_timedate(&tm, 0);
@@ -358,6 +359,32 @@ static uint32_t tstmp_read(void *opaque, uint32_t addr)
 
 /* software dip-switch */
 
+static void sdip_save(SysPortState *s)
+{
+    char filename[1024];
+    FILE* fp;
+
+    snprintf(filename, sizeof(filename), "%s/%s", bios_dir, SDIP_FILE_NAME);
+    if ((fp = fopen(filename, "wb")) != NULL) {
+        fwrite(s->sdip, 24, 1, fp);
+        fclose(fp);
+    }
+}
+
+static int sdip_load(SysPortState *s)
+{
+    char filename[1024];
+    FILE* fp;
+
+    snprintf(filename, sizeof(filename), "%s/%s", bios_dir, SDIP_FILE_NAME);
+    if ((fp = fopen(filename, "rb")) != NULL) {
+        fwrite(s->sdip, 24, 1, fp);
+        fclose(fp);
+        return 0;
+    }
+    return -1;
+}
+
 static void sdip_data_write(void *opaque, uint32_t addr, uint32_t value)
 {
     SysPortState *s = opaque;
@@ -368,7 +395,11 @@ static void sdip_data_write(void *opaque, uint32_t addr, uint32_t value)
     } else {
         bank = ((addr >> 8) & 0x0f) - 4;
     }
-    s->sdip[bank] = value;
+    if (s->sdip[bank] != value) {
+        s->sdip[bank] = value;
+        /* save software dip-switch */
+//        sdip_save(s);
+    }
 }
 
 static uint32_t sdip_data_read(void *opaque, uint32_t addr)
@@ -412,6 +443,8 @@ static void pc98_sys_reset(void *opaque)
     s->prn_portb = 0x00;
     s->prn_portc = 0x81;
     s->prn_mode = 0x82;
+
+    s->sdip_bank = 0;
 }
 
 static void pc98_sys_save(QEMUFile *f, void *opaque)
@@ -465,11 +498,7 @@ static int pc98_sys_load(QEMUFile *f, void *opaque, int version_id)
 }
 
 static const uint8_t sdip_default[] = {
-#ifdef PC98_DONT_USE_16MB_MEM
-    0x7c, 0x12, 0xf7, 0x3e, 0x7c, 0x7f, 0xff, 0xbf, 0x7f, 0x7f, 0x49, 0x19,
-#else
-    0x7c, 0x12, 0xf7, 0x3e, 0x7c, 0x7f, 0xff, 0xbf, 0x7f, 0x7f, 0x49, 0x98,
-#endif
+    0x7c, 0x73, 0x76, 0x3e, 0xdc, 0x7f, 0xff, 0xbf, 0x7f, 0x7f, 0x49, 0x98,
     0x8f, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
 };
 
@@ -480,8 +509,9 @@ void *pc98_sys_init(qemu_irq irq)
 
     s = qemu_mallocz(sizeof(SysPortState));
 
-    memcpy(s->sdip, sdip_default, 24);
-    s->sdip_bank = 0;
+//    if (sdip_load(s)) {
+        memcpy(s->sdip, sdip_default, 24);
+//    }
 
     register_ioport_write(0x20, 1, 1, rtc_reg_write, s);
     register_ioport_write(0x22, 1, 1, rtc_mode_write, s);

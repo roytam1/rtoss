@@ -176,16 +176,6 @@ void isa_ne2000_init(int base, qemu_irq irq, NICInfo *nd);
     #define PC98_PIT_FREQ 1996800
 #endif
 
-//#define PC98_DONT_USE_16MB_MEM
-
-//#define PC98_SUPPORT_CIRRUS_VGA
-
-/* cirrus_vga.c */
-void *pc98_cirrus_vga_init(DisplayState *ds);
-void pc98_cirrus_vga_update_display(void *opaque);
-void pc98_cirrus_vga_invalidate_display(void *opaque);
-void pc98_cirrus_vga_invalidate_display_size(void *opaque);
-
 /* i8254.c */
 PITState *pc98_pit_init(qemu_irq irq);
 
@@ -200,6 +190,7 @@ void pc98_ne2000_init(int base, qemu_irq irq, NICInfo *nd);
 
 /* pc.c */
 void pc98_cpu_shutdown(void);
+void pc98_select_ems(uint32_t value);
 
 /* piix_pci.c */
 int pc98_piix3_init(PCIBus *bus);
@@ -226,6 +217,7 @@ void *pc98_sys_init(qemu_irq irq);
 uint8_t pc98_sys_read_shut(void *opaque);
 
 /* pc98vga.c */
-void pc98_vga_init(qemu_irq irq);
+void *pc98_vga_init(qemu_irq irq);
+void pc98_vga_select_ems(void *opaque, uint32_t value);
 
 #endif
