@@ -18,6 +18,13 @@
   $arrowext	= array('7z','zip','lzh','rar','avi','mpg','wmv','mp3','wma','swf','txt','bmp','jpg','png','gif','psd','aac');	//許可拡張子 小文字（それ以外はエラー
   $denyupload	= array('annony');	//拒否ファイル
 
+  $xsendfile = false; // use x-sendfile header?
+                      // false: use PHP readfile_chunked()
+                      // 'X-sendfile': for apache mod_xsendfile/lighttpd-1.5
+                      // 'X-LIGHTTPD-send-file': for lighttpd-1.4.20+
+                      // 'X-Accel-Redirect': for nginx
+  $xendfile_prefix = ''; // path prefix for x-sendfile
+
   $count_start	= "2009/10/30";	//カウンタ開始日
 
   $last_time	= 0;		//同一IPからの連続投稿許可する間隔（分）（0で無制限）

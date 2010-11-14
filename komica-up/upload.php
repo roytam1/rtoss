@@ -82,7 +82,7 @@ if(!($act=='get' && $_SERVER['REQUEST_METHOD'] == 'POST')) htmlheader();
 $foot = <<<FOOT
 
 <h2>著作権表示</h2>
-<p id="link"><a href="http://php.s3.to/">レッツPHP!</a> + <a href="http://utu.under.jp">Wastepaper Basket</a> + <a href="http://scrappedblog.blogspot.com/">Roytam1</a>(k-up SQL 20100327)</p>
+<p id="link"><a href="http://php.s3.to/">レッツPHP!</a> + <a href="http://utu.under.jp">Wastepaper Basket</a> + <a href="http://scrappedblog.blogspot.com/">Roytam1</a>(k-up SQL 20101114)</p>
 
 </body>
 </html>
@@ -175,6 +175,28 @@ function matchCIDR($addr, $cidr) {
 	list($ip, $mask) = explode('/', $cidr);
 	return (ip2long($addr) >> (32 - $mask) == ip2long($ip.str_repeat('.0', 3 - substr_count($ip, '.'))) >> (32 - $mask));
 }
+
+// faster readfile()
+function readfile_chunked($filename,$retbytes=true) {
+   $chunksize = 1*(1024*1024); // how many bytes per chunk
+   $buffer = '';
+   $cnt =0;
+   // $handle = fopen($filename, 'rb');
+   $handle = fopen($filename, 'rb');
+   if ($handle === false) return false;
+   while (!feof($handle)) {
+       $buffer = fread($handle, $chunksize);
+       echo $buffer;
+       ob_flush();flush();
+       if ($retbytes) $cnt += strlen($buffer);
+   }
+   $status = fclose($handle);
+   if ($retbytes && $status) {
+       return $cnt; // return num. bytes delivered like readfile() does.
+   }
+   return $status;
+}
+
 /* start */
 $limitb = $limitk * 1024;
 $host = @gethostbyaddr($REMOTE_ADDR);
@@ -320,8 +342,11 @@ error($txt);
 
 		$fname = $name == 'gen' ? $prefix.padNum($id).'.'.$row['ext'] : $row['upfile_name'];
 		header("Content-Disposition: attachment; filename=$fname");
-		header("Content-type: $row[upfile_type]; name=$fname");
-		readfile($updir.$prefix.padNum($id).'.'.$row['ext']);
+		header("Content-Type: $row[upfile_type]; name=$fname");
+		if($xsendfile == false)
+			readfile_chunked($updir.$prefix.padNum($id).'.'.$row['ext']);
+		else
+			header($xsendfile.': '.$xendfile_prefix.$updir.$prefix.padNum($id).'.'.$row['ext']);
 		exit;
 	} else {
 		htmlheader();
@@ -355,6 +380,7 @@ if(isset($GLOBALS['denyuplist'])&&is_array($denyuplist)){
 			}
 		}
 	}
+	
 	/* 拡張子と新ファイル名 */
 	$pos = strrpos($upfile_name,'.');	//拡張子取得
 	$ext = substr($upfile_name,$pos+1,strlen($upfile_name)-$pos);
@@ -525,4 +551,3 @@ if($act=='mult')	echo '<div align="right">密碼:<input type="password" name="de
 echo '<p class="tline">'.paging($page,$rows)."</p>\n";
 echo $foot;
 ?>
-
