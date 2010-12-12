@@ -60,7 +60,7 @@ function reCAPTCHA($title,$desc) {
 $subject = CleanStr($_REQUEST['subject']);
 $FROM1 = $_REQUEST['nick'];
 $FROM = CleanStr($_REQUEST['nick']);
-$FROM = ereg_replace("[\r\n]", "", $FROM);
+$FROM = preg_replace("/[\r\n]/", "", $FROM);
 $MESSAGE = CleanStr($_REQUEST['content']);
 $mail = Cleanstr($_REQUEST['mail']);
 $c_pass = $_REQUEST['delk'];
@@ -68,10 +68,10 @@ $delk = substr(md5($_REQUEST['delk']), 2, 8);
 $key = $_REQUEST['key'];
 $HOST = gethostbyaddr($IP=getREMOTE_ADDR());
 
-if (ereg("^( |　|\t)*$", $MESSAGE)) {
+if (preg_match("/^( |　|\t)*$/", $MESSAGE)) {
 	error("本文がありません！", $FROM, $mail, $HOST, $MESSAGE);
 }
-if ($key == "" && (ereg("^( |　|\t)*$", $subject))) {
+if ($key == "" && (preg_match("/^( |　|\t)*$/", $subject))) {
 	error("サブジェクトが存在しません！", $FROM, $mail, $HOST, $MESSAGE);
 }
 if (!isset($_REQUEST['url']) || (isset($_REQUEST['url']) && $_REQUEST['url']!="")) {
@@ -202,7 +202,7 @@ if (strstr($FROM, "#")) {
 	$pass = substr($FROM, strpos($FROM, "#") + 1);
 	$pass = str_replace('&#44;', ',', $pass);
 	$salt = substr($pass . "H.", 1, 2);
-	$salt = ereg_replace("[^\.-z]", ".", $salt);
+	$salt = preg_replace("/[^\.-z]/", ".", $salt);
 	$salt = strtr($salt, ":;<=>?@[\\]^_`", "ABCDEFGabcdef");
 	$FROM2 = substr($FROM, 0, strpos($FROM, "#"));
 	$FROM = $FROM2 . " ◆" . substr(crypt($pass, $salt), -10);
@@ -221,7 +221,7 @@ if (file_exists("cap.php") && strstr($mail, "#")) {
 	}
 	$mail = substr($mail, 0, strpos($mail, "#"));
 }
-if (ereg("^( |　|\t)*$", $FROM)) {
+if (preg_match("/^( |　|\t)*$/", $FROM)) {
 	$FROM = $nanasi;
 }
 // 記事フォーマット
