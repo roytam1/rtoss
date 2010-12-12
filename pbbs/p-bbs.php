@@ -195,14 +195,14 @@ function head(&$dat){ 		//ヘッダー表示部
 		}
 		if ($flag == 0) error("該当記事が見つかりません");
 
-		if(ereg("Re\[([0-9]+)\]:", $sub, $reg)){
+		if(preg_match("/Re\[([0-9]+)\]:/", $sub, $reg)){
 			$reg[1]++;
-			$r_sub=ereg_replace("Re\[([0-9]+)\]:", "Re[$reg[1]]:", $sub);
-		}elseif(ereg("^Re:", $sub)){
-			$r_sub=ereg_replace("^Re:", "Re[2]:", $sub);
+			$r_sub=preg_replace("/Re\[([0-9]+)\]:/", "Re[$reg[1]]:", $sub);
+		}elseif(preg_match("/^Re:/", $sub)){
+			$r_sub=preg_replace("/^Re:/", "Re[2]:", $sub);
 		}else{ $r_sub = "Re:$sub"; }
 		$r_com = "&gt;$com";
-		$r_com = eregi_replace("<br( /)?>","\r&gt;",$r_com);
+		$r_com = preg_replace("#<br( /)?>#i","\r&gt;",$r_com);
 	}
 	$head='<html lang="ja"><head>
 <META HTTP-EQUIV="Content-type" CONTENT="text/html; charset=UTF-8">
@@ -273,7 +273,7 @@ function Main(&$dat){	//記事表示部
 		if($url){ $url = "<a href=\"http://$url\" target=\"_blank\">http://$url</a>";}
 		if($email){ $name = "<a href=\"mailto:$email\">$name</a>";}
 		// ＞がある時は色変更
-		$com = eregi_replace("(^|>)(&gt;[^<]*)", "\\1<font color=$re_color>\\2</font>", $com);
+		$com = preg_replace("/(^|>)(&gt;[^<]*)/i", "\\1<font color=$re_color>\\2</font>", $com);
 		// URL自動リンク
 		if ($autolink) { $com=auto_link($com); }
 		// Host表示形式
@@ -315,11 +315,11 @@ function regist(){	//ログ書き込み
 	setcookie ("p_bbs", $cookvalue,time()+14*24*3600);	/* 2週間で期限切れ */
 
 	if($REQUEST_METHOD != "POST") error("不正な投稿をしないで下さい");
-	if(GAIBU && !eregi($PHP_SELF,getenv("HTTP_REFERER"))) error("外部から書き込みできません");
+	if(GAIBU && !preg_match('/'.$PHP_SELF.'/i',getenv("HTTP_REFERER"))) error("外部から書き込みできません");
 	// フォーム内容をチェック
-	if(!$name||ereg("^( |　)*$",$name)){ if(ANONY_POST) $name="名無し"; else error("名前が書き込まれていません"); }
-	if(!$com||ereg("^( |　|\t|\r|\n)*$",$com)){ error("本文が書き込まれていません"); }
-	if(!$sub||ereg("^( |　)*$",$sub)){ $sub=$mudai; }
+	if(!$name||preg_match("/^( |　)*$/",$name)){ if(ANONY_POST) $name="名無し"; else error("名前が書き込まれていません"); }
+	if(!$com||preg_match("/^( |　|\t|\r|\n)*$/",$com)){ error("本文が書き込まれていません"); }
+	if(!$sub||preg_match("/^( |　)*$/",$sub)){ $sub=$mudai; }
 
 	if(strlen($name) > $maxn){ error("名前が長すぎますっ！"); }
 	if(strlen($sub) > $maxs){ error("タイトルが長すぎますっ！"); }
@@ -358,7 +358,7 @@ function regist(){	//ログ書き込み
 	$PW = ($password) ? crypt(($password),"aa") : '';
 
 	$now = gmdate("Y/m/d(D) H:i",time()+9*60*60);
-	$url = ereg_replace("^http://","",$url);
+	$url = preg_replace("#^http://#","",$url);
 
 	CleanStr($com);
 	CleanStr($sub);
@@ -366,13 +366,13 @@ function regist(){	//ログ書き込み
 	CleanStr($email);
 	CleanStr($url);
 
-	$name = ereg_replace("◆","◇",$name);
-	if(ereg("(#|＃)(.*)",$name,$regs)){ // 使用トリップ(Trip)機能 (ex：無名#abcd)
+	$name = str_replace("◆","◇",$name);
+	if(preg_match("/(#|＃)(.*)/",$name,$regs)){ // 使用トリップ(Trip)機能 (ex：無名#abcd)
 		$cap = $regs[2];
 		$cap = strtr($cap,array("&amp;"=>"&","&#44;"=>","));
-		$name = ereg_replace("(#|＃)(.*)","",$name);
+		$name = preg_replace("/(#|＃)(.*)/","",$name);
 		$salt = substr($cap."H.",1,2);
-		$salt = ereg_replace("[^\.-z]",".",$salt);
+		$salt = preg_replace("/[^\.-z]/",".",$salt);
 		$salt = strtr($salt,":;<=>?@[\\]^_`","ABCDEFGabcdef");
 		$name .= "<code>◆".substr(crypt($cap,$salt),-10)."</code>";
 	}
@@ -384,9 +384,9 @@ function regist(){	//ログ書き込み
 	$temp = str_replace("\n", "\n"."a",$com);
 	$str_cnt=strlen($temp)-strlen($com);
 	if($str_cnt > $maxline) error("行数が長すぎますっ！");
-	$com = ereg_replace("\n((　| |\t)*\n){3,}","\n",$com);//連続する空行を一行
+	$com = preg_replace("/\n((　| |\t)*\n){3,}/","\n",$com);//連続する空行を一行
 	$com = nl2br($com);	//改行文字の前に<br>を代入する。
-	$com = ereg_replace( "\n","", $com);	//\nを文字列から消す。
+	$com = str_replace( "\n","", $com);	//\nを文字列から消す。
 
 	$new_msg="$no<>$now<>$name<>$email<>$sub<>$com<>$url<>$host<>$PW<>$times\n";
 
@@ -645,7 +645,7 @@ function past_log($data){//過去ログ作成
 	if($purl){ $purl = "<a href=\"http://$purl\" target=\"_blank\">HP</a>";}
 	if($pemail){ $pname = "<a href=\"mailto:$pemail\">$pname</a>";}
 	// ＞がある時は色変更
-	$pcom = eregi_replace("(&gt;)([^<]*)", "<font color=999999>\\1\\2</font>", $pcom);
+	$pcom = preg_replace("/(&gt;)([^<]*)/i", "<font color=999999>\\1\\2</font>", $pcom);
 	// URL自動リンク
 	if ($autolink) { $pcom=auto_link($pcom); }
 
@@ -696,7 +696,7 @@ function past_view(){
 	die("</body></html>");
 }
 function auto_link($proto){//自動リンク5/25修正
-	$proto = ereg_replace("(https?|ftp|news)(://[[:alnum:]\+\$\;\?\.%,!#~*/:@&=_-]+)","<a href=\"\\1\\2\" target=\"_blank\">\\1\\2</a>",$proto);
+	$proto = preg_replace("#(https?|ftp|news)(://[[:alnum:]\+\$\;\?\.%,!#~*/:@&=_-]+)#","<a href=\"\\1\\2\" target=\"_blank\">\\1\\2</a>",$proto);
 	return $proto;
 }
 function error($mes){	//エラーフォーマット

@@ -61,7 +61,7 @@ $file_path=preg_replace("/\?.*$/","",$file_path);
 //$file_path=str_replace("?","",$file_path);
 //$file_path=str_replace("=","",$file_path);
 #$file_path=substr($_SERVER['PATH_INFO'],1); // 進行即時壓縮之檔案名稱
-if($file_path && eregi(".htm", $file_path) && @filesize($file_path)){
+if($file_path && preg_match("/\.htm/i", $file_path) && @filesize($file_path)){
 	readfile($file_path);
 	GZipOutput(2); // 使用等級二壓縮輸出
 }else{
