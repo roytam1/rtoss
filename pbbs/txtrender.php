@@ -1,4 +1,4 @@
-<?
+<?php
 $TTF_LOCATION="./Mona-UMingTW-MSPG.ttf";
 $FONT_SIZE=12;
 include ("./big52utf8.php");
