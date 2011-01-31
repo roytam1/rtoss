@@ -59,10 +59,10 @@ $title2 = "<font size=5 face=Verdana color=gray><b>$title1</b></font>";
 $body = '<body bgcolor="#ddf2ed" text="#444444" link="#0000AA">';
 
 /* 管理者用パスワード。必ず変更して下さい。*/
-$admin_pass = '0123';
+define("ADMIN_PASS", '0123');
 
 /* ログ保存ファイル */
-$logfile = 'bbs.log';
+define("LOGFILE", 'bbs.log');
 
 /* ログ保存ファイルを圧縮する （yes=1 no=0）*/
 $gzlog=0;
@@ -70,7 +70,7 @@ $gzlog=0;
 /* TOPページをHTMLに書き出すか （yes=1 no=0）*/
 $htmlw = 1;
 /* 静的HTMLを書き出す場合のHTMLファイル */
-$html_file = 'pbbs.html';
+define("HTML_FILE", 'pbbs.html');
 
 /* 戻り先（HOME）*/
 $home = 'http://cuc.moe.hm/';
@@ -110,12 +110,12 @@ define("LOCK" , "lock/plock");	//lockの中に作るロックファイル名
 /* 過去ログ作成する? */
 $past_key = 1;
 /* 過去ログ番号ファイル */
-$past_no	= "pastno.log";
+define("PAST_NO", "pastno.log");
 /* 過去ログ作成ディレクトリ(書き込み権限必要) */
-$past_dir = "./";
+define("PAST_DIR", "./");
 /* 過去ログ一つに書き込む行数 */
 $past_line= "50";
-$past_prefix = "past";
+define("PAST_PREFIX", "past");
 
 // 閲覧禁止?
 $no_host_read = 0;
@@ -183,11 +183,11 @@ function hostblock() {
 if($no_host_read) hostblock();
 
 function head(&$dat){ 		//ヘッダー表示部
-	global $mode,$no,$PHP_SELF,$logfile,$gzlog,$title1,$title2,$body,$p_bbs,$htmlw,$max,$page_def;
+	global $mode,$no,$PHP_SELF,$gzlog,$title1,$title2,$body,$p_bbs,$htmlw,$max,$page_def;
 	$r_sub='';$r_com='';
 
 	if($mode == "resmsg"){	//レスの場合
-		$res = $gzlog?ungzlog($logfile):file($logfile);
+		$res = $gzlog?ungzlog(LOGFILE):file(LOGFILE);
 		$flag = 0;
 		while (list($key, $value) = each ($res)) {
 			list($rno,$date,$name,$email,$sub,$com,$url) = explode("<>", $value);
@@ -248,17 +248,17 @@ $dat.='<div align="right"><a name="form"></a><form method="POST" action="'.$PHP_
 <input type=hidden name=mode value="usrdel">No <input type=text name=no size=2>
 pass <input type=password name=pwd size=4 maxlength=8>
 <input type=submit value="Del"></form>
-[ <a href="'.$home.'">ホーム</a> ] [ <a href="'.$PHP_SELF.'?mode=admin">管理</a> ] ';
+[ <a href="'.$home.'">ホーム</a> ] [ <a href="'.$PHP_SELF.'?mode=search">検索</a> ] [ <a href="'.$PHP_SELF.'?mode=admin">管理</a> ] ';
 if($past_key) $dat.='[ <a href="'.$PHP_SELF.'?mode=past">過去ログ</a> ]';
 $dat.='<br><br><small><!-- P-BBS v1.232 --><!-- RTHack 20060116 -->
 - <a href="http://php.s3.to" target="_top">P-BBS</a> + arranged by <a href="http://scrappedblog.blogspot.com" target="_top">roytam1</a> -</small></div>
 </body></html>';
 }
 function Main(&$dat){	//記事表示部
-	global $logfile,$gzlog,$page_def,$page,$PHP_SELF,$autolink,$re_color,$hostview;
+	global $gzlog,$page_def,$page,$PHP_SELF,$autolink,$re_color,$hostview;
 	$p=0;
 
-	$view = $gzlog?ungzlog($logfile):file($logfile);
+	$view = $gzlog?ungzlog(LOGFILE):file(LOGFILE);
 	$total = sizeof($view);
 	$total2 = $total;
 
@@ -305,7 +305,7 @@ function Main(&$dat){	//記事表示部
 }
 function regist(){	//ログ書き込み
 	global $name,$email,$sub,$com,$url,$tag,$past_key,$maxn,$maxs,$maxv,$maxline;
-	global $password,$html_url,$logfile,$gzlog,$jisa,$max,$w_regist,$autolink,$mudai,$PHP_SELF,$REQUEST_METHOD,$no_word;
+	global $password,$html_url,$gzlog,$jisa,$max,$w_regist,$autolink,$mudai,$PHP_SELF,$REQUEST_METHOD,$no_word;
 
 	// 禁止ホスト
 	hostblock();
@@ -335,7 +335,7 @@ function regist(){	//ログ書き込み
 	}
 	$times = time();
 
-	$check = $gzlog?ungzlog($logfile):file($logfile);
+	$check = $gzlog?ungzlog(LOGFILE):file(LOGFILE);
 	$tail = sizeof($check);
 
 	list($tno,$tdate,$tname,$tmail,$tsub,$tcom,,,$tpw,$ttime) = explode("<>", $check[0]);
@@ -390,7 +390,7 @@ function regist(){	//ログ書き込み
 
 	$new_msg="$no<>$now<>$name<>$email<>$sub<>$com<>$url<>$host<>$PW<>$times\n";
 
-	$old_log = $gzlog?ungzlog($logfile):file($logfile);
+	$old_log = $gzlog?ungzlog(LOGFILE):file(LOGFILE);
 
 	list($ono,$odat,$oname,$oemail,$osub,$ocom,$ourl,$ohost,$opas) = @explode("<>",@$old_log[0]);
 	if($com == $ocom) error("連続投稿はお止めください。");
@@ -410,11 +410,11 @@ function regist(){	//ログ書き込み
 
 }
 function usrdel(){	//ユーザー削除
-	global $admin_pass,$pwd,$no,$logfile,$gzlog;
+	global $pwd,$no,$gzlog;
 	if ($no == "" || $pwd == "")
 	error("削除Noまたは削除キーが入力モレです");
 
-	$logall = $gzlog?ungzlog($logfile):file($logfile);
+	$logall = $gzlog?ungzlog(LOGFILE):file(LOGFILE);
 	$flag=0;
 
 	while(list(,$lines)=each($logall)){
@@ -423,7 +423,7 @@ function usrdel(){	//ユーザー削除
 	else { $pushlog[]=$lines; }
 	}
 	if ($flag == 0) { error("該当記事が見当たりません"); }
-	if ($pwd != $admin_pass) {
+	if ($pwd != ADMIN_PASS) {
 		if ($pass == "") { error("該当記事には削除キーが設定されていません"); }
 
 		// 削除キーを照合
@@ -435,9 +435,9 @@ function usrdel(){	//ユーザー削除
 	renewlog($pushlog);
 }
 function admin(){	//管理機能
-	global $admin_pass,$PHP_SELF,$logfile,$htmlw,$gzlog;
+	global $PHP_SELF,$htmlw,$gzlog;
 	global $del,$apass,$head,$body;
-	if ($apass && $apass != "$admin_pass")
+	if ($apass && $apass != ADMIN_PASS)
 	{ error("パスワードが違います"); }
 	echo "$head";
 	echo "$body";
@@ -457,7 +457,7 @@ function admin(){	//管理機能
 	// 削除処理
 	if (is_array($del)) {
 		// 削除情報をマッチングし更新
-		$delall = $gzlog?ungzlog($logfile):file($logfile);
+		$delall = $gzlog?ungzlog(LOGFILE):file(LOGFILE);
 
 		for($i=0; $i<count($delall); $i++) {
 			list($no,) = explode("<>",$delall[$i]);
@@ -477,7 +477,7 @@ function admin(){	//管理機能
 	echo "<th>投稿者</th><th>コメント</th><th>ホスト名</th>";
 	echo "</tr>\n";
 
-	$delmode = $gzlog?ungzlog($logfile):file($logfile);
+	$delmode = $gzlog?ungzlog(LOGFILE):file(LOGFILE);
 
 	if (is_array($delmode)) {
 		while (list($l,$val)=each($delmode)){
@@ -578,11 +578,11 @@ function lock_error() {
 }
 
 function renewlog($arrline){//ログ更新	入力:配列
-	global $logfile,$gzlog;
+	global $gzlog;
 
 	if(LOCKEY==1){ lock_dir(LOCK) or lock_error(); }
-	if(LOCKEY==3){ m_lock($logfile, true); m_lock($logfile) or lock_error(); }
-	$rp = $gzlog?gzopen($logfile, "w"):fopen($logfile, "w");
+	if(LOCKEY==3){ m_lock(LOGFILE, true); m_lock(LOGFILE) or lock_error(); }
+	$rp = $gzlog?gzopen(LOGFILE, "w"):fopen(LOGFILE, "w");
 	if(LOCKEY>=2){ @flock($rp, 2); }
 	set_file_buffer($rp, 0);
 	fputs($rp, implode("",$arrline));
@@ -590,23 +590,21 @@ function renewlog($arrline){//ログ更新	入力:配列
 	if(!$gzlog) fclose($rp);
 	else gzclose($rp);
 	if(LOCKEY==1){ unlock_dir(LOCK); }
-	if(LOCKEY==3){ m_lock($logfile, false); }
+	if(LOCKEY==3){ m_lock(LOGFILE, false); }
 }
 function MakeHtml(){	//HTML生成
-	global $html_file;
-
 	head($buf);
 	Main($buf);
 	foot($buf);
 
-	$hp = @fopen($html_file,"w");
+	$hp = @fopen(HTML_FILE,"w");
 	flock($hp,2);
 	fputs($hp, $buf);
 	fclose($hp);
-	@chmod($html_file,0666);
+	@chmod(HTML_FILE,0666);
 }
 function ShowHtml(){
-	global $html_file,$htmlw,$page,$mode;
+	global $htmlw,$page,$mode;
 
 	if(!$htmlw || $page || $mode=='resmsg') {
 		head($buf);
@@ -614,29 +612,29 @@ function ShowHtml(){
 		foot($buf);
 		echo $buf;
 	} else {
-		if(!is_file($html_file)) MakeHtml();
-		if(file_exists("mod_gzip.php")) $html_file="mod_gzip.php?".$html_file;
-		echo "<META HTTP-EQUIV=\"refresh\" content=\"0;URL=$html_file?".microtime()."\">";
+		if(!is_file(HTML_FILE)) MakeHtml();
+		$html_file= file_exists('mod_gzip.php') ? "mod_gzip.php?".HTML_FILE : HTML_FILE;
+		echo '<META HTTP-EQUIV="refresh" content="0;URL='.$html_file.'?'.microtime().'">';
 		#header("Location: $html_file?");
 	}
 }
 function past_log($data){//過去ログ作成
-	global $past_no,$past_dir,$past_line,$autolink,$past_prefix;$dat='';
+	global $past_line,$autolink;$dat='';
 
 	if(!trim($data)) return 0;
 
-	$fc = @fopen($past_no, "r") or die(__LINE__.$past_no."が開けません");
+	$fc = @fopen(PAST_NO, "r") or die(__LINE__.PAST_NO."が開けません");
 	$count = fgets($fc, 10);
 	fclose($fc);
-	$pastfile = $past_dir.$past_prefix.$count.".html";
+	$pastfile = PAST_DIR.PAST_PREFIX.$count.".html";
 	if(file_exists($pastfile)) $past = file($pastfile);
 
 	if(@sizeof($past) > $past_line){
 	$count++;
-	$pf = fopen($past_no, "w");
+	$pf = fopen(PAST_NO, "w");
 	fputs($pf, $count);
 	fclose($pf);
-	$pastfile = $past_dir.$past_prefix.$count.".html";
+	$pastfile = PAST_DIR.PAST_PREFIX.$count.".html";
 	$past = "";
 	}
 
@@ -661,11 +659,11 @@ function past_log($data){//過去ログ作成
 
 }
 function past_view(){
-	global $past_no,$past_dir,$past_line,$past_prefix,$body,$pno,$PHP_SELF;
+	global $past_line,$body,$pno,$PHP_SELF;
 
 	$pno = htmlspecialchars($pno);
 
-	$fc = @fopen($past_no, "r") or die(__LINE__.$past_no."が開けません");
+	$fc = @fopen(PAST_NO, "r") or die(__LINE__.PAST_NO."が開けません");
 	$count = fgets($fc, 10);
 	fclose($fc);
 	if(!$pno) $pno = $count;
@@ -690,14 +688,13 @@ function past_view(){
 	$pastkey--;
 	}
 	echo ' →old</center>'.$past_line.'件ずつ表示';
-	$pastfile = $past_dir.$past_prefix.$pno.".html";
+	$pastfile = PAST_DIR.PAST_PREFIX.$pno.".html";
 	if(!file_exists($pastfile)) error("<br>過去ログがみつかりません");
 	readfile($pastfile);
 	die("</body></html>");
 }
 function auto_link($proto){//自動リンク5/25修正
-	$proto = preg_replace("#(https?|ftp|news)(://[[:alnum:]\+\$\;\?\.%,!#~*/:@&=_-]+)#","<a href=\"\\1\\2\" target=\"_blank\">\\1\\2</a>",$proto);
-	return $proto;
+	return preg_replace('/(https?|ftp|news)(:\/\/[\w\+\$\;\?\.\{\}%,!#~*\/:@&=_-]+)/u', '<a href="$1$2" rel="_blank">$1$2</a>', $proto);
 }
 function error($mes){	//エラーフォーマット
 	global $body;
@@ -708,13 +705,13 @@ function error($mes){	//エラーフォーマット
 <br><br><hr size=1><br><br>
 <center><font color=red size=5><b><?php echo $mes; ?></b></font></center>
 <br><br><hr size=1></body></html>
-	<?php
+<?php
 	exit;
 }
 
 function get_comment($sno) {
-	global $logfile,$gzlog,$PHP_SELF,$hostview;
-	$view = $gzlog?ungzlog($logfile):file($logfile);
+	global $gzlog,$PHP_SELF,$hostview;
+	$view = $gzlog?ungzlog(LOGFILE):file(LOGFILE);
 	$total2= count($view);
 	$s=0;$no=0;
 
@@ -724,6 +721,64 @@ function get_comment($sno) {
 		$s++;
 	}
 	return $com;
+}
+function search() {
+	global $gzlog,$PHP_SELF,$keyword;
+	global $head,$body;
+	echo $head;
+	echo $body;
+	echo "[<a href=\"$PHP_SELF?\">掲示板に戻る</a>]";
+	echo "<table width='100%'><tr><th bgcolor=\"#508000\">\n";
+	echo "<font color=\"#FFFFFF\">検索モード</font>\n";
+	echo "</th></tr></table>\n";
+	if(!isset($keyword)||$keyword=='') {
+	   	echo "<form action=\"$PHP_SELF\" method=\"GET\">
+掲示板のログをキーワードで検索します。<br>
+<small>（キーワードを複数指定する場合は スペース で区切ってください。）</small><br />
+<input name=\"mode\" type=\"hidden\" value=\"search\">
+<input name=\"keyword\" type=\"text\" size=\"80\">
+<input type=\"submit\" value=\"検索する\">
+</form></body></html>";
+		exit();
+	}else{
+
+		$view = $gzlog?ungzlog(LOGFILE):file(LOGFILE);
+		$total2= count($view);
+		$s=0;$no=0;$resultlist = "";
+
+		//スペース区切りの複数単語でand検索
+		$keyword = preg_replace('/(　| )+/', ' ', trim($keyword));
+		$keyword = preg_replace('/(^ | $)+/', '', $keyword);
+		$keyword = explode(' ', $keyword);
+		$keyword_count = count($keyword);
+
+		if($keyword_count) {
+			for($s=0;$s < $total2;$s++){
+				$res = explode("<>", $view[$s]); // $no,$now,$name,$email,$sub,$com,$url,$host,$pw
+				$found = 0;
+				foreach($keyword as $w) {
+					foreach(array(0,2,3,4,5) as $idx) {
+						if(strpos($res[$idx], $w) !== FALSE) {
+							$found++;
+							break;
+						}
+					}
+				}
+				if( $found==$keyword_count ) {
+					$hits[] = $res;
+				}
+			}
+			foreach($hits as $h) {
+				$resultlist.="[${h[0]}] <font color=\"#009900\"><b>{$h[4]}</b></font> Name：<b>{$h[2]}</b> <small>Date：{$h[1]}</small> {$h[6]}<br><ul>{$h[5]}</ul><hr>\n";
+			}
+
+			foreach($keyword as $w) {
+				$resultlist = str_replace($w, "<strong>$w</strong>", $resultlist);
+			}
+		}
+		$resultlist = $resultlist ? $resultlist : "キーワードにマッチする記事がありませんでした。<br><a href=\"javascript:history.back()\">[戻る]</a>";
+		echo $resultlist.'</body></html>';
+	}
 }
 /* 文字修整 */
 function CleanStr(& $str){
@@ -746,8 +801,8 @@ switch($mode):
 	case 'regist':
 		regist();
 		if($htmlw) MakeHtml();
-		if(file_exists("mod_gzip.php")) $html_file="mod_gzip.php?".$html_file;
-		echo "<META HTTP-EQUIV=\"refresh\" content=\"0;URL=$PHP_SELF?\">";
+		$html_file= file_exists('mod_gzip.php') ? "mod_gzip.php?".HTML_FILE : HTML_FILE;
+		echo "<META HTTP-EQUIV=\"refresh\" content=\"0;URL=$html_file?\">";
 #		header("Location: $PHP_SELF?");
 		break;
 	case 'txt2png':
@@ -757,9 +812,13 @@ switch($mode):
 	case 'admin':
 		admin();
 		break;
+	case 'search':
+		search();
+		break;
 	case 'remake':
 		if($htmlw) MakeHtml();
-		echo "<META HTTP-EQUIV=\"refresh\" content=\"0;URL=$PHP_SELF?\">";
+		$html_file= file_exists('mod_gzip.php') ? "mod_gzip.php?".HTML_FILE : HTML_FILE;
+		echo "<META HTTP-EQUIV=\"refresh\" content=\"0;URL=$html_file?\">";
 //		ShowHtml();
 		break;
 	case 'usrdel':
