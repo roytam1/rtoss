@@ -477,7 +477,7 @@ $qry = 'UPDATE counter SET counter=counter+1';
 sqlRun($qry,$conn);
 $qry = 'SELECT counter FROM counter';
 $rs = sqlite_query($conn,$qry);
-echo sqlite_fetch_single($rs);
+echo intval(sqlite_fetch_single($rs));
 
 /* モードリンク */
 echo '
