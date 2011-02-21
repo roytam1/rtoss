@@ -158,9 +158,20 @@ void CMainWnd::LoadM3uPlayList(LPTSTR pszFile)
 	_tcscpy(szPath, pszFile);
 	LPTSTR psz = _tcsrchr(szPath, _T('\\'));
 	if (psz) *psz = NULL;
+	BOOL isFirstLine = TRUE;
+	int z = 0;
 
 #define EXTINF	"#EXTINF"
 	while (fgets(szBuff, MAX_PATH * 2, fp)) {
+		if(isM3U8 && isFirstLine) {
+			if( (unsigned char)(szBuff[0]) == 0xef && (unsigned char)(szBuff[1]) == 0xbb && (unsigned char)(szBuff[2]) == 0xbf ) {
+				for(z = 0; szBuff[z+3] != 0; z++)
+					szBuff[z] = szBuff[z+3];
+				szBuff[z] = NULL;
+			}
+		}
+		isFirstLine = FALSE;
+
 		RemoveReturn(szBuff);
 		if (szBuff[0] == '#') {
 			if (strncmp(szBuff, EXTINF, strlen(EXTINF)) == 0) {
