@@ -45,6 +45,7 @@ LIBS = \
  -lcomdlg32 \
  -lcomctl32 \
  -lole32    \
+ -luuid     \
  -limm32
 
 PRE:
@@ -56,8 +57,12 @@ PRE:
 RES = $(INTDIR)/gp_rsrc.o
 
 VPATH    = editwing:kilib
-CXXFLAGS = -mno-cygwin -O2 -idirafter kilib -c
+CXXFLAGS = -mno-cygwin -O2 -idirafter kilib -c -D_UNICODE -DUNICODE
 LOPT     = -mwindows -mno-cygwin
+
+ifneq ($(NOCHARSET),1)
+CXXFLAGS += -finput-charset=cp932 -fexec-charset=cp932
+endif
 
 $(TARGET) : $(OBJS) $(RES)
 	g++ $(LOPT) -o$(TARGET) $(OBJS) $(RES) $(LIBS)

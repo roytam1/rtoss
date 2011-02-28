@@ -71,6 +71,7 @@ enum charset {
 	IBM5550    = 20003,// ’†‘Œê‚W (”É‘ÌŽš IBM5550)
 	Teletext   = 20004,// ’†‘Œê‚X (”É‘ÌŽš Teletext)
 	Wang       = 20005,// ’†‘Œê‚P‚O (”É‘ÌŽš Wang)
+	GB18030    = 54936,// ’†‘Œê‚P‚P (ŠÈ‘ÌŽš GB18030 >> GBK >> EUC-CN)
 
 	SJIS       = 932,  // “ú–{Œê‚P (Shift_JIS)
 	EucJP      = -932, // “ú–{Œê‚Q (“ú–{ŒêEUC)
