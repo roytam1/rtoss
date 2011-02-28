@@ -318,10 +318,11 @@ void IMEManager::SetString( HWND wnd, unicode* str, ulong len )
 		#ifndef _UNICODE
 			if( s == 0 )
 			{
-				len = ::WideCharToMultiByte( CP_ACP,MB_PRECOMPOSED,str,-1,NULL,NULL,TRUE );
+				BOOL defchr = TRUE;
+				len = ::WideCharToMultiByte( CP_ACP,MB_PRECOMPOSED,str,-1,NULL,NULL,"?",&defchr );
 				char* tmp = new char[len];
 				
-				::WideCharToMultiByte( CP_ACP, MB_PRECOMPOSED, str, -1, tmp, &len,TRUE );
+				::WideCharToMultiByte( CP_ACP,MB_PRECOMPOSED,str,-1,tmp,len,"?",&defchr );
 				s = ::ImmSetCompositionStringA(ime,SCS_SETSTR,tmp,len,NULL,0);
 				delete [] tmp;
 			}

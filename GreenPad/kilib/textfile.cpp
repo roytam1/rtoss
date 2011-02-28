@@ -689,6 +689,88 @@ namespace
 		return const_cast<char*>( p+GetMaskIndex(uchar(*p)) );
 	}
 
+	// CharNextExAはGB18030の４バイト文字列を扱えないそうだ。
+	static char* WINAPI CharNextGB18030( WORD, const char* p, DWORD )
+	{
+		const char *q;
+		if (!(*p & 0x80) || *p == 0x80 || *p == 0xFF || // ASCII, Euro sign, EOF
+			!p[1] || p[1] == 0xFF || (unsigned char)p[1] < 0x30) // invalid DBCS
+			q = p+1;
+		else if (p[1] >= 0x30 && p[1] <= 0x39) // 4BCS leading
+		{
+			if (p[2] && p[3] && (p[2] & 0x80) && p[2] != 0x80 && p[2] != 0xFF
+				&& p[3] >= 0x30 && p[3] <= 0x39 &&
+				(((unsigned char)*p >= 0x81 && (unsigned char)*p <= 0x84) ||
+				 ((unsigned char)*p >= 0x90 && (unsigned char)*p <= 0xE3)))
+				q = p+4;
+			else
+				q = p+1;
+		}
+		else // DBCS
+			q = p+2;
+		return const_cast<char*>( q );
+	}
+
+	// IMultiLanguage2::DetectInputCodepageはGB18030のことを認識できません。
+	static bool IsGB18030Like( const uchar* ptr, ulong siz, int refcs )
+	{
+		ulong i;
+		int qbcscnt = 0; // valid Quad Byte Char Seq count
+		int dbcscnt = 0; // valid Double Byte Char Seq count
+		int invcnt = 0;  // invalid char seq count
+		for (i = 0; i < siz;)
+		{
+			if (!ptr[i]) // NULL
+				invcnt++;
+			if (ptr[i] <= 0x80 || ptr[i] == 0xFF)
+				i++;
+			else if (i < siz-1)
+			{
+				if (ptr[i+1] < 0x40) // non-GBK
+				{
+					if (ptr[i+1] < 0x30) // non-GB18030
+					{
+						invcnt++;
+						i++;
+					}
+					else if (i < siz-3)
+					{
+						if (ptr[i+2] > 0x80 && ptr[i+2] < 0xFF &&
+							ptr[i+3] >= 0x30 && ptr[i+3] <= 0x39 &&
+							((ptr[i] >= 0x81 && ptr[i] <= 0x84) ||
+							 (ptr[i] >= 0x90 && ptr[i] <= 0xE3)))
+						{
+							qbcscnt++;
+							i += 4;
+						}
+						else // invalid 4BCS
+						{
+							invcnt++;
+							i++;
+						}
+					}
+					else // incomplete, ignore
+						i++;
+				}
+				else if (ptr[i+1] != 0x7F && ptr[i+1] != 0xFF)
+				{
+					dbcscnt++;
+					i += 2;
+				}
+				else // invalid DBCS
+				{
+					invcnt++;
+					i++;
+				}
+			}
+			else // incomplete, ignore
+				i++;
+		}
+		if (qbcscnt)
+			return !invcnt || (invcnt < (((qbcscnt << 1) + dbcscnt) >> 3));
+		return dbcscnt && (refcs>950) && (!invcnt || (invcnt < (dbcscnt >> 5)));
+	}
+
 	// Win95対策。
 	//   http://support.microsoft.com/default.aspx?scid=%2Fisapi%2Fgomscom%2Easp%3Ftarget%3D%2Fjapan%2Fsupport%2Fkb%2Farticles%2Fjp175%2F3%2F92%2Easp&LN=JA
 	// MSDNにはWin95以降でサポートと書いてあるのにCP_UTF8は
@@ -731,7 +813,8 @@ struct rMBCS : public TextFileRPimpl
 		, fe( reinterpret_cast<const char*>(b+s) )
 		, cp( c==UTF8 ? UTF8N : c )
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
-		, next( cp==UTF8N ?   CharNextUtf8 : CharNextExA )
+		, next( cp==UTF8N ?   CharNextUtf8 : cp==GB18030 ? CharNextGB18030 :
+							CharNextExA )
 #endif
 		, conv( cp==UTF8N && (app().isWin95()||!::IsValidCodePage(65001))
 		                  ? Utf8ToWideChar : MultiByteToWideChar )
@@ -755,7 +838,7 @@ struct rMBCS : public TextFileRPimpl
 				break;
 			}
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
-			else if( (*p) & 0x80 && p+1<end )
+			else if( (*p) & 0x80 && p+1<fe )
 			{
 				p = next(cp,p,0);
 			}
@@ -1248,7 +1331,7 @@ int TextFileR::MLangAutoDetection( const uchar* ptr, ulong siz )
 				cs =  detectEnc[detectEncCount-1].nCodePage; // always use last one
 			}
 		}
-		else if ( detectEncCount > 1 && detectEnc[0].nCodePage > 950 ) // non asian codepage in first
+		else if ( detectEncCount > 1 && detectEnc[0].nCodePage > 950 && detectEnc[0].nCodePage != UTF8N ) // non asian codepage in first
 		{
 			int highestConfidence = 0;
 			for(int x=0;x<detectEncCount;x++)
@@ -1259,6 +1342,11 @@ int TextFileR::MLangAutoDetection( const uchar* ptr, ulong siz )
 					cs = detectEnc[x].nCodePage;
 				}
 			}
+		}
+		else if ( detectEnc[0].nCodePage != UTF8N && ::IsValidCodePage(GB18030) &&
+				  IsGB18030Like( ptr, siz, detectEnc[0].nCodePage ) ) // Check if GB18030 is vaild system codepage
+		{
+			cs = GB18030;
 		}
 		else
 		{
@@ -1326,7 +1414,7 @@ int TextFileR::chardetAutoDetection( const uchar* ptr, ulong siz )
 				STR2CP("EUC-KR",UHC)
 				STR2CP("x-euc-tw",CNS)
 				STR2CP("Big5",Big5)
-				STR2CP("gb18030",GBK)
+				STR2CP("gb18030",(::IsValidCodePage(GB18030) ? GB18030 : GBK))
 				STR2CP("UTF-8",UTF8)
 				STR2CP("windows-1253",Greek)
 				STR2CP("KOI8-R",Koi8R)
