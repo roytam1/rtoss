@@ -434,6 +434,16 @@ sub regist {
 	# 時間を取得
 	&get_time;
 
+	# URL Trap
+	if ($linktrap) {
+		my($altmp) = $in{'comment'};
+		my($alcnt) = 0;
+		$alcnt = ($altmp =~ s/([^=^\"]|^)(https?\:[\w\.\~\-\/\?\&\+\=\:\@\%\;\#\%]+)/$1<a href=\"$2\" target='_blank'>$2<\/a>/g);
+		if ($alcnt > $linktrap) {
+			&error('Trapped');
+		}
+	}
+
 	# クッキーを発行
 	&set_cookie($in{'name'},$in{'email'},$in{'url'},$in{'pwd'},$in{'icon'},$in{'color'});
 
@@ -1673,7 +1683,7 @@ sub header {
 #  自動URLリンク  #
 #-----------------#
 sub auto_link {
-	$_[0] =~ s/([^=^\"]|^)(http\:[\w\.\~\-\/\?\&\+\=\:\@\%\;\#\%]+)/$1<a href=\"$2\" target='_blank'>$2<\/a>/g;
+	$_[0] =~ s/([^=^\"]|^)(https?\:[\w\.\~\-\/\?\&\+\=\:\@\%\;\#\%]+)/$1<a href=\"$2\" target='_blank'>$2<\/a>/g;
 }
 
 #----------------#
