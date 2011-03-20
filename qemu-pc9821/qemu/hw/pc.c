@@ -1199,6 +1199,14 @@ QEMUMachine isapc_machine = {
 
 /* NEC PC-9821 */
 
+#define SUPPORT_PC98_FMSOUND
+
+#ifdef SUPPORT_PC98_FMSOUND
+#define PC98_NE2000_NB_MAX 1
+#else
+#define PC98_NE2000_NB_MAX 2
+#endif
+
 static void *pc98_sys;
 static void *pc98_vga;
 
@@ -1246,10 +1254,12 @@ static uint32_t pc98_ioport_9894_read(void *opaque, uint32_t addr)
     return 0x90; /* cpu wait */
 }
 
+#ifndef SUPPORT_PC98_FMSOUND
 static uint32_t pc98_ioport_a460_read(void *opaque, uint32_t addr)
 {
-    return 0x7f; /* Mate-X PCM (CS4231) */
+    return 0x7f; /* Mate-X PCM */
 }
+#endif
 
 void pc98_cpu_shutdown(void)
 {
@@ -1265,11 +1275,9 @@ void pc98_select_ems(uint32_t value)
     pc98_vga_select_ems(pc98_vga, value);
 }
 
-#define PC98_NE2000_NB_MAX 2
-
-/* LGY-98: I/O port = 0x00d0, IRQ = 3 (FreeBSD/pc98) */
-static const int pc98_ne2000_io[PC98_NE2000_NB_MAX] = { 0xd0, 0x10d0 };
-static const int pc98_ne2000_irq[PC98_NE2000_NB_MAX] = { 6, 3 };
+/* LGY-98 */
+static const int pc98_ne2000_io[2] = { 0xd0, 0x10d0 };
+static const int pc98_ne2000_irq[2] = { 6, 3 };
 
 static void pc98_init_ne2k_isa(NICInfo *nd, qemu_irq *pic)
 {
@@ -1313,7 +1321,7 @@ static void pc98_init1(ram_addr_t ram_size,
 #ifdef TARGET_X86_64
         cpu_model = "qemu64";
 #else
-        cpu_model = "486";
+        cpu_model = "qemu32";
 #endif
     }
     sprintf(cpu_model_opt, "%s,+pc98_a20mask", cpu_model);
@@ -1366,23 +1374,24 @@ static void pc98_init1(ram_addr_t ram_size,
     /* IRQ 0  PIT
            1  KEYBOARD
            2  CRTV
-           3  LGY-98 #2 (I/O=10D0h)
+           3  PC-9801-86
+              LGY-98 #2 (I/O=10D0h)
            4  RS-232C
            5  (SCSI)
            6  LGY-98 #1 (I/O=00D0h)
            7  SLAVE PIC
            8  FPU
            9  IDE
-           10 
-           11 FDC
+           10 FDC (640KB I/F)
+           11 FDC (1MB I/F)
            12 CS4231A
            13 MOUSE
            14 
            15 RTC
        DRQ 0  
            1  CS4231A
-           2  FDC
-           3  (SCSI)
+           2  FDC (1MB I/F)
+           3  FDC (640KB I/F)
     */
 
     register_ioport_write(0xf2, 1, 1, pc98_ioport_f2_write, NULL);
@@ -1392,7 +1401,11 @@ static void pc98_init1(ram_addr_t ram_size,
     register_ioport_write(0x534, 1, 1, pc98_ioport_534_write, NULL);
     register_ioport_read(0x534, 1, 1, pc98_ioport_534_read, NULL);
     register_ioport_read(0x9894, 1, 1, pc98_ioport_9894_read, NULL);
+#ifdef SUPPORT_PC98_FMSOUND
+    /* This port is assigned in pc98fmsound.c */
+#else
     register_ioport_read(0xa460, 1, 1, pc98_ioport_a460_read, NULL);
+#endif
 
     cpu_irq = qemu_allocate_irqs(pic_irq_request, NULL, 1);
     i8259 = pc98_i8259_init(cpu_irq[0]);
@@ -1432,19 +1445,29 @@ static void pc98_init1(ram_addr_t ram_size,
 
     pc98_ide_init(hd, i8259[9]);
     pc98_DMA_init(1);
+
 #ifdef HAS_AUDIO
     audio = AUD_init();
     pcspk_audio_init(audio, i8259);
-#ifdef CONFIG_CS4231A
+#ifdef SUPPORT_PC98_FMSOUND
+    /* 98MULTi CanBe (YMF288 + CS4231) */
+    pc98_sound_init(audio, i8259, 3);
+    pc98_cs4231a_init(audio, i8259, 12, 1);
+#else
+    /* Mate-X PCM */
     pc98_cs4231a_init(audio, i8259, 12, 1);
 #endif
 #endif
-    pc98_fdctrl_init(i8259[11], 2, fd);
+
+    pc98_fdctrl_init(i8259[11], i8259[10], fd);
     pc98_kbd_init(i8259[1]);
     pc98_mouse_init(i8259[13]);
     pc98_serial_init(i8259[4]);
+
     pc98_sys = pc98_sys_init(i8259[15]);
     pc98_vga = pc98_vga_init(i8259[2]);
+
+    /* memory must be initialized after vga is initialized */
     pc98_mem_init(ram_size, hd_connect);
 
 //    if (pci_enabled && usb_enabled) {

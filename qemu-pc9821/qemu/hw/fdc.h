@@ -11,4 +11,4 @@ fdctrl_t *sun4m_fdctrl_init (qemu_irq irq, target_phys_addr_t io_base,
 int fdctrl_get_drive_type(fdctrl_t *fdctrl, int drive_num);
 
 /* NEC PC-9821 */
-void pc98_fdctrl_init (qemu_irq irq, int dma_chann,  BlockDriverState **fds);
+void pc98_fdctrl_init (qemu_irq irq11, qemu_irq irq10, BlockDriverState **fds);

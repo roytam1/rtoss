@@ -119,7 +119,7 @@ LDFLAGS+=$(OS_LDFLAGS) $(ARCH_LDFLAGS)
 CPPFLAGS+=-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
 LIBS+=-lm
 ifdef CONFIG_WIN32
-LIBS+=-lwinmm -lws2_32 -liphlpapi
+LIBS+=-lwinmm -lws2_32 -liphlpapi -lstdc++
 endif
 ifdef CONFIG_SOLARIS
 LIBS+=-lsocket -lnsl -lresolv
@@ -584,7 +584,8 @@ OBJS+= fdc.o mc146818rtc.o serial.o i8259.o i8254.o pcspk.o pc.o
 OBJS+= cirrus_vga.o apic.o parallel.o acpi.o piix_pci.o
 OBJS+= usb-uhci.o vmmouse.o vmport.o vmware_vga.o hpet.o
 OBJS += device-hotplug.o pci-hotplug.o
-OBJS+= pc98kbd.o pc98mem.o pc98mouse.o pc98serial.o pc98sys.o pc98vga.o
+OBJS+= pc98kbd.o pc98mem.o pc98mouse.o pc98serial.o pc98sound.o pc98sys.o pc98vga.o
+OBJS+= fmopna.o fmgen/fmgen.o fmgen/fmtimer.o fmgen/opna.o fmgen/psg.o
 CPPFLAGS += -DHAS_AUDIO -DHAS_AUDIO_CHOICE
 endif
 ifeq ($(TARGET_BASE_ARCH), ppc)

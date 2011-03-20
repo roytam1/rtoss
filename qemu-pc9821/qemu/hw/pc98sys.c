@@ -72,7 +72,7 @@ struct SysPortState {
 
     QEMUTimer *rtc_timer;
     qemu_irq irq;
-    int64_t tstmp_initial_clock;
+    int64_t tstmp_init_clock;
 };
 
 typedef struct SysPortState SysPortState;
@@ -345,8 +345,8 @@ static void prn_ctrl_write(void *opaque, uint32_t addr, uint32_t value)
 static uint32_t tstmp_read(void *opaque, uint32_t addr)
 {
     SysPortState *s = opaque;
-    uint64_t d = muldiv64(qemu_get_clock(vm_clock) - s->tstmp_initial_clock,
-                          TSTMP_FREQ, ticks_per_sec);
+    uint64_t d = muldiv64(qemu_get_clock_ns(rt_clock) - s->tstmp_init_clock,
+                          TSTMP_FREQ, 1000000000LL);
 
     switch(addr) {
     case 0x5c:
@@ -550,7 +550,7 @@ void *pc98_sys_init(qemu_irq irq)
     s->rtc_timer = qemu_new_timer(rt_clock, rtc_timer_handler, s);
     qemu_mod_timer(s->rtc_timer, qemu_get_clock(rt_clock) +
                    rtc_period[(rtc_period_ptr++) & 7]);
-    s->tstmp_initial_clock = qemu_get_clock(vm_clock);
+    s->tstmp_init_clock = qemu_get_clock_ns(rt_clock);
 
     register_savevm("pc98sys", 0, 1, pc98_sys_save, pc98_sys_load, s);
     pc98_sys_reset(s);
