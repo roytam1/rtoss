@@ -1,0 +1,8 @@
+QEMU/9821での修正点
+
+- fmtimer内で、Timer Aの値が負にならないようにシフト量を調整
+- Intr()をOPNBaseの関数とする
+- ReadInterrupt()を追加（INT信号の状態を取得する）
+- TimerActive()を追加（タイマーが駆動中か判定する）
+- FileIO()の廃止
+- MinGWで発生するビルドエラーの修正

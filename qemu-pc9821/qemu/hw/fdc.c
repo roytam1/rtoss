@@ -567,6 +567,8 @@ struct fdctrl_t {
     uint8_t frdy;
     uint8_t if_mode;
     uint8_t if_mode144;
+    qemu_irq irq11; /* 1MB I/F */
+    qemu_irq irq10; /* 640KB I/F */
     QEMUTimer *media_timer;
     /* Floppy drives */
     fdrive_t drives[MAX_LOGICAL_FD];
@@ -1136,7 +1138,7 @@ static void fdctrl_stop_transfer (fdctrl_t *fdctrl, uint8_t status0,
                                   uint8_t status1, uint8_t status2)
 {
     fdrive_t *cur_drv;
-    int i, bps;
+    int i;
 
     cur_drv = get_cur_drv(fdctrl);
     FLOPPY_DPRINTF("transfer status: %02x %02x %02x (%02x)\n",
@@ -1148,8 +1150,9 @@ static void fdctrl_stop_transfer (fdctrl_t *fdctrl, uint8_t status0,
     fdctrl->fifo[3] = cur_drv->track;
     fdctrl->fifo[4] = cur_drv->head;
     fdctrl->fifo[5] = cur_drv->sect;
-    for (i = 0, bps = 128; i < 7; i++, bps <<= 1) {
-        if (cur_drv->bps == bps) {
+    fdctrl->fifo[6] = FD_SECTOR_SC;
+    for (i = 0; i < 8; i++) {
+        if (cur_drv->bps == (128 << i)) {
             fdctrl->fifo[6] = i;
             break;
         }
@@ -1659,9 +1662,9 @@ static void fdctrl_handle_sense_drive_status (fdctrl_t *fdctrl, int direction)
     SET_CUR_DRV(fdctrl, fdctrl->fifo[1] & FD_DOR_SELMASK);
     cur_drv = get_cur_drv(fdctrl);
     /* 1 Byte status back */
-    if (!cur_drv->connected) {
+    if (fdctrl->pc98 && !cur_drv->connected) {
         fdctrl->fifo[0] = GET_CUR_DRV(fdctrl) | FD_SR3_FAULT;
-    } if (!fdctrl_media_inserted(cur_drv)) {
+    } if (fdctrl->pc98 && !fdctrl_media_inserted(cur_drv)) {
         fdctrl->fifo[0] = GET_CUR_DRV(fdctrl);
     } else {
         cur_drv->head = (fdctrl->fifo[1] >> 2) & 1;
@@ -2097,8 +2100,8 @@ static uint32_t pc98_fdctrl_read_port (void *opaque, uint32_t reg)
         value = PC98_SW_TYP0 | PC98_SW_FINT0;
         break;
     case 0xbe:
-        value = 0xf0 | PC98_MODE_DSW | PC98_MODE_FIX | PC98_MODE_PORTEXC;
-        value |= (fdctrl->if_mode & PC98_MODE_FDDEXC);
+        value = 0xf0 | PC98_MODE_DSW | PC98_MODE_FIX;
+        value |= (fdctrl->if_mode & (PC98_MODE_PORTEXC | PC98_MODE_FDDEXC));
         break;
     case 0x4be:
         value = 0xfe;
@@ -2147,6 +2150,15 @@ static void pc98_fdctrl_write_port (void *opaque, uint32_t reg, uint32_t value)
         }
         break;
     case 0xbe:
+        if(value & PC98_MODE_PORTEXC) {
+            /* 1MB I/F (IRQ=11, DMA=2) */
+            fdctrl->irq = fdctrl->irq11;
+            fdctrl->dma_chann = 2;
+        } else {
+            /* 640KB I/F (IRQ=10, DMA=3) */
+            fdctrl->irq = fdctrl->irq10;
+            fdctrl->dma_chann = 3;
+        }
         fdctrl->if_mode = value;
         break;
     case 0x4be:
@@ -2188,7 +2200,7 @@ static void pc98_fdctrl_media_timer(void *opaque)
                    qemu_get_clock(vm_clock) + ticks_per_sec / 10);
 }
 
-void pc98_fdctrl_init (qemu_irq irq, int dma_chann, BlockDriverState **fds)
+void pc98_fdctrl_init (qemu_irq irq11, qemu_irq irq10, BlockDriverState **fds)
 {
     static const target_phys_addr_t port[8] = {
         0x90, 0x92, 0x94, 0xc8, 0xca, 0xcc, 0xbe, 0x4be
@@ -2196,10 +2208,21 @@ void pc98_fdctrl_init (qemu_irq irq, int dma_chann, BlockDriverState **fds)
     fdctrl_t *fdctrl;
     int i;
 
-    fdctrl = fdctrl_init_common(irq, dma_chann, port[0], fds);
+    /* Don't register dma channel in fdctrl_init_common() */
+    fdctrl = fdctrl_init_common(NULL, -1, port[0], fds);
+
+    /* 1MB I/F (IRQ=11, DMA=2) */
+    fdctrl->irq11 = irq11;
+    DMA_register_channel(2, &fdctrl_transfer_handler, fdctrl);
+
+    /* 640KB I/F (IRQ=10, DMA=3) */
+    fdctrl->irq10 = irq10;
+    DMA_register_channel(3, &fdctrl_transfer_handler, fdctrl);
 
     fdctrl->pc98 = 1;
     fdctrl->version = 0x80; /* NEC uPD765A controller */
+    fdctrl->irq = fdctrl->irq11;
+    fdctrl->dma_chann = 2;
     fdctrl->if_mode = PC98_MODE_FDDEXC | PC98_MODE_PORTEXC;
     fdctrl->dor |= FD_DOR_DMAEN;
 

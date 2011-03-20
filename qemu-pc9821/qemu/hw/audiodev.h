@@ -18,3 +18,4 @@ int cs4231a_init (AudioState *s, qemu_irq *pic);
 
 /* NEC PC-9821 */
 void pc98_cs4231a_init (AudioState *audio, qemu_irq *pic, int irq, int dma);
+void pc98_sound_init(AudioState *audio, qemu_irq *pic, int irq);

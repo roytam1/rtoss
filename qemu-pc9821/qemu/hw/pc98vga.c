@@ -4994,12 +4994,8 @@ void *pc98_vga_init(qemu_irq irq)
     register_ioport_write(0xae, 1, 1, palette_ae_write, s);
     register_ioport_read(0xae, 1, 1, palette_ae_read, s);
 
-    for (i = 0; i < 16; i++) {
-        register_ioport_write(0x4a0 + i, 1, 1, egc_ioport_writeb, &s->egc);
-    }
-    for (i = 0; i < 16; i += 2) {
-        register_ioport_write(0x4a0 + i, 2, 2, egc_ioport_writew, &s->egc);
-    }
+    register_ioport_write(0x4a0, 16, 1, egc_ioport_writeb, &s->egc);
+    register_ioport_write(0x4a0, 16, 2, egc_ioport_writew, &s->egc);
 
     register_ioport_write(0x9a0, 1, 1, mode_select_write, s);
     register_ioport_read(0x9a0, 1, 1, mode_status_read, s);
