@@ -582,7 +582,7 @@ struct rBOCU1 : public rBasicUTF
 
 	void Skip() { fb+=skip; skip=0; }
 	bool Eof() { return fb==fe; }
-	uchar GetChar() { return *(fb+(skip++)); }
+	uchar GetChar() { return (fb+skip < fe) ? *(fb+(skip++)) : 0; }
 	unicode PeekC()
 	{
 		uchar c = GetChar();
