@@ -19,11 +19,11 @@
 #include <config.h>
 #endif
 
-#if __STDC__
+/*#if __STDC__
 #define VOID void
 #else
 #define VOID char
-#endif
+#endif*/
 
 #include <stddef.h>
 #include <sys/types.h>

@@ -21,7 +21,7 @@ and David MacKenzie <djm@gnu.ai.mit.edu>.  */
 #include <config.h>
 
 #include <process.h>
-#include "d:/projects/cpp/downhill/include/downhill.h"
+#include "../../downhill/include/downhill.h"
 
 #if __STDC__
 #define P_(s) s
@@ -176,6 +176,9 @@ static long args_per_exec = 1024;
 /* If true, exit if lines_per_exec or args_per_exec is exceeded.  */
 static myboolean exit_if_size_exceeded = false;
 
+/* If true, backslash escape will not be done.  */
+static myboolean no_escape = false;
+
 /* The maximum number of characters that can be used per command line.  */
 static long arg_max;
 
@@ -245,10 +248,13 @@ static struct option const longopts[] =
 	{"max-procs", required_argument, NULL, 'P'},
 	{"version", no_argument, NULL, 'v'},
 	{"help", no_argument, NULL, 'h'},
+	{"no-escape", no_argument, NULL, 'c'},
+	{"whole-line", no_argument, NULL, 'w'},
 	{NULL, no_argument, NULL, 0}
 };
 
 static int read_line P_ ((void));
+static int read_whole_line P_ ((void));
 static int read_string P_ ((void));
 static void do_insert P_ ((char *arg, size_t arglen, size_t lblen));
 static void push_arg P_ ((char *arg, size_t len));
@@ -295,13 +301,17 @@ char **argv;
 	if (arg_max <= 0)
 		error (1, 0, "environment is too large for exec");
 	
-	while ((optc = getopt_long (argc, argv, "+0e::i::l::n:prs:txP:",
+	while ((optc = getopt_long (argc, argv, "+0e::i::l::n:prs:txP:wc",
 		longopts, (int *) 0)) != -1)
     {
 		switch (optc)
 		{
 		case '0':
 			read_args = read_string;
+			break;
+			
+		case 'w':
+			read_args = read_whole_line;
 			break;
 			
 		case 'e':
@@ -369,6 +379,10 @@ char **argv;
 		case 'v':
 			printf ("GNU xargs version %s\n", version_string);
 			exit (0);
+			
+		case 'c':
+			no_escape = true;
+			break;
 			
 		default:
 			usage (stderr, 1);
@@ -467,10 +481,10 @@ read_line ()
     {
 		prevc = c;
 		c = getc (stdin);
-#ifdef WIN32
+/*#ifdef WIN32
 	if(c == '\\')
 				c='/';
-#endif
+#endif*/
 		if (c == EOF)
 		{
 		/* COMPAT: SYSV seems to ignore stuff on a line that
@@ -535,9 +549,14 @@ read_line ()
 			switch (c)
 			{
 			case '\\':
-
-				state = BACKSLASH;
-				continue;
+			    if ( !no_escape ) {
+					state = BACKSLASH;
+					continue;
+				}
+				else
+				{
+					break;
+				}
 
 			case '\'':
 			case '"':
@@ -561,6 +580,53 @@ read_line ()
 			case BACKSLASH:
 				state = NORM;
 				break;
+		}
+		if (p >= endbuf)
+			error (1, 0, "argument line too long");
+		*p++ = c;
+    }
+}
+
+static int
+read_whole_line ()
+{
+	static myboolean eof = false;
+	int len;
+	char *p = linebuf;
+	/* Including the NUL, the args must not grow past this point.  */
+	char *endbuf = linebuf + arg_max - initial_argv_chars - 1;
+	
+	if (eof)
+		return -1;
+
+	*p++ = '"';
+
+		while (1)
+    {
+		int c = getc (stdin);
+		if (c == EOF)
+		{
+			eof = true;
+			if (*(p-1) == '"') /* empty line */
+				return -1;
+			if (p == linebuf)
+				return -1;
+			*p++ = '"';
+			*p++ = '\0';
+			len = p - linebuf;
+			if (!replace_pat)
+				push_arg (linebuf, len);
+			return len;
+		}
+		if (c == '\n')
+		{
+			lineno++;		/* For -l.  */
+			*p++ = '"';
+			*p++ = '\0';
+			len = p - linebuf;
+			if (!replace_pat)
+				push_arg (linebuf, len);
+			return len;
 		}
 		if (p >= endbuf)
 			error (1, 0, "argument line too long");
@@ -944,12 +1010,12 @@ FILE *stream;
 int status;
 {
 fprintf (stream, "\
-				 Usage: %s [-0prtx] [-e[eof-str]] [-i[replace-str]] [-l[max-lines]]\n\
-				 [-n max-args] [-s max-chars] [-P max-procs] [--null] [--eof[=eof-str]]\n\
-				 [--replace[=replace-str]] [--max-lines[=max-lines]] [--interactive]\n\
-				 [--max-chars=max-chars] [--verbose] [--exit] [--max-procs=max-procs]\n\
-				 [--max-args=max-args] [--no-run-if-empty] [--version] [--help]\n\
-				 [command [initial-arguments]]\n",
-				 program_name);
+ Usage: %s [-0prtxwe] [-e[eof-str]] [--eof[=eof-str]] [-i[replace-str]]\n\
+ [--replace[=replace-str]] [-l[max-lines]] [--max-lines[=max-lines]]\n\
+ [-n max-args] [--max-args=max-args] [-s max-chars] [--max-chars=max-chars]\n\
+ [-P max-procs] [--max-procs=max-procs] [--null] [--interactive] [--verbose]\n\
+ [--exit] [--no-run-if-empty] [--version] [--help] [--whole-line] [--no-escape]\n\
+ [command [initial-arguments]]\n",
+ program_name);
 exit (status);
 }
