@@ -32,6 +32,10 @@
 #define BSIZE 1024
 #endif
 
+#  if defined (__DJGPP__) || defined (MSC_VER)
+typedef long daddr_t; /* for disk address */
+#  endif
+
 /* Number of inode pointers per indirect block. */
 #define NINDIR (BSIZE/sizeof(daddr_t))
 #endif /* !NINDIR */
