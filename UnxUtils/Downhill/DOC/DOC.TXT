@@ -1,0 +1,213 @@
+
+
+                              THE DOWNHILL PROJECT
+                         Porting UNIX to Microsoft Win32
+
+                                  Release 1.3
+
+
+Functions and macros **************************************************
+
+These are the functions and macros simulated by the Downhill Project.
+For the most part, when a function is emulated, all its features are
+included, though there are special cases where features are left out
+or crudely dummied.  There are also a few Downhill-specific functions.
+	To the right of each name is what standard it belongs to:
+"POSIX" for POSIX.1, "Std C" for Standard C, and "DHill" for the
+Downhill Project.  Empty space indicates a random BSD/System V/
+Whatever function.  In the Downhill makefile, you can specify if you
+want only the "POSIX", "Std C" and "DHill" functions, or all of them.
+
+
+Downhill functions ====================================================
+
+Process ---------------------------------------------------------------
+	Downhill_Process_System()				DHill
+		Similar to system(), but returns a string of stdout and
+		stderr.  Memory must be free()'d by hand.
+
+	Downhill_Process_Forkexec()				DHill
+		Asynchronously forks off a process and adds its pid to
+		the process list for SIGCHLD monitoring.
+
+	Downhill_Process_Add()					DHill
+		Adds a pid to SIGCHLD monitoring list.  Not necessacary
+		for Downhill_Process_Forkexec()'d programs.
+
+Signal ----------------------------------------------------------------
+	Downhill_Signal_Check()					DHill
+		Checks for signals.  This should be called as often as
+		possible if you're using SIGCHLD, etc.
+
+
+Enhanced functions ====================================================
+
+Process ---------------------------------------------------------------
+	signal()						Std C
+		See man page.  Handles additional signals.
+
+	raise()							Std C
+		See man page.  Handles additional signals.
+
+	mkdir()							POSIX
+		See man page.  Handles permissions.
+
+	stat()							POSIX
+	fstat()							POSIX
+		See man page.  Sets uid and gid to Downhill variables.
+
+
+Simulated functions ===================================================
+
+Directory -------------------------------------------------------------
+	opendir()						POSIX
+	closedir()						POSIX
+	readdir()						POSIX
+	telldir()						POSIX
+	seekdir()
+	rewinddir()
+		See man page.
+
+File ------------------------------------------------------------------
+	lstat()
+	readlink()
+		See man page.  Assumes file is not link.
+
+	utimes()
+		See man page.
+
+	chown()							POSIX
+	fchown()
+		See man page.  Always return 0.
+
+	sethostent()
+	endhostent()
+		See man page.  Always return 0.
+
+	S_ISDIR()						POSIX
+	S_ISCHR()						POSIX
+	S_ISREG()						POSIX
+	S_ISBLK()						POSIX
+	S_ISREG()						POSIX
+	S_ISFIFO()						POSIX
+	S_ISUID()						POSIX
+	S_ISGID()						POSIX
+		See man page.  S_ISUID() and S_ISGID() always return 1.
+
+	ftruncate()
+	truncate()
+		See man page.
+
+Group -----------------------------------------------------------------
+	getgid()						POSIX
+	getegid()						POSIX
+	setgid()						POSIX
+	getgrgid()						POSIX
+	getgrnam()						POSIX
+	getgroups()						POSIX
+	getgrent()
+	setgrent()
+	endgrent()
+	setrgid()
+	setegid()
+		See man page.  Values are dummied.
+
+Misc ------------------------------------------------------------------
+	sleep()							POSIX
+	pause()							POSIX
+		See man page.
+
+	uname()							POSIX
+		See man page.
+
+	getopt()
+	opterr
+	optopt
+	optind
+	optarg
+		See man page.
+
+Net -------------------------------------------------------------------
+	rresvport()
+	rcmd()
+	ruserok()
+	rexec()
+	ruserpass()
+		See man page.
+
+Process ---------------------------------------------------------------
+	wait()							POSIX
+	waitpid()						POSIX
+	wait3()
+	wait4()
+		See man page.  Will only wait on processes launched
+		with Downhill_Process_Forkexec'd() or added to process
+		list with Downhill_Process_Add().
+
+	WIFEXITED()						POSIX
+		Always returns TRUE.
+
+	WIFSTOPPED()						POSIX
+		Always returns FALSE.
+
+	WIFSIGNALED()						POSIX
+		Always returns FALSE.
+
+	WEXITSTATUS()						POSIX
+		See man page.
+
+	WTERMSIG()						POSIX
+		Always returns 0.
+
+	WSTOPSIG()						POSIX
+		Always returns 0.
+
+	WCOREDUMP()
+		Always returns 0.
+
+Signal ----------------------------------------------------------------
+	sigaction()						POSIX
+	sigaddset()						POSIX
+	sigdelset()						POSIX
+	sigemptyset()						POSIX
+	sigfillset()						POSIX
+	sigismember()						POSIX
+	sigpending()						POSIX
+	sigprocmask()						POSIX
+	sigsuspend()						POSIX
+	sigmask()
+	sigsetmask()
+	sigblock()
+	sighold()
+	sigrelse()
+		See man page.
+
+String ----------------------------------------------------------------
+	strcasecmp()
+	strncasecmp()
+		See man page.
+
+	index()
+	rindex()
+		See man page.
+
+	ffs()
+		See man page.
+
+Time ------------------------------------------------------------------
+	gettimeofday()
+		See man page.  Depends on environment variables being
+		set correctly.
+
+User ------------------------------------------------------------------
+	getuid()						POSIX
+	geteuid()						POSIX
+	setuid()						POSIX
+	getpwuid()						POSIX
+	getpwnam()						POSIX
+	getpwent()
+	setpwent()
+	endpwent()
+	setruid()
+	seteuid()
+		See man page.  Values are dummied.
