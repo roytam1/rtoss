@@ -1,0 +1,1 @@
+memset.o: memset.c

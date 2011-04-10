@@ -1,0 +1,1882 @@
+{\rtf1\windows \deff0{\fonttbl
+{\f0\fswiss MS Sans Serif;}{\f1\fmodern Courier New;}{\f2\ftech Symbol;}}\fs20
+\page #{\footnote hcAbout}${\footnote \pard{}About this help file}\pard{\fs24\b About this help file}\par\par\pard{}This file was made with the help of {\ul Makertf 3.12b-1}{\v hcMakertf} from the input file find.texi.\par\par{{START-INFO-DIR-ENTRY\line
+* Finding Files: (find).        Listing and operating on files\line
+                                that match certain criteria.\line
+END-INFO-DIR-ENTRY\par
+\pard{}}\par
+\pard{}This file documents the GNU utilities for finding files that match certain criteria and performing various operations on them.\par
+\par
+\pard{}Copyright (C) 1994 Free Software Foundation, Inc.\par
+\par
+\pard{}Permission is granted to make and distribute verbatim copies of this manual provided the copyright notice and this permission notice are preserved on all copies.\par
+\par
+\pard{}Permission is granted to copy and distribute modified versions of this manual under the conditions for verbatim copying, provided that the entire resulting derived work is distributed under the terms of a permission notice identical to this one.\par
+\par
+\pard{}Permission is granted to copy and distribute translations of this manual into another language, under the above conditions for modified versions, except that this permission notice may be stated in a translation approved by the Foundation.  }\par
+\par
+\page\pard Node: {\b Top}, \keepn Next: {\uldb Introduction}{\v Introduction}, Prev: {\uldb }{\v }, Up: {\uldb (dir)}{\v Top @dir.hlp}\tab\tab{\uldb About this help file}{\v hcAbout}\line
+K{\footnote K Top}
+#{\footnote Top}
+{\par
+\pard\pard{}This file documents the GNU utilities for finding files that match certain criteria and performing various actions on them.  This is edition 1.1, for {\f1{}find} version 4.1.  }\par
+\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb Introduction}{\v Introduction}\tab Summary of the tasks this manual describes.\par
+{\uldb Finding Files}{\v Finding_Files}\tab Finding files that match certain criteria.\par
+{\uldb Actions}{\v Actions}\tab Doing things to files you have found.\par
+{\uldb Common Tasks}{\v Common_Tasks}\tab Solutions to common real-world problems.\par
+{\uldb Databases}{\v Databases}\tab Maintaining file name databases.\par
+{\uldb File Permissions}{\v File_Permissions}\tab How to control access to files.\par
+{\uldb Reference}{\v Reference}\tab Summary of how to invoke the programs.\par
+{\uldb Primary Index}{\v Primary_Index}\tab The components of {\f1{}find} expressions.\par
+\pard{}}\par
+\page\pard Node: {\b Introduction}, \keepn Next: {\uldb Finding Files}{\v Finding_Files}, Prev: {\uldb Top}{\v Top}, Up: {\uldb Top}{\v Top}\line
+K{\footnote K Introduction}
+#{\footnote Introduction}
+${\footnote \pard{}Introduction}\par
+\pard{\fs24\b Introduction}\par
+\par
+\pard{}This manual shows how to find files that meet criteria you specify, and how to perform various actions on the files that you find.  The principal programs that you use to perform these tasks are {\f1{}find}, {\f1{}locate}, and {\f1{}xargs}.  Some of the examples in this manual use capabilities specific to the GNU versions of those programs.\par
+\par
+\pard{}GNU {\f1{}find} was originally written by Eric Decker, with enhancements by David MacKenzie, Jay Plett, and Tim Wood.  GNU {\f1{}xargs} was originally written by Mike Rendell, with enhancements by David MacKenzie.  GNU {\f1{}locate} and its associated utilities were originally written by James Woods, with enhancements by David MacKenzie.  The idea for {\f1{}find -print0} and {\f1{}xargs -0} came from Dan Bernstein.  Many other people have contributed bug fixes, small improvements, and helpful suggestions.  Thanks!\par
+\par
+\pard{}Mail suggestions and bug reports for these programs to {\f1{}bug-gnu-utils@prep.ai.mit.edu}.  Please include the version number, which you can get by running {\f1{}find --version}.\par
+\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb Scope}{\v Scope}\tab \par
+{\uldb Overview}{\v Overview}\tab \par
+{\uldb find Expressions}{\v find_Expressions}\tab\par
+\pard{}}\par
+\page\pard Node: {\b Scope}, \keepn Next: {\uldb Overview}{\v Overview}, Prev: {\uldb }{\v }, Up: {\uldb Introduction}{\v Introduction}\line
+K{\footnote K Scope}
+#{\footnote Scope}
+${\footnote \pard{}Scope}\par
+\pard{\fs24\b Scope}\par
+\par
+\pard{}For brevity, the word \'A2file\'A2 in this manual means a regular file, a directory, a symbolic link, or any other kind of node that has a directory entry.  A directory entry is also called a \'A2file name\'A2.  A file name may contain some, all, or none of the directories in a path that leads to the file.  These are all examples of what this manual calls "file names":\par
+\par
+{\pard\keep\li720\f1{}parser.c\line
+README\line
+./budget/may-94.sc\line
+fred/.cshrc\line
+/usr/local/include/termcap.h\par
+\pard\f0{}}\par
+\pard{}A \'A2directory tree\'A2 is a directory and the files it contains, all of its subdirectories and the files they contain, etc.  It can also be a single non-directory file.\par
+\par
+\pard{}These programs enable you to find the files in one or more directory trees that:\par
+\par
+{\pard\fi-720\li720\tx144\tx720{}\tab{}{\f2\'B7}\tab{}have names that contain certain text or match a certain pattern;\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}{\f2\'B7}\tab{}are links to certain files;\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}{\f2\'B7}\tab{}were last used during a certain period of time;\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}{\f2\'B7}\tab{}are within a certain size range;\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}{\f2\'B7}\tab{}are of a certain type (regular file, directory, symbolic link, etc.);\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}{\f2\'B7}\tab{}are owned by a certain user or group;\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}{\f2\'B7}\tab{}have certain access permissions;\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}{\f2\'B7}\tab{}contain text that matches a certain pattern;\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}{\f2\'B7}\tab{}are within a certain depth in the directory tree;\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}{\f2\'B7}\tab{}or some combination of the above.\par
+\pard{}}\par
+\pard{}Once you have found the files you're looking for (or files that are potentially the ones you're looking for), you can do more to them than simply list their names.  You can get any combination of the files' attributes, or process the files in many ways, either individually or in groups of various sizes.  Actions that you might want to perform on the files you have found include, but are not limited to:\par
+\par
+{\pard\fi-720\li720\tx144\tx720{}\tab{}{\f2\'B7}\tab{}view or edit\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}{\f2\'B7}\tab{}store in an archive\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}{\f2\'B7}\tab{}remove or rename\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}{\f2\'B7}\tab{}change access permissions\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}{\f2\'B7}\tab{}classify into groups\par
+\pard{}}\par
+\pard{}This manual describes how to perform each of those tasks, and more.\par
+\par
+\page\pard Node: {\b Overview}, \keepn Next: {\uldb find Expressions}{\v find_Expressions}, Prev: {\uldb Scope}{\v Scope}, Up: {\uldb Introduction}{\v Introduction}\line
+K{\footnote K Overview}
+#{\footnote Overview}
+${\footnote \pard{}Overview}\par
+\pard{\fs24\b Overview}\par
+\par
+\pard{}The principal programs used for making lists of files that match given criteria and running commands on them are {\f1{}find}, {\f1{}locate}, and {\f1{}xargs}.  An additional command, {\f1{}updatedb}, is used by system administrators to create databases for {\f1{}locate} to use.\par
+\par
+{\f1{}\pard{}find} searches for files in a directory hierarchy and prints information about the files it found.  It is run like this:\par
+\par
+{\pard\keep\li720\f1{}find [{\i file}...] [{\i expression}]\par
+\pard\f0{}}\par
+\pard{}Here is a typical use of {\f1{}find}.  This example prints the names of all files in the directory tree rooted in {\f1{}/usr/src} whose name ends with {\f1{}.c} and that are larger than 100 Kilobytes.  {\par
+\pard\keep\li720\f1{}find /usr/src -name '*.c' -size +100k -print\par
+\pard\f0{}}\par
+{\f1{}\pard{}locate} searches special file name databases for file names that match patterns.  The system administrator runs the {\f1{}updatedb} program to create the databases.  {\f1{}locate} is run like this:\par
+\par
+{\pard\keep\li720\f1{}locate [{\i option}...] {\i pattern}...\par
+\pard\f0{}}\par
+\pard{}This example prints the names of all files in the default file name database whose name ends with {\f1{}Makefile} or {\f1{}makefile}.  Which file names are stored in the database depends on how the system administrator ran {\f1{}updatedb}.  {\par
+\pard\keep\li720\f1{}locate '*[Mm]akefile'\par
+\pard\f0{}}\par
+\pard{}The name {\f1{}xargs}, pronounced EX-args, means "combine arguments."  {\f1{}xargs} builds and executes command lines by gathering together arguments it reads on the standard input.  Most often, these arguments are lists of file names generated by {\f1{}find}.  {\f1{}xargs} is run like this:\par
+\par
+{\pard\keep\li720\f1{}xargs [{\i option}...] [{\i command} [{\i initial-arguments}]]\par
+\pard\f0{}}\par
+\pard{}The following command searches the files listed in the file {\f1{}file-list} and prints all of the lines in them that contain the word {\f1{}typedef}.  {\par
+\pard\keep\li720\f1{}xargs grep typedef < file-list\par
+\pard\f0{}}\par
+\page\pard Node: {\b find Expressions}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Overview}{\v Overview}, Up: {\uldb Introduction}{\v Introduction}\line
+K{\footnote K find Expressions}
+#{\footnote find_Expressions}
+${\footnote {\f1{}\pard{}find} Expressions}\par
+\pard{\fs24\b {\f1{}find} Expressions}\par
+\par
+\pard{}The expression that {\f1{}find} uses to select files consists of one or more \'A2primaries\'A2, each of which is a separate command line argument to {\f1{}find}.  {\f1{}find} evaluates the expression each time it processes a file.  An expression can contain any of the following types of primaries:\par
+\par
+{\pard{}\'A2options\'A2\par
+\pard\li720{}affect overall operation rather than the processing of a specific file;\par
+\par
+\pard{}\'A2tests\'A2\par
+\pard\li720{}return a true or false value, depending on the file's attributes;\par
+\par
+\pard{}\'A2actions\'A2\par
+\pard\li720{}have side effects and return a true or false value; and\par
+\par
+\pard{}\'A2operators\'A2\par
+\pard\li720{}connect the other arguments and affect when and whether they are evaluated.\par
+\pard{}}\par
+\pard{}You can omit the operator between two primaries; it defaults to {\f1{}-and}.  See {\uldb Combining Primaries With Operators}{\v Combining_Primaries_With_Operators}, for ways to connect primaries into more complex expressions.  If the expression contains no actions other than {\f1{}-prune}, {\f1{}-print} is performed on all files for which the entire expression is true (see {\uldb Print File Name}{\v Print_File_Name}).\par
+\par
+\pard{}Options take effect immediately, rather than being evaluated for each file when their place in the expression is reached.  Therefore, for clarity, it is best to place them at the beginning of the expression.\par
+\par
+\pard{}Many of the primaries take arguments, which immediately follow them in the next command line argument to {\f1{}find}.  Some arguments are file names, patterns, or other strings; others are numbers.  Numeric arguments can be specified as\par
+\par
+{\pard{}{\f1{}+{\i n}}\par
+\pard\li720{}for greater than {\i n},\par
+\par
+\pard{}{\f1{}-{\i n}}\par
+\pard\li720{}for less than {\i n},\par
+\par
+\pard{}{\f1{}{\i n}}\par
+\pard\li720{}for exactly {\i n}.\par
+\pard{}}\par
+\page\pard Node: {\b Finding Files}, \keepn Next: {\uldb Actions}{\v Actions}, Prev: {\uldb Introduction}{\v Introduction}, Up: {\uldb Top}{\v Top}\line
+K{\footnote K Finding Files}
+#{\footnote Finding_Files}
+${\footnote \pard{}Finding Files}\par
+\pard{\fs24\b Finding Files}\par
+\par
+\pard{}By default, {\f1{}find} prints to the standard output the names of the files that match the given criteria.  See {\uldb Actions}{\v Actions}, for how to get more information about the matching files.\par
+\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb Name}{\v Name}\tab \par
+{\uldb Links}{\v Links}\tab \par
+{\uldb Time}{\v Time}\tab \par
+{\uldb Size}{\v Size}\tab \par
+{\uldb Type}{\v Type}\tab \par
+{\uldb Owner}{\v Owner}\tab \par
+{\uldb Permissions}{\v Permissions}\tab \par
+{\uldb Contents}{\v Contents}\tab \par
+{\uldb Directories}{\v Directories}\tab \par
+{\uldb Filesystems}{\v Filesystems}\tab \par
+{\uldb Combining Primaries With Operators}{\v Combining_Primaries_With_Operators}\tab\par
+\pard{}}\par
+\page\pard Node: {\b Name}, \keepn Next: {\uldb Links}{\v Links}, Prev: {\uldb }{\v }, Up: {\uldb Finding Files}{\v Finding_Files}\line
+K{\footnote K Name}
+#{\footnote Name}
+${\footnote \pard{}Name}\par
+\pard{\fs24\b Name}\par
+\par
+\pard{}Here are ways to search for files whose name matches a certain pattern.  See {\uldb Shell Pattern Matching}{\v Shell_Pattern_Matching}, for a description of the {\i pattern} arguments to these tests.\par
+\par
+\pard{}Each of these tests has a case-sensitive version and a case-insensitive version, whose name begins with {\f1{}i}.  In a case-insensitive comparison, the patterns {\f1{}fo*} and {\f1{}F??} match the file names {\f1{}Foo}, {\f1{}FOO}, {\f1{}foo}, {\f1{}fOo}, etc.\par
+\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb Base Name Patterns}{\v Base_Name_Patterns}\tab \par
+{\uldb Full Name Patterns}{\v Full_Name_Patterns}\tab \par
+{\uldb Fast Full Name Search}{\v Fast_Full_Name_Search}\tab \par
+{\uldb Shell Pattern Matching}{\v Shell_Pattern_Matching}\tab Wildcards used by these programs.\par
+\pard{}}\par
+\page\pard Node: {\b Base Name Patterns}, \keepn Next: {\uldb Full Name Patterns}{\v Full_Name_Patterns}, Prev: {\uldb }{\v }, Up: {\uldb Name}{\v Name}\line
+K{\footnote K Base Name Patterns}
+#{\footnote Base_Name_Patterns}
+${\footnote \pard{}Base Name Patterns}\par
+\pard{\fs24\b Base Name Patterns}\par
+\par
+{\pard{}Test: {\b -name} pattern\par
+\pard\li720{}{K{\footnote K -name}}\par
+\par
+\pard{}Test: {\b -iname} pattern\par
+\pard\li720{}{K{\footnote K -iname}}True if the base of the file name (the path with the leading directories removed) matches shell pattern {\i pattern}.  For {\f1{}-iname}, the match is case-insensitive.  To ignore a whole directory tree, use {\f1{}-prune} (see {\uldb Directories}{\v Directories}).  As an example, to find Texinfo source files in {\f1{}/usr/local/doc}:\par
+\par
+{\pard\keep\li1440\f1{}find /usr/local/doc -name '*.texi'\par
+\pard\li720\f0{}}}\par
+\page\pard Node: {\b Full Name Patterns}, \keepn Next: {\uldb Fast Full Name Search}{\v Fast_Full_Name_Search}, Prev: {\uldb Base Name Patterns}{\v Base_Name_Patterns}, Up: {\uldb Name}{\v Name}\line
+K{\footnote K Full Name Patterns}
+#{\footnote Full_Name_Patterns}
+${\footnote \pard{}Full Name Patterns}\par
+\pard{\fs24\b Full Name Patterns}\par
+\par
+{\pard{}Test: {\b -path} pattern\par
+\pard\li720{}{K{\footnote K -path}}\par
+\par
+\pard{}Test: {\b -ipath} pattern\par
+\pard\li720{}{K{\footnote K -ipath}}True if the entire file name, starting with the command line argument under which the file was found, matches shell pattern {\i pattern}.  For {\f1{}-ipath}, the match is case-insensitive.  To ignore a whole directory tree, use {\f1{}-prune} rather than checking every file in the tree (see {\uldb Directories}{\v Directories}).\par
+\pard{}}\par
+{\pard{}Test: {\b -regex} expr\par
+\pard\li720{}{K{\footnote K -regex}}\par
+\par
+\pard{}Test: {\b -iregex} expr\par
+\pard\li720{}{K{\footnote K -iregex}}True if the entire file name matches regular expression {\i expr}.  This is a match on the whole path, not a search.  For example, to match a file named {\f1{}./fubar3}, you can use the regular expression {\f1{}.*bar.} or {\f1{}.*b.*3}, but not {\f1{}b.*r3}.  See {\uldb Syntax of Regular Expressions}{\v Regexps @emacs.hlp}, for a description of the syntax of regular expressions.  For {\f1{}-iregex}, the match is case-insensitive.\par
+\pard{}}\par
+\page\pard Node: {\b Fast Full Name Search}, \keepn Next: {\uldb Shell Pattern Matching}{\v Shell_Pattern_Matching}, Prev: {\uldb Full Name Patterns}{\v Full_Name_Patterns}, Up: {\uldb Name}{\v Name}\line
+K{\footnote K Fast Full Name Search}
+#{\footnote Fast_Full_Name_Search}
+${\footnote \pard{}Fast Full Name Search}\par
+\pard{\fs24\b Fast Full Name Search}\par
+\par
+\pard{}To search for files by name without having to actually scan the directories on the disk (which can be slow), you can use the {\f1{}locate} program.  For each shell pattern you give it, {\f1{}locate} searches one or more databases of file names and displays the file names that contain the pattern.  See {\uldb Shell Pattern Matching}{\v Shell_Pattern_Matching}, for details about shell patterns.\par
+\par
+\pard{}If a pattern is a plain string--it contains no metacharacters--{\f1{}locate} displays all file names in the database that contain that string.  If a pattern contains metacharacters, {\f1{}locate} only displays file names that match the pattern exactly.  As a result, patterns that contain metacharacters should usually begin with a {\f1{}*}, and will most often end with one as well.  The exceptions are patterns that are intended to explicitly match the beginning or end of a file name.\par
+\par
+\pard{}The command {\par
+\pard\keep\li720\f1{}locate {\i pattern}\par
+\pard\f0{}}\par
+\pard{}is almost equivalent to {\par
+\pard\keep\li720\f1{}find {\i directories} -name {\i pattern}\par
+\pard\f0{}}\par
+\pard{}where {\i directories} are the directories for which the file name databases contain information.  The differences are that the {\f1{}locate} information might be out of date, and that {\f1{}locate} handles wildcards in the pattern slightly differently than {\f1{}find} (see {\uldb Shell Pattern Matching}{\v Shell_Pattern_Matching}).\par
+\par
+\pard{}The file name databases contain lists of files that were on the system when the databases were last updated.  The system administrator can choose the file name of the default database, the frequency with which the databases are updated, and the directories for which they contain entries.\par
+\par
+\pard{}Here is how to select which file name databases {\f1{}locate} searches.  The default is system-dependent.\par
+\par
+{\pard{}{\f1{}--database={\i path}}\par
+\pard{}{\f1{}-d {\i path}}\par
+\pard\li720{}Instead of searching the default file name database, search the file name databases in {\i path}, which is a colon-separated list of database file names.  You can also use the environment variable {\f1{}LOCATE_PATH} to set the list of database files to search.  The option overrides the environment variable if both are used.\par
+\pard{}}\par
+\page\pard Node: {\b Shell Pattern Matching}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Fast Full Name Search}{\v Fast_Full_Name_Search}, Up: {\uldb Name}{\v Name}\line
+K{\footnote K Shell Pattern Matching}
+#{\footnote Shell_Pattern_Matching}
+${\footnote \pard{}Shell Pattern Matching}\par
+\pard{\fs24\b Shell Pattern Matching}\par
+\par
+{\f1{}\pard{}find} and {\f1{}locate} can compare file names, or parts of file names, to shell patterns.  A \'A2shell pattern\'A2 is a string that may contain the following special characters, which are known as \'A2wildcards\'A2 or \'A2metacharacters\'A2.\par
+\par
+\pard{}You must quote patterns that contain metacharacters to prevent the shell from expanding them itself.  Double and single quotes both work; so does escaping with a backslash.\par
+\par
+{\pard{}{\f1{}*}\par
+\pard\li720{}Matches any zero or more characters.\par
+\par
+\pard{}{\f1{}?}\par
+\pard\li720{}Matches any one character.\par
+\par
+\pard{}{\f1{}[{\i string}]}\par
+\pard\li720{}Matches exactly one character that is a member of the string {\i string}.  This is called a \'A2character class\'A2.  As a shorthand, {\i string} may contain ranges, which consist of two characters with a dash between them.  For example, the class {\f1{}[a-z0-9_]} matches a lowercase letter, a number, or an underscore.  You can negate a class by placing a {\f1{}!} or {\f1{}^} immediately after the opening bracket.  Thus, {\f1{}[^A-Z@]} matches any character except an uppercase letter or an at sign.\par
+\par
+\pard{}{\f1{}\'5C}\par
+\pard\li720{}Removes the special meaning of the character that follows it.  This works even in character classes.\par
+\pard{}}\par
+\pard{}In the {\f1{}find} tests that do shell pattern matching ({\f1{}-name}, {\f1{}-path}, etc.), wildcards in the pattern do not match a {\f1{}.} at the beginning of a file name.  This is not the case for {\f1{}locate}.  Thus, {\f1{}find -name '*macs'} does not match a file named {\f1{}.emacs}, but {\f1{}locate '*macs'} does.\par
+\par
+\pard{}Slash characters have no special significance in the shell pattern matching that {\f1{}find} and {\f1{}locate} do, unlike in the shell, in which wildcards do not match them.  Therefore, a pattern {\f1{}foo*bar} can match a file name {\f1{}foo3/bar}, and a pattern {\f1{}./sr*sc} can match a file name {\f1{}./src/misc}.\par
+\par
+\page\pard Node: {\b Links}, \keepn Next: {\uldb Time}{\v Time}, Prev: {\uldb Name}{\v Name}, Up: {\uldb Finding Files}{\v Finding_Files}\line
+K{\footnote K Links}
+#{\footnote Links}
+${\footnote \pard{}Links}\par
+\pard{\fs24\b Links}\par
+\par
+\pard{}There are two ways that files can be linked together.  \'A2Symbolic links\'A2 are a special type of file whose contents are a portion of the name of another file.  \'A2Hard links\'A2 are multiple directory entries for one file; the file names all have the same index node (\'A2inode\'A2) number on the disk.\par
+\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb Symbolic Links}{\v Symbolic_Links}\tab \par
+{\uldb Hard Links}{\v Hard_Links}\tab\par
+\pard{}}\par
+\page\pard Node: {\b Symbolic Links}, \keepn Next: {\uldb Hard Links}{\v Hard_Links}, Prev: {\uldb }{\v }, Up: {\uldb Links}{\v Links}\line
+K{\footnote K Symbolic Links}
+#{\footnote Symbolic_Links}
+${\footnote \pard{}Symbolic Links}\par
+\pard{\fs24\b Symbolic Links}\par
+\par
+{\pard{}Test: {\b -lname} pattern\par
+\pard\li720{}{K{\footnote K -lname}}\par
+\par
+\pard{}Test: {\b -ilname} pattern\par
+\pard\li720{}{K{\footnote K -ilname}}True if the file is a symbolic link whose contents match shell pattern {\i pattern}.  For {\f1{}-ilname}, the match is case-insensitive.  See {\uldb Shell Pattern Matching}{\v Shell_Pattern_Matching}, for details about the {\i pattern} argument.  So, to list any symbolic links to {\f1{}sysdep.c} in the current directory and its subdirectories, you can do:\par
+\par
+{\pard\keep\li1440\f1{}find . -lname '*sysdep.c'\par
+\pard\li720\f0{}}}\par
+{\pard{}Option: {\b -follow}\par
+\pard\li720{}{K{\footnote K -follow}}Dereference symbolic links.  The following differences in behavior occur when this option is given:\par
+\par
+{\pard\fi-720\li1440\tx864\tx1440{}\tab{}{\f2\'B7}\tab{}{\f1{}find} follows symbolic links to directories when searching directory trees.\par
+\par
+\pard\fi-720\li1440\tx864\tx1440{}\tab{}{\f2\'B7}\tab{}{\f1{}-lname} and {\f1{}-ilname} always return false.\par
+\par
+\pard\fi-720\li1440\tx864\tx1440{}\tab{}{\f2\'B7}\tab{}{\f1{}-type} reports the types of the files that symbolic links point to.\par
+\par
+\pard\fi-720\li1440\tx864\tx1440{}\tab{}{\f2\'B7}\tab{}Implies {\f1{}-noleaf} (see {\uldb Directories}{\v Directories}).\par
+\pard\li720{}}}\par
+\page\pard Node: {\b Hard Links}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Symbolic Links}{\v Symbolic_Links}, Up: {\uldb Links}{\v Links}\line
+K{\footnote K Hard Links}
+#{\footnote Hard_Links}
+${\footnote \pard{}Hard Links}\par
+\pard{\fs24\b Hard Links}\par
+\par
+\pard{}To find hard links, first get the inode number of the file whose links you want to find.  You can learn a file's inode number and the number of links to it by running {\f1{}ls -i} or {\f1{}find -ls}.  If the file has more than one link, you can search for the other links by passing that inode number to {\f1{}-inum}.  Add the {\f1{}-xdev} option if you are starting the search at a directory that has other filesystems mounted on it, such as {\f1{}/usr} on many systems.  Doing this saves needless searching, since hard links to a file must be on the same filesystem.  See {\uldb Filesystems}{\v Filesystems}.\par
+\par
+{\pard{}Test: {\b -inum} n\par
+\pard\li720{}{K{\footnote K -inum}}File has inode number {\i n}.\par
+\pard{}}\par
+\pard{}You can also search for files that have a certain number of links, with {\f1{}-links}.  Directories normally have at least two hard links; their {\f1{}.} entry is the second one.  If they have subdirectories, each of those also has a hard link called {\f1{}..} to its parent directory.\par
+\par
+{\pard{}Test: {\b -links} n\par
+\pard\li720{}{K{\footnote K -links}}File has {\i n} hard links.\par
+\pard{}}\par
+\page\pard Node: {\b Time}, \keepn Next: {\uldb Size}{\v Size}, Prev: {\uldb Links}{\v Links}, Up: {\uldb Finding Files}{\v Finding_Files}\line
+K{\footnote K Time}
+#{\footnote Time}
+${\footnote \pard{}Time}\par
+\pard{\fs24\b Time}\par
+\par
+\pard{}Each file has three time stamps, which record the last time that certain operations were performed on the file:\par
+\par
+{\pard\fi-720\li720\tx144\tx720{}\tab{}1. \tab{}access (read the file's contents)\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}2. \tab{}change the status (modify the file or its attributes)\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}3. \tab{}modify (change the file's contents)\par
+\pard{}}\par
+\pard{}You can search for files whose time stamps are within a certain age range, or compare them to other time stamps.\par
+\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb Age Ranges}{\v Age_Ranges}\tab \par
+{\uldb Comparing Timestamps}{\v Comparing_Timestamps}\tab\par
+\pard{}}\par
+\page\pard Node: {\b Age Ranges}, \keepn Next: {\uldb Comparing Timestamps}{\v Comparing_Timestamps}, Prev: {\uldb }{\v }, Up: {\uldb Time}{\v Time}\line
+K{\footnote K Age Ranges}
+#{\footnote Age_Ranges}
+${\footnote \pard{}Age Ranges}\par
+\pard{\fs24\b Age Ranges}\par
+\par
+\pard{}These tests are mainly useful with ranges ({\f1{}+{\i n}} and {\f1{}-{\i n}}).\par
+\par
+{\pard{}Test: {\b -atime} n\par
+\pard\li720{}{K{\footnote K -atime}}\par
+\par
+\pard{}Test: {\b -ctime} n\par
+\pard\li720{}{K{\footnote K -ctime}}\par
+\par
+\pard{}Test: {\b -mtime} n\par
+\pard\li720{}{K{\footnote K -mtime}}True if the file was last accessed (or its status changed, or it was modified) {\i n}*24 hours ago.\par
+\pard{}}\par
+{\pard{}Test: {\b -amin} n\par
+\pard\li720{}{K{\footnote K -amin}}\par
+\par
+\pard{}Test: {\b -cmin} n\par
+\pard\li720{}{K{\footnote K -cmin}}\par
+\par
+\pard{}Test: {\b -mmin} n\par
+\pard\li720{}{K{\footnote K -mmin}}True if the file was last accessed (or its status changed, or it was modified) {\i n} minutes ago.  These tests provide finer granularity of measurement than {\f1{}-atime} et al.  For example, to list files in {\f1{}/u/bill} that were last read from 2 to 6 hours ago:\par
+\par
+{\pard\keep\li1440\f1{}find /u/bill -amin +2 -amin -6\par
+\pard\li720\f0{}}}\par
+{\pard{}Option: {\b -daystart}\par
+\pard\li720{}{K{\footnote K -daystart}}Measure times from the beginning of today rather than from 24 hours ago.  So, to list the regular files in your home directory that were modified yesterday, do\par
+\par
+{\pard\keep\li1440\f1{}find ~ -daystart -type f -mtime 1\par
+\pard\li720\f0{}}}\par
+\page\pard Node: {\b Comparing Timestamps}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Age Ranges}{\v Age_Ranges}, Up: {\uldb Time}{\v Time}\line
+K{\footnote K Comparing Timestamps}
+#{\footnote Comparing_Timestamps}
+${\footnote \pard{}Comparing Timestamps}\par
+\pard{\fs24\b Comparing Timestamps}\par
+\par
+\pard{}As an alternative to comparing timestamps to the current time, you can compare them to another file's timestamp.  That file's timestamp could be updated by another program when some event occurs.  Or you could set it to a particular fixed date using the {\f1{}touch} command.  For example, to list files in {\f1{}/usr} modified after February 1 of the current year:\par
+\par
+{\pard\keep\li720\f1{}touch -t 02010000 /tmp/stamp$$\line
+find /usr -newer /tmp/stamp$$\line
+rm -f /tmp/stamp$$\par
+\pard\f0{}}\par
+{\pard{}Test: {\b -anewer} file\par
+\pard\li720{}{K{\footnote K -anewer}}\par
+\par
+\pard{}Test: {\b -cnewer} file\par
+\pard\li720{}{K{\footnote K -cnewer}}\par
+\par
+\pard{}Test: {\b -newer} file\par
+\pard\li720{}{K{\footnote K -newer}}True if the file was last accessed (or its status changed, or it was modified) more recently than {\i file} was modified.  These tests are affected by {\f1{}-follow} only if {\f1{}-follow} comes before them on the command line.  See {\uldb Symbolic Links}{\v Symbolic_Links}, for more information on {\f1{}-follow}.  As an example, to list any files modified since {\f1{}/bin/sh} was last modified:\par
+\par
+{\pard\keep\li1440\f1{}find . -newer /bin/sh\par
+\pard\li720\f0{}}}\par
+{\pard{}Test: {\b -used} n\par
+\pard\li720{}{K{\footnote K -used}}True if the file was last accessed {\i n} days after its status was last changed.  Useful for finding files that are not being used, and could perhaps be archived or removed to save disk space.\par
+\pard{}}\par
+\page\pard Node: {\b Size}, \keepn Next: {\uldb Type}{\v Type}, Prev: {\uldb Time}{\v Time}, Up: {\uldb Finding Files}{\v Finding_Files}\line
+K{\footnote K Size}
+#{\footnote Size}
+${\footnote \pard{}Size}\par
+\pard{\fs24\b Size}\par
+\par
+{\pard{}Test: {\b -size} n[bckw]\par
+\pard\li720{}{K{\footnote K -size}}True if the file uses {\i n} units of space, rounding up.  The units are 512-byte blocks by default, but they can be changed by adding a one-character suffix to {\i n}:\par
+\par
+{\pard\li720{}{\f1{}b}\par
+\pard\li1440{}512-byte blocks\par
+\par
+\pard\li720{}{\f1{}c}\par
+\pard\li1440{}bytes\par
+\par
+\pard\li720{}{\f1{}k}\par
+\pard\li1440{}kilobytes (1024 bytes)\par
+\par
+\pard\li720{}{\f1{}w}\par
+\pard\li1440{}2-byte words\par
+\pard\li720{}}\par
+\pard\li720{}The size does not count indirect blocks, but it does count blocks in sparse files that are not actually allocated.\par
+\pard{}}\par
+{\pard{}Test: {\b -empty}\par
+\pard\li720{}{K{\footnote K -empty}}True if the file is empty and is either a regular file or a directory.  This might make it a good candidate for deletion.  This test is useful with {\f1{}-depth} (see {\uldb Directories}{\v Directories}) and {\f1{}-exec rm -rf '\'7B\'7D' ';'} (see {\uldb Single File}{\v Single_File}).\par
+\pard{}}\par
+\page\pard Node: {\b Type}, \keepn Next: {\uldb Owner}{\v Owner}, Prev: {\uldb Size}{\v Size}, Up: {\uldb Finding Files}{\v Finding_Files}\line
+K{\footnote K Type}
+#{\footnote Type}
+${\footnote \pard{}Type}\par
+\pard{\fs24\b Type}\par
+\par
+{\pard{}Test: {\b -type} c\par
+\pard\li720{}{K{\footnote K -type}}True if the file is of type {\i c}:\par
+\par
+{\pard\li720{}{\f1{}b}\par
+\pard\li1440{}block (buffered) special\par
+\par
+\pard\li720{}{\f1{}c}\par
+\pard\li1440{}character (unbuffered) special\par
+\par
+\pard\li720{}{\f1{}d}\par
+\pard\li1440{}directory\par
+\par
+\pard\li720{}{\f1{}p}\par
+\pard\li1440{}named pipe (FIFO)\par
+\par
+\pard\li720{}{\f1{}f}\par
+\pard\li1440{}regular file\par
+\par
+\pard\li720{}{\f1{}l}\par
+\pard\li1440{}symbolic link\par
+\par
+\pard\li720{}{\f1{}s}\par
+\pard\li1440{}socket\par
+\pard\li720{}}}\par
+{\pard{}Test: {\b -xtype} c\par
+\pard\li720{}{K{\footnote K -xtype}}The same as {\f1{}-type} unless the file is a symbolic link.  For symbolic links: if {\f1{}-follow} has not been given, true if the file is a link to a file of type {\i c}; if {\f1{}-follow} has been given, true if {\i c} is {\f1{}l}.  In other words, for symbolic links, {\f1{}-xtype} checks the type of the file that {\f1{}-type} does not check.  See {\uldb Symbolic Links}{\v Symbolic_Links}, for more information on {\f1{}-follow}.\par
+\pard{}}\par
+\page\pard Node: {\b Owner}, \keepn Next: {\uldb Permissions}{\v Permissions}, Prev: {\uldb Type}{\v Type}, Up: {\uldb Finding Files}{\v Finding_Files}\line
+K{\footnote K Owner}
+#{\footnote Owner}
+${\footnote \pard{}Owner}\par
+\pard{\fs24\b Owner}\par
+\par
+{\pard{}Test: {\b -user} uname\par
+\pard\li720{}{K{\footnote K -user}}\par
+\par
+\pard{}Test: {\b -group} gname\par
+\pard\li720{}{K{\footnote K -group}}True if the file is owned by user {\i uname} (belongs to group {\i gname}).  A numeric ID is allowed.\par
+\pard{}}\par
+{\pard{}Test: {\b -uid} n\par
+\pard\li720{}{K{\footnote K -uid}}\par
+\par
+\pard{}Test: {\b -gid} n\par
+\pard\li720{}{K{\footnote K -gid}}True if the file's numeric user ID (group ID) is {\i n}.  These tests support ranges ({\f1{}+{\i n}} and {\f1{}-{\i n}}), unlike {\f1{}-user} and {\f1{}-group}.\par
+\pard{}}\par
+{\pard{}Test: {\b -nouser}\par
+\pard\li720{}{K{\footnote K -nouser}}\par
+\par
+\pard{}Test: {\b -nogroup}\par
+\pard\li720{}{K{\footnote K -nogroup}}True if no user corresponds to the file's numeric user ID (no group corresponds to the numeric group ID).  These cases usually mean that the files belonged to users who have since been removed from the system.  You probably should change the ownership of such files to an existing user or group, using the {\f1{}chown} or {\f1{}chgrp} program.\par
+\pard{}}\par
+\page\pard Node: {\b Permissions}, \keepn Next: {\uldb Contents}{\v Contents}, Prev: {\uldb Owner}{\v Owner}, Up: {\uldb Finding Files}{\v Finding_Files}\line
+K{\footnote K Permissions}
+#{\footnote Permissions}
+${\footnote \pard{}Permissions}\par
+\pard{\fs24\b Permissions}\par
+\par
+\pard{}See {\uldb File Permissions}{\v File_Permissions}, for information on how file permissions are structured and how to specify them.\par
+\par
+{\pard{}Test: {\b -perm} mode\par
+\pard\li720{}{K{\footnote K -perm}}True if the file's permissions are exactly {\i mode} (which can be numeric or symbolic).  Symbolic modes use mode 0 as a point of departure.  If {\i mode} starts with {\f1{}-}, true if {\i all} of the permissions set in {\i mode} are set for the file; permissions not set in {\i mode} are ignored.  If {\i mode} starts with {\f1{}+}, true if {\i any} of the permissions set in {\i mode} are set for the file; permissions not set in {\i mode} are ignored.\par
+\pard{}}\par
+\page\pard Node: {\b Contents}, \keepn Next: {\uldb Directories}{\v Directories}, Prev: {\uldb Permissions}{\v Permissions}, Up: {\uldb Finding Files}{\v Finding_Files}\line
+K{\footnote K Contents}
+#{\footnote Contents}
+${\footnote \pard{}Contents}\par
+\pard{\fs24\b Contents}\par
+\par
+\pard{}To search for files based on their contents, you can use the {\f1{}grep} program.  For example, to find out which C source files in the current directory contain the string {\f1{}thing}, you can do:\par
+\par
+{\pard\keep\li720\f1{}grep -l thing *.[ch]\par
+\pard\f0{}}\par
+\pard{}If you also want to search for the string in files in subdirectories, you can combine {\f1{}grep} with {\f1{}find} and {\f1{}xargs}, like this:\par
+\par
+{\pard\keep\li720\f1{}find . -name '*.[ch]' | xargs grep -l thing\par
+\pard\f0{}}\par
+\pard{}The {\f1{}-l} option causes {\f1{}grep} to print only the names of files that contain the string, rather than the lines that contain it.  The string argument ({\f1{}thing}) is actually a regular expression, so it can contain metacharacters.  This method can be refined a little by using the {\f1{}-r} option to make {\f1{}xargs} not run {\f1{}grep} if {\f1{}find} produces no output, and using the {\f1{}find} action {\f1{}-print0} and the {\f1{}xargs} option {\f1{}-0} to avoid misinterpreting files whose names contain spaces:\par
+\par
+{\pard\keep\li720\f1{}find . -name '*.[ch]' -print0 | xargs -r -0 grep -l thing\par
+\pard\f0{}}\par
+\pard{}For a fuller treatment of finding files whose contents match a pattern, see the manual page for {\f1{}grep}.\par
+\par
+\page\pard Node: {\b Directories}, \keepn Next: {\uldb Filesystems}{\v Filesystems}, Prev: {\uldb Contents}{\v Contents}, Up: {\uldb Finding Files}{\v Finding_Files}\line
+K{\footnote K Directories}
+#{\footnote Directories}
+${\footnote \pard{}Directories}\par
+\pard{\fs24\b Directories}\par
+\par
+\pard{}Here is how to control which directories {\f1{}find} searches, and how it searches them.  These two options allow you to process a horizontal slice of a directory tree.\par
+\par
+{\pard{}Option: {\b -maxdepth} levels\par
+\pard\li720{}{K{\footnote K -maxdepth}}Descend at most {\i levels} (a non-negative integer) levels of directories below the command line arguments.  {\f1{}-maxdepth 0} means only apply the tests and actions to the command line arguments.\par
+\pard{}}\par
+{\pard{}Option: {\b -mindepth} levels\par
+\pard\li720{}{K{\footnote K -mindepth}}Do not apply any tests or actions at levels less than {\i levels} (a non-negative integer).  {\f1{}-mindepth 1} means process all files except the command line arguments.\par
+\pard{}}\par
+{\pard{}Option: {\b -depth}\par
+\pard\li720{}{K{\footnote K -depth}}Process each directory's contents before the directory itself.  Doing this is a good idea when producing lists of files to archive with {\f1{}cpio} or {\f1{}tar}.  If a directory does not have write permission for its owner, its contents can still be restored from the archive since the directory's permissions are restored after its contents.\par
+\pard{}}\par
+{\pard{}Action: {\b -prune}\par
+\pard\li720{}{K{\footnote K -prune}}If {\f1{}-depth} is not given, true; do not descend the current directory.  If {\f1{}-depth} is given, false; no effect.  {\f1{}-prune} only affects tests and actions that come after it in the expression, not those that come before.\par
+\par
+\pard\li720{}For example, to skip the directory {\f1{}src/emacs} and all files and directories under it, and print the names of the other files found:\par
+\par
+{\pard\keep\li1440\f1{}find . -path './src/emacs' -prune -o -print\par
+\pard\li720\f0{}}}\par
+{\pard{}Option: {\b -noleaf}\par
+\pard\li720{}{K{\footnote K -noleaf}}Do not optimize by assuming that directories contain 2 fewer subdirectories than their hard link count.  This option is needed when searching filesystems that do not follow the Unix directory-link convention, such as CD-ROM or MS-DOS filesystems or AFS volume mount points.  Each directory on a normal Unix filesystem has at least 2 hard links: its name and its {\f1{}.}  entry.  Additionally, its subdirectories (if any) each have a {\f1{}..}  entry linked to that directory.  When {\f1{}find} is examining a directory, after it has statted 2 fewer subdirectories than the directory's link count, it knows that the rest of the entries in the directory are non-directories (\'A2leaf\'A2 files in the directory tree).  If only the files' names need to be examined, there is no need to stat them; this gives a significant increase in search speed.\par
+\pard{}}\par
+\page\pard Node: {\b Filesystems}, \keepn Next: {\uldb Combining Primaries With Operators}{\v Combining_Primaries_With_Operators}, Prev: {\uldb Directories}{\v Directories}, Up: {\uldb Finding Files}{\v Finding_Files}\line
+K{\footnote K Filesystems}
+#{\footnote Filesystems}
+${\footnote \pard{}Filesystems}\par
+\pard{\fs24\b Filesystems}\par
+\par
+\pard{}A \'A2filesystem\'A2 is a section of a disk, either on the local host or mounted from a remote host over a network.  Searching network filesystems can be slow, so it is common to make {\f1{}find} avoid them.\par
+\par
+\pard{}There are two ways to avoid searching certain filesystems.  One way is to tell {\f1{}find} to only search one filesystem:\par
+\par
+{\pard{}Option: {\b -xdev}\par
+\pard\li720{}{K{\footnote K -xdev}}\par
+\par
+\pard{}Option: {\b -mount}\par
+\pard\li720{}{K{\footnote K -mount}}Don't descend directories on other filesystems.  These options are synonyms.\par
+\pard{}}\par
+\pard{}The other way is to check the type of filesystem each file is on, and not descend directories that are on undesirable filesystem types:\par
+\par
+{\pard{}Test: {\b -fstype} type\par
+\pard\li720{}{K{\footnote K -fstype}}True if the file is on a filesystem of type {\i type}.  The valid filesystem types vary among different versions of Unix; an incomplete list of filesystem types that are accepted on some version of Unix or another is: {\par
+\pard\keep\li1440\f1{}ufs 4.2 4.3 nfs tmp mfs S51K S52K\par
+\pard\li720\f0{}}You can use {\f1{}-printf} with the {\f1{}%F} directive to see the types of your filesystems.  See {\uldb Print File Information}{\v Print_File_Information}.  {\f1{}-fstype} is usually used with {\f1{}-prune} to avoid searching remote filesystems (see {\uldb Directories}{\v Directories}).\par
+\pard{}}\par
+\page\pard Node: {\b Combining Primaries With Operators}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Filesystems}{\v Filesystems}, Up: {\uldb Finding Files}{\v Finding_Files}\line
+K{\footnote K Combining Primaries With Operators}
+#{\footnote Combining_Primaries_With_Operators}
+${\footnote \pard{}Combining Primaries With Operators}\par
+\pard{\fs24\b Combining Primaries With Operators}\par
+\par
+\pard{}Operators build a complex expression from tests and actions.  The operators are, in order of decreasing precedence:\par
+\par
+{\pard{}{\f1{}( {\i expr} )}\par
+\pard\li720{}Force precedence.  True if {\i expr} is true.\par
+\par
+\pard{}{\f1{}! {\i expr}}\par
+\pard{}{\f1{}-not {\i expr}}\par
+\pard\li720{}True if {\i expr} is false.\par
+\par
+\pard{}{\f1{}{\i expr1 expr2}}\par
+\pard{}{\f1{}{\i expr1} -a {\i expr2}}\par
+\pard{}{\f1{}{\i expr1} -and {\i expr2}}\par
+\pard\li720{}And; {\i expr2} is not evaluated if {\i expr1} is false.\par
+\par
+\pard{}{\f1{}{\i expr1} -o {\i expr2}}\par
+\pard{}{\f1{}{\i expr1} -or {\i expr2}}\par
+\pard\li720{}Or; {\i expr2} is not evaluated if {\i expr1} is true.\par
+\par
+\pard{}{\f1{}{\i expr1} , {\i expr2}}\par
+\pard\li720{}List; both {\i expr1} and {\i expr2} are always evaluated.  True if {\i expr2} is true.  The value of {\i expr1} is discarded.  This operator lets you do multiple independent operations on one traversal, without depending on whether other operations succeeded.\par
+\pard{}}\par
+{\f1{}\pard{}find} searches the directory tree rooted at each file name by evaluating the expression from left to right, according to the rules of precedence, until the outcome is known (the left hand side is false for {\f1{}-and}, true for {\f1{}-or}), at which point {\f1{}find} moves on to the next file name.\par
+\par
+\pard{}There are two other tests that can be useful in complex expressions:\par
+\par
+{\pard{}Test: {\b -true}\par
+\pard\li720{}{K{\footnote K -true}}Always true.\par
+\pard{}}\par
+{\pard{}Test: {\b -false}\par
+\pard\li720{}{K{\footnote K -false}}Always false.\par
+\pard{}}\par
+\page\pard Node: {\b Actions}, \keepn Next: {\uldb Common Tasks}{\v Common_Tasks}, Prev: {\uldb Finding Files}{\v Finding_Files}, Up: {\uldb Top}{\v Top}\line
+K{\footnote K Actions}
+#{\footnote Actions}
+${\footnote \pard{}Actions}\par
+\pard{\fs24\b Actions}\par
+\par
+\pard{}There are several ways you can print information about the files that match the criteria you gave in the {\f1{}find} expression.  You can print the information either to the standard output or to a file that you name.  You can also execute commands that have the file names as arguments.  You can use those commands as further filters to select files.\par
+\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb Print File Name}{\v Print_File_Name}\tab \par
+{\uldb Print File Information}{\v Print_File_Information}\tab \par
+{\uldb Run Commands}{\v Run_Commands}\tab \par
+{\uldb Adding Tests}{\v Adding_Tests}\tab\par
+\pard{}}\par
+\page\pard Node: {\b Print File Name}, \keepn Next: {\uldb Print File Information}{\v Print_File_Information}, Prev: {\uldb }{\v }, Up: {\uldb Actions}{\v Actions}\line
+K{\footnote K Print File Name}
+#{\footnote Print_File_Name}
+${\footnote \pard{}Print File Name}\par
+\pard{\fs24\b Print File Name}\par
+\par
+{\pard{}Action: {\b -print}\par
+\pard\li720{}{K{\footnote K -print}}True; print the full file name on the standard output, followed by a newline.\par
+\pard{}}\par
+{\pard{}Action: {\b -fprint} file\par
+\pard\li720{}{K{\footnote K -fprint}}True; print the full file name into file {\i file}, followed by a newline.  If {\i file} does not exist when {\f1{}find} is run, it is created; if it does exist, it is truncated to 0 bytes.  The file names {\f1{}/dev/stdout} and {\f1{}/dev/stderr} are handled specially; they refer to the standard output and standard error output, respectively.\par
+\pard{}}\par
+\page\pard Node: {\b Print File Information}, \keepn Next: {\uldb Run Commands}{\v Run_Commands}, Prev: {\uldb Print File Name}{\v Print_File_Name}, Up: {\uldb Actions}{\v Actions}\line
+K{\footnote K Print File Information}
+#{\footnote Print_File_Information}
+${\footnote \pard{}Print File Information}\par
+\pard{\fs24\b Print File Information}\par
+\par
+{\pard{}Action: {\b -ls}\par
+\pard\li720{}{K{\footnote K -ls}}True; list the current file in {\f1{}ls -dils} format on the standard output.  The output looks like this:\par
+\par
+{\pard\keep\li1440\f1{}204744   17 -rw-r--r--   1 djm      staff       17337 Nov  2  1992 ./lwall-quotes\par
+\pard\li720\f0{}}\par
+\pard\li720{}The fields are:\par
+\par
+{\pard\fi-720\li1440\tx864\tx1440{}\tab{}1. \tab{}The inode number of the file.  See {\uldb Hard Links}{\v Hard_Links}, for how to find files based on their inode number.\par
+\par
+\pard\fi-720\li1440\tx864\tx1440{}\tab{}2. \tab{}the number of blocks in the file.  The block counts are of 1K blocks, unless the environment variable {\f1{}POSIXLY_CORRECT} is set, in which case 512-byte blocks are used.  See {\uldb Size}{\v Size}, for how to find files based on their size.\par
+\par
+\pard\fi-720\li1440\tx864\tx1440{}\tab{}3. \tab{}The file's type and permissions.  The type is shown as a dash for a regular file; for other file types, a letter like for {\f1{}-type} is used (see {\uldb Type}{\v Type}).  The permissions are read, write, and execute for the file's owner, its group, and other users, respectively; a dash means the permission is not granted.  See {\uldb File Permissions}{\v File_Permissions}, for more details about file permissions.  See {\uldb Permissions}{\v Permissions}, for how to find files based on their permissions.\par
+\par
+\pard\fi-720\li1440\tx864\tx1440{}\tab{}4. \tab{}The number of hard links to the file.\par
+\par
+\pard\fi-720\li1440\tx864\tx1440{}\tab{}5. \tab{}The user who owns the file.\par
+\par
+\pard\fi-720\li1440\tx864\tx1440{}\tab{}6. \tab{}The file's group.\par
+\par
+\pard\fi-720\li1440\tx864\tx1440{}\tab{}7. \tab{}The file's size in bytes.\par
+\par
+\pard\fi-720\li1440\tx864\tx1440{}\tab{}8. \tab{}The date the file was last modified.\par
+\par
+\pard\fi-720\li1440\tx864\tx1440{}\tab{}9. \tab{}The file's name.  {\f1{}-ls} quotes non-printable characters in the file names using C-like backslash escapes.\par
+\pard\li720{}}}\par
+{\pard{}Action: {\b -fls} file\par
+\pard\li720{}{K{\footnote K -fls}}True; like {\f1{}-ls} but write to {\i file} like {\f1{}-fprint} (see {\uldb Print File Name}{\v Print_File_Name}).\par
+\pard{}}\par
+{\pard{}Action: {\b -printf} format\par
+\pard\li720{}{K{\footnote K -printf}}True; print {\i format} on the standard output, interpreting {\f1{}\'5C} escapes and {\f1{}%} directives.  Field widths and precisions can be specified as with the {\f1{}printf} C function.  Unlike {\f1{}-print}, {\f1{}-printf} does not add a newline at the end of the string.\par
+\pard{}}\par
+{\pard{}Action: {\b -fprintf} file format\par
+\pard\li720{}{K{\footnote K -fprintf}}True; like {\f1{}-printf} but write to {\i file} like {\f1{}-fprint} (see {\uldb Print File Name}{\v Print_File_Name}).\par
+\pard{}}\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb Escapes}{\v Escapes}\tab \par
+{\uldb Format Directives}{\v Format_Directives}\tab \par
+{\uldb Time Formats}{\v Time_Formats}\tab\par
+\pard{}}\par
+\page\pard Node: {\b Escapes}, \keepn Next: {\uldb Format Directives}{\v Format_Directives}, Prev: {\uldb }{\v }, Up: {\uldb Print File Information}{\v Print_File_Information}\line
+K{\footnote K Escapes}
+#{\footnote Escapes}
+${\footnote \pard{}Escapes}\par
+\pard{\fs24\b Escapes}\par
+\par
+\pard{}The escapes that {\f1{}-printf} and {\f1{}-fprintf} recognize are:\par
+\par
+{\pard{}{\f1{}\'5Ca}\par
+\pard\li720{}Alarm bell.\par
+\par
+\pard{}{\f1{}\'5Cb}\par
+\pard\li720{}Backspace.\par
+\par
+\pard{}{\f1{}\'5Cc}\par
+\pard\li720{}Stop printing from this format immediately and flush the output.\par
+\par
+\pard{}{\f1{}\'5Cf}\par
+\pard\li720{}Form feed.\par
+\par
+\pard{}{\f1{}\'5Cn}\par
+\pard\li720{}Newline.\par
+\par
+\pard{}{\f1{}\'5Cr}\par
+\pard\li720{}Carriage return.\par
+\par
+\pard{}{\f1{}\'5Ct}\par
+\pard\li720{}Horizontal tab.\par
+\par
+\pard{}{\f1{}\'5Cv}\par
+\pard\li720{}Vertical tab.\par
+\par
+\pard{}{\f1{}\'5C\'5C}\par
+\pard\li720{}A literal backslash ({\f1{}\'5C}).\par
+\pard{}}\par
+\pard{}A {\f1{}\'5C} character followed by any other character is treated as an ordinary character, so they both are printed, and a warning message is printed to the standard error output (because it was probably a typo).\par
+\par
+\page\pard Node: {\b Format Directives}, \keepn Next: {\uldb Time Formats}{\v Time_Formats}, Prev: {\uldb Escapes}{\v Escapes}, Up: {\uldb Print File Information}{\v Print_File_Information}\line
+K{\footnote K Format Directives}
+#{\footnote Format_Directives}
+${\footnote \pard{}Format Directives}\par
+\pard{\fs24\b Format Directives}\par
+\par
+{\f1{}\pard{}-printf} and {\f1{}-fprintf} support the following format directives to print information about the file being processed.  Unlike the C {\f1{}printf} function, they do not support field width specifiers.\par
+\par
+{\f1{}\pard{}%%} is a literal percent sign.  A {\f1{}%} character followed by any other character is discarded (but the other character is printed), and a warning message is printed to the standard error output (because it was probably a typo).\par
+\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb Name Directives}{\v Name_Directives}\tab \par
+{\uldb Ownership Directives}{\v Ownership_Directives}\tab \par
+{\uldb Size Directives}{\v Size_Directives}\tab \par
+{\uldb Location Directives}{\v Location_Directives}\tab \par
+{\uldb Time Directives}{\v Time_Directives}\tab\par
+\pard{}}\par
+\page\pard Node: {\b Name Directives}, \keepn Next: {\uldb Ownership Directives}{\v Ownership_Directives}, Prev: {\uldb }{\v }, Up: {\uldb Format Directives}{\v Format_Directives}\line
+K{\footnote K Name Directives}
+#{\footnote Name_Directives}
+${\footnote \pard{}Name Directives}\par
+\pard{\fs24\b Name Directives}\par
+\par
+{\pard{}{\f1{}%p}\par
+\pard\li720{}File's name.\par
+\par
+\pard{}{\f1{}%f}\par
+\pard\li720{}File's name with any leading directories removed (only the last element).\par
+\par
+\pard{}{\f1{}%h}\par
+\pard\li720{}Leading directories of file's name (all but the last element and the slash before it).\par
+\par
+\pard{}{\f1{}%P}\par
+\pard\li720{}File's name with the name of the command line argument under which it was found removed from the beginning.\par
+\par
+\pard{}{\f1{}%H}\par
+\pard\li720{}Command line argument under which file was found.\par
+\pard{}}\par
+\page\pard Node: {\b Ownership Directives}, \keepn Next: {\uldb Size Directives}{\v Size_Directives}, Prev: {\uldb Name Directives}{\v Name_Directives}, Up: {\uldb Format Directives}{\v Format_Directives}\line
+K{\footnote K Ownership Directives}
+#{\footnote Ownership_Directives}
+${\footnote \pard{}Ownership Directives}\par
+\pard{\fs24\b Ownership Directives}\par
+\par
+{\pard{}{\f1{}%g}\par
+\pard\li720{}File's group name, or numeric group ID if the group has no name.\par
+\par
+\pard{}{\f1{}%G}\par
+\pard\li720{}File's numeric group ID.\par
+\par
+\pard{}{\f1{}%u}\par
+\pard\li720{}File's user name, or numeric user ID if the user has no name.\par
+\par
+\pard{}{\f1{}%U}\par
+\pard\li720{}File's numeric user ID.\par
+\par
+\pard{}{\f1{}%m}\par
+\pard\li720{}File's permissions (in octal).\par
+\pard{}}\par
+\page\pard Node: {\b Size Directives}, \keepn Next: {\uldb Location Directives}{\v Location_Directives}, Prev: {\uldb Ownership Directives}{\v Ownership_Directives}, Up: {\uldb Format Directives}{\v Format_Directives}\line
+K{\footnote K Size Directives}
+#{\footnote Size_Directives}
+${\footnote \pard{}Size Directives}\par
+\pard{\fs24\b Size Directives}\par
+\par
+{\pard{}{\f1{}%k}\par
+\pard\li720{}File's size in 1K blocks (rounded up).\par
+\par
+\pard{}{\f1{}%b}\par
+\pard\li720{}File's size in 512-byte blocks (rounded up).\par
+\par
+\pard{}{\f1{}%s}\par
+\pard\li720{}File's size in bytes.\par
+\pard{}}\par
+\page\pard Node: {\b Location Directives}, \keepn Next: {\uldb Time Directives}{\v Time_Directives}, Prev: {\uldb Size Directives}{\v Size_Directives}, Up: {\uldb Format Directives}{\v Format_Directives}\line
+K{\footnote K Location Directives}
+#{\footnote Location_Directives}
+${\footnote \pard{}Location Directives}\par
+\pard{\fs24\b Location Directives}\par
+\par
+{\pard{}{\f1{}%d}\par
+\pard\li720{}File's depth in the directory tree; files named on the command line have a depth of 0.\par
+\par
+\pard{}{\f1{}%F}\par
+\pard\li720{}Type of the filesystem the file is on; this value can be used for {\f1{}-fstype} (see {\uldb Directories}{\v Directories}).\par
+\par
+\pard{}{\f1{}%l}\par
+\pard\li720{}Object of symbolic link (empty string if file is not a symbolic link).\par
+\par
+\pard{}{\f1{}%i}\par
+\pard\li720{}File's inode number (in decimal).\par
+\par
+\pard{}{\f1{}%n}\par
+\pard\li720{}Number of hard links to file.\par
+\pard{}}\par
+\page\pard Node: {\b Time Directives}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Location Directives}{\v Location_Directives}, Up: {\uldb Format Directives}{\v Format_Directives}\line
+K{\footnote K Time Directives}
+#{\footnote Time_Directives}
+${\footnote \pard{}Time Directives}\par
+\pard{\fs24\b Time Directives}\par
+\par
+\pard{}Some of these directives use the C {\f1{}ctime} function.  Its output depends on the current locale, but it typically looks like\par
+\par
+{\pard\keep\li720\f1{}Wed Nov  2 00:42:36 1994\par
+\pard\f0{}}\par
+{\pard{}{\f1{}%a}\par
+\pard\li720{}File's last access time in the format returned by the C {\f1{}ctime} function.\par
+\par
+\pard{}{\f1{}%A{\i k}}\par
+\pard\li720{}File's last access time in the format specified by {\i k} (see {\uldb Time Formats}{\v Time_Formats}).\par
+\par
+\pard{}{\f1{}%c}\par
+\pard\li720{}File's last status change time in the format returned by the C {\f1{}ctime} function.\par
+\par
+\pard{}{\f1{}%C{\i k}}\par
+\pard\li720{}File's last status change time in the format specified by {\i k} (see {\uldb Time Formats}{\v Time_Formats}).\par
+\par
+\pard{}{\f1{}%t}\par
+\pard\li720{}File's last modification time in the format returned by the C {\f1{}ctime} function.\par
+\par
+\pard{}{\f1{}%T{\i k}}\par
+\pard\li720{}File's last modification time in the format specified by {\i k} (see {\uldb Time Formats}{\v Time_Formats}).\par
+\pard{}}\par
+\page\pard Node: {\b Time Formats}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Format Directives}{\v Format_Directives}, Up: {\uldb Print File Information}{\v Print_File_Information}\line
+K{\footnote K Time Formats}
+#{\footnote Time_Formats}
+${\footnote \pard{}Time Formats}\par
+\pard{\fs24\b Time Formats}\par
+\par
+\pard{}Below are the formats for the directives {\f1{}%A}, {\f1{}%C}, and {\f1{}%T}, which print the file's timestamps.  Some of these formats might not be available on all systems, due to differences in the C {\f1{}strftime} function between systems.\par
+\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb Time Components}{\v Time_Components}\tab \par
+{\uldb Date Components}{\v Date_Components}\tab \par
+{\uldb Combined Time Formats}{\v Combined_Time_Formats}\tab\par
+\pard{}}\par
+\page\pard Node: {\b Time Components}, \keepn Next: {\uldb Date Components}{\v Date_Components}, Prev: {\uldb }{\v }, Up: {\uldb Time Formats}{\v Time_Formats}\line
+K{\footnote K Time Components}
+#{\footnote Time_Components}
+${\footnote \pard{}Time Components}\par
+\pard{\fs24\b Time Components}\par
+\par
+\pard{}The following format directives print single components of the time.\par
+\par
+{\pard{}{\f1{}H}\par
+\pard\li720{}hour (00..23)\par
+\par
+\pard{}{\f1{}I}\par
+\pard\li720{}hour (01..12)\par
+\par
+\pard{}{\f1{}k}\par
+\pard\li720{}hour ( 0..23)\par
+\par
+\pard{}{\f1{}l}\par
+\pard\li720{}hour ( 1..12)\par
+\par
+\pard{}{\f1{}p}\par
+\pard\li720{}locale's AM or PM\par
+\par
+\pard{}{\f1{}Z}\par
+\pard\li720{}time zone (e.g., EDT), or nothing if no time zone is determinable\par
+\par
+\pard{}{\f1{}M}\par
+\pard\li720{}minute (00..59)\par
+\par
+\pard{}{\f1{}S}\par
+\pard\li720{}second (00..61)\par
+\par
+\pard{}{\f1{}@}\par
+\pard\li720{}seconds since Jan. 1, 1970, 00:00 GMT.\par
+\pard{}}\par
+\page\pard Node: {\b Date Components}, \keepn Next: {\uldb Combined Time Formats}{\v Combined_Time_Formats}, Prev: {\uldb Time Components}{\v Time_Components}, Up: {\uldb Time Formats}{\v Time_Formats}\line
+K{\footnote K Date Components}
+#{\footnote Date_Components}
+${\footnote \pard{}Date Components}\par
+\pard{\fs24\b Date Components}\par
+\par
+\pard{}The following format directives print single components of the date.\par
+\par
+{\pard{}{\f1{}a}\par
+\pard\li720{}locale's abbreviated weekday name (Sun..Sat)\par
+\par
+\pard{}{\f1{}A}\par
+\pard\li720{}locale's full weekday name, variable length (Sunday..Saturday)\par
+\par
+\pard{}{\f1{}b}\par
+\pard{}{\f1{}h}\par
+\pard\li720{}locale's abbreviated month name (Jan..Dec)\par
+\par
+\pard{}{\f1{}B}\par
+\pard\li720{}locale's full month name, variable length (January..December)\par
+\par
+\pard{}{\f1{}m}\par
+\pard\li720{}month (01..12)\par
+\par
+\pard{}{\f1{}d}\par
+\pard\li720{}day of month (01..31)\par
+\par
+\pard{}{\f1{}w}\par
+\pard\li720{}day of week (0..6)\par
+\par
+\pard{}{\f1{}j}\par
+\pard\li720{}day of year (001..366)\par
+\par
+\pard{}{\f1{}U}\par
+\pard\li720{}week number of year with Sunday as first day of week (00..53)\par
+\par
+\pard{}{\f1{}W}\par
+\pard\li720{}week number of year with Monday as first day of week (00..53)\par
+\par
+\pard{}{\f1{}Y}\par
+\pard\li720{}year (1970...)\par
+\par
+\pard{}{\f1{}y}\par
+\pard\li720{}last two digits of year (00..99)\par
+\pard{}}\par
+\page\pard Node: {\b Combined Time Formats}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Date Components}{\v Date_Components}, Up: {\uldb Time Formats}{\v Time_Formats}\line
+K{\footnote K Combined Time Formats}
+#{\footnote Combined_Time_Formats}
+${\footnote \pard{}Combined Time Formats}\par
+\pard{\fs24\b Combined Time Formats}\par
+\par
+\pard{}The following format directives print combinations of time and date components.\par
+\par
+{\pard{}{\f1{}r}\par
+\pard\li720{}time, 12-hour (hh:mm:ss [AP]M)\par
+\par
+\pard{}{\f1{}T}\par
+\pard\li720{}time, 24-hour (hh:mm:ss)\par
+\par
+\pard{}{\f1{}X}\par
+\pard\li720{}locale's time representation (H:M:S)\par
+\par
+\pard{}{\f1{}c}\par
+\pard\li720{}locale's date and time (Sat Nov 04 12:02:33 EST 1989)\par
+\par
+\pard{}{\f1{}D}\par
+\pard\li720{}date (mm/dd/yy)\par
+\par
+\pard{}{\f1{}x}\par
+\pard\li720{}locale's date representation (mm/dd/yy)\par
+\pard{}}\par
+\page\pard Node: {\b Run Commands}, \keepn Next: {\uldb Adding Tests}{\v Adding_Tests}, Prev: {\uldb Print File Information}{\v Print_File_Information}, Up: {\uldb Actions}{\v Actions}\line
+K{\footnote K Run Commands}
+#{\footnote Run_Commands}
+${\footnote \pard{}Run Commands}\par
+\pard{\fs24\b Run Commands}\par
+\par
+\pard{}You can use the list of file names created by {\f1{}find} or {\f1{}locate} as arguments to other commands.  In this way you can perform arbitrary actions on the files.\par
+\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb Single File}{\v Single_File}\tab \par
+{\uldb Multiple Files}{\v Multiple_Files}\tab \par
+{\uldb Querying}{\v Querying}\tab\par
+\pard{}}\par
+\page\pard Node: {\b Single File}, \keepn Next: {\uldb Multiple Files}{\v Multiple_Files}, Prev: {\uldb }{\v }, Up: {\uldb Run Commands}{\v Run_Commands}\line
+K{\footnote K Single File}
+#{\footnote Single_File}
+${\footnote \pard{}Single File}\par
+\pard{\fs24\b Single File}\par
+\par
+\pard{}Here is how to run a command on one file at a time.\par
+\par
+{\pard{}Action: {\b -exec} command ;\par
+\pard\li720{}{K{\footnote K -exec}}Execute {\i command}; true if 0 status is returned.  {\f1{}find} takes all arguments after {\f1{}-exec} to be part of the command until an argument consisting of {\f1{};} is reached.  It replaces the string {\f1{}\'7B\'7D} by the current file name being processed everywhere it occurs in the command.  Both of these constructions need to be escaped (with a {\f1{}\'5C}) or quoted to protect them from expansion by the shell.  The command is executed in the directory in which {\f1{}find} was run.\par
+\par
+\pard\li720{}For example, to compare each C header file in the current directory with the file {\f1{}/tmp/master}:\par
+\par
+{\pard\keep\li1440\f1{}find . -name '*.h' -exec diff -u '\'7B\'7D' /tmp/master ';'\par
+\pard\li720\f0{}}}\par
+\page\pard Node: {\b Multiple Files}, \keepn Next: {\uldb Querying}{\v Querying}, Prev: {\uldb Single File}{\v Single_File}, Up: {\uldb Run Commands}{\v Run_Commands}\line
+K{\footnote K Multiple Files}
+#{\footnote Multiple_Files}
+${\footnote \pard{}Multiple Files}\par
+\pard{\fs24\b Multiple Files}\par
+\par
+\pard{}Sometimes you need to process files alone.  But when you don't, it is faster to run a command on as many files as possible at a time, rather than once per file.  Doing this saves on the time it takes to start up the command each time.\par
+\par
+\pard{}To run a command on more than one file at once, use the {\f1{}xargs} command, which is invoked like this:\par
+\par
+{\pard\keep\li720\f1{}xargs [{\i option}...] [{\i command} [{\i initial-arguments}]]\par
+\pard\f0{}}\par
+{\f1{}\pard{}xargs} reads arguments from the standard input, delimited by blanks (which can be protected with double or single quotes or a backslash) or newlines.  It executes the {\i command} (default is {\f1{}/bin/echo}) one or more times with any {\i initial-arguments} followed by arguments read from standard input.  Blank lines on the standard input are ignored.\par
+\par
+\pard{}Instead of blank-delimited names, it is safer to use {\f1{}find -print0} or {\f1{}find -fprint0} and process the output by giving the {\f1{}-0} or {\f1{}--null} option to GNU {\f1{}xargs}, GNU {\f1{}tar}, GNU {\f1{}cpio}, or {\f1{}perl}.\par
+\par
+\pard{}You can use shell command substitution (backquotes) to process a list of arguments, like this:\par
+\par
+{\pard\keep\li720\f1{}grep -l sprintf `find $HOME -name '*.c' -print`\par
+\pard\f0{}}\par
+\pard{}However, that method produces an error if the length of the {\f1{}.c} file names exceeds the operating system's command-line length limit.  {\f1{}xargs} avoids that problem by running the command as many times as necessary without exceeding the limit:\par
+\par
+{\pard\keep\li720\f1{}find $HOME -name '*.c' -print | grep -l sprintf\par
+\pard\f0{}}\par
+\pard{}However, if the command needs to have its standard input be a terminal ({\f1{}less}, for example), you have to use the shell command substitution method.\par
+\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb Unsafe File Name Handling}{\v Unsafe_File_Name_Handling}\tab \par
+{\uldb Safe File Name Handling}{\v Safe_File_Name_Handling}\tab \par
+{\uldb Limiting Command Size}{\v Limiting_Command_Size}\tab \par
+{\uldb Interspersing File Names}{\v Interspersing_File_Names}\tab\par
+\pard{}}\par
+\page\pard Node: {\b Unsafe File Name Handling}, \keepn Next: {\uldb Safe File Name Handling}{\v Safe_File_Name_Handling}, Prev: {\uldb }{\v }, Up: {\uldb Multiple Files}{\v Multiple_Files}\line
+K{\footnote K Unsafe File Name Handling}
+#{\footnote Unsafe_File_Name_Handling}
+${\footnote \pard{}Unsafe File Name Handling}\par
+\pard{\fs24\b Unsafe File Name Handling}\par
+\par
+\pard{}Because file names can contain quotes, backslashes, blank characters, and even newlines, it is not safe to process them using {\f1{}xargs} in its default mode of operation.  But since most files' names do not contain blanks, this problem occurs only infrequently.  If you are only searching through files that you know have safe names, then you need not be concerned about it.\par
+\par
+\pard{}In many applications, if {\f1{}xargs} botches processing a file because its name contains special characters, some data might be lost.  The importance of this problem depends on the importance of the data and whether anyone notices the loss soon enough to correct it.  However, here is an extreme example of the problems that using blank-delimited names can cause.  If the following command is run daily from {\f1{}cron}, then any user can remove any file on the system:\par
+\par
+{\pard\keep\li720\f1{}find / -name '#*' -atime +7 -print | xargs rm\par
+\pard\f0{}}\par
+\pard{}For example, you could do something like this:\par
+\par
+{\pard\keep\li720\f1{}eg$ echo > '#\line
+vmunix'\par
+\pard\f0{}}\par
+\pard{}and then {\f1{}cron} would delete {\f1{}/vmunix}, if it ran {\f1{}xargs} with {\f1{}/} as its current directory.\par
+\par
+\pard{}To delete other files, for example {\f1{}/u/joeuser/.plan}, you could do this:\par
+\par
+{\pard\keep\li720\f1{}eg$ mkdir '#\line
+'\line
+eg$ cd '#\line
+'\line
+eg$ mkdir u u/joeuser u/joeuser/.plan'\line
+'\line
+eg$ echo > u/joeuser/.plan'\line
+/#foo'\line
+eg$ cd ..\line
+eg$ find . -name '#*' -print | xargs echo\line
+./# ./# /u/joeuser/.plan /#foo\par
+\pard\f0{}}\par
+\page\pard Node: {\b Safe File Name Handling}, \keepn Next: {\uldb Limiting Command Size}{\v Limiting_Command_Size}, Prev: {\uldb Unsafe File Name Handling}{\v Unsafe_File_Name_Handling}, Up: {\uldb Multiple Files}{\v Multiple_Files}\line
+K{\footnote K Safe File Name Handling}
+#{\footnote Safe_File_Name_Handling}
+${\footnote \pard{}Safe File Name Handling}\par
+\pard{\fs24\b Safe File Name Handling}\par
+\par
+\pard{}Here is how to make {\f1{}find} output file names so that they can be used by other programs without being mangled or misinterpreted.  You can process file names generated this way by giving the {\f1{}-0} or {\f1{}--null} option to GNU {\f1{}xargs}, GNU {\f1{}tar}, GNU {\f1{}cpio}, or {\f1{}perl}.\par
+\par
+{\pard{}Action: {\b -print0}\par
+\pard\li720{}{K{\footnote K -print0}}True; print the full file name on the standard output, followed by a null character.\par
+\pard{}}\par
+{\pard{}Action: {\b -fprint0} file\par
+\pard\li720{}{K{\footnote K -fprint0}}True; like {\f1{}-print0} but write to {\i file} like {\f1{}-fprint} (see {\uldb Print File Name}{\v Print_File_Name}).\par
+\pard{}}\par
+\page\pard Node: {\b Limiting Command Size}, \keepn Next: {\uldb Interspersing File Names}{\v Interspersing_File_Names}, Prev: {\uldb Safe File Name Handling}{\v Safe_File_Name_Handling}, Up: {\uldb Multiple Files}{\v Multiple_Files}\line
+K{\footnote K Limiting Command Size}
+#{\footnote Limiting_Command_Size}
+${\footnote \pard{}Limiting Command Size}\par
+\pard{\fs24\b Limiting Command Size}\par
+\par
+{\f1{}\pard{}xargs} gives you control over how many arguments it passes to the command each time it executes it.  By default, it uses up to {\f1{}ARG_MAX} - 2k, or 20k, whichever is smaller, characters per command.  It uses as many lines and arguments as fit within that limit.  The following options modify those values.\par
+\par
+{\pard{}{\f1{}--no-run-if-empty}\par
+\pard{}{\f1{}-r}\par
+\pard\li720{}If the standard input does not contain any nonblanks, do not run the command.  By default, the command is run once even if there is no input.\par
+\par
+\pard{}{\f1{}--max-lines[={\i max-lines}]}\par
+\pard{}{\f1{}-l[{\i max-lines}]}\par
+\pard\li720{}Use at most {\i max-lines} nonblank input lines per command line; {\i max-lines} defaults to 1 if omitted.  Trailing blanks cause an input line to be logically continued on the next input line, for the purpose of counting the lines.  Implies {\f1{}-x}.\par
+\par
+\pard{}{\f1{}--max-args={\i max-args}}\par
+\pard{}{\f1{}-n {\i max-args}}\par
+\pard\li720{}Use at most {\i max-args} arguments per command line.  Fewer than {\i max-args} arguments will be used if the size (see the {\f1{}-s} option) is exceeded, unless the {\f1{}-x} option is given, in which case {\f1{}xargs} will exit.\par
+\par
+\pard{}{\f1{}--max-chars={\i max-chars}}\par
+\pard{}{\f1{}-s {\i max-chars}}\par
+\pard\li720{}Use at most {\i max-chars} characters per command line, including the command and initial arguments and the terminating nulls at the ends of the argument strings.\par
+\par
+\pard{}{\f1{}--max-procs={\i max-procs}}\par
+\pard{}{\f1{}-P {\i max-procs}}\par
+\pard\li720{}Run up to {\i max-procs} processes at a time; the default is 1.  If {\i max-procs} is 0, {\f1{}xargs} will run as many processes as possible at a time.  Use the {\f1{}-n}, {\f1{}-s}, or {\f1{}-l} option with {\f1{}-P}; otherwise chances are that the command will be run only once.\par
+\pard{}}\par
+\page\pard Node: {\b Interspersing File Names}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Limiting Command Size}{\v Limiting_Command_Size}, Up: {\uldb Multiple Files}{\v Multiple_Files}\line
+K{\footnote K Interspersing File Names}
+#{\footnote Interspersing_File_Names}
+${\footnote \pard{}Interspersing File Names}\par
+\pard{\fs24\b Interspersing File Names}\par
+\par
+{\f1{}\pard{}xargs} can insert the name of the file it is processing between arguments you give for the command.  Unless you also give options to limit the command size (see {\uldb Limiting Command Size}{\v Limiting_Command_Size}), this mode of operation is equivalent to {\f1{}find -exec} (see {\uldb Single File}{\v Single_File}).\par
+\par
+{\pard{}{\f1{}--replace[={\i replace-str}]}\par
+\pard{}{\f1{}-i[{\i replace-str}]}\par
+\pard\li720{}Replace occurences of {\i replace-str} in the initial arguments with names read from standard input.  Also, unquoted blanks do not terminate arguments.  If {\i replace-str} is omitted, it defaults to {\f1{}\'7B\'7D} (like for {\f1{}find -exec}).  Implies {\f1{}-x} and {\f1{}-l 1}.  As an example, to sort each file the {\f1{}bills} directory, leaving the output in that file name with {\f1{}.sorted} appended, you could do:\par
+\par
+{\pard\keep\li1440\f1{}find bills -type f | xargs -iXX sort -o XX.sorted XX\par
+\pard\li720\f0{}}\par
+\pard\li720{}The equivalent command using {\f1{}find -exec} is:\par
+\par
+{\pard\keep\li1440\f1{}find bills -type f -exec sort -o '\'7B\'7D.sorted' '\'7B\'7D' ';'\par
+\pard\li720\f0{}}}\par
+\page\pard Node: {\b Querying}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Multiple Files}{\v Multiple_Files}, Up: {\uldb Run Commands}{\v Run_Commands}\line
+K{\footnote K Querying}
+#{\footnote Querying}
+${\footnote \pard{}Querying}\par
+\pard{\fs24\b Querying}\par
+\par
+\pard{}To ask the user whether to execute a command on a single file, you can use the {\f1{}find} primary {\f1{}-ok} instead of {\f1{}-exec}:\par
+\par
+{\pard{}Action: {\b -ok} command ;\par
+\pard\li720{}{K{\footnote K -ok}}Like {\f1{}-exec} (see {\uldb Single File}{\v Single_File}), but ask the user first (on the standard input); if the response does not start with {\f1{}y} or {\f1{}Y}, do not run the command, and return false.\par
+\pard{}}\par
+\pard{}When processing multiple files with a single command, to query the user you give {\f1{}xargs} the following option.  When using this option, you might find it useful to control the number of files processed per invocation of the command (see {\uldb Limiting Command Size}{\v Limiting_Command_Size}).\par
+\par
+{\pard{}{\f1{}--interactive}\par
+\pard{}{\f1{}-p}\par
+\pard\li720{}Prompt the user about whether to run each command line and read a line from the terminal.  Only run the command line if the response starts with {\f1{}y} or {\f1{}Y}.  Implies {\f1{}-t}.\par
+\pard{}}\par
+\page\pard Node: {\b Adding Tests}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Run Commands}{\v Run_Commands}, Up: {\uldb Actions}{\v Actions}\line
+K{\footnote K Adding Tests}
+#{\footnote Adding_Tests}
+${\footnote \pard{}Adding Tests}\par
+\pard{\fs24\b Adding Tests}\par
+\par
+\pard{}You can test for file attributes that none of the {\f1{}find} builtin tests check.  To do this, use {\f1{}xargs} to run a program that filters a list of files printed by {\f1{}find}.  If possible, use {\f1{}find} builtin tests to pare down the list, so the program run by {\f1{}xargs} has less work to do.  The tests builtin to {\f1{}find} will likely run faster than tests that other programs perform.\par
+\par
+\pard{}For example, here is a way to print the names of all of the unstripped binaries in the {\f1{}/usr/local} directory tree.  Builtin tests avoid running {\f1{}file} on files that are not regular files or are not executable.\par
+\par
+{\pard\keep\li720\f1{}find /usr/local -type f -perm +a=x | xargs file |\line
+  grep 'not stripped' | cut -d: -f1\par
+\pard\f0{}}\par
+\pard{}The {\f1{}cut} program removes everything after the file name from the output of {\f1{}file}.\par
+\par
+\pard{}If you want to place a special test somewhere in the middle of a {\f1{}find} expression, you can use {\f1{}-exec} to run a program that performs the test.  Because {\f1{}-exec} evaluates to the exit status of the executed program, you can write a program (which can be a shell script) that tests for a special attribute and make it exit with a true (zero) or false (non-zero) status.  It is a good idea to place such a special test {\i after} the builtin tests, because it starts a new process which could be avoided if a builtin test evaluates to false.  Use this method only when {\f1{}xargs} is not flexible enough, because starting one or more new processes to test each file is slower than using {\f1{}xargs} to start one process that tests many files.\par
+\par
+\pard{}Here is a shell script called {\f1{}unstripped} that checks whether its argument is an unstripped binary file:\par
+\par
+{\pard\keep\li720\f1{}#!/bin/sh\line
+file $1 | grep 'not stripped' > /dev/null\par
+\pard\f0{}}\par
+\pard{}This script relies on the fact that the shell exits with the status of the last program it executed, in this case {\f1{}grep}.  {\f1{}grep} exits with a true status if it found any matches, false if not.  Here is an example of using the script (assuming it is in your search path).  It lists the stripped executables in the file {\f1{}sbins} and the unstripped ones in {\f1{}ubins}.\par
+\par
+{\pard\keep\li720\f1{}find /usr/local -type f -perm +a=x \'5C\line
+  \'5C( -exec unstripped '\'7B\'7D' \'5C; -fprint ubins -o -fprint sbins \'5C)\par
+\pard\f0{}}\par
+\page\pard Node: {\b Common Tasks}, \keepn Next: {\uldb Databases}{\v Databases}, Prev: {\uldb Actions}{\v Actions}, Up: {\uldb Top}{\v Top}\line
+K{\footnote K Common Tasks}
+#{\footnote Common_Tasks}
+${\footnote \pard{}Common Tasks}\par
+\pard{\fs24\b Common Tasks}\par
+\par
+\pard{}The sections that follow contain some extended examples that both give a good idea of the power of these programs, and show you how to solve common real-world problems.\par
+\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb Viewing And Editing}{\v Viewing_And_Editing}\tab \par
+{\uldb Archiving}{\v Archiving}\tab \par
+{\uldb Cleaning Up}{\v Cleaning_Up}\tab \par
+{\uldb Strange File Names}{\v Strange_File_Names}\tab \par
+{\uldb Fixing Permissions}{\v Fixing_Permissions}\tab \par
+{\uldb Classifying Files}{\v Classifying_Files}\tab\par
+\pard{}}\par
+\page\pard Node: {\b Viewing And Editing}, \keepn Next: {\uldb Archiving}{\v Archiving}, Prev: {\uldb }{\v }, Up: {\uldb Common Tasks}{\v Common_Tasks}\line
+K{\footnote K Viewing And Editing}
+#{\footnote Viewing_And_Editing}
+${\footnote \pard{}Viewing And Editing}\par
+\pard{\fs24\b Viewing And Editing}\par
+\par
+\pard{}To view a list of files that meet certain criteria, simply run your file viewing program with the file names as arguments.  Shells substitute a command enclosed in backquotes with its output, so the whole command looks like this:\par
+\par
+{\pard\keep\li720\f1{}less `find /usr/include -name '*.h' | xargs grep -l mode_t`\par
+\pard\f0{}}\par
+\pard{}You can edit those files by giving an editor name instead of a file viewing program.\par
+\par
+\page\pard Node: {\b Archiving}, \keepn Next: {\uldb Cleaning Up}{\v Cleaning_Up}, Prev: {\uldb Viewing And Editing}{\v Viewing_And_Editing}, Up: {\uldb Common Tasks}{\v Common_Tasks}\line
+K{\footnote K Archiving}
+#{\footnote Archiving}
+${\footnote \pard{}Archiving}\par
+\pard{\fs24\b Archiving}\par
+\par
+\pard{}You can pass a list of files produced by {\f1{}find} to a file archiving program.  GNU {\f1{}tar} and {\f1{}cpio} can both read lists of file names from the standard input--either delimited by nulls (the safe way) or by blanks (the lazy, risky default way).  To use null-delimited names, give them the {\f1{}--null} option.  You can store a file archive in a file, write it on a tape, or send it over a network to extract on another machine.\par
+\par
+\pard{}One common use of {\f1{}find} to archive files is to send a list of the files in a directory tree to {\f1{}cpio}.  Use {\f1{}-depth} so if a directory does not have write permission for its owner, its contents can still be restored from the archive since the directory's permissions are restored after its contents.  Here is an example of doing this using {\f1{}cpio}; you could use a more complex {\f1{}find} expression to archive only certain files.\par
+\par
+{\pard\keep\li720\f1{}find . -depth -print0 |\line
+  cpio --create --null --format=crc --file=/dev/nrst0\par
+\pard\f0{}}\par
+\pard{}You could restore that archive using this command:\par
+\par
+{\pard\keep\li720\f1{}cpio --extract --null --make-dir --unconditional \'5C\line
+  --preserve --file=/dev/nrst0\par
+\pard\f0{}}\par
+\pard{}Here are the commands to do the same things using {\f1{}tar}:\par
+\par
+{\pard\keep\li720\f1{}find . -depth -print0 |\line
+  tar --create --null --files-from=- --file=/dev/nrst0\line
+\line
+tar --extract --null --preserve-perm --same-owner \'5C\line
+  --file=/dev/nrst0\par
+\pard\f0{}}\par
+\pard{}Here is an example of copying a directory from one machine to another:\par
+\par
+{\pard\keep\li720\f1{}find . -depth -print0 | cpio -0o -Hnewc |\line
+  rsh {\i other-machine} "cd `pwd` && cpio -i0dum"\par
+\pard\f0{}}\par
+\page\pard Node: {\b Cleaning Up}, \keepn Next: {\uldb Strange File Names}{\v Strange_File_Names}, Prev: {\uldb Archiving}{\v Archiving}, Up: {\uldb Common Tasks}{\v Common_Tasks}\line
+K{\footnote K Cleaning Up}
+#{\footnote Cleaning_Up}
+${\footnote \pard{}Cleaning Up}\par
+\pard{\fs24\b Cleaning Up}\par
+\par
+\pard{}This section gives examples of removing unwanted files in various situations.  Here is a command to remove the CVS backup files created when an update requires a merge:\par
+\par
+{\pard\keep\li720\f1{}find . -name '.#*' -print0 | xargs -0r rm -f\par
+\pard\f0{}}\par
+\pard{}You can run this command to clean out your clutter in {\f1{}/tmp}.  You might place it in the file your shell runs when you log out ({\f1{}.bash_logout}, {\f1{}.logout}, or {\f1{}.zlogout}, depending on which shell you use).\par
+\par
+{\pard\keep\li720\f1{}find /tmp -user $LOGNAME -type f -print0 | xargs -0 -r rm -f\par
+\pard\f0{}}\par
+\pard{}To remove old Emacs backup and auto-save files, you can use a command like the following.  It is especially important in this case to use null-terminated file names because Emacs packages like the VM mailer often create temporary file names with spaces in them, like {\f1{}#reply to David J. MacKenzie<1>#}.\par
+\par
+{\pard\keep\li720\f1{}find ~ \'5C( -name '*~' -o -name '#*#' \'5C) -print0 |\line
+  xargs --no-run-if-empty --null rm -vf\par
+\pard\f0{}}\par
+\pard{}Removing old files from {\f1{}/tmp} is commonly done from {\f1{}cron}:\par
+\par
+{\pard\keep\li720\f1{}find /tmp /var/tmp -not -type d -mtime +3 -print0 |\line
+  xargs --null --no-run-if-empty rm -f\line
+\line
+find /tmp /var/tmp -depth -mindepth 1 -type d -empty -print0 |\line
+  xargs --null --no-run-if-empty rmdir\par
+\pard\f0{}}\par
+\pard{}The second {\f1{}find} command above uses {\f1{}-depth} so it cleans out empty directories depth-first, hoping that the parents become empty and can be removed too.  It uses {\f1{}-mindepth} to avoid removing {\f1{}/tmp} itself if it becomes totally empty.\par
+\par
+\page\pard Node: {\b Strange File Names}, \keepn Next: {\uldb Fixing Permissions}{\v Fixing_Permissions}, Prev: {\uldb Cleaning Up}{\v Cleaning_Up}, Up: {\uldb Common Tasks}{\v Common_Tasks}\line
+K{\footnote K Strange File Names}
+#{\footnote Strange_File_Names}
+${\footnote \pard{}Strange File Names}\par
+\pard{\fs24\b Strange File Names}\par
+\par
+{\f1{}\pard{}find} can help you remove or rename a file with strange characters in its name.  People are sometimes stymied by files whose names contain characters such as spaces, tabs, control characters, or characters with the high bit set.  The simplest way to remove such files is:\par
+\par
+{\pard\keep\li720\f1{}rm -i {\i some*pattern*that*matches*the*problem*file}\par
+\pard\f0{}}\par
+{\f1{}\pard{}rm} asks you whether to remove each file matching the given pattern.  If you are using an old shell, this approach might not work if the file name contains a character with the high bit set; the shell may strip it off.  A more reliable way is:\par
+\par
+{\pard\keep\li720\f1{}find . -maxdepth 1 {\i tests} -ok rm '\'7B\'7D' \'5C;\par
+\pard\f0{}}\par
+\pard{}where {\i tests} uniquely identify the file.  The {\f1{}-maxdepth 1} option prevents {\f1{}find} from wasting time searching for the file in any subdirectories; if there are no subdirectories, you may omit it.  A good way to uniquely identify the problem file is to figure out its inode number; use\par
+\par
+{\pard\keep\li720\f1{}ls -i\par
+\pard\f0{}}\par
+\pard{}Suppose you have a file whose name contains control characters, and you have found that its inode number is 12345.  This command prompts you for whether to remove it:\par
+\par
+{\pard\keep\li720\f1{}find . -maxdepth 1 -inum 12345 -ok rm -f '\'7B\'7D' \'5C;\par
+\pard\f0{}}\par
+\pard{}If you don't want to be asked, perhaps because the file name may contain a strange character sequence that will mess up your screen when printed, then use {\f1{}-exec} instead of {\f1{}-ok}.\par
+\par
+\pard{}If you want to rename the file instead, you can use {\f1{}mv} instead of {\f1{}rm}:\par
+\par
+{\pard\keep\li720\f1{}find . -maxdepth 1 -inum 12345 -ok mv '\'7B\'7D' {\i new-file-name} \'5C;\par
+\pard\f0{}}\par
+\page\pard Node: {\b Fixing Permissions}, \keepn Next: {\uldb Classifying Files}{\v Classifying_Files}, Prev: {\uldb Strange File Names}{\v Strange_File_Names}, Up: {\uldb Common Tasks}{\v Common_Tasks}\line
+K{\footnote K Fixing Permissions}
+#{\footnote Fixing_Permissions}
+${\footnote \pard{}Fixing Permissions}\par
+\pard{\fs24\b Fixing Permissions}\par
+\par
+\pard{}Suppose you want to make sure that everyone can write to the directories in a certain directory tree.  Here is a way to find directories lacking either user or group write permission (or both), and fix their permissions:\par
+\par
+{\pard\keep\li720\f1{}find . -type d -not -perm -ug=w | xargs chmod ug+w\par
+\pard\f0{}}\par
+\pard{}You could also reverse the operations, if you want to make sure that directories do {\i not} have world write permission.\par
+\par
+\page\pard Node: {\b Classifying Files}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Fixing Permissions}{\v Fixing_Permissions}, Up: {\uldb Common Tasks}{\v Common_Tasks}\line
+K{\footnote K Classifying Files}
+#{\footnote Classifying_Files}
+${\footnote \pard{}Classifying Files}\par
+\pard{\fs24\b Classifying Files}\par
+\par
+\pard{}If you want to classify a set of files into several groups based on different criteria, you can use the comma operator to perform multiple independent tests on the files.  Here is an example:\par
+\par
+{\pard\keep\li720\f1{}find / -type d \'5C( -perm -o=w -fprint allwrite , \'5C\line
+  -perm -o=x -fprint allexec \'5C)\line
+\line
+echo "Directories that can be written to by everyone:"\line
+cat allwrite\line
+echo ""\line
+echo "Directories with search permissions for everyone:"\line
+cat allexec\par
+\pard\f0{}}\par
+{\f1{}\pard{}find} has only to make one scan through the directory tree (which is one of the most time consuming parts of its work).\par
+\par
+\page\pard Node: {\b Databases}, \keepn Next: {\uldb File Permissions}{\v File_Permissions}, Prev: {\uldb Common Tasks}{\v Common_Tasks}, Up: {\uldb Top}{\v Top}\line
+K{\footnote K Databases}
+#{\footnote Databases}
+${\footnote \pard{}File Name Databases}\par
+\pard{\fs24\b File Name Databases}\par
+\par
+\pard{}The file name databases used by {\f1{}locate} contain lists of files that were in particular directory trees when the databases were last updated.  The file name of the default database is determined when {\f1{}locate} and {\f1{}updatedb} are configured and installed.  The frequency with which the databases are updated and the directories for which they contain entries depend on how often {\f1{}updatedb} is run, and with which arguments.\par
+\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb Database Locations}{\v Database_Locations}\tab \par
+{\uldb Database Formats}{\v Database_Formats}\tab\par
+\pard{}}\par
+\page\pard Node: {\b Database Locations}, \keepn Next: {\uldb Database Formats}{\v Database_Formats}, Prev: {\uldb }{\v }, Up: {\uldb Databases}{\v Databases}\line
+K{\footnote K Database Locations}
+#{\footnote Database_Locations}
+${\footnote \pard{}Database Locations}\par
+\pard{\fs24\b Database Locations}\par
+\par
+\pard{}There can be multiple file name databases.  Users can select which databases {\f1{}locate} searches using an environment variable or a command line option.  The system administrator can choose the file name of the default database, the frequency with which the databases are updated, and the directories for which they contain entries.  File name databases are updated by running the {\f1{}updatedb} program, typically nightly.\par
+\par
+\pard{}In networked environments, it often makes sense to build a database at the root of each filesystem, containing the entries for that filesystem.  {\f1{}updatedb} is then run for each filesystem on the fileserver where that filesystem is on a local disk, to prevent thrashing the network.  Here are the options to {\f1{}updatedb} to select which directories each database contains entries for:\par
+\par
+{\pard{}{\f1{}--localpaths='{\i path}...'}\par
+\pard\li720{}Non-network directories to put in the database.  Default is {\f1{}/}.\par
+\par
+\pard{}{\f1{}--netpaths='{\i path}...'}\par
+\pard\li720{}Network (NFS, AFS, RFS, etc.) directories to put in the database.  Default is none.\par
+\par
+\pard{}{\f1{}--prunepaths='{\i path}...'}\par
+\pard\li720{}Directories to not put in the database, which would otherwise be.  Default is {\f1{}/tmp /usr/tmp /var/tmp /afs}.\par
+\par
+\pard{}{\f1{}--output={\i dbfile}}\par
+\pard\li720{}The database file to build.  Default is system-dependent, but typically {\f1{}/usr/local/var/locatedb}.\par
+\par
+\pard{}{\f1{}--netuser={\i user}}\par
+\pard\li720{}The user to search network directories as, using {\f1{}su}.  Default is {\f1{}daemon}.\par
+\pard{}}\par
+\page\pard Node: {\b Database Formats}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Database Locations}{\v Database_Locations}, Up: {\uldb Databases}{\v Databases}\line
+K{\footnote K Database Formats}
+#{\footnote Database_Formats}
+${\footnote \pard{}Database Formats}\par
+\pard{\fs24\b Database Formats}\par
+\par
+\pard{}The file name databases contain lists of files that were in particular directory trees when the databases were last updated.  The file name database format changed starting with GNU {\f1{}locate} version 4.0 to allow machines with diffent byte orderings to share the databases.  The new GNU {\f1{}locate} can read both the old and new database formats.  However, old versions of {\f1{}locate} and {\f1{}find} produce incorrect results if given a new-format database.\par
+\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb New Database Format}{\v New_Database_Format}\tab \par
+{\uldb Sample Database}{\v Sample_Database}\tab \par
+{\uldb Old Database Format}{\v Old_Database_Format}\tab\par
+\pard{}}\par
+\page\pard Node: {\b New Database Format}, \keepn Next: {\uldb Sample Database}{\v Sample_Database}, Prev: {\uldb }{\v }, Up: {\uldb Database Formats}{\v Database_Formats}\line
+K{\footnote K New Database Format}
+#{\footnote New_Database_Format}
+${\footnote \pard{}New Database Format}\par
+\pard{\fs24\b New Database Format}\par
+\par
+{\f1{}\pard{}updatedb} runs a program called {\f1{}frcode} to \'A2front-compress\'A2 the list of file names, which reduces the database size by a factor of 4 to 5.  Front-compression (also known as incremental encoding) works as follows.\par
+\par
+\pard{}The database entries are a sorted list (case-insensitively, for users' convenience).  Since the list is sorted, each entry is likely to share a prefix (initial string) with the previous entry.  Each database entry begins with an offset-differential count byte, which is the additional number of characters of prefix of the preceding entry to use beyond the number that the preceding entry is using of its predecessor.  (The counts can be negative.)  Following the count is a null-terminated ASCII remainder--the part of the name that follows the shared prefix.\par
+\par
+\pard{}If the offset-differential count is larger than can be stored in a byte (+/-127), the byte has the value 0x80 and the count follows in a 2-byte word, with the high byte first (network byte order).\par
+\par
+\pard{}Every database begins with a dummy entry for a file called {\f1{}LOCATE02}, which {\f1{}locate} checks for to ensure that the database file has the correct format; it ignores the entry in doing the search.\par
+\par
+\pard{}Databases can not be concatenated together, even if the first (dummy) entry is trimmed from all but the first database.  This is because the offset-differential count in the first entry of the second and following databases will be wrong.\par
+\par
+\page\pard Node: {\b Sample Database}, \keepn Next: {\uldb Old Database Format}{\v Old_Database_Format}, Prev: {\uldb New Database Format}{\v New_Database_Format}, Up: {\uldb Database Formats}{\v Database_Formats}\line
+K{\footnote K Sample Database}
+#{\footnote Sample_Database}
+${\footnote \pard{}Sample Database}\par
+\pard{\fs24\b Sample Database}\par
+\par
+\pard{}Sample input to {\f1{}frcode}:\par
+\par
+{\pard\keep\li720\f1{}/usr/src\line
+/usr/src/cmd/aardvark.c\line
+/usr/src/cmd/armadillo.c\line
+/usr/tmp/zoo\par
+\pard\f0{}}\par
+\pard{}Length of the longest prefix of the preceding entry to share:\par
+\par
+{\pard\keep\li720\f1{}0 /usr/src\line
+8 /cmd/aardvark.c\line
+14 rmadillo.c\line
+5 tmp/zoo\par
+\pard\f0{}}\par
+\pard{}Output from {\f1{}frcode}, with trailing nulls changed to newlines and count bytes made printable:\par
+\par
+{\pard\keep\li720\f1{}0 LOCATE02\line
+0 /usr/src\line
+8 /cmd/aardvark.c\line
+6 rmadillo.c\line
+-9 tmp/zoo\par
+\pard\f0{}}\par
+\pard{}(6 = 14 - 8, and -9 = 5 - 14)\par
+\par
+\page\pard Node: {\b Old Database Format}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Sample Database}{\v Sample_Database}, Up: {\uldb Database Formats}{\v Database_Formats}\line
+K{\footnote K Old Database Format}
+#{\footnote Old_Database_Format}
+${\footnote \pard{}Old Database Format}\par
+\pard{\fs24\b Old Database Format}\par
+\par
+\pard{}The old database format is used by Unix {\f1{}locate} and {\f1{}find} programs and earlier releases of the GNU ones.  {\f1{}updatedb} produces this format if given the {\f1{}--old-format} option.\par
+\par
+{\f1{}\pard{}updatedb} runs programs called {\f1{}bigram} and {\f1{}code} to produce old-format databases.  The old format differs from the new one in the following ways.  Instead of each entry starting with an offset-differential count byte and ending with a null, byte values from 0 through 28 indicate offset-differential counts from -14 through 14.  The byte value indicating that a long offset-differential count follows is 0x1e (30), not 0x80.  The long counts are stored in host byte order, which is not necessarily network byte order, and host integer word size, which is usually 4 bytes.  They also represent a count 14 less than their value.  The database lines have no termination byte; the start of the next line is indicated by its first byte having a value <= 30.\par
+\par
+\pard{}In addition, instead of starting with a dummy entry, the old database format starts with a 256 byte table containing the 128 most common bigrams in the file list.  A bigram is a pair of adjacent bytes.  Bytes in the database that have the high bit set are indexes (with the high bit cleared) into the bigram table.  The bigram and offset-differential count coding makes these databases 20-25% smaller than the new format, but makes them not 8-bit clean.  Any byte in a file name that is in the ranges used for the special codes is replaced in the database by a question mark, which not coincidentally is the shell wildcard to match a single character.\par
+\par
+\page\pard Node: {\b File Permissions}, \keepn Next: {\uldb Reference}{\v Reference}, Prev: {\uldb Databases}{\v Databases}, Up: {\uldb Top}{\v Top}\line
+K{\footnote K File Permissions}
+#{\footnote File_Permissions}
+${\footnote \pard{}File Permissions}\par
+\pard{\fs24\b File Permissions}\par
+\par
+\pard{}Each file has a set of \'A2permissions\'A2 that control the kinds of access that users have to that file.  The permissions for a file are also called its \'A2access mode\'A2.  They can be represented either in symbolic form or as an octal number.\par
+\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb Mode Structure}{\v Mode_Structure}\tab Structure of file permissions.\par
+{\uldb Symbolic Modes}{\v Symbolic_Modes}\tab Mnemonic permissions representation.\par
+{\uldb Numeric Modes}{\v Numeric_Modes}\tab Permissions as octal numbers.\par
+\pard{}}\par
+\page\pard Node: {\b Mode Structure}, \keepn Next: {\uldb Symbolic Modes}{\v Symbolic_Modes}, Prev: {\uldb }{\v }, Up: {\uldb File Permissions}{\v File_Permissions}\line
+K{\footnote K Mode Structure}
+#{\footnote Mode_Structure}
+${\footnote \pard{}Structure of File Permissions}\par
+\pard{\fs24\b Structure of File Permissions}\par
+\par
+\pard{}There are three kinds of permissions that a user can have for a file:\par
+\par
+{\pard\fi-720\li720\tx144\tx720{}\tab{}1. \tab{}{K{\footnote K read permission}}permission to read the file.  For directories, this means permission to list the contents of the directory.\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}2. \tab{}{K{\footnote K write permission}}permission to write to (change) the file.  For directories, this means permission to create and remove files in the directory.\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}3. \tab{}{K{\footnote K execute permission}}permission to execute the file (run it as a program).  For directories, this means permission to access files in the directory.\par
+\pard{}}\par
+\pard{}There are three categories of users who may have different permissions to perform any of the above operations on a file:\par
+\par
+{\pard\fi-720\li720\tx144\tx720{}\tab{}1. \tab{}the file's owner;\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}2. \tab{}other users who are in the file's group;\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}3. \tab{}everyone else.\par
+\pard{}}\par
+\pard{}{K{\footnote K owner, default}}{K{\footnote K group owner, default}}Files are given an owner and group when they are created.  Usually the owner is the current user and the group is the group of the directory the file is in, but this varies with the operating system, the filesystem the file is created on, and the way the file is created.  You can change the owner and group of a file by using the {\f1{}chown} and {\f1{}chgrp} commands.\par
+\par
+\pard{}In addition to the three sets of three permissions listed above, a file's permissions have three special components, which affect only executable files (programs) and, on some systems, directories:\par
+\par
+{\pard\fi-720\li720\tx144\tx720{}\tab{}1. \tab{}{K{\footnote K setuid}}set the process's effective user ID to that of the file upon execution (called the \'A2setuid bit\'A2).  No effect on directories.\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}2. \tab{}{K{\footnote K setgid}}set the process's effective group ID to that of the file upon execution (called the \'A2setgid bit\'A2).  For directories on some systems, put files created in the directory into the same group as the directory, no matter what group the user who creates them is in.\par
+\par
+\pard\fi-720\li720\tx144\tx720{}\tab{}3. \tab{}{K{\footnote K sticky}}{K{\footnote K swap space, saving text image in}}{K{\footnote K text image, saving in swap space}}{K{\footnote K append-only directories}}save the program's text image on the swap device so it will load more quickly when run (called the \'A2sticky bit\'A2).  For directories on some systems, prevent users from removing files that they do not own in the directory; this is called making the directory \'A2append-only\'A2.\par
+\pard{}}\par
+\page\pard Node: {\b Symbolic Modes}, \keepn Next: {\uldb Numeric Modes}{\v Numeric_Modes}, Prev: {\uldb Mode Structure}{\v Mode_Structure}, Up: {\uldb File Permissions}{\v File_Permissions}\line
+K{\footnote K Symbolic Modes}
+#{\footnote Symbolic_Modes}
+${\footnote \pard{}Symbolic Modes}\par
+\pard{\fs24\b Symbolic Modes}\par
+\par
+\pard{}{K{\footnote K symbolic modes}}\'A2Symbolic modes\'A2 represent changes to files' permissions as operations on single-character symbols.  They allow you to modify either all or selected parts of files' permissions, optionally based on their previous values, and perhaps on the current {\f1{}umask} as well (see {\uldb Umask and Protection}{\v Umask_and_Protection}).\par
+\par
+\pard{}The format of symbolic modes is:\par
+\par
+{\pard\li720\f1{}[ugoa...][[+-=][rwxXstugo...]...][,...]\par
+\pard\f0{}}\par
+\pard{}The following sections describe the operators and other details of symbolic modes.\par
+\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb Setting Permissions}{\v Setting_Permissions}\tab Basic operations on permissions.\par
+{\uldb Copying Permissions}{\v Copying_Permissions}\tab Copying existing permissions.\par
+{\uldb Changing Special Permissions}{\v Changing_Special_Permissions}\tab Special permissions.\par
+{\uldb Conditional Executability}{\v Conditional_Executability}\tab Conditionally affecting executability.\par
+{\uldb Multiple Changes}{\v Multiple_Changes}\tab Making multiple changes.\par
+{\uldb Umask and Protection}{\v Umask_and_Protection}\tab The effect of the umask.\par
+\pard{}}\par
+\page\pard Node: {\b Setting Permissions}, \keepn Next: {\uldb Copying Permissions}{\v Copying_Permissions}, Prev: {\uldb }{\v }, Up: {\uldb Symbolic Modes}{\v Symbolic_Modes}\line
+K{\footnote K Setting Permissions}
+#{\footnote Setting_Permissions}
+${\footnote \pard{}Setting Permissions}\par
+\pard{\fs24\b Setting Permissions}\par
+\par
+\pard{}The basic symbolic operations on a file's permissions are adding, removing, and setting the permission that certain users have to read, write, and execute the file.  These operations have the following format:\par
+\par
+{{\i \pard\li720\f1{}users} {\i operation} {\i permissions}\par
+\pard\f0{}}\par
+\pard{}The spaces between the three parts above are shown for readability only; symbolic modes can not contain spaces.\par
+\par
+\pard{}The {\i users} part tells which users' access to the file is changed.  It consists of one or more of the following letters (or it can be empty; see {\uldb Umask and Protection}{\v Umask_and_Protection}, for a description of what happens then).  When more than one of these letters is given, the order that they are in does not matter.\par
+\par
+{\pard{}{\f1{}u}\par
+\pard\li720{}{K{\footnote K owner of file, permissions for}}the user who owns the file;\par
+\par
+\pard{}{\f1{}g}\par
+\pard\li720{}{K{\footnote K group, permissions for}}other users who are in the file's group;\par
+\par
+\pard{}{\f1{}o}\par
+\pard\li720{}{K{\footnote K other permissions}}all other users;\par
+\par
+\pard{}{\f1{}a}\par
+\pard\li720{}all users; the same as {\f1{}ugo}.\par
+\pard{}}\par
+\pard{}The {\i operation} part tells how to change the affected users' access to the file, and is one of the following symbols:\par
+\par
+{\pard{}{\f1{}+}\par
+\pard\li720{}{K{\footnote K adding permissions}}to add the {\i permissions} to whatever permissions the {\i users} already have for the file;\par
+\par
+\pard{}{\f1{}-}\par
+\pard\li720{}{K{\footnote K removing permissions}}{K{\footnote K subtracting permissions}}to remove the {\i permissions} from whatever permissions the {\i users} already have for the file;\par
+\par
+\pard{}{\f1{}=}\par
+\pard\li720{}{K{\footnote K setting permissions}}to make the {\i permissions} the only permissions that the {\i users} have for the file.\par
+\pard{}}\par
+\pard{}The {\i permissions} part tells what kind of access to the file should be changed; it is zero or more of the following letters.  As with the {\i users} part, the order does not matter when more than one letter is given.  Omitting the {\i permissions} part is useful only with the {\f1{}=} operation, where it gives the specified {\i users} no access at all to the file.\par
+\par
+{\pard{}{\f1{}r}\par
+\pard\li720{}{K{\footnote K read permission, symbolic}}the permission the {\i users} have to read the file;\par
+\par
+\pard{}{\f1{}w}\par
+\pard\li720{}{K{\footnote K write permission, symbolic}}the permission the {\i users} have to write to the file;\par
+\par
+\pard{}{\f1{}x}\par
+\pard\li720{}{K{\footnote K execute permission, symbolic}}the permission the {\i users} have to execute the file.\par
+\pard{}}\par
+\pard{}For example, to give everyone permission to read and write a file, but not to execute it, use:\par
+\par
+{\pard\keep\li720\f1{}a=rw\par
+\pard\f0{}}\par
+\pard{}To remove write permission for from all users other than the file's owner, use:\par
+\par
+{\pard\keep\li720\f1{}go-w\par
+\pard\f0{}}\par
+\pard{}The above command does not affect the access that the owner of the file has to it, nor does it affect whether other users can read or execute the file.\par
+\par
+\pard{}To give everyone except a file's owner no permission to do anything with that file, use the mode below.  Other users could still remove the file, if they have write permission on the directory it is in.\par
+\par
+{\pard\keep\li720\f1{}go=\par
+\pard\f0{}}\par
+\pard{}Another way to specify the same thing is:\par
+\par
+{\pard\keep\li720\f1{}og-rxw\par
+\pard\f0{}}\par
+\page\pard Node: {\b Copying Permissions}, \keepn Next: {\uldb Changing Special Permissions}{\v Changing_Special_Permissions}, Prev: {\uldb Setting Permissions}{\v Setting_Permissions}, Up: {\uldb Symbolic Modes}{\v Symbolic_Modes}\line
+K{\footnote K Copying Permissions}
+#{\footnote Copying_Permissions}
+${\footnote \pard{}Copying Existing Permissions}\par
+\pard{\fs24\b Copying Existing Permissions}\par
+\par
+\pard{}{K{\footnote K copying existing permissions}}{K{\footnote K permissions, copying existing}}You can base part of a file's permissions on part of its existing permissions.  To do this, instead of using {\f1{}r}, {\f1{}w}, or {\f1{}x} after the operator, you use the letter {\f1{}u}, {\f1{}g}, or {\f1{}o}.  For example, the mode\par
+\par
+{\pard\keep\li720\f1{}o+g\par
+\pard\f0{}}\par
+\pard{}adds the permissions for users who are in a file's group to the permissions that other users have for the file.  Thus, if the file started out as mode 664 ({\f1{}rw-rw-r--}), the above mode would change it to mode 666 ({\f1{}rw-rw-rw-}).  If the file had started out as mode 741 ({\f1{}rwxr----x}), the above mode would change it to mode 745 ({\f1{}rwxr--r-x}).  The {\f1{}-} and {\f1{}=} operations work analogously.\par
+\par
+\page\pard Node: {\b Changing Special Permissions}, \keepn Next: {\uldb Conditional Executability}{\v Conditional_Executability}, Prev: {\uldb Copying Permissions}{\v Copying_Permissions}, Up: {\uldb Symbolic Modes}{\v Symbolic_Modes}\line
+K{\footnote K Changing Special Permissions}
+#{\footnote Changing_Special_Permissions}
+${\footnote \pard{}Changing Special Permissions}\par
+\pard{\fs24\b Changing Special Permissions}\par
+\par
+\pard{}{K{\footnote K changing special permissions}}In addition to changing a file's read, write, and execute permissions, you can change its special permissions.  See {\uldb Mode Structure}{\v Mode_Structure}, for a summary of these permissions.\par
+\par
+\pard{}To change a file's permission to set the user ID on execution, use {\f1{}u} in the {\i users} part of the symbolic mode and {\f1{}s} in the {\i permissions} part.\par
+\par
+\pard{}To change a file's permission to set the group ID on execution, use {\f1{}g} in the {\i users} part of the symbolic mode and {\f1{}s} in the {\i permissions} part.\par
+\par
+\pard{}To change a file's permission to stay permanently on the swap device, use {\f1{}o} in the {\i users} part of the symbolic mode and {\f1{}t} in the {\i permissions} part.\par
+\par
+\pard{}For example, to add set user ID permission to a program, you can use the mode:\par
+\par
+{\pard\keep\li720\f1{}u+s\par
+\pard\f0{}}\par
+\pard{}To remove both set user ID and set group ID permission from it, you can use the mode:\par
+\par
+{\pard\keep\li720\f1{}ug-s\par
+\pard\f0{}}\par
+\pard{}To cause a program to be saved on the swap device, you can use the mode:\par
+\par
+{\pard\keep\li720\f1{}o+t\par
+\pard\f0{}}\par
+\pard{}Remember that the special permissions only affect files that are executable, plus, on some systems, directories (on which they have different meanings; see {\uldb Mode Structure}{\v Mode_Structure}).  Using {\f1{}a} in the {\i users} part of a symbolic mode does not cause the special permissions to be affected; thus,\par
+\par
+{\pard\keep\li720\f1{}a+s\par
+\pard\f0{}}\par
+\pard{}has {\i no effect}.  You must use {\f1{}u}, {\f1{}g}, and {\f1{}o} explicitly to affect the special permissions.  Also, the combinations {\f1{}u+t}, {\f1{}g+t}, and {\f1{}o+s} have no effect.\par
+\par
+\pard{}The {\f1{}=} operator is not very useful with special permissions; for example, the mode:\par
+\par
+{\pard\keep\li720\f1{}o=t\par
+\pard\f0{}}\par
+\pard{}does cause the file to be saved on the swap device, but it also removes all read, write, and execute permissions that users not in the file's group might have had for it.\par
+\par
+\page\pard Node: {\b Conditional Executability}, \keepn Next: {\uldb Multiple Changes}{\v Multiple_Changes}, Prev: {\uldb Changing Special Permissions}{\v Changing_Special_Permissions}, Up: {\uldb Symbolic Modes}{\v Symbolic_Modes}\line
+K{\footnote K Conditional Executability}
+#{\footnote Conditional_Executability}
+${\footnote \pard{}Conditional Executability}\par
+\pard{\fs24\b Conditional Executability}\par
+\par
+\pard{}{K{\footnote K conditional executability}}There is one more special type of symbolic permission: if you use {\f1{}X} instead of {\f1{}x}, execute permission is affected only if the file already had execute permission or is a directory.  It affects directories' execute permission even if they did not initially have any execute permissions set.\par
+\par
+\pard{}For example, this mode:\par
+\par
+{\pard\keep\li720\f1{}a+X\par
+\pard\f0{}}\par
+\pard{}gives all users permission to execute files (or search directories) if anyone could before.\par
+\par
+\page\pard Node: {\b Multiple Changes}, \keepn Next: {\uldb Umask and Protection}{\v Umask_and_Protection}, Prev: {\uldb Conditional Executability}{\v Conditional_Executability}, Up: {\uldb Symbolic Modes}{\v Symbolic_Modes}\line
+K{\footnote K Multiple Changes}
+#{\footnote Multiple_Changes}
+${\footnote \pard{}Making Multiple Changes}\par
+\pard{\fs24\b Making Multiple Changes}\par
+\par
+\pard{}{K{\footnote K multiple changes to permissions}}The format of symbolic modes is actually more complex than described above (see {\uldb Setting Permissions}{\v Setting_Permissions}).  It provides two ways to make multiple changes to files' permissions.\par
+\par
+\pard{}The first way is to specify multiple {\i operation} and {\i permissions} parts after a {\i users} part in the symbolic mode.\par
+\par
+\pard{}For example, the mode:\par
+\par
+{\pard\keep\li720\f1{}og+rX-w\par
+\pard\f0{}}\par
+\pard{}gives users other than the owner of the file read permission and, if it is a directory or if someone already had execute permission to it, gives them execute permission; and it also denies them write permission to it file.  It does not affect the permission that the owner of the file has for it.  The above mode is equivalent to the two modes:\par
+\par
+{\pard\keep\li720\f1{}og+rX\line
+og-w\par
+\pard\f0{}}\par
+\pard{}The second way to make multiple changes is to specify more than one simple symbolic mode, separated by commas.  For example, the mode:\par
+\par
+{\pard\keep\li720\f1{}a+r,go-w\par
+\pard\f0{}}\par
+\pard{}gives everyone permission to read the file and removes write permission on it for all users except its owner.  Another example:\par
+\par
+{\pard\keep\li720\f1{}u=rwx,g=rx,o=\par
+\pard\f0{}}\par
+\pard{}sets all of the non-special permissions for the file explicitly.  (It gives users who are not in the file's group no permission at all for it.)\par
+\par
+\pard{}The two methods can be combined.  The mode:\par
+\par
+{\pard\keep\li720\f1{}a+r,g+x-w\par
+\pard\f0{}}\par
+\pard{}gives all users permission to read the file, and gives users who are in the file's group permission to execute it, as well, but not permission to write to it.  The above mode could be written in several different ways; another is:\par
+\par
+{\pard\keep\li720\f1{}u+r,g+rx,o+r,g-w\par
+\pard\f0{}}\par
+\page\pard Node: {\b Umask and Protection}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Multiple Changes}{\v Multiple_Changes}, Up: {\uldb Symbolic Modes}{\v Symbolic_Modes}\line
+K{\footnote K Umask and Protection}
+#{\footnote Umask_and_Protection}
+${\footnote \pard{}The Umask and Protection}\par
+\pard{\fs24\b The Umask and Protection}\par
+\par
+\pard{}{K{\footnote K umask and modes}}{K{\footnote K modes and umask}}If the {\i users} part of a symbolic mode is omitted, it defaults to {\f1{}a} (affect all users), except that any permissions that are {\i set} in the system variable {\f1{}umask} are {\i not affected}.  The value of {\f1{}umask} can be set using the {\f1{}umask} command.  Its default value varies from system to system.\par
+\par
+\pard{}{K{\footnote K giving away permissions}}Omitting the {\i users} part of a symbolic mode is generally not useful with operations other than {\f1{}+}.  It is useful with {\f1{}+} because it allows you to use {\f1{}umask} as an easily customizable protection against giving away more permission to files than you intended to.\par
+\par
+\pard{}As an example, if {\f1{}umask} has the value 2, which removes write permission for users who are not in the file's group, then the mode:\par
+\par
+{\pard\keep\li720\f1{}+w\par
+\pard\f0{}}\par
+\pard{}adds permission to write to the file to its owner and to other users who are in the file's group, but {\i not} to other users.  In contrast, the mode:\par
+\par
+{\pard\keep\li720\f1{}a+w\par
+\pard\f0{}}\par
+\pard{}ignores {\f1{}umask}, and {\i does} give write permission for the file to all users.\par
+\par
+\page\pard Node: {\b Numeric Modes}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Symbolic Modes}{\v Symbolic_Modes}, Up: {\uldb File Permissions}{\v File_Permissions}\line
+K{\footnote K Numeric Modes}
+#{\footnote Numeric_Modes}
+${\footnote \pard{}Numeric Modes}\par
+\pard{\fs24\b Numeric Modes}\par
+\par
+\pard{}{K{\footnote K numeric modes}}{K{\footnote K file permissions, numeric}}{K{\footnote K octal numbers for file modes}}File permissions are stored internally as 16 bit integers.  As an alternative to giving a symbolic mode, you can give an octal (base 8) number that corresponds to the internal representation of the new mode.  This number is always interpreted in octal; you do not have to add a leading 0, as you do in C.  Mode 0055 is the same as mode 55.\par
+\par
+\pard{}A numeric mode is usually shorter than the corresponding symbolic mode, but it is limited in that it can not take into account a file's previous permissions; it can only set them absolutely.\par
+\par
+\pard{}The permissions granted to the user, to other users in the file's group, and to other users not in the file's group are each stored as three bits, which are represented as one octal digit.  The three special permissions are also each stored as one bit, and they are as a group represented as another octal digit.  Here is how the bits are arranged in the 16 bit integer, starting with the lowest valued bit:\par
+\par
+{\pard\keep\li720\f1{}Value in  Corresponding\line
+Mode      Permission\line
+\line
+          Other users not in the file's group:\line
+   1      Execute\line
+   2      Write\line
+   4      Read\line
+\line
+          Other users in the file's group:\line
+  10      Execute\line
+  20      Write\line
+  40      Read\line
+\line
+          The file's owner:\line
+ 100      Execute\line
+ 200      Write\line
+ 400      Read\line
+\line
+          Special permissions:\line
+1000      Save text image on swap device\line
+2000      Set group ID on execution\line
+4000      Set user ID on execution\par
+\pard\f0{}}\par
+\pard{}For example, numeric mode 4755 corresponds to symbolic mode {\f1{}u=rwxs,go=rx}, and numeric mode 664 corresponds to symbolic mode {\f1{}ug=rw,o=r}.  Numeric mode 0 corresponds to symbolic mode {\f1{}ugo=}.\par
+\par
+\page\pard Node: {\b Reference}, \keepn Next: {\uldb Primary Index}{\v Primary_Index}, Prev: {\uldb File Permissions}{\v File_Permissions}, Up: {\uldb Top}{\v Top}\line
+K{\footnote K Reference}
+#{\footnote Reference}
+${\footnote \pard{}Reference}\par
+\pard{\fs24\b Reference}\par
+\par
+\pard{}Below are summaries of the command line syntax for the programs discussed in this manual.\par
+\par
+{\par
+\pard\keep\fi-2880\li2880\tx2880{}{\uldb Invoking find}{\v Invoking_find}\tab \par
+{\uldb Invoking locate}{\v Invoking_locate}\tab \par
+{\uldb Invoking updatedb}{\v Invoking_updatedb}\tab \par
+{\uldb Invoking xargs}{\v Invoking_xargs}\tab\par
+\pard{}}\par
+\page\pard Node: {\b Invoking find}, \keepn Next: {\uldb Invoking locate}{\v Invoking_locate}, Prev: {\uldb }{\v }, Up: {\uldb Reference}{\v Reference}\line
+K{\footnote K Invoking find}
+#{\footnote Invoking_find}
+${\footnote \pard{}Invoking {\f1{}find}}\par
+\pard{\fs24\b Invoking {\f1{}find}}\par
+\par
+{\pard\keep\li720\f1{}find [{\i file}...] [{\i expression}]\par
+\pard\f0{}}\par
+{\f1{}\pard{}find} searches the directory tree rooted at each file name {\i file} by evaluating the {\i expression} on each file it finds in the tree.\par
+\par
+{\f1{}\pard{}find} considers the first argument that begins with {\f1{}-}, {\f1{}(}, {\f1{})}, {\f1{},}, or {\f1{}!} to be the beginning of the expression; any arguments before it are paths to search, and any arguments after it are the rest of the expression.  If no paths are given, the current directory is used.  If no expression is given, the expression {\f1{}-print} is used.\par
+\par
+{\f1{}\pard{}find} exits with status 0 if all files are processed successfully, greater than 0 if errors occur.\par
+\par
+\pard{}See {\uldb Primary Index}{\v Primary_Index}, for a summary of all of the tests, actions, and options that the expression can contain.\par
+\par
+{\f1{}\pard{}find} also recognizes two options for administrative use:\par
+\par
+{\pard{}{\f1{}--help}\par
+\pard\li720{}Print a summary of the command-line argument format and exit.\par
+\par
+\pard{}{\f1{}--version}\par
+\pard\li720{}Print the version number of {\f1{}find} and exit.\par
+\pard{}}\par
+\page\pard Node: {\b Invoking locate}, \keepn Next: {\uldb Invoking updatedb}{\v Invoking_updatedb}, Prev: {\uldb Invoking find}{\v Invoking_find}, Up: {\uldb Reference}{\v Reference}\line
+K{\footnote K Invoking locate}
+#{\footnote Invoking_locate}
+${\footnote \pard{}Invoking {\f1{}locate}}\par
+\pard{\fs24\b Invoking {\f1{}locate}}\par
+\par
+{\pard\keep\li720\f1{}locate [{\i option}...] {\i pattern}...\par
+\pard\f0{}}\par
+{\pard{}{\f1{}--database={\i path}}\par
+\pard{}{\f1{}-d {\i path}}\par
+\pard\li720{}Instead of searching the default file name database, search the file name databases in {\i path}, which is a colon-separated list of database file names.  You can also use the environment variable {\f1{}LOCATE_PATH} to set the list of database files to search.  The option overrides the environment variable if both are used.\par
+\par
+\pard{}{\f1{}--help}\par
+\pard\li720{}Print a summary of the options to {\f1{}locate} and exit.\par
+\par
+\pard{}{\f1{}--version}\par
+\pard\li720{}Print the version number of {\f1{}locate} and exit.\par
+\pard{}}\par
+\page\pard Node: {\b Invoking updatedb}, \keepn Next: {\uldb Invoking xargs}{\v Invoking_xargs}, Prev: {\uldb Invoking locate}{\v Invoking_locate}, Up: {\uldb Reference}{\v Reference}\line
+K{\footnote K Invoking updatedb}
+#{\footnote Invoking_updatedb}
+${\footnote \pard{}Invoking {\f1{}updatedb}}\par
+\pard{\fs24\b Invoking {\f1{}updatedb}}\par
+\par
+{\pard\keep\li720\f1{}updatedb [{\i option}...]\par
+\pard\f0{}}\par
+{\pard{}{\f1{}--localpaths='{\i path}...'}\par
+\pard\li720{}Non-network directories to put in the database.  Default is {\f1{}/}.\par
+\par
+\pard{}{\f1{}--netpaths='{\i path}...'}\par
+\pard\li720{}Network (NFS, AFS, RFS, etc.) directories to put in the database.  Default is none.\par
+\par
+\pard{}{\f1{}--prunepaths='{\i path}...'}\par
+\pard\li720{}Directories to not put in the database, which would otherwise be.  Default is {\f1{}/tmp /usr/tmp /var/tmp /afs}.\par
+\par
+\pard{}{\f1{}--output={\i dbfile}}\par
+\pard\li720{}The database file to build.  Default is system-dependent, but typically {\f1{}/usr/local/var/locatedb}.\par
+\par
+\pard{}{\f1{}--netuser={\i user}}\par
+\pard\li720{}The user to search network directories as, using {\f1{}su}(1).  Default is {\f1{}daemon}.\par
+\pard{}}\par
+\page\pard Node: {\b Invoking xargs}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Invoking updatedb}{\v Invoking_updatedb}, Up: {\uldb Reference}{\v Reference}\line
+K{\footnote K Invoking xargs}
+#{\footnote Invoking_xargs}
+${\footnote \pard{}Invoking {\f1{}xargs}}\par
+\pard{\fs24\b Invoking {\f1{}xargs}}\par
+\par
+{\pard\keep\li720\f1{}xargs [{\i option}...] [{\i command} [{\i initial-arguments}]]\par
+\pard\f0{}}\par
+{\f1{}\pard{}xargs} exits with the following status:\par
+\par
+{\pard{}0\par
+\pard\li720{}if it succeeds\par
+\par
+\pard{}123\par
+\pard\li720{}if any invocation of the command exited with status 1-125\par
+\par
+\pard{}124\par
+\pard\li720{}if the command exited with status 255\par
+\par
+\pard{}125\par
+\pard\li720{}if the command is killed by a signal\par
+\par
+\pard{}126\par
+\pard\li720{}if the command cannot be run\par
+\par
+\pard{}127\par
+\pard\li720{}if the command is not found\par
+\par
+\pard{}1\par
+\pard\li720{}if some other error occurred.\par
+\pard{}}\par
+{\pard{}{\f1{}--null}\par
+\pard{}{\f1{}-0}\par
+\pard\li720{}Input filenames are terminated by a null character instead of by whitespace, and the quotes and backslash are not special (every character is taken literally).  Disables the end of file string, which is treated like any other argument.\par
+\par
+\pard{}{\f1{}--eof[={\i eof-str}]}\par
+\pard{}{\f1{}-e[{\i eof-str}]}\par
+\pard\li720{}Set the end of file string to {\i eof-str}.  If the end of file string occurs as a line of input, the rest of the input is ignored.  If {\i eof-str} is omitted, there is no end of file string.  If this option is not given, the end of file string defaults to {\f1{}_}.\par
+\par
+\pard{}{\f1{}--help}\par
+\pard\li720{}Print a summary of the options to {\f1{}xargs} and exit.\par
+\par
+\pard{}{\f1{}--replace[={\i replace-str}]}\par
+\pard{}{\f1{}-i[{\i replace-str}]}\par
+\pard\li720{}Replace occurences of {\i replace-str} in the initial arguments with names read from standard input.  Also, unquoted blanks do not terminate arguments.  If {\i replace-str} is omitted, it defaults to {\f1{}\'7B\'7D} (like for {\f1{}find -exec}).  Implies {\f1{}-x} and {\f1{}-l 1}.\par
+\par
+\pard{}{\f1{}--max-lines[={\i max-lines}]}\par
+\pard{}{\f1{}-l[{\i max-lines}]}\par
+\pard\li720{}Use at most {\i max-lines} nonblank input lines per command line; {\i max-lines} defaults to 1 if omitted.  Trailing blanks cause an input line to be logically continued on the next input line, for the purpose of counting the lines.  Implies {\f1{}-x}.\par
+\par
+\pard{}{\f1{}--max-args={\i max-args}}\par
+\pard{}{\f1{}-n {\i max-args}}\par
+\pard\li720{}Use at most {\i max-args} arguments per command line.  Fewer than {\i max-args} arguments will be used if the size (see the {\f1{}-s} option) is exceeded, unless the {\f1{}-x} option is given, in which case {\f1{}xargs} will exit.\par
+\par
+\pard{}{\f1{}--interactive}\par
+\pard{}{\f1{}-p}\par
+\pard\li720{}Prompt the user about whether to run each command line and read a line from the terminal.  Only run the command line if the response starts with {\f1{}y} or {\f1{}Y}.  Implies {\f1{}-t}.\par
+\par
+\pard{}{\f1{}--no-run-if-empty}\par
+\pard{}{\f1{}-r}\par
+\pard\li720{}If the standard input does not contain any nonblanks, do not run the command.  By default, the command is run once even if there is no input.\par
+\par
+\pard{}{\f1{}--max-chars={\i max-chars}}\par
+\pard{}{\f1{}-s {\i max-chars}}\par
+\pard\li720{}Use at most {\i max-chars} characters per command line, including the command and initial arguments and the terminating nulls at the ends of the argument strings.\par
+\par
+\pard{}{\f1{}--verbose}\par
+\pard{}{\f1{}-t}\par
+\pard\li720{}Print the command line on the standard error output before executing it.\par
+\par
+\pard{}{\f1{}--version}\par
+\pard\li720{}Print the version number of {\f1{}xargs} and exit.\par
+\par
+\pard{}{\f1{}--exit}\par
+\pard{}{\f1{}-x}\par
+\pard\li720{}Exit if the size (see the {\i -s} option) is exceeded.\par
+\par
+\pard{}{\f1{}--max-procs={\i max-procs}}\par
+\pard{}{\f1{}-P {\i max-procs}}\par
+\pard\li720{}Run up to {\i max-procs} processes at a time; the default is 1.  If {\i max-procs} is 0, {\f1{}xargs} will run as many processes as possible at a time.\par
+\pard{}}\par
+\page\pard Node: {\b Primary Index}, \keepn Next: {\uldb }{\v }, Prev: {\uldb Reference}{\v Reference}, Up: {\uldb Top}{\v Top}\line
+K{\footnote K Primary Index}
+#{\footnote Primary_Index}
+${\footnote {\f1{}\pard{}find} Primary Index}\par
+\pard{\fs24\b {\f1{}find} Primary Index}\par
+\par
+\pard{}This is a list of all of the primaries (tests, actions, and options) that make up {\f1{}find} expressions for selecting files.  See {\uldb find Expressions}{\v find_Expressions}, for more information on expressions.\par
+\par
+{\fi-2880\li2880\tx2880{\f1{}-amin}:\tab {\uldb Age Ranges}{\v Age_Ranges}.\par}{\fi-2880\li2880\tx2880{\f1{}-anewer}:\tab {\uldb Comparing Timestamps}{\v Comparing_Timestamps}.\par}{\fi-2880\li2880\tx2880{\f1{}-atime}:\tab {\uldb Age Ranges}{\v Age_Ranges}.\par}{\fi-2880\li2880\tx2880{\f1{}-cmin}:\tab {\uldb Age Ranges}{\v Age_Ranges}.\par}{\fi-2880\li2880\tx2880{\f1{}-cnewer}:\tab {\uldb Comparing Timestamps}{\v Comparing_Timestamps}.\par}{\fi-2880\li2880\tx2880{\f1{}-ctime}:\tab {\uldb Age Ranges}{\v Age_Ranges}.\par}{\fi-2880\li2880\tx2880{\f1{}-daystart}:\tab {\uldb Age Ranges}{\v Age_Ranges}.\par}{\fi-2880\li2880\tx2880{\f1{}-depth}:\tab {\uldb Directories}{\v Directories}.\par}{\fi-2880\li2880\tx2880{\f1{}-empty}:\tab {\uldb Size}{\v Size}.\par}{\fi-2880\li2880\tx2880{\f1{}-exec}:\tab {\uldb Single File}{\v Single_File}.\par}{\fi-2880\li2880\tx2880{\f1{}-false}:\tab {\uldb Combining Primaries With Operators}{\v Combining_Primaries_With_Operators}.\par}{\fi-2880\li2880\tx2880{\f1{}-fls}:\tab {\uldb Print File Information}{\v Print_File_Information}.\par}{\fi-2880\li2880\tx2880{\f1{}-follow}:\tab {\uldb Symbolic Links}{\v Symbolic_Links}.\par}{\fi-2880\li2880\tx2880{\f1{}-fprint0}:\tab {\uldb Safe File Name Handling}{\v Safe_File_Name_Handling}.\par}{\fi-2880\li2880\tx2880{\f1{}-fprintf}:\tab {\uldb Print File Information}{\v Print_File_Information}.\par}{\fi-2880\li2880\tx2880{\f1{}-fprint}:\tab {\uldb Print File Name}{\v Print_File_Name}.\par}{\fi-2880\li2880\tx2880{\f1{}-fstype}:\tab {\uldb Filesystems}{\v Filesystems}.\par}{\fi-2880\li2880\tx2880{\f1{}-gid}:\tab {\uldb Owner}{\v Owner}.\par}{\fi-2880\li2880\tx2880{\f1{}-group}:\tab {\uldb Owner}{\v Owner}.\par}{\fi-2880\li2880\tx2880{\f1{}-ilname}:\tab {\uldb Symbolic Links}{\v Symbolic_Links}.\par}{\fi-2880\li2880\tx2880{\f1{}-iname}:\tab {\uldb Base Name Patterns}{\v Base_Name_Patterns}.\par}{\fi-2880\li2880\tx2880{\f1{}-inum}:\tab {\uldb Hard Links}{\v Hard_Links}.\par}{\fi-2880\li2880\tx2880{\f1{}-ipath}:\tab {\uldb Full Name Patterns}{\v Full_Name_Patterns}.\par}{\fi-2880\li2880\tx2880{\f1{}-iregex}:\tab {\uldb Full Name Patterns}{\v Full_Name_Patterns}.\par}{\fi-2880\li2880\tx2880{\f1{}-links}:\tab {\uldb Hard Links}{\v Hard_Links}.\par}{\fi-2880\li2880\tx2880{\f1{}-lname}:\tab {\uldb Symbolic Links}{\v Symbolic_Links}.\par}{\fi-2880\li2880\tx2880{\f1{}-ls}:\tab {\uldb Print File Information}{\v Print_File_Information}.\par}{\fi-2880\li2880\tx2880{\f1{}-maxdepth}:\tab {\uldb Directories}{\v Directories}.\par}{\fi-2880\li2880\tx2880{\f1{}-mindepth}:\tab {\uldb Directories}{\v Directories}.\par}{\fi-2880\li2880\tx2880{\f1{}-mmin}:\tab {\uldb Age Ranges}{\v Age_Ranges}.\par}{\fi-2880\li2880\tx2880{\f1{}-mount}:\tab {\uldb Filesystems}{\v Filesystems}.\par}{\fi-2880\li2880\tx2880{\f1{}-mtime}:\tab {\uldb Age Ranges}{\v Age_Ranges}.\par}{\fi-2880\li2880\tx2880{\f1{}-name}:\tab {\uldb Base Name Patterns}{\v Base_Name_Patterns}.\par}{\fi-2880\li2880\tx2880{\f1{}-newer}:\tab {\uldb Comparing Timestamps}{\v Comparing_Timestamps}.\par}{\fi-2880\li2880\tx2880{\f1{}-nogroup}:\tab {\uldb Owner}{\v Owner}.\par}{\fi-2880\li2880\tx2880{\f1{}-noleaf}:\tab {\uldb Directories}{\v Directories}.\par}{\fi-2880\li2880\tx2880{\f1{}-nouser}:\tab {\uldb Owner}{\v Owner}.\par}{\fi-2880\li2880\tx2880{\f1{}-ok}:\tab {\uldb Querying}{\v Querying}.\par}{\fi-2880\li2880\tx2880{\f1{}-path}:\tab {\uldb Full Name Patterns}{\v Full_Name_Patterns}.\par}{\fi-2880\li2880\tx2880{\f1{}-perm}:\tab {\uldb Permissions}{\v Permissions}.\par}{\fi-2880\li2880\tx2880{\f1{}-print0}:\tab {\uldb Safe File Name Handling}{\v Safe_File_Name_Handling}.\par}{\fi-2880\li2880\tx2880{\f1{}-printf}:\tab {\uldb Print File Information}{\v Print_File_Information}.\par}{\fi-2880\li2880\tx2880{\f1{}-print}:\tab {\uldb Print File Name}{\v Print_File_Name}.\par}{\fi-2880\li2880\tx2880{\f1{}-prune}:\tab {\uldb Directories}{\v Directories}.\par}{\fi-2880\li2880\tx2880{\f1{}-regex}:\tab {\uldb Full Name Patterns}{\v Full_Name_Patterns}.\par}{\fi-2880\li2880\tx2880{\f1{}-size}:\tab {\uldb Size}{\v Size}.\par}{\fi-2880\li2880\tx2880{\f1{}-true}:\tab {\uldb Combining Primaries With Operators}{\v Combining_Primaries_With_Operators}.\par}{\fi-2880\li2880\tx2880{\f1{}-type}:\tab {\uldb Type}{\v Type}.\par}{\fi-2880\li2880\tx2880{\f1{}-uid}:\tab {\uldb Owner}{\v Owner}.\par}{\fi-2880\li2880\tx2880{\f1{}-used}:\tab {\uldb Comparing Timestamps}{\v Comparing_Timestamps}.\par}{\fi-2880\li2880\tx2880{\f1{}-user}:\tab {\uldb Owner}{\v Owner}.\par}{\fi-2880\li2880\tx2880{\f1{}-xdev}:\tab {\uldb Filesystems}{\v Filesystems}.\par}{\fi-2880\li2880\tx2880{\f1{}-xtype}:\tab {\uldb Type}{\v Type}.\par}\page K{\footnote Makertf}#{\footnote hcMakertf}${\footnote \pard{}About Makertf}\pard{\fs24\b About Makertf}\par\par\pard{}Makertf is a program that converts "Texinfo" files into "Rich Text Format" (RTF) files. It can be used to make WinHelp Files from GNU manuals and other documentation written in Texinfo. Visit http://www.snafu.de/~cschenk/makertf for more information.}

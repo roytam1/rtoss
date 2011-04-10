@@ -1,0 +1,1 @@
+link /out:groff.exe groff.obj pipeline.obj ..\libgroff\groff.lib fu.lib \projects\cpp\downhill\downhill.lib wsock32.lib /force

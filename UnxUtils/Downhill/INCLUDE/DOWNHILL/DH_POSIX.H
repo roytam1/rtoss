@@ -1,0 +1,1 @@
+#define _DOWNHILL_POSIX_SOURCE 0 

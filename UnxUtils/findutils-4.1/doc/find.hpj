@@ -1,0 +1,11 @@
+[OPTIONS]
+CONTENTS=TOP
+COMPRESS=YES
+COPYRIGHT=Made with the help of makertf 3.12b-1
+TITLE=Finding Files
+
+[WINDOWS]
+main=,,0,,(192,192,192),0
+
+[FILES]
+find.rtf

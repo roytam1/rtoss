@@ -1,0 +1,31 @@
+All the user and group UNIX routines included in the Downhill Project
+are currently written to be compatible with Win32s, so they don't take
+advantage of Windows NT's multi-user ability.
+
+In other words, they're faked, and faked bad.
+
+User and group information is controlled by the following global
+variables:
+
+	char* Downhill_User_Name
+	uid_t Downhill_User_IdReal
+	uid_t Downhill_User_IdEffective
+	uid_t Downhill_User_IdSaved
+	char* Downhill_User_Password
+	char* Downhill_User_Gecos
+	char* Downhill_User_Dir
+	char* Downhill_User_Shell
+	char* Downhill_Group_Name
+	gid_t Downhill_Group_IdReal
+	gid_t Downhill_Group_IdEffective
+	gid_t Downhill_Group_IdSaved
+	char* Downhill_Group_Password
+
+By changing the values of these variables, you control what the various
+user and group routines return.  Yes, it's ugly.  But it works.  Or,
+rather, it works enough.
+
+Eventually, these routines will be expanding to use NT's abilities, but
+that's still a ways off.  If you want to give it a stab, feel free,
+but be sure to leave the current functionality in so Win32s can still
+use them.
