@@ -458,13 +458,17 @@ void ViewImpl::on_hscroll( int code, int pos )
 	case SB_LINERIGHT: dx= +cvs_.getPainter().W(); break;
 	case SB_PAGELEFT:  dx= -(cx()>>1); break;
 	case SB_PAGERIGHT: dx= +(cx()>>1); break;
-	case SB_THUMBTRACK: dx = pos - rlScr_.nPos; break;
-		/*{
+	case SB_THUMBTRACK:
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
+		{
 			SCROLLINFO si = { sizeof(SCROLLINFO), SIF_TRACKPOS };
 			::GetScrollInfo( hwnd_, SB_HORZ, &si );
 			dx = si.nTrackPos - rlScr_.nPos;
 			break;
-		}*/
+		}
+#else
+		dx = pos - rlScr_.nPos; break;
+#endif
 	case SB_LEFT:    dx = -rlScr_.nPos; break;
 	case SB_RIGHT:   dx = rlScr_.nMax+1-(signed)rlScr_.nPage-rlScr_.nPos; break;
 	}
@@ -484,13 +488,17 @@ void ViewImpl::on_vscroll( int code, int pos )
 	case SB_LINEDOWN: dy= +1; break;
 	case SB_PAGEUP:   dy= -(cy() / cvs_.getPainter().H()); break;
 	case SB_PAGEDOWN: dy= +(cy() / cvs_.getPainter().H()); break;
-	case SB_THUMBTRACK: dy = pos - udScr_.nPos; break;
-		/*{
+	case SB_THUMBTRACK:
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
+		{
 			SCROLLINFO si = { sizeof(SCROLLINFO), SIF_TRACKPOS };
 			::GetScrollInfo( hwnd_, SB_VERT, &si );
 			dy = si.nTrackPos - udScr_.nPos;
 			break;
-		}*/
+		}
+#else
+		dy = pos - udScr_.nPos; break;
+#endif
 	case SB_TOP:      dy = -udScr_.nPos; break;
 	case SB_BOTTOM:   dy = udScr_.nMax+1-(signed)udScr_.nPage-udScr_.nPos; break;
 	}
