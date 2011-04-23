@@ -2,6 +2,18 @@
 require("./fav_settings.php");
 require("./fav_strings.php");
 
+function printAdmJs($id) {
+	if(isset($_SESSION['isLogined']))
+		return ' onmouseover="toggleAdmTool(\'adm'.$id.'\')" onmouseout="toggleAdmTool(\'adm'.$id.'\')"';
+	else
+		return '';
+}
+
+function printAdmTools($id) {
+	global $SidebarSuffix2,$admAppend,$MyFav_Edit,$MyFav_Delete;
+	return '<a href="'.text2xml("fav_action.php?action=edit&id=".$id.$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Edit.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=delete&id=".$id.$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Delete.'</a>';
+}
+
 if(isset($_POST['pwd'])||isset($_POST['logout'])) logInOut(val($_POST,'pwd'),isset($_POST['logout']));
 
 $conn=sqlite_popen($sqlite_file);
@@ -16,6 +28,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-tw" lang="zh-tw">
 <head>
 <meta http-equiv="Content-Type" content="'.(($oldNetscape || $noXML)?'text/html':'application/xhtml+xml').'; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" /> <!-- IE8 workaround -->
 <title>'.$MyFav_Title.'</title>
 <link href="./style.css" rel="stylesheet" type="text/css" />
 <link rel="alternate" type="application/xml" title="RSS 1.0 Feed" href="rss.php" />
@@ -59,8 +72,11 @@ a.navi {
 	height:1em;
 	overflow:hidden;
 }
-ul,li,dt,dl,dd { margin-left: 0px;text-indent: 0px;list-style-position:inside;padding-left:0px;}
-dl dd div ul li {margin-left:0.35em;}';
+ul,li,dt,dl,dd { margin:0; padding:0; text-indent:0px; list-style-position:inside;}
+dl dd div ul li {padding-left:0.35em;}
+.admtools-hide {display:none;}
+.admtools {display:inline; padding-left:1em;}
+';
 if (!($oldNetscape || $noXML)) echo ']]>';
 echo '</style>
 <script type="text/javascript">';
@@ -123,6 +139,10 @@ function ExpandDiv(divID,aID) {
 	gID(divID).className="dv";
 	add_submenu(divID);
 	setLinkText(aID,"'.$MyFav_ShrinkMark.'");
+}
+function toggleAdmTool(divID) {
+	if(gID(divID).className=="admtools-hide") gID(divID).className="admtools";
+	else gID(divID).className="admtools-hide";
 }
 function ShrinkDiv(divID,aID) {
 	gID(divID).className="dh";
@@ -231,19 +251,20 @@ echo '</div>
 <dl>';
 while($row = sqlite_fetch_array($rs)) {
 	echo '<dt>';
+	if(isset($_SESSION['isLogined'])) echo '<div onmouseover="toggleAdmTool(\'adm'.$row['id'].'\')" onmouseout="toggleAdmTool(\'adm'.$row['id'].'\')">';
 	if (!$oldNetscape)
 		echo '<a id="a'.$row['id'].'" href="'.text2xml("javascript:ToggleDiv('d".$row['id']."','a".$row['id']."');").'" class="toggle">'.($shrinkFirst?$MyFav_ExpandMark:$MyFav_ShrinkMark).'</a> ';
 	echo '<a name="'.$row['id'].'"'.($row['addr']?' href="'.text2xml($row['addr']).'" '.$aAppend:'').'>'.text2xml($row['name']).'</a>';
-	if (isset($_SESSION['isLogined'])) echo '&nbsp;&nbsp;&nbsp;<a href="'.text2xml("fav_action.php?action=add&catid=".$row['id'].$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Add.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=order&id=".$row['id'].$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Order.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=edit&id=".$row['id'].$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Edit.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=delete&id=".$row['id'].$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Delete.'</a>';
+	if (isset($_SESSION['isLogined'])) echo '<span class="admtools-hide" id="adm'.$row['id'].'"><a href="'.text2xml("fav_action.php?action=add&catid=".$row['id'].$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Add.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=order&id=".$row['id'].$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Order.'</a>&nbsp;'.printAdmTools($row['id']).'</span></div>';
 	echo '</dt>
   <dd><div id="d'.$row['id'].'" class="'.$divShrink.'">';
 	$qry2="SELECT * FROM Fav WHERE cat = 0 AND catid = ".$row['id']." ORDER BY ord,id";
 	$rs2=sqlite_query($conn2,$qry2);
 	echo '<ul>';
 	while($row2 = sqlite_fetch_array($rs2)) {
-		if ($row2['protected']) echo '<li type="circle"><a href="'.text2xml("fav_action.php?action=go&id=".$row2['id']).'" '.$aAppend.'>'.text2xml($row2['name']).'</a>';
-		else echo'<li><a href="'.text2xml($row2['addr']).'" '.$aAppend.'>'.text2xml($row2['name']).'</a>';
-		if (isset($_SESSION['isLogined'])) echo '&nbsp;&nbsp;&nbsp;<a href="'.text2xml("fav_action.php?action=edit&id=".$row2['id'].$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Edit.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=delete&id=".$row2['id'].$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Delete.'</a>';
+		if ($row2['protected']) echo '<li type="circle"'.(printAdmJs($row2['id'])).'><a href="'.text2xml("fav_action.php?action=go&id=".$row2['id']).'" '.$aAppend.'>'.text2xml($row2['name']).'</a>';
+		else echo'<li'.(printAdmJs($row2['id'])).'><a href="'.text2xml($row2['addr']).'" '.$aAppend.'>'.text2xml($row2['name']).'</a>';
+		if (isset($_SESSION['isLogined'])) echo '<span class="admtools-hide" id="adm'.$row2['id'].'">'.printAdmTools($row2['id']).'</span>';
 		echo "</li>\n";
 	}
 echo '</ul>
@@ -255,9 +276,9 @@ $qry="SELECT * FROM Fav WHERE cat = 0 AND catid = 0 ORDER BY ord,id";
 $rs=sqlite_query($conn,$qry);
 echo '<dd><ul>';
 while($row = sqlite_fetch_array($rs)) {
-	if ($row['protected']) echo '<li type="circle"><a href="'.text2xml("fav_action.php?action=go&id=".$row['id']).'" '.$aAppend.'>'.$row['name'].'</a>';
-	else echo '<li><a href="'.text2xml($row['addr']).'" '.$aAppend.'>'.text2xml($row['name']).'</a>';
-	if (isset($_SESSION['isLogined'])) echo '&nbsp;&nbsp;&nbsp;<a href="'.text2xml("fav_action.php?action=edit&id=".$row['id'].$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Edit.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=delete&id=".$row['id'].$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Delete.'</a>';
+	if ($row['protected']) echo '<li type="circle"'.(printAdmJs($row['id'])).'><a href="'.text2xml("fav_action.php?action=go&id=".$row['id']).'" '.$aAppend.'>'.$row['name'].'</a>';
+	else echo '<li'.(printAdmJs($row['id'])).'><a href="'.text2xml($row['addr']).'" '.$aAppend.'>'.text2xml($row['name']).'</a>';
+	if (isset($_SESSION['isLogined'])) echo '<span class="admtools-hide" id="adm'.$row['id'].'">'.printAdmTools($row['id']).'</span>';
 	echo "</li>\n";
 }
 echo '</ul></dd></dl>
