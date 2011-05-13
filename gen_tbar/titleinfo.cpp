@@ -114,17 +114,18 @@ void TitleInfo::drawOnCaption()
 	strName.ReleaseBuffer();
 
 	// patch from Darren Owen (problems with command line option "/class")
-	if((strName != "Winamp PE") && (strName != "Winamp v1.x"))
-		if(FindWindowEx(hForegroundWnd,0,"WinampVis",0))
+	if((strName != _T("Winamp PE")) && (strName != _T("Winamp v1.x")))
+		if(FindWindowEx(hForegroundWnd,0,_T("WinampVis"),0))
 			return;
 	// patch end
 
 	nStyle = GetWindowLong(hForegroundWnd, GWL_STYLE);
 	nExStyle = GetWindowLong(hForegroundWnd, GWL_EXSTYLE);
 
-	if ((nStyle & WS_CAPTION) == WS_CAPTION && !(nExStyle & WS_EX_TOOLWINDOW) && (strName != "#32770") &&
-		(strName != "Shell_TrayWnd") && (strName != "Winamp v1.x") && (strName != "Winamp EQ") &&
-		(strName != "Winamp PE") && (strName =! "Winamp MB"))
+	if ((nStyle & WS_CAPTION) == WS_CAPTION && !(nExStyle & WS_EX_TOOLWINDOW) && (strName != _T("#32770")) &&
+		(strName != _T("Shell_TrayWnd")) && (strName != _T("Winamp v1.x")) && (strName != _T("Winamp EQ")) &&
+		(strName != _T("Winamp PE")) && (strName != _T("Winamp MB"))
+		 && (strName != _T("Chrome_WidgetWin_0"))) // chrome hack
 	{
 		drawCaption(hForegroundWnd, nStyle);
 	}
@@ -281,7 +282,7 @@ void TitleInfo::setSearchCaption(CStdString newSearchCaption)
 	CStdString strSearchCaption;
 	strSearchCaption = newSearchCaption;
 
-	char* token = strtok(strSearchCaption.GetBuffer(512), ";");
+	TCHAR* token = _tcstok(strSearchCaption.GetBuffer(512), _T(";"));
 	strSearchCaption.ReleaseBuffer();
 
 	for (int i=0; i < 10; i++)
@@ -291,7 +292,7 @@ void TitleInfo::setSearchCaption(CStdString newSearchCaption)
 		else
 			pSearchCaption[i].Empty();
 
-		token = strtok(NULL, ";");
+		token = _tcstok(NULL, _T(";"));
 	}
 }
 

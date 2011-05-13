@@ -74,7 +74,7 @@ int init()
 	strVersion = strHelpFile;
 	PathRemoveFileSpec(strHelpFile.GetBuffer(MAX_PATH));
 	strHelpFile.ReleaseBuffer();
-	strHelpFile += "\\gen_tbar.chm";
+	strHelpFile += _T("\\gen_tbar.chm");
 
 	DWORD dwArg;
 	DWORD dwInfoSize = GetFileVersionInfoSize(strVersion.GetBuffer(MAX_PATH), &dwArg);
@@ -88,12 +88,16 @@ int init()
 	LPVOID lpValue;
 
 	if (VerQueryValue(lpBuffer, TEXT("\\StringFileInfo\\040904b0\\FileVersion"), &lpValue, &uInfoSize))
-		strVersion.Format("Titlebar Info %s", lpValue);
+		strVersion.Format(_T("Titlebar Info %s"), lpValue);
 	else
-		strVersion = "Titlebar Info x.xx";
+		strVersion = _T("Titlebar Info x.xx");
 
 	delete[] lpBuffer;
 	lpBuffer = NULL;
+
+#ifndef _MBCS
+	strVersion += " [Unicode]";
+#endif
 
 	// Set plugin description
 	static char c[512];
@@ -101,8 +105,11 @@ int init()
 	CStdString strFilename;
 	GetModuleFileName(hInstance, strFilename.GetBuffer(MAX_PATH), MAX_PATH);
 	strFilename.ReleaseBuffer();
+	std::string strVersionA, strFilenameA;
+	ssasn(strVersionA, strVersion.GetBuffer(MAX_PATH));
+	ssasn(strFilenameA, PathFindFileName(strFilename.GetBuffer(MAX_PATH)));
 
-	wsprintf((c), "%s (%s)", strVersion.GetBuffer(MAX_PATH), PathFindFileName(strFilename.GetBuffer(MAX_PATH))); // "%s" must be a pointer to char!
+	wsprintfA((c), "%s (%s)", strVersionA.c_str(), strFilenameA.c_str()); // "%s" must be a pointer to char!
 	plugin.description = c;
 
 	strFilename.ReleaseBuffer();

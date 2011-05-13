@@ -130,7 +130,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,5,2,0
+ FILEVERSION 1,5,3,0
  PRODUCTVERSION 1,0,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -149,7 +149,7 @@ BEGIN
             VALUE "Comments", " \0"
             VALUE "CompanyName", "radix\0"
             VALUE "FileDescription", "Titlebar Info for Winamp 2 and 5\0"
-            VALUE "FileVersion", "1.52\0"
+            VALUE "FileVersion", "1.53\0"
             VALUE "InternalName", "gen_tbar_2\0"
             VALUE "LegalCopyright", "(c) 1999-2005 Mats Ljungqvist, Jos van den Oever, Martin Zuther\0"
             VALUE "LegalTrademarks", " \0"
