@@ -1,0 +1,47 @@
+.topic IDH_OK
+Apply new settings and exit.
+
+.topic IDH_CANCEL
+Exit without changes.
+
+.topic IDH_SHOW_REMAINING_TIME
+Display the current song's remaining time instead of its playing time.
+
+.topic IDH_SHOW_SONG_LENGTH
+Display the current song's length.
+
+.topic IDH_CHOOSE_FONT
+Select the font that should be used.
+
+.topic IDH_SHOW_PLAYSTATUS
+Display blinking [Pause] and [Stop] on the caption.
+
+.topic IDH_GET_HELP
+Displays the help file for this plugin.
+
+.topic IDH_ABOUT
+About this plugin.
+
+.topic IDH_HSPIN
+Shift the font horizontally on the caption.
+
+.topic IDH_HEDIT
+Shift the font horizontally on the caption.
+
+.topic IDH_VEDIT
+Shift the font vertically on the caption.
+
+.topic IDH_VSPIN
+Shift the font vertically on the caption.
+
+.topic IDH_SEARCH_CAPTION
+If the text you specified here appears somewhere in a caption, the plugin won't display data on that caption. You can specify up to ten different strings by separating them with semicolons: string1;string2;string3. Comparision is case sensitive. In case you experience problems with this option, just remove all text from the text box, and the data should appear on the caption again.
+
+.topic IDH_PLUGIN_ENABLED
+Enable or disable the plugin.
+
+.topic IDH_TITLE_MASK
+You can change what is displayed on your caption by using a few variables. %time% for instance will display the current or remaining time of the song, while %artist% will show the artist's name.
+
+.topic IDH_TITLE_MASK_RESET
+Click here if you messed up the display configuration and want to restore the default setting.
