@@ -1,3 +1,5 @@
+#ifndef NULLSOFT_WINAMP_DSP_H
+#define NULLSOFT_WINAMP_DSP_H
 // DSP plugin interface
 
 // notes:
@@ -33,7 +35,31 @@ typedef struct {
 } winampDSPHeader;
 
 // exported symbols
-typedef winampDSPHeader* (*winampDSPGetHeaderType)();
+#ifdef USE_DSP_HDR_HWND
+typedef winampDSPHeader* (*winampDSPGetHeaderType)(HWND);
+#define DSP_HDRVER 0x22
 
+#else
+
+typedef winampDSPHeader* (*winampDSPGetHeaderType)(HWND);
 // header version: 0x20 == 0.20 == winamp 2.0
 #define DSP_HDRVER 0x20
+#endif
+
+// return values from the winampUninstallPlugin(HINSTANCE hdll, HWND parent, int param)
+// which determine if we can uninstall the plugin immediately or on winamp restart
+#define DSP_PLUGIN_UNINSTALL_NOW    0x0
+#define DSP_PLUGIN_UNINSTALL_REBOOT 0x1
+//
+// uninstall support was added from 5.0+ and uninstall now support from 5.5+
+// it is down to you to ensure that if uninstall now is returned that it will not cause a crash
+// (ie don't use if you've been subclassing the main window)
+
+// Version note:
+//
+// Added passing of Winamp's main hwnd in the call to the exported winampDSPHeader()
+// which allows for primarily the use of localisation features with the bundled plugins.
+// If you want to use the new version then either you can edit you version of dsp.h or
+// you can add USE_DSP_HDR_HWND to your project's defined list or before use of dsp.h
+//
+#endif

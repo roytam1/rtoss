@@ -41,6 +41,7 @@
 #ifndef GEN_TBAR_H
 #define GEN_TBAR_H
 
+#include <TCHAR.H>
 #include <windows.h>
 #include "Winamp SDK/wa_ipc.h"
 
@@ -70,8 +71,8 @@ public:
 protected:
 	bool get_song_data();
 
-	bool get_registry_string(HKEY root_key, char* sub_key, char* key_name, char** data);
-	bool set_registry_string(HKEY root_key, char* sub_key, char* key_name, char* data);
+	bool get_registry_string(HKEY root_key, TCHAR* sub_key, TCHAR* key_name, TCHAR** data);
+	bool set_registry_string(HKEY root_key, TCHAR* sub_key, TCHAR* key_name, TCHAR* data);
 
 	UINT uTimerID;
 
@@ -92,7 +93,7 @@ protected:
 	DWORD color;
 	DWORD color_old;
 
-	char* data;
+	TCHAR* data;
 
 	CStdString strHelpFile;
 	CStdString strSearchCaption;
