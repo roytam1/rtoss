@@ -96,7 +96,7 @@ int init()
 	lpBuffer = NULL;
 
 #ifndef _MBCS
-	strVersion += " [Unicode]";
+	strVersion += L" [Unicode]";
 #endif
 
 	// Set plugin description
