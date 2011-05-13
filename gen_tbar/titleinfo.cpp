@@ -125,7 +125,7 @@ void TitleInfo::drawOnCaption()
 	if ((nStyle & WS_CAPTION) == WS_CAPTION && !(nExStyle & WS_EX_TOOLWINDOW) && (strName != _T("#32770")) &&
 		(strName != _T("Shell_TrayWnd")) && (strName != _T("Winamp v1.x")) && (strName != _T("Winamp EQ")) &&
 		(strName != _T("Winamp PE")) && (strName != _T("Winamp MB"))
-		 && (strName != _T("Chrome_WidgetWin_0"))) // chrome hack
+		 /*&& (strName != _T("Chrome_WidgetWin_0"))*/ ) // chrome hack
 	{
 		drawCaption(hForegroundWnd, nStyle);
 	}
@@ -264,6 +264,19 @@ void TitleInfo::drawCaption(HWND hForegroundWnd, unsigned int nStyle)
 
 		hLastForegroundWindow = hForegroundWnd;
 		updateCaption(hForegroundWnd);
+
+		/* titlebar area cleanup hack */
+		sDrawRectTitle.top    -= 5;
+		sDrawRectTitle.left   -= 10;
+		sDrawRectTitle.right  += 10;
+		sDrawRectTitle.bottom += 5;
+		RedrawWindow(hForegroundWnd, &sDrawRectTitle, NULL, RDW_INVALIDATE | RDW_UPDATENOW | RDW_FRAME);
+		sDrawRectTitle.top    += 5;
+		sDrawRectTitle.left   += 10;
+		sDrawRectTitle.right  -= 10;
+		sDrawRectTitle.bottom -= 5;
+		/* titlebar area cleanup hack end */
+
 		DrawText(hDC, strTitleText, strTitleText.GetLength(), &sDrawRectTitle, DT_LEFT | DT_VCENTER | DT_NOPREFIX);
 
 		hDrawFont = (HFONT)SelectObject(hDC, hDrawFont);
