@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>Winamp plugin &quot;gen_tbar&quot;</title>
+<meta name="author" content="Martin Zuther">
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+<base target="_blank">
+</head>
+<body>
+<center><h1>Winamp plugin &quot;gen_tbar&quot;</h1></center>
+<center><a href="http://www.radix-musik.de/"><img src="caption.jpg" width="353" height="35" border="0" alt="Example caption"></a></center>
+<center><h2><a name="about" />About</h2></center>
+
+<p>This is a free plugin for <a href="http://www.winamp.com/">Winamp</a> (versions 2 and 5) that displays customizable data on the caption of the active window. Here are some of the options:</p>
+
+<ul style="list-style-type:disk">
+   <li>position in the playlist</li>
+   <li>artist name</li>
+   <li>song title</li>
+   <li>remaining time</li>
+</ul>
+<hr>
+<center><h2><a name="options" />Options</h2></center>
+
+<p>You can change the plugin's default options ( <i>Winamp preferences -> Plug-ins -> General Purpose -> Titlebar Info x.xx (gen_tbar_2.dll) -> Configure</i>). All settings (except for <i>Caption of window...</i>) take effect at once, so you don't have to close the dialog window to see the changes.</p>
+<hr>
+<table summary="Options" cellspacing="0" cellpadding="2" border="0">
+   <tr>
+      <td valign=top width="160"><b>Question mark (?):</b></td>
+      <td>Display help for the control you click on.</td>
+   </tr>
+   <tr>
+      <td valign=top><b>Plugin [en|dis]abled:</b></td>
+      <td>Enable or disable the plugin.</td>
+   </tr>
+   <tr>
+      <td valign=top><b>Show remaining time:</b></td>
+      <td>Display the remaining time of the song instead of the current time.</td>
+   </tr>
+   <tr>
+      <td valign=top><b>Show playback status:</b></td>
+      <td>Display blinking [Pause] and [Stop] on the caption.</td>
+   </tr>
+   <tr>
+      <td valign=top><b>[Font name]:</b></td>
+      <td>Select the font that should be used.</td>
+   </tr>
+   <tr>
+      <td valign=top><b>Horizontal shift:</b></td>
+      <td>Shift the font horizontally on the caption.</td>
+   </tr>
+   <tr>
+      <td valign=top><b>Vertical shift:</b></td>
+      <td>Shift the font vertically on the caption.</td>
+   </tr>
+   <tr>
+      <td valign=top><b>Display configuration:</b></td>
+      <td>You can change what is displayed on your caption by using a few variables. <i>%time%</i> for instance will display the current or remaining time of the song, while <i>%artist%</i> will show the artist's name. Note that a couple of variabes can only be used in Winamp 2.90 or Winamp 5 and also require ID3 information to be present in the current song.</td>
+   </tr>
+   <tr>
+      <td valign=top><b>Reset:</b></td>
+      <td>Click here if you messed up the <i>display configuration</i> and want to restore the default setting.</td>
+   </tr>
+   <tr>
+      <td valign=top><b>Window captions [...]:</b></td>
+      <td>If the text you specified here appears somewhere in a caption, the plugin won't display data on it. You can specify up to ten different strings if you separate them with semicolons: <b>string1;string2;string3</b>. Comparision is case sensitive. In case you experience problems with this option, just remove all text from the text box, and the data should appear on the caption again.</td>
+   </tr>
+   <tr>
+      <td valign=top><b>Ok:</b></td>
+      <td>Apply new settings and exit.</td>
+   </tr>
+   <tr>
+      <td valign=top><b>Cancel:</b></td>
+      <td>Exit without changes.</td>
+   </tr>
+   <tr>
+      <td valign=top><b>Help:</b></td>
+      <td>Displays this help file.</td>
+   </tr>
+   <tr>
+      <td valign=top><b>About:</b></td>
+      <td>About this plugin.</td>
+   </tr>
+</table>
+<hr>
+<center><h2><a name="uninstall" />Uninstall</h2></center>
+
+<p>I included an uninstaller with the plugin. If you still want to uninstall manually, please follow the instructions below:</p>
+
+<ul style="list-style-type:disk">
+   <li>Close Winamp and open the subdirectory <i>Plugins</i> of your Winamp-Directory</li>
+   <li>Delete the files <i>gen_tbar_2.dll</i> and <i>gen_tbar.chm</i></li>
+</ul>
+
+<p>If you know how to use RegEdit, you may delete the registry key <i>HKEY_CURRENT_USER\Software\radix\gen_tbar</i>. Otherwise you'll better leave this alone!</p>
+<hr>
+<center><h2><a name="miscellaneous" />Miscellaneous</h2></center>
+
+<p>You can listen to my music at <a href="http://www.radix-musik.de/">www.radix-musik.de</a>, while my homepage is at <a href="http://www.mzuther.de/">www.mzuther.de</a>.</p>
+
+<p>If you have any ideas, find bugs or encounter problems, feel free to <a href="http://www.mzuther.de/" target="_blank">contact</a> me.</p>
+</body>
+</html>

@@ -1,0 +1,26 @@
+[OPTIONS]
+Compatibility=1.1 or later
+Compiled file=gen_tbar.chm
+Contents file=toc.hhc
+Default Window=Hauptfenster
+Default topic=index.html
+Display compile progress=Yes
+Language=0x409 Englisch (USA)
+
+[WINDOWS]
+Hauptfenster="gen_tbar","toc.hhc",,"index.html",,,,,,0x2120,150,0x0,[150,75,950,675],,0x200,,,,,0
+
+
+[FILES]
+index.html
+license.html
+
+[MAP]
+#include ..\resource.h
+
+[TEXT POPUPS]
+popup.h
+popup.txt
+
+[INFOTYPES]
+
