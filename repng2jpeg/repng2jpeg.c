@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h> /* for atoi(),atof() */
 #include <string.h>
-#define VER "1.0.4"
+#define VER "1.0.4.1"
 
 int main(int argc, char *argv[]) {
 
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	if (argc >= 2 && strcmp(argv[1],"--help") == 0){ 
-		fprintf(stdout,"usage: repng2jpeg inputfile outputfile (width height|Z ratio) [Quality|P|G]\n\ninput  JPEG,PNG,GIF\noutput JPEG,PNG,GIF\n\n[option]\n  Quality  Set the JPEG Quality (1-100 or Default.75)\n  P or p   Output a PNG image\n  G or g   Output a GIF image\n\nex.\nrepng2jpeg 1.jpg 2.jpg 400 300\nrepng2jpeg 1.jpg 2.jpg 400 300 90\nrepng2jpeg 1.jpg 2.png 400 300 P\nrepng2jpeg 1.jpg 2.gif Z 0.5 G\n\n",VER);
+		fprintf(stdout,"usage: repng2jpeg inputfile outputfile (width height|Z ratio) [Quality|P|G]\n\ninput  JPEG,PNG,BMP,GIF\noutput JPEG,PNG,GIF\n\n[option]\n  Quality  Set the JPEG Quality (1-100 or Default.75)\n  P or p   Output a PNG image\n  G or g   Output a GIF image\n\nex.\nrepng2jpeg 1.jpg 2.jpg 400 300\nrepng2jpeg 1.jpg 2.jpg 400 300 90\nrepng2jpeg 1.jpg 2.png 400 300 P\nrepng2jpeg 1.jpg 2.gif Z 0.5 G\n\n",VER);
 		return 0;
 	}
 	
@@ -45,10 +45,12 @@ int main(int argc, char *argv[]) {
 		src = gdImageCreateFromPng(imgin);
 	}else if (num[0] == 0xff && num[1] == 0xd8){
 		src = gdImageCreateFromJpeg(imgin);
+	}else if (num[0] == 0x42 && num[1] == 0x4d){
+		src = gdImageCreateFromBmp(imgin);
 	}else if (num[0] == 0x47 && num[1] == 0x49 && num[2] == 0x46){
 		src = gdImageCreateFromGif(imgin);
 	}else{
-		fprintf(stderr,"Input is not in JPEG PNG or GIF format!\n");
+		fprintf(stderr,"Input is not in JPEG PNG BMP or GIF format!\n");
 		return 3;
 	}
 
