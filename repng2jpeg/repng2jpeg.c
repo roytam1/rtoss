@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h> /* for atoi(),atof() */
 #include <string.h>
-#define VER "1.0.4.1"
+#define VER "1.0.4.2"
 
 int main(int argc, char *argv[]) {
 
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	if (argc >= 2 && strcmp(argv[1],"--help") == 0){ 
-		fprintf(stdout,"usage: repng2jpeg inputfile outputfile (width height|Z ratio) [Quality|P|G]\n\ninput  JPEG,PNG,BMP,GIF\noutput JPEG,PNG,GIF\n\n[option]\n  Quality  Set the JPEG Quality (1-100 or Default.75)\n  P or p   Output a PNG image\n  G or g   Output a GIF image\n\nex.\nrepng2jpeg 1.jpg 2.jpg 400 300\nrepng2jpeg 1.jpg 2.jpg 400 300 90\nrepng2jpeg 1.jpg 2.png 400 300 P\nrepng2jpeg 1.jpg 2.gif Z 0.5 G\n\n",VER);
+		fprintf(stdout,"usage: repng2jpeg inputfile outputfile (width height|Z ratio) [Quality|P|G|B]\n\ninput  JPEG,PNG,GIF,BMP\noutput JPEG,PNG,GIF,BMP\n\n[option]\n  Quality  Set the JPEG Quality (1-100 or Default.75)\n  P or p   Output a PNG image\n  G or g   Output a GIF image\n  B or b   Output a BMP image\n\nex.\nrepng2jpeg 1.jpg 2.jpg 400 300\nrepng2jpeg 1.jpg 2.jpg 400 300 90\nrepng2jpeg 1.jpg 2.png 400 300 P\nrepng2jpeg 1.jpg 2.gif Z 0.5 G\n\n",VER);
 		return 0;
 	}
 	
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 	}else if (num[0] == 0x47 && num[1] == 0x49 && num[2] == 0x46){
 		src = gdImageCreateFromGif(imgin);
 	}else{
-		fprintf(stderr,"Input is not in JPEG PNG BMP or GIF format!\n");
+		fprintf(stderr,"Input is not in JPEG PNG GIF or BMP format!\n");
 		return 3;
 	}
 
@@ -80,6 +80,7 @@ int main(int argc, char *argv[]) {
 	if(argc > 5){
 		if(strcmp(argv[5],"P") == 0||strcmp(argv[5],"p") == 0){ imgouttype = 2; }
 		else if(strcmp(argv[5],"G") == 0||strcmp(argv[5],"g") == 0){ imgouttype = 3; }
+		else if(strcmp(argv[5],"B") == 0||strcmp(argv[5],"B") == 0){ imgouttype = 4; }
 		else{ jpegq = atoi(argv[5]); imgouttype = 1; }
 	}else{
 		imgouttype = 1;
@@ -116,6 +117,8 @@ int main(int argc, char *argv[]) {
 		gdImagePng(dst,imgout);
 	}else if(imgouttype == 3){
 		gdImageGif(dst,imgout);
+	}else if(imgouttype == 4){
+		gdImageBmp(dst,imgout, 0);
 	}
 
 	fclose(imgout);
