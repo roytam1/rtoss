@@ -96,7 +96,7 @@ $mudai = '(無題)';
 /* ＞がついた時の色 */
 $re_color = "#225588";
 /* ホストを表示するか（表示しない=0 <!-->内で表示=1 表示=2）*/
-$hostview = 1;
+define("HOSTVIEW", 0);
 /* 外部書き込み禁止にする?(する=1,しない=0) */
 define("GAIBU", 0);
 /* 名無し書き込み禁止にする?（no=1 yes=0）*/
@@ -130,6 +130,31 @@ $no_host[] = 'anonymizer.com';
 //---------設定ここまで--------------
 if($gzlog) {
 include_once("./lib_gzip.php");
+}
+
+$js='';
+$head='';
+
+function str_cut($str, $maxlen=20){
+    $i = $l = 0; $len = strlen($str); $f = true; $return_str = $str;
+	while($i < $len){
+		$chars = ord($str{$i});
+		if($chars < 0x80){ $l++; $i++; }
+		elseif($chars < 0xe0){ $l++; $i += 2; }
+		elseif($chars < 0xf0){ $l += 2; $i += 3; }
+		elseif($chars < 0xf8){ $l++; $i += 4; }
+      	elseif($chars < 0xfc){ $l++; $i += 5; }
+		elseif($chars < 0xfe){ $l++; $i += 6; }
+		if(($l >= $maxlen) && $f){
+			$return_str = substr($str, 0, $i);
+			$f = false;
+		}
+		if(($l > $maxlen) && ($i <= $len)){
+			$return_str = $return_str.'…';
+			break;
+		}
+    }
+	return $return_str;
 }
 
 function externalIPQuery($addr) {
@@ -183,7 +208,7 @@ function hostblock() {
 if($no_host_read) hostblock();
 
 function head(&$dat){ 		//ヘッダー表示部
-	global $mode,$no,$PHP_SELF,$gzlog,$title1,$title2,$body,$p_bbs,$htmlw,$max,$page_def;
+	global $mode,$no,$PHP_SELF,$gzlog,$title1,$title2,$body,$p_bbs,$htmlw,$max,$page_def,$head,$js;
 	$r_sub='';$r_com='';
 
 	if($mode == "resmsg"){	//レスの場合
@@ -201,6 +226,7 @@ function head(&$dat){ 		//ヘッダー表示部
 		}elseif(preg_match("/^Re:/", $sub)){
 			$r_sub=preg_replace("/^Re:/", "Re[2]:", $sub);
 		}else{ $r_sub = "Re:$sub"; }
+		$r_sub .= '{'.$no.'}';
 		$r_com = "&gt;$com";
 		$r_com = preg_replace("#<br( /)?>#i","\r&gt;",$r_com);
 	}
@@ -219,12 +245,13 @@ function head(&$dat){ 		//ヘッダー表示部
 <script>
 <!--
 function l(e){var P=getCookie("p_bbs"),i;var pb=P.split(",");if(pb.length!=4) return false;with(document){for(i=0;i<forms.length;i++){if(forms[i].pwd)with(forms[i]){pwd.value=pb[2];}if(forms[i].password)with(forms[i]){password.value=pb[2];}if(forms[i].name)with(forms[i]){name.value=pb[0];}if(forms[i].url)with(forms[i]){url.value=pb[3];}if(forms[i].email)with(forms[i]){email.value=pb[1].replace("+"," ");}}}};onload=l;
-function getCookie(key, tmp1, tmp2, xx1, xx2, xx3) {tmp1 = " " + document.cookie + ";";xx1 = xx2 = 0;len = tmp1.length;	while (xx1 < len) {xx2 = tmp1.indexOf(";", xx1);tmp2 = tmp1.substring(xx1 + 1, xx2);xx3 = tmp2.indexOf("=");if (tmp2.substring(0, xx3) == key) {return(unescape(tmp2.substring(xx3 + 1, xx2 - xx1 - 1)));}xx1 = xx2 + 1;}return("");}
+function getCookie(key, tmp1, tmp2, xx1, xx2, xx3) {tmp1 = " " + document.cookie + ";";xx1 = xx2 = 0;len = tmp1.length;	while (xx1 < len) {xx2 = tmp1.indexOf(";", xx1);tmp2 = tmp1.substring(xx1 + 1, xx2);xx3 = tmp2.indexOf("=");if (tmp2.substring(0, xx3) == key) {return(decodeURIComponent(tmp2.substring(xx3 + 1, xx2 - xx1 - 1)));}xx1 = xx2 + 1;}return("");}
 function s(o){if(o.url.value.match(/^http/)) o.url.value="!"+o.url.value;}
 -->
 </script>
+'.$js.'
 </head>';
-$dat=$head.$body.'
+	$dat=$head.$body.'
 <form method="POST" action="'.$PHP_SELF.'" enctype="multipart/form-data" onsubmit="s(this);return true;">
 <input type="hidden" name="mode" value="regist">
 <BASEFONT SIZE="3">'.$title2.'<hr size=1><br>
@@ -236,7 +263,7 @@ $dat=$head.$body.'
 <textarea name="com" rows=7 cols=82 wrap="off">'.$r_com.'</textarea><br><br>
 ＵＲＬ　 <input type=text name="url" size=70 value="http://"><noscript>＊「!」から始まってください。 例えば、「!http://...」</noscript><br>
 削除キー <input type=password name="password" size=8 value="">(記事の削除用。英数字で8文字以内)
-</form></TT>
+</TT></form>
 <hr size=1><font size=-2>新しい記事から表示します。最高'.$max.'件の記事が記録され、それを超えると古い記事から過去ログへ移ります。<br>
  １回の表示で'.$page_def.'件を越える場合は、下のボタンを押すことで次の画面の記事を表示します。</font>
 ';
@@ -255,7 +282,7 @@ $dat.='<br><br><small><!-- P-BBS v1.232 --><!-- RTHack 20060116 -->
 </body></html>';
 }
 function Main(&$dat){	//記事表示部
-	global $gzlog,$page_def,$page,$PHP_SELF,$autolink,$re_color,$hostview;
+	global $gzlog,$page_def,$page,$PHP_SELF,$autolink,$re_color;
 	$p=0;
 
 	$view = $gzlog?ungzlog(LOGFILE):file(LOGFILE);
@@ -277,8 +304,8 @@ function Main(&$dat){	//記事表示部
 		// URL自動リンク
 		if ($autolink) { $com=auto_link($com); }
 		// Host表示形式
-		if($hostview==1){ $host="<!--$host-->"; }
-		elseif($hostview==2){ $host="[ $host ]"; }
+		if(HOSTVIEW==1){ $host="<!--$host-->"; }
+		elseif(HOSTVIEW==2){ $host="[ $host ]"; }
 		else{ $host=""; }
 
 		$dat.='<hr size=1>[<a href="'.$PHP_SELF.'?mode=resmsg&no='.$no.'" name="'.$no.'">'.$no.'</a>] ';
@@ -436,9 +463,75 @@ function usrdel(){	//ユーザー削除
 }
 function admin(){	//管理機能
 	global $PHP_SELF,$htmlw,$gzlog;
-	global $del,$apass,$head,$body;
+	global $del,$apass,$head,$js,$body;
 	if ($apass && $apass != ADMIN_PASS)
 	{ error("パスワードが違います"); }
+	$js="<script>
+function ID(s){return document.getElementById(s);}
+function ObjectPos(obj){
+	var curleft = 0;
+	var curtop = 0;
+	if (obj.offsetParent){
+		do {
+			curleft += obj.offsetLeft;
+			curtop += obj.offsetTop;
+		} while (obj = obj.offsetParent);
+	}
+	return [curleft,curtop];
+}
+function hover(o,no){
+	if(!o) ID('tt').style.display='none';
+	else{
+		getComment(no);
+		var opos=ObjectPos(o);
+		with(ID('tt')){
+			style.top=(opos[1]+30)+'px';
+			style.left=opos[0]+'px';
+			style.display='block';
+		}
+	}
+}
+var prevno;
+
+/* 建立XMLHttpRequest物件 */
+function JSONXMLHttpReq(){
+	var objxml = false;
+	/*@cc_on @*/
+	/*@if (@_jscript_version >= 5)
+	try{
+		objxml = new ActiveXObject(\"Msxml2.XMLHTTP\");
+	}catch(e){
+		try{
+			objxml = new ActiveXObject(\"Microsoft.XMLHTTP\");
+		}catch(e2){ objxml = false; }
+	}
+	@end @*/
+	if(!objxml && typeof XMLHttpRequest!='undefined') {
+		objxml = new XMLHttpRequest();
+		if(objxml.overrideMimeType) objxml.overrideMimeType('text/plain');
+	}
+	return objxml;
+}
+var xhttpjson=JSONXMLHttpReq();
+
+function getComment(no){
+	if(xhttpjson && no != prevno){
+		prevno = no;
+		xhttpjson.open('GET','".$PHP_SELF."?mode=getcomment&no='+no, true);
+		xhttpjson.onreadystatechange = ParseComment;
+		xhttpjson.send(null);
+	}
+	else if(no == prevno && ID('tt').innerHTML) ID('tt').style.display='block';
+}
+function ParseComment(){
+	if(xhttpjson.readyState==4){ // 讀取完成
+		ID('tt').innerHTML=xhttpjson.responseText;
+	}
+}
+</script>
+";
+	$dat='';
+	head($dat);
 	echo "$head";
 	echo "$body";
 	echo "[<a href=\"$PHP_SELF?\">掲示板に戻る</a>]";
@@ -470,10 +563,10 @@ function admin(){	//管理機能
 	// 削除画面を表示
 	echo "<form action=\"$PHP_SELF\" method=\"POST\">\n";
 	echo "<input type=hidden name=mode value=\"admin\">\n";
-	echo "<input type=hidden name=apass value=\"$apass\">\n";
-	echo "<center><P>削除したい記事のチェックボックスにチェックを入れ、削除ボタンを押して下さい。\n";
-	echo "<P><table border=0 cellspacing=0>\n";
-	echo "<tr bgcolor=bbbbbb><th>削除</th><th>記事No</th><th>投稿日</th><th>題名</th>";
+	echo "<input type=hidden name=apass value=\"$apass\"><div id='tt' style='display:none;border:#000 solid 1px;background-color:#ffc;position:absolute'></div>\n";
+	echo "<center><P>削除したい記事のチェックボックスにチェックを入れ、削除ボタンを押して下さい。</P>\n";
+	echo "<P></P><table border='0' cellspacing='0'>\n";
+	echo "<tr bgcolor='#bbbbbb'><th>削除</th><th>記事No</th><th>投稿日</th><th>題名</th>";
 	echo "<th>投稿者</th><th>コメント</th><th>ホスト名</th>";
 	echo "</tr>\n";
 
@@ -487,9 +580,9 @@ function admin(){	//管理機能
 		if ($email) { $name="<a href=\"mailto:$email\">$name</a>"; }
 		$com = str_replace("<br />","",$com);
 		//$com = htmlspecialchars($com);
-		if(strlen($com) > 40){ $com = substr($com,0,38) . " ..."; }
+		if(strlen($com) > 40){ $com = str_cut($com,38); }
 
-		echo ($l % 2) ? "<tr bgcolor=#F8F8F8>" : "<tr bgcolor=#DDDDDD>";
+		echo ($l % 2) ? "<tr bgcolor='#F8F8F8' onmouseover='hover(this,".$no.")' onmouseout='hover(null,0)'>" : "<tr bgcolor='#DDDDDD' onmouseover='hover(this,".$no.")' onmouseout='hover(null,0)'>";
 		echo "<th><input type=checkbox name=del[] value=\"$no\"></th>";
 		echo "<th><a href=\"$PHP_SELF?mode=resmsg&no=$no\">$no</a></th><td><small>$date</small></td><td>$sub</td>";
 		echo "<td><b>$name</b></td><td><small>$com</small></td>";
@@ -582,6 +675,12 @@ function renewlog($arrline){//ログ更新	入力:配列
 
 	if(LOCKEY==1){ lock_dir(LOCK) or lock_error(); }
 	if(LOCKEY==3){ m_lock(LOGFILE, true); m_lock(LOGFILE) or lock_error(); }
+
+	if(filesize(LOGFILE)) copy(LOGFILE,LOGFILE.'.bak');
+	else {
+		if(file_exists(LOGFILE.'.bak')) rename(LOGFILE.'.bak',LOGFILE.'.bak2');
+	}
+
 	$rp = $gzlog?gzopen(LOGFILE, "w"):fopen(LOGFILE, "w");
 	if(LOCKEY>=2){ @flock($rp, 2); }
 	set_file_buffer($rp, 0);
@@ -710,7 +809,7 @@ function error($mes){	//エラーフォーマット
 }
 
 function get_comment($sno) {
-	global $gzlog,$PHP_SELF,$hostview;
+	global $gzlog,$PHP_SELF;
 	$view = $gzlog?ungzlog(LOGFILE):file(LOGFILE);
 	$total2= count($view);
 	$s=0;$no=0;
@@ -808,6 +907,9 @@ switch($mode):
 	case 'txt2png':
 		include_once('./txtrender.php');
 		text2etc(get_comment($no),'utf8','png',$trans);
+		break;
+	case 'getcomment':
+		echo get_comment($no);
 		break;
 	case 'admin':
 		admin();
