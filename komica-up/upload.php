@@ -1,6 +1,6 @@
 <?php
 /*********************************************
-	k-up SQL 20091030
+	k-up SQL 20111217
 	http://scrappedblog.blogspot.com/
 	Use SQLite2 database instead of flatfile
 	Add more useful functions
@@ -82,7 +82,7 @@ if(!($act=='get' && $_SERVER['REQUEST_METHOD'] == 'POST')) htmlheader();
 $foot = <<<FOOT
 
 <h2>著作権表示</h2>
-<p id="link"><a href="http://php.s3.to/">レッツPHP!</a> + <a href="http://utu.under.jp">Wastepaper Basket</a> + <a href="http://scrappedblog.blogspot.com/">Roytam1</a>(k-up SQL 20101114)</p>
+<p id="link"><a href="http://php.s3.to/">レッツPHP!</a> + <a href="http://utu.under.jp">Wastepaper Basket</a> + <a href="http://scrappedblog.blogspot.com/">Roytam1</a>(k-up SQL 20111217)</p>
 
 </body>
 </html>
@@ -313,7 +313,7 @@ elseif($act=='mdel') {
 <form method=\"post\" action=\"$PHP_SELF\">
 <p><input type=\"hidden\" name=\"act\" value=\"get\" /><input type=\"hidden\" name=\"id\" value=\"$row[id]\" /></p>
 <h3>下載檔案</h3>
-<p>您將要下載檔案 $prefix".padNum($id).".$row[ext]。</p>";
+<p>您將要下載檔案 $prefix".padNum($id).".$row[ext]。</p><fieldset><legend>備注：</legend>$row[com]</fieldset>";
 	if($row['dpwd'] != '*') $txt.='<p>請輸入下載密碼：<input type="password" size="10" name="downpass" maxlength="10" class="box" tabindex="3" accesskey="3" /></p>';
 	$txt.="<p>檔案名稱：<label><input type='radio' name='name' value='gen' checked='checked'/>$prefix".padNum($id).".$row[ext]</label> ".($row['upfile_name']{0}!='*'?"<label><input type='radio' name='name' value='user'/>$row[upfile_name]</label> </p>":'')."
 <p><input type=\"submit\" value=\"下載\" tabindex=\"8\" accesskey=\"8\" /></p>
@@ -432,7 +432,7 @@ if(isset($GLOBALS['denyuplist'])&&is_array($denyuplist)){
 	/* 自鯖転送 */
 	move_uploaded_file($upfile, $updir.$newname);//3.0.16より後のバージョンのPHP 3または 4.0.2 後
 	//copy($upfile, $updir.$newname);
-	chmod($updir.$newname, 0604);
+	chmod($updir.$newname, 0666);
 
 	$qry = 'SELECT count(*) FROM upload';
 	$rs = sqlite_query($conn,$qry);
