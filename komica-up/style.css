@@ -23,8 +23,9 @@ h3 {
 	font-weight: normal;
 	font-size: 90%;
 	text-align: left;
-	margin: 0;
+	margin: 0 0 0.2em 0;
 	padding: 0;
+	border-bottom: 1px #99CCCC dotted;
 }
 p {
 	font-size: 90%;
@@ -115,6 +116,12 @@ ul,li {
 	margin-top: 0;
 	margin-bottom: 0;
 }
+
+fieldset {
+	margin:0.45em 0 0.75em 0;
+	border:1px #99CCCC solid;
+}
+
 #up_progress { display:none; }
 #progressbarborder {
 	display:none;
@@ -126,4 +133,8 @@ ul,li {
 	width:0%;
 	height:1em;
 	background-color:#99CCCC;
+}
+.rb {
+	color:red;
+	font-weight:bold;
 }
