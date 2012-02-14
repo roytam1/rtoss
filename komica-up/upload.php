@@ -82,7 +82,7 @@ if(!($act=='get' && $_SERVER['REQUEST_METHOD'] == 'POST')) htmlheader();
 $foot = <<<FOOT
 
 <h2>著作権表示</h2>
-<p id="link"><a href="http://php.s3.to/">レッツPHP!</a> + <a href="http://utu.under.jp">Wastepaper Basket</a> + <a href="http://scrappedblog.blogspot.com/">Roytam1</a>(k-up SQL 20111217)</p>
+<p id="link"><a href="http://php.s3.to/">レッツPHP!</a> + <a href="http://utu.under.jp">Wastepaper Basket</a> + <a href="http://scrappedblog.blogspot.com/">Roytam1</a>(k-up SQL 20120214)</p>
 
 </body>
 </html>
@@ -203,20 +203,22 @@ $host = @gethostbyaddr($REMOTE_ADDR);
 if(!$upcook) $upcook=@implode(",",array($f_act,$f_dlcnt,$f_com,$f_size,$f_mime,$f_date,$f_dlim,$f_orig));
 list($c_act,$c_dlcnt,$c_com,$c_size,$c_mime,$c_date,$c_dlim,$c_orig)=explode(',',$upcook);
 
+session_start();
+
 /* アクセス制限 */
 if(isset($GLOBALS['denylist'])&&is_array($denylist)){
 	if(BanIPHostCheck($REMOTE_ADDR,$host,$denylist)) error('<h2>錯誤</h2>
 <p class="error">存取限制：您沒有使用權限</p>');
 }
 /* 削除実行 */
-if($delid && $delpass!=''){
+if($delid && ($delpass!='' || (isset($_SESSION['adminlogin']) && $_SESSION['adminlogin'] === true))){
 	$qry = 'SELECT * FROM upload WHERE id = '.$delid;
 	$rs = sqlite_query($conn,$qry);
 	$row = sqlite_fetch_array($rs);
 
 	if(!$row) error('<h2>錯誤</h2>
 <p class="error">刪除錯誤：此檔案找不到</p>');
-	if($delpass == $admin || substr(md5($delpass), 2, 7) == $row['pwd']){
+	if($delpass == $admin || (isset($_SESSION['adminlogin']) && $_SESSION['adminlogin'] === true) || substr(md5($delpass), 2, 7) == $row['pwd']){
 		if(file_exists($updir.$prefix.padNum($delid).'.'.$row['ext'])) unlink($updir.$prefix.padNum($delid).'.'.$row['ext']);
 
 		$qry = 'DELETE FROM upload WHERE id = '.$delid;
@@ -239,6 +241,7 @@ if($del){
 ");
 }
 /* 環境設定フォーム */
+do {
 if($act=="env"){
 	error("<h2>環境設定</h2>
 <form method=\"get\" action=\"$PHP_SELF\">
@@ -260,9 +263,19 @@ if($act=="env"){
 ");
 }
 elseif($act=='mdel') {
+	if(!isset($_POST['mdid']) && $delpass==$admin) {
+		$_SESSION['adminlogin']=true;
+		$act='mult';
+		break;
+	}
+	if(!isset($_POST['mdid']) && isset($_SESSION['adminlogin']) && $_SESSION['adminlogin']==true) {
+		unset($_SESSION['adminlogin']);
+		break;
+	}
+
 	if(!isset($_POST['mdid'])) error('<h2>錯誤</h2>
 <p class="error">刪除錯誤:未選擇檔案</p>');
-	if($delpass==$admin) {
+	if($delpass==$admin || (isset($_SESSION['adminlogin']) && $_SESSION['adminlogin']==true)) {
 		$qry = 'SELECT * FROM upload WHERE id IN ('.implode(',',$_POST['mdid']).')';
 		$rs = sqlite_query($conn,$qry);
 		while($row = sqlite_fetch_array($rs)) {
@@ -354,6 +367,8 @@ error($txt);
 <p class="error">下載錯誤：密碼錯誤</p>');
 	}
 }
+
+} while(false);
 /* アプロード書き込み処理 */
 if(file_exists($upfile) && $com && $upfile_size > 0){
 /* うｐアクセス制限 */
@@ -501,7 +516,7 @@ if($page == 'all'){
 echo paging($page, $rows);//ページリンク
 //メインヘッダ
 echo "</p>\n";
-if($act=='mult')	echo "<form action=\"$PHP_SELF\" method=POST><input type='hidden' name='act' value='mdel'/>";
+if($act=='mult') echo "<form action=\"$PHP_SELF\" method=POST><input type='hidden' name='act' value='mdel'/>";
 echo "<table summary=\"files\">\n<tr>";
 if($c_act) echo '<th abbr="delete" scope="col">刪</th>';
 echo '<th abbr="name" scope="col">檔名</th>';
@@ -534,7 +549,7 @@ while($row = sqlite_fetch_array($rs)) {
 	if($c_com) echo "<td>$pmark$row[com]</td>";
 	if($c_size) echo "<td class=\"size\">$fsize</td>";
 	if($c_mime) echo "<td>$row[upfile_type]</td>";
-	if($c_date) echo "<td>$row[now]</td>\n";
+	if($c_date) echo "<td>$row[now]".(isset($_SESSION['adminlogin'])&&$_SESSION['adminlogin']==true?' <span class="rb">Host</span>: '.$row['host']:'')."</td>\n";
 	if($c_dlim) {
 		$dlimit='';
 		if($row['tlim']) $dlimit=$row['tlim'].'分';
@@ -542,7 +557,7 @@ while($row = sqlite_fetch_array($rs)) {
 		if(!$dlimit) $dlimit='無';
 		echo "<td>$dlimit</td>";
 	}
-	if($c_orig) echo "<td class=\"orig\">\n".($row['upfile_name']{0}=='*'?'':$row['upfile_name'])."</td>\n";
+	if($c_orig) echo "<td class=\"orig\">\n".($row['upfile_name']{0}=='*'?(isset($_SESSION['adminlogin'])&&$_SESSION['adminlogin']==true?substr($row['upfile_name'],1):''):$row['upfile_name'])."</td>\n";
 	echo "</tr>\n";
 	}
 
