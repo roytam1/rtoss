@@ -1,44 +1,54 @@
 <?php
 if (phpversion()>="4.1.0"){
-  extract($_SERVER);
-  extract($_REQUEST);
+	extract($_SERVER);
+	extract($_REQUEST);
 }
 /***********************************
-  * DLƒJƒEƒ“ƒ^         by ToR
-  *
-  * http://php.s3.to/
-  * 2001/10/23
-  **********************************
-  * DLƒJƒEƒ“ƒ^‚Å‚·
-  * ƒtƒ@ƒCƒ‹‚É
-  * ID|ƒJƒEƒ“ƒg|êŠ|“o˜^“ú|ƒ^ƒCƒgƒ‹|QÆURL|‚ğ‹L˜^‚µ‚Ü‚·
-  * ŠÇ—ƒ‚[ƒh‚ÍJavaScript‚ğg—p‚µ‚Ä‚¢‚Ü‚·B
-  * w’èƒŠƒ“ƒNŒ³ˆÈŠO‚ÍDL‚µ‚È‚¢‚æ‚¤‚Éo—ˆ‚Ü‚·
-  * http://www.proxy2.de‚Ìtop_dl‚ğQl‚É‚µ‚Ü‚µ‚½
-  *
-  * 2002/08/19 ”FØ‹­‰»Bà–¾•ÏX•s‰ÂA‰»‚¯ƒoƒOC³
-  * 2002/09/13 ROOT‚â‚ßB‘Š‘ÎÊß½‚Å‚à‰Â
-  *
-  * ƒtƒ@ƒCƒ‹‚ÌêŠ‚Æ‰ğàƒy[ƒW‚ÍAdl.php‚©‚ç‚Ì‘Š‘ÎÊß½‚©Aƒtƒ‹URL‚ğ‘‚«‚Ü‚·
-  */
-define(LOGFILE, "dllog.txt");		/* ƒƒOƒtƒ@ƒCƒ‹–¼ */
+	* DLã‚«ã‚¦ãƒ³ã‚¿         by ToR
+	*
+	* http://php.s3.to/
+	* 2001/10/23
+	**********************************
+	* DLã‚«ã‚¦ãƒ³ã‚¿ã§ã™
+	* ãƒ•ã‚¡ã‚¤ãƒ«ã«
+	* ID|ã‚«ã‚¦ãƒ³ãƒˆ|å ´æ‰€|ç™»éŒ²æ—¥|ã‚¿ã‚¤ãƒˆãƒ«|å‚ç…§URL|ã‚’è¨˜éŒ²ã—ã¾ã™
+	* ç®¡ç†ãƒ¢ãƒ¼ãƒ‰ã¯JavaScriptã‚’ä½¿ç”¨ã—ã¦ã„ã¾ã™ã€‚
+	* æŒ‡å®šãƒªãƒ³ã‚¯å…ƒä»¥å¤–ã¯DLã—ãªã„ã‚ˆã†ã«å‡ºæ¥ã¾ã™
+	* http://www.proxy2.deã®top_dlã‚’å‚è€ƒã«ã—ã¾ã—ãŸ
+	*
+	* 2002/08/19 èªè¨¼å¼·åŒ–ã€‚èª¬æ˜å¤‰æ›´ä¸å¯ã€åŒ–ã‘ãƒã‚°ä¿®æ­£
+	* 2002/09/13 ROOTã‚„ã‚ã€‚ç›¸å¯¾ï¾Šï¾Ÿï½½ã§ã‚‚å¯
+	*
+	* ãƒ•ã‚¡ã‚¤ãƒ«ã®å ´æ‰€ã¨è§£èª¬ãƒšãƒ¼ã‚¸ã¯ã€dl.phpã‹ã‚‰ã®ç›¸å¯¾ï¾Šï¾Ÿï½½ã‹ã€ãƒ•ãƒ«URLã‚’æ›¸ãã¾ã™
+	*/
+define(LOGFILE, "dllog.txt");		/* ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«å */
 
-define(ADMINPASS, "0123");		/* ŠÇ—ƒpƒX */
-define(SHOW_DEF,15);			/* ƒ‰ƒ“ƒN‚ÍÅ‰‰½Œ•\¦H */
+define(ADMINPASS, "0123");		/* ç®¡ç†ãƒ‘ã‚¹ */
+define('SHOW_DEF','all');			/* ãƒ©ãƒ³ã‚¯ã¯æœ€åˆä½•ä»¶è¡¨ç¤ºï¼Ÿ */
 
-define(BAR, "aqua.gif");		/* ƒo[‚Ì‰æ‘œ */
-define(HEIGHT, 10);			/* ‰æ‘œ‚Ì‚‚³ */
+define('BAR', 'aqua.gif');		/* ãƒãƒ¼ã®ç”»åƒ */
+define('HEIGHT', 10);			/* ç”»åƒã®é«˜ã• */
 
-define(REFCHECK, 0);			/* ƒŠƒ“ƒNŒ³ƒ`ƒFƒbƒN‚·‚éH‚·‚éê‡« */
-$okurl = array('http://php.s3.to');	/* ‚±‚ÌƒŠƒXƒgˆÈŠO‚©‚ç‚ÌDL‚Í•s‰Â */
+define('NODETAILS', false);			/* è©³ç´°ãƒ‡ãƒ¼ã‚¿è¡¨ç¤ºï¼Ÿ */
 
-/* ‚Ö‚Á‚¾•”•ª */
+define(REFCHECK, 0);			/* ãƒªãƒ³ã‚¯å…ƒãƒã‚§ãƒƒã‚¯ã™ã‚‹ï¼Ÿã™ã‚‹å ´åˆâ†“ */
+$okurl = array('http://php.s3.to');	/* ã“ã®ãƒªã‚¹ãƒˆä»¥å¤–ã‹ã‚‰ã®DLã¯ä¸å¯ */
+
+$xsendfile = false;   // use x-sendfile header?
+                      // false: use PHP readfile_chunked()
+                      // 'X-sendfile': for apache mod_xsendfile/lighttpd-1.5
+                      // 'X-LIGHTTPD-send-file': for lighttpd-1.4.20+
+                      // 'X-Accel-Redirect': for nginx
+$xendfile_prefix = dirname(__FILE__).'/'; // path prefix for x-sendfile
+
+/* ã¸ã£ã éƒ¨åˆ† */
 function head(){
-  global $PHP_SELF;
-  $this_day = gmdate("Y/m/d(D) H:i:s", time()+9*3600);//Œ»İ
-  ?>
+	global $PHP_SELF;
+	$this_day = gmdate("Y/m/d(D) H:i:s", time()+8*3600);//ç¾åœ¨æ™‚åˆ»
+	?>
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Top Downloads</title>
 <style type=text/css>
 td { font-family: Arial, Helvetica, sans-serif; font-size: 8pt}
@@ -47,12 +57,13 @@ select {  font-family: Arial, Helvetica, sans-serif; font-size: 8pt}
 input {  font-size: 8pt}
 tt {  font-family: Verdana, Arial; font-size: 13pt; font-weight: bold;color:f08020;}
 a {  text-decoration: none}
+.bar {  height:1em; background-color:#6666CC;float:left;}
 </style>
 <script language="Javascript">
 <!--
-  function ViewDetail(target,selObj) {
-    eval(target+".location='<? echo $PHP_SELF;?>?job=detail&detail="+selObj.options[selObj.selectedIndex].value+"'");
-  }
+	function ViewDetail(target,selObj) {
+		eval(target+".location='<? echo $PHP_SELF;?>?job=detail&detail="+selObj.options[selObj.selectedIndex].value+"'");
+	}
 // -->
 </script>
 </head>
@@ -60,189 +71,230 @@ a {  text-decoration: none}
 <br>
 <form method="post" action="<? echo $PHP_SELF;?>">
 <table width="560" border="0" cellspacing="0" cellpadding="2" height="55" align="center">
-  <tr> 
-    <td> <tt>ƒŒƒbƒcPHP! Downloads </tt></td>
-    <td align="right"> <img src="point.gif" width="9" height="9"><a href="<? echo $PHP_SELF;?>?job=admin">Administration</a></td>
-  </tr>
-  <tr>
-    <td><img src="point.gif" width="9" height="9"><b>Date: <? echo $this_day;?></b></td>
-    <td align="right">
-       <select name="files" onChange="ViewDetail('self',this)">
-         <option selected>show details</option>
+	<tr> 
+		<td> <tt>ãƒ¬ãƒƒãƒ„PHP! Downloads </tt></td>
+		<td align="right"> <small style="text-color:blue">â–¶</small><a href="<? echo $PHP_SELF;?>?job=admin">Administration</a></td>
+	</tr>
+	<tr>
+		<td><small style="text-color:blue">â–¶</small><b>Date: <? echo $this_day;?></b></td>
+		<td align="right">
 <?php
 }
-/* ƒtƒbƒ^•”•ª */
+/* ãƒ•ãƒƒã‚¿éƒ¨åˆ† */
 function foot() {
-  ?>
+	?>
  <table border=0 width="560" align="center" cellspacing="1" cellpadding="3">
-  <tr> 
-    <td valign="top"><a href="http://php.s3.to/" target=_new">PHP Downloads</a></td>
-      <td align="right">
-       <select name="option">
-         <option value="total" selected>Total</option>
-         <option value="perDay">Per day</option>
-       </select>
-       <select name="top">
-         <option value="10" selected>Top 10</option>
-         <option value="15">Top 15</option>
-         <option value="20">Top 20</option>
-         <option value="30">Top 30</option>
-         <option value="all">all</option>
-       </select>
-       <input type="submit" value="Submit">
-    </td>
-  </tr>
+	<tr> 
+		<td valign="top"><a href="http://php.s3.to/" target="_blank">PHP Downloads</a></td>
+			<td align="right">
+			 <select name="option">
+				 <option value="total" selected>Total</option>
+				 <option value="perDay">Per day</option>
+			 </select>
+			 <select name="top">
+				 <option value="10" selected>Top 10</option>
+				 <option value="15">Top 15</option>
+				 <option value="20">Top 20</option>
+				 <option value="30">Top 30</option>
+				 <option value="all">all</option>
+			 </select>
+			 <input type="submit" value="Submit">
+		</td>
+	</tr>
 </table>
 </form>
 </body>
 </html>
 <?php
-  exit;
+	exit;
 }
-/* ƒJƒEƒ“ƒgƒAƒbƒv‚ÆDL */
-function count_dl($id){
 
-  $lines = file(LOGFILE);	//ƒtƒ@ƒCƒ‹“Ç‚İ‚İ
-  $find = FALSE;		//ƒtƒ‰ƒO
-  for($i=0; $i<count($lines); $i++){
-    list($file_id,$count,$location,$stamp,$descript,$ref) = explode("|",$lines[$i]);
-    if($id == $file_id){	//Œ©‚Â‚©‚Á‚½‚çƒJƒEƒ“ƒgƒAƒbƒv
-      $find=TRUE;
-      $count++;
-      $lines[$i] = "$file_id|$count|$location|$stamp|$descript|$ref|\n";//‘‚«Š·‚¦
-      $redirect = $location;	//ƒtƒ@ƒCƒ‹ˆÊ’uŒˆ’è
-      break;
-    }
-  }
-  if($find){//ƒ^[ƒQƒbƒg‚ªŒ©‚Â‚©‚Á‚½‚çDL
-    //ƒƒOXV
-    $fp = fopen(LOGFILE, "w");
-    flock($fp, LOCK_EX);
-    fputs($fp, implode("", $lines));
-    fclose($fp);
-    if(eregi("^(f|ht)tp:\/\/[._a-z0-9-]+",$redirect)){
-      header("Location: $redirect");//URL‚Ìê‡Location
-    }else{//ƒ[ƒJƒ‹‚Ìê‡ƒ_ƒCƒAƒƒO
-      header("Content-Type: application/octet-stream; name=".basename($redirect));
-      header("Content-Disposition: attachment; filename=".basename($redirect));
-      readfile($redirect);//“Ç‚İ‚İ
-    }
-  }else{
-    die("‘ÎÛƒtƒ@ƒCƒ‹‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñI");
-  }
-  exit;
+// faster readfile()
+function readfile_chunked($filename,$retbytes=true) {
+   $chunksize = 1*(1024*1024); // how many bytes per chunk
+   $buffer = '';
+   $cnt =0;
+   // $handle = fopen($filename, 'rb');
+   $handle = fopen($filename, 'rb');
+   if ($handle === false) return false;
+   while (!feof($handle)) {
+       $buffer = fread($handle, $chunksize);
+       echo $buffer;
+       ob_flush();flush();
+       if ($retbytes) $cnt += strlen($buffer);
+   }
+   $status = fclose($handle);
+   if ($retbytes && $status) {
+       return $cnt; // return num. bytes delivered like readfile() does.
+   }
+   return $status;
 }
-/* ƒ‰ƒ“ƒLƒ“ƒO•\¦ */
+
+/* ã‚«ã‚¦ãƒ³ãƒˆã‚¢ãƒƒãƒ—ã¨DL */
+function count_dl($id){
+	global $xsendfile, $xendfile_prefix;
+
+	$lines = file(LOGFILE);	//ãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿
+	$find = FALSE;		//ãƒ•ãƒ©ã‚°
+	for($i=0; $i<count($lines); $i++){
+		list($file_id,$count,$location,$stamp,$descript,$ref) = explode("|",$lines[$i]);
+		if($id == $file_id){	//è¦‹ã¤ã‹ã£ãŸã‚‰ã‚«ã‚¦ãƒ³ãƒˆã‚¢ãƒƒãƒ—
+			$find=TRUE;
+			$count++;
+			$lines[$i] = "$file_id|$count|$location|$stamp|$descript|$ref|\n";//æ›¸ãæ›ãˆ
+			$redirect = $location;	//ãƒ•ã‚¡ã‚¤ãƒ«ä½ç½®æ±ºå®š
+			break;
+		}
+	}
+	if($find){//ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãŒè¦‹ã¤ã‹ã£ãŸã‚‰DL
+		//ãƒ­ã‚°æ›´æ–°
+		$fp = fopen(LOGFILE, "w");
+		flock($fp, LOCK_EX);
+		fputs($fp, implode("", $lines));
+		fclose($fp);
+		if(eregi("^(f|ht)tp:\/\/[._a-z0-9-]+",$redirect)){
+			header("Location: $redirect");//URLã®å ´åˆLocation
+		}else{//ãƒ­ãƒ¼ã‚«ãƒ«ã®å ´åˆãƒ€ã‚¤ã‚¢ãƒ­ã‚°
+			header("Content-Type: application/octet-stream; name=".basename($redirect));
+			header("Content-Disposition: attachment; filename=".basename($redirect));
+			if($xsendfile == false) {
+				readfile_chunked($redirect);
+//				readfile($redirect);//èª­ã¿è¾¼ã¿
+			} else {
+				header($xsendfile.': '.$xendfile_prefix.$redirect);
+			}
+			exit;
+		}
+	}else{
+		die("å¯¾è±¡ãƒ•ã‚¡ã‚¤ãƒ«ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ï¼");
+	}
+	exit;
+}
+/* ãƒ©ãƒ³ã‚­ãƒ³ã‚°è¡¨ç¤º */
 function show_table($top,$option){
 
-  head();//ƒwƒbƒ_•\¦
-  //ƒy[ƒWˆ—
-  $lines = file(LOGFILE);
-  $now = time();
+	head();//ãƒ˜ãƒƒãƒ€è¡¨ç¤º
+	//ãƒšãƒ¼ã‚¸å‡¦ç†
+	$lines = file(LOGFILE);
+	$now = time();
 
-  if($top == all) $top = count($lines);
-  else $top = (preg_match("/^(\d+)/",$top)) ? $top : SHOW_DEF;
-  //ƒ\[ƒg—p‚É“Ç‚İ‚Ş
-  for($i=0; $i<count($lines); $i++){
-    list($file_id,$num,$location,$stamp,$descript,$refurl) = explode("|",$lines[$i]);
-    if($option=="perDay"){
-      $dl_perday = ($now-$stamp>86400) ? sprintf("%.2f",($num*86400/($now-$stamp))) : 0;
-      $num_arr[$descript] = $dl_perday;	//ƒ‰ƒ“ƒN—p
-      $name_arr[$file_id] = $descript;	//‰Eã‘I‘ğ—p
-      $ref_arr[$descript] = $refurl;	//QÆ—p
-      $total += $dl_perday;			//‡ŒvƒJƒEƒ“ƒgŒvZ
-    }else{
-      $num_arr[$descript] = $num;	//ƒ‰ƒ“ƒN—p
-      $name_arr[$file_id] = $descript;	//‰Eã‘I‘ğ—p
-      $ref_arr[$descript] = $refurl;	//QÆ—p
-      $total += $num;			//‡ŒvƒJƒEƒ“ƒgŒvZ
-    }
-  }
-  arsort($num_arr);			//”š‚Ì‘å‚«‚¢‡
-  asort($name_arr);			//–¼‘O‚Ì¬‚³‚¢‡
-  //‰Eã•”•ªì¬
-  while(list($fileid,$desc)=each($name_arr)){
-    echo "        <option value=\"$fileid\">$desc</option>\n";
-  }
-  //ƒe[ƒuƒ‹ƒwƒbƒ_
-  echo "      </select>\n    </td>\n  </tr>\n</table>\n";
-  echo "<table bgcolor=\"F7F7F7\" border=0 cellpadding=3 cellspacing=2 width=560 align=center>\n"; 
-  echo "  <tr><td colspan=4 bgcolor=\"A8C1F1\"><font color=\"#000099\"><b>Top $top Downloads</b></font></td></tr>\n";
-  //‡Œv‚ª‚ ‚Á‚½‚ç
-  if($total > 0){
-    $flag = FALSE;	//ˆêˆÊƒtƒ‰ƒO
-    while(list($title,$value)=each($num_arr)){
-      if ($show < $top) {//ãˆÊ‰½Œ
-        $tmp = $rank;						//ˆÈ‘O‚Ì”
-        $rank = $value;						//V‚µ‚¢”
-        if($tmp != $rank) $num = $show + 1;			//ˆá‚¤‚È‚çƒ‰ƒ“ƒNƒAƒv
-        if(!$flag) $top_pos = $value;				//ˆêˆÊƒf[ƒ^
-        $per = sprintf("%.1f %%",($value *100 / $total));	//“ƒtƒH[ƒ}ƒbƒg
-        $img_width = ($value * 310 / $top_pos);			//ƒo[•Œˆ’è
-        if($ref_arr[$title]) $title = "<a href=\"$ref_arr[$title]\">$title</a>";
-        echo "<tr><td align=center><b>$num</b></td><td>$title</td><td nowrap><img src=\"".BAR."\" width=$img_width height=".HEIGHT."> $value </td><td>$per</td></tr>\n";
-        $show++;						//•\¦ƒJƒEƒ“ƒg
-        $flag = TRUE;
-      }else{
-        break;
-      }
-    }
-  }
-  foot();//ƒtƒbƒ^•\¦
+	if($top == 'all') $top = count($lines);
+	else $top = (preg_match("/^(\d+)/",$top)) ? $top : (SHOW_DEF == 'all' ? count($lines) : SHOW_DEF);
+	//ã‚½ãƒ¼ãƒˆç”¨ã«èª­ã¿è¾¼ã‚€
+	for($i=0; $i<count($lines); $i++){
+		list($file_id,$num,$location,$stamp,$descript,$refurl) = explode("|",$lines[$i]);
+		if($option=="perDay"){
+			$dl_perday = ($now-$stamp>86400) ? sprintf("%.2f",($num*86400/($now-$stamp))) : 0;
+			$num_arr[$descript] = $dl_perday;	//ãƒ©ãƒ³ã‚¯ç”¨
+			$name_arr[$file_id] = $descript;	//å³ä¸Šé¸æŠç”¨
+			$ref_arr[$descript] = $refurl;	//å‚ç…§ç”¨
+			$total += $dl_perday;			//åˆè¨ˆã‚«ã‚¦ãƒ³ãƒˆè¨ˆç®—
+		}else{
+			$num_arr[$descript] = $num;	//ãƒ©ãƒ³ã‚¯ç”¨
+			$name_arr[$file_id] = $descript;	//å³ä¸Šé¸æŠç”¨
+			$ref_arr[$descript] = $refurl;	//å‚ç…§ç”¨
+			$total += $num;			//åˆè¨ˆã‚«ã‚¦ãƒ³ãƒˆè¨ˆç®—
+		}
+	}
+	arsort($num_arr);			//æ•°å­—ã®å¤§ãã„é †
+	asort($name_arr);			//åå‰ã®å°ã•ã„é †
+	//å³ä¸Šéƒ¨åˆ†ä½œæˆ
+	if(!NODETAILS) {
+		echo '       <select name="files" onChange="ViewDetail(\'self\',this)">
+       <option selected>show details</option>
+';
+		while(list($fileid,$desc)=each($name_arr)){
+			echo "        <option value=\"$fileid\">$desc</option>\n";
+		}
+		echo "      </select>\n";
+	}
+	//ãƒ†ãƒ¼ãƒ–ãƒ«ãƒ˜ãƒƒãƒ€
+	echo "      </select>\n    </td>\n  </tr>\n</table>\n";
+	echo "<table bgcolor=\"F7F7F7\" border=0 cellpadding=3 cellspacing=2 width=560 align=center>\n"; 
+	echo "  <tr><td colspan=4 bgcolor=\"A8C1F1\"><font color=\"#000099\"><b>Top $top Downloads</b></font></td></tr>\n";
+	//åˆè¨ˆãŒã‚ã£ãŸã‚‰
+	if($total > 0){
+		$flag = FALSE;	//ä¸€ä½ãƒ•ãƒ©ã‚°
+		while(list($title,$value)=each($num_arr)){
+			if ($show < $top) {//ä¸Šä½ä½•ä»¶
+				$tmp = $rank;						//ä»¥å‰ã®æ•°
+				$rank = $value;						//æ–°ã—ã„æ•°
+				if($tmp != $rank) $num = $show + 1;			//é•ã†ãªã‚‰ãƒ©ãƒ³ã‚¯ã‚¢ãƒ—
+				if(!$flag) $top_pos = $value;				//ä¸€ä½ãƒ‡ãƒ¼ã‚¿
+				$per = sprintf("%.1f %%",($value *100 / $total));	//ï¼…ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+				$img_width = ($value * 310 / $top_pos);			//ãƒãƒ¼å¹…æ±ºå®š
+				if($ref_arr[$title]) $title = "<a href=\"$ref_arr[$title]\">$title</a>";
+				echo "<tr><td align=center><b>$num</b></td><td>$title</td><td nowrap><div class=\"bar\" style=\"width:".$img_width."px\"></div> $value </td><td>$per</td></tr>\n";
+				$show++;						//è¡¨ç¤ºã‚«ã‚¦ãƒ³ãƒˆ
+				$flag = TRUE;
+			}else{
+				break;
+			}
+		}
+	}
+	foot();//ãƒ•ãƒƒã‚¿è¡¨ç¤º
 }
-/* Ú×ƒf[ƒ^•\¦ */
+/* è©³ç´°ãƒ‡ãƒ¼ã‚¿è¡¨ç¤º */
 function show_detail($id){
 
-  head();//ƒwƒbƒ_•\¦
-  $now = time();
-  //‰Eã•”•ª
-  $lines = file(LOGFILE);
-  for($i=0; $i<count($lines); $i++){
-    list($file_id,$num,$location,$stamp,$descript,) = explode("|",$lines[$i]);
-    $name_arr[$file_id] = $descript;
-    $total += $num;
-  }
-  asort($name_arr);
-  while(list($fileid,$desc)=each($name_arr)){
-    echo "        <option value=\"$fileid\">$desc</option>\n";
-  }
-  //ƒe[ƒuƒ‹ƒwƒbƒ_
-  echo "      </select>\n    </td>\n  </tr>\n</table>\n";
-  echo "<table bgcolor=\"F7F7F7\" border=0 cellpadding=3 cellspacing=2 width=560 align=center>\n"; 
-  echo "  <tr><td colspan=4 bgcolor=\"A8C1F1\"><font color=\"#000099\"><b>Top $top Downloads</b></font></td></tr>\n";
-  //€–Ú–¼‚Ì”z—ñ
-  $details = array('ƒtƒ@ƒCƒ‹–¼','ƒ^ƒCƒgƒ‹','“o˜^“ú','Œo‰ß“ú”','ˆê“ú‚ ‚½‚è‚ÌDL”','‡ŒvDL”','‘S‘Ì‚ÌŠ„‡','‰ğàƒy[ƒW');
-  reset($lines);//ˆê‰ƒŠƒZƒbƒg
-  for($i=0; $i<count($lines); $i++){
-    list($file_id,$count,$location,$stamp,$descript,$refurl) = explode("|",$lines[$i]);
-    if($id == $file_id){
-      $file_date = date("Y/m/d(D) H:i:s", $stamp);	//ƒf[ƒ^“o˜^“ú
-      $total_days = (int)(($now-$stamp)/86400);		//Œo‰ß“ú”
-      //ˆê“ú‚ ‚½‚è‚ÌDL”
-      $dl_perday = ($now-$stamp>86400) ? sprintf("%.2f",($count*86400/($now-$stamp))) : 0;
-      $percent = sprintf("%.2f%%",($count*100/$total));//‘S‘Ì‚É‚¨‚¯‚éŠ„‡
-      $link = "<a href=\"$refurl\">$refurl</a>";
-      break;
-    }
-  }
-  //ƒf[ƒ^‚Ì”z—ñ
-  $vals = array($file_id,$descript,$file_date,$total_days,$dl_perday,$count,$percent,$link);
-  //‘Î‰‚³‚¹‚Ä•\¦
-  for($c=0; $c<count($details); $c++){
-    echo "  <tr>\n    <td width=35% bgcolor=ced5ff>$details[$c]</td>\n    <td bgcolor=e0e8ff>$vals[$c]</td>\n  </tr>\n";
-  }
-  
-  echo "<tr><td colspan=2 align=left bgcolor=A8C1F1><a href=\"$GLOBALS[PHP_SELF]\">&lt;&lt;Back</a></td></tr>";
-  echo "</table>\n";
-  foot();//ƒtƒbƒ^•\¦
+	head();//ãƒ˜ãƒƒãƒ€è¡¨ç¤º
+	if(!NODETAILS) {
+		$now = time();
+		//å³ä¸Šéƒ¨åˆ†
+		$lines = file(LOGFILE);
+		for($i=0; $i<count($lines); $i++){
+			list($file_id,$num,$location,$stamp,$descript,) = explode("|",$lines[$i]);
+			$name_arr[$file_id] = $descript;
+			$total += $num;
+		}
+		asort($name_arr);
+		echo '       <select name="files" onChange="ViewDetail(\'self\',this)">
+       <option selected>show details</option>
+';
+		while(list($fileid,$desc)=each($name_arr)){
+			echo "        <option value=\"$fileid\">$desc</option>\n";
+		}
+		//ãƒ†ãƒ¼ãƒ–ãƒ«ãƒ˜ãƒƒãƒ€
+		echo "      </select>\n    </td>\n  </tr>\n</table>\n";
+		echo "<table bgcolor=\"F7F7F7\" border=0 cellpadding=3 cellspacing=2 width=560 align=center>\n"; 
+		echo "  <tr><td colspan=4 bgcolor=\"A8C1F1\"><font color=\"#000099\"><b>Top $top Downloads</b></font></td></tr>\n";
+		//é …ç›®åã®é…åˆ—
+		$details = array('ãƒ•ã‚¡ã‚¤ãƒ«å','ã‚¿ã‚¤ãƒˆãƒ«','ç™»éŒ²æ—¥','çµŒéæ—¥æ•°','ä¸€æ—¥ã‚ãŸã‚Šã®DLæ•°','åˆè¨ˆDLæ•°','å…¨ä½“ã®å‰²åˆ','è§£èª¬ãƒšãƒ¼ã‚¸');
+		reset($lines);//ä¸€å¿œãƒªã‚»ãƒƒãƒˆ
+		for($i=0; $i<count($lines); $i++){
+			list($file_id,$count,$location,$stamp,$descript,$refurl) = explode("|",$lines[$i]);
+			if($id == $file_id){
+				$file_date = date("Y/m/d(D) H:i:s", $stamp);	//ãƒ‡ãƒ¼ã‚¿ç™»éŒ²æ—¥
+				$total_days = (int)(($now-$stamp)/86400);		//çµŒéæ—¥æ•°
+				//ä¸€æ—¥ã‚ãŸã‚Šã®DLæ•°
+				$dl_perday = ($now-$stamp>86400) ? sprintf("%.2f",($count*86400/($now-$stamp))) : 0;
+				$percent = sprintf("%.2f%%",($count*100/$total));//å…¨ä½“ã«ãŠã‘ã‚‹å‰²åˆ
+				$link = "<a href=\"$refurl\">$refurl</a>";
+				break;
+			}
+		}
+		//ãƒ‡ãƒ¼ã‚¿ã®é…åˆ—
+		$vals = array($file_id,$descript,$file_date,$total_days,$dl_perday,$count,$percent,$link);
+		//å¯¾å¿œã•ã›ã¦è¡¨ç¤º
+		for($c=0; $c<count($details); $c++){
+			echo "  <tr>\n    <td width=35% bgcolor=ced5ff>$details[$c]</td>\n    <td bgcolor=e0e8ff>$vals[$c]</td>\n  </tr>\n";
+		}
+		
+		echo "<tr><td colspan=2 align=left bgcolor=A8C1F1><a href=\"$GLOBALS[PHP_SELF]\">&lt;&lt;Back</a></td></tr>";
+		echo "</table>\n";
+	} else {
+		echo "</td>\n  </tr>\n</table>\n
+		<table border=0 cellpadding=3 cellspacing=2 width=560 align=center><tr><td>ãã‚“ãªæ©Ÿèƒ½ãªã„ã‚‚ã‚“ã€‚</td>\n  </tr>\n</table>";
+	}
+	foot();//ãƒ•ãƒƒã‚¿è¡¨ç¤º
 }
-/* ŠÇ—‰æ–Ê•\¦@*/
+/* ç®¡ç†ç”»é¢è¡¨ç¤ºã€€*/
 function show_track(){
-  global $PHP_SELF;
+	global $PHP_SELF;
 
-  $jump = $PHP_SELF."?job=admin&admin=".md5(ADMINPASS);
+	$jump = $PHP_SELF."?job=admin&admin=".md5(ADMINPASS);
 
-  ?>
+	?>
 <html><head>
 <meta http-equiv="Expires" content="Tue, 01 Jan 1980 1:00:00 GMT">
 <meta http-equiv="Pragma" content="no-cache">
@@ -261,63 +313,63 @@ tt {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 13pt; font-
 function check_char(strg) {
  var found = 0;
  for (char_pos=0; char_pos<strg.length; char_pos++) {
-    if (strg.charAt(char_pos) == "|" || strg.charAt(char_pos) == "&" || strg.charAt(char_pos) == "=" || strg.charAt(char_pos) == '"' || strg.charAt(char_pos) == "'") {
-       found = 1;
-       break;
-    }
+		if (strg.charAt(char_pos) == "|" || strg.charAt(char_pos) == "&" || strg.charAt(char_pos) == "=" || strg.charAt(char_pos) == '"' || strg.charAt(char_pos) == "'") {
+			 found = 1;
+			 break;
+		}
  }
  return (found == 1) ? false : true;
 }
 function set_value(entry, old_value) {
- var new_value = window.prompt(entry+" ‚Ì’l‚ğ•ÏX‚µ‚Ü‚·",old_value)
+ var new_value = window.prompt(entry+" ã®å€¤ã‚’å¤‰æ›´ã—ã¾ã™",old_value)
  var found = 0;
  if (new_value != "" && new_value != null) {
-    for (char_pos=0; char_pos<new_value.length; char_pos++) {
-       if (!(new_value.charAt(char_pos) >= '0' && new_value.charAt(char_pos) <= '9')) {
-          found = 1;
-       }
-    }
-    if (found == 1) {
-       alert ("”š‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢I");
-    }
-    else if (new_value == old_value) {
-       alert ("•ÏX‚³‚ê‚Ä‚Ü‚¹‚ñI");
-    }
-    else { 
-       window.location.href = "<? echo $jump;?>&act=set_value&id="+entry+"&new="+new_value
-    }
+		for (char_pos=0; char_pos<new_value.length; char_pos++) {
+			 if (!(new_value.charAt(char_pos) >= '0' && new_value.charAt(char_pos) <= '9')) {
+				  found = 1;
+			 }
+		}
+		if (found == 1) {
+			 alert ("æ•°å­—ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„ï¼");
+		}
+		else if (new_value == old_value) {
+			 alert ("å¤‰æ›´ã•ã‚Œã¦ã¾ã›ã‚“ï¼");
+		}
+		else { 
+			 window.location.href = "<? echo $jump;?>&act=set_value&id="+entry+"&new="+new_value
+		}
  }
 }
 function ChangeEntry(entry, old_name, feature) {
- var new_name = window.prompt(entry+"@‚ÌV‚µ‚¢ "+feature+" ‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢",old_name)
+ var new_name = window.prompt(entry+"ã€€ã®æ–°ã—ã„ "+feature+" ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„",old_name)
  var found = 1;
  if (new_name != "" && new_name != null) {
-    if (check_char(new_name)) {
-         found = 0;
-    }
-    if (found == 1) {
-       alert ("Error! "+entry+" ‚É‹–‰Â‚³‚ê‚Ä‚È‚¢•¶š‚ªŠÜ‚Ü‚ê‚Ä‚¢‚Ü‚·!");
-    }
-    else if (new_name == old_name) {
-       alert ("•ÏX‚³‚ê‚Ä‚Ü‚¹‚ñI");
-    }
-    else if (feature == "à–¾") {
-       window.location.href = "<? echo $jump;?>&act=ren_entry&id="+entry+"&new="+new_name
-    }
-    else if (feature == "FileID") {
-       window.location.href = "<? echo $jump;?>&act=ren_id&id="+entry+"&new="+new_name
-    }
-    else if (feature == "URL") {
-       window.location.href = "<? echo $jump;?>&act=set_loc&id="+entry+"&new="+new_name
-    }
-    else if (feature == "‰ğàƒy[ƒW") {
-       window.location.href = "<? echo $jump;?>&act=set_ref&id="+entry+"&new="+new_name
-    }
+		if (check_char(new_name)) {
+				 found = 0;
+		}
+		if (found == 1) {
+			 alert ("Error! "+entry+" ã«è¨±å¯ã•ã‚Œã¦ãªã„æ–‡å­—ãŒå«ã¾ã‚Œã¦ã„ã¾ã™!");
+		}
+		else if (new_name == old_name) {
+			 alert ("å¤‰æ›´ã•ã‚Œã¦ã¾ã›ã‚“ï¼");
+		}
+		else if (feature == "èª¬æ˜") {
+			 window.location.href = "<? echo $jump;?>&act=ren_entry&id="+entry+"&new="+new_name
+		}
+		else if (feature == "FileID") {
+			 window.location.href = "<? echo $jump;?>&act=ren_id&id="+entry+"&new="+new_name
+		}
+		else if (feature == "URL") {
+			 window.location.href = "<? echo $jump;?>&act=set_loc&id="+entry+"&new="+new_name
+		}
+		else if (feature == "è§£èª¬ãƒšãƒ¼ã‚¸") {
+			 window.location.href = "<? echo $jump;?>&act=set_ref&id="+entry+"&new="+new_name
+		}
  }
 }
 function del_entry(entry) {
- if (window.confirm("–{“–‚Éíœ‚µ‚Ä‚à‚æ‚ë‚µ‚¢‚Å‚·‚©H("+entry+")")) {
-    window.location.href = "<? echo $jump;?>&act=del_entry&id="+entry
+ if (window.confirm("æœ¬å½“ã«å‰Šé™¤ã—ã¦ã‚‚ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ("+entry+")")) {
+		window.location.href = "<? echo $jump;?>&act=del_entry&id="+entry
  }
 }
 function check_form() {
@@ -325,20 +377,20 @@ function check_form() {
  des_field=document.form.description.value;
  id_field=document.form.new_id.value;
  if (des_field == "" || id_field == "") {
-    alert ("ID‚Æƒ^ƒCƒgƒ‹‚ğ–„‚ß‚Ä‚­‚¾‚³‚¢I");
-    return false;
+		alert ("IDã¨ã‚¿ã‚¤ãƒˆãƒ«ã‚’åŸ‹ã‚ã¦ãã ã•ã„ï¼");
+		return false;
  }
  if (check_char(des_field) && check_char(id_field)) {
-    found = 0;
+		found = 0;
  }
  if (found == 1) {
-    alert ("Error! ‹–‰Â‚³‚ê‚Ä‚¢‚È‚¢•¶š‚Å‚·");
-    return false;
+		alert ("Error! è¨±å¯ã•ã‚Œã¦ã„ãªã„æ–‡å­—ã§ã™");
+		return false;
  }
  if (document.form.new_loc.value.indexOf(".")==-1) {
-    alert("ƒtƒ@ƒCƒ‹‚ÌêŠ‚ª³‚µ‚­‚ ‚è‚Ü‚¹‚ñI");
-    document.form.new_loc.focus();
-    return false;
+		alert("ãƒ•ã‚¡ã‚¤ãƒ«ã®å ´æ‰€ãŒæ­£ã—ãã‚ã‚Šã¾ã›ã‚“ï¼");
+		document.form.new_loc.focus();
+		return false;
  }
 }
 // -->
@@ -346,162 +398,163 @@ function check_form() {
 </head>
 <body bgcolor="#FFFFFF">
  <table width="560" border="0" align="center">
-  <tr>
-    <td height="40"><tt>Administration Mode</tt></td>
-    <td height="40" align="right" valign="bottom"><img src="point.gif" width="9" height="9"><a href="<? echo $PHP_SELF;?>?">Back to Top Downloads</a></td>
-  </tr>
+	<tr>
+		<td height="40"><tt>Administration Mode</tt></td>
+		<td height="40" align="right" valign="bottom"><small style="text-color:blue">â–¶</small><a href="<? echo $PHP_SELF;?>?">Back to Top Downloads</a></td>
+	</tr>
  </table>
  <table bgcolor="#F7F7F7" border=1 cellspacing=0 cellpadding=3 width="560" align="center">
-    <tr bgcolor="#A8E1A8"> 
-      <td><b>à–¾</b></td>
-      <td><b>ƒtƒ@ƒCƒ‹ID</b></td>
-      <td><b>DL”</b></td>
-      <td><b>êŠ</b></td>
-      <td><b>‰ğàƒy[ƒW</b></td>
-      <td><b>íœ</b></td>
-    </tr>
+		<tr bgcolor="#A8E1A8"> 
+			<td><b>å¤–ï¾˜ï¾ï½¸</b></td>
+			<td><b>èª¬æ˜</b></td>
+			<td><b>ï¾Œï½§ï½²ï¾™ID</b></td>
+			<td><b>DLæ•°</b></td>
+			<td><b>å ´æ‰€</b></td>
+			<td><b>è§£èª¬ï¾ï¾Ÿï½°ï½¼ï¾</b></td>
+			<td><b>å‰Šé™¤</b></td>
+		</tr>
 <?php
 $lines = file(LOGFILE);
 $totalfiles = count($lines);
 for($i=0; $i<count($lines); $i++){
-  list($file_id,$count,$location,$stamp,$descript,$refurl) = explode("|",$lines[$i]);
-  if($location=="") $location = "-";
-  if($refurl=="") $refurl="-";
-  print "    <tr>\n      <td><a href=\"javascript:ChangeEntry('$file_id','$descript','à–¾')\">$descript</a></td>\n      <td><a href=\"javascript:ChangeEntry('$file_id','$file_id','FileID')\">$file_id</a></td>\n";
-  print "      <td><a href=\"javascript:set_value('$file_id','$count')\">$count</a></td>\n      <td><a href=\"javascript:ChangeEntry('$file_id','$location','URL')\">$location</a></td>\n"; 
-  print "      <td><a href=\"javascript:ChangeEntry('$file_id','$refurl','‰ğàƒy[ƒW')\">$refurl</a><td><a href=\"javascript:del_entry('$file_id')\">íœ</a></td>\n    </tr>\n";
-  $total+=$count;
+	list($file_id,$count,$location,$stamp,$descript,$refurl) = explode("|",$lines[$i]);
+	if($location=="") $location = "-";
+	if($refurl=="") $refurl="-";
+	print "    <tr>\n      <td><a href=\"$_SERVER[PHP_SELF]?dl=$file_id\">â—†</a></td>\n      <td><a href=\"javascript:ChangeEntry('$file_id','$descript','èª¬æ˜')\">$descript</a></td>\n      <td><a href=\"javascript:ChangeEntry('$file_id','$file_id','FileID')\">$file_id</a></td>\n";
+	print "      <td><a href=\"javascript:set_value('$file_id','$count')\">$count</a></td>\n      <td><a href=\"javascript:ChangeEntry('$file_id','$location','URL')\">$location</a></td>\n"; 
+	print "      <td><a href=\"javascript:ChangeEntry('$file_id','$refurl','è§£èª¬ãƒšãƒ¼ã‚¸')\">$refurl</a><td><a href=\"javascript:del_entry('$file_id')\">å‰Šé™¤</a></td>\n    </tr>\n";
+	$total+=$count;
 }
 echo '
-    <tr> 
-      <td><b><font color="#336600">&gt;&gt;Total Files:</font></b> <font color="#FF0000">'.$totalfiles.'</font></td>
-      <td colspan="4"><b><font color="#336600">&gt;&gt;Total Downloads:</font></b> <font color="#FF0000">'.$total.'</font></td>
-    </tr>
-  </table>
-  <form method="post" action="'.$PHP_SELF.'" name="form">
-    <table width="560" border="0" align="center">
-      <tr>
+		<tr> 
+			<td colspan="2"><b><font color="#336600">&gt;&gt;Total Files:</font></b> <font color="#FF0000">'.$totalfiles.'</font></td>
+			<td colspan="5"><b><font color="#336600">&gt;&gt;Total Downloads:</font></b> <font color="#FF0000">'.$total.'</font></td>
+		</tr>
+	</table>
+	<form method="post" action="'.$PHP_SELF.'" name="form">
+		<table width="560" border="0" align="center">
+			<tr>
 ';?>
-        <td>ƒtƒ@ƒCƒ‹‚ÌêŠF </td>
-        <td><input type="text" name="new_loc" size="42"><small>dl.php‚©‚ç‚ÌƒpƒX‚©URL</small>
-          <input type="hidden" name="job" value="admin">
-          <input type="hidden" name="admin" value="<? echo md5(ADMINPASS);?>">
-      </tr>
-      <tr> 
-        <td>ƒtƒ@ƒCƒ‹ IDF </td>
-        <td><input type="text" name="new_id" size="42"></td>
-      </tr>
-      <tr> 
-        <td>•\¦ƒ^ƒCƒgƒ‹F </td>
-        <td><input type="text" name="description" size="42"></td>
-      </tr>
-      <tr> 
-        <td>‰ğàƒy[ƒWURLF </td>
-        <td><input type="text" name="new_ref" size="42">
-          <input type="submit" name="submit" value="Add Entry" onclick="return check_form()" class="input"></td>
-      </tr>
-    </table>
-  </form>
-<br><center>ƒŠƒ“ƒN‚Ìd•û@dl.php?dl=[ƒtƒ@ƒCƒ‹ID]</center>
+				<td>ãƒ•ã‚¡ã‚¤ãƒ«ã®å ´æ‰€ï¼š </td>
+				<td><input type="text" name="new_loc" size="42"><small>dl.phpã‹ã‚‰ã®ãƒ‘ã‚¹ã‹URL</small>
+				  <input type="hidden" name="job" value="admin">
+				  <input type="hidden" name="admin" value="<? echo md5(ADMINPASS);?>">
+			</tr>
+			<tr> 
+				<td>ãƒ•ã‚¡ã‚¤ãƒ« IDï¼š </td>
+				<td><input type="text" name="new_id" size="42"></td>
+			</tr>
+			<tr> 
+				<td>è¡¨ç¤ºã‚¿ã‚¤ãƒˆãƒ«ï¼š </td>
+				<td><input type="text" name="description" size="42"></td>
+			</tr>
+			<tr> 
+				<td>è§£èª¬ãƒšãƒ¼ã‚¸URLï¼š </td>
+				<td><input type="text" name="new_ref" size="42">
+				  <input type="submit" name="submit" value="Add Entry" onclick="return check_form()" class="input"></td>
+			</tr>
+		</table>
+	</form>
+<br><center>ãƒªãƒ³ã‚¯ã®ä»•æ–¹ã€€dl.php?dl=[ãƒ•ã‚¡ã‚¤ãƒ«ID]</center>
 </body>
 </html>
 <?
 exit;
 }
-/* ’Ç‰ÁE•ÏXEíœ */
+/* è¿½åŠ ãƒ»å¤‰æ›´ãƒ»å‰Šé™¤ */
 function manage($manage,$id,$new){
-  $lines = file(LOGFILE);//ƒƒO“Ç‚İ‚İ
-  $find = FALSE;//ƒtƒ‰ƒO
+	$lines = file(LOGFILE);//ãƒ­ã‚°èª­ã¿è¾¼ã¿
+	$find = FALSE;//ãƒ•ãƒ©ã‚°
 
-  for($i=0; $i<count($lines); $i++){
-    //ƒf[ƒ^•ª‰ğ
-    list($file_id,$count,$location,$stamp,$descript,$refurl) = explode("|",$lines[$i]);
-    if($id == $file_id){//“¯‚¶ID‚¾‚Á‚½‚ç
-      switch($manage){	//ƒ‚[ƒh•ªŠò
-      case 'del_entry':	//íœ
-        $lines[$i] = "";
-        $find = TRUE;
-        break;
-      case 'ren_entry':	//à–¾•ÏX
-        $new = chop($new);
-        if(get_magic_quotes_gpc()) $new = stripslashes($new);
-        $lines[$i] = "$file_id|$count|$location|$stamp|$new|$refurl|\n";
-        $find = TRUE;
-        break;
-      case 'ren_id':	//ID•ÏX
-        $new = preg_replace("/\s*/","",$new);
-        $lines[$i] = "$new|$count|$location|$stamp|$descript|$refurl|\n";
-        $find = TRUE;
-        break;
-      case 'set_value':	//ƒJƒEƒ“ƒg•ÏX
-        $lines[$i] = "$file_id|$new|$location|$stamp|$descript|$refurl|\n";
-        $find = TRUE;
-        break;
-      case 'set_loc':	//êŠ•ÏX
-        $new = preg_replace("/\s*/","",$new);
-        $lines[$i] = "$file_id|$count|$new|$stamp|$descript|$refurl|\n";
-        $find = TRUE;
-        break;
-      case 'set_ref':	//QÆURL•ÏX
-        $lines[$i] = "$file_id|$count|$location|$stamp|$descript|$new|\n";
-        $find = TRUE;
-        break;
-      }
-    }
-  }
-  if($find){//ƒƒOXV
-    $fp = fopen(LOGFILE, "w");
-    flock($fp, LOCK_EX);
-    fputs($fp, implode("", $lines));
-    fclose($fp);
-  }
+	for($i=0; $i<count($lines); $i++){
+		//ãƒ‡ãƒ¼ã‚¿åˆ†è§£
+		list($file_id,$count,$location,$stamp,$descript,$refurl) = explode("|",$lines[$i]);
+		if($id == $file_id){//åŒã˜IDã ã£ãŸã‚‰
+			switch($manage){	//ãƒ¢ãƒ¼ãƒ‰åˆ†å²
+			case 'del_entry':	//å‰Šé™¤
+				$lines[$i] = "";
+				$find = TRUE;
+				break;
+			case 'ren_entry':	//èª¬æ˜å¤‰æ›´
+				$new = chop($new);
+				if(get_magic_quotes_gpc()) $new = stripslashes($new);
+				$lines[$i] = "$file_id|$count|$location|$stamp|$new|$refurl|\n";
+				$find = TRUE;
+				break;
+			case 'ren_id':	//IDå¤‰æ›´
+				$new = preg_replace("/\s*/","",$new);
+				$lines[$i] = "$new|$count|$location|$stamp|$descript|$refurl|\n";
+				$find = TRUE;
+				break;
+			case 'set_value':	//ã‚«ã‚¦ãƒ³ãƒˆå¤‰æ›´
+				$lines[$i] = "$file_id|$new|$location|$stamp|$descript|$refurl|\n";
+				$find = TRUE;
+				break;
+			case 'set_loc':	//å ´æ‰€å¤‰æ›´
+				$new = preg_replace("/\s*/","",$new);
+				$lines[$i] = "$file_id|$count|$new|$stamp|$descript|$refurl|\n";
+				$find = TRUE;
+				break;
+			case 'set_ref':	//å‚ç…§URLå¤‰æ›´
+				$lines[$i] = "$file_id|$count|$location|$stamp|$descript|$new|\n";
+				$find = TRUE;
+				break;
+			}
+		}
+	}
+	if($find){//ãƒ­ã‚°æ›´æ–°
+		$fp = fopen(LOGFILE, "w");
+		flock($fp, LOCK_EX);
+		fputs($fp, implode("", $lines));
+		fclose($fp);
+	}
 }
-/* V‹K’Ç‰Á */
+/* æ–°è¦è¿½åŠ  */
 function add_data($url,$id,$desc,$ref){
-  //®Œ`
-  $id = str_replace("|","",$id);
-  $id = str_replace("'","",$id);
-  $id = chop(str_replace('"','',$id));
-  $url = chop($url);
-  if(strstr($url,".") && !empty($id)) {
-    $lines = file(LOGFILE);
-    $find = FALSE;
-    //“¯‚¶ID‚ª“o˜^‚³‚ê‚Ä‚¢‚È‚¢‚©
-    for($i=1; $i<count($lines); $i++){
-      list($file_id,) = explode("|",$lines[$i]);
-      if($id == $file_id){
-        $find = TRUE;
-        break;
-      }
-    }
-    if(!$find){//ƒƒO‘‚«‚İ
-      $desc = str_replace("|","",$desc);
-      $desc = str_replace("'","",$desc);
-      $desc = chop(str_replace('"','',$desc));
-      if(get_magic_quotes_gpc()) $desc = stripslashes($desc);
-      $ref = str_replace("|","",$ref);
-      $ref = str_replace("'","",$ref);
-      $ref = chop(str_replace('"','',$ref));
-      $stamp = time();
-      $newline = "$id|0|$url|$stamp|$desc|$ref|\n";//ƒtƒH[ƒ}ƒbƒg
-      $fp = fopen(LOGFILE, "a");
-      fputs($fp, $newline);
-      fclose($fp);
-    }
-  }else{
-    die("URL‚©ID‚ª•s³‚Å‚·");
-  }
+	//æ•´å½¢
+	$id = str_replace("|","",$id);
+	$id = str_replace("'","",$id);
+	$id = chop(str_replace('"','',$id));
+	$url = chop($url);
+	if(strstr($url,".") && !empty($id)) {
+		$lines = file(LOGFILE);
+		$find = FALSE;
+		//åŒã˜IDãŒç™»éŒ²ã•ã‚Œã¦ã„ãªã„ã‹
+		for($i=1; $i<count($lines); $i++){
+			list($file_id,) = explode("|",$lines[$i]);
+			if($id == $file_id){
+				$find = TRUE;
+				break;
+			}
+		}
+		if(!$find){//ãƒ­ã‚°æ›¸ãè¾¼ã¿
+			$desc = str_replace("|","",$desc);
+			$desc = str_replace("'","",$desc);
+			$desc = chop(str_replace('"','',$desc));
+			if(get_magic_quotes_gpc()) $desc = stripslashes($desc);
+			$ref = str_replace("|","",$ref);
+			$ref = str_replace("'","",$ref);
+			$ref = chop(str_replace('"','',$ref));
+			$stamp = time();
+			$newline = "$id|0|$url|$stamp|$desc|$ref|\n";//ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+			$fp = fopen(LOGFILE, "a");
+			fputs($fp, $newline);
+			fclose($fp);
+		}
+	}else{
+		die("URLã‹IDãŒä¸æ­£ã§ã™");
+	}
 }
-/* ŠÇ—ƒ‚[ƒhƒƒOƒCƒ“ */
+/* ç®¡ç†ãƒ¢ãƒ¼ãƒ‰ãƒ­ã‚°ã‚¤ãƒ³ */
 function validation($admin){
 
-  if($admin && ($admin != md5(ADMINPASS)))
-    $err = "<font color=red>ƒpƒXƒ[ƒh‚ªˆá‚¢‚Ü‚·I</font>";
-  if(empty($admin) || $err){
-    ?>
-      <html>
-        <head><title>PHP Downloads</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+	if($admin && ($admin != md5(ADMINPASS)))
+		$err = "<font color=red>ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒé•ã„ã¾ã™ï¼</font>";
+	if(empty($admin) || $err){
+		?>
+<html>
+	<head><title>PHP Downloads</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <style type="text/css">
 <!--
 td {  font-family: Arial, Helvetica, sans-serif; font-size: 8pt}
@@ -512,63 +565,67 @@ tt {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 13pt; font-
 <body bgcolor="FFFFDD">
 <form method="post" action="<? echo $PHP_SELF;?>">
  <table width="560" border="0" align="center">
-  <tr>
-    <td height="40"><tt>Administration Mode</tt></td>
-  </tr>
+	<tr>
+		<td height="40"><tt>Administration Mode</tt></td>
+	</tr>
  </table>
  <table width="560" border="0" cellspacing="0" cellpadding="3" align="center">
-   <tr bgcolor="A8E1E1">
-     <td><b>ƒpƒXƒ[ƒh‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢</b></td>
-   </tr>
-   <tr bgcolor="F7F7F7"> 
-     <td> 
-       <input type="password" name="admin_submit">
-       <input type="submit" value="Submit">
-       <input type="hidden" name="job" value="admin">
-     </td>
-   </tr>
-   <tr bgcolor="F7F7F7"> 
-     <td><? echo $err;?></td>
-   </tr>
-   <tr> 
-     <td><br>
-       <a href="http://php.s3.to" target="_blank">ƒŒƒbƒcPHP!</a> 
-       | <a href="<? echo $PHP_SELF;?>?">Back to Top Downloads</a></td>
-   </tr>
+	 <tr bgcolor="A8E1E1">
+		 <td><b>ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„</b></td>
+	 </tr>
+	 <tr bgcolor="F7F7F7"> 
+		 <td> 
+			 <input type="password" name="admin_submit">
+			 <input type="submit" value="Submit">
+			 <input type="hidden" name="job" value="admin">
+		 </td>
+	 </tr>
+	 <tr bgcolor="F7F7F7"> 
+		 <td><? echo $err;?></td>
+	 </tr>
+	 <tr> 
+		 <td><br>
+			 <a href="http://php.s3.to" target="_blank">ãƒ¬ãƒƒãƒ„PHP!</a> 
+			 | <a href="<? echo $PHP_SELF;?>?">Back to Top Downloads</a></td>
+	 </tr>
  </table>
 </form>
 </body>
 </html>
 <?php
 exit;
-  }
-  return true;
+	}
+	return true;
 }
 /*************main******************/
-//ƒ_ƒEƒ“ƒ[ƒh
+//ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰
 if(!empty($dl)){
-  if(REFCHECK){
-    for($i=0; $i<count($okurl); $i++){
-      if(!strstr(getenv("HTTP_REFERER"),$okurl[$i]))
-        die("w’èURLˆÈŠO‚©‚ç‚ÍDL‚Å‚«‚Ü‚¹‚ñ");
-    }
-  }
-  count_dl($dl);
-  exit;
+	if(REFCHECK){
+		$c_okurl=count($okurl);
+		$is_okurl=false;
+		for($i=0; $i<$c_okurl; $i++){
+			if(isset($_SERVER['HTTP_REFERER']) && ($is_okurl = strstr($_SERVER['HTTP_REFERER'],$okurl[$i]) !== FALSE))
+				break;
+			if(!$is_okurl && $i==$c_okurl-1)
+				die("æŒ‡å®šURLä»¥å¤–ã‹ã‚‰ã¯DLã§ãã¾ã›ã‚“");
+		}
+	}
+	count_dl($dl);
+	exit;
 }
 switch($job){
 case 'detail':
-  if($detail) show_detail($detail);
-  break;
+	if($detail) show_detail($detail);
+	break;
 case 'admin':
-  if($admin_submit) $admin = md5($admin_submit);
-  validation($admin);
-  if($act) manage($act,$id,$new);
-  if($submit=="Add Entry") add_data($new_loc,$new_id,$description,$new_ref);
-  show_track();
-  break;
+	if($admin_submit) $admin = md5($admin_submit);
+	validation($admin);
+	if($act) manage($act,$id,$new);
+	if($submit=="Add Entry") add_data($new_loc,$new_id,$description,$new_ref);
+	show_track();
+	break;
 default:
-  if(time()-filemtime(LOGFILE) > 3600) @copy(LOGFILE,LOGFILE.".bak");
-  show_table($top,$option);
+	if(time()-filemtime(LOGFILE) > 3600) @copy(LOGFILE,LOGFILE.".bak");
+	show_table($top,$option);
 }
 ?>
