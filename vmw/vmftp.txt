@@ -1,0 +1,329 @@
+INTRODUCTION
+============
+
+This is an FTP client-like user interface program to exchange files
+between host and guest through VMware Shared Folders.  Naturally it
+requires a VMware product which supports the Shared Folders feature
+(Workstation 4.0 and later).
+
+This program takes no command line parameters.
+
+Once started, it enters its command interpreter (such as it is) and awaits
+instructions from the user.  When it is awaiting commands from the user,
+it displays the prompt "vmftp>".
+
+
+INTERACTIVE COMMANDS
+====================
+
+This program accepts the following commands:
+
+! [<command>]
+
+    Runs <command> as a shell command on the guest machine.
+    If no <command> is given, it invokes an interactive shell.
+
+
+? [<command>]
+
+    Prints an informative message about the meaning of a vmftp command.
+    If no <command> is given, a list of available commands is shown.
+    A command name can be abbreviated as long as it can be uniquely
+    identifiable.
+
+
+bye, quit
+
+    Terminates the vmftp session and exit.  An end of file at the prompt
+    will also terminate the session.
+
+
+cd [<host-dir>]
+
+    Changes the current working directory on the host machine to
+    <host-dir>.  If no directory is specified, the Shared Folder root
+    becomes the working directory.
+
+    <host-dir> can be either a full path or a partial path of the target
+    directory.  Wild cards (* and ?) are not expanded.
+
+    The initial host working directory is the shared folder root.
+
+    SEE ALSO:
+        Use pwd command to print the current host working directory.
+        Use lcd command to change the guest working directory.
+
+
+chmod <mode> <host-file>
+
+    Changes the permission of a file <host-file> on the host machine.
+
+    <mode> must be one of the following:
+      '+r' grant read permission
+      '-r' revoke read permission
+      '+w' grant write permission
+      '-w' revoke write permission
+      '+x' grant execute permission
+      '-x' revoke execute permission
+
+    Combinations of more than one of these or unix-style octal values
+    (e.g. 644) are NOT accepted.
+
+    On Windows host 'r' and 'x' modes do not have any effect (read and
+    execute are always allowed on Windows).
+
+    On Linux host, this command changes the file's owner permissions and
+    also revokes all group and guest permissions.
+
+    <host-file> can be either a full path or a partial path of the
+    target file.  Wild cards (* and ?) are not expanded.
+
+    NOTE: Use shell escapement to change a guest file permission:
+          e.g. "!attrib +r guestfile" on DOS/WIN
+               "!chmod -r guestfile" on unix
+
+
+debug
+
+   Toggles debugging mode.  When debugging is on, vmftp prints parameter
+   and return status of every Shared Folder function it executes.
+
+
+delete <host-file>
+
+    Deletes a file <host-file> on the host machine.
+
+    <host-file> can be either a full path or a partial path of the
+    target file.  Wild cards (* and ?) are not expanded.
+
+    NOTE: Use shell escapement to delete a guest file.
+          e.g. "!del guestfile" on DOS/WIN
+               "!rm guestfile" on unix
+
+    SEE ALSO: Use rmdir command to delete a host directory
+
+
+get <host-path> [<guest-name>]
+
+    Retrieves files or directories specified by <host-path> and store
+    on a guest disk.  If <guest-name> is not specified, the host file name
+    is used.
+
+    Existing guest files with the same names are overwritten without a
+    warning.
+
+    <host-path> can be either a full path or a partial path of the
+    target file or directory.  Wild cards (* and ?) are expanded, but
+    directories are excluded from the result.
+
+    <guest-name> can be either a full path or a partial path of a guest
+    file or directory.  Wild cards (* and ?) are not expanded.
+
+    File data is transfered as opaque binary data and no conversion is
+    applied (like binary mode in FTP).
+
+
+lcd [<guest-dir>]
+
+    Changes the current working directory on the guest machine to
+    <guest-dir>.  If no directory is specified, the user's home directory
+    becomes the working directory.
+
+    <guest-dir> can be either a full path or a partial path of the
+    target directory.  Wild cards (* and ?) are not expanded.
+
+    The initial guest working directory is the directory from which you
+    started this program.
+
+    NOTE: A cd command took place in a child shell (e.g. vmftp> !cd) has
+        its effect only in the child shell process.
+
+    NOTE: Use shell escapement to print the current guest working
+        directory.
+        e.g. "!cd" on DOS/WIN
+             "!pwd" on unix
+
+    SEE ALSO:
+        Use cd command to change the host working directory.
+
+
+ls [<host-dir>]
+
+    Prints a listing of the contents of a directory on the host machine.
+    If <host-dir> is not specified, the current host working directory is
+    used.
+
+    <host-dir> can be either a full path or a partial path of the
+    target directory.  Wild cards (* and ?) are not expanded.
+
+    On Linux host, file permissions shown with this command are owner
+    permissions.
+
+    On DOS and some unix guests, the TZ environment must be set correctly
+    in order for this command to show file date/time correctly.
+
+    NOTE: Use shell escapement to print the listings of a guest directory:
+          e.g. "!dir" on DOS/WIN
+               "!ls" on unix
+
+
+mkdir <host-dir>
+
+    Creates a directory on the host machine.
+
+    <host-dir> can be either a full path or a partial path of the
+    target file.  Wild cards (* and ?) are not expanded.
+
+    NOTE: Use shell escapement to create a guest directory:
+          e.g. "!mkdir guestdir"
+
+
+put <guest-path> [<host-name>]
+
+    Sends files or directories specified by  <guest-path> and store on the
+    host machine.  If <host-name> is not specified, the guest file name is
+    used.
+
+    Existing host files with the same names are overwritten without a
+    warning.
+
+    <guest-path> can be either a full path or a partial path of the
+    target file or directory.  Wild cards (* and ?) are expanded, but
+    directories are excluded from the matching result.
+
+    <host-name> can be either a full path or a partial path of a host
+    file or directory.  Wild cards (* and ?) are not expanded.
+
+    File data is transfered as opaque binary data and no conversion is
+    applied (like binary mode in FTP).
+
+
+pwd
+
+    Prints the current host working directory.
+
+    NOTE: Use shell escapemnt to see the guest working directory:
+          e.g. "!cd" on DOS/WIN
+               "!pwd" on unix
+
+
+rename <host-file> <new-name>
+
+    Rename a host file <host-file> to <new-name>.
+
+    <host-file> can be either a full path or a partial path to the
+    target file.
+
+    <new-name> must be a single file name (cannot contain any path
+    delimiters) and it must conform to the host system's file name
+    convention.
+
+    Wild cards (* and ?) are not expanded for both <host-file> and
+    <new-name>
+
+    NOTE: Use shell escapement to rename a guest file:
+          e.g. "!ren old new" on DOS/WIN
+               "!mv old new" on unix
+
+
+rmdir <host-dir>
+
+    Delete a directory on the host system.
+
+    <host-dir> can be either a full path or a partial path to the target
+    directory.  Wild cards (* and ?) are not expanded.
+
+    The target directory must be empty.
+
+    NOTE: Use shell escapement to delete a guest directory:
+          e.g. "!rmdir guestdir"
+
+    SEE ALSO: Use "delete" command to delete a regular host file
+
+
+NOTES
+=====
+
+Specifying a path
+
+    This program accepts both "/" and "\" as path delimiters regardless
+    of guest/host operating systems.
+
+    This program accepts both full and partial paths unless otherwise
+    stated.
+
+    A full path is a path relative to the root and starts with a "/" or a
+    "\" (or "x:\" in DOS/WIN guest).  The root in the guest is the guest
+    file system's root.  The root in the host is a conceptual node to
+    which all shared folders assigned to the virtual machine belong.
+
+    A partial path is a path relative to the current working directory.
+
+    "." (current) and ".." (parent) notations are accepted and translated
+    accordingly.
+
+    The case of paths in the host is significant.
+
+    The significance of the case in the guest depends on the guest
+    operating system.
+
+
+Transferring multiple files
+
+    You can transfer multiple files either with wild card characters in
+    the transfer source path or specifying a directory name explicitly as
+    the transfer source path.
+
+    When you specify a directory name explicitly, this program prompts
+    for confirmation and transferres the contents of the directory and its
+    subdirectories recursively.  If a file with the same name exists in
+    the destination system, the file is overwritten without warning.  If a
+    directory with the same name exists in the destination system, the
+    transfer aborts with an error.
+
+    When you use one or more wild card characters in the transfer source
+    path, this program performs the pattern matching and transferres all
+    matching files without any confirmation prompted.  Directories are
+    excluded from matchinh and the program does not descend into
+    subdirectories in this case.
+    The wildcard matching of this program is not very sophisticated and
+    you should avoid using complex expressions.
+
+    You cannot specify the name in the distination system in these cases
+    because all transferred files will end up using the same name.
+
+    examples:
+       When "hostdir" is a directory in the host,
+
+       "get hostdir" transfers all the contents of the directory and its
+       subdirectories recursively.
+
+       "get hostdir/*" transfers all files in the directory but does not
+       descend into its subdirectories.
+
+
+File name conversion
+
+    VMware Shared Folder uses UTF-8 for non-ascii characters in file
+    names.  Although this program implements some conversion for some
+    guest systems, it is not very sophisticated and you should generally
+    avoid using non-ascii characters in file names.
+
+    DOS:  All non-ascii characters are replaced with "_".  Also file names
+        are truncated into 8.3 format when transferring from host to
+        guest.  If these conversion causes a file name conflict, it is not
+        solved and the destination file is overwritten with the last
+        transferred file.
+
+    Windows: Conversion between UTF-8 and ANSI code is performed with
+        MultiByteToWideChar / WideCharToMultiByte Win32 APIs.  However
+        Windows does not provide a method to tell if the resulting
+        characters are printable on the current system and the result
+        could be unreadable.  For example, although CJK characters are
+        generally not printable on Windows in Western countries, Windows
+        does not report an error when converting a UTF-8 text containing
+        those characters into local code page.
+
+    Unix: Conversion between UTF-8 and local codeset is performed with
+        iconv functions when they are available.  Otherwise all non-ascii
+        characters are replaced with "_".

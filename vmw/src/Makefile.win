@@ -1,0 +1,33 @@
+# makefile.win
+# Digital Mars MAKE.EXE makefile for 32 bit windows
+#
+# Copyright (c) 2006 Ken Kato
+
+CC=sc.exe
+CFLAGS=-DHAVE_STDINT_H -mn -6 -Nc -o -w- -c
+
+LINK=link.exe
+LFLAGS=/nologo
+
+all: vmw vmftp vmshrink
+
+vmw: vmw.exe
+
+vmshrink: vmshrink.exe
+
+vmftp: vmftp.exe
+
+vmw.exe: vmw.obj vmcall.obj vmtool.obj termutil.obj
+
+vmshrink.exe: vmshrink.obj vmcall.obj vmtool.obj termutil.obj
+
+vmftp.exe: vmftp.obj vmshf.obj vmcall.obj vmtool.obj
+
+.obj.exe:
+	$(LINK) $(LFLAGS) $**,$@,NUL,user32 kernel32;
+
+.c.obj:
+	$(CC) $(CFLAGS) $<
+
+clean:
+	del vmw.exe vmshrink.exe vmftp.exe *.obj

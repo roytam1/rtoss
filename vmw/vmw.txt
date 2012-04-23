@@ -1,0 +1,398 @@
+INTRODUCTION
+============
+
+This is a VMware guest command line utility program with the following
+functions:
+
+  - Call VMware virtual machine's APM functions directly, bypassing the
+    APM BIOS inside the guest.
+
+  - Copy and paste text between guest and host.
+
+  - Get and/or set mouse cursor location.
+
+  - Get connectable virtual device information such as floppy and CD.
+
+  - Connect and/or disconnect connectable virtual devices.
+
+  - Get and/or set VMware GUI option settings such as availability of
+    the copy & paste function and mouse cursor grab / release settings.
+
+  - Get virtual machine and host machine information, such as virtual
+    hardware version, memory size, processor speed and screen size.
+
+  - Call VMware guest-to-host RPC functions such as virtual disk shrinking
+    and log message output.
+
+  - Get the host's system time and/or synchronize the guest's clock with
+    the host.
+
+
+NOTATION
+========
+
+The following abbreviations are used in subsequent sections in this text:
+
+    ESX         stands for VMware ESX Server
+    GSX         stands for VMware GSX Server
+    VM          stands for virtual machine
+    WS          stands for VMware Workstation
+
+The following conventions are used in subsequent sections in this text:
+
+    <value>     Indicates variable information supplied by the user.
+
+    [option]    Indicates an optional item.
+
+    [o1|o2|...] Indicates you MAY choose one of the enclosed items.
+
+    {c1|c2|...} Indicates you MUST choose one of the enclosed items.
+
+
+GENERAL USAGE
+=============
+
+  vmw <command> [-q|-c|-v][-d][-h][<command specific options>]
+
+    <command> specifies a command to execute.
+    The following commands are available:
+
+	a[pm]     execute an APM function
+	co[py]    copy text into clipboard
+	cu[rsor]  get/set mouse cursor location
+	d[evice]  get/set device information/state
+	h[wver]   get virtual hardware version
+	me[mory]  get memory size (MB)
+	mh[z]     get processor speed (MHz)
+	o[ption]  get/set option settings
+	p[aste]   paste text from clipboard
+	r[pc]     call guest-host RPC
+	s[creen]  get host screen size
+	t[ime]    get host system time / sync guest system time
+	u[uid]    get BIOS UUID
+	v[ersion] get VMware version
+
+    You can abbreviate them as long as they are distinguishable from
+    other commands.  Case is significant for all commands (all commands
+    must be typed in lower case).
+
+    The following options are common to all commands, although some
+    of them may not make much sense with some commands:
+
+      -q  quiet (no text message)
+      -c  curt (minimum text message: default)
+      -v  verbose (maximum text message)
+      -d  dump (print register values in text for each backdoor call)
+      -h  print help message
+
+    "vmw <command> -h" shows a command specific help message.
+
+    Case is significant for all options.
+
+
+COMMAND "apm"
+=============
+
+  vmw apm [<common options>] {-p|-s|<value>}
+
+    Call VMware virtual machine's APM functions directly, bypassing the
+    APM BIOS inside the guest.
+
+    -p      Power off the virtual machine
+    -s      Suspend the virtual machine
+    <value> Immediate 32 bit hex value to be interpreded as a combination
+            of a APM function number (high order word) and a function
+            specific parameter (low order word).
+
+    You may not be able to resume a virtual machine suspended with the -s
+    option (I have no idea why).
+
+    On WS4.5/GSX3.2 and later, this command works only if the virtual
+    processor is in privileged mode (such as in real mode DOS and in OS
+    kernel), apparently for security reasons.
+    Works without such restrictions on WS4.0/GSX2.5 and earlier.
+
+  examples:
+
+    vmw apm -p        Power off the virtual machine
+    vmw apm 00070007  Also power off the virtual machine
+
+
+COMMAND "copy"
+==============
+
+  vmw copy [<common options>] [<file>|-t<text>]
+
+    Copy text into the host's clipboard.
+
+    <file>   specifies a file to read the text from
+    -t<text> specifies the text to copy. Quote if it contains any blank
+             characters.
+
+    If neither file nor text is specified, the text is read from the
+    standard input.
+
+    The text must not contain any non-ascii characters except for new
+    line characters.  Carriage return characters will be added or removed
+    depending on guest and host operating systems.
+    The maximun allowed length of the text is about 65,000 bytes.
+
+  examples:
+
+    vmw copy file.txt    Copy content of file.txt into the clipboard
+    vmw copy -tabcde     Copy "abcde" into the clipboard
+    dir | vmw copy       Copy the output of "dir" command into the clipboard
+
+
+COMMAND "cursor"
+================
+
+  vmw cursor [<common options>][{-r|-R}[<interval>]][-s<X>,<Y>]
+
+    Get and/or set the mouse cursor location.
+
+    -r  Repeat every <interval> milliseconds (default=100) untill a
+        key is pressed.  No space between -r and <interval> are allowed.
+
+    -R  Same as -r but suppresses line feeding on the terminal.
+
+    -s  Move cursor to the specified location.
+        A comma between <X> and <Y> is required.
+        No space between -s, <X> and <Y> are allowed.
+
+  examples:
+
+    vmw cursor -R     Monitors the cursor location repeatedly and prints
+                      at the same location on the terminal screen.
+
+    vmw cursor -s0,0  Moves the cursor to the left-top corner of the guest
+                      screen.
+
+
+COMMAND "device"
+================
+
+  vmw device [<common options>][+|-|/][<targets>]
+
+    Get connectable virtual devices information.
+    Connect and/or disconnect connectable virtual devices.
+
+    +         (Re)connect the devices specified by <targets>.
+
+    -         Disconnect the devices specified by <targets>.
+
+    /         Toggle the connect state of devices specified by <targets>.
+
+    <targets> One or more target device numbers separated by comma.
+              'a' stands for 'all'. It is also the default.
+              No spaces among +,-,/ and <targets> are allowed.
+
+    If neither +, -, nor / is specified, this command prints the current
+    connect state of the target devices.
+
+  examples:
+
+    vmw device     List all connectable devices and its status.
+    vmw device +0  (Re)connect the device number 0.
+    vmw device -a  Disconnect all connectable devices.
+
+
+COMMAND "hwver"
+===============
+
+  vmw [<common options>] hwver
+
+    Print the virtual hardware version of the VM.
+
+    Currently the following virtual hardware version numbers are known:
+
+     1  VM created with WS 2.x (Possibly the idea of virtual hardware
+        version was introduced from WS 3.x).
+
+     2  VMs created with WS 3.x (probably also GSX 2.x and ESX 1.x)
+
+     3  VMs created with WS 4.x (probably also GSX 3.x ESX 2.x and ACE 1.x)
+        and with WS 5.x as "legacy" VMs.
+
+     4  VMs created with WS 5.x.
+
+
+COMMAND "memory"
+================
+
+  vmw [<common options>] memory
+
+    Print the size of memory allocated to the VM in megabytes.
+
+
+COMMAND "mhz"
+=============
+
+  vmw [<common options>] mhz
+
+    Print the actual processor speed in megahertz.
+
+
+COMMAND "option"
+================
+
+  vmw [<common options>] option [[+|-|/]<options>]
+
+    Get and/or set the VMware GUI option settings.
+
+    +    Enables the option specified by <options>.
+
+    -    Disables the option specified by <options>.
+
+    /    Toggles the state of the option specified by <options>.
+
+    <options> Specifies one or more following VMware GUI options:
+
+      g  grab input when cursor enters window
+
+      u  ungrab input when cursor leaves window
+
+      s  scroll when cursor approaches window edge
+
+      c  copy and paste between host and guest
+
+      t  time syncronization between host and guest
+
+    If neither +, -, nor / is specified, this command prints the current
+    GUI option settings.
+
+    The "copy and paste" setting affects the function of the "copy" and
+    "paste" commands of this program, for this setting changes the
+    behavior of the backdoor functions.
+
+    The "time synchronization" setting does not affect the function of
+    the "time" command of this program, for this setting does not change
+    the behavior of backdoor functions.  Apparently this setting is used
+    by the official VMwareTools only to decide if it should perform sync
+    or not.
+
+  examples:
+
+    vmw option    Prints the current option settings
+    vmw option +c Enables the copy & paste option setting
+
+
+COMMAND "paste"
+===============
+
+  vmw paste [<common options>][<file>]
+
+    Get text from the host clipboard.
+
+    <file>     Specifies the file to store the text.
+               If <file> is not specified, the text is printed to the
+               standard output regardless of the "-q" option.
+
+  examples:
+
+    vmw paste host.txt  Store the clipboard text into "host.txt" file
+    vmw paste | more    Browse the clipboard text with "more" utility
+
+
+COMMAND "rpc"
+=============
+
+  vmw rpc [<common options>[-e] <rpc command>
+
+    Call VMware guest-to-host RPC functions
+
+    -e             Use enhanced RPC mechanism in WS4.0/GSX3.2 and later
+
+    <rpc command>  RPC command text to send to the host
+                   Quote if it contains any blank characters
+
+
+    Following RPC commands are known to work:
+
+      machine.id.get
+          Retrieves a machine id string specified fot the VM
+
+      log <message>
+          Writes <message> into vmware.log file in the host
+
+      info-set guestinfo.<varname> <value>
+      info-get guestinfo.<varname>
+          Purpose unknown.
+
+      tools.set.version <version>
+          Notifies VMware of the VMwareTools version.  VMware responds
+          to this version number and changes notification text on the
+          status area.
+
+      disk.wiper.enable
+          Checks if virtual disk shrinking is possible.
+
+      disk.shrink
+          Starts virtual disk shrink process.
+
+
+COMMAND "screen"
+================
+
+  vmw screen [<common options>]
+
+    Print the screen resolution of the host in pixels.
+
+
+COMMAND "time"
+==============
+
+  vmw time [<common options>][-u|-U][{-r|-R}[<interval>]][-g]
+
+    Print the host's system time and/or synchronize the guest system clock
+
+    -u  Update the guest system clock as local time.
+
+    -U  Update the guest system clock as GMT.
+
+    If neither option is not specified, the host system time is printed
+    without updating the guest sytem clock.
+    The distinction of -u and -U takes effect only on unix guests.
+    The system clock is always set as local time on DOS.
+    The system clock is always set as GMT on Windows.
+
+    -r  Repeat every <interval> seconds (default: 60 sec)
+
+    -R  same as -r but suppress line feeding in the terminal screen.
+
+    -g  Print the time in GMT.  If this option is not specified
+        time is printed in local time.
+
+
+  examples:
+
+    vmw time           Prints the host's system time
+    vmw time -q -r -U  Quietly synchronizes the clock as GMT every 60 seconds
+
+
+COMMAND "uuid"
+==============
+
+  vmw uuid [<common options>]
+
+    Print the UUID of the VM.
+
+
+COMMAND "version"
+=================
+
+  vmw version [<common options>]
+
+    Print the VMware product type and internal version number.
+    The version number printed here has no relation with VMware product
+    version numbers such as "Workstation 5.0" and "ESX Server 1.0".
+    As far as I know, it is always 6.
+
+    Also the product type has become kind of meaningless recently since
+    it does not reflect the recent VMware product line.
+    For the record, known product type values are:
+
+      1   VMware Express
+      2   VMware ESX Server
+      3   VMware GSX Server
+      4   VMware Workstation

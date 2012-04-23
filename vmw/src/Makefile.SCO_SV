@@ -1,0 +1,22 @@
+# makefile for SCO OpenServer
+#
+# Copyright (c) 2006 Ken Kato
+
+AS = as
+ASFLAGS =
+
+CC = cc
+CFLAGS = -O
+
+LD = $(CC)
+LDFLAGS =
+
+VMCALL_O = vmcall.sco.o
+
+CPPFLAGS = -DHAVE_STDINT_H -DHAVE_SETTIMEOFDAY -DHAVE_SIGLONGJMP -DHAVE_USLEEP -DHAVE_ICONV_H
+
+VMWLIB = -lrt
+SHRLIB =
+FTPLIB =
+
+include Makefile.inc
