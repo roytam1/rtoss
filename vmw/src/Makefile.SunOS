@@ -1,0 +1,31 @@
+# makefile for Sun Solaris
+# for both native make and gmake
+#
+# Copyright (c) 2006 Ken Kato
+
+# replace the following line if you prefer GNU 'gas'
+# AS = gas
+AS = as
+ASFLAGS =
+
+# replace the following 2 lines if you prefer gcc
+# CC = gcc
+# CFLAGS = -O2
+CC = cc
+CFLAGS = -O
+
+LD = $(CC)
+LDFLAGS =
+
+# replace the following line if you prefer inline version
+# of vmcall functions (vmcall.c) -- works only with gcc
+# VMCALL_O = vmcall.o
+VMCALL_O = vmcall.gas.o
+
+CPPFLAGS = -DHAVE_STDINT_H -DHAVE_CLOCK_SETTIME -DHAVE_SIGLONGJMP -DHAVE_NANOSLEEP -DHAVE_ICONV_H
+
+VMWLIB = -lrt
+SHRLIB =
+FTPLIB =
+
+include Makefile.inc

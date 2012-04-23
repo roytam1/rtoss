@@ -1,0 +1,33 @@
+# Makefile.dos
+# Digital Mars MAKE.EXE makefile for 16 bit dos
+#
+# Copyright (c) 2006 Ken Kato
+
+CC=sc.exe
+CFLAGS=-DHAVE_STDINT_H -mt -6 -Nc -w- -o -c
+
+LINK=link.exe
+LFLAGS=/nologo /tiny ct
+
+all: vmw vmftp vmshrink
+
+vmw: vmw.com
+
+vmshrink: vmshrink.com
+
+vmftp: vmftp.com
+
+vmw.com: vmw.obj vmcall.obj vmtool.obj termutil.obj
+
+vmshrink.com: vmshrink.obj vmcall.obj vmtool.obj termutil.obj
+
+vmftp.com: vmftp.obj vmshf.obj vmcall.obj vmtool.obj
+
+.obj.com:
+	$(LINK) $(LFLAGS) $**,$@;
+
+.c.obj:
+	$(CC) $(CFLAGS) $<
+
+clean:
+	del vmw.com vmshrink.com vmftp.com *.obj *.map *.cod

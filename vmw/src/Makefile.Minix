@@ -1,0 +1,26 @@
+# makefile for Minix (both native make and gname)
+# use assembly version of vmcall functions (vmcall.mnx.s)
+# and 64 bit integer operations (vmint.mnx.s)
+#
+# Copyright (c) 2006 Ken Kato
+
+AS = cc
+ASFLAGS = -c
+
+CC = cc
+CFLAGS = -O
+
+LD = cc
+LDFLAGS =
+
+VMCALL_O = vmcall.mnx.o
+VMINT_O = vmint.mnx.o
+
+CPPFLAGS = -D_MINIX -DHAVE_STIME -DHAVE_STDINT_H
+# macro _MINIX is required for stime() prototype in time.h
+
+VMWLIB =
+SHRLIB =
+FTPLIB =
+
+include Makefile.inc

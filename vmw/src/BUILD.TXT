@@ -1,0 +1,126 @@
+
+BUILD NOTES
+===========
+
+DOS
+
+    You need the Digital Mars C/C++ Compiler and the 16 bit DOS
+    libraries (http://www.digitalmars.com/).
+    Run make.exe with -f option to specify the proper makefile:
+        make.exe -f Makefile.dos
+
+    Alternately you could rename "Makefile.dos" to "Makefile" so that
+    you wouldn't need to specify the -f option every time you run make
+    if you don't need the original "Makefile" (it's for unix systems)
+
+
+Windows
+
+    With the Digital Mars C/C++ Compiler (http://www.digitalmars.com/),
+    run make.exe with -f option to specify the proper makefile:
+        make.exe -f Makefile.win
+
+    Alternately you could rename "Makefile.win" to "Makefile" so that
+    you wouldn't need to specify the -f option every time you run make
+    if you don't need the original "Makefile" (it's for unix systems)
+
+    With the Microsoft Visual C++ 6.0, simply use the vmw.dsw workspace
+    file.
+
+
+Linux, Sun Solaris, FreeBSD, NetBSD, OpenBSD, Minix, SCO OpenServer
+
+    Simply run make (or gmake) without any parameters, and the master
+    make file (Makefile) should choose an appropriate make file.
+    Or you could specify a makefile explicitly with the -f option:
+    e.g.
+        make -f Makefile.Linux (on Linux)
+        make -f Makefile.SunOS (on Sun Solaris)
+
+    Edit the system specific makefile (such as Makefile.Linux) if you
+    need to adjust build parameters.  The extension part of such system
+    specific makefiles matche the system name returned by "uname".
+
+Linux and *BSD
+
+    Makefile.Linux and Makefile.*BSD refer to "as" and "gcc".
+    Edit this file if you want to use different assembler and compiler.
+
+Sun Solaris
+
+    "Makefile.SunOS" refers to Solaris native "as" and "cc".
+    Edit this file if you want to use different assembler and compiler
+    such as gcc and GNU assembler (which is usually installed as "gas"
+    on Solaris).
+
+SCO OpenServer
+
+    I have not actually built binaries for OpenServer systems and I
+    even don't know it it actually compiles.
+
+
+Function Controlling Macro
+==========================
+
+The following macros are used to control system functions to be used in
+the programs.  You may have to edit the makefile for your system to adjust
+them to your system configuration.
+
+    HAVE_STDINT_H	your system has stdint.h
+    HAVE_INTTYPES_H	your system has inttypes.h, but not stdint.h
+
+			When neither is defined, the following typedefs
+			are used:
+
+			typedef short			int16_t;
+			typedef int			int32_t;
+			typedef unsigned char		uint8_t;
+			typedef unsigned short		uint16_t;
+			typedef unsigned int		uint32_t;
+			typedef unsigned long long	uint64_t;
+
+    HAVE_ICONV_H        your system has iconv.h and the programs use
+ 			iconv() functions to convert characters.
+                        When not defined, character conversion is not
+			performed.
+
+    HAVE_SIGLONGJMP	your system has siglongjmp() and sigsetjmp()
+                        functions.
+			When not defined, longjmp() and setjmp() are used
+			instead.
+
+    HAVE_NANOSLEEP      your system has nanosleep() function
+    HAVE_USLEEP         your system has usleep() function
+
+			When neither is defined, sleep() is used and
+			intervals shorter than a second is not available.
+
+    HAVE_CLOCK_SETTIME	your system has clock_settime() and
+                        clock_gettime() functions
+    HAVE_SETTIMEOFDAY	your system has settimeofday() and gettimeofday()
+  			functions
+    HAVE_STIME          your system has stime() function
+
+			When none of these is defined, the programs cannot
+			change the guest's system time.  Also time() is
+			used to get the system time and resolution finer
+			than a second is not available.
+
+Some finctions are conditioned with the following pre-defined macro.
+
+    _WIN32		32 bit Windows system
+    _MSDOS		16 bit DOS system
+    __linux__		Linux
+    __FreeBSD__		FreeBSD
+    __NetBSD__		NetBSD
+    __OpenBSD__		OpenBSD
+    __sun		Sun Solaris (gcc also defines __sun__, but Sun
+			Studio compiler does not)
+    __minix		Minix
+
+    _MSC_VER		Microsoft C compiler
+    __DMC__		Digital Mars C/C++ compiler
+    __GNUC__		gcc
+    __SUNPRO_C		Sun Studio compiler
+    __SCO_VERSION__	SCO OpenServer compiler
+    __ACK__		Minix compiler

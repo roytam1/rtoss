@@ -1,0 +1,132 @@
+INTRODUCTION
+============
+
+This is a program to shrink virtual disks from command line in a VMware
+guest.
+
+To be able to shrink virtual disks, all virtual disks attached to the
+virtual machine must be in persistent mode, which means the virtual
+machine must not have a snapshot.
+
+Also you must have enough rights to create a file in the root of every
+mounted partitions.  Basically you should be a super user (on unix) or an
+administrator (on Windows) to perform the task.
+
+
+USAGE
+=====
+
+This program takes no command line options.
+The shrinking process proceeds as following:
+
+ 1) Asks VMware if virtual disk shrinking is possible.
+    If not, the program shows the message and quits.
+
+ 2) Looks for mounted partitions and prepare them for shrinking (i.e.
+    clear unused disk space).  The program will terminate with an error if
+    you don't have enough access rights for the root of the partition.
+    The progress of this preparation is displayed on screen.
+
+    During this phase the following key inputs are accepted:
+
+    'C') Cancel disk shrinking and exit the program
+    'S') Skip preparing the current partition and go on to the next
+
+    DO NOT cancel the operation with Ctrl+C -- it will leave a work file,
+    which tends to be quite large, in the root of the partition being
+    prepared at the time.
+
+ 3) Kicks off the actual disk shrink operation.  This process takes place
+    in the host:  the guest loses the input focus and progress dialog is
+    shown in the host.  You can cancell the operation by clicking the
+    cancell button.
+
+
+FILE SYSTEMS
+============
+
+This program supports the following file systems:
+
+  DOS       FAT12 and FAT16. FAT32 also if it is supported by the
+            operating system, such as FreeDOS, and Win 95 OSR2 and later
+            DOS mode.
+
+  Windows   Any supported file systems on local disks (i.e. drives with
+            DRIVE_FIXED drive type).  By default they are:
+
+              95 - FAT12 and FAT16
+              95 OSR 2, 98, 98 SE, Me - FAT12, FAT16 and FAT32
+              NT - FAT12, FAT16 and NTFS
+              2K, XP, 2K3 - FAT12, FAT16, FAT32 and NTFS
+
+            Others are possible with third party file system drivers such
+            as NTFS driver for Win9x, FAT32 driver for NT, and ext2fs
+            driver.
+
+  Linux     adfs, affs, coherent, ext, ext2, ext3, fat, gfs, minix, msdos
+            ntfs, reiserfs, sysv, ufs, umsdos, vfat, xenix, xfs, xiafs
+
+            FIXME: I had to rely on file system names because I don't know
+            how to decide if a file  system is on a local disk in Linux.
+
+  Solaris   ufs
+
+            FIXME: I had to rely on file system names because I don't know
+            how to decide if a file  system is on a local disk in Solaris.
+
+  FreeBSD, NetBSD and OpenBSD
+
+            Any mounted file systems on local disks (i.e. mount entries
+            with MNT_LOCAL or ST_LOCAL flag set).
+
+  Minix     Minix partitions mounted in RW mode.
+
+
+TECHNICALS
+==========
+
+What this program does is actually not very much more than the following
+pseudo shell script (which uses vmw program to issue VMware RPC commands):
+
+#!/bin/sh
+
+# check if shrinking is possible
+
+RPC=`vmw rpc disk.wiper.enable` # issue a VMware RPC command
+
+if [ $? -ne 0 ]; then           # see if RPC call succeeded
+    echo RPC call failed
+    exit 1
+fi
+
+if [ "${RPC}" != "1 1" ]; then  # see if shrinking is possible
+    echo Shrinking is not possible
+    exit 1
+fi
+
+# shrink preparation
+
+for part in (somehow get a list of mounted partitions)
+do
+    # fill unused sectors with zero
+
+    dd if=/dev/zero of=${part}/wiperfile bs=1000k
+    rm ${part}/wiperfile
+done
+
+# shrink
+
+RPC=`vme rpc disk.shrink`       # issue an VMware RPC command
+
+if [ $? -ne 0 ]; then           # see if RPC call succeeded
+    echo RPC call failed
+    exit 1
+fi
+
+if [ "${RPC}" != "1 " ]; then   # see if shrinking was cancelled
+    echo Cancelled
+    exit 1
+fi
+
+echo Complete                   # all went well
+exit 0
