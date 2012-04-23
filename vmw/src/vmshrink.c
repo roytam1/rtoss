@@ -970,6 +970,7 @@ static int enum_disk(char *path, uint32_t *total, uint32_t *avail)
 			!strcmp(mnt->mnt_type, "ext") ||
 			!strcmp(mnt->mnt_type, "ext2") ||
 			!strcmp(mnt->mnt_type, "ext3") ||
+			!strcmp(mnt->mnt_type, "ext4") ||
 			!strcmp(mnt->mnt_type, "fat") ||
 			!strcmp(mnt->mnt_type, "gfs") ||
 			//!strcmp(mnt->mnt_type, "hfs") ||
