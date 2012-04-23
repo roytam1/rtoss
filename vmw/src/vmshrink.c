@@ -8,6 +8,11 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <limits.h>
+#if !defined(PATH_MAX) && defined(_POSIX_PATH_MAX)
+#define PATH_MAX _POSIX_PATH_MAX
+#endif
+
 #include "vmtool.h"
 #include "termutil.h"
 
@@ -1074,6 +1079,77 @@ static int enum_disk(char *path, uint32_t *total, uint32_t *avail)
 
 	fclose(mnttab);
 	mnttab = NULL;
+
+	return VMTOOL_SUCCESS;
+}
+
+#elif defined (_SCO_DS)
+
+#include <mnttab.h>
+#include <sys/statvfs.h>
+
+static int enum_disk(char *path, uint32_t *total, uint32_t *avail)
+{
+	static FILE *mnttab = NULL;
+	struct mnttab mnt;
+	struct statvfs vfs;
+	int br; int bx = sizeof(struct mnttab);
+
+	if (path == NULL) {
+		//	end enumeration
+		if (mnttab) {
+			fclose(mnttab);
+			mnttab = NULL;
+		}
+		return VMTOOL_SUCCESS;
+	}
+
+	if (mnttab == NULL) {
+		//	first time
+		mnttab = fopen("/etc/mnttab", "r");
+
+		if (mnttab == NULL) {
+			if (vmtool_msg > vmtool_quiet) {
+				fprintf(stderr, "Failed to open /etc/mnttab\n");
+			}
+			return VMTOOL_SYS_ERROR;
+		}
+	}
+
+
+	while (fread (&mnt, bx, 1, mnttab)) {
+/*fprintf(stderr, "%s %s %d\n", mnt.mt_dev,mnt.mt_filsys,mnt.mt_ro_flg & 1);*/
+		if (mnt.mt_dev && mnt.mt_filsys &&
+			!(mnt.mt_ro_flg & 1)) {
+
+			strcpy(path, mnt.mt_filsys);
+
+			if (statvfs(path, &vfs) == 0) {
+				*total = (uint32_t)((long long)vfs.f_frsize *
+					vfs.f_blocks / 1024);
+
+				*avail = (uint32_t)((long long)vfs.f_frsize *
+					vfs.f_bfree / 1024);
+			}
+			else {
+				if (vmtool_msg > vmtool_quiet) {
+					fprintf(stderr, "failed to get %s free space\n", path);
+				}
+
+				*total = *avail = (uint32_t)-1;
+			}
+
+			return VMTOOL_SUCCESS;
+		}
+	}
+
+	//	no more mounted partition
+	*path = NULL;
+
+	fclose(mnttab);
+	mnttab = NULL;
+
+//exit(0);
 
 	return VMTOOL_SUCCESS;
 }
