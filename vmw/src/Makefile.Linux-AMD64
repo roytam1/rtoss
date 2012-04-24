@@ -2,14 +2,14 @@
 #
 # Copyright (c) 2006 Ken Kato
 
-AS = as
-ASFLAGS = -arch i386
+AS = gcc
+ASFLAGS = -m32 -c
 
 CC = gcc
 CFLAGS = -O2 -m32
 
 LD = gcc
-LDFLAGS = -m32
+LDFLAGS = -m32 
 
 # replace the following line if you prefer inline version
 # of vmcall functions (vmcall.c)
