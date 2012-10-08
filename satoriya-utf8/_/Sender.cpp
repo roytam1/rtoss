@@ -84,6 +84,8 @@ bool	Sender::send(const char* iFormat, ...)
 	}
 
 	const int nest = nest_object::count();
+	DWORD ret_dword = 0;
+	
 	if ( nest>0 )
 	{
 		char*	buf = new char[nest+1];
@@ -92,7 +94,7 @@ bool	Sender::send(const char* iFormat, ...)
 			buf[i]=' ';
 		buf[i]='\0';
 		COPYDATASTRUCT	cds = {1, nest+1, buf};
-		::SendMessage(sm_receiver_window, WM_COPYDATA, NULL, (LPARAM)(&cds));
+		::SendMessageTimeout(sm_receiver_window, WM_COPYDATA, NULL, (LPARAM)(&cds),SMTO_BLOCK|SMTO_ABORTIFHUNG,5000,&ret_dword);
 		delete [] buf;
 	}
 
@@ -105,7 +107,7 @@ bool	Sender::send(const char* iFormat, ...)
 	}*/
 
 	COPYDATASTRUCT	cds = {0,  strlen(theBuf)+1, &theBuf};
-	::SendMessage(sm_receiver_window, WM_COPYDATA, NULL, (LPARAM)(&cds));
+	::SendMessageTimeout(sm_receiver_window, WM_COPYDATA, NULL, (LPARAM)(&cds),SMTO_BLOCK|SMTO_ABORTIFHUNG,5000,&ret_dword);
 
 	//::OutputDebugString(theBuf);
 	//::OutputDebugString("\n");

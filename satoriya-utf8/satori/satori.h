@@ -59,6 +59,7 @@ extern const char* gSaoriVersion;
 static const int RESPONSE_HISTORY_SIZE=64;
 
 enum SurfaceRestoreMode {
+	SR_INVALID = -1,
 	SR_NONE = 0,
 	SR_NORMAL,
 	SR_FORCE,
@@ -102,6 +103,7 @@ private:
 	string	mRequestType;		// SHIORI / SAORI / MAKOTO
 	string	mRequestVersion;	// 1.0, 2.x, 3.0
 	bool	mIsMateria;	// まてりあは特殊処理が要る
+	bool    mIsStatusHeaderExist; //ステータスヘッダ対応してるかどうか
 	strvec	mReferences;
 	strvec  mKakkoCallResults;
 	enum { SAORI, SHIORI2, SHIORI3, MAKOTO2, UNKNOWN } mRequestMode;
@@ -215,6 +217,11 @@ private:
 
 	// 会話時サーフェス戻し・＄変数
 	enum SurfaceRestoreMode	surface_restore_at_talk;
+	enum SurfaceRestoreMode	surface_restore_at_talk_onetime;
+
+	bool auto_anchor_enable;
+	bool auto_anchor_enable_onetime;
+
 	map<int, int>	default_surface;
 	map<int, int>	surface_add_value;
 	map<int, int>	next_default_surface; // 途中でdef_surfaceを切り換えても、そのrequestでは使わない
@@ -239,7 +246,7 @@ private:
 	map<int, string>	BalloonOffset;
 
 	// 時間系情報取得用
-	unsigned long tick_count_at_load, tick_count_total;
+	unsigned long sec_count_at_load, sec_count_total;
 
 	// サーフェス
 	map<int, int>	cur_surface;

@@ -158,14 +158,21 @@ void Satori::surface_restore_string_addfunc(string &str,map<int, int>::const_ite
 }
 
 string	Satori::surface_restore_string()
-{ 
-	if ( surface_restore_at_talk == SR_NONE ) {	// そもそも必要なし、の場合
+{
+	enum SurfaceRestoreMode srestore = surface_restore_at_talk_onetime;
+	if ( srestore == SR_INVALID ) {
+		srestore = surface_restore_at_talk;
+	}
+
+	// そもそも必要なし、の場合
+	// invalid比較はただの保険（ありえない）
+	if ( srestore == SR_NONE || srestore == SR_INVALID ) {	
 		return	"\\1";
 	}
 
 	string	str="";
 	
-	if ( surface_restore_at_talk == SR_FORCE ) {	
+	if ( srestore == SR_FORCE ) {	
 		for ( map<int, int>::const_iterator i=default_surface.begin() ; i!=default_surface.end() ; ++i ) {
 			if ( surface_changed_before_speak.size() ) {
 				map<int,bool>::const_iterator found = surface_changed_before_speak.find(i->first);
@@ -625,7 +632,7 @@ bool	Satori::system_variable_operation(string key, string value, string* result)
 		return true;
 	}
 
-	if ( key == "会話時サーフェス戻し" ) {
+	if ( key == "会話時サーフェス戻し" || key == "会話時サーフィス戻し" ) {
 		if ( value == "有効" ) {
 			surface_restore_at_talk = SR_NORMAL;
 		}
@@ -634,6 +641,41 @@ bool	Satori::system_variable_operation(string key, string value, string* result)
 		}
 		else {
 			surface_restore_at_talk = SR_NONE;
+		}
+		return true;
+	}
+
+	if ( key == "今回は会話時サーフェス戻し" || key == "今回は会話時サーフィス戻し" ) {
+		if ( value == "有効" ) {
+			surface_restore_at_talk_onetime = SR_NORMAL;
+		}
+		else if ( value == "強制" ) {
+			surface_restore_at_talk_onetime = SR_FORCE;
+		}
+		else {
+			surface_restore_at_talk_onetime = SR_NONE;
+		}
+		return true;
+	}
+
+	if ( key == "自動アンカー" ) {
+		if ( value == "有効" ) {
+			auto_anchor_enable = true;
+			auto_anchor_enable_onetime = auto_anchor_enable;
+		}
+		else {
+			auto_anchor_enable = false;
+			auto_anchor_enable_onetime = auto_anchor_enable;
+		}
+		return true;
+	}
+
+	if ( key == "今回は自動アンカー" ) {
+		if ( value == "有効" ) {
+			auto_anchor_enable_onetime = true;
+		}
+		else {
+			auto_anchor_enable_onetime = false;
 		}
 		return true;
 	}
@@ -824,7 +866,7 @@ bool	Satori::system_variable_operation(string key, string value, string* result)
 	
 	if ( key == "全タイマ解除" && value=="実行") {
 		variables.erase(key);
-		for (strintmap::iterator i=timer.begin();i!=timer.end();++i)
+		for (strintmap::const_iterator i=timer.begin();i!=timer.end();++i)
 			variables.erase(i->first + "タイマ");
 		timer.clear();
 		return true;

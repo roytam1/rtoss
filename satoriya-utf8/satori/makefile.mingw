@@ -14,8 +14,8 @@ DYLIB_NAME_POSTFIX = .dll
 # 追加するフラグ。
 # CXXFLAGSは必要無ければ空でも良いが、LDFLAGSはdlopen可能なライブラリを
 # 作れる設定にしなければならない。darwinなら-bundle、LinuxやBSDなら-shared。
-CXXFLAGS = -Os
-LDFLAGS = -shared
+CXXFLAGS = -Os -fno-rtti
+LDFLAGS = -s -shared
 
 
 ################## これより下は弄らなくてもコンパイル出来ます ##################
