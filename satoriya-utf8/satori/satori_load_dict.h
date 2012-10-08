@@ -1,6 +1,4 @@
-#ifdef POSIX
-#  include "posix_utils.h"
-#endif
+#include "posix_utils.h"
 
 void	Satori::InitMembers() {
 
@@ -56,6 +54,11 @@ void	Satori::InitMembers() {
 	assert(kakko_replace_history.size()==0);
 
 	surface_restore_at_talk=SR_NORMAL;
+	surface_restore_at_talk_onetime=SR_INVALID;
+
+	auto_anchor_enable = true;
+	auto_anchor_enable_onetime = true;
+
 	surface_add_value.clear();
 	last_talk_exiting_surface.clear();
 	next_default_surface.clear();
@@ -67,14 +70,8 @@ void	Satori::InitMembers() {
 	BalloonOffset[0] = BalloonOffset[1] = "0,0";
 	validBalloonOffset.clear();
 
-#ifdef POSIX
-	// GetTickCount()はWindows起動後の経過ミリ秒…らしい。
-	// それを取得することは出来ないので、エポックミリ秒で代用！
-	tick_count_at_load = posix_get_current_millis();
-#else
-	tick_count_at_load = ::GetTickCount();
-#endif
-	tick_count_total = 0;
+	sec_count_at_load = posix_get_current_sec();
+	sec_count_total = 0;
 
 	ghosts_info.clear();
 	mCommunicateFor="";
@@ -112,6 +109,9 @@ void	Satori::InitMembers() {
 	//喋るごとに初期化する変数
 	return_empty = false;
 	is_quick_section = false;
+
+	surface_restore_at_talk_onetime = SR_INVALID;
+	auto_anchor_enable_onetime = auto_anchor_enable;
 
 	is_dic_loaded = false;
 	is_call_ontalk_at_mikire = false;

@@ -90,11 +90,13 @@ bool	getline(istream& i, string& o, int delimtier='\n');
 bool	getline(istream& i, int& o, int delimtier='\n');
 
 // intとの相互変換
-inline int	stoi(const string& s) { return atoi(s.c_str()); }
-inline int  stoi(const char* s) { return atoi(s); }
+inline long stoi(const string& s) { return strtol(s.c_str(),NULL,10); }
+inline long stoi(const char* s) { return strtol(s,NULL,10); }
+inline unsigned long stoui(const string& s) { return strtoul(s.c_str(),NULL,10); }
+inline unsigned long stoui(const char* s) { return strtoul(s,NULL,10); }
 
-inline string	itos(int i, const char* iFormat="%d") { char buf[32]; sprintf(buf,iFormat,i); return buf; }
-inline string	uitos(unsigned int i, const char* iFormat="%u") { char buf[32]; sprintf(buf,iFormat,i); return buf; }
+inline string	itos(long i, const char* iFormat="%d") { char buf[32]; sprintf(buf,iFormat,i); return buf; }
+inline string	uitos(unsigned long i, const char* iFormat="%u") { char buf[32]; sprintf(buf,iFormat,i); return buf; }
 
 // それてなに。
 bool	aredigits(const char* p);
@@ -321,17 +323,54 @@ string	combine(const T& in, const string& dlmt="", bool add_dlmt_on_final=false)
 bool	is_exist_file(const string& iFileName);
 
 // strの先頭がheadであればtrue
+bool	compare_head_s(const char* str, const char* head);
+
 inline bool	compare_head(const string& str, const string& head) {
-	if ( str.size() == 0 || head.size() == 0 ) { return false; }
-	return str.compare(0, head.size(), head)==0;
+	return compare_head_s(str.c_str(),head.c_str());
+}
+inline bool	compare_head(const string& str, const char* head) {
+	return compare_head_s(str.c_str(),head);
 }
 inline bool	compare_head(const char* str, const char* head) {
-	if ( ! str || ! head || str[0] == 0 || head[0] == 0 ) { return false; }
-	return strncmp(str, head, strlen(head))==0;
+	return compare_head_s(str,head);
 }
+
+bool	compare_head_nocase_s(const char* str, const char* head);
+
+inline bool	compare_head_nocase(const string& str, const string& head) {
+	return compare_head_nocase_s(str.c_str(),head.c_str());
+}
+inline bool	compare_head_nocase(const string& str, const char* head) {
+	return compare_head_nocase_s(str.c_str(),head);
+}
+inline bool	compare_head_nocase(const char* str, const char* head) {
+	return compare_head_nocase_s(str,head);
+}
+
 // strの末尾がtailであればtrue
-bool	compare_tail(const string& str, const string& tail);	
-bool	compare_tail(const string& str, const char* tail);	
+bool	compare_tail_s(const char* str, const char* tail);
+
+inline bool compare_tail(const string& str, const string& tail) {
+	return compare_tail_s(str.c_str(),tail.c_str());
+}	
+inline bool compare_tail(const string& str, const char* tail) {
+	return compare_tail_s(str.c_str(),tail);
+}	
+inline bool compare_tail(const char* str, const char* tail) {
+	return compare_tail_s(str,tail);
+}	
+
+bool	compare_tail_nocase_s(const char* str, const char* tail);
+	
+inline bool compare_tail_nocase(const string& str, const string& tail) {
+	return compare_tail_nocase_s(str.c_str(),tail.c_str());
+}	
+inline bool compare_tail_nocase(const string& str, const char* tail) {
+	return compare_tail_nocase_s(str.c_str(),tail);
+}	
+inline bool compare_tail_nocase(const char* str, const char* tail) {
+	return compare_tail_nocase_s(str,tail);
+}	
 
 // target中の最初にfind文字列が出現する位置を返す。半角全角両対応
 const char*	strstr_hz(const char* target, const char* find);

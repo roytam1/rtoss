@@ -1,8 +1,6 @@
 #include	"satori.h"
 #include	"../_/Utilities.h"
-#ifdef POSIX
-#  include      "posix_utils.h"
-#endif
+#include "posix_utils.h"
 #include	<time.h>
 
 #include "random.h"
@@ -699,93 +697,105 @@ bool	Satori::CallReal(const string& iName, string& oResult, bool for_calc, bool 
 	else if ( iName == "現在分" ) { SYSTEMTIME st; ::GetLocalTime(&st); oResult=int2zen(st.wMinute); }
 	else if ( iName == "現在秒" ) { SYSTEMTIME st; ::GetLocalTime(&st); oResult=int2zen(st.wSecond); }
 #endif
-#ifdef POSIX
+	//起動
 	else if (iName == "起動時") {
-	    unsigned long msec = posix_get_current_millis() - tick_count_at_load;
-	    int hour = msec / 1000 / 60 / 60;
+	    time_t sec = posix_get_current_sec() - sec_count_at_load;
+	    time_t hour = sec / 60 / 60;
 	    oResult = int2zen(hour);
 	}
 	else if (iName == "起動分") {
-	    unsigned long msec = posix_get_current_millis() - tick_count_at_load;
-	    int hour = msec / 1000 / 60 / 60;
-	    msec -= hour * 60 * 60 * 1000;
-	    int minute = msec / 1000 / 60;
+	    time_t sec = posix_get_current_sec() - sec_count_at_load;
+	    time_t hour = sec / 60 / 60;
+	    sec -= hour * 60 * 60;
+	    time_t minute = sec / 60;
 	    oResult = int2zen(minute);
 	}
 	else if (iName == "起動秒" ) {
-	    unsigned long msec = posix_get_current_millis() - tick_count_at_load;
-	    int hour = msec / 1000 / 60 / 60;
-	    msec -= hour * 60 * 60 * 1000;
-	    int minute = msec / 1000 / 60;
-	    msec -= minute * 60 * 1000;
-	    int second = msec / 1000;
-	    oResult = int2zen(second);
+	    time_t sec = posix_get_current_sec() - sec_count_at_load;
+	    time_t hour = sec / 60 / 60;
+	    sec -= hour * 60 * 60;
+	    time_t minute = sec / 60;
+	    sec -= minute * 60;
+	    oResult = int2zen(sec);
 	}
 	else if (iName == "単純起動秒" ) {
-	    unsigned long msec = posix_get_current_millis() - tick_count_at_load;
-	    oResult = int2zen(msec / 1000);
+	    time_t sec = posix_get_current_sec() - sec_count_at_load;
+	    oResult = int2zen(sec);
 	}
 	else if (iName == "単純起動分") {
-	    unsigned long msec = posix_get_current_millis() - tick_count_at_load;
-	    oResult = int2zen(msec / 1000 / 60);
+	    time_t sec = posix_get_current_sec() - sec_count_at_load;
+	    oResult = int2zen(sec / 60);
 	}
-#else
-	else if ( iName == "起動時" ) { oResult=int2zen(DwordToSystemTime(::GetTickCount()-tick_count_at_load).wHour); }
-	else if ( iName == "起動分" ) { oResult=int2zen(DwordToSystemTime(::GetTickCount()-tick_count_at_load).wMinute); }
-	else if ( iName == "起動秒" ) { oResult=int2zen(DwordToSystemTime(::GetTickCount()-tick_count_at_load).wSecond); }
-	else if ( iName == "単純起動秒" ) { oResult=int2zen( (::GetTickCount()-tick_count_at_load)/1000 ); }
-	else if ( iName == "単純起動分" ) { oResult=int2zen( (::GetTickCount()-tick_count_at_load)/1000/60 ); }
-#endif
-#ifdef POSIX
-	else if (hankaku == "OS起動時" || hankaku == "OS起動分" || hankaku == "OS起動秒" ||
-		 hankaku == "単純OS起動秒" || hankaku == "単純OS起動分") {
-	    // 取得する方法が無い。
-	    oResult = int2zen(0);
+	else if (iName == "単純起動時") {
+	    time_t sec = posix_get_current_sec() - sec_count_at_load;
+	    oResult = int2zen(sec / 60 / 60);
 	}
-#else
-	else if ( hankaku == "OS起動時" ) { oResult=int2zen(DwordToSystemTime(::GetTickCount()).wHour); }
-	else if ( hankaku == "OS起動分" ) { oResult=int2zen(DwordToSystemTime(::GetTickCount()).wMinute); }
-	else if ( hankaku == "OS起動秒" ) { oResult=int2zen(DwordToSystemTime(::GetTickCount()).wSecond); }
-	else if ( hankaku == "単純OS起動秒" ) { oResult=int2zen( ::GetTickCount() / 1000 ); }
-	else if ( hankaku == "単純OS起動分" ) { oResult=int2zen( ::GetTickCount() / 1000/60 ); }
-#endif
-#ifdef POSIX
+	//OS起動
+	else if (iName == "OS起動時" || iName == "ＯＳ起動時") {
+	    time_t sec = posix_get_current_sec();
+	    time_t hour = sec / 60 / 60;
+	    oResult = int2zen(hour);
+	}
+	else if (iName == "OS起動分" || iName == "ＯＳ起動分" ) {
+	    time_t sec = posix_get_current_sec();
+	    time_t hour = sec / 60 / 60;
+	    sec -= hour * 60 * 60;
+	    time_t minute = sec / 60;
+	    oResult = int2zen(minute);
+	}
+	else if (iName == "OS起動秒" || iName == "ＯＳ起動秒") {
+	    time_t sec = posix_get_current_sec();
+	    time_t hour = sec / 60 / 60;
+	    sec -= hour * 60 * 60;
+	    time_t minute = sec / 60;
+	    sec -= minute * 60;
+	    oResult = int2zen(sec);
+	}
+	else if (iName == "単純OS起動秒" || iName == "単純ＯＳ起動秒") {
+	    time_t sec = posix_get_current_sec();
+	    oResult = int2zen(sec);
+	}
+	else if (iName == "単純OS起動分" || iName == "単純ＯＳ起動分") {
+	    time_t sec = posix_get_current_sec();
+	    oResult = int2zen(sec / 60);
+	}
+	else if (iName == "単純OS起動時" || iName == "単純ＯＳ起動時") {
+	    time_t sec = posix_get_current_sec();
+	    oResult = int2zen(sec / 60 / 60);
+	}
+	//累計
 	else if (iName == "累計時") {
-	    unsigned long msec = posix_get_current_millis() - tick_count_at_load + tick_count_total;
-	    int hour = msec / 1000 / 60 / 60;
+	    time_t sec = posix_get_current_sec() - sec_count_at_load + sec_count_total;
+	    time_t hour = sec / 60 / 60;
 	    oResult = int2zen(hour);
 	}
 	else if (iName == "累計分" ) {
-	    unsigned long msec = posix_get_current_millis() - tick_count_at_load + tick_count_total;
-	    int hour = msec / 1000 / 60 / 60;
-	    msec -= hour * 60 * 60 * 1000;
-	    int minute = msec / 1000 / 60;
+	    time_t sec = posix_get_current_sec() - sec_count_at_load + sec_count_total;
+	    time_t hour = sec / 60 / 60;
+	    sec -= hour * 60 * 60;
+	    time_t minute = sec / 60;
 	    oResult = int2zen(minute);
 	}
 	else if (iName == "累計秒") {
-	    unsigned long msec = posix_get_current_millis() - tick_count_at_load + tick_count_total;
-	    int hour = msec / 1000 / 60 / 60;
-	    msec -= hour * 60 * 60 * 1000;
-	    int minute = msec / 1000 / 60;
-	    msec -= minute * 60 * 1000;
-	    int second = msec / 1000;
-	    oResult = int2zen(second);
+	    time_t sec = posix_get_current_sec() - sec_count_at_load + sec_count_total;
+	    time_t hour = sec / 60 / 60;
+	    sec -= hour * 60 * 60;
+	    time_t minute = sec / 60;
+	    sec -= minute * 60;
+	    oResult = int2zen(sec);
 	}
 	else if (iName == "単純累計秒") {
-	    unsigned long msec = posix_get_current_millis() - tick_count_at_load + tick_count_total;
-	    oResult = int2zen(msec / 1000);
+	    time_t sec = posix_get_current_sec() - sec_count_at_load + sec_count_total;
+	    oResult = int2zen(sec);
 	}
 	else if (iName == "単純累計分") {
-	    unsigned long msec = posix_get_current_millis() - tick_count_at_load + tick_count_total;
-	    oResult = int2zen(msec / 1000 / 60);
+	    time_t sec = posix_get_current_sec() - sec_count_at_load + sec_count_total;
+	    oResult = int2zen(sec / 60);
 	}
-#else
-	else if ( iName == "累計時" ) { oResult=int2zen(DwordToSystemTime( ::GetTickCount() - tick_count_at_load + tick_count_total ).wHour); }
-	else if ( iName == "累計分" ) { oResult=int2zen(DwordToSystemTime( ::GetTickCount() - tick_count_at_load + tick_count_total ).wMinute); }
-	else if ( iName == "累計秒" ) { oResult=int2zen(DwordToSystemTime( ::GetTickCount() - tick_count_at_load + tick_count_total ).wSecond); }
-	else if ( iName == "単純累計秒" ) { oResult=int2zen( (::GetTickCount() - tick_count_at_load + tick_count_total)/1000 ); }
-	else if ( iName == "単純累計分" ) { oResult=int2zen( (::GetTickCount() - tick_count_at_load + tick_count_total)/1000/60 ); }
-#endif
+	else if (iName == "単純累計時") {
+	    time_t sec = posix_get_current_sec() - sec_count_at_load + sec_count_total;
+	    oResult = int2zen(sec / 60 / 60);
+	}
 	else if ( hankaku == "time_t" ) { time_t tm; time(&tm); oResult=int2zen(tm); }
 	else if ( iName == "最終トークからの経過秒" ) { oResult=int2zen(second_from_last_talk); }
 
@@ -799,9 +809,9 @@ bool	Satori::CallReal(const string& iName, string& oResult, bool for_calc, bool 
 #ifndef POSIX
 	else if ( compare_head(iName, "ウィンドウハンドル") && iName.length() > 27 ) {
 		int character = zen2int(iName.c_str()+27);
-		map<int,HWND>::iterator found = characters_hwnd.find(character);
+		map<int,HWND>::const_iterator found = characters_hwnd.find(character);
 		if ( found != characters_hwnd.end() ) {
-			oResult = uitos((unsigned int)characters_hwnd[character]);
+			oResult = uitos((unsigned int)found->second);
 		}
 	}
 #endif
@@ -982,13 +992,13 @@ bool	Satori::CallReal(const string& iName, string& oResult, bool for_calc, bool 
 		}
 	}
 	else if ( iName=="次のトーク" ) {
-		map<int,string>::iterator it = reserved_talk.find(1);
+		map<int,string>::const_iterator it = reserved_talk.find(1);
 		if ( it != reserved_talk.end() ) 
 			oResult = it->second;
 	}
 	else if ( compare_head(iName,"次から") && compare_tail(iName,"回目のトーク") ) {
 		int	count = zen2int( string(iName.c_str()+const_strlen("次から"), iName.length()-const_strlen("次から")-const_strlen("回目のトーク")) );
-		map<int,string>::iterator it = reserved_talk.find(count);
+		map<int,string>::const_iterator it = reserved_talk.find(count);
 		if ( it != reserved_talk.end() ) {
 			oResult = it->second;
 		}
@@ -996,7 +1006,7 @@ bool	Satori::CallReal(const string& iName, string& oResult, bool for_calc, bool 
 	else if ( compare_head(iName, "トーク「") && compare_tail(iName, "」の予約有無") ) {
 		string	str(iName, const_strlen("トーク「"), iName.length()-const_strlen("トーク「")-const_strlen("」の予約有無"));
 		oResult = "0";
-		for (map<int, string>::iterator it=reserved_talk.begin(); it!=reserved_talk.end() ; ++it) {
+		for (map<int, string>::const_iterator it=reserved_talk.begin(); it!=reserved_talk.end() ; ++it) {
 			if ( str == it->second ) {
 				oResult = "1";
 				break;
