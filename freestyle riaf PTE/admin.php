@@ -95,7 +95,7 @@ if (count($_POST) > 0) {
 			for($j = 0; $j < count($sub); $j++) {
 				$old = explode(",", $sub[$j]);
 				foreach($key as $val) {
-					if ($old[0] == $val) {
+					if ($old[0] == $val.$ext) {
 						$sub[$j] = "";
 						$flag = true;
 					} 
@@ -186,34 +186,35 @@ if (check_login(0)) {
 		$delcgi = $ddir . $del . $ext_cgi;
 		$line = file($delfile);
 		$cgiline = @file($delcgi);
-		list($name, $email, $now, $com, $sub) = explode(",", $line[0]);
+		list($name, $email, $now, $com, $sub) = explode(",", isset($_POST['viewcgi'])?$cgiline[0]:$line[0]);
 		echo "<font size=+1 color=red>$sub</font>";
 		for($i = 0; $i < count($line); $i++) {
-			list($name, $email, $now, $com, $sub) = explode(",", $line[$i]);
+			list($name, $email, $now, $com, $sub) = explode(",", isset($_POST['viewcgi'])?$cgiline[$i]:$line[$i]);
 			list(,,,,, $host) = @explode(",", $cgiline[$i]);
 			if ($email != "") {
 				$name = "<a href=\"mailto:$email\">$name</a>";
 			} 
 			$com = bb2html($com);
 			$n = $i + 1;
-			if($host) $now = preg_replace('/IP.*$/',preg_match('/[a-zA-Z\-]/',$host)?"Host: $host":"IP: $host", $now);
+			if($host) $now = preg_replace('/I[PD].*$/',preg_match('/[a-zA-Z\-]/',$host)?"Host: $host":"IP: $host", $now);
 			echo "<dt><input type=checkbox name=\"num[$i]\"> ";
 			echo "$n <font color=\"forestgreen\"><b>$name</b></font> [ $now ]<dd>$com<br><br>\n";
 		} 
 		echo "</dl><input type=hidden name=dat value=$del>";
 		$stop = " <input type=submit name=act_stop value='スレッド停止'><input type=submit name=act_html value='HTML化'>";
+		$backup = isset($_POST['viewcgi'])?"<input type=submit name=viewdat value=\" ログ本体を見る \">":"<input type=submit name=viewcgi value=\" バックアップを見る \">";
 	} else {
 		$filename = ($mode == "all") ? $sub_back : $subj_file;
 		$idx = file($filename);
 		for($i = 0; $i < count($idx); $i++) {
 			$data = explode(",", $idx[$i]);
 			list($key,) = explode(".", $data[0]);
-			echo "<input type=checkbox name=key[] value=$data[0]> ";
+			echo "<input type=checkbox name=key[] value=$key> ";
 			echo " <a href=admin.php?del=$key>$data[1]</a><br>\n";
 		} 
 	} 
 	echo "<br>
-<input type=submit name=act_del value=\" 削除する \">$stop<br>各ボタンを押してね</form>
+<input type=submit name=act_del value=\" 削除する \">$backup$stop<br>各ボタンを押してね</form>
 <FORM method=\"POST\" action=\"$_SERVER[PHP_SELF]?action=logout\" ENCTYPE=\"multipart/form-data\">
 <INPUT type=\"submit\" value=\"ログアウト\"></form>";
 	echo "</body></html>";

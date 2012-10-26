@@ -67,6 +67,7 @@ $c_pass = $_REQUEST['delk'];
 $delk = substr(md5($_REQUEST['delk']), 2, 8);
 $key = $_REQUEST['key'];
 $HOST = gethostbyaddr($IP=getREMOTE_ADDR());
+$idtag=false;
 
 if (preg_match("/^( |　|\t)*$/", $MESSAGE)) {
 	error("本文がありません！", $FROM, $mail, $HOST, $MESSAGE);
@@ -88,6 +89,7 @@ if(!$key) {
 $IsBanned=false;
 $killip = file("killip.cgi");
 $checkTwice = ($IP != $HOST); // 是否需檢查第二次
+$killip = explode(',', $killip[0]);
 foreach ($killip as $kill) {
 	$kill = rtrim($kill);
 	if ($kill) {
@@ -107,7 +109,7 @@ foreach ($killip as $kill) {
 		if(preg_match($kill, $HOST) || ($checkTwice && preg_match($kill, $IP))){ $IsBanned = true; break; }
 	}
 }
-if($IsBanned) error("投稿が禁止されています", $FROM, $mail, $HOST, $MESSAGE);
+if($IsBanned) error("投稿が禁止されています (x1)", $FROM, $mail, $HOST, $MESSAGE);
 
 if(count($ngfiles)) {
 	foreach($ngfiles as $ngfile) {
@@ -115,7 +117,7 @@ if(count($ngfiles)) {
 			$ngwords=explode(',',rtrim(implode('',file($ngfile))));
 			foreach($ngwords as $value){
 				if($value!="" && (strpos($MESSAGE, $value)!==false || strpos($subject ,$value)!==false || strpos($FROM, $value)!==false || strpos($mail,$value)!==false))
-					error("投稿が禁止されています", $FROM, $mail, $HOST, $MESSAGE);
+					error("投稿が禁止されています (x2)", $FROM, $mail, $HOST, $MESSAGE);
 			}
 		}
 	}
@@ -127,24 +129,28 @@ if(is_file($rengfile)) {
 		if($value){
 			$value="/$value/";
 			if((preg_match($value,$MESSAGE) || preg_match($value,$subject) || preg_match($value,$FROM) || preg_match($value,$mail)))
-				error("投稿が禁止されています", $FROM, $mail, $HOST, $MESSAGE);
+				error("投稿が禁止されています (x3)", $FROM, $mail, $HOST, $MESSAGE);
 		}
 	}
 }
 
 // ID 処理
+if(strpos($mail,'!id')!==false) {
+	$mail=str_replace('!id','',$mail);
+	$idtag=true;
+}
 /*
 if (!empty($mail)) {
 	$id = " ID:???";
+} else*/ if($idtag) {
+	$idnum = substr(strtr($_SERVER['REMOTE_ADDR'], '.', ''), 8);
+	$bbscrypt = ord($_SERVER['PHP_SELF'][3]) + ord($_SERVER['PHP_SELF'][4]);
+	$idcrypt = substr(crypt(($bbscrypt + $idnum), gmdate('Ymd', time() + $TZ * 3600)), -8);
+	$id = ' ID:' . $idcrypt;
 } else {
-	$idnum = substr(strtr($_SERVER["REMOTE_ADDR"], ".", ""), 8);
-	$bbscrypt = ord($_SERVER["PHP_SELF"][3]) + ord($_SERVER["PHP_SELF"][4]);
-	$idcrypt = substr(crypt(($bbscrypt + $idnum), gmdate("Ymd", time() + $TZ * 3600)), -8);
-	$id = " ID:" . $idcrypt;
+	// IP
+	$id = ' IP:'.preg_replace('/\d+$/','*',$IP);
 }
-*/
-// IP
-$id = " IP:".preg_replace('/\d+$/','*',$IP);
 
 $qcnt=$exflg=0;
 if($extipq && $IP != "127.0.0.1" && strpos($FROM,"fusianasan")===false && strpos($FROM,"mokorikomo")===false) {
@@ -283,8 +289,14 @@ if ($subject) {
 	// レスｶｳﾝﾄアップ
 	for ($r = 0; $r < count($subj_arr); $r++) {
 		list($kdate, $t_r) = explode(",", $subj_arr[$r]);
-		$t_r = str_replace(")", "", $t_r);
-		list($title, $rescnt) = explode("(", $t_r);
+
+		//$t_r = str_replace(")", "", $t_r);
+		//list($title, $rescnt) = explode("(", $t_r);
+		$tlen = strlen($t_r);
+		$lastcur = strrpos($t_r, '(');
+		$title = substr($t_r,0,$lastcur);
+		$rescnt = substr($t_r, $lastcur+1, $tlen-$lastcur-2);
+
 		list($dkey,) = explode(".", $kdate);
 		if ($dkey == $key) {
 			if (strstr($mail, "sage")) {
