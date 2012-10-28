@@ -1,10 +1,15 @@
 #include <windows.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 #include <locale.h>
 
 void DisplayVolumePaths(PWCHAR VolumeName);
+WCHAR *fdigitsW(uint64_t integer);
 WCHAR *ComputerUnits(uint64_t integer, int maxdiv);
+void DrawGauge(int length, int percent, int isempty);
+int IsTargetDrive(int DriveType, int flgNoRemoveable);
+void ShowVolume(WCHAR* VolumeName, int flgShowDevName, int flgVerbose, int flgUnit, int flgGauge, int flgNoRemoveable);
 
 void DisplayVolumePaths(PWCHAR VolumeName) {
     DWORD  CharCount = MAX_PATH + 1;
@@ -89,13 +94,15 @@ WCHAR *ComputerUnits(uint64_t integer, int maxdiv) {
     double smallfloat;
     uint64_t smallint;
 
-	for(smallint = smallfloat = integer; smallint > 1024 && count < maxdiv;) {
+    for(smallint = smallfloat = integer; smallint > 1024 && count < maxdiv;) {
         count++;
         smallint /= 1024;
         smallfloat /= 1024;
     }
 
-    swprintf(tmp, L"%.2f", smallfloat-smallint);
+    if(count)
+        swprintf(tmp, L"%.2f", smallfloat-smallint);
+
     swprintf(fdigits, L"%s%s %s", fdigitsW(smallint), tmp+1, units[count]); /* convert integer to string */
 
     return fdigits;
@@ -120,21 +127,21 @@ void DrawGauge(int length, int percent, int isempty) {
     putchar('|');
 }
 
+int IsTargetDrive(int DriveType, int flgRemoveable) {
+    if(!flgRemoveable)
+        return DriveType > 1 && DriveType != 2 && DriveType != 5;
+    else
+        return DriveType > 1;
+}
 
-int main(int argc, char **argv)
-{
-    DWORD  CharCount            = 0;
-    WCHAR  DeviceName[MAX_PATH] = L"";
+void ShowVolume(WCHAR* VolumeName, int flgShowDevName, int flgVerbose, int flgUnit, int flgGauge, int flgRemoveable) {
     DWORD  Error                = ERROR_SUCCESS;
-    HANDLE FindHandle           = INVALID_HANDLE_VALUE;
-    BOOL   Found                = FALSE;
-    size_t Index                = 0;
-    BOOL   Success              = FALSE;
-    WCHAR  VolumeName[MAX_PATH] = L"";
-
+    DWORD  CharCount            = 0;
+    WCHAR  tmp[MAX_PATH]        = L"";
+    WCHAR  DeviceName[MAX_PATH] = L"";
     WCHAR* VolumeTypeName       = 0;
     UINT   VolumeType           = 0;
-
+    size_t Index                = 0;
     DWORD  SectorsPerCluster    = 0;
     DWORD  BytesPerSector       = 0;
     DWORD  NumberOfFreeClusters = 0;
@@ -142,162 +149,218 @@ int main(int argc, char **argv)
     uint64_t TotalSize          = 0;
     uint64_t FreeSize           = 0;
 
-    double den, percent;
+    double den                  = 0.0f;
+    double percent              = 0.0f;
 
-    int i         = 1;
-    int flgVerbose= 0;
-    int flgUnit   = 3;
-    int flgGauge  = 0;
+    wcscpy(tmp, VolumeName);
 
-    for (; i < argc; i++) {
-        if(stricmp(argv[i],"-v") == 0)
-            flgVerbose = 1;
-        if(strnicmp(argv[i],"-u",2) == 0)
-            if(argv[i][2] >= '0' && argv[i][2] <= '9')
-                flgUnit = argv[i][2] - '0';
-        if(stricmp(argv[i],"-g") == 0)
-            flgGauge = 1;
-        if(strcmp(argv[i],"-?") == 0) {
-            printf("%s [-v] [-g] [-u#] [-?]\n\n"
-                " -v\t\tbe verbose (-g switch will be off)\n"
-                " -g\t\tdraw gauge of free space\n"
-                " -u[num]\tuse unit # (0=byte, 1=KB, 2=MB, 3=GB, 4=TB)\n"
-                " -?\t\tshow this help and exit\n", argv[0]);
-            return 0;
-        }
-    }
-
-    setlocale(LC_CTYPE, ""); // reset locale
-
-    //
-    //  Enumerate all volumes in the system.
-    FindHandle = FindFirstVolumeW(VolumeName, ARRAYSIZE(VolumeName));
-
-    if (FindHandle == INVALID_HANDLE_VALUE)
-    {
-        Error = GetLastError();
-        wprintf(L"FindFirstVolumeW failed with error code %d\n", Error);
-        return 1;
-    }
-
-    for (;;)
-    {
+    if(flgShowDevName) {
         //
         //  Skip the \\?\ prefix and remove the trailing backslash.
-        Index = wcslen(VolumeName) - 1;
+        Index = wcslen(tmp) - 1;
 
-        if (VolumeName[0]     != L'\\' ||
-            VolumeName[1]     != L'\\' ||
-            VolumeName[2]     != L'?'  ||
-            VolumeName[3]     != L'\\' ||
-            VolumeName[Index] != L'\\') 
+        if (tmp[0]     != L'\\' ||
+            tmp[1]     != L'\\' ||
+            tmp[2]     != L'?'  ||
+            tmp[3]     != L'\\' ||
+            tmp[Index] != L'\\') 
         {
             Error = ERROR_BAD_PATHNAME;
-            wprintf(L"FindFirstVolumeW/FindNextVolumeW returned a bad path: %s\n", VolumeName);
-            break;
+            wprintf(L"FindFirstVolumeW/FindNextVolumeW returned a bad path: %s\n", tmp);
+            return;
         }
 
         //
         //  QueryDosDeviceW does not allow a trailing backslash,
         //  so temporarily remove it.
-        VolumeName[Index] = L'\0';
+        tmp[Index] = L'\0';
 
-        CharCount = QueryDosDeviceW(&VolumeName[4], DeviceName, ARRAYSIZE(DeviceName)); 
+        CharCount = QueryDosDeviceW(&tmp[4], DeviceName, ARRAYSIZE(DeviceName)); 
 
-        VolumeName[Index] = L'\\';
+        tmp[Index] = L'\\';
 
-        if ( CharCount == 0 ) 
-        {
+        if ( CharCount == 0 ) {
             Error = GetLastError();
             wprintf(L"QueryDosDeviceW failed with error code %d\n", Error);
-            break;
-        }
-
-        VolumeType = GetDriveTypeW(VolumeName);
-        switch(VolumeType) {
-            case 0:
-                VolumeTypeName = L"(Unknown)";
-                break;
-            case 1:
-                VolumeTypeName = L"(invalid root path)";
-                break;
-            case 2:
-                VolumeTypeName = L"(Removable)";
-                break;
-            case 3:
-                VolumeTypeName = L"(Fixed)";
-                break;
-            case 4:
-                VolumeTypeName = L"(Remote)";
-                break;
-            case 5:
-                VolumeTypeName = L"(CD-ROM)";
-                break;
-            case 6:
-                VolumeTypeName = L"(RAM Disk)";
-                break;
-        }
-
-        // get free space information
-        if(VolumeType == 3) {
-            GetDiskFreeSpaceW(VolumeName, &SectorsPerCluster, &BytesPerSector, &NumberOfFreeClusters, &TotalNumberOfClusters);
-            FreeSize = TotalSize = SectorsPerCluster;
-            FreeSize *= BytesPerSector;
-            TotalSize *= BytesPerSector;
-            FreeSize *= NumberOfFreeClusters;
-            TotalSize *= TotalNumberOfClusters;
-            den = TotalSize;
-            percent = FreeSize;
-            percent /= den;
-            percent *= 100;
-        }
-
-        if(flgVerbose) {
-            wprintf(L"\nFound a device: %s %s", DeviceName, VolumeTypeName);
-            wprintf(L"\nVolume name: %s", VolumeName);
-            wprintf(L"\nPaths:");
-        }
-        if(!flgVerbose && flgGauge)
-            DrawGauge(36,(int)percent,VolumeType != 3);
-
-        DisplayVolumePaths(VolumeName);
-
-
-        if(VolumeType == 3) {
-            // VolumeName is reused here
-            wcscpy(VolumeName, ComputerUnits(FreeSize, flgUnit));
-            wprintf(L" (%s / %s) %.2f%%", VolumeName, ComputerUnits(TotalSize, flgUnit), percent);
-        }
-        if(!flgVerbose) {
-            if(VolumeType != 3) wprintf(L" %s", VolumeTypeName);
-        }
-        wprintf(L"\n");
-
-        //
-        //  Move on to the next volume.
-        Success = FindNextVolumeW(FindHandle, VolumeName, ARRAYSIZE(VolumeName));
-
-        if ( !Success ) 
-        {
-            Error = GetLastError();
-
-            if (Error != ERROR_NO_MORE_FILES) 
-            {
-                wprintf(L"FindNextVolumeW failed with error code %d\n", Error);
-                break;
-            }
-
-            //
-            //  Finished iterating
-            //  through all the volumes.
-            Error = ERROR_SUCCESS;
-            break;
+            return;
         }
     }
 
-    FindVolumeClose(FindHandle);
-    FindHandle = INVALID_HANDLE_VALUE;
+    VolumeType = GetDriveTypeW(tmp);
+    switch(VolumeType) {
+        case 0:
+            VolumeTypeName = L"(Unknown)";
+            break;
+        case 1:
+            VolumeTypeName = L"(invalid root path)";
+            break;
+        case 2:
+            VolumeTypeName = L"(Removable)";
+            break;
+        case 3:
+            VolumeTypeName = L"(Fixed)";
+            break;
+        case 4:
+            VolumeTypeName = L"(Remote)";
+            break;
+        case 5:
+            VolumeTypeName = L"(CD-ROM)";
+            break;
+        case 6:
+            VolumeTypeName = L"(RAM Disk)";
+            break;
+    }
 
+    if(!flgVerbose && !IsTargetDrive(VolumeType,1)) return;
+    // get free space information
+    if(IsTargetDrive(VolumeType,flgRemoveable)) {
+        GetDiskFreeSpaceW(tmp, &SectorsPerCluster, &BytesPerSector, &NumberOfFreeClusters, &TotalNumberOfClusters);
+        FreeSize = TotalSize = SectorsPerCluster;
+        FreeSize *= BytesPerSector;
+        TotalSize *= BytesPerSector;
+        FreeSize *= NumberOfFreeClusters;
+        TotalSize *= TotalNumberOfClusters;
+        den = TotalSize;
+        percent = FreeSize;
+        percent /= den;
+        percent *= 100;
+    }
+
+    if(flgVerbose) {
+        wprintf(L"\nFound a device: %s", DeviceName);
+        wprintf(L"\nVolume name: %s %s", tmp, VolumeTypeName);
+        wprintf(L"\nPaths:");
+    }
+    else if(flgGauge) {
+        DrawGauge(36,(int)percent,!IsTargetDrive(VolumeType,flgRemoveable)|!TotalSize);
+    }
+
+    if (flgShowDevName)
+        DisplayVolumePaths(tmp);
+    else
+        wprintf(L"  %s", tmp);
+
+
+    if(IsTargetDrive(VolumeType,flgRemoveable)) {
+        // VolumeName is reused here
+        wcscpy(tmp, ComputerUnits(FreeSize, flgUnit));
+
+        // DeviceName is reused here
+        if(TotalSize)
+            swprintf(DeviceName, L"%.2f", percent);
+        else
+            wcscpy(DeviceName, L"--");
+
+        wprintf(L" (%s / %s) %s%%", tmp, ComputerUnits(TotalSize, flgUnit), DeviceName);
+    }
+    if(!flgVerbose) {
+        if(VolumeType != 3) wprintf(L" %s", VolumeTypeName);
+    }
+    wprintf(L"\n");
+}
+
+
+int main(int argc, char **argv)
+{
+    DWORD  Error                = ERROR_SUCCESS;
+    HANDLE FindHandle           = INVALID_HANDLE_VALUE;
+    BOOL   Found                = FALSE;
+    size_t Index                = 0;
+    BOOL   Success              = FALSE;
+    WCHAR  VolumeName[MAX_PATH] = L"";
+    DWORD  dwAttrib             = 0;
+
+    int i               = 1;
+    int flgVerbose      = 0;
+    int flgUnit         = 3;
+    int flgGauge        = 0;
+    int flgRemoveable   = 0;
+    int flgNonEnum      = 0;
+    int OldMode; //a place to store the old error mode
+
+    for (; i < argc; i++) {
+        if(stricmp(argv[i],"-g") == 0) {
+            flgGauge = 1;
+        } else if(strnicmp(argv[i],"-u",2) == 0) {
+            if(argv[i][2] >= '0' && argv[i][2] <= '4')
+                flgUnit = argv[i][2] - '0';
+        } else if(stricmp(argv[i],"-r") == 0) {
+            flgRemoveable = 1;
+        } else if(stricmp(argv[i],"-v") == 0) {
+            flgVerbose = 1;
+        } else if(strcmp(argv[i],"-?") == 0) {
+            printf("%s [-v] [-g] [-r] [-u#] [-?] [drive|path...]\n\n"
+                " -v\t\tbe verbose (-g switch will be turned off)\n"
+                " -g\t\tdraw gauge of free space\n"
+                " -r\t\tdetect removable device free space\n"
+                " -u[num]\tuse unit # (0=byte, 1=KB, 2=MB, 3=GB, 4=TB)\n"
+                " -?\t\tshow this help and exit\n"
+                " drive|path...\tshow individual drives\n"
+                " \t\texample:  C: D: F:\\mountpoint\\\n", argv[0]);
+            return 0;
+        } else {
+            // assume it is a path
+            dwAttrib = GetFileAttributesA(argv[i]);
+            if(dwAttrib != INVALID_FILE_ATTRIBUTES && (dwAttrib & FILE_ATTRIBUTE_DIRECTORY)) {
+                // yes it is valid path
+                flgNonEnum = 1;
+                // dwAttrib is reused
+                dwAttrib = MultiByteToWideChar(CP_ACP, 0, argv[i], -1, VolumeName, MAX_PATH);
+                // workaround on getting free space from \\host\share
+                if (VolumeName[dwAttrib-2] != L'\\') VolumeName[dwAttrib-1] = L'\\';
+                ShowVolume(VolumeName, 0, flgVerbose, flgUnit, flgGauge, flgRemoveable);
+            } else {
+                printf("%s is not valid path.\n", argv[i]);
+                return 0;
+            }
+        }
+    }
+
+    setlocale(LC_CTYPE, ""); // reset locale
+
+    //save the old error mode and set the new mode to let us do the work:
+    OldMode = SetErrorMode(SEM_FAILCRITICALERRORS); 
+
+    if(!flgNonEnum) {
+        //
+        //  Enumerate all volumes in the system.
+        FindHandle = FindFirstVolumeW(VolumeName, ARRAYSIZE(VolumeName));
+
+        if (FindHandle == INVALID_HANDLE_VALUE) {
+            Error = GetLastError();
+            wprintf(L"FindFirstVolumeW failed with error code %d\n", Error);
+            return 1;
+        }
+
+        for (;;) {
+            ShowVolume(VolumeName, 1, flgVerbose, flgUnit, flgGauge, flgRemoveable);
+
+            //
+            //  Move on to the next volume.
+            Success = FindNextVolumeW(FindHandle, VolumeName, ARRAYSIZE(VolumeName));
+
+            if ( !Success ) {
+                Error = GetLastError();
+
+                if (Error != ERROR_NO_MORE_FILES) {
+                    wprintf(L"FindNextVolumeW failed with error code %d\n", Error);
+                    break;
+                }
+
+                //
+                //  Finished iterating
+                //  through all the volumes.
+                Error = ERROR_SUCCESS;
+                break;
+            }
+        }
+
+        FindVolumeClose(FindHandle);
+        FindHandle = INVALID_HANDLE_VALUE;
+
+    }
+
+    SetErrorMode(OldMode); //put things back the way they were
     return 0;
 }
 
