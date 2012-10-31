@@ -83,7 +83,7 @@ WCHAR* FindDriveLetterFromVolumePath(WCHAR* wszVolumePath) {
 
         tmp[0] = L'A';
         for(i = 0; i < 26; i++, tmp[0]++) {
-            if(wcsicmp(wszVolumePath, vPathLetters[i]) == 0) {
+            if(wcscmp(wszVolumePath, vPathLetters[i]) == 0) {
                 tmp[0] = L'A' + i;
                 return tmp;
             }
@@ -231,7 +231,7 @@ void DisplayVolumePaths(PWCHAR VolumeName) {
 
         // print drive letter first
         Names = FindDriveLetterFromVolumePath(VolumeName);
-        wprintf(L"  %s", Names);
+        if(Names) wprintf(L"  %s", Names);
 
         // then mountpoints
         GetMountPoint();
