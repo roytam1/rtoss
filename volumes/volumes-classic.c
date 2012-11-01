@@ -30,15 +30,10 @@ WCHAR *fdigitsW(uint64_t integer) {
 WCHAR *ComputerUnits(uint64_t integer, int maxdiv) {
     static WCHAR fdigits[MAX_PLACES + (MAX_PLACES / 3) + 1];
     WCHAR *units[] = {L"B",L"KB",L"MB",L"GB",L"TB",L"PB",L"EB", NULL};
-    char atmp[16] = {0};
-    char *ftmp = 0;
     WCHAR tmp[16] = {0};
     int count = 0;
-    int i = 0;
     double smallfloat;
     uint64_t smallint;
-    int dec = 0;
-    int sign = 0;
 
     for(smallint = smallfloat = integer; smallint > 1024 && count < maxdiv;) {
         count++;
@@ -47,20 +42,11 @@ WCHAR *ComputerUnits(uint64_t integer, int maxdiv) {
     }
 
     if(count) {
-        ftmp = _fcvt(smallfloat-smallint, 2, &dec, &sign);
-        if(dec < 0) {
-            sprintf(atmp,"%%0%dd%%s", dec*-1);
-            sprintf(atmp,atmp, 0, ftmp);
-        } else {
-            sprintf(atmp,"%s", ftmp+dec);
-        }
-
-        //swprintf(tmp, L"%.2f", smallfloat-smallint);
-        i = MultiByteToWideChar(CP_ACP, 0, atmp, -1, tmp, 10);
-        tmp[2] = 0; // truncate
+        swprintf(tmp, L"%.3f", smallfloat-smallint);
+        tmp[4] = 0; // truncate
     }
 
-    swprintf(fdigits, L"%s.%s %s", fdigitsW(smallint), tmp, units[count]); /* convert integer to string */
+    swprintf(fdigits, L"%s%s %s", fdigitsW(smallint), tmp+1, units[count]); /* convert integer to string */
 
     return fdigits;
 }
@@ -85,12 +71,16 @@ void DrawGauge(int length, int percent, int isempty) {
 }
 
 int IsTargetDrive(int DriveType, int flgRemoveable, int flgIsRealFloppy) {
+    int ret = 0;
     if(!flgRemoveable)
-        return DriveType > 1 && DriveType != 2 && DriveType != 5;
-    else if(flgRemoveable == 2)
-        return DriveType > 1;
-    else
-        return DriveType > 1 && !flgIsRealFloppy;
+        ret = DriveType > 1 && DriveType != 2 && DriveType != 4 && DriveType != 5;
+    if(flgRemoveable & 1)
+        ret |= DriveType > 1 && DriveType != 4 && !flgIsRealFloppy;
+    if(flgRemoveable & 2)
+        ret |= DriveType > 1 && DriveType != 4;
+    if(flgRemoveable & 4)
+        ret |= DriveType > 1 && DriveType != 2 && DriveType != 5;
+    return ret;
 }
 
 void ShowVolume(WCHAR* VolumeName, int flgShowDevName, int flgVerbose, int flgUnit, int flgGauge, int flgRemoveable) {
@@ -140,7 +130,7 @@ void ShowVolume(WCHAR* VolumeName, int flgShowDevName, int flgVerbose, int flgUn
             break;
     }
 
-    if(!flgVerbose && !IsTargetDrive(VolumeType,1,0)) return;
+    if(!flgVerbose && !IsTargetDrive(VolumeType,7,0)) return;
     // get free space information
     if(IsTargetDrive(VolumeType,flgRemoveable,flgIsRealFloppy)) {
         GetDiskFreeSpaceW(tmp, &SectorsPerCluster, &BytesPerSector, &NumberOfFreeClusters, &TotalNumberOfClusters);
@@ -216,19 +206,22 @@ int main(int argc, char **argv)
             if(argv[i][2] >= '0' && argv[i][2] <= '4')
                 flgUnit = argv[i][2] - '0';
         } else if(strnicmp(argv[i],"-r",2) == 0) {
-            flgRemoveable = 1;
+            flgRemoveable |= 1;
             if(argv[i][2] == 'f')
-                flgRemoveable += 1;
+                flgRemoveable |= 2;
+        } else if(stricmp(argv[i],"-n") == 0) {
+            flgRemoveable |= 4;
         } else if(stricmp(argv[i],"-v") == 0) {
             flgVerbose = 1;
         } else if(stricmp(argv[i],"-a") == 0) {
             flgForceEnum = 1;
         } else if(strcmp(argv[i],"-?") == 0) {
-            printf("%s [-v] [-g] [-a] [-r[f]] [-u#] [-?] [drive|path...]\n\n"
+            printf("%s [-v] [-g] [-a] [-r[f]] [-n] [-u#] [-?] [drive|path...]\n\n"
                 " -v\t\tbe verbose (-g switch will be turned off)\n"
                 " -g\t\tdraw gauge of free space\n"
                 " -a\t\tappend drive|path to detected list\n"
                 " -r[f]\t\tdetect removable device free space (-rf for real floppy drive)\n"
+                " -n\t\tdetect mounted network drive free space\n"
                 " -u[num]\tuse unit # (0=byte, 1=KB, 2=MB, 3=GB, 4=TB)\n"
                 " -?\t\tshow this help and exit\n"
                 " drive|path...\tshow individual drives\n"
@@ -258,7 +251,7 @@ int main(int argc, char **argv)
     if(!flgNonEnum) {
 
         wcscpy(VolumeName,L"A:\\");
-        if(flgRemoveable > 1) i = 0;
+        if(flgRemoveable & 2) i = 0;
         else i = 2;
         // i is reused here
         for (; i< 26 ; i++) {

@@ -281,8 +281,10 @@ WCHAR *ComputerUnits(uint64_t integer, int maxdiv) {
         smallfloat /= 1024;
     }
 
-    if(count)
-        swprintf(tmp, L"%.2f", smallfloat-smallint);
+    if(count) {
+        swprintf(tmp, L"%.3f", smallfloat-smallint);
+        tmp[4] = 0; // truncate
+    }
 
     swprintf(fdigits, L"%s%s %s", fdigitsW(smallint), tmp+1, units[count]); /* convert integer to string */
 
@@ -309,12 +311,14 @@ void DrawGauge(int length, int percent, int isempty) {
 }
 
 int IsTargetDrive(int DriveType, int flgRemoveable, int flgIsRealFloppy) {
+    int ret = 0;
     if(!flgRemoveable)
-        return DriveType > 1 && DriveType != 2 && DriveType != 5;
-    else if(flgRemoveable == 2)
-        return DriveType > 1;
-    else
-        return DriveType > 1 && !flgIsRealFloppy;
+        ret = DriveType > 1 && DriveType != 2 && DriveType != 5;
+    if(flgRemoveable & 1)
+        ret |= DriveType > 1 && !flgIsRealFloppy;
+    if(flgRemoveable & 2)
+        ret |= DriveType > 1;
+    return ret;
 }
 
 void ShowVolume(WCHAR* VolumeName, int flgShowDevName, int flgVerbose, int flgUnit, int flgGauge, int flgRemoveable) {
@@ -479,9 +483,9 @@ int main(int argc, char **argv)
             if(argv[i][2] >= '0' && argv[i][2] <= '4')
                 flgUnit = argv[i][2] - '0';
         } else if(strnicmp(argv[i],"-r",2) == 0) {
-            flgRemoveable = 1;
+            flgRemoveable |= 1;
             if(argv[i][2] == 'f')
-                flgRemoveable += 1;
+                flgRemoveable |= 2;
         } else if(stricmp(argv[i],"-v") == 0) {
             flgVerbose = 1;
         } else if(stricmp(argv[i],"-a") == 0) {
