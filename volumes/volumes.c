@@ -18,7 +18,7 @@ WCHAR *fdigitsW(uint64_t integer);
 WCHAR *ComputerUnits(uint64_t integer, int maxdiv);
 void DrawGauge(int length, int percent, int isempty);
 int IsTargetDrive(int DriveType, int flgNoRemoveable, int flgIsRealFloppy);
-void ShowVolume(WCHAR* VolumeName, int flgShowDevName, int flgVerbose, int flgUnit, int flgGauge, int flgNoRemoveable);
+void ShowVolume(WCHAR* VolumeName, int flgShowDevName, int flgVerbose, int flgUnit, int flgGauge, int flgNoRemoveable, uint64_t* AllTotalSize, uint64_t* AllFreeSize);
 
 typedef BOOL (WINAPI *PGVPNFVNW)(LPCWSTR,LPWSTR,DWORD,PDWORD);
 
@@ -321,7 +321,7 @@ int IsTargetDrive(int DriveType, int flgRemoveable, int flgIsRealFloppy) {
     return ret;
 }
 
-void ShowVolume(WCHAR* VolumeName, int flgShowDevName, int flgVerbose, int flgUnit, int flgGauge, int flgRemoveable) {
+void ShowVolume(WCHAR* VolumeName, int flgShowDevName, int flgVerbose, int flgUnit, int flgGauge, int flgRemoveable, uint64_t* AllTotalSize, uint64_t* AllFreeSize) {
     DWORD  Error                = ERROR_SUCCESS;
     DWORD  CharCount            = 0;
     WCHAR  tmp[MAX_PATH]        = L"";
@@ -414,6 +414,12 @@ void ShowVolume(WCHAR* VolumeName, int flgShowDevName, int flgVerbose, int flgUn
         TotalSize *= BytesPerSector;
         FreeSize *= NumberOfFreeClusters;
         TotalSize *= TotalNumberOfClusters;
+
+        if(VolumeType == 3) {
+            *AllTotalSize += TotalSize;
+            *AllFreeSize += FreeSize;
+        }
+
         den = TotalSize;
         percent = FreeSize;
         percent /= den;
@@ -464,6 +470,10 @@ int main(int argc, char **argv)
     WCHAR  VolumeName[MAX_PATH] = L"";
     DWORD  dwAttrib             = 0;
 
+    uint64_t allTotal           = 0;
+    uint64_t allFree            = 0;
+    double   percent            = 0.0f;
+
     int i               = 1;
     int flgVerbose      = 0;
     int flgUnit         = 3;
@@ -471,6 +481,7 @@ int main(int argc, char **argv)
     int flgRemoveable   = 0;
     int flgNonEnum      = 0;
     int flgForceEnum    = 0;
+    int flgShowAllTotal = 0;
     int OldMode; //a place to store the old error mode
 
     //save the old error mode and set the new mode to let us do the work:
@@ -490,13 +501,16 @@ int main(int argc, char **argv)
             flgVerbose = 1;
         } else if(stricmp(argv[i],"-a") == 0) {
             flgForceEnum = 1;
+        } else if(stricmp(argv[i],"-t") == 0) {
+            flgShowAllTotal = 1;
         } else if(strcmp(argv[i],"-?") == 0) {
-            printf("%s [-v] [-g] [-a] [-r[f]] [-u#] [-?] [drive|path...]\n\n"
+            printf("%s [-v] [-g] [-a] [-r[f]] [-u#] [-t] [-?] [drive|path...]\n\n"
                 " -v\t\tbe verbose (-g switch will be turned off)\n"
                 " -g\t\tdraw gauge of free space\n"
                 " -a\t\tappend drive|path to detected list\n"
                 " -r[f]\t\tdetect removable device free space (-rf for real floppy drive)\n"
                 " -u[num]\tuse unit # (0=byte, 1=KB, 2=MB, 3=GB, 4=TB)\n"
+                " -t\t\tshow total and free of all local fixed drives\n"
                 " -?\t\tshow this help and exit\n"
                 " drive|path...\tshow individual drives\n"
                 " \t\texample:  C: D: F:\\mountpoint\\\n", argv[0]);
@@ -512,7 +526,7 @@ int main(int argc, char **argv)
                 dwAttrib = MultiByteToWideChar(CP_ACP, 0, argv[i], -1, VolumeName, MAX_PATH);
                 // workaround on getting free space from \\host\share
                 if (VolumeName[dwAttrib-2] != L'\\') VolumeName[dwAttrib-1] = L'\\';
-                ShowVolume(VolumeName, 0, flgVerbose, flgUnit, flgGauge, flgRemoveable);
+                ShowVolume(VolumeName, 0, flgVerbose, flgUnit, flgGauge, flgRemoveable, &allTotal, &allFree);
             } else {
                 printf("%s is not valid path.\n", argv[i]);
                 return 0;
@@ -534,7 +548,7 @@ int main(int argc, char **argv)
         }
 
         for (;;) {
-            ShowVolume(VolumeName, 1, flgVerbose, flgUnit, flgGauge, flgRemoveable);
+            ShowVolume(VolumeName, 1, flgVerbose, flgUnit, flgGauge, flgRemoveable, &allTotal, &allFree);
 
             //
             //  Move on to the next volume.
@@ -559,6 +573,24 @@ int main(int argc, char **argv)
         FindVolumeClose(FindHandle);
         FindHandle = INVALID_HANDLE_VALUE;
 
+    }
+
+
+    if(flgShowAllTotal) {
+        percent = allFree;
+        percent /= allTotal;
+        percent *= 100;
+
+        if(flgVerbose)
+            wprintf(L"\n");
+
+        if(!flgVerbose && flgGauge) {
+            DrawGauge(36,(int)percent,0);
+        }
+        // VolumeName is reused here
+        wcscpy(VolumeName, ComputerUnits(allFree, flgUnit));
+
+        wprintf(L"Total: (%s / %s) %.2f%%\n", VolumeName, ComputerUnits(allTotal, flgUnit), percent);
     }
 
     SetErrorMode(OldMode); //put things back the way they were
