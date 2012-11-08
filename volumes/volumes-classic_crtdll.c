@@ -7,7 +7,7 @@
 
 #ifdef _MSC_VER
 #if _MSC_VER < 1200
-// VC++ < 6.0 doesn't support unsigned int64 to double (VC5 untested)
+// VC++ < 6.0 doesn't support unsigned __int64 to double (VC5 untested)
 typedef __int64 uint64_t;
 #else
 typedef unsigned __int64 uint64_t;
@@ -22,6 +22,37 @@ char *ComputerUnits(uint64_t integer, int maxdiv);
 void DrawGauge(int length, int percent, int isempty);
 int IsTargetDrive(int DriveType, int flgNoRemoveable, int flgIsRealFloppy);
 void ShowVolume(char* VolumeName, int flgShowDevName, int flgVerbose, int flgUnit, int flgGauge, int flgNoRemoveable, uint64_t* AllTotalSize, uint64_t* AllFreeSize);
+static INT ConvertULargeInteger(uint64_t num, CHAR cThousandSeparator, LPSTR des, INT len);
+
+static INT ConvertULargeInteger(uint64_t num, CHAR cThousandSeparator, LPSTR des, INT len)
+{
+	CHAR temp[32];
+	INT c = 0;
+	INT n = 0;
+
+	if (num == 0)
+	{
+		des[0] = '0';
+		des[1] = '\0';
+		n = 1;
+	}
+	else
+	{
+		temp[31] = 0;
+		while (num > 0)
+		{
+			if (cThousandSeparator && ((c + 1) % (3 + 1)) == 0)
+				temp[30 - c++] = cThousandSeparator;
+			temp[30 - c++] = (CHAR)(num % 10) + '0';
+			num /= 10;
+		}
+
+		for (n = 0; n <= c; n++)
+			des[n] = temp[31 - c + n];
+	}
+
+	return n;
+}
 
 #define MAX_PLACES 64
 char *fdigitsA(uint64_t integer) {
@@ -30,12 +61,12 @@ char *fdigitsA(uint64_t integer) {
     char *dgt = digits, *fdgt = fdigits;
     int places;
 
-    places = sprintf(digits, "%I64u", integer); /* convert integer to string */
+    places = ConvertULargeInteger(integer, ',', digits, MAX_PLACES + 1); /* convert integer to string */
     /* places = digits in string */
-    while (*fdgt++ = *dgt++) /* while there are more digits*/
-        if (--places) /* if places-1 > 0 */
-            if ( !(places % 3) ) /* if places is multiple of 3 */
-                *fdgt++ = ','; /* insert a comma here */
+    while (*fdgt++ = *dgt++); /* while there are more digits*/
+        //if (--places) /* if places-1 > 0 */
+            //if ( !(places % 3) ) /* if places is multiple of 3 */
+                //*fdgt++ = ','; /* insert a comma here */
 
     return fdigits;
 }
