@@ -293,7 +293,7 @@ echo '</script>
 <a name="bottom"></a>';
 sqlite_close($conn);
 sqlite_close($conn2);
-if (isset($_SESSION['isLogined'])) echo '<a href="'.text2xml("fav_action.php?action=add".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Add.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=order&id=0".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Order.'</a> <a href="'.text2xml("fav_action.php?action=opt".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Optimize.'</a> <a href="'.text2xml("javascript:location.href='".$BaseURL."fav_action.php?action=add&name='+escape(document.title)+'&url='+document.location.href.replace(/&/g,'%2526').replace(/#/g,'%2523');").'" class="admtool" '.$admAppend.'>'.$MyFav_Bookmarklet.'</a>';
+if (isset($_SESSION['isLogined'])) echo '<a href="'.text2xml("fav_action.php?action=add".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Add.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=order&id=0".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Order.'</a> <a href="'.text2xml("fav_action.php?action=opt".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Optimize.'</a> <a href="'.text2xml("javascript:location.href='".$BaseURL."fav_action.php?action=add&name='+escape(document.title)+'&url='+escape(document.location.href);").'" class="admtool" '.$admAppend.'>'.$MyFav_Bookmarklet.'</a>';
 $uriSuffix=isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING']!=""?"?".$_SERVER['QUERY_STRING']:'';
 
 echo '<form action="'.text2xml($_SERVER['PHP_SELF'].$uriSuffix).'" method="post">';
