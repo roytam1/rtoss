@@ -1,9 +1,9 @@
 <?php
 // Settings
 $excludes_order = array('detail');
-$includes_order = array('/\d{8}(_p\d+)?','/waren','/kaberen','/moeren','/kabeura','/moeura');
+$includes_order = array('/\d{5,8}(_big)?(_p\d+)?\.','/waren','/kaberen','/moeren','/kabeura','/moeura');
 $deselects = array('this-one-needs-duplicate');
-$normal_depth = 2;
+$normal_depth = isset($_GET['depth']) ? intval($_GET['depth']) : 2;
 
 if(!isset($_GET['file'])) select_file();
 elseif(isset($_POST['generate'])) generate_new_list();
@@ -83,6 +83,7 @@ function hdr() {
 <head>
 <meta http-equiv="content-type" content="text/html; charset=big5"/>
 <title>Dup Selector</title>
+<style>a:active, a:hover {color:#f00}</style>
 </head>
 <body>';
 }
@@ -92,7 +93,7 @@ function select_file() {
 
 	hdr();
 	foreach ($fs as $f)
-		echo $f.' <a href="'.$_SERVER['PHP_SELF'].'?file='.$f.'">DupSelect</a> <a href="'.$_SERVER['PHP_SELF'].'?file='.$f.'&calctotal=1">CalcTotal</a><br/>';
+		echo $f.' <a href="'.$_SERVER['PHP_SELF'].'?file='.$f.'">DupSelect</a><a href="'.$_SERVER['PHP_SELF'].'?file='.$f.'&depth=3">(3)</a> <a href="'.$_SERVER['PHP_SELF'].'?file='.$f.'&calctotal=1">CalcTotal</a><br/>';
 	echo '</body></html>';
 }
 
