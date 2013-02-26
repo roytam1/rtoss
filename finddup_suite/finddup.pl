@@ -12,9 +12,10 @@ my $totalpossibledupfiles;
 my $totalpossibledupfilessize;
 my $possibledupfilescount;
 my $possibledupfilescountsize;
- 
+
+($#ARGV == 0) && push @ARGV, ".";
 print STDERR "Searching files...\n";
-find(\&check_file, $ARGV[0] || ".");
+find(\&check_file, @ARGV);
  
 local $" = ", ";
 
