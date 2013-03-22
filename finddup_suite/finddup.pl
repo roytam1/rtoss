@@ -13,7 +13,7 @@ my $totalpossibledupfilessize;
 my $possibledupfilescount;
 my $possibledupfilescountsize;
 
-($#ARGV == 0) && push @ARGV, ".";
+($#ARGV < 0) && push @ARGV, ".";
 print STDERR "Searching files...\n";
 find(\&check_file, @ARGV);
  
