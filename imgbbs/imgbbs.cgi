@@ -105,7 +105,8 @@ sub formdecode{
 	$in{'time'} = time;
 	$in{'date'} = conv_date($in{'time'});
 	if ($ENV{'CONTENT_LENGTH'} > $set{'max_size'} * 1024){ &error(106);}
-	my $q = new CGI;
+	$in{'q'} = new CGI;
+	my $q = $in{'q'};
 	$in{'upfile'} = $q->param('upfile');
 	$in{'tmpfile'} = $q->tmpFileName($in{'upfile'});
 	$in{'type'} = $q->uploadInfo($in{'upfile'})->{'Content-Type'} if ($in{'upfile'});
