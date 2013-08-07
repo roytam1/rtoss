@@ -35,7 +35,7 @@ $set{'res_dir'} = './res/';		#レスディレクトリ
 $set{'res_dir2'} = '../';		#レスディレクトリからみたスクリプトディレクトリへの相対パス
 $set{'resize'} = './resize.pl';		#サムネイル作成ライブラリ
 $set{'use_thumb'} = 1;		#サムネイルを作成する 0=off,1=on
-$set{'disp_ip'} = 0;		#0=off,1=HOST表示,2=ID表示
+$set{'disp_ip'} = 2;		#0=off,1=HOST表示,2=ID表示
 $set{'interval'} = 5;		#投稿間隔秒数
 $set{'br_max'} = 10;		#改行コードがこれ以上なら投稿させない
 $set{'sort'} = 1;		#ソート機能 off=0,on=1(ユーザー任意),on=2(強制)
@@ -172,7 +172,7 @@ sub formcheck{
 #　投稿処理
 #----------------
 sub regist{
-	&filecheck if ($in{'mode'} eq 'regist' && $in{'textonly'} ne 'on');
+	&filecheck if (($in{'mode'} eq 'regist' || $in{'mode'} eq 'res') && ($in{'upfile'} || $in{'textonly'} ne 'on'));
 	eval { close($in{'upfile'}); };
 	eval { unlink($in{'tmpfile'}); };
 	&logwrite;
@@ -403,7 +403,7 @@ EOM
 EOM
 				$buff .= make_item($no,$i,$name,$email,$comment,$date,$host,$id,$sub,$time,$ext,$W,$H,$newW,$newH,$size,$dispid,$disphost,1);
 			}else{
-				$buff .= make_item($no,$i,$name,$email,$comment,$date,$host,$id,0,0,0,0,0,0,0,0,$dispid,$disphost,2);
+				$buff .= make_item($no,$i,$name,$email,$comment,$date,$host,$id,$sub,$time,$ext,$W,$H,$newW,$newH,$size,$dispid,$disphost,2);
 			}
 
 		}
@@ -907,7 +907,7 @@ EOM
 					$printbuff .= "<TABLE border=0 cellpadding=2 summary=\"$no\"><TR><TD rowspan=2 width=40><BR></TD><TD valign=top nowrap><font color=\"#666666\">※レス$ry件省略 全て読むには返信ボタンを押してください</font></TD></TR></TABLE>\n" if($ry > 0);
 				}else{
 					if ($i < $ry + 2){ next; }
-					$printbuff .= make_item($no,$i,$name,$email,$comment,$date,$host,$id,0,0,0,0,0,0,0,0,$dispid,$disphost,2);
+					$printbuff .= make_item($no,$i,$name,$email,$comment,$date,$host,$id,$sub,$time,$ext,$W,$H,$newW,$newH,$size,$dispid,$disphost,2);
 				}
 			}
 		}
@@ -1001,7 +1001,7 @@ $set{'style_sheet'}
 <blockquote>
 <div align=right>[<a href="$set{'res_dir2'}$set{'base_html'}">掲示板に戻る</a>] [<a href="$homedir$set{'home'}" target="_top">ホーム</a>] [<a href="$set{'res_dir2'}$set{'base_cgi'}?mode=admin">管理用</a>]</div>
 [ <a href="javascript:history.back()">戻る</a> ] No.$refno への返信
-<form action="$set{'res_dir2'}$set{'base_cgi'}" method="POST" name="Form">
+<form action="$set{'res_dir2'}$set{'base_cgi'}" method="POST" name="Form" enctype="multipart/form-data">
 <table border=0 cellspacing=0 summary="投稿フォーム">
 <tr>
   <td nowrap>おなまえ</td>
@@ -1017,6 +1017,7 @@ $set{'style_sheet'}
 </tr>
 <tr><td nowrap>本文</td>
 <td><textarea name=comment COLS=40 ROWS=3></textarea></td></tr>
+<tr><td>画像選択</td><td><input type="file" name="upfile" size="30"> <input type="checkbox" name="textonly" value="on" checked>画像なし</td></tr>
 <tr><td nowrap>削除キー</td><td><input type="password" size=8 name="pass" value=""></td></tr>
 <tr><td nowrap><td><input type="submit" value="投稿する"><input type="reset" value="中止"></td></tr>
 </table></form>
@@ -1033,7 +1034,7 @@ EOM
 		if ($reno == $no){
 			$printbuff .= make_item($no,$i,$name,$email,$comment,$date,$host,$id,$sub,$time,$ext,$W,$H,$newW,$newH,$size,$dispid,$disphost,3);
 		}else{
-			$printbuff .= make_item($no,$i,$name,$email,$comment,$date,$host,$id,0,0,0,0,0,0,0,0,$dispid,$disphost,2);
+			$printbuff .= make_item($no,$i,$name,$email,$comment,$date,$host,$id,$sub,$time,$ext,$W,$H,$newW,$newH,$size,$dispid,$disphost,4);
 		}
 	}
 	
@@ -1178,12 +1179,12 @@ sub filecheck{
 sub make_item{
 	my ($no,$i,$name,$email,$comment,$date,$host,$id,$sub,$time,$ext,$W,$H,$newW,$newH,$size,$dispid,$disphost,$itemmode) = @_;
 	my ($buff,$disp);
-	unless($itemmode == 1||$itemmode == 2||$itemmode == 3){ return; }
+	unless($itemmode == 1||$itemmode == 2||$itemmode == 3||$itemmode == 4){ return; }
 
 	$comment =~ s/http:\/\/([\w\$\#\~\.\,\/\-\?\=\&\+\:\@\%\;]+)/<a href=\"http:\/\/$1\" target\="\_blank\">http:\/\/$1<\/a>/g if($set{'autolink'});
 
-	if($dispid){ $disp = "<br>ID:$id";}
-	if($disphost){ $disp .= "<br>HOST:$host"; }
+	if($dispid){ $disp = "<small>($id)</small>";}
+	if($disphost){ $disp .= "<small>[$host]</small>"; }
 	if($name =~ /^(.*)<\/b>◆(.*)<b>$/){
 		my $tmpname = $1;
 		my $tmptrip = $2;
@@ -1197,32 +1198,32 @@ sub make_item{
 	}
 	$name = "<a href=\"mailto:$email\">$name</a>" if ($email);
 	$name = "<FONT COLOR=\"$set{'name'}\">$name</FONT>";
+	my ($img,$msg,$resdir,$thumb);
+	$resdir = $set{'res_dir2'} if($itemmode == 3||$itemmode == 4);
+	
+	if (-e "$set{'thumb_dir'}${time}s$ext"){ $thumb = "$set{'thumb_dir'}${time}s$ext"; }
+	elsif(-e "$set{'thumb_dir'}${time}s.jpg"){ $thumb = "$set{'thumb_dir'}${time}s.jpg"; }
+	elsif(-e "$set{'thumb_dir'}${time}s.png"){ $thumb = "$set{'thumb_dir'}${time}s.png"; }
+	elsif(-e "$set{'thumb_dir'}${time}s.gif"){ $thumb = "$set{'thumb_dir'}${time}s.gif"; }
+	
+	if($thumb && $ext =~ /(jpe?g|gif|png)/){ $img = "<a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\">$time$ext (${W}x${H} $size) <font size=-1>[サムネイル]</font><img src=\"$resdir$thumb\" border=0 align=left hspace=12 width=$newW height=$newH alt=\"$time$ext\"></a>\n"; }
+	elsif($thumb){ $img = "<a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\">$time$ext ($size)<img src=\"$resdir$thumb\" border=0 align=left hspace=12 width=$newW height=$newH alt=\"$time$ext\"></a>\n"; }
+	elsif($ext =~ /(jpg|gif|png)/){ $img = "<a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\">$time$ext (${W}x${H} $size)<img src=\"$resdir$set{'img_dir'}$time$ext\" border=0 align=left hspace=12 width=$newW height=$newH alt=\"$time$ext\"></a>\n"; }
+	elsif(-e "$set{'img_dir'}${time}$ext"){$img = "<a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\">$time$ext ($size)</a>\n";}
+	
+	$sub = "<FONT COLOR=\"$set{'subject'}\"><B>$sub</B></FONT>" if($sub);
+	$msg = " <a href=\"$set{'res_dir'}res$no$set{'res_ext'}\" title=\"$noへの返信\">返信</a>" if ($itemmode == 1);
 	if($itemmode == 1 || $itemmode == 3){
-		my ($img,$msg,$resdir,$thumb);
-		$resdir = $set{'res_dir2'} if($itemmode == 3);
-		
-		if (-e "$set{'thumb_dir'}${time}s$ext"){ $thumb = "$set{'thumb_dir'}${time}s$ext"; }
-		elsif(-e "$set{'thumb_dir'}${time}s.jpg"){ $thumb = "$set{'thumb_dir'}${time}s.jpg"; }
-		elsif(-e "$set{'thumb_dir'}${time}s.png"){ $thumb = "$set{'thumb_dir'}${time}s.png"; }
-		elsif(-e "$set{'thumb_dir'}${time}s.gif"){ $thumb = "$set{'thumb_dir'}${time}s.gif"; }
-		
-		if($thumb && $ext =~ /(jpe?g|gif|png)/){ $img = "<a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\">$time$ext (${W}x${H} $size) <font size=-1>[サムネイル]</font><img src=\"$resdir$thumb\" border=0 align=left hspace=12 width=$newW height=$newH alt=\"$time$ext\"></a>\n"; }
-		elsif($thumb){ $img = "<a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\">$time$ext ($size)<img src=\"$resdir$thumb\" border=0 align=left hspace=12 width=$newW height=$newH alt=\"$time$ext\"></a>\n"; }
-		elsif($ext =~ /(jpg|gif|png)/){ $img = "<a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\">$time$ext (${W}x${H} $size)<img src=\"$resdir$set{'img_dir'}$time$ext\" border=0 align=left hspace=12 width=$newW height=$newH alt=\"$time$ext\"></a>\n"; }
-		elsif(-e "$set{'img_dir'}${time}$ext"){$img = "<a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\">$time$ext ($size)</a>\n";}
-		
-		$sub = "<FONT COLOR=\"$set{'subject'}\"><B>$sub</B></FONT>" if($sub);
-		$msg = " <a href=\"$set{'res_dir'}res$no$set{'res_ext'}\" title=\"$noへの返信\">返信</a>" if ($itemmode == 1);
 		$buff =<<"EOM"
 <BR CLEAR=LEFT><HR size=1>$img
-<BR><BR>$i $sub $name $date No.$no$msg$disp
+<BR><BR>$i $sub $name $disp $date No.$no$msg
 <BLOCKQUOTE>$comment</BLOCKQUOTE>
 EOM
-	}elsif($itemmode == 2){
+	}elsif($itemmode == 2||$itemmode == 4){
 		$buff =<<"EOM";
 <TABLE border=0 summary="$noの投稿"><TR><TD NOWRAP ALIGN=RIGHT VALIGN=TOP>&gt;&gt;</TD><TD bgcolor="$set{'tablecolor'}">
-$i $name $date No.$no$disp
-<BLOCKQUOTE>$comment</BLOCKQUOTE></TD></TR></TABLE>
+$i $name $disp $date No.$no
+<div>$img</div><BLOCKQUOTE>$comment</BLOCKQUOTE></TD></TR></TABLE>
 EOM
 	}
 	return $buff;
