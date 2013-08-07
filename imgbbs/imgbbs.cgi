@@ -50,6 +50,7 @@ $set{'link'} = '#0000FF';		#link 未訪問時のリンク色
 $set{'vlink'} = '#800080';		#alink 選択時のリンク色
 $set{'alink'} = '#FF0000';		#vlink 既訪問時のリンク色
 $set{'cookie_name'} = 'IMG_BBS';		#cookieの名前
+$set{'def_comment'} = '本文なし';		#本文なしを示す文字列
 $set{'autolink'} = 1;		#自動リンク貼り 0=off,1=on
 $set{'encode'} = 3;		# SHIFT_JIS=1,EUC=2,UTF-8=3
 $set{'error_level'} = 1;		#0=off, 投稿失敗時のログを記録=1
@@ -163,7 +164,13 @@ sub formcheck{
 	if (length($in{'sub'}) > 40){ &error(112);}
 	if (length($in{'comment'}) > 1000){ &error(105);}
 	if ($in{'mode'} eq 'regist' || $in{'mode'} eq 'res'){
-		if (length($in{'comment'}) == 0){ &error(110);}
+		if (length($in{'comment'}) == 0){
+			if(!$in{'type'}){
+				&error(110);
+			}else{
+				$in{'comment'} = $set{'def_comment'};
+			}
+		}
 		my $br = $in{'comment'} =~ s/<br>/<br>/g;
 		if ($set{'br_max'} < $br){ &error(113,$br - $set{'br_max'});}
 	}
