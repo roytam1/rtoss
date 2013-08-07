@@ -119,7 +119,9 @@ sub formdecode{
 	$in{'textonly'} = $q->param('textonly');
 	$in{'mode'} = $q->param('mode');
 	$in{'delno'} = $q->param('delno');
+	$in{'delmode'} = $q->param('delmode');
 	$in{'delpass'} = $q->param('delpass');
+	$in{'delre'} = $q->param('delre');
 	$in{'treeno'} = $q->param('treeno');
 	$in{'delmode'} = $q->param('delmode');
 	$in{'deloption'} = $q->param('deloption');
@@ -270,7 +272,18 @@ sub delete{
 	}
 	if ($del_flag == 0){ &error(401); }
 	elsif ($del_flag == 1){ &error(402); }
-	else{ &makehtml; &quit; }
+	else{
+		&makehtml;
+		if($in{'delmode'} eq 'admin' && $in{'delre'}){
+			$in{'treeno'} = $in{'delre'};
+			$in{'delmode'} = 'logview';
+			$in{'mode'} = 'admin';
+			$in{'pass'} = $in{'delpass'};
+			&admin;
+		}else{
+			&quit;
+		}
+	}
 }
 
 #----------------
@@ -401,6 +414,7 @@ EOM
 <input type="submit" value="このスレッドを削除する">
 </form>
 EOM
+				$buff .="<FORM METHOD=POST ACTION=\"$set{'base_cgi'}\"><input type=hidden name=mode value=delete>レスNo.<input type=text size=5 name=delno><input type=hidden value=\"$in{'pass'}\" name=delpass><input type=hidden value=\"admin\" name=delmode><input type=hidden value=\"$in{'treeno'}\" name=delre> <input type=submit value=\"削除\"></form>";
 				$buff .= make_item($no,$i,$name,$email,$comment,$date,$host,$id,$sub,$time,$ext,$W,$H,$newW,$newH,$size,$dispid,$disphost,1);
 			}else{
 				$buff .= make_item($no,$i,$name,$email,$comment,$date,$host,$id,$sub,$time,$ext,$W,$H,$newW,$newH,$size,$dispid,$disphost,2);
@@ -1206,9 +1220,9 @@ sub make_item{
 	elsif(-e "$set{'thumb_dir'}${time}s.png"){ $thumb = "$set{'thumb_dir'}${time}s.png"; }
 	elsif(-e "$set{'thumb_dir'}${time}s.gif"){ $thumb = "$set{'thumb_dir'}${time}s.gif"; }
 	
-	if($thumb && $ext =~ /(jpe?g|gif|png)/){ $img = "<a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\">$time$ext (${W}x${H} $size) <font size=-1>[サムネイル]</font><img src=\"$resdir$thumb\" border=0 align=left hspace=12 width=$newW height=$newH alt=\"$time$ext\"></a>\n"; }
-	elsif($thumb){ $img = "<a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\">$time$ext ($size)<img src=\"$resdir$thumb\" border=0 align=left hspace=12 width=$newW height=$newH alt=\"$time$ext\"></a>\n"; }
-	elsif($ext =~ /(jpg|gif|png)/){ $img = "<a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\">$time$ext (${W}x${H} $size)<img src=\"$resdir$set{'img_dir'}$time$ext\" border=0 align=left hspace=12 width=$newW height=$newH alt=\"$time$ext\"></a>\n"; }
+	if($thumb && $ext =~ /(jpe?g|gif|png)/){ $img = "<a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\">$time$ext (${W}x${H} $size)</a><font size=-1>[サムネイル]</font><br><a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\"><img src=\"$resdir$thumb\" border=0 align=left hspace=12 width=$newW height=$newH alt=\"$time$ext\"></a>\n"; }
+	elsif($thumb){ $img = "<a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\">$time$ext ($size)</a><br><a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\"><img src=\"$resdir$thumb\" border=0 align=left hspace=12 width=$newW height=$newH alt=\"$time$ext\"></a>\n"; }
+	elsif($ext =~ /(jpg|gif|png)/){ $img = "<a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\">$time$ext (${W}x${H} $size)</a><br><a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\"><img src=\"$resdir$set{'img_dir'}$time$ext\" border=0 align=left hspace=12 width=$newW height=$newH alt=\"$time$ext\"></a>\n"; }
 	elsif(-e "$set{'img_dir'}${time}$ext"){$img = "<a href=\"$resdir$set{'img_dir'}$time$ext\" target=\"_blank\">$time$ext ($size)</a>\n";}
 	
 	$sub = "<FONT COLOR=\"$set{'subject'}\"><B>$sub</B></FONT>" if($sub);
@@ -1216,14 +1230,15 @@ sub make_item{
 	if($itemmode == 1 || $itemmode == 3){
 		$buff =<<"EOM"
 <BR CLEAR=LEFT><HR size=1>$img
-<BR><BR>$i $sub $name $disp $date No.$no$msg
+$i $sub $name $disp $date No.$no$msg
 <BLOCKQUOTE>$comment</BLOCKQUOTE>
 EOM
 	}elsif($itemmode == 2||$itemmode == 4){
+		if($img) {$img="<br>$img";}
 		$buff =<<"EOM";
 <TABLE border=0 summary="$noの投稿"><TR><TD NOWRAP ALIGN=RIGHT VALIGN=TOP>&gt;&gt;</TD><TD bgcolor="$set{'tablecolor'}">
 $i $name $disp $date No.$no
-<div>$img</div><BLOCKQUOTE>$comment</BLOCKQUOTE></TD></TR></TABLE>
+$img<BLOCKQUOTE>$comment</BLOCKQUOTE></TD></TR></TABLE>
 EOM
 	}
 	return $buff;
