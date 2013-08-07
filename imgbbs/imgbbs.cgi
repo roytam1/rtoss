@@ -109,7 +109,7 @@ sub formdecode{
 	my $q = $in{'q'};
 	$in{'upfile'} = $q->param('upfile');
 	$in{'tmpfile'} = $q->tmpFileName($in{'upfile'});
-	$in{'type'} = $q->uploadInfo($in{'upfile'})->{'Content-Type'} if ($in{'upfile'});
+	$in{'type'} = $q->uploadInfo($in{'upfile'})->{'Content-Type'} if (tell($in{'upfile'}) != -1);
 	$in{'name'} = $q->param('name');
 	$in{'email'} = $q->param('email');
 	$in{'sub'} = $q->param('sub');
@@ -174,7 +174,7 @@ sub formcheck{
 #　投稿処理
 #----------------
 sub regist{
-	&filecheck if (($in{'mode'} eq 'regist' || $in{'mode'} eq 'res') && ($in{'upfile'} || $in{'textonly'} ne 'on'));
+	&filecheck if (($in{'mode'} eq 'regist' || $in{'mode'} eq 'res') && ($in{'type'} || $in{'textonly'} ne 'on'));
 	eval { close($in{'upfile'}); };
 	eval { unlink($in{'tmpfile'}); };
 	&logwrite;
