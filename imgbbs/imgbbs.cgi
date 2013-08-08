@@ -82,7 +82,7 @@ $ENV{'LD_LIBRARY_PATH'} = $ENV{'SCRIPT_FILENAME'};
 $ENV{'LD_LIBRARY_PATH'} =~ s/\/[\d\w\.\+\-]+$//;
 
 #+++++++++++++++++++++++++
-$set{'ver'} = "15:52 2003/06/02";
+$set{'ver'} = "20:54 2003/07/29";
 &formdecode;
 &formcheck;
 if ($in{'mode'} eq 'regist' || $in{'mode'} eq 'res'){ &regist; }
@@ -1163,7 +1163,7 @@ sub filecheck{
 		if($set{'use_thumb'} == 1){
 			$thumb_flag = 1;
 		}
-	}elsif($in{'ext'}){
+	}elsif(!$format && $in{'ext'}){
 		$in{'newH'} = $in{'H'};
 		$in{'newW'} = $in{'W'};
 		if($set{'use_thumb'} == 1 && $gif_flame > 1 && $size > $set{'max_gifanime'} * 1024 ){
