@@ -40,6 +40,73 @@ function SysError($text) {
 ';
 	exit();
 }
+function HTMLize($no) {
+	global $ddir,$ext,$kdir,$kext;
+	$log = file($ddir . $no . $ext);
+	list($fname, $femail, $fdate, $fcom, $fsub) = explode(",", $log[0]); //親
+	$fcom = bb2html($fcom);
+	$kako = "<title>$fsub</title><body><dl><b><font size=+1 color=red>$fsub</font></b>";
+	$kako .= "<dt>1 <font color=\"forestgreen\"><b>$fname</b></font> [ $fdate ]<dt><dd>$fcom<br><br><br>";
+	for($i = 2; $i < count($log) + 1; $i++) {
+		list($name, $email, $date, $com) = explode(",", $log[$i-1]);
+		$com = bb2html($com);
+		$kako .= "<dt>$i <font color=forestgreen><b>$name</b></font> [ $date ]<dd>$com<br><br>";
+	} 
+	$kako .= "</dl><hr size=1></body>";
+
+	$fp = fopen($kdir . $no . $kext, "w");
+	fputs($fp, $kako);
+	fclose($fp);
+	echo "<a href=\"$kdir$no$kext\"> $fsub </a>HTML化完了<br>";
+}
+function DelThreads($key){
+	global $sub_back,$ext,$ext_cgi,$ddir;
+	$flag = false;
+	$sub = file($sub_back);
+	for($j = 0; $j < count($sub); $j++) {
+		$old = explode(",", $sub[$j]);
+		foreach($key as $val) {
+			if ($old[0] == $val.$ext) {
+				$sub[$j] = "";
+				$flag = true;
+			} 
+		} 
+	} 
+	if ($flag) {
+		$sp = fopen($sub_back, "w");
+		flock($sp, LOCK_EX);
+		fputs($sp, implode('', $sub));
+		fclose($sp);
+
+		$sf = fopen($subj_file, "w");
+		flock($sf, LOCK_EX);
+		for($i = 0; $i < $thre_def; $i++) {
+			fputs($sf, $sub[$i]);
+		} 
+		fclose($sf);
+	} 
+	foreach($key as $val) {
+		if (file_exists($ddir . $val . $ext)) {
+			unlink($ddir . $val . $ext);
+			echo "$ddir$val$ext を削除しました<br>";
+		} 
+		if (file_exists($ddir . $val . $ext_cgi)) {
+			unlink($ddir . $val . $ext_cgi);
+			echo "$ddir$val$ext_cgi を削除しました<br>";
+		} 
+	} 
+}
+function StopThread($dat){
+	global $ddir,$ext,$st_name,$st_date,$st_com;
+	$fp = fopen($ddir . $dat . $ext, "a");
+	flock($fp, LOCK_EX);
+	$data = "$st_name,,$st_date,$st_com\n";
+	fputs($fp, $data);
+	fclose($fp);
+
+	@chmod($ddir . $dat . $ext, 0444);
+	echo "$ddir$dat$ext を書き込み禁止にしました<br>";
+}
 
 $mode = $_GET['mode'];
 
@@ -91,35 +158,7 @@ if (count($_POST) > 0) {
 		} 
 		if ($err == "" && is_array($key)) { // スレッドの削除
 			check_login();
-			$sub = file($sub_back);
-			for($j = 0; $j < count($sub); $j++) {
-				$old = explode(",", $sub[$j]);
-				foreach($key as $val) {
-					if ($old[0] == $val.$ext) {
-						$sub[$j] = "";
-						$flag = true;
-					} 
-				} 
-			} 
-			if ($flag) {
-				$sp = fopen($sub_back, "w");
-				flock($sp, LOCK_EX);
-				fputs($sp, implode('', $sub));
-				fclose($sp);
-
-				$sf = fopen($subj_file, "w");
-				flock($sf, LOCK_EX);
-				for($i = 0; $i < $thre_def; $i++) {
-					fputs($sf, $sub[$i]);
-				} 
-				fclose($sf);
-			} 
-			foreach($key as $val) {
-				if (file_exists($ddir . $val . $ext)) {
-					unlink($ddir . $val . $ext);
-					echo "$ddir$val$ext を削除しました<br>";
-				} 
-			} 
+			DelThreads($key);
 		} 
 		include("./index.inc");
 	} 
@@ -127,14 +166,13 @@ if (count($_POST) > 0) {
 	if (isset($_POST['act_stop'])) {
 		check_login();
 		if ($err == "" && isset($dat)) {
-			$fp = fopen($ddir . $dat . $ext, "a");
-			flock($fp, LOCK_EX);
-			$data = "$st_name,,$st_date,$st_com\n";
-			fputs($fp, $data);
-			fclose($fp);
-
-			@chmod($ddir . $dat . $ext, 0444);
-			echo "$ddir$dat$ext を書き込み禁止にしました<br>";
+			StopThread($dat);
+		} 
+		if ($err == "" && is_array($key)) { // スレスト
+			check_login();
+			foreach($key as $dat){
+				StopThread($dat);
+			}
 		} 
 		include("./index.inc");
 	} 
@@ -142,23 +180,28 @@ if (count($_POST) > 0) {
 	if (isset($_POST['act_html'])) {
 		check_login();
 		if ($err == "" && isset($dat)) {
-			$log = file($ddir . $dat . $ext);
-			list($fname, $femail, $fdate, $fcom, $fsub) = explode(",", $log[0]); //親
-			$fcom = bb2html($fcom);
-			$kako = "<title>$fsub</title><body><dl><b><font size=+1 color=red>$fsub</font></b>";
-			$kako .= "<dt>1 <font color=\"forestgreen\"><b>$fname</b></font> [ $fdate ]<dt><dd>$fcom<br><br><br>";
-			for($i = 2; $i < count($log) + 1; $i++) {
-				list($name, $email, $date, $com) = explode(",", $log[$i-1]);
-				$com = bb2html($com);
-				$kako .= "<dt>$i <font color=forestgreen><b>$name</b></font> [ $date ]<dd>$com<br><br>";
-			} 
-			$kako .= "</dl><hr size=1></body>";
-
-			$fp = fopen($kdir . $dat . $kext, "w");
-			fputs($fp, $kako);
-			fclose($fp);
-
-			echo "<a href=\"$kdir$dat$kext\"> $fsub </a>HTML化完了<br>";
+			HTMLize($dat);
+		} 
+		if ($err == "" && is_array($key)) { // HTML化
+			check_login();
+			foreach($key as $dat){
+				HTMLize($dat);
+			}
+		} 
+	} 
+	// HTML化のあと削除
+	if (isset($_POST['act_htmlndel'])) {
+		check_login();
+		if ($err == "" && isset($dat)) {
+			HTMLize($dat);
+			DelThreads(array($dat));
+		} 
+		if ($err == "" && is_array($key)) { // HTML化のあと削除
+			check_login();
+			foreach($key as $dat){
+				HTMLize($dat);
+			}
+			DelThreads($key);
 		} 
 	} 
 } 
@@ -180,6 +223,7 @@ if (check_login(0)) {
 	$del = (int)$_GET['del'];
 	$mode = $_GET['mode'];
 
+	$stop = " <input type=submit name=act_stop value='スレッド停止'><input type=submit name=act_html value='HTML化'><input type=submit name=act_htmlndel value='HTML化＆削除'>";
 	if ($del) {
 		echo "<dl>";
 		$delfile = $ddir . $del . $ext;
@@ -201,7 +245,6 @@ if (check_login(0)) {
 			echo "$n <font color=\"forestgreen\"><b>$name</b></font> [ $now ]<dd>$com<br><br>\n";
 		} 
 		echo "</dl><input type=hidden name=dat value=$del>";
-		$stop = " <input type=submit name=act_stop value='スレッド停止'><input type=submit name=act_html value='HTML化'>";
 		$backup = isset($_POST['viewcgi'])?"<input type=submit name=viewdat value=\" ログ本体を見る \">":"<input type=submit name=viewcgi value=\" バックアップを見る \">";
 	} else {
 		$filename = ($mode == "all") ? $sub_back : $subj_file;

@@ -75,7 +75,7 @@ A:visited {color:#8000D0;text-decoration:none;}
 A:active  {color:blue;text-decoration:none;}
 A:hover  {color:#000080;background-color:#fafad2;}
 .input {border:solid 1;background-color:white;}
-.submit {border:solid 1 #122173;font-family:Tahoma,Osaka,Verdana;font-size:8pt;color:white;background-color:7281C3; height=18px}
+.submit {border:solid 1 #122173;font-family:Tahoma,Osaka,Verdana;font-size:8pt;color:white;background-color:#7281C3; height:18px}
 -->
 </style>
 </head>
@@ -92,12 +92,10 @@ A:hover  {color:#000080;background-color:#fafad2;}
           </tr>
           <tr>
             <td bgcolor="EFF5FF">
-            <font color="#004080" size="+2">{$tit}</font><blockquote><font color="green">{$rmes}<br>{$tmes}</font></blockquote>
-            <form method="post" action="./bbs.php"><font size="-1">名前&nbsp; <input type="text" name="nick" size="20" class="input" value="">　 メール <input type="text" name="mail" size="30" class="input" value=""><br>
-            題名&nbsp; <input type="text" name="subject" class="input" maxlength="80" size="50"> <input type="submit" value="新規投稿"> <b><a href="?">リロード</a> </b><br>
-            本文&nbsp; <textarea name="content" rows="5" class="input" cols="70"></textarea></font>
-			<span style="display:none;"> URL（省略必要）<input type="text" value="" name="url" size="19" class="input"></span>
-			</form>
+            <font color="#004080" size="+2">{$tit}</font>
+            <blockquote><font color="green">{$rmes}<br>{$tmes}
+            </font></blockquote>
+<!--&NEWFORM/-->
             </td>
           </tr>
           <tr>
@@ -123,12 +121,13 @@ A:hover  {color:#000080;background-color:#fafad2;}
           </tr>
         </tbody>
       </table>
-      <small><a href="subback.php">スレッド一覧はこちら</a></small> </font></td>
+      <small><!--&PAGES/-->&emsp;<a href="subback.php">スレッド一覧はこちら</a></small> </font></td>
     </tr>
   </tbody>
 </table>
 <br>
 <!--&FOREACH($oya,'THREAD')-->
+<!--&IF($PAGEBAR,'<!--&PAGEBAR/-->','')-->
 <hr>
 <div align="right"><a href="http://php.s3.to" target="_blank">freeStyle bbs byレッツPHP!</a> + <a href="http://riaf.org/f_style/">riaf web</a> + PTE</div>
 </center>
@@ -215,3 +214,27 @@ A:hover  {color:#000080;background-color:#fafad2;}
           </tr>
           </form>
 <!--/&RESFORM-->
+
+<!--&PAGEBAR-->
+<!--&PAGES/-->
+<!--/&PAGEBAR-->
+
+<!--&PAGES-->
+<!--&IF($PREVPAGE,'<a href="page.php?page={$PREVPAGE}">＜＜前のページ</a> ','')-->
+<!--&FOREACH($PAGES,'PAGE')-->
+<!--&IF($NEXTPAGE,'<a href="page.php?page={$NEXTPAGE}">次のページ＞＞</a> ','')-->
+<!--/&PAGES-->
+
+<!--&PAGE-->
+<!--&IF($THISPAGE,'<b>[{$PAGE}]</b> ','<a href="page.php?page={$PAGE}">[{$PAGE}]</a> ')-->
+<!--/&PAGE-->
+
+<!--&NEWFORM-->
+            <span id="newform">
+            <form method="post" action="./bbs.php"><font size="-1">名前&nbsp; <input type="text" name="nick" size="20" class="input" value="">　 メール <input type="text" name="mail" size="30" class="input" value=""><br>
+            題名&nbsp; <input type="text" name="subject" class="input" maxlength="80" size="50"> <input type="submit" value="新規投稿"> <b><a href="?">リロード</a> </b><br>
+            本文&nbsp; <textarea name="content" rows="5" class="input" cols="70"></textarea></font>
+			<span style="display:none;"> URL（省略必要）<input type="text" value="" name="url" size="19" class="input"></span>
+			</form>
+            </span>
+<!--/&NEWFORM-->

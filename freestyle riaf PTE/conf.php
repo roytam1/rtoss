@@ -24,15 +24,16 @@ $dir_path = 'http://'.$_SERVER['HTTP_HOST'].preg_replace('|[^/]*?\.php.*$|U', ''
 $page_def = 10; //１ページに何スレッド？
 $res_def = 7; //１スレッドに何個レス？
 $thre_def = 45; //ヘッドライン表示最大数
+$read_def = 50; //最新何個レス
 $extag = 1; //独自タグを使う？
 $imgtag = 1; //上記１の場合、imgタグ使う？
 $nanasi = '名無しさん'; //無記名時の名前
 $thre_cut = 26; //スレ表示文字数(追加
 
-$viewline = 15; //表示時の最大行数（これ以上はリンク）
-$viewbyte = 1200; //表示時の最大バイト数（これ以上はリンク）
-$postline = 25; //投稿時の最大行数
-$postbyte = 3000; //投稿時の最大バイト数
+$viewline = 25; //表示時の最大行数（これ以上はリンク）
+$viewbyte = 3000; //表示時の最大バイト数（これ以上はリンク）
+$postline = 45; //投稿時の最大行数
+$postbyte = 4000; //投稿時の最大バイト数
 $numlimit = 1000; //レス最大投稿数（これ以上は書き込めない）
 $taborn = 2; //透明あぼーん
 
@@ -70,6 +71,7 @@ $TZ='+8'; //Timezone
 $ngfiles=array('./spamdata.cgi','./ngwords.cgi');
 $rengfile='./rengwords.cgi';
 $extipq=7;
+$faillog='./nglog.log';
 
 if(isset($_SERVER['ORIG_PATH_INFO'])) $_SERVER['PATH_INFO']=$_SERVER['ORIG_PATH_INFO']; //PHP5 workaround
 
@@ -108,5 +110,13 @@ function error($emsg, $name = "", $mail = "", $host = "", $msg = "")
 	print "</small></body></html>";
 	exit();
 } 
+
+function nglog_append($ip,$tim,$msg){
+	global $faillog;
+	$fp = fopen($faillog,'ab') or fopen($faillog,'wb');
+	flock($fp,2);
+	fputs($fp,"$ip\t$tim\t$msg\n");
+	fclose($fp);
+}
 
 ?>

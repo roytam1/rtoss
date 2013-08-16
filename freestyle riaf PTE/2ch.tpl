@@ -1,12 +1,10 @@
-<!--&MAIN-->
-<html>
+<!--&MAIN--><html>
 <head>
 <title>{$tit}</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <META HTTP-EQUIV="pragma" CONTENT="no-cache">
 <link rel="alternate" type="application/rss+xml" title="RSS" href="backend.php">
-</head>
-<head><script language="JavaScript"><!-- 
+<script language="JavaScript"><!-- 
 function l(e){var N=loadCookie("NAME"),M=loadCookie("MAIL"),P=loadCookie("PASS"),i;with(document)for(i=0;i<forms.length;i++)if(forms[i].nick&&forms[i].mail)with(forms[i]){nick.value=N;mail.value=M;forms[i].delk?delk.value=P:P=P;} li();}onload=l;
 /* Function Equivalent to URLDecoder.decode(String, "UTF-8")
    Copyright (C) 2002 Cresc Corp. http://www.cresc.co.jp/
@@ -81,22 +79,15 @@ font-size:12pt; font-family:"ＭＳ Ｐゴシック", "Osaka"}
 <a name="menu" /><table border=1 cellspacing=7 cellpadding=3 width=95% bgcolor=#ccffcc><tr><td><small>
 <!--&FOREACH($head,'HEAD')-->
 <!--&FOREACH($over,'HEADOVER')-->
-      <br><div align="right"><a href="subback.php">スレッド一覧はこちら</a></div></small></td>
+      <br><div style="float:left"><!--&PAGES/--></div><div align="right"><a href="subback.php">スレッド一覧はこちら</a></div></small></td>
     </tr>
 </table>
 <br>
 <!--&FOREACH($oya,'THREAD')-->
-<form method="post" action="./bbs.php"><a name="new"></a>
-<table border=1 cellspacing=7 cellpadding=3 width=95% bgcolor=#ccffcc><tr><td><table border=0 width=100%><tr><td><div align="right" style="float:right"><a href="#top">■</a></div>
-<font size=-1>名前&nbsp; <input type="text" name="nick" size="20" class=input value="">　
-メール <input type="text" name="mail" size="30" class=input value=""><br>
-題名&nbsp; <input type="text" name="subject" class=input maxlength="80" size="50">
-<input type="submit" value="新規スレッド作成">
-<b><a href="?">リロード</a> </b><br>
-本文&nbsp; <textarea name="content" rows="5" class=input cols="70"></textarea>
-<span style="display:none;"> ＵＲＬ：（省略必要）<input type="text" value="" name="url" size="19" class="input"></span>
-</font>
-</td></tr></table></td></tr></table></form>
+<!--&IF($PAGEBAR,'<!--&PAGEBAR/-->','')-->
+
+<!--&NEWFORM/-->
+
 <center>- <a href="http://php.s3.to" target="_blank">freeStyle bbs byレッツPHP!</a> + <a href="http://riaf.org/f_style/">riaf web</a> + PTE -</center>
 </center>
 </body>
@@ -148,3 +139,35 @@ font-size:12pt; font-family:"ＭＳ Ｐゴシック", "Osaka"}
 <ul><textarea rows=5 cols=64 wrap=off name="content"></textarea><br>
 </form>
 <!--/&RESFORM-->
+
+<!--&PAGEBAR-->
+<table border=1 cellspacing=7 cellpadding=3 bgcolor=#ccffcc align=center>
+<tr><td>
+<!--&PAGES/-->
+</td></tr></table><br/>
+<!--/&PAGEBAR-->
+
+<!--&PAGES-->
+<!--&IF($PREVPAGE,'<a href="page.php?page={$PREVPAGE}">＜＜前のページ</a> ','')-->
+<!--&FOREACH($PAGES,'PAGE')-->
+<!--&IF($NEXTPAGE,'<a href="page.php?page={$NEXTPAGE}">次のページ＞＞</a> ','')-->
+<!--/&PAGES-->
+
+<!--&PAGE-->
+<!--&IF($THISPAGE,'<b>[{$PAGE}]</b> ','<a href="page.php?page={$PAGE}">[{$PAGE}]</a> ')-->
+<!--/&PAGE-->
+
+<!--&NEWFORM-->
+<form method="post" action="./bbs.php"><a name="new"></a>
+<div id="newform">
+<table border=1 cellspacing=7 cellpadding=3 width=95% bgcolor=#ccffcc><tr><td><table border=0 width=100%><tr><td><div align="right" style="float:right"><a href="#top">■</a></div>
+<font size=-1>名前&nbsp; <input type="text" name="nick" size="20" class=input value="">　
+メール <input type="text" name="mail" size="30" class=input value=""><br>
+題名&nbsp; <input type="text" name="subject" class=input maxlength="80" size="50">
+<input type="submit" value="新規スレッド作成">
+<b><a href="?">リロード</a> </b><br>
+本文&nbsp; <textarea name="content" rows="5" class=input cols="70"></textarea>
+<span style="display:none;"> ＵＲＬ：（省略必要）<input type="text" value="" name="url" size="19" class="input"></span>
+</font>
+</td></tr></table></td></tr></table></div></form>
+<!--/&NEWFORM-->
