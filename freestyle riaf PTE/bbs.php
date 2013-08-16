@@ -19,7 +19,7 @@ function matchCIDR($addr, $cidr) {
 function getREMOTE_ADDR(){
 	if(isset($_SERVER['HTTP_X_FORWARDED_FOR'])){
 		$tmp = preg_split('/[ ,]+/', $_SERVER['HTTP_X_FORWARDED_FOR']);
-		return $tmp[0];
+		return (!strncmp($tmp[0],'10.',3)||!strncmp($tmp[0],'192.168.',8)||matchCIDR($tmp[0],'172.16.0.0/12'))?$_SERVER['REMOTE_ADDR']:$tmp[0];
 	}
 	return $_SERVER['REMOTE_ADDR'];
 }
@@ -109,15 +109,17 @@ foreach ($killip as $kill) {
 		if(preg_match($kill, $HOST) || ($checkTwice && preg_match($kill, $IP))){ $IsBanned = true; break; }
 	}
 }
-if($IsBanned) error("投稿が禁止されています (x1)", $FROM, $mail, $HOST, $MESSAGE);
+if($IsBanned) {nglog_append($IP,time(),"badip\t$kill\t$FROM|$mail|".str_replace("\r\n",'<br>',$MESSAGE)); error("投稿が禁止されています (x1)", $FROM, $mail, $HOST, $MESSAGE);}
 
 if(count($ngfiles)) {
 	foreach($ngfiles as $ngfile) {
 		if(is_file($ngfile)) {
 			$ngwords=explode(',',rtrim(implode('',file($ngfile))));
 			foreach($ngwords as $value){
-				if($value!="" && (strpos($MESSAGE, $value)!==false || strpos($subject ,$value)!==false || strpos($FROM, $value)!==false || strpos($mail,$value)!==false))
+				if($value!="" && (strpos($MESSAGE, $value)!==false || strpos($subject ,$value)!==false || strpos($FROM, $value)!==false || strpos($mail,$value)!==false)){
+					nglog_append($IP,time(),"ngword\t$value\t$FROM|$mail|".str_replace("\r\n",'<br>',$MESSAGE));
 					error("投稿が禁止されています (x2)", $FROM, $mail, $HOST, $MESSAGE);
+				}
 			}
 		}
 	}
@@ -128,8 +130,10 @@ if(is_file($rengfile)) {
 		$value = trim($value);
 		if($value){
 			$value="/$value/";
-			if((preg_match($value,$MESSAGE) || preg_match($value,$subject) || preg_match($value,$FROM) || preg_match($value,$mail)))
+			if((preg_match($value,$MESSAGE) || preg_match($value,$subject) || preg_match($value,$FROM) || preg_match($value,$mail))){
+				nglog_append($IP,time(),"rengword\t$value\t$FROM|$mail|".str_replace("\r\n",'<br>',$MESSAGE));
 				error("投稿が禁止されています (x3)", $FROM, $mail, $HOST, $MESSAGE);
+			}
 		}
 	}
 }
@@ -143,9 +147,12 @@ if(strpos($mail,'!id')!==false) {
 if (!empty($mail)) {
 	$id = " ID:???";
 } else*/ if($idtag) {
+/*
 	$idnum = substr(strtr($_SERVER['REMOTE_ADDR'], '.', ''), 8);
 	$bbscrypt = ord($_SERVER['PHP_SELF'][3]) + ord($_SERVER['PHP_SELF'][4]);
-	$idcrypt = substr(crypt(($bbscrypt + $idnum), gmdate('Ymd', time() + $TZ * 3600)), -8);
+	$idcrypt = substr(crypt(($bbscrypt + $idnum),gmdate('Ymd', time() + $TZ * 3600),'id'), -8);*/
+	$rawstr=pack('N',ip2long($_SERVER['REMOTE_ADDR'])).pack('N',gmdate('Ymd', time() + $TZ * 3600));
+	$idcrypt=substr(crypt($rawstr,'id'),-8);;
 	$id = ' ID:' . $idcrypt;
 } else {
 	// IP
@@ -155,7 +162,7 @@ if (!empty($mail)) {
 $qcnt=$exflg=0;
 if($extipq && $IP != "127.0.0.1" && strpos($FROM,"fusianasan")===false && strpos($FROM,"mokorikomo")===false) {
 	$rev = implode('.', array_reverse(explode('.', $IP)));
-	$queries = array( 'list.dsbl.org','bbx.2ch.net','dnsbl.ahbl.org','niku.2ch.net','virus.rbl.jp','ircbl.ahbl.org','tor.ahbl.org' );
+	$queries = array( /*'list.dsbl.org',*/'bbx.2ch.net','dnsbl.ahbl.org','niku.2ch.net','list.blogspambl.com','virus.rbl.jp','ircbl.ahbl.org','tor.ahbl.org' );
 	foreach ( $queries as $query ) {
 		$qres=gethostbyname($rev.'.'.$query);
 		if($rev.'.'.$query!=$qres){ $exflg=1; break; }
@@ -163,7 +170,7 @@ if($extipq && $IP != "127.0.0.1" && strpos($FROM,"fusianasan")===false && strpos
 		if($qcnt>=$extipq) break;
 	}
 }
-if($exflg) error("投稿が禁止されています (#".$qcnt.')', $FROM, $mail, $HOST, $MESSAGE);
+if($exflg) {nglog_append($IP,time(),"extipq\t$query($qres)\t$FROM|$mail|".str_replace("\r\n",'<br>',$MESSAGE)); error("投稿が禁止されています (#".$qcnt.')<!--'.$rev.'.'.$query.', '.$qres.'-->', $FROM, $mail, $HOST, $MESSAGE);}
 
 
 $FROM = str_replace("fusianasan", "</b>" . $HOST . "<b>", $FROM); //fusianasan？
