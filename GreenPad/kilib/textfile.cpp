@@ -254,6 +254,56 @@ struct rUtf9 : public rBasicUTF
 };
 
 //-------------------------------------------------------------------------
+// Old FSS-UTF (/usr/ken/utf/xutf from dump of Sep 2 1992)
+//-------------------------------------------------------------------------
+struct rUtfOFSS : public rBasicUTF
+{
+	rUtfOFSS( const uchar* b, ulong s )
+		: fb( b )
+		, fe( b+s )
+		, SurrogateLow( 0 ) {}
+
+	const uchar *fb, *fe;
+	qbyte SurrogateLow;
+
+	bool Eof() { return SurrogateLow ? false : fb==fe; }
+	void Skip()
+	{
+		if( SurrogateLow ) return; // don't go further if leftover exists
+
+		if( *fb >= 0xf0 && *fb <= 0xf8 )      { fb+=5; }
+		else if( *fb >= 0xe0 && *fb <= 0xf0 ) { fb+=4; }
+		else if( *fb >= 0xc0 && *fb <= 0xe0 ) { fb+=3; }
+		else if( *fb >= 0x80 && *fb <= 0xc0 ) { fb+=2; }
+		else /* 0~0x7F,0xA0~0xFF */           {  ++fb; }
+	}
+	unicode PeekC()
+	{
+		qbyte ch;
+
+		if( SurrogateLow )
+		{
+			ch = SurrogateLow;
+			SurrogateLow = 0;
+			return (unicode)ch;
+		}
+
+		if( *fb >= 0xf0 && *fb <= 0xf8 )      { ch = (((*fb & 0x07) << 28) + ((*(fb+1) & 0x7F) << 21) + ((*(fb+2) & 0x7F) << 14) + ((*(fb+3) & 0x7F) << 7) + (*(fb+4) & 0x7F) + 0x2082080); }
+		else if( *fb >= 0xe0 && *fb <= 0xf0 ) { ch = (((*fb & 0x0f) << 21) + ((*(fb+1) & 0x7F) << 14) + ((*(fb+2) & 0x7F) << 7) + (*(fb+3) & 0x7F) + 0x0082080); }
+		else if( *fb >= 0xc0 && *fb <= 0xe0 ) { ch = (((*fb & 0x1f) << 14) + ((*(fb+1) & 0x7F) << 7) + (*(fb+2) & 0x7F) + 0x0002080); }
+		else if( *fb >= 0x80 && *fb <= 0xc0 ) { ch = (((*fb & 0x3f) << 7) + (*(fb+1) & 0x7F) + 0x0000080); }
+		else /* 0~0x7F,0xA0~0xFF */           { ch = (*fb); }
+
+		if( ch > 0x10000 )
+		{
+			SurrogateLow = (0xDC00 + (((ch-0x10000)    )&0x3ff));
+			ch = (0xD800 + (((ch-0x10000)>>10)&0x3ff));
+		}
+		return (unicode)ch;
+	}
+};
+
+//-------------------------------------------------------------------------
 // UTF-5
 //     0-  F : 1bbbb
 //    10- FF : 1bbbb 0bbbb
@@ -1142,6 +1192,8 @@ bool TextFileR::Open( const TCHAR* fname )
 	case UTF9:    impl_ = new rUtf9(buf,siz); break;
 	case SCSU:    impl_ = new rSCSU(buf,siz); break;
 	case BOCU1:   impl_ = new rBOCU1(buf,siz); break;
+	case OFSSUTFY:
+	case OFSSUTF: impl_ = new rUtfOFSS(buf,siz); break;
 	case EucJP:   impl_ = new rIso2022(buf,siz,true,false,ASCII,JIS,KANA); break;
 	case IsoJP:   impl_ = new rIso2022(buf,siz,false,false,ASCII,KANA); break;
 	case IsoKR:   impl_ = new rIso2022(buf,siz,true,false,ASCII,KSX); break;
@@ -1211,6 +1263,7 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 	else if( (bom4>>8) == 0x93fdff ) cs = UTF9Y;
 	else if( (bom4>>8) == 0x0efeff ) cs = SCSU;
 	else if( (bom4>>8) == 0xfbee28 ) cs = BOCU1;
+	else if( (bom4>>8) == 0xc3bcff ) cs = OFSSUTFY;
 	else if( bom4 == 0x0000feff ) cs = UTF32b;
 	else if( bom4 == 0xfffe0000 ) cs = UTF32l;
 	else if( bom2 == 0xfeff )     cs = UTF16b;
@@ -1725,6 +1778,57 @@ struct wUtf9 : public TextFileWPimpl
 			fp_.WriteC( static_cast<uchar>(0x80 | (c & 0x7F)) );
 		else
 			fp_.WriteC( static_cast<uchar>(0x98 | (c >> 28) & 0x07) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 21) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 14) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 7) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c & 0x7F)) );
+	}
+};
+
+struct wUtfOFSS : public TextFileWPimpl
+{
+	wUtfOFSS( FileW& w, bool bom ) : TextFileWPimpl(w), SurrogateHi(0)
+	{
+		if( bom ) // BOMèëÇ´çûÇ›
+			fp_.Write( "\xC3\xBC\xFF", 3 );
+	}
+
+	qbyte SurrogateHi;
+
+	void WriteChar( unicode ch )
+	{
+		qbyte c = ch;
+		if( 0xD800<=ch&&ch<=0xDBFF )
+		{
+			SurrogateHi = c; return;
+		}
+		else if( 0xDC00<=ch&&ch<=0xDFFF )
+			if( SurrogateHi )
+				c = 0x10000 + (((SurrogateHi-0xD800)&0x3ff)<<10) + ((c-0xDC00)&0x3ff), SurrogateHi = 0;
+			else return; // find Surrogate Low part only, discard it
+		else // find Surrogate Hi part only, discard it
+			SurrogateHi = 0;
+
+		if( c <= 0x7F )
+			fp_.WriteC( static_cast<uchar>(c) );
+		else if( c <= 0x1fff + 0x0000080 )
+			c -= 0x0000080,
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 7)) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c & 0x7F)) );
+		else if( c <= 0x7ffff + 0x0002080 )
+			c -= 0x0002080,
+			fp_.WriteC( static_cast<uchar>(0xc0 | (c >> 14)) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 7) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c & 0x7F)) );
+		else if( c <= 0x1ffffff + 0x0082080 )
+			c -= 0x0082080,
+			fp_.WriteC( static_cast<uchar>(0xe0 | (c >> 21)) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 14) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 7) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c & 0x7F)) );
+		else
+			c -= 0x2082080,
+			fp_.WriteC( static_cast<uchar>(0xf0 | (c >> 28) & 0x07) ),
 			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 21) & 0x7F) ),
 			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 14) & 0x7F) ),
 			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 7) & 0x7F) ),
@@ -2499,6 +2603,8 @@ bool TextFileW::Open( const TCHAR* fname )
 	case UTF32BE: impl_ = new wUtf32BE( fp_, cs_==UTF32b ); break;
 	case SCSU:    impl_ = new wSCSU( fp_ ); break;
 	case BOCU1:   impl_ = new wBOCU1( fp_ ); break;
+	case OFSSUTF:
+	case OFSSUTFY: impl_ = new wUtfOFSS( fp_, cs_==OFSSUTFY ); break;
 	case EucJP:   impl_ = new wEucJp( fp_ ); break;
 	case IsoJP:   impl_ = new wIsoJp( fp_ ); break;
 	case IsoKR:   impl_ = new wIso2022( fp_, cs_ ); break;
