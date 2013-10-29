@@ -7,14 +7,137 @@ Var SetupName
 OutFile "shellrunner.exe"
 Name $SetupName
 Icon "gear_02.ico"
+SetCompressor LZMA
+
+; Comment out next line for ANSI build
+;TargetMinimalOS 5.0 ; make a Unicode installer
 
 RequestExecutionLevel user
 
 Var scriptname
+Var argvc
+Var argv0
+Var argv1
+Var argv2
+Var argv3
+Var argv4
+Var argv5
+Var argv6
+Var argv7
+Var argv8
+Var argv9
 
 ; init StrRep macro/function outside everything first
 ${StrRep}
 ${StrTok}
+
+; SplitArg by Anders
+; http://stackoverflow.com/a/19644470/145278
+Function SplitArg
+Exch $0 ; str
+Push $1 ; inQ
+Push $3 ; idx
+Push $4 ; tmp
+StrCpy $1 0
+StrCpy $3 0
+loop:
+    StrCpy $4 $0 1 $3
+    ${If} $4 == '"'
+        ${If} $1 <> 0 
+            StrCpy $0 $0 "" 1
+            IntOp $3 $3 - 1
+        ${EndIf}
+        IntOp $1 $1 !
+    ${EndIf}
+    ${If} $4 == '' ; The end?
+        StrCpy $1 0
+        StrCpy $4 ' '
+    ${EndIf} 
+    ${If} $4 == ' '
+    ${AndIf} $1 = 0
+        StrCpy $4 $0 $3
+        StrCpy $1 $4 "" -1
+        ${IfThen} $1 == '"' ${|} StrCpy $4 $4 -1 ${|}
+        killspace:
+            IntOp $3 $3 + 1
+            StrCpy $0 $0 "" $3
+            StrCpy $1 $0 1
+            StrCpy $3 0
+            StrCmp $1 ' ' killspace
+        Push $0 ; Remaining
+        Exch 4
+        Pop $0
+        StrCmp $4 "" 0 moreleft
+            Pop $4
+            Pop $3
+            Pop $1
+            Return
+        moreleft:
+        Exch $4
+        Exch 2
+        Pop $1
+        Pop $3
+        Return
+    ${EndIf}
+    IntOp $3 $3 + 1
+    Goto loop
+FunctionEnd
+
+
+!define fillArgv "!insertmacro fillArgv"
+!macro fillArgv argline
+  StrCpy $argv0 ""
+  StrCpy $argv1 ""
+  StrCpy $argv2 ""
+  StrCpy $argv3 ""
+  StrCpy $argv4 ""
+  StrCpy $argv5 ""
+  StrCpy $argv6 ""
+  StrCpy $argv7 ""
+  StrCpy $argv8 ""
+  StrCpy $argv9 ""
+  StrCpy $argvc 0
+  Push "${argline}"
+argloop:
+  Call SplitArg
+  Pop $R9
+  StrCmp $R9 "" argdone
+  ${Switch} $argvc
+    ${Case} 0
+      StrCpy $argv0 $R9
+      ${Break}
+    ${Case} 1
+      StrCpy $argv1 $R9
+      ${Break}
+    ${Case} 2
+      StrCpy $argv2 $R9
+      ${Break}
+    ${Case} 3
+      StrCpy $argv3 $R9
+      ${Break}
+    ${Case} 4
+      StrCpy $argv4 $R9
+      ${Break}
+    ${Case} 5
+      StrCpy $argv5 $R9
+      ${Break}
+    ${Case} 6
+      StrCpy $argv6 $R9
+      ${Break}
+    ${Case} 7
+      StrCpy $argv7 $R9
+      ${Break}
+    ${Case} 8
+      StrCpy $argv8 $R9
+      ${Break}
+    ${Case} 9
+      StrCpy $argv9 $R9
+      ${Break}
+  ${EndSwitch}
+  IntOp $argvc $argvc + 1
+  goto argloop
+argdone:
+!macroend
 
 !define processLine "!insertmacro processLine"
 !macro processLine Line
@@ -27,6 +150,9 @@ Function processLine
 	Var /GLOBAL argv
 	Var /GLOBAL arg0
 	Var /GLOBAL arg1
+	Var /GLOBAL lineno
+
+	StrCpy $lineno 1
 
 	Pop $0
 	${StrRep} $line "$0" "$\r" ""
@@ -74,6 +200,9 @@ Function processLine
 	${StrTok} $arg0 $argv " " "0" ""
 	${StrRep} $arg1 "$argv" "$arg0 " ""
 
+	${fillArgv} $arg1
+
+;	MessageBox MB_OK "line = '$line'$\narg0 = '$arg0'$\narg1 = '$arg1'$\n$\nargv0 = '$argv0'$\nargv1 = '$argv1'$\nargv2 = '$argv2'$\nargv3 = '$argv3'$\nargv4 = '$argv4'$\nargv5 = '$argv5'$\nargv6 = '$argv6'$\nargv7 = '$argv7'$\nargv8 = '$argv8'$\nargv9 = '$argv9'"
 ;	MessageBox MB_OK "line = '$line'$\narg0 = '$arg0'$\narg1 = '$arg1'"
 
 	${Switch} $arg0
@@ -90,14 +219,19 @@ Function processLine
 			CreateDirectory "$arg1"
 			${Break}
 		${Case} '!copy'
-			${StrTok} $R1 $arg1 " " "0" ""
-			${StrTok} $R2 $arg1 " " "1" ""
+;			${StrTok} $R1 $arg1 " " "0" ""
+;			${StrTok} $R2 $arg1 " " "1" ""
+			StrCpy $R1 $argv0
+			StrCpy $R2 $argv1
 			CopyFiles "$R1" "$R2"
 			${Break}
 		${Case} '!rd'
-			${StrTok} $R1 $arg1 " " "0" ""
-			${StrTok} $R2 $arg1 " " "1" ""
-			${StrTok} $R3 $arg1 " " "2" ""
+;			${StrTok} $R1 $arg1 " " "0" ""
+;			${StrTok} $R2 $arg1 " " "1" ""
+;			${StrTok} $R3 $arg1 " " "2" ""
+			StrCpy $R1 $argv0
+			StrCpy $R2 $argv1
+			StrCpy $R3 $argv2
 			${If} $R1 = '/r'
 				${If} $R2 = '/REBOOTOK'
 					RMDir /r /REBOOTOK "$R3"
@@ -115,9 +249,12 @@ Function processLine
 			${EndIf}
 			${Break}
 		${Case} '!rename'
-			${StrTok} $R1 $arg1 " " "0" ""
-			${StrTok} $R2 $arg1 " " "1" ""
-			${StrTok} $R3 $arg1 " " "2" ""
+;			${StrTok} $R1 $arg1 " " "0" ""
+;			${StrTok} $R2 $arg1 " " "1" ""
+;			${StrTok} $R3 $arg1 " " "2" ""
+			StrCpy $R1 $argv0
+			StrCpy $R2 $argv1
+			StrCpy $R3 $argv2
 			${If} $R1 = '/REBOOTOK'
 				Rename /REBOOTOK "$R2" "$R3"
 			${Else}
@@ -125,8 +262,10 @@ Function processLine
 			${EndIf}
 			${Break}
 		${Case} '!del'
-			${StrTok} $R1 $arg1 " " "0" ""
-			${StrTok} $R2 $arg1 " " "1" ""
+;			${StrTok} $R1 $arg1 " " "0" ""
+;			${StrTok} $R2 $arg1 " " "1" ""
+			StrCpy $R1 $argv0
+			StrCpy $R2 $argv1
 			${If} $R1 = '/REBOOTOK'
 				Delete /REBOOTOK "$R2"
 			${Else}
@@ -144,6 +283,7 @@ Function processLine
 			${Break}
 	${EndSwitch}
 
+	IntOp $lineno $lineno + 1
 FunctionEnd
 
 !define readFile "!insertmacro readFile"
@@ -173,16 +313,14 @@ FunctionEnd
 
 Section
 
-	Var /GLOBAL selfbase
 	Var /GLOBAL args
 
-	StrCpy $selfbase $EXEFILE -4
 	StrCpy $args $CMDLINE
 	${GetParameters} $args
 
 	${If} $args == ""
-		${If} ${FileExists} `$EXEDIR\$selfbase.txt`
-			${readFile} "$EXEDIR\$selfbase.txt"
+		${If} ${FileExists} `$EXEDIR\$SetupName.txt`
+			${readFile} "$EXEDIR\$SetupName.txt"
 		${EndIf}
        	${Else}
 		${StrRep} $args "$args" '"' ""
@@ -196,5 +334,5 @@ Section
 		${EndIf}
 	${EndIf}
 
-;	MessageBox MB_OK "CMDLINE = '$selfbase' '$args'"
+;	MessageBox MB_OK "CMDLINE = '$SetupName' '$args'"
 SectionEnd
