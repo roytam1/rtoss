@@ -2,6 +2,8 @@
 !include "StrFunc.nsh"
 !include "LogicLib.nsh"
 
+!packhdr "$%TEMP%\exehead.tmp" 'upx --best "$%TEMP%\exehead.tmp"'
+
 Var SetupName
 
 OutFile "shellrunner.exe"
@@ -10,7 +12,8 @@ Icon "gear_02.ico"
 SetCompressor LZMA
 
 ; Comment out next line for ANSI build
-;TargetMinimalOS 5.0 ; make a Unicode installer
+Unicode true ; make a Unicode installer
+
 
 RequestExecutionLevel user
 
