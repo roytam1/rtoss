@@ -30,6 +30,18 @@ Var argv7
 Var argv8
 Var argv9
 
+Var retval
+Var var0
+Var var1
+Var var2
+Var var3
+Var var4
+Var var5
+Var var6
+Var var7
+Var var8
+Var var9
+
 ; init StrRep macro/function outside everything first
 ${StrRep}
 ${StrTok}
@@ -198,6 +210,17 @@ Function processLine
 	${StrRep} $line "$line" "$$RESOURCES" "$RESOURCES"
 	${StrRep} $line "$line" "$$CDBURN_AREA" "$CDBURN_AREA"
 	${StrRep} $line "$line" "$$RESOURCES_LOCALIZED" "$RESOURCES_LOCALIZED"
+	${StrRep} $line "$line" "$$retval" "$retval"
+	${StrRep} $line "$line" "$$var0" "$var0"
+	${StrRep} $line "$line" "$$var1" "$var1"
+	${StrRep} $line "$line" "$$var2" "$var2"
+	${StrRep} $line "$line" "$$var3" "$var3"
+	${StrRep} $line "$line" "$$var4" "$var4"
+	${StrRep} $line "$line" "$$var5" "$var5"
+	${StrRep} $line "$line" "$$var6" "$var6"
+	${StrRep} $line "$line" "$$var7" "$var7"
+	${StrRep} $line "$line" "$$var8" "$var8"
+	${StrRep} $line "$line" "$$var9" "$var9"
 
 	StrCpy $argv $line
 	${StrTok} $arg0 $argv " " "0" ""
@@ -205,7 +228,38 @@ Function processLine
 
 	${fillArgv} $arg1
 
-;	MessageBox MB_OK "line = '$line'$\narg0 = '$arg0'$\narg1 = '$arg1'$\n$\nargv0 = '$argv0'$\nargv1 = '$argv1'$\nargv2 = '$argv2'$\nargv3 = '$argv3'$\nargv4 = '$argv4'$\nargv5 = '$argv5'$\nargv6 = '$argv6'$\nargv7 = '$argv7'$\nargv8 = '$argv8'$\nargv9 = '$argv9'"
+	${If} $argvc > 0
+		${StrRep} $argv0 "$argv0" "$$empty" ""
+	${EndIf}
+	${If} $argvc > 1
+		${StrRep} $argv1 "$argv1" "$$empty" ""
+	${EndIf}
+	${If} $argvc > 2
+		${StrRep} $argv2 "$argv2" "$$empty" ""
+	${EndIf}
+	${If} $argvc > 3
+		${StrRep} $argv3 "$argv3" "$$empty" ""
+	${EndIf}
+	${If} $argvc > 4
+		${StrRep} $argv4 "$argv4" "$$empty" ""
+	${EndIf}
+	${If} $argvc > 5
+		${StrRep} $argv5 "$argv5" "$$empty" ""
+	${EndIf}
+	${If} $argvc > 6
+		${StrRep} $argv6 "$argv6" "$$empty" ""
+	${EndIf}
+	${If} $argvc > 7
+		${StrRep} $argv7 "$argv7" "$$empty" ""
+	${EndIf}
+	${If} $argvc > 8
+		${StrRep} $argv8 "$argv8" "$$empty" ""
+	${EndIf}
+	${If} $argvc > 9
+		${StrRep} $argv9 "$argv9" "$$empty" ""
+	${EndIf}
+
+;	MessageBox MB_OK "line = '$line'$\narg0 = '$arg0'$\narg1 = '$arg1'$\n$\nargvc = $argvc$\n$\nargv0 = '$argv0'$\nargv1 = '$argv1'$\nargv2 = '$argv2'$\nargv3 = '$argv3'$\nargv4 = '$argv4'$\nargv5 = '$argv5'$\nargv6 = '$argv6'$\nargv7 = '$argv7'$\nargv8 = '$argv8'$\nargv9 = '$argv9'"
 ;	MessageBox MB_OK "line = '$line'$\narg0 = '$arg0'$\narg1 = '$arg1'"
 
 	${Switch} $arg0
@@ -222,57 +276,37 @@ Function processLine
 			CreateDirectory "$arg1"
 			${Break}
 		${Case} '!copy'
-;			${StrTok} $R1 $arg1 " " "0" ""
-;			${StrTok} $R2 $arg1 " " "1" ""
-			StrCpy $R1 $argv0
-			StrCpy $R2 $argv1
-			CopyFiles "$R1" "$R2"
+			CopyFiles "$argv0" "$argv1"
 			${Break}
 		${Case} '!rd'
-;			${StrTok} $R1 $arg1 " " "0" ""
-;			${StrTok} $R2 $arg1 " " "1" ""
-;			${StrTok} $R3 $arg1 " " "2" ""
-			StrCpy $R1 $argv0
-			StrCpy $R2 $argv1
-			StrCpy $R3 $argv2
-			${If} $R1 = '/r'
-				${If} $R2 = '/REBOOTOK'
-					RMDir /r /REBOOTOK "$R3"
+			${If} $argv0 = '/r'
+				${If} $argv1 = '/REBOOTOK'
+					RMDir /r /REBOOTOK "$argv2"
 				${Else}
-					RMDir /r "$R2"
+					RMDir /r "$argv1"
 				${EndIf}
-			${ElseIf} $R1 = '/REBOOTOK'
-				${If} $R2 = '/r'
-					RMDir /r /REBOOTOK "$R3"
+			${ElseIf} $argv0 = '/REBOOTOK'
+				${If} $argv1 = '/r'
+					RMDir /r /REBOOTOK "$argv2"
 				${Else}
-					RMDir /REBOOTOK "$R2"
+					RMDir /REBOOTOK "$argv1"
 				${EndIf}
 			${Else}
-				RMDir "$R1"
+				RMDir "$argv0"
 			${EndIf}
 			${Break}
 		${Case} '!rename'
-;			${StrTok} $R1 $arg1 " " "0" ""
-;			${StrTok} $R2 $arg1 " " "1" ""
-;			${StrTok} $R3 $arg1 " " "2" ""
-			StrCpy $R1 $argv0
-			StrCpy $R2 $argv1
-			StrCpy $R3 $argv2
-			${If} $R1 = '/REBOOTOK'
-				Rename /REBOOTOK "$R2" "$R3"
+			${If} $argv0 = '/REBOOTOK'
+				Rename /REBOOTOK "$argv1" "$argv2"
 			${Else}
-				Rename "$R1" "$R2"
+				Rename "$argv0" "$argv1"
 			${EndIf}
 			${Break}
 		${Case} '!del'
-;			${StrTok} $R1 $arg1 " " "0" ""
-;			${StrTok} $R2 $arg1 " " "1" ""
-			StrCpy $R1 $argv0
-			StrCpy $R2 $argv1
-			${If} $R1 = '/REBOOTOK'
-				Delete /REBOOTOK "$R2"
+			${If} $argv0 = '/REBOOTOK'
+				Delete /REBOOTOK "$argv1"
 			${Else}
-				Delete "$R1"
+				Delete "$argv0"
 			${EndIf}
 			${Break}
 		${Case} '!open'
@@ -283,6 +317,173 @@ Function processLine
 			${Break}
 		${Case} '!unregdll'
 			UnRegDLL "$arg1"
+			${Break}
+		${Case} '!plugin'
+			${If} $argvc = 10
+				Push $argv9
+				Push $argv8
+				Push $argv7
+				Push $argv6
+				Push $argv5
+				Push $argv4
+				Push $argv3
+				Push $argv2
+				CallInstDLL $argv0 $argv1
+				Pop $retval
+			${ElseIf} $argvc = 9
+				Push $argv8
+				Push $argv7
+				Push $argv6
+				Push $argv5
+				Push $argv4
+				Push $argv3
+				Push $argv2
+				CallInstDLL $argv0 $argv1
+				Pop $retval
+			${ElseIf} $argvc = 8
+				Push $argv7
+				Push $argv6
+				Push $argv5
+				Push $argv4
+				Push $argv3
+				Push $argv2
+				CallInstDLL $argv0 $argv1
+				Pop $retval
+			${ElseIf} $argvc = 7
+				Push $argv6
+				Push $argv5
+				Push $argv4
+				Push $argv3
+				Push $argv2
+				CallInstDLL $argv0 $argv1
+				Pop $retval
+			${ElseIf} $argvc = 6
+				Push $argv5
+				Push $argv4
+				Push $argv3
+				Push $argv2
+				CallInstDLL $argv0 $argv1
+				Pop $retval
+			${ElseIf} $argvc = 5
+				Push $argv4
+				Push $argv3
+				Push $argv2
+				CallInstDLL $argv0 $argv1
+				Pop $retval
+			${ElseIf} $argvc = 4
+				Push $argv3
+				Push $argv2
+				CallInstDLL $argv0 $argv1
+				Pop $retval
+			${ElseIf} $argvc = 3
+				Push $argv2
+				CallInstDLL $argv0 $argv1
+				Pop $retval
+			${ElseIf} $argvc = 2
+				CallInstDLL $argv0 $argv1
+				Pop $retval
+			${EndIf}
+			${Break}
+		${Case} '!set'
+			${If} $argv0 = 'var0'
+				StrCpy $var0 $argv1
+			${ElseIf} $argv0 = 'var1'
+				StrCpy $var1 $argv1
+			${ElseIf} $argv0 = 'var2'
+				StrCpy $var2 $argv1
+			${ElseIf} $argv0 = 'var3'
+				StrCpy $var3 $argv1
+			${ElseIf} $argv0 = 'var4'
+				StrCpy $var4 $argv1
+			${ElseIf} $argv0 = 'var5'
+				StrCpy $var5 $argv1
+			${ElseIf} $argv0 = 'var6'
+				StrCpy $var6 $argv1
+			${ElseIf} $argv0 = 'var7'
+				StrCpy $var7 $argv1
+			${ElseIf} $argv0 = 'var8'
+				StrCpy $var8 $argv1
+			${ElseIf} $argv0 = 'var9'
+				StrCpy $var9 $argv1
+			${EndIf}
+			${Break}
+		${Case} '!intfmt'
+			IntFmt $retval $argv0 $argv1
+			${Break}
+		${Case} '!intop'
+			${If} $argv1 = '+'
+				IntOp $retval $argv0 + $argv2
+			${ElseIf} $argv1 = '-'
+				IntOp $retval $argv0 - $argv2
+			${ElseIf} $argv1 = '*'
+				IntOp $retval $argv0 * $argv2
+			${ElseIf} $argv1 = '/'
+				IntOp $retval $argv0 / $argv2
+			${ElseIf} $argv1 = '%'
+				IntOp $retval $argv0 % $argv2
+			${ElseIf} $argv1 = '|'
+				IntOp $retval $argv0 | $argv2
+			${ElseIf} $argv1 = '&'
+				IntOp $retval $argv0 & $argv2
+			${ElseIf} $argv1 = '^'
+				IntOp $retval $argv0 ^ $argv2
+			${ElseIf} $argv1 = '<<'
+				IntOp $retval $argv0 << $argv2
+			${ElseIf} $argv1 = '||'
+				IntOp $retval $argv0 || $argv2
+			${ElseIf} $argv1 = '&&'
+				IntOp $retval $argv0 && $argv2
+			${ElseIf} $argv1 = '~'
+				IntOp $retval $argv0 ~
+			${ElseIf} $argv1 = '!'
+				IntOp $retval $argv0 !
+			${EndIf}
+			${Break}
+		${Case} '!strrep'
+			${StrRep} $retval $argv0 $argv1 $argv2
+			${Break}
+		${Case} '!strlen'
+			StrLen $retval $argv0
+			${Break}
+		${Case} '!strcpy'
+			${If} $argv1 = ''
+				${If} $argv2 = ''
+					StrCpy $retval "$argv0"
+				${Else}
+					StrCpy $retval "$argv0" "" "$argv2"
+				${EndIf}
+			${Else}
+				${If} $argv2 = ''
+					StrCpy $retval "$argv0" "$argv1"
+				${Else}
+					StrCpy $retval "$argv0" "$argv1" "$argv2"
+				${EndIf}
+			${EndIf}
+			${Break}
+		${Case} '!findwin'
+			${If} $argvc = 4
+				${If} $argv1 = ''
+					FindWindow $retval $argv0 "" $argv2 $argv3
+				${Else}
+					FindWindow $retval $argv0 $argv1 $argv2 $argv3
+				${EndIf}
+			${ElseIf} $argvc = 3
+				${If} $argv1 = ''
+					FindWindow $retval $argv0 "" $argv2
+				${Else}
+					FindWindow $retval $argv0 $argv1 $argv2
+				${EndIf}
+			${ElseIf} $argvc = 2
+				FindWindow $retval $argv0 $argv1
+			${Else}
+				FindWindow $retval $argv0
+			${EndIf}
+			${Break}
+		${Case} '!showwin'
+			ShowWindow $argv0 $argv1
+			${Break}
+		${Case} '!sendmsg'
+			SendMessage $argv0 $argv1 $argv2 $argv3
 			${Break}
 	${EndSwitch}
 
