@@ -333,6 +333,8 @@ Section
 	       	${Else}
 			${If} ${FileExists} `$EXEDIR\$args`
 				${readFile} "$EXEDIR\$args"
+			${Else}
+				${processLine} $args
 			${EndIf}
 		${EndIf}
 	${EndIf}
