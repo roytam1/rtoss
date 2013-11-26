@@ -11,13 +11,14 @@ Name $SetupName
 Icon "gear_02.ico"
 SetCompressor LZMA
 
-; Comment out next line for ANSI build
-Unicode true ; make a Unicode installer
-
+; Comment out next lines for ANSI build
+;Unicode true ; make a Unicode installer
+;!define UTF16Script
 
 RequestExecutionLevel user
 
 Var scriptname
+Var parseverbose
 Var argvc
 Var argv0
 Var argv1
@@ -29,6 +30,7 @@ Var argv6
 Var argv7
 Var argv8
 Var argv9
+Var lineno
 
 Var retval
 Var var0
@@ -42,9 +44,52 @@ Var var7
 Var var8
 Var var9
 
+!define RetvalToVar "!insertmacro RetvalToVar"
+!macro RetvalToVar var
+Push $retval
+Pop ${var}
+!macroend
+
+!define VarToRetval "!insertmacro VarToRetval"
+!macro VarToRetval var
+Push ${var}
+Pop $retval
+!macroend
+
 ; init StrRep macro/function outside everything first
 ${StrRep}
 ${StrTok}
+
+/*
+!define CharToASCII "!insertmacro CharToASCII" 
+ 
+!macro CharToASCII AsciiCode Character
+  Push "${Character}"
+  Call CharToASCII
+  Pop "${AsciiCode}"
+!macroend
+ 
+Function CharToASCII
+  Exch $0 ; given character
+  Push $1 ; current character
+  Push $2 ; current Ascii Code
+ 
+  StrCpy $2 1 ; right from start
+Loop:
+  IntFmt $1 %c $2 ; Get character from current ASCII code
+  ${If} $1 S== $0 ; case sensitive string comparison
+     StrCpy $0 $2
+     Goto Done
+  ${EndIf}
+  IntOp $2 $2 + 1
+  StrCmp $2 255 0 Loop ; ascii from 1 to 255
+  StrCpy $0 0 ; ASCII code wasn't found -> return 0
+Done:         
+  Pop $2
+  Pop $1
+  Exch $0
+FunctionEnd
+*/
 
 ; SplitArg by Anders
 ; http://stackoverflow.com/a/19644470/145278
@@ -57,6 +102,8 @@ StrCpy $1 0
 StrCpy $3 0
 loop:
     StrCpy $4 $0 1 $3
+;    ${CharToASCII} $R9 $1
+;    DetailPrint "'$0'|'$1'($R9)|'$3'|'$4'"
     ${If} $4 == '"'
         ${If} $1 <> 0 
             StrCpy $0 $0 "" 1
@@ -64,7 +111,10 @@ loop:
         ${EndIf}
         IntOp $1 $1 !
     ${EndIf}
-    ${If} $4 == '' ; The end?
+    StrLen $R8 $4
+;    ${CharToASCII} $R9 $1
+;    DetailPrint "x'$0'|'$1'($R9)|'$3'|'$4'[$R8]"
+    ${If} $R8 = 0 ; The end?
         StrCpy $1 0
         StrCpy $4 ' '
     ${EndIf} 
@@ -72,22 +122,32 @@ loop:
     ${AndIf} $1 = 0
         StrCpy $4 $0 $3
         StrCpy $1 $4 "" -1
+;    ${CharToASCII} $R9 $1
+;    DetailPrint "+'$0'|'$1'($R9)|'$3'|'$4'"
         ${IfThen} $1 == '"' ${|} StrCpy $4 $4 -1 ${|}
         killspace:
+;    ${CharToASCII} $R9 $1
+;    DetailPrint "++'$0'|'$1'($R9)|'$3'|'$4'"
             IntOp $3 $3 + 1
             StrCpy $0 $0 "" $3
             StrCpy $1 $0 1
             StrCpy $3 0
             StrCmp $1 ' ' killspace
         Push $0 ; Remaining
+;    ${CharToASCII} $R9 $1
+;    DetailPrint "-'$0'|'$1'($R9)|'$3'|'$4'"
         Exch 4
         Pop $0
         StrCmp $4 "" 0 moreleft
+;    ${CharToASCII} $R9 $1
+;    DetailPrint "*'$0'|'$1'($R9)|'$3'|'$4'"
             Pop $4
             Pop $3
             Pop $1
             Return
         moreleft:
+;    ${CharToASCII} $R9 $1
+;    DetailPrint "/'$0'|'$1'($R9)|'$3'|'$4'"
         Exch $4
         Exch 2
         Pop $1
@@ -165,9 +225,7 @@ Function processLine
 	Var /GLOBAL argv
 	Var /GLOBAL arg0
 	Var /GLOBAL arg1
-	Var /GLOBAL lineno
-
-	StrCpy $lineno 1
+	Var /GLOBAL arg0len
 
 	Pop $0
 	${StrRep} $line "$0" "$\r" ""
@@ -224,7 +282,9 @@ Function processLine
 
 	StrCpy $argv $line
 	${StrTok} $arg0 $argv " " "0" ""
-	${StrRep} $arg1 "$argv" "$arg0 " ""
+	StrLen $arg0len "$arg0 "
+	StrCpy $arg1 "$argv" "" $arg0len
+;	${StrRep} $arg1 "$argv" "$arg0 " ""
 
 	${fillArgv} $arg1
 
@@ -259,8 +319,10 @@ Function processLine
 		${StrRep} $argv9 "$argv9" "$$empty" ""
 	${EndIf}
 
-;	MessageBox MB_OK "line = '$line'$\narg0 = '$arg0'$\narg1 = '$arg1'$\n$\nargvc = $argvc$\n$\nargv0 = '$argv0'$\nargv1 = '$argv1'$\nargv2 = '$argv2'$\nargv3 = '$argv3'$\nargv4 = '$argv4'$\nargv5 = '$argv5'$\nargv6 = '$argv6'$\nargv7 = '$argv7'$\nargv8 = '$argv8'$\nargv9 = '$argv9'"
-;	MessageBox MB_OK "line = '$line'$\narg0 = '$arg0'$\narg1 = '$arg1'"
+	StrCmp $line "" done
+	${If} $parseverbose = 1
+		MessageBox MB_OK "$lineno line = '$line'$\narg0 = '$arg0'$\narg1 = '$arg1'$\n$\nargvc = $argvc$\n$\nargv0 = '$argv0'$\nargv1 = '$argv1'$\nargv2 = '$argv2'$\nargv3 = '$argv3'$\nargv4 = '$argv4'$\nargv5 = '$argv5'$\nargv6 = '$argv6'$\nargv7 = '$argv7'$\nargv8 = '$argv8'$\nargv9 = '$argv9'"
+	${EndIf}
 
 	${Switch} $arg0
 		${Case} '!wait'
@@ -279,14 +341,14 @@ Function processLine
 			CopyFiles "$argv0" "$argv1"
 			${Break}
 		${Case} '!rd'
-			${If} $argv0 = '/r'
-				${If} $argv1 = '/REBOOTOK'
+			${If} $argv0 == '/r'
+				${If} $argv1 == '/REBOOTOK'
 					RMDir /r /REBOOTOK "$argv2"
 				${Else}
 					RMDir /r "$argv1"
 				${EndIf}
-			${ElseIf} $argv0 = '/REBOOTOK'
-				${If} $argv1 = '/r'
+			${ElseIf} $argv0 == '/REBOOTOK'
+				${If} $argv1 == '/r'
 					RMDir /r /REBOOTOK "$argv2"
 				${Else}
 					RMDir /REBOOTOK "$argv1"
@@ -296,14 +358,14 @@ Function processLine
 			${EndIf}
 			${Break}
 		${Case} '!rename'
-			${If} $argv0 = '/REBOOTOK'
+			${If} $argv0 == '/REBOOTOK'
 				Rename /REBOOTOK "$argv1" "$argv2"
 			${Else}
 				Rename "$argv0" "$argv1"
 			${EndIf}
 			${Break}
 		${Case} '!del'
-			${If} $argv0 = '/REBOOTOK'
+			${If} $argv0 == '/REBOOTOK'
 				Delete /REBOOTOK "$argv1"
 			${Else}
 				Delete "$argv0"
@@ -319,125 +381,160 @@ Function processLine
 			UnRegDLL "$arg1"
 			${Break}
 		${Case} '!plugin'
-			${If} $argvc = 10
-				Push $argv9
-				Push $argv8
-				Push $argv7
-				Push $argv6
-				Push $argv5
-				Push $argv4
-				Push $argv3
-				Push $argv2
-				CallInstDLL $argv0 $argv1
-				Pop $retval
-			${ElseIf} $argvc = 9
-				Push $argv8
-				Push $argv7
-				Push $argv6
-				Push $argv5
-				Push $argv4
-				Push $argv3
-				Push $argv2
-				CallInstDLL $argv0 $argv1
-				Pop $retval
-			${ElseIf} $argvc = 8
-				Push $argv7
-				Push $argv6
-				Push $argv5
-				Push $argv4
-				Push $argv3
-				Push $argv2
-				CallInstDLL $argv0 $argv1
-				Pop $retval
-			${ElseIf} $argvc = 7
-				Push $argv6
-				Push $argv5
-				Push $argv4
-				Push $argv3
-				Push $argv2
-				CallInstDLL $argv0 $argv1
-				Pop $retval
-			${ElseIf} $argvc = 6
-				Push $argv5
-				Push $argv4
-				Push $argv3
-				Push $argv2
-				CallInstDLL $argv0 $argv1
-				Pop $retval
-			${ElseIf} $argvc = 5
-				Push $argv4
-				Push $argv3
-				Push $argv2
-				CallInstDLL $argv0 $argv1
-				Pop $retval
-			${ElseIf} $argvc = 4
-				Push $argv3
-				Push $argv2
-				CallInstDLL $argv0 $argv1
-				Pop $retval
-			${ElseIf} $argvc = 3
-				Push $argv2
-				CallInstDLL $argv0 $argv1
-				Pop $retval
-			${ElseIf} $argvc = 2
-				CallInstDLL $argv0 $argv1
-				Pop $retval
-			${EndIf}
+			${Switch} $argvc
+				${Case} 10
+					Push $argv9
+					Push $argv8
+					Push $argv7
+					Push $argv6
+					Push $argv5
+					Push $argv4
+					Push $argv3
+					Push $argv2
+					CallInstDLL $argv0 $argv1
+					Pop $retval
+					${Break}
+				${Case} 9
+					Push $argv8
+					Push $argv7
+					Push $argv6
+					Push $argv5
+					Push $argv4
+					Push $argv3
+					Push $argv2
+					CallInstDLL $argv0 $argv1
+					Pop $retval
+					${Break}
+				${Case} 8
+					Push $argv7
+					Push $argv6
+					Push $argv5
+					Push $argv4
+					Push $argv3
+					Push $argv2
+					CallInstDLL $argv0 $argv1
+					Pop $retval
+					${Break}
+				${Case} 7
+					Push $argv6
+					Push $argv5
+					Push $argv4
+					Push $argv3
+					Push $argv2
+					CallInstDLL $argv0 $argv1
+					Pop $retval
+					${Break}
+				${Case} 6
+					Push $argv5
+					Push $argv4
+					Push $argv3
+					Push $argv2
+					CallInstDLL $argv0 $argv1
+					Pop $retval
+					${Break}
+				${Case} 5
+					Push $argv4
+					Push $argv3
+					Push $argv2
+					CallInstDLL $argv0 $argv1
+					Pop $retval
+					${Break}
+				${Case} 4
+					Push $argv3
+					Push $argv2
+					CallInstDLL $argv0 $argv1
+					Pop $retval
+					${Break}
+				${Case} 3
+					Push $argv2
+					CallInstDLL $argv0 $argv1
+					Pop $retval
+					${Break}
+				${Case} 2
+					CallInstDLL $argv0 $argv1
+					Pop $retval
+					${Break}
+			${EndSwitch}
 			${Break}
 		${Case} '!set'
-			${If} $argv0 = 'var0'
-				StrCpy $var0 $argv1
-			${ElseIf} $argv0 = 'var1'
-				StrCpy $var1 $argv1
-			${ElseIf} $argv0 = 'var2'
-				StrCpy $var2 $argv1
-			${ElseIf} $argv0 = 'var3'
-				StrCpy $var3 $argv1
-			${ElseIf} $argv0 = 'var4'
-				StrCpy $var4 $argv1
-			${ElseIf} $argv0 = 'var5'
-				StrCpy $var5 $argv1
-			${ElseIf} $argv0 = 'var6'
-				StrCpy $var6 $argv1
-			${ElseIf} $argv0 = 'var7'
-				StrCpy $var7 $argv1
-			${ElseIf} $argv0 = 'var8'
-				StrCpy $var8 $argv1
-			${ElseIf} $argv0 = 'var9'
-				StrCpy $var9 $argv1
-			${EndIf}
+			${Switch} $argv0
+				${Case} 'var0'
+					StrCpy $var0 $argv1
+					${Break}
+				${Case} 'var1'
+					StrCpy $var1 $argv1
+					${Break}
+				${Case} 'var2'
+					StrCpy $var2 $argv1
+					${Break}
+				${Case} 'var3'
+					StrCpy $var3 $argv1
+					${Break}
+				${Case} 'var4'
+					StrCpy $var4 $argv1
+					${Break}
+				${Case} 'var5'
+					StrCpy $var5 $argv1
+					${Break}
+				${Case} 'var6'
+					StrCpy $var6 $argv1
+					${Break}
+				${Case} 'var7'
+					StrCpy $var7 $argv1
+					${Break}
+				${Case} 'var8'
+					StrCpy $var8 $argv1
+					${Break}
+				${Case} 'var9'
+					StrCpy $var9 $argv1
+					${Break}
+			${EndSwitch}
 			${Break}
 		${Case} '!intfmt'
 			IntFmt $retval $argv0 $argv1
 			${Break}
 		${Case} '!intop'
-			${If} $argv1 = '+'
-				IntOp $retval $argv0 + $argv2
-			${ElseIf} $argv1 = '-'
-				IntOp $retval $argv0 - $argv2
-			${ElseIf} $argv1 = '*'
-				IntOp $retval $argv0 * $argv2
-			${ElseIf} $argv1 = '/'
-				IntOp $retval $argv0 / $argv2
-			${ElseIf} $argv1 = '%'
-				IntOp $retval $argv0 % $argv2
-			${ElseIf} $argv1 = '|'
-				IntOp $retval $argv0 | $argv2
-			${ElseIf} $argv1 = '&'
-				IntOp $retval $argv0 & $argv2
-			${ElseIf} $argv1 = '^'
-				IntOp $retval $argv0 ^ $argv2
-			${ElseIf} $argv1 = '<<'
-				IntOp $retval $argv0 << $argv2
-			${ElseIf} $argv1 = '||'
-				IntOp $retval $argv0 || $argv2
-			${ElseIf} $argv1 = '&&'
-				IntOp $retval $argv0 && $argv2
-			${ElseIf} $argv1 = '~'
-				IntOp $retval $argv0 ~
-			${ElseIf} $argv1 = '!'
-				IntOp $retval $argv0 !
-			${EndIf}
+			${Switch} $argv1 
+				${Case} '+'
+					IntOp $retval $argv0 + $argv2
+					${Break}
+				${Case} '-'
+					IntOp $retval $argv0 - $argv2
+					${Break}
+				${Case} '*'
+					IntOp $retval $argv0 * $argv2
+					${Break}
+				${Case} '/'
+					IntOp $retval $argv0 / $argv2
+					${Break}
+				${Case} '%'
+					IntOp $retval $argv0 % $argv2
+					${Break}
+				${Case} '|'
+					IntOp $retval $argv0 | $argv2
+					${Break}
+				${Case} '&'
+					IntOp $retval $argv0 & $argv2
+					${Break}
+				${Case} '^'
+					IntOp $retval $argv0 ^ $argv2
+					${Break}
+				${Case} '<<'
+					IntOp $retval $argv0 << $argv2
+					${Break}
+				${Case} '||'
+					IntOp $retval $argv0 || $argv2
+					${Break}
+				${Case} '&&'
+					IntOp $retval $argv0 && $argv2
+					${Break}
+				${Case} '~'
+					IntOp $retval $argv0 ~
+					${Break}
+				${Case} '!'
+					IntOp $retval $argv0 !
+					${Break}
+			${EndSwitch}
 			${Break}
 		${Case} '!strrep'
 			${StrRep} $retval $argv0 $argv1 $argv2
@@ -446,8 +543,8 @@ Function processLine
 			StrLen $retval $argv0
 			${Break}
 		${Case} '!strcpy'
-			${If} $argv1 = ''
-				${If} $argv2 = ''
+			${If} $argv1 == ''
+				${If} $argv2 == ''
 					StrCpy $retval "$argv0"
 				${Else}
 					StrCpy $retval "$argv0" "" "$argv2"
@@ -459,6 +556,15 @@ Function processLine
 					StrCpy $retval "$argv0" "$argv1" "$argv2"
 				${EndIf}
 			${EndIf}
+			${Break}
+		${Case} '!expendenv'
+			StrLen $retval $argv0
+			${Break}
+		${Case} '!readenv'
+			StrLen $retval $argv0
+			${Break}
+		${Case} '!readini'
+			ReadINIStr $retval $argv0 $argv1 $argv2
 			${Break}
 		${Case} '!findwin'
 			${If} $argvc = 4
@@ -485,9 +591,84 @@ Function processLine
 		${Case} '!sendmsg'
 			SendMessage $argv0 $argv1 $argv2 $argv3
 			${Break}
+		${Case} '!vartoret'
+			${Switch} $argv0
+				${Case} 'var0'
+					${VarToRetval} $var0
+					${Break}
+				${Case} 'var1'
+					${VarToRetval} $var1
+					${Break}
+				${Case} 'var2'
+					${VarToRetval} $var2
+					${Break}
+				${Case} 'var3'
+					${VarToRetval} $var3
+					${Break}
+				${Case} 'var4'
+					${VarToRetval} $var4
+					${Break}
+				${Case} 'var5'
+					${VarToRetval} $var5
+					${Break}
+				${Case} 'var6'
+					${VarToRetval} $var6
+					${Break}
+				${Case} 'var7'
+					${VarToRetval} $var7
+					${Break}
+				${Case} 'var8'
+					${VarToRetval} $var8
+					${Break}
+				${Case} 'var9'
+					${VarToRetval} $var9
+					${Break}
+			${EndSwitch}
+			${Break}
+		${Case} '!rettovar'
+			${Switch} $argv0
+				${Case} 'var0'
+					${RetvalToVar} $var0
+					${Break}
+				${Case} 'var1'
+					${RetvalToVar} $var1
+					${Break}
+				${Case} 'var2'
+					${RetvalToVar} $var2
+					${Break}
+				${Case} 'var3'
+					${RetvalToVar} $var3
+					${Break}
+				${Case} 'var4'
+					${RetvalToVar} $var4
+					${Break}
+				${Case} 'var5'
+					${RetvalToVar} $var5
+					${Break}
+				${Case} 'var6'
+					${RetvalToVar} $var6
+					${Break}
+				${Case} 'var7'
+					${RetvalToVar} $var7
+					${Break}
+				${Case} 'var8'
+					${RetvalToVar} $var8
+					${Break}
+				${Case} 'var9'
+					${RetvalToVar} $var9
+					${Break}
+			${EndSwitch}
+			${Break}
+		${Case} '!verbose'
+			${If} $argv0 == 'on'
+				StrCpy $parseverbose 1
+			${Else}
+				StrCpy $parseverbose 0
+			${EndIf}
+			${Break}
 	${EndSwitch}
 
-	IntOp $lineno $lineno + 1
+done:
 FunctionEnd
 
 !define readFile "!insertmacro readFile"
@@ -502,10 +683,20 @@ Function readFile
 	Exch $0
 	StrCpy $scriptname $0
 	FileOpen $4 "$scriptname" r
+!ifdef UTF16Script
+	FileReadUTF16LE $4 $oline
+!else
 	FileRead $4 $oline
+!endif
+	StrCpy $lineno 1
 	${DoUntil} ${Errors}
 		${processLine} $oline
+		IntOp $lineno $lineno + 1
+!ifdef UTF16Script
+		FileReadUTF16LE $4 $oline
+!else
 		FileRead $4 $oline
+!endif
 	${LoopUntil} 1 = 0
 	FileClose $4
 FunctionEnd
@@ -520,6 +711,7 @@ Section
 	Var /GLOBAL args
 
 	StrCpy $args $CMDLINE
+	StrCpy $parseverbose 0
 	${GetParameters} $args
 
 	${If} $args == ""
