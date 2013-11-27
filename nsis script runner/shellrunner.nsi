@@ -12,13 +12,14 @@ Icon "gear_02.ico"
 SetCompressor LZMA
 
 ; Comment out next lines for ANSI build
-;Unicode true ; make a Unicode installer
+Unicode true ; make a Unicode installer
 ;!define UTF16Script
 
 RequestExecutionLevel user
 
 Var scriptname
 Var parseverbose
+Var utf8script
 Var argvc
 Var argv0
 Var argv1
@@ -90,6 +91,90 @@ Done:
   Exch $0
 FunctionEnd
 */
+
+!define FileReadUTF8 "!insertmacro FileReadUTF8"
+!macro FileReadUTF8 handle output
+  Push "${handle}"
+  Call FileReadUTF8
+  Pop "${output}"
+!macroend
+Function FileReadUTF8
+	Push $0
+	Exch 
+	Pop $0 ; handle
+	Push $1 ; Out
+	Push $2 ; read byte 1
+	Push $3 ; read byte 2
+ 
+	StrCpy $1 ""
+	SetErrorLevel 0
+	IfErrors done
+read:	
+	FileReadByte $0 $2
+	${If} $2 = 0x0a
+	${OrIf} $2 == ''
+		Goto done
+	${ElseIf} $2 = 0x0d
+		Goto read
+	${ElseIf} $2 < 0x80
+		IntFmt $2 "%c" $2
+		StrCpy $1 "$1$2"
+	${ElseIf} $2 >= 0xc0
+	${AndIf} $2 < 0xe0
+		IntOp $2 $2 & 0x1f
+		IntOp $2 $2 << 6
+		FileReadByte $0 $3
+		IntOp $3 $3 & 0x3f
+		IntOp $2 $2 + $3
+		IntFmt $2 "%c" $2
+		StrCpy $1 "$1$2"
+	${ElseIf} $2 >= 0xe0
+	${AndIf} $2 < 0xf0
+		IntOp $2 $2 & 0x0f
+		IntOp $2 $2 << 6
+		FileReadByte $0 $3
+		IntOp $3 $3 & 0x3f
+		IntOp $2 $2 + $3
+		IntOp $2 $2 << 6
+		FileReadByte $0 $3
+		IntOp $3 $3 & 0x3f
+		IntOp $2 $2 + $3
+		IntFmt $2 "%c" $2
+		StrCpy $1 "$1$2"
+	${ElseIf} $2 >= 0xf0
+	${AndIf} $2 < 0xf7
+		IntOp $2 $2 & 0x07
+		IntOp $2 $2 << 6
+		FileReadByte $0 $3
+		IntOp $3 $3 & 0x3f
+		IntOp $2 $2 + $3
+		IntOp $2 $2 << 6
+		FileReadByte $0 $3
+		IntOp $3 $3 & 0x3f
+		IntOp $2 $2 + $3
+		IntOp $2 $2 << 6
+		FileReadByte $0 $3
+		IntOp $3 $3 & 0x3f
+		IntOp $2 $2 + $3
+		IntFmt $2 "%c" $2
+		StrCpy $1 "$1$2"
+	${EndIf}
+
+	Goto read
+
+done:
+	${If} $1 != ''
+		ClearErrors
+	${EndIf}
+	Pop $3
+	Pop $2
+	Push $1
+	Exch 
+	Pop $1
+	Exch 
+	Pop $0
+FunctionEnd
+
 
 ; SplitArg by Anders
 ; http://stackoverflow.com/a/19644470/145278
@@ -666,6 +751,15 @@ Function processLine
 				StrCpy $parseverbose 0
 			${EndIf}
 			${Break}
+!ifndef UTF16Script
+		${Case} '!utf8'
+			${If} $argv0 == 'on'
+				StrCpy $utf8script 1
+			${Else}
+				StrCpy $utf8script 0
+			${EndIf}
+			${Break}
+!endif
 	${EndSwitch}
 
 done:
@@ -695,7 +789,11 @@ Function readFile
 !ifdef UTF16Script
 		FileReadUTF16LE $4 $oline
 !else
-		FileRead $4 $oline
+		${If} $utf8script = 1
+			${FileReadUTF8} $4 $oline
+		${Else}
+			FileRead $4 $oline
+		${EndIf}
 !endif
 	${LoopUntil} 1 = 0
 	FileClose $4
