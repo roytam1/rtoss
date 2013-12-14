@@ -11,23 +11,21 @@ $h=@$_SERVER['argv'][3] ? @$_SERVER['argv'][3] : 16;
 $offset=@$_SERVER['argv'][4] ? @$_SERVER['argv'][4] : 0;
 
 $fp=fopen(str_replace('.','-',@$_SERVER['argv'][1]).'.bdf','wb') or die('Cannot write file');
+$fa=ceil($h*0.75);
+$fd=$h-$fa;
 $hdr= <<<HEADER
 STARTFONT 2.1
 FONT ${w}x$h
-SIZE $h 100 100
-FONTBOUNDINGBOX $w $h 0 0
-STARTPROPERTIES 9
-PIXEL_SIZE $h
-POINT_SIZE 1
-RESOLUTION_X 100
-RESOLUTION_Y 100
-FONT_ASCENT $h
-FONT_DESCENT 0
-AVERAGE_WIDTH 80
+SIZE $h 75 75
+FONTBOUNDINGBOX $w $h 0 -$fd
+STARTPROPERTIES 4
+FONT_ASCENT $fa
+FONT_DESCENT $fd
 SPACING "C"
 DEFAULT_CHAR 32
 ENDPROPERTIES
 CHARS 256
+
 HEADER;
 fwrite($fp,$hdr);
 
@@ -39,7 +37,7 @@ for ($char=0; $char<256; $char++)
 	fwrite($fp,"ENCODING $char\n");
 	fwrite($fp,"SWIDTH $swidth 0\n");
 	fwrite($fp,"DWIDTH $w 0\n");
-	fwrite($fp,"BBX $w $h 0 0\n");
+	fwrite($fp,"BBX $w $h 0 -$fd\n");
 	fwrite($fp,"BITMAP\n");
 
 	for ($y=0; $y<$h*$bwidth; $y++)
