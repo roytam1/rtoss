@@ -7,7 +7,9 @@ $byteArray = unpack("C*",$contents); $tmp=array_shift($byteArray); array_unshift
 //print_r($byteArray);
 
 $w=@$_SERVER['argv'][2] ? @$_SERVER['argv'][2] : 8;
-$h=@$_SERVER['argv'][3] ? @$_SERVER['argv'][3] : 14;
+$h=@$_SERVER['argv'][3] ? @$_SERVER['argv'][3] : 16;
+$offset=@$_SERVER['argv'][4] ? @$_SERVER['argv'][4] : 0;
+$skip=@$_SERVER['argv'][5] ? @$_SERVER['argv'][5] : 0;
 
 $fp=fopen(str_replace('.','-',@$_SERVER['argv'][1]).'.bdf','wb') or die('Cannot write file');
 $fa=ceil($h*0.75);
@@ -32,7 +34,6 @@ $swidth = $w*90;
 $bwidth=ceil($w/8);
 for ($char=0; $char<256; $char++)
 {
-$h=14;
 	fwrite($fp,"STARTCHAR $char\n");
 	fwrite($fp,"ENCODING $char\n");
 	fwrite($fp,"SWIDTH $swidth 0\n");
@@ -40,20 +41,14 @@ $h=14;
 	fwrite($fp,"BBX $w $h 0 -$fd\n");
 	fwrite($fp,"BITMAP\n");
 
-$h=8;
+	if($char > 0x7f) $offset=1;
 	for ($y=0; $y<$h*$bwidth; $y++)
 	{
 		$v='';
 		//printf("offset=%d, chr=%d\n",$char*($bwidth*$h)+$y,$byteArray[$char*($bwidth*$h)+$y]);
-		$v.=sprintf("%02X\n",$byteArray[$char*($bwidth*$h)+$y]);
-		fwrite($fp, $v);
-	}
-
-	for ($y=0; $y<$h*$bwidth-2; $y++)
-	{
-		$v='';
-		//printf("offset=%d, chr=%d\n",$char*($bwidth*$h)+$y,$byteArray[$char*($bwidth*$h)+$y]);
-		$v.=sprintf("%02X\n",$byteArray[128*$h*2+$char*($bwidth*$h)+$y]);
+		for($j=1;$j<$bwidth;$j++)
+			$v.=sprintf("%02X",$byteArray[$offset+$skip*$char+$char*($bwidth*$h)+$y++]);
+		$v.=sprintf("%02X\n",$byteArray[$offset+$skip*$char+$char*($bwidth*$h)+$y]);
 		fwrite($fp, $v);
 	}
 
