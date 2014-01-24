@@ -34,7 +34,7 @@ fwrite($fp,$hdr);
 $swidth = $w*90;
 $bwidth=ceil($w/8);
 $bheight=ceil($h/8);
-$cellsize=$bwidth*$h;
+$cellsize=$bheight*$w;
 
 $pow = array(1);
 for ($x=1; $x<$bwidth*8; $x++) {
@@ -59,8 +59,8 @@ for ($char=0; $char<$chrs; $char++)
 			}
 		}
 		$v='';
-		for ($x=0; $x<8; $x++) {
-			$v.=sprintf('%0'.($bwidth*2)."X\n",$rot[$x]);
+		for ($y=0; $y<8; $y++) {
+			$v.=sprintf('%0'.($bwidth*2)."X\n",$rot[$y]);
 		}
 		fwrite($fp, $v);
 	}
