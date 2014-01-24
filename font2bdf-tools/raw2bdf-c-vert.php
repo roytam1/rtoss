@@ -37,7 +37,7 @@ $bheight=ceil($h/8);
 $cellsize=$bwidth*$h;
 
 $pow = array(1);
-for ($x=1; $x<$w; $x++)	{
+for ($x=1; $x<$bwidth*8; $x++) {
 	$pow[$x] = $pow[$x-1]*2;
 }
 
@@ -55,7 +55,7 @@ for ($char=0; $char<$chrs; $char++)
 		for ($x=0; $x<$w; $x++)
 		{
 			for($y=0;$y<8;$y++) {
-				$rot[$y] |= (ord($contents{$offset+$char*$skip+$char*$cellsize+$s*$w+$x}) & $pow[$y]) ? $pow[$w-1-$x] : 0;
+				$rot[$y] |= (ord($contents{$offset+$char*$skip+$char*$cellsize+$s*$w+$x}) & $pow[$y]) ? $pow[$bwidth*8-1-$x] : 0;
 			}
 		}
 		$v='';
