@@ -1,24 +1,58 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
+#
+# Copyright (C) 1998, 2013 Roman Czyborra, Paul Hardy
+#
+# LICENSE:
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 2 of the License, or
+#    (at your option) any later version.
+#  
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+#    GNU General Public License for more details.
+#  
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
-while (<>) { $glyph{$1} = $2 if /(....):(.+)\n/; }
-@chars = sort keys %glyph; $[ = 1;
+$globalwidth= int($ARGV[0]) ? int($ARGV[0]) : 8;
+$globalheight= int($ARGV[1]) ? int($ARGV[1]) : 16;
+
+shift;
+shift;
+
+while (<>) { $glyph{$1} = $2 if /(....):(.+)\r?\n/; }
+@chars = sort keys %glyph;
+$nchars = $#chars + 1;
+
+$width=$globalwidth*2;
+$descent = 2;
+$ascent  = $globalheight - $descent;
+
+$bwidth=int($globalwidth/8 + 0.99);
+
 # dbmopen (%charname, "/usr/share/unicode/unidata/charname.db", 0);
 
 print "STARTFONT 2.1
-FONT -gnu-unifont-medium-r-normal--16-160-75-75-c-80-iso10646-1
-SIZE 16 75 75
-FONTBOUNDINGBOX 16 16 0 -2
-STARTPROPERTIES 3
-FONT_ASCENT 14
-FONT_DESCENT 2
-DEFAULT_CHAR 32
+FONT $globalwidth.$globalheight
+SIZE $globalheight 75 75
+FONTBOUNDINGBOX $width $globalheight 0 -2
+STARTPROPERTIES 4
+FONT_ASCENT $ascent
+FONT_DESCENT $descent
+DEFAULT_CHAR 65533
+SPACING \"C\"
 ENDPROPERTIES
-CHARS $#chars\n";
+CHARS $nchars\n";
 
 foreach $character (@chars)
 {
 	$encoding = hex($character); $glyph = $glyph{$character};
-	$width = length ($glyph) > 32 ? 2 : 1;
+#print STDERR length($glyph)," ",($bwidth*$globalheight*2),"\n";
+	$width = length ($glyph) > ($bwidth*$globalheight*2) ? 2*$bwidth : $bwidth;
 	$dwidth = $width * 8; $swidth= $width * 500;
 	$glyph =~ s/((..){$width})/\n$1/g;
 	$character = "$character $charname"
@@ -28,7 +62,7 @@ foreach $character (@chars)
 ENCODING $encoding
 SWIDTH $swidth 0
 DWIDTH $dwidth 0
-BBX $dwidth 16 0 -2
+BBX $dwidth $globalheight 0 -2
 BITMAP $glyph
 ENDCHAR\n";
 }
