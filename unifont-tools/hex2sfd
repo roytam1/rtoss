@@ -1,0 +1,159 @@
+#!/usr/bin/perl
+#
+# hex2sfd created in 2005 by Luis Gonzalez Miranda, http://www.lgm.cl
+#
+# Modified by Paul Hardy, June 2008.
+#
+# The original combining mark code didn't work properly.  The replacement code
+# below wastes RAM, but it works as a quick fix.
+#
+@combining = ();
+for ($i = 0; $i < 65536; $i++) {
+   push(@combining, 0);
+}
+open(A, "<combining.dat");
+while (<A>) {
+   chomp;
+   $combining[ hex($_) ] = 1;
+}
+close(A);
+#
+# Modified by Paul Hardy, July 2008.
+#
+# Make pixel 64 units for greatest scale; floating point numbers in
+# TrueType have 6 fractional bits, so this works out well (2^6 = 64).
+# Also, make size of font a power of 2 (16 * 64) for efficient scaling
+# to any point size in TrueType.  Made bitmask a variable for easy
+# experimenting.
+#
+$pixel   = 64;
+$descent = 2 * $pixel;
+$ascent  = 16 * $pixel - $descent;
+# $bitmask = 25;  # round in x (doesn't really work), corner point selected
+
+print << "END";
+SplineFontDB: 1.0
+FontName: unifont
+FullName: GNU Unifont
+FamilyName: unifont
+Weight: Medium
+Comments: Created from the 2008-07-06 version of the GNU Unifont
+Comments: with Luis Gonzalez Miranda's Perl and FontForge scripts.
+Comments: See http://www.lgm.cl/trabajos/unifont/index.en.html for
+Comments: information on Luis' scripts.
+Comments: See http://czyborra.com/unifont
+Comments: and http://unifoundry.com/unifont.html
+Comments: for information on GNU Unifont.
+Comments: See http://fontforge.sf.net for information on FontForge.
+Version: 1.00
+ItalicAngle: 0
+UnderlinePosition: -100
+UnderlineWidth: 40
+Ascent: $ascent
+Descent: $descent
+NeedsXUIDChange: 1
+XUID: [1021 140 1293607838 5610107]
+FSType: 0
+PfmFamily: 33
+TTFWeight: 500
+TTFWidth: 5
+Panose: 2 0 6 4 0 0 0 0 0 0
+LineGap: 72
+VLineGap: 0
+OS2WinAscent: 0
+OS2WinAOffset: 1
+OS2WinDescent: 0
+OS2WinDOffset: 1
+HheadAscent: 0
+HheadAOffset: 1
+HheadDescent: 0
+HheadDOffset: 1
+ScriptLang: 1
+ 1 latn 1 dflt 
+Encoding: UnicodeBmp
+UnicodeInterp: none
+DisplaySize: -24
+AntiAlias: 1
+FitToEm: 1
+WinInfo: 0 50 22
+TeXData: 1 0 0 346030 173015 115343 0 1048576 115343 783286 444596 497025 792723 393216 433062 380633 303038 157286 324010 404750 52429 2506097 1059062 262144
+BeginChars: 65536 3
+END
+$count=0;
+while(<STDIN>) {
+	chomp;
+	($c,$d)=split(/:/);
+	$width=length($d)/4;
+	$ptwidth=$pixel * $width;
+	$xoffset = 0; # assume this isn't a combining mark
+#	if($combining{$c}) {             # this was the original "if"
+	if ($combining[ hex($c) ]) { # this code point is a combining mark
+		$xoffset = -$ptwidth; # we'll go left by this amount
+		$ptwidth = 0;
+	}
+	$cn=hex($c);
+        # Changed "Flags: H" to "Flags: HW" to fix spaces - Paul Hardy, 2008
+	print << "END";
+StartChar: $c
+Encoding: $cn $cn $count
+Width: $ptwidth
+Flags: HW
+TeX: 0 0 0 0
+Fore
+END
+
+	for($i=0;$i<16;$i++) {
+		$l=substr($d, $i*$width/4, $width/4);
+		$num=hex($l);
+		$prev=0;
+		for($j=0; $j<$width; $j++) {
+			$x=$width - 1 - $j;
+			$y=15 - $i;
+			if($num%2) {
+				# point at i, width-1-j
+				if(!$prev) {
+					$x1=$x * $pixel + $pixel;
+					$x1 += $xoffset;
+					$y1=$y * $pixel - $descent;
+					$x2=$x1 + $pixel;
+					$x2 += $xoffset;
+					$y2=$y1 + $pixel;
+				}
+				$prev=1;
+			} else {
+				if($prev) {
+					$x2=$x * $pixel + $pixel;
+					$x2 += $xoffset;
+					print << "END";
+$x1 $y1 m 29
+ $x1 $y2 l 25
+ $x2 $y2 l 25
+ $x2 $y1 l 25
+ $x1 $y1 l 29
+END
+				}
+				$prev=0;
+			}
+			$num=int($num/2);
+		}
+		if($prev) {
+			$x2 = $xoffset;
+			print << "END";
+$x1 $y1 m 29
+ $x1 $y2 l 25
+ $x2 $y2 l 25
+ $x2 $y1 l 25
+ $x1 $y1 l 29
+END
+		}
+	}
+	print << "END";
+EndSplineSet
+EndChar
+END
+	$count++;
+}
+print << "END";
+EndChars
+EndSplineFont
+END

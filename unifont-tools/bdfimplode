@@ -1,0 +1,6 @@
+#!/usr/local/bin/perl -n
+
+if (/^ENCODING\s+(\d+)/) { printf ("%04X:", $1); }
+elsif (/^BITMAP/) { $BITMAP=1; }
+elsif (/^ENDCHAR/) { $BITMAP=0; print "\n"; }
+elsif ($BITMAP) { y/a-f/A-F/; s/\n$//; print; }
