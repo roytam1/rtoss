@@ -132,7 +132,7 @@ int main(int argc, char** argv){
     FILE *f;
 
     if (argc < 2) {
-        printf("Usage: %s [-q|-v] [-n] <input.jpg>\n", argv[0]);
+        printf("Usage: %s [-q|-v] [-n] <input.jpg>\n\t-q\tBe quiet\n\t-v\tBe verbose\n\t-n\tPrint numeric instead of string\n", argv[0]);
         return 2;
     }
 
