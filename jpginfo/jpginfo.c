@@ -132,7 +132,7 @@ int main(int argc, char** argv){
     FILE *f;
 
     if (argc < 2) {
-        printf("Usage: %s [-q|-v] [-n] <input.jpg>\n\t-q\tBe quiet\n\t-v\tBe verbose\n\t-n\tPrint numeric instead of string\n", argv[0]);
+        fprintf(stderr,"Usage: %s [-q|-v] [-n] <input.jpg>\n\t-q\tBe quiet\n\t-v\tBe verbose\n\t-n\tPrint numeric instead of string\n", argv[0]);
         return 2;
     }
 
@@ -147,7 +147,7 @@ int main(int argc, char** argv){
 
     f = fopen(argv[argc-1], "rb");
     if (!f) {
-        printf("Error opening the input file.\n");
+        fprintf(stderr,"Error opening the input file.\n");
         return 1;
     }
     fseek(f, 0, SEEK_END);
@@ -169,47 +169,60 @@ int main(int argc, char** argv){
 	}
 
 	SKIP(2);
+	if(debug>0)
+		fprintf(stderr,"offset %d marker %02x%02x\n",length-size-2,buf[-2],buf[-1]);
+
 	while (size > 0) {
-		SKIP(2);
+		SKIP(1);
 		if(buf[-2]==0xff) {
 			if(debug>0)
-				fprintf(stderr,"offset %d marker %02x-%02x\n",length-size,buf[-2],buf[-1]);
+				if((!done && buf[-1]>0xBF && buf[-1]!=0xFF) || (done && buf[-1] == 0xD9))
+					fprintf(stderr,"offset %d marker %02x%02x\n",length-size-2,buf[-2],buf[-1]);
 
-			switch (buf[-1]) {
-            case 0xC0: // SOF0 (baseline)
-            case 0xC1: // SOF1 (Extended sequential, Huffman)
-            case 0xC2: // SOF2 (Progressive, Huffman)
-            case 0xC9: // SOF9 (Extended sequential, arithmetic)
-            case 0xCA: // SOF10 (Progressive, arithmetic)
-			// rarely used/unsupported SOFs
-            case 0xC3: // SOF3 (Lossless, Huffman)
-            case 0xC5: // SOF5 (Differential sequential, Huffman)
-            case 0xC6: // SOF6 (Differential progressive, Huffman)
-            case 0xC7: // SOF7 (Differential lossless, Huffman)
-            case 0xC8: // SOF8 (Reserved for JPEG extensions)
-            case 0xCB: // SOF11 (Lossless, arithmetic)
-            case 0xCD: // SOF13 (Differential sequential, arithmetic)
-            case 0xCE: // SOF14 (Differential progressive, arithmetic)
-            case 0xCF: // SOF15 (Differential lossless, arithmetic)
-				method = buf[-1] - 0xc0;
-				DecodeSOF();
-				break;
-            case 0xE0: // APP0 marker
-				DecodeAPP0();
-				break;
-            case 0xEE: // APP14 marker
-				DecodeAPP14();
-				break;
-            case 0xDA: // SOS marker
-				SkipMarker();
-				done = 1;
-				break;
-			default:
-				SkipMarker();
+			if(done && buf[-1] == 0xD9) {
+				done = 2;
 			}
-		if(done) break;
+
+			if(!done && buf[-1]>0xBF && buf[-1]!=0xFF) {
+				switch (buf[-1]) {
+					case 0xC0: // SOF0 (baseline)
+					case 0xC1: // SOF1 (Extended sequential, Huffman)
+					case 0xC2: // SOF2 (Progressive, Huffman)
+					case 0xC9: // SOF9 (Extended sequential, arithmetic)
+					case 0xCA: // SOF10 (Progressive, arithmetic)
+					// rarely used/unsupported SOFs
+					case 0xC3: // SOF3 (Lossless, Huffman)
+					case 0xC5: // SOF5 (Differential sequential, Huffman)
+					case 0xC6: // SOF6 (Differential progressive, Huffman)
+					case 0xC7: // SOF7 (Differential lossless, Huffman)
+					case 0xC8: // SOF8 (Reserved for JPEG extensions)
+					case 0xCB: // SOF11 (Lossless, arithmetic)
+					case 0xCD: // SOF13 (Differential sequential, arithmetic)
+					case 0xCE: // SOF14 (Differential progressive, arithmetic)
+					case 0xCF: // SOF15 (Differential lossless, arithmetic)
+						method = buf[-1] - 0xc0;
+						DecodeSOF();
+						break;
+					case 0xE0: // APP0 marker
+						DecodeAPP0();
+						break;
+					case 0xEE: // APP14 marker
+						DecodeAPP14();
+						break;
+					case 0xDA: // SOS marker
+						SkipMarker();
+						done = 1;
+						break;
+					default:
+						SkipMarker();
+				}
+			}
+		if(done == 2) break;
 		}
 	}
+
+	if(debug>0)
+		fprintf(stderr,"remain size = %d\n",size);
 
 	if(comp == 1)
 		colsp = 1; // Grayscale
