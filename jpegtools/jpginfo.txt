@@ -1,0 +1,57 @@
+jpginfo - a tiny tool for reading JPEG file information
+
+Usage: jpginfo [-q|-v] [-n] <input.jpg>
+        -q      Be quiet
+        -v      Be verbose
+        -n      Print numeric instead of string
+
+Running jpginfo with a file will return a space separated string like this:
+
+    D:\>jpginfo Lake_mapourika_NZ.jpeg
+    2048 1536 3 YCbCr Baseline
+
+The format is like:
+  width height number-of-componment color-space file-tpye
+
+Where:
+
+  width: Image width in pixels
+
+  height: Image height in pixels
+
+  number-of-componment: Number of Color componment(s)/channel(s).
+    Normally number-of-componment reflects color spaces, for example:
+      1 - grayscale
+      3 - YCbCr(YUV) / RGB
+      4 - CMYK / YCCK(Adobe inverted CMYK)
+
+  color-space: Color space string or type number(in libjpeg order)
+    0 - Unknown
+    1 - Grayscale
+    2 - RGB
+    3 - YCbCr
+    4 - CMYK
+    5 - YCCK
+
+  file-type: The method string or number(in SOF order) which the file use
+    0 - Baseline
+    1 - Extended-sequential
+    2 - Progressive
+    3 - Lossless
+
+    5 - Differential-sequential
+    6 - Differential-progressive
+    7 - Differential-lossless
+    8 - Reserved
+    9 - Extended-sequential-arithmetic
+    10 - Progressive-arithmetic
+    11 - Lossless-arithmetic
+
+    13 - Differential-sequential-arithmetic
+    14 - Differential-progressive-arithmetic
+    15 - Differential-lossless-arithmetic
+
+Example for getting information in batch:
+
+  for /f "tokens=1-5" %a in ('jpginfo -n image.jpg') do echo [%a] [%b] [%c] [%d] [%e]
+
