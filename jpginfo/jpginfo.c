@@ -179,8 +179,9 @@ int main(int argc, char** argv){
 				if((!done && buf[-1]>0xBF && buf[-1]!=0xFF) || (done && buf[-1] == 0xD9))
 					fprintf(stderr,"offset %d marker %02x%02x\n",length-size-2,buf[-2],buf[-1]);
 
-			if(done && buf[-1] == 0xD9) {
-				done = 2;
+			if(done) {
+				if(buf[-1] == 0xD9) done = 2;
+				else SKIP(1);
 			}
 
 			if(!done && buf[-1]>0xBF && buf[-1]!=0xFF) {
@@ -218,7 +219,7 @@ int main(int argc, char** argv){
 				}
 			}
 		if(done == 2) break;
-		}
+		} else if(buf[-1]!=0xff) SKIP(1);
 	}
 
 	if(debug>0)
