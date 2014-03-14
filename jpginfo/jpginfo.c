@@ -16,6 +16,7 @@ static int length;
 static unsigned char *buf;
 
 /* prop. */
+static int found_soi = 0;
 static int imgw = 0;
 static int imgh = 0;
 static int comp = 0;
@@ -162,7 +163,14 @@ int main(int argc, char** argv){
 			fprintf(stderr,"file too small\n");
 		return 1;
 	}
-	if (!((buf[0] == 0xFF) && (buf[1] == 0xD8))) {
+
+	do {
+		if ((buf[0] == 0xFF) && (buf[1] == 0xD8)) {
+			found_soi = 1;
+		} else SKIP(1);
+	} while(!found_soi && size > 0);
+
+	if(!found_soi) {
 		if(debug>-1)
 			fprintf(stderr,"file is not JPEG\n");
 		return 1;
@@ -179,9 +187,8 @@ int main(int argc, char** argv){
 				if((!done && buf[-1]>0xBF && buf[-1]!=0xFF) || (done && buf[-1] == 0xD9))
 					fprintf(stderr,"offset %d marker %02x%02x\n",length-size-2,buf[-2],buf[-1]);
 
-			if(done) {
-				if(buf[-1] == 0xD9) done = 2;
-				else SKIP(1);
+			if(done && buf[-1] == 0xD9) {
+				done = 2;
 			}
 
 			if(!done && buf[-1]>0xBF && buf[-1]!=0xFF) {
@@ -219,7 +226,7 @@ int main(int argc, char** argv){
 				}
 			}
 		if(done == 2) break;
-		} else if(buf[-1]!=0xff) SKIP(1);
+		}
 	}
 
 	if(debug>0)
