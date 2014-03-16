@@ -9,11 +9,21 @@
 /* flags */
 static int debug = 0;
 static int newfile = 0;
+static int setycck = 0;
 
 /* buffer */
 static int size;
 static int length;
 static unsigned char *buf;
+static unsigned char newname[256];
+
+/* YCCK marker */
+static unsigned char ycck[] = {
+	0xFF, 0xEE, 0x00, 0x0E,
+	0x41, 0x64, 0x6F, 0x62,
+	0x65, 0x00, 0x64, 0x00,
+	0x00, 0x00, 0x00, 0x02};
+
 
 /* prop. */
 static int found_soi = 0;
@@ -128,7 +138,7 @@ void DecodeSOF(int marker) {
 
 	if(comp*3+8 != len) {
 		if(debug>-1)
-			fprintf(stderr,"SOF marker length mismatch\n");
+			fprintf(stderr,"%s: SOF marker length mismatch\n",newname);
 	} else {
 		for(i=0; i<__MIN(comp,4); i++) {
 			compid[i] = *(buf+8+i*3); // -2 bytes for length field
@@ -145,7 +155,7 @@ void DecodeAPP0(int marker) {
     SKIP(2);
 	if(len < 14) {
 		if(debug>-1)
-			fprintf(stderr,"APP0 marker too short\n");
+			fprintf(stderr,"%s: APP0 marker too short\n",newname);
 	} else {
 		if(buf[0] == 0x4A && buf[1] == 0x46 &&
 		 buf[2] == 0x49 && buf[3] == 0x46 &&
@@ -163,7 +173,7 @@ void DecodeAPP14(int marker) {
     SKIP(2);
 	if(len < 12) {
 		if(debug>-1)
-			fprintf(stderr,"APP14 marker too short\n");
+			fprintf(stderr,"%s: APP14 marker too short\n",newname);
 	} else {
 		if(buf[0] == 0x41 && buf[1] == 0x64 &&
 		 buf[2] == 0x6F && buf[3] == 0x62 &&
@@ -177,12 +187,11 @@ void DecodeAPP14(int marker) {
 
 int main(int argc, char** argv){
 	int i, newsize;
-	unsigned char newname[256];
 	unsigned char markers_kept[] = {0xC0,0xC1,0xC2,0xC9,0xCA,0xC3,0xC5,0xC6,0xC7,0xC8,0xCB,0xCD,0xCE,0xCF,0xCC,0xDD,0xDB,0xC4};
     FILE *f;
 
     if (argc < 2) {
-        fprintf(stderr,"Usage: %s [-q|-v] [-n] <input.jpg>\n\t-q\tBe quiet\n\t-v\tBe verbose\n\t-n\tSave new file with '.new' suffix\n\t\twithout this switch, overwriting input.\n", argv[0]);
+        fprintf(stderr,"Usage: %s [-q|-v] [-n] [-y] <input.jpg>\n\t-q\tBe quiet\n\t-v\tBe verbose\n\t-n\tSave new file with '.new' suffix\n\t\twithout this switch, overwriting input.\n\t-y\tForced writing APP14 YCCK marker to CMYK JPEG file\n", argv[0]);
         return 2;
     }
 
@@ -193,11 +202,15 @@ int main(int argc, char** argv){
 			debug = -1;
 		else if(strncmp(argv[i],"-n",2)==0)
 			newfile = 1;
+		else if(strncmp(argv[i],"-y",2)==0)
+			setycck = 1;
 	}
+
+	strcpy(newname,argv[argc-1]);
 
     f = fopen(argv[argc-1], "rb");
     if (!f) {
-        fprintf(stderr,"Error opening the input file.\n");
+        fprintf(stderr,"Error opening the input file '%s'.\n",newname);
         return 1;
     }
     fseek(f, 0, SEEK_END);
@@ -209,7 +222,7 @@ int main(int argc, char** argv){
 
 	if (size < 2) {
 		if(debug>-1)
-			fprintf(stderr,"file too small\n");
+			fprintf(stderr,"%s: file too small\n",newname);
 		return 1;
 	}
 
@@ -221,7 +234,7 @@ int main(int argc, char** argv){
 
 	if(!found_soi) {
 		if(debug>-1)
-			fprintf(stderr,"file is not JPEG\n");
+			fprintf(stderr,"%s: file is not JPEG\n",newname);
 		return 1;
 	}
 
@@ -289,10 +302,10 @@ int main(int argc, char** argv){
 			colsp = 3;
 		else if (found_adobe)
 			colsp = !adobe_transform ? 2 : 3;
-		else if(compid[0] == 1 && compid[1] == 2 && compid[2] == 3)
-			colsp = 3; // YCbCr
 		else if(compid[0] == 82 && compid[1] == 71 && compid[2] == 66)
 			colsp = 2;  // RGB
+		else /*if(compid[0] == 1 && compid[1] == 2 && compid[2] == 3)*/ // ID = 1,2,3 / 0,1,2 = YCbCr
+			colsp = 3; // YCbCr
 	} else if (comp == 4) {
 		if (found_adobe)
 			colsp = !adobe_transform ? 4 : 5;
@@ -313,20 +326,23 @@ int main(int argc, char** argv){
 
 
 	/* write new file */
-	strcpy(newname,argv[argc-1]);
 	if(newfile)
 		strcat(newname,".new");
     f = fopen(newname, "wb");
     if (!f) {
-        fprintf(stderr,"Error opening the output file.\n");
+        fprintf(stderr,"%s: Error opening the output file.\n",newname);
         return 1;
     }
 
 	fwrite((char*)found_soi,2,1,f);
-	if(comp==4 && found_adobe) {
-		m = markers_find(0xee);
-		fwrite(m->buf-2,m->len+2,1,f);
-		markers_remove(m);
+	if(comp==4) {
+		if(found_adobe) {
+			m = markers_find(0xee);
+			fwrite(m->buf-2,m->len+2,1,f);
+			markers_remove(m);
+		} else if (setycck) {
+			fwrite(ycck,sizeof(ycck)/sizeof(ycck[0]),1,f);
+		}
 	}
 	for( i=0;i<(sizeof(markers_kept) / sizeof(markers_kept[0])); i++ ) {
 		while(m = markers_find(markers_kept[i])) {
