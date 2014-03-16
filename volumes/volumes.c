@@ -31,19 +31,19 @@ struct vpath_pairs{
 static struct vpath_pairs *vpath = NULL;
 
 void vpath_pairs_append(WCHAR *volpath, WCHAR *win32path) {
-    struct vpath_pairs* v;
+    struct vpath_pairs *v, *t;
+
+    v = (struct vpath_pairs*) malloc(sizeof(struct vpath_pairs));
+    wcscpy(v->vpath, volpath);
+    wcscpy(v->w32path, win32path);
+    v->next = NULL;
+
     if(!vpath) {
-        vpath = (struct vpath_pairs*) malloc(sizeof(struct vpath_pairs));
-        wcscpy(vpath->vpath, volpath);
-        wcscpy(vpath->w32path, win32path);
-        vpath->next = NULL;
+        vpath = v;
     } else {
-        v = vpath;
-        while(v->next != NULL) v = v->next;
-        v->next = (struct vpath_pairs*) malloc(sizeof(struct vpath_pairs));
-        wcscpy(v->next->vpath, volpath);
-        wcscpy(v->next->w32path, win32path);
-        vpath->next->next = NULL;
+        t = vpath;
+        while(v->next != NULL) t = t->next;
+        t->next = v;
     }
 }
 
