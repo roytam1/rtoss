@@ -14,6 +14,7 @@ static int numeric = 0;
 static int size;
 static int length;
 static unsigned char *buf;
+static char *fname;
 
 /* prop. */
 static int found_soi = 0;
@@ -85,7 +86,7 @@ void DecodeSOF(void) {
 
 	if(comp*3+8 != length) {
 		if(debug>-1)
-			fprintf(stderr,"SOF marker length mismatch\n");
+			fprintf(stderr,"%s: SOF marker length mismatch\n",fname);
 	} else {
 		for(i=0; i<__MIN(comp,4); i++) {
 			compid[i] = *(buf+6+i*3); // -2 bytes for length field
@@ -100,7 +101,7 @@ void DecodeAPP0(void) {
     length = DecodeLength();
 	if(length < 14) {
 		if(debug>-1)
-			fprintf(stderr,"APP0 marker too short\n");
+			fprintf(stderr,"%s: APP0 marker too short\n",fname);
 	} else {
 		if(buf[0] == 0x4A && buf[1] == 0x46 &&
 		 buf[2] == 0x49 && buf[3] == 0x46 &&
@@ -116,7 +117,7 @@ void DecodeAPP14(void) {
     length = DecodeLength();
 	if(length < 12) {
 		if(debug>-1)
-			fprintf(stderr,"APP14 marker too short\n");
+			fprintf(stderr,"%s: APP14 marker too short\n",fname);
 	} else {
 		if(buf[0] == 0x41 && buf[1] == 0x64 &&
 		 buf[2] == 0x6F && buf[3] == 0x62 &&
@@ -146,9 +147,10 @@ int main(int argc, char** argv){
 			numeric = 1;
 	}
 
-    f = fopen(argv[argc-1], "rb");
+	fname = argv[argc-1];
+    f = fopen(fname, "rb");
     if (!f) {
-        fprintf(stderr,"Error opening the input file.\n");
+        fprintf(stderr,"Error opening the input file '%s'.\n",fname);
         return 1;
     }
     fseek(f, 0, SEEK_END);
@@ -160,7 +162,7 @@ int main(int argc, char** argv){
 
 	if (size < 2) {
 		if(debug>-1)
-			fprintf(stderr,"file too small\n");
+			fprintf(stderr,"%s: file too small\n",fname);
 		return 1;
 	}
 
@@ -172,7 +174,7 @@ int main(int argc, char** argv){
 
 	if(!found_soi) {
 		if(debug>-1)
-			fprintf(stderr,"file is not JPEG\n");
+			fprintf(stderr,"%s: file is not JPEG\n",fname);
 		return 1;
 	}
 
@@ -239,10 +241,10 @@ int main(int argc, char** argv){
 			colsp = 3;
 		else if (found_adobe)
 			colsp = !adobe_transform ? 2 : 3;
-		else if(compid[0] == 1 && compid[1] == 2 && compid[2] == 3)
-			colsp = 3; // YCbCr
 		else if(compid[0] == 82 && compid[1] == 71 && compid[2] == 66)
 			colsp = 2;  // RGB
+		else /*if(compid[0] == 1 && compid[1] == 2 && compid[2] == 3)*/ // ID = 1,2,3 / 0,1,2 = YCbCr
+			colsp = 3; // YCbCr
 	} else if (comp == 4) {
 		if (found_adobe)
 			colsp = !adobe_transform ? 4 : 5;
