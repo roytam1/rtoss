@@ -295,7 +295,7 @@ BOOL PrintHelp (LPCTSTR lpMessage)
     puts (PRG_NAME" v"PRG_VERS" ("PRG_DATE") - License: "PRG_LIC);  /*
     puts ("********************************************************************************"); */
     puts ("Usage:\n"
-          "touch.exe [-hxamcDsvq] [-r ref_file|-t time|-d date_time] -- <file_1> [file_N]");
+          "touch.exe [-hxamcDsvq] [-r ref_file|-t time|-d date_time] [--] <file_1> [file_N]");
     puts ("  -h : Show this help\n"
           "  -x : Modify creation time\n"
           "  -a : Modify access time\n"
@@ -309,6 +309,7 @@ BOOL PrintHelp (LPCTSTR lpMessage)
           "  -t : Use time [[CC]YY]MMDDhhmm[.SS] instead of today\n"
           "  -d : Use date_time [[YYYY-]MM-DD][Thh:mm[:ss]] instead of today\n"
           "  -- : Finish options, followed by the file list\n"
+          "       Without this switch, only last entry will be processed\n"
           "The options '-r', '-d' and '-t' can not be used simultaneously.\n"
           "By default, all times will be modified (creation, access and modification).");
     puts ("Examples:\n"
@@ -353,7 +354,8 @@ BOOL GetArgs (LPDWORD dwList, LPTSTR *lpRefFile, LPTSTR *lpDateTime, LPDWORD dwO
             if (!strcmp ("--", ARGV[*dwList]))
                 break;
         if (++(*dwList) >= (DWORD)ARGC)
-            return PrintHelp ("Error 2: No file(s) specified!");
+            /*return PrintHelp ("Error 2: No file(s) specified!");*/
+            *dwList = ARGC - 1;
 
         *dwOptions |= GetOptC ('x', 0) * OPT_MODIFY_TIME_C;
         *dwOptions |= GetOptC ('a', 0) * OPT_MODIFY_TIME_A;
@@ -601,6 +603,7 @@ int main (void)  /* (int argc, char *argv[]) */
     CHAR      szDrive[_MAX_DRIVE], szDir[_MAX_DIR], szFileName[_MAX_FNAME], szExt[_MAX_EXT];
     PCHAR     lpRefFile = NULL, lpDateTime = NULL;
     FILETIME  fTimeC, fTimeA, fTimeM;
+    HANDLE    fh;
 
     ARGV = CommandLineToArgv (GetCommandLine (), &ARGC);
     hStdOut = GetStdHandle (STD_OUTPUT_HANDLE);
@@ -639,6 +642,12 @@ int main (void)  /* (int argc, char *argv[]) */
         if (szPath[strlen (szPath) - 1] == '\"')
             szPath[strlen (szPath) - 1]  = '\\';
 
+        if (!Exists (szPath) && !(dwOptions & OPT_RECURSIVE) )  /* create file if not exist */
+        {
+            _fullpath (szFullPath, szPath, LEN_PATH);
+            fh = CreateFile(szFullPath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+            CloseHandle(fh);
+        }
         if (Exists (szPath) && !(dwOptions & OPT_RECURSIVE) )  /* file or directory */
         {
             _fullpath (szFullPath, szPath, LEN_PATH);
