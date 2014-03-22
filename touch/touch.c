@@ -54,6 +54,10 @@ Changelog:
 #include <stdlib.h>
 #include <windows.h>
 
+#ifndef INVALID_FILE_ATTRIBUTES
+#define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
+#endif
+
 #define PRG_NAME  "Touch"
 #define PRG_VERS  "1.21"
 #define PRG_DATE  "2011-04-28"
@@ -85,10 +89,10 @@ int    ARGC;
 
 int GetOptC (const char cOption, const int nDef)
 {
+    int i;
     if ( (ARGC < 2) || (!ARGV) )
         return nDef;
 
-    int i;
     for (i = 1; i < ARGC; i++)
         if ( (ARGV[i][0] == '-') && (strchr (ARGV[i], cOption) != NULL) )
             return 1;
@@ -98,10 +102,10 @@ int GetOptC (const char cOption, const int nDef)
 
 char *GetOptCPStr (char **szStr, const char cOption, char *nDef)
 {
+    int i;
     if ( (ARGC < 2) || (!ARGV) )
         return (*szStr = nDef);
 
-    int i;
     for (i = 1; i < ARGC; i++)
         if ( (ARGV[i][0] == '-') && (ARGV[i][1] == cOption) )
         {
@@ -201,9 +205,10 @@ BOOL Exists (LPCTSTR lpFileName)
 
 int printFileTime (LPFILETIME lpFileTime)
 {
-    if (!lpFileTime) return 0;
     FILETIME   fTime;
     SYSTEMTIME sTime;
+
+    if (!lpFileTime) return 0;
 
     FileTimeToLocalFileTime (lpFileTime, &fTime);
     FileTimeToSystemTime    (&fTime    , &sTime);
@@ -214,12 +219,14 @@ int printFileTime (LPFILETIME lpFileTime)
 
 int printfOem (LPCTSTR lpFmt, ...)
 {
+	PCHAR lpBuf;
+	INT nLen;
     if (dwOptions & OPT_QUIET) return 0;
     if (! lpFmt) return 0;
     if (!*lpFmt) return 0;
 
-    PCHAR lpBuf = calloc (LEN_PATH, 1);
-    INT nLen = _vsnprintf (lpBuf, LEN_PATH, lpFmt, (va_list)(&lpFmt + 1));
+    lpBuf = calloc (LEN_PATH, 1);
+    nLen = _vsnprintf (lpBuf, LEN_PATH, lpFmt, (va_list)(&lpFmt + 1));
     if (nLen < 0)
         nLen = strlen (lpBuf);
     CharToOemBuff (lpBuf, lpBuf, nLen);
@@ -231,13 +238,16 @@ int printfOem (LPCTSTR lpFmt, ...)
 
 DWORD Touch (LPCTSTR lpFileName)
 {
+	DWORD dwFileAttributes, dwResult;
+	HANDLE hFile;
+	BOOL bCreateDir;
     SetLastError (ERROR_SUCCESS);
-    DWORD dwFileAttributes = GetFileAttributes (lpFileName);
-    DWORD dwResult = GetLastError ();
+    dwFileAttributes = GetFileAttributes (lpFileName);
+    dwResult = GetLastError ();
     if ((dwFileAttributes == INVALID_FILE_ATTRIBUTES) && (dwResult != ERROR_FILE_NOT_FOUND))
         return dwResult;
 
-    BOOL bCreateDir = ((OPT_CREATE_DIR   & dwOptions)                && (dwFileAttributes == INVALID_FILE_ATTRIBUTES)) ||
+    bCreateDir = ((OPT_CREATE_DIR   & dwOptions)                && (dwFileAttributes == INVALID_FILE_ATTRIBUTES)) ||
                       ((dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && (dwFileAttributes != INVALID_FILE_ATTRIBUTES));
 
     /* If target doesn't exist, create a directory. */
@@ -254,7 +264,7 @@ DWORD Touch (LPCTSTR lpFileName)
     }
 
     SetLastError (ERROR_SUCCESS);
-    HANDLE hFile = CreateFile (lpFileName, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+    hFile = CreateFile (lpFileName, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
                                ( (dwOptions & OPT_NO_CREATE) || bCreateDir) ? OPEN_EXISTING : OPEN_ALWAYS,
                                FILE_ATTRIBUTE_NORMAL | (bCreateDir ? FILE_FLAG_BACKUP_SEMANTICS : 0), 0);
     dwResult = GetLastError ();
@@ -324,9 +334,9 @@ BOOL PrintHelp (LPCTSTR lpMessage)
 /* Prints a message translated from a Windows Error code, then prints the usage */
 PCHAR PrintError (LPCTSTR lpInfo, DWORD dwError)
 {
+    LPTSTR lpText = NULL;
     if (dwOptions & OPT_QUIET) return NULL;
 
-    LPTSTR lpText = NULL;
     FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                    NULL, dwError, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpText, 0, NULL);
     printfOem ("\nError: %s = %s", lpInfo, lpText);
@@ -509,8 +519,9 @@ BOOL DecodeTime (LPTSTR lpDateTime, LPSYSTEMTIME st)
 
 BOOL StrToFileTime (LPTSTR lpDateTime, LPFILETIME ts)
 {
-    INT nLen = (lpDateTime) ? strlen (lpDateTime) : 0;
+    FILETIME ft;
     SYSTEMTIME st;
+    INT nLen = (lpDateTime) ? strlen (lpDateTime) : 0;
     GetLocalTime (&st);
 
     if (nLen)
@@ -527,7 +538,6 @@ BOOL StrToFileTime (LPTSTR lpDateTime, LPFILETIME ts)
         }
     }
 
-    FILETIME ft;
     if (!SystemTimeToFileTime (&st, &ft))
         return PrintHelp (PrintError ("13 SystemTimeToFileTime()"   , GetLastError ()));
 
