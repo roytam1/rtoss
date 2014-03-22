@@ -20,7 +20,7 @@ typedef unsigned __int64 uint64_t;
 #ifdef _MSC_VER
 __declspec(dllimport) HANDLE WINAPI FindFirstVolumeW(WCHAR * lpszVolumeName, DWORD cchBufferLength);
 __declspec(dllimport) HANDLE WINAPI FindFirstVolumeMountPointW(WCHAR * lpszRootPathName, WCHAR * lpszVolumeMountPoint, DWORD cchBufferLength);
-__declspec(dllimport) BOOL WINAPI GetVolumeNameForVolumeMountPointW(WCHAR * lpszVolumeMountPoint, WCHAR * lpszVolumeName, DWORD cchBufferLength);
+__declspec(dllimport) BOOL WINAPI GetVolumeNameForVolumeMountPointW(WCHAR ** lpszVolumeMountPoint, WCHAR * lpszVolumeName, DWORD cchBufferLength);
 __declspec(dllimport) BOOL WINAPI FindNextVolumeW(HANDLE hFindVolume, WCHAR * lpszVolumeName, DWORD cchBufferLength);
 __declspec(dllimport) BOOL WINAPI FindNextVolumeMountPointW(HANDLE hFindVolumeMountPoint, WCHAR * lpszVolumeMountPoint, DWORD cchBufferLength);
 __declspec(dllimport) BOOL WINAPI FindVolumeClose(HANDLE hFindVolume);
