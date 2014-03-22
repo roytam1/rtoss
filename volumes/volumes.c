@@ -1,8 +1,31 @@
 #include <windows.h>
 #include <stdio.h>
-#include <stdint.h>
+#ifndef _MSC_VER
+# include <stdint.h>
+#else
+#if _MSC_VER < 1200
+// VC++ < 6.0 doesn't support unsigned int64 to double (VC5 untested)
+typedef __int64 uint64_t;
+#else
+typedef unsigned __int64 uint64_t;
+#endif
+# define ARRAYSIZE(arr) (sizeof(arr) / sizeof(arr[0]))
+#endif
+#ifndef INVALID_FILE_ATTRIBUTES
+# define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
+#endif
 #include <string.h>
 #include <locale.h>
+
+#ifdef _MSC_VER
+__declspec(dllimport) HANDLE WINAPI FindFirstVolumeW(WCHAR * lpszVolumeName, DWORD cchBufferLength);
+__declspec(dllimport) HANDLE WINAPI FindFirstVolumeMountPointW(WCHAR * lpszRootPathName, WCHAR * lpszVolumeMountPoint, DWORD cchBufferLength);
+__declspec(dllimport) BOOL WINAPI GetVolumeNameForVolumeMountPointW(WCHAR * lpszVolumeMountPoint, WCHAR * lpszVolumeName, DWORD cchBufferLength);
+__declspec(dllimport) BOOL WINAPI FindNextVolumeW(HANDLE hFindVolume, WCHAR * lpszVolumeName, DWORD cchBufferLength);
+__declspec(dllimport) BOOL WINAPI FindNextVolumeMountPointW(HANDLE hFindVolumeMountPoint, WCHAR * lpszVolumeMountPoint, DWORD cchBufferLength);
+__declspec(dllimport) BOOL WINAPI FindVolumeClose(HANDLE hFindVolume);
+__declspec(dllimport) BOOL WINAPI FindVolumeMountPointClose(HANDLE hFindVolumeMountPoint);
+#endif
 
 void vpath_pairs_append(WCHAR *volpath, WCHAR *win32path);
 void vpath_pairs_free();
