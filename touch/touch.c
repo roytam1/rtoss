@@ -642,13 +642,8 @@ int main (void)  /* (int argc, char *argv[]) */
         if (szPath[strlen (szPath) - 1] == '\"')
             szPath[strlen (szPath) - 1]  = '\\';
 
-        if (!Exists (szPath) && !(dwOptions & OPT_RECURSIVE) )  /* create file if not exist */
-        {
-            _fullpath (szFullPath, szPath, LEN_PATH);
-            fh = CreateFile(szFullPath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-            CloseHandle(fh);
-        }
-        if (Exists (szPath) && !(dwOptions & OPT_RECURSIVE) )  /* file or directory */
+
+        if (!(dwOptions & OPT_RECURSIVE) )  /* file or directory */
         {
             _fullpath (szFullPath, szPath, LEN_PATH);
             if ((dwResult = Touch (szFullPath)) != ERROR_SUCCESS)
