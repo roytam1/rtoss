@@ -187,6 +187,8 @@ void DecodeAPP14(int marker) {
 
 int main(int argc, char** argv){
 	int i, newsize;
+	struct markers *m;
+
 	unsigned char markers_kept[] = {0xC0,0xC1,0xC2,0xC9,0xCA,0xC3,0xC5,0xC6,0xC7,0xC8,0xCB,0xCD,0xCE,0xCF,0xCC,0xDD,0xDB,0xC4};
     FILE *f;
 
@@ -315,7 +317,6 @@ int main(int argc, char** argv){
 
 	//printf("%d %d\n",comp,colsp);
 
-	struct markers *m;
 	if(debug>0 && allmarkers) {
 		m = allmarkers;
 		while(m != NULL) {
