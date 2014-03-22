@@ -1,7 +1,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <stdio.h>
-//#include <stdint.h>
 #include <string.h>
 #include <locale.h>
 
@@ -15,6 +14,8 @@ typedef unsigned __int64 uint64_t;
 #endif
 #ifndef INVALID_FILE_ATTRIBUTES
 #define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
+#else
+#include <stdint.h>
 #endif
 
 char *fdigitsA(uint64_t integer);
