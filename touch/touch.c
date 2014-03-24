@@ -1,4 +1,4 @@
-/* touch.c v1.21 - 2011-04-28
+/* touch.c v1.22 - 2014-03-24
 Update:
   http://myc01.free.fr/touch
 
@@ -32,6 +32,10 @@ Examples:
 
 ********************************************************************************
 Changelog:
+1.22 - 2014-03-24
+  * fix '-c', '-D' switch, '-c' is always on and '-D' is ignored in 1.21
+  * make '--' optional
+
 1.21 - 2011-04-28
   * fix decode date/time
   * add touch folder with *.*
@@ -59,8 +63,8 @@ Changelog:
 #endif
 
 #define PRG_NAME  "Touch"
-#define PRG_VERS  "1.21"
-#define PRG_DATE  "2011-04-28"
+#define PRG_VERS  "1.22"
+#define PRG_DATE  "2014-03-24"
 #define PRG_LIC   "Public Domain Dedication (CC0 1.0)"
 
 /* Options in command line */
