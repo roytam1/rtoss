@@ -87,38 +87,6 @@ char **ARGV;
 int    ARGC;
 
 
-int GetOptC (const char cOption, const int nDef)
-{
-    int i;
-    if ( (ARGC < 2) || (!ARGV) )
-        return nDef;
-
-    for (i = 1; i < ARGC; i++)
-        if ( (ARGV[i][0] == '-') && (strchr (ARGV[i], cOption) != NULL) )
-            return 1;
-    return nDef;
-}  /* GetOptC */
-
-
-char *GetOptCPStr (char **szStr, const char cOption, char *nDef)
-{
-    int i;
-    if ( (ARGC < 2) || (!ARGV) )
-        return (*szStr = nDef);
-
-    for (i = 1; i < ARGC; i++)
-        if ( (ARGV[i][0] == '-') && (ARGV[i][1] == cOption) )
-        {
-            if (++i < ARGC)
-                return (*szStr = ARGV[i]);
-            else
-                return (*szStr = nDef);
-        }
-
-    return (*szStr = nDef);
-}  /* GetOptCPStr */
-
-
 char **_CommandLineToArgvA (const char *CmdLine, int *pnArgc)
 {
     char           a;
@@ -219,8 +187,8 @@ int printFileTime (LPFILETIME lpFileTime)
 
 int printfOem (LPCTSTR lpFmt, ...)
 {
-	PCHAR lpBuf;
-	INT nLen;
+    PCHAR lpBuf;
+    INT nLen;
     if (dwOptions & OPT_QUIET) return 0;
     if (! lpFmt) return 0;
     if (!*lpFmt) return 0;
@@ -238,9 +206,9 @@ int printfOem (LPCTSTR lpFmt, ...)
 
 DWORD Touch (LPCTSTR lpFileName)
 {
-	DWORD dwFileAttributes, dwResult;
-	HANDLE hFile;
-	BOOL bCreateDir;
+    DWORD dwFileAttributes, dwResult;
+    HANDLE hFile;
+    BOOL bCreateDir;
     SetLastError (ERROR_SUCCESS);
     dwFileAttributes = GetFileAttributes (lpFileName);
     dwResult = GetLastError ();
@@ -348,11 +316,12 @@ PCHAR PrintError (LPCTSTR lpInfo, DWORD dwError)
 
 BOOL GetArgs (LPDWORD dwList, LPTSTR *lpRefFile, LPTSTR *lpDateTime, LPDWORD dwOptions)
 {
+    int i, find_double_dash = 0;
     if (ARGC < 2)
         return PrintHelp (NULL);
     else if (ARGC == 2)
     {
-        if (GetOptC ('h', 0))
+        if (ARGV[1][0] == '-' && ARGV[1][0] == 'h')
             return PrintHelp (NULL);
         else if (ARGV[1][0] == '-')
             return PrintHelp ("Error 1: Not enough arguments.");
@@ -360,29 +329,70 @@ BOOL GetArgs (LPDWORD dwList, LPTSTR *lpRefFile, LPTSTR *lpDateTime, LPDWORD dwO
     }
     else
     {
-        for (*dwList = 1; *dwList < (DWORD)ARGC; (*dwList)++)
-            if (!strcmp ("--", ARGV[*dwList]))
+        for(i = 1; i < (find_double_dash ? *dwList : (DWORD)ARGC); i++) {
+            if(ARGV[i][0]=='-') {
+                switch(ARGV[i][1]) {
+                    case 'x':
+                        *dwOptions |= OPT_MODIFY_TIME_C;
+                        break;
+                    case 'a':
+                        *dwOptions |= OPT_MODIFY_TIME_A;
+                        break;
+                    case 'm':
+                        *dwOptions |= OPT_MODIFY_TIME_M;
+                        break;
+                    case 'c':
+                        *dwOptions |= OPT_NO_CREATE;
+                        break;
+                    case 'D':
+                        *dwOptions |= OPT_CREATE_DIR;
+                        break;
+                    case 'v':
+                        *dwOptions |= OPT_VERBOSE;
+                        break;
+                    case 's':
+                        *dwOptions |= OPT_RECURSIVE;
+                        break;
+                    case 'q':
+                        *dwOptions |= OPT_QUIET;
+                        break;
+                    case 'h':
+                        return PrintHelp (NULL);
+                    case '-':
+                        find_double_dash = 1;
+                        *dwList = i;
+                        break;
+                    case 'r':
+                        if(i+1 < ARGC) {
+                            *lpRefFile = ARGV[++i];
+                            *dwOptions |= OPT_USE_REF_FILE;
+                        }
+                        break;
+                    case 'd':
+                        if(i+1 < ARGC) {
+                            *lpDateTime = ARGV[++i];
+                            *dwOptions |= OPT_USER_DATE;
+                        }
+                        break;
+                    case 't':
+                        if(i+1 < ARGC) {
+                            *lpDateTime = ARGV[++i];
+                            *dwOptions |= OPT_USER_TIME;
+                        }
+                        break;
+                }
+            } else {
                 break;
-        if (++(*dwList) >= (DWORD)ARGC)
-            /*return PrintHelp ("Error 2: No file(s) specified!");*/
-            *dwList = ARGC - 1;
+            }
+        }
 
-        *dwOptions |= GetOptC ('x', 0) * OPT_MODIFY_TIME_C;
-        *dwOptions |= GetOptC ('a', 0) * OPT_MODIFY_TIME_A;
-        *dwOptions |= GetOptC ('m', 0) * OPT_MODIFY_TIME_M;
-        *dwOptions |= GetOptC ('c', 0) * OPT_NO_CREATE;
-        *dwOptions |= GetOptC ('D', 0) * OPT_CREATE_DIR;
-        *dwOptions |= GetOptC ('v', 0) * OPT_VERBOSE;
-        *dwOptions |= GetOptC ('s', 0) * OPT_RECURSIVE;
-        *dwOptions |= GetOptC ('q', 0) * OPT_QUIET;
-        /*
-        if (GetOptPStr (lpRefFile , "-r", NULL)) *dwOptions |= OPT_USE_REF_FILE;
-        if (GetOptPStr (lpDateTime, "-d", NULL)) *dwOptions |= OPT_USER_DATE;
-        if (GetOptPStr (lpDateTime, "-t", NULL)) *dwOptions |= OPT_USER_TIME;
-        */
-        if (GetOptCPStr (lpRefFile , 'r', NULL)) *dwOptions |= OPT_USE_REF_FILE;
-        if (GetOptCPStr (lpDateTime, 'd', NULL)) *dwOptions |= OPT_USER_DATE;
-        if (GetOptCPStr (lpDateTime, 't', NULL)) *dwOptions |= OPT_USER_TIME;
+        if(!find_double_dash && i < ARGC) {
+            *dwList = i;
+        }
+
+        if ((find_double_dash && ++(*dwList) >= (DWORD)ARGC) ||
+            (!find_double_dash && (*dwList) >= (DWORD)ARGC))
+            return PrintHelp ("Error 2: No file(s) specified!");
     }
 
     if ( (*dwOptions & OPT_USE_REF_FILE) &&  (*dwOptions & OPT_USER_TIME) )
