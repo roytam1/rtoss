@@ -1,0 +1,33 @@
+This is an IPS patcher.  I don't guarantee that it works, but it seems to.
+I have included a binary for MS-DOS, which will also work under Windows 98
+Second Edition and should also have no problems on NT-based systems, since
+it doesn't do anything "dirty".  It's ANSI C, to the best of my knowledge,
+so it should compile on almost anything.  I have also included a Linux ELF
+statically-linked (against whatever glibc Red Hat 8.0 Linux uses) binary.
+
+To run it, first MAKE A BACKUP OF THE FILE YOU ARE PATCHING.  This is VERY
+important!  UIPS will NOT preserve your original file, and since it uses a
+"modify-in-place" system, it will overwrite the file as it stands, meaning
+that you cannot use an "undelete" program of any kind to recover your lost
+file.  Back up first.  Then type:
+
+   uips  filename.ext  patch.ips
+
+where "filename.ext" is the name of the data file you intend to patch, and
+"patch.ips" is the name of the patch file.  You must include the extension
+of .IPS if present, since UIPS will *not* add it on automatically.  I hope
+you know what you're doing.  You should see a little copyright blurb, then
+the command prompt should return.  If you got no messages except the blurb
+you should be fine.  Test and see.  There are a lot of "maybes" when using
+IPS.
+
+As I said, UIPS should compile on almost anything.  However, I have only a
+PC running Win98SE and a modified Red Hat 8.0 Linux to test on, and I have
+only done minimal testing, using these binaries. Please let me know if you
+have trouble compiling UIPS especially on a non-Intel system.  If you have
+gcc (djgpp, mingw32, cygwin, etc.), try typing "gcc -o uips uips.c".
+
+Steve Nickolas
+<dosius@dosius.com>
+2003.0428
+2004.0112
