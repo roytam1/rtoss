@@ -30,26 +30,49 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* Forward declarations */
 void getrle(void);
 void closefiles(void);
 
 #define ADDRESSBYTES 3
-#define MAXARRAYSIZE 50000UL
-char sourcename[1024], patchname[1024];
+#define MAXARRAYSIZE 2147483648UL
+//char sourcename[1024], patchname[1024];
+char outname[1024];
 FILE *patchfile, *sourcefile, *f;
 unsigned char header[5],
 	      addarray[3],
 	      rlearray[3],
 	      bytesarray[2],
-	      chunkarray[MAXARRAYSIZE];
-unsigned long address,numbytes,rlebytes;
+	      *chunkarray;
+unsigned long address,numbytes,rlebytes,patchsize;
 unsigned char rlebyte;
 unsigned long count;
 int totalchunks;
 unsigned long a1,a2,a3;
 int overload;
+
+void fcopy(FILE *f1, FILE *f2)
+{
+#define FCOPY_BUFSIZE 8192
+ char    *buffer;
+ size_t  n;
+
+ buffer = malloc(FCOPY_BUFSIZE);
+ if(buffer)
+ {
+  while ((n = fread(buffer, sizeof(char), FCOPY_BUFSIZE, f1)) > 0)
+  {
+   if (fwrite(buffer, sizeof(char), n, f2) != n)
+   {
+    fprintf(stderr,"write failed\n");
+    break;
+   }
+  }
+ }
+}
 
 void isitanips(void)
 {
@@ -131,6 +154,8 @@ void applyrle(void)
 
 void closefiles(void)
 {
+ if(chunkarray) free(chunkarray);
+
  fclose(sourcefile);
  fclose(patchfile);
  if (overload)
@@ -140,16 +165,21 @@ void closefiles(void)
 "maximum patch size this version can handle.  The maximum\n"
 "patch size is currently set to: %u\n",MAXARRAYSIZE);
  }
+
+ if(*outname)
+  printf ("Output to file '%s' done.\n", outname);
+ else
+  printf ("Done.\n");
+
  exit(overload);
 }
 
 int main (int argc, char **argv)
 {
- fprintf (stderr,"Universal IPS Patcher - Copyright 2003 Steve Nickolas\n");
-
- if (argc!=3)
+ if (argc<3)
  {
-  fprintf (stderr,"usage: uips source.ext patch.ips\n");
+  fprintf (stderr,"Universal IPS Patcher - Copyright 2003 Steve Nickolas\n");
+  fprintf (stderr,"usage: uips source.ext patch.ips [outfile.ext]\n");
   return -1;
  }
  sourcefile=fopen(argv[1],"r+b");
@@ -159,6 +189,19 @@ int main (int argc, char **argv)
   perror(argv[1]);
   return -1;
  }
+ if (argc>3)
+ {
+  f=fopen(argv[3],"wb");
+ }
+ if(f)
+ {
+  fcopy(sourcefile, f);
+  fclose(f);
+  fclose(sourcefile);
+  sourcefile=fopen(argv[3],"r+b");
+  strcpy(outname,argv[3]);
+ }
+
  patchfile=fopen(argv[2],"rb");
  if (!patchfile)
  {
@@ -166,7 +209,22 @@ int main (int argc, char **argv)
   perror(argv[2]);
   return -1;
  }
+
+ fseek(patchfile, 0, SEEK_END);
+ patchsize = (int) ftell(patchfile);
+ fseek(patchfile, 0, SEEK_SET);
+ chunkarray = (char*)malloc(patchsize);
+
+ if(!chunkarray)
+ {
+  fprintf (stderr,"Cannot allocate memory.");
+  return -1;
+ }
+
  isitanips();
+
+ printf ("Applying Patch '%s' to file '%s'...\n", argv[2], argv[1]);
+
  while (!feof(patchfile))
  {
   getaddress();
@@ -175,6 +233,7 @@ int main (int argc, char **argv)
   if (numbytes) applypatch(); else applyrle();
  }
  closefiles();
+
  /* avert warning */
  return 40;
 }
