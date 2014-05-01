@@ -24,7 +24,9 @@
 #define _BSD_SOURCE
 #ifndef WIN32
 #include <unistd.h>
-#define MAX_PATH 256
+#include <limits.h>
+#define MAX_PATH PATH_MAX
+#include <sys/stat.h>
 #else
 #include <direct.h>
 #include <windows.h>
@@ -73,6 +75,14 @@ static char* do_lilpath()
 	#ifdef WIN32
 	retval = malloc(MAX_PATH);
 	GetModuleFileName(NULL,retval,MAX_PATH);
+	#else
+	struct stat info;
+	char* ppath = malloc(PATH_MAX);
+	pid_t pid = getpid();
+	retval = malloc(PATH_MAX);
+	sprintf(ppath, "/proc/%d/exe", pid);
+	readlink(ppath, retval, PATH_MAX);
+	free(ppath);
 	#endif
 	return retval;
 }
