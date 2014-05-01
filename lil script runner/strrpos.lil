@@ -1,0 +1,24 @@
+func strrpos {str find last} {
+	set i 0
+	set j 0
+	set first 1
+	if [expr $last > 0] {
+		set str [substr $str 0 $last]
+	}
+	while not {$i == -1} {
+		if $first {
+			set first 0
+			set i -1
+		}
+		set j $i
+		set i [strpos $str $find [expr $i + 1]]
+		if [expr $i == -1] {
+			return $j
+		}
+	}
+	return -1
+}
+
+# Get $EXEPATH
+set a [strrpos [lilpath] "\\" 0]
+print [substr [lilpath] 0 $a]
