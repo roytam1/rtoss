@@ -98,22 +98,28 @@ static char* do_getcwd()
 static char* do_getenv(size_t argc, char** argv)
 {
 	char* retval = NULL;
-	#ifdef WIN32
 	if(argc) {
 		retval = malloc(32768);
+	#ifdef WIN32
 		GetEnvironmentVariable(argv[0],retval,32768);
-	}
+	#else
+		char* pEnv;
+		pEnv = getenv(argv[0]);
+		strcpy(retval,pEnv);
 	#endif
+	}
 	return retval;
 }
 
 static void do_setenv(size_t argc, char** argv)
 {
-	#ifdef WIN32
 	if(argc > 1) {
+	#ifdef WIN32
 		SetEnvironmentVariable(argv[0],argv[1]);
-	}
+	#else
+		setenv(argv[0],argv[1], 1);
 	#endif
+	}
 }
 
 static void do_chdir(size_t argc, char** argv)
