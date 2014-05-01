@@ -24,7 +24,9 @@
 #define _BSD_SOURCE
 #ifndef WIN32
 #include <unistd.h>
+#define MAX_PATH 256
 #else
+#include <direct.h>
 #include <windows.h>
 #include <shlobj.h>
 #endif
@@ -36,7 +38,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <direct.h>
 #include "lil.h"
 
 static int running = 1;
