@@ -127,6 +127,60 @@ static void do_chdir(size_t argc, char** argv)
 	chdir(argv[0]);
 }
 
+static void do_shellopen(size_t argc, char** argv)
+{
+	#if defined(WIN32) || defined(WATCOMC)
+	int i = 0;
+	for (i=0; i<argc; i++) {
+		ShellExecute(NULL, "open", argv[i], NULL, NULL, SW_SHOWNORMAL);
+	}
+	#endif
+}
+
+static void do_exec(size_t argc, char** argv)
+{
+	#if defined(WIN32) || defined(WATCOMC)
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+
+	char* cmd = NULL;
+	int cmdlen = 0;
+	int i = 0;
+	for (i=0; i<argc; i++) {
+		size_t len = strlen(argv[i]);
+		if (i != 0) {
+			cmd = realloc(cmd, cmdlen + 1);
+			cmd[cmdlen++] = ' ';
+		}
+		cmd = realloc(cmd, cmdlen + len);
+		memcpy(cmd + cmdlen, argv[i], len);
+		cmdlen += len;
+	}
+	cmd = realloc(cmd, cmdlen + 1);
+	cmd[cmdlen] = 0;
+
+	ZeroMemory( &si, sizeof(si) );
+	si.cb = sizeof(si);
+	ZeroMemory( &pi, sizeof(pi) );
+	
+	if( CreateProcess( NULL,   // No module name (use command line)
+		cmd,        // Command line
+		NULL,           // Process handle not inheritable
+		NULL,           // Thread handle not inheritable
+		FALSE,          // Set handle inheritance to FALSE
+		0,              // No creation flags
+		NULL,           // Use parent's environment block
+		NULL,           // Use parent's starting directory 
+		&si,            // Pointer to STARTUPINFO structure
+		&pi )           // Pointer to PROCESS_INFORMATION structure
+	) {
+		CloseHandle( pi.hProcess );
+		CloseHandle( pi.hThread );
+	}
+	free(cmd);
+	#endif
+}
+
 static char* do_system(size_t argc, char** argv)
 {
 	char* retval = NULL;
@@ -202,6 +256,7 @@ static char* do_system(size_t argc, char** argv)
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 	}
+	free(cmd);
 	return retval;
 	#else
 	FILE* p;
@@ -251,6 +306,32 @@ static LILCALLBACK lil_value_t fnc_system(lil_t lil, size_t argc, lil_value_t* a
 	}
 	free(sargv);
 	return r;
+}
+
+static LILCALLBACK lil_value_t fnc_exec(lil_t lil, size_t argc, lil_value_t* argv)
+{
+	char** sargv = malloc(sizeof(char*)*(argc + 1));
+	lil_value_t r = NULL;
+	size_t i;
+	if (argc == 0) return NULL;
+	for (i=0; i<argc; i++)
+		sargv[i] = (char*)lil_to_string(argv[i]);
+	sargv[argc] = NULL;
+	do_exec(argc, (char**)sargv);
+	return NULL;
+}
+
+static LILCALLBACK lil_value_t fnc_shellopen(lil_t lil, size_t argc, lil_value_t* argv)
+{
+	char** sargv = malloc(sizeof(char*)*(argc + 1));
+	lil_value_t r = NULL;
+	size_t i;
+	if (argc == 0) return NULL;
+	for (i=0; i<argc; i++)
+		sargv[i] = (char*)lil_to_string(argv[i]);
+	sargv[argc] = NULL;
+	do_shellopen(argc, (char**)sargv);
+	return NULL;
 }
 
 static LILCALLBACK lil_value_t fnc_specialdir(lil_t lil, size_t argc, lil_value_t* argv)
@@ -378,6 +459,8 @@ static int repl(void)
 	lil_register(lil, "chdir", fnc_chdir);
 	lil_register(lil, "specialdir", fnc_specialdir);
 	lil_register(lil, "readline", fnc_readline);
+	lil_register(lil, "exec", fnc_exec);
+	lil_register(lil, "shellopen", fnc_shellopen);
 	printf("Little Interpreted Language Interactive Shell\n");
 	lil_callback(lil, LIL_CALLBACK_EXIT, (lil_callback_proc_t)do_exit);
 	while (running) {
@@ -418,6 +501,8 @@ static int nonint(int argc, const char* argv[])
 	lil_register(lil, "lilpath", fnc_lilpath);
 	lil_register(lil, "getcwd", fnc_getcwd);
 	lil_register(lil, "chdir", fnc_chdir);
+	lil_register(lil, "exec", fnc_exec);
+	lil_register(lil, "shellopen", fnc_shellopen);
 	lil_register(lil, "specialdir", fnc_specialdir);
 	for (i=2; i<argc; i++) {
 		lil_list_append(arglist, lil_alloc_string(argv[i]));
