@@ -1,0 +1,1 @@
+cl /O1 /MD /DWIN32 /DLILINT_INT64 lil.c main.c
