@@ -26,6 +26,7 @@
 #include <unistd.h>
 #else
 #include <windows.h>
+#include <shlobj.h>
 #endif
 #ifdef __MINGW32__
 /* allow the definition of popen, etc */
@@ -35,6 +36,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <direct.h>
 #include "lil.h"
 
 static int running = 1;
@@ -44,6 +46,68 @@ static LILCALLBACK void do_exit(lil_t lil, lil_value_t val)
 {
 	running = 0;
 	exit_code = (int)lil_to_integer(val);
+}
+
+static char* do_specialdir(int nCSIDL)
+{
+	char* retval = NULL;
+	#ifdef WIN32
+	LPITEMIDLIST pidl;
+	LPMALLOC pShellMalloc;
+	if(SUCCEEDED(SHGetMalloc(&pShellMalloc))) {
+		if(SUCCEEDED(SHGetSpecialFolderLocation(NULL,nCSIDL,&pidl))) {
+			retval = malloc(MAX_PATH);
+			SHGetPathFromIDList(pidl, retval);
+			pShellMalloc->lpVtbl->Free(pShellMalloc,pidl);
+		}
+		pShellMalloc->lpVtbl->Release(pShellMalloc);
+	}
+	#endif
+	return retval;
+}
+
+static char* do_lilpath()
+{
+	char* retval = NULL;
+	#ifdef WIN32
+	retval = malloc(MAX_PATH);
+	GetModuleFileName(NULL,retval,MAX_PATH);
+	#endif
+	return retval;
+}
+
+static char* do_getcwd()
+{
+	char* retval = NULL;
+	retval = malloc(MAX_PATH);
+	getcwd(retval,MAX_PATH);
+	return retval;
+}
+
+static char* do_getenv(size_t argc, char** argv)
+{
+	char* retval = NULL;
+	#ifdef WIN32
+	if(argc) {
+		retval = malloc(32768);
+		GetEnvironmentVariable(argv[0],retval,32768);
+	}
+	#endif
+	return retval;
+}
+
+static void do_setenv(size_t argc, char** argv)
+{
+	#ifdef WIN32
+	if(argc > 1) {
+		SetEnvironmentVariable(argv[0],argv[1]);
+	}
+	#endif
+}
+
+static void do_chdir(size_t argc, char** argv)
+{
+	chdir(argv[0]);
 }
 
 static char* do_system(size_t argc, char** argv)
@@ -155,13 +219,13 @@ static LILCALLBACK lil_value_t fnc_writechar(lil_t lil, size_t argc, lil_value_t
 
 static LILCALLBACK lil_value_t fnc_system(lil_t lil, size_t argc, lil_value_t* argv)
 {
-	const char** sargv = malloc(sizeof(char*)*(argc + 1));
+	char** sargv = malloc(sizeof(char*)*(argc + 1));
 	lil_value_t r = NULL;
 	char* rv;
 	size_t i;
 	if (argc == 0) return NULL;
 	for (i=0; i<argc; i++)
-		sargv[i] = lil_to_string(argv[i]);
+		sargv[i] = (char*)lil_to_string(argv[i]);
 	sargv[argc] = NULL;
 	rv = do_system(argc, (char**)sargv);
 	if (rv) {
@@ -170,6 +234,94 @@ static LILCALLBACK lil_value_t fnc_system(lil_t lil, size_t argc, lil_value_t* a
 	}
 	free(sargv);
 	return r;
+}
+
+static LILCALLBACK lil_value_t fnc_specialdir(lil_t lil, size_t argc, lil_value_t* argv)
+{
+	lil_value_t r = NULL;
+	char* rv;
+	size_t i;
+	if (argc == 0) return NULL;
+	i = lil_to_integer(argv[0]);
+	rv = do_specialdir(i);
+	if (rv) {
+		r = lil_alloc_string(rv);
+		free(rv);
+	}
+	return r;
+}
+
+static LILCALLBACK lil_value_t fnc_getcwd(lil_t lil, size_t argc, lil_value_t* argv)
+{
+	lil_value_t r = NULL;
+	char* rv;
+	rv = do_getcwd();
+	if (rv) {
+		r = lil_alloc_string(rv);
+		free(rv);
+	}
+	return r;
+}
+
+static LILCALLBACK lil_value_t fnc_lilpath(lil_t lil, size_t argc, lil_value_t* argv)
+{
+	lil_value_t r = NULL;
+	char* rv;
+	rv = do_lilpath();
+	if (rv) {
+		r = lil_alloc_string(rv);
+		free(rv);
+	}
+	return r;
+}
+
+static LILCALLBACK lil_value_t fnc_getenv(lil_t lil, size_t argc, lil_value_t* argv)
+{
+	char** sargv = malloc(sizeof(char*)*(argc + 1));
+	lil_value_t r = NULL;
+	char* rv;
+	size_t i;
+	if (argc == 0) return NULL;
+	for (i=0; i<argc; i++)
+		sargv[i] = (char*)lil_to_string(argv[i]);
+	sargv[argc] = NULL;
+	rv = do_getenv(argc, (char**)sargv);
+	if (rv) {
+		r = lil_alloc_string(rv);
+		free(rv);
+	}
+	free(sargv);
+	return r;
+}
+
+static LILCALLBACK lil_value_t fnc_setenv(lil_t lil, size_t argc, lil_value_t* argv)
+{
+	char** sargv = malloc(sizeof(char*)*(argc + 1));
+	lil_value_t r = NULL;
+	char* rv;
+	size_t i;
+	if (argc == 0) return NULL;
+	for (i=0; i<argc; i++)
+		sargv[i] = (char*)lil_to_string(argv[i]);
+	sargv[argc] = NULL;
+	do_setenv(argc, (char**)sargv);
+	free(sargv);
+	return NULL;
+}
+
+static LILCALLBACK lil_value_t fnc_chdir(lil_t lil, size_t argc, lil_value_t* argv)
+{
+	char** sargv = malloc(sizeof(char*)*(argc + 1));
+	lil_value_t r = NULL;
+	char* rv;
+	size_t i;
+	if (argc == 0) return NULL;
+	for (i=0; i<argc; i++)
+		sargv[i] = (char*)lil_to_string(argv[i]);
+	sargv[argc] = NULL;
+	do_chdir(argc, (char**)sargv);
+	free(sargv);
+	return NULL;
 }
 
 static LILCALLBACK lil_value_t fnc_readline(lil_t lil, size_t argc, lil_value_t* argv)
@@ -202,6 +354,12 @@ static int repl(void)
 	lil_t lil = lil_new();
 	lil_register(lil, "writechar", fnc_writechar);
 	lil_register(lil, "system", fnc_system);
+	lil_register(lil, "getenv", fnc_getenv);
+	lil_register(lil, "setenv", fnc_setenv);
+	lil_register(lil, "lilpath", fnc_lilpath);
+	lil_register(lil, "getcwd", fnc_getcwd);
+	lil_register(lil, "chdir", fnc_chdir);
+	lil_register(lil, "specialdir", fnc_specialdir);
 	lil_register(lil, "readline", fnc_readline);
 	printf("Little Interpreted Language Interactive Shell\n");
 	lil_callback(lil, LIL_CALLBACK_EXIT, (lil_callback_proc_t)do_exit);
@@ -238,6 +396,12 @@ static int nonint(int argc, const char* argv[])
 	int i;
 	lil_register(lil, "writechar", fnc_writechar);
 	lil_register(lil, "system", fnc_system);
+	lil_register(lil, "getenv", fnc_getenv);
+	lil_register(lil, "setenv", fnc_setenv);
+	lil_register(lil, "lilpath", fnc_lilpath);
+	lil_register(lil, "getcwd", fnc_getcwd);
+	lil_register(lil, "chdir", fnc_chdir);
+	lil_register(lil, "specialdir", fnc_specialdir);
 	for (i=2; i<argc; i++) {
 		lil_list_append(arglist, lil_alloc_string(argv[i]));
 	}
