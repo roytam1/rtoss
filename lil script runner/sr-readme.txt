@@ -25,3 +25,11 @@ New commands added in lil script runner:
   * 34 = Internet Explorer History folder
 - getcwd : Get path of current directory
 - chdir <path> : Change directory
+- exec <command-line> : Execute command-line without waiting
+- shellopen <full-path-file-or-program> : Open file/run program
+- unlink <file> : Delete file
+- renamefile <from> <to> : Rename/Move file or directory
+- copyfile <old> <new> : Copy file
+- mkdir <new-dir> : Create new directory
+- rmdir <empty-dir> : Delete empty directory
+- dirlist [file-spec] : List directories and files in current directory
