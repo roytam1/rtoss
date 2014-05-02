@@ -51,6 +51,8 @@ static LILCALLBACK void do_exit(lil_t lil, lil_value_t val)
 	exit_code = (int)lil_to_integer(val);
 }
 
+/* Start of extended functions */
+
 static char* do_specialdir(int nCSIDL)
 {
 	char* retval = NULL;
@@ -122,9 +124,72 @@ static void do_setenv(size_t argc, char** argv)
 	}
 }
 
+static lil_value_t do_dirlist(size_t argc, char** argv)
+{
+	lil_value_t rv = NULL;
+#ifdef WIN32
+	lil_list_t flist = lil_alloc_list();
+	lil_value_t r = NULL;
+
+
+	WIN32_FIND_DATAA findFileData;
+	HANDLE MyHandle = FindFirstFileA(argv[0],&findFileData);
+
+	if( MyHandle != INVALID_HANDLE_VALUE)
+	{
+		r = lil_alloc_string(findFileData.cFileName);
+		lil_list_append(flist, r);
+
+		while(FindNextFileA(MyHandle,&findFileData) != 0)
+		{
+			r = lil_alloc_string(findFileData.cFileName);
+			lil_list_append(flist, r);
+		}
+	}
+	rv = lil_list_to_value(flist, 1);
+	lil_free_list(flist);
+#else
+	/* unimplenemted */
+#endif
+	return rv;
+}
+
 static void do_chdir(size_t argc, char** argv)
 {
 	chdir(argv[0]);
+}
+
+static void do_unlink(size_t argc, char** argv)
+{
+	unlink(argv[0]);
+}
+
+static void do_renamefile(size_t argc, char** argv)
+{
+	if(argc > 1) {
+		rename(argv[0],argv[1]);
+	}
+}
+
+static void do_copyfile(size_t argc, char** argv)
+{
+	if(argc > 1) {
+	#ifdef WIN32
+		CopyFile(argv[0],argv[1],FALSE);
+	#else
+		/* unimplenemted */
+	#endif
+	}
+}
+
+static void do_mkdir(size_t argc, char** argv)
+{
+	mkdir(argv[0]);
+}
+
+static void do_rmdir(size_t argc, char** argv)
+{
+	rmdir(argv[0]);
 }
 
 static void do_shellopen(size_t argc, char** argv)
@@ -282,6 +347,27 @@ static char* do_system(size_t argc, char** argv)
 	#endif
 }
 
+/* End of extended functions */
+
+static void conv_argv(size_t* argc, lil_value_t* argv, char*** sargv, char* defarg)
+{
+	size_t i;
+	if(defarg && !*argc)
+	{
+		*sargv = malloc(sizeof(char*)*((++*argc) + 1));
+		((char**)*sargv)[0] = defarg;
+	}
+	else
+	{
+		*sargv = malloc(sizeof(char*)*((*argc) + 1));
+		for (i=0; i<*argc; i++)
+			((char**)*sargv)[i] = (char*)lil_to_string(argv[i]);
+	}
+	((char**)*sargv)[*argc] = NULL;
+}
+
+/* Start of glue functions */
+
 static LILCALLBACK lil_value_t fnc_writechar(lil_t lil, size_t argc, lil_value_t* argv)
 {
 	if (!argc) return NULL;
@@ -291,14 +377,12 @@ static LILCALLBACK lil_value_t fnc_writechar(lil_t lil, size_t argc, lil_value_t
 
 static LILCALLBACK lil_value_t fnc_system(lil_t lil, size_t argc, lil_value_t* argv)
 {
-	char** sargv = malloc(sizeof(char*)*(argc + 1));
+	char** sargv = NULL;
 	lil_value_t r = NULL;
 	char* rv;
 	size_t i;
 	if (argc == 0) return NULL;
-	for (i=0; i<argc; i++)
-		sargv[i] = (char*)lil_to_string(argv[i]);
-	sargv[argc] = NULL;
+	conv_argv(&argc,argv,&sargv,NULL);
 	rv = do_system(argc, (char**)sargv);
 	if (rv) {
 		r = lil_alloc_string(rv);
@@ -310,26 +394,22 @@ static LILCALLBACK lil_value_t fnc_system(lil_t lil, size_t argc, lil_value_t* a
 
 static LILCALLBACK lil_value_t fnc_exec(lil_t lil, size_t argc, lil_value_t* argv)
 {
-	char** sargv = malloc(sizeof(char*)*(argc + 1));
+	char** sargv = NULL;
 	lil_value_t r = NULL;
 	size_t i;
 	if (argc == 0) return NULL;
-	for (i=0; i<argc; i++)
-		sargv[i] = (char*)lil_to_string(argv[i]);
-	sargv[argc] = NULL;
+	conv_argv(&argc,argv,&sargv,NULL);
 	do_exec(argc, (char**)sargv);
 	return NULL;
 }
 
 static LILCALLBACK lil_value_t fnc_shellopen(lil_t lil, size_t argc, lil_value_t* argv)
 {
-	char** sargv = malloc(sizeof(char*)*(argc + 1));
+	char** sargv = NULL;
 	lil_value_t r = NULL;
 	size_t i;
 	if (argc == 0) return NULL;
-	for (i=0; i<argc; i++)
-		sargv[i] = (char*)lil_to_string(argv[i]);
-	sargv[argc] = NULL;
+	conv_argv(&argc,argv,&sargv,NULL);
 	do_shellopen(argc, (char**)sargv);
 	return NULL;
 }
@@ -375,14 +455,12 @@ static LILCALLBACK lil_value_t fnc_lilpath(lil_t lil, size_t argc, lil_value_t* 
 
 static LILCALLBACK lil_value_t fnc_getenv(lil_t lil, size_t argc, lil_value_t* argv)
 {
-	char** sargv = malloc(sizeof(char*)*(argc + 1));
+	char** sargv = NULL;
 	lil_value_t r = NULL;
 	char* rv;
 	size_t i;
 	if (argc == 0) return NULL;
-	for (i=0; i<argc; i++)
-		sargv[i] = (char*)lil_to_string(argv[i]);
-	sargv[argc] = NULL;
+	conv_argv(&argc,argv,&sargv,NULL);
 	rv = do_getenv(argc, (char**)sargv);
 	if (rv) {
 		r = lil_alloc_string(rv);
@@ -394,30 +472,103 @@ static LILCALLBACK lil_value_t fnc_getenv(lil_t lil, size_t argc, lil_value_t* a
 
 static LILCALLBACK lil_value_t fnc_setenv(lil_t lil, size_t argc, lil_value_t* argv)
 {
-	char** sargv = malloc(sizeof(char*)*(argc + 1));
+	char** sargv = NULL;
 	lil_value_t r = NULL;
 	char* rv;
 	size_t i;
 	if (argc == 0) return NULL;
-	for (i=0; i<argc; i++)
-		sargv[i] = (char*)lil_to_string(argv[i]);
+	conv_argv(&argc,argv,&sargv,NULL);
 	sargv[argc] = NULL;
 	do_setenv(argc, (char**)sargv);
 	free(sargv);
 	return NULL;
 }
 
+static LILCALLBACK lil_value_t fnc_dirlist(lil_t lil, size_t argc, lil_value_t* argv)
+{
+	char** sargv = NULL;
+	lil_value_t r = NULL;
+	size_t i;
+	conv_argv(&argc,argv,&sargv,"*.*");
+	r = do_dirlist(argc, (char**)sargv);
+	free(sargv);
+	return r;
+}
+
 static LILCALLBACK lil_value_t fnc_chdir(lil_t lil, size_t argc, lil_value_t* argv)
 {
-	char** sargv = malloc(sizeof(char*)*(argc + 1));
+	char** sargv = NULL;
 	lil_value_t r = NULL;
 	char* rv;
 	size_t i;
 	if (argc == 0) return NULL;
-	for (i=0; i<argc; i++)
-		sargv[i] = (char*)lil_to_string(argv[i]);
-	sargv[argc] = NULL;
+	conv_argv(&argc,argv,&sargv,NULL);
 	do_chdir(argc, (char**)sargv);
+	free(sargv);
+	return NULL;
+}
+
+static LILCALLBACK lil_value_t fnc_unlink(lil_t lil, size_t argc, lil_value_t* argv)
+{
+	char** sargv = NULL;
+	lil_value_t r = NULL;
+	char* rv;
+	size_t i;
+	if (argc == 0) return NULL;
+	conv_argv(&argc,argv,&sargv,NULL);
+	do_unlink(argc, (char**)sargv);
+	free(sargv);
+	return NULL;
+}
+
+static LILCALLBACK lil_value_t fnc_renamefile(lil_t lil, size_t argc, lil_value_t* argv)
+{
+	char** sargv = NULL;
+	lil_value_t r = NULL;
+	char* rv;
+	size_t i;
+	if (argc == 0) return NULL;
+	conv_argv(&argc,argv,&sargv,NULL);
+	do_renamefile(argc, (char**)sargv);
+	free(sargv);
+	return NULL;
+}
+
+static LILCALLBACK lil_value_t fnc_copyfile(lil_t lil, size_t argc, lil_value_t* argv)
+{
+	char** sargv = NULL;
+	lil_value_t r = NULL;
+	char* rv;
+	size_t i;
+	if (argc == 0) return NULL;
+	conv_argv(&argc,argv,&sargv,NULL);
+	do_copyfile(argc, (char**)sargv);
+	free(sargv);
+	return NULL;
+}
+
+static LILCALLBACK lil_value_t fnc_mkdir(lil_t lil, size_t argc, lil_value_t* argv)
+{
+	char** sargv = NULL;
+	lil_value_t r = NULL;
+	char* rv;
+	size_t i;
+	if (argc == 0) return NULL;
+	conv_argv(&argc,argv,&sargv,NULL);
+	do_mkdir(argc, (char**)sargv);
+	free(sargv);
+	return NULL;
+}
+
+static LILCALLBACK lil_value_t fnc_rmdir(lil_t lil, size_t argc, lil_value_t* argv)
+{
+	char** sargv = NULL;
+	lil_value_t r = NULL;
+	char* rv;
+	size_t i;
+	if (argc == 0) return NULL;
+	conv_argv(&argc,argv,&sargv,NULL);
+	do_rmdir(argc, (char**)sargv);
 	free(sargv);
 	return NULL;
 }
@@ -446,6 +597,8 @@ static LILCALLBACK lil_value_t fnc_readline(lil_t lil, size_t argc, lil_value_t*
 	return retval;
 }
 
+/* End of glue functions */
+
 static int repl(void)
 {
 	char buffer[16384];
@@ -457,10 +610,16 @@ static int repl(void)
 	lil_register(lil, "lilpath", fnc_lilpath);
 	lil_register(lil, "getcwd", fnc_getcwd);
 	lil_register(lil, "chdir", fnc_chdir);
+	lil_register(lil, "unlink", fnc_unlink);
+	lil_register(lil, "renamefile", fnc_renamefile);
+	lil_register(lil, "copyfile", fnc_copyfile);
+	lil_register(lil, "dirlist", fnc_dirlist);
+	lil_register(lil, "mkdir", fnc_mkdir);
+	lil_register(lil, "rmdir", fnc_rmdir);
 	lil_register(lil, "specialdir", fnc_specialdir);
-	lil_register(lil, "readline", fnc_readline);
 	lil_register(lil, "exec", fnc_exec);
 	lil_register(lil, "shellopen", fnc_shellopen);
+	lil_register(lil, "readline", fnc_readline);
 	printf("Little Interpreted Language Interactive Shell\n");
 	lil_callback(lil, LIL_CALLBACK_EXIT, (lil_callback_proc_t)do_exit);
 	while (running) {
@@ -501,6 +660,12 @@ static int nonint(int argc, const char* argv[])
 	lil_register(lil, "lilpath", fnc_lilpath);
 	lil_register(lil, "getcwd", fnc_getcwd);
 	lil_register(lil, "chdir", fnc_chdir);
+	lil_register(lil, "unlink", fnc_unlink);
+	lil_register(lil, "renamefile", fnc_renamefile);
+	lil_register(lil, "copyfile", fnc_copyfile);
+	lil_register(lil, "dirlist", fnc_dirlist);
+	lil_register(lil, "mkdir", fnc_mkdir);
+	lil_register(lil, "rmdir", fnc_rmdir);
 	lil_register(lil, "exec", fnc_exec);
 	lil_register(lil, "shellopen", fnc_shellopen);
 	lil_register(lil, "specialdir", fnc_specialdir);
