@@ -47,7 +47,7 @@
 				StringPooling="false"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				SmallerTypeCheck="true"
+				SmallerTypeCheck="false"
 				RuntimeLibrary="1"
 				EnableEnhancedInstructionSet="0"
 				TreatWChar_tAsBuiltInType="true"

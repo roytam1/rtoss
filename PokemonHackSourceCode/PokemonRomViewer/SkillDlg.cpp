@@ -112,7 +112,8 @@ void CSkillDlg::SetSkillListItem(WORD wIndex)
 	pSkill = rom.GetSkillListEntry(wSkill);
 
 	// 属性
-	m_ctrlSkillList.SetItemText(wIndex, 2, szTypes[pSkill->bType]);
+	szText.Format(_T("0x%02X"), (DWORD)(pSkill->bType));
+	m_ctrlSkillList.SetItemText(wIndex, 2, pSkill->bType < dwTypesCount ? szTypes[pSkill->bType] : szText);
 
 	// 威力
 	szText.Format(_T("%lu"), (DWORD)(pSkill->bPower));
@@ -135,8 +136,9 @@ void CSkillDlg::SetSkillListItem(WORD wIndex)
 	m_ctrlSkillList.SetItemText(wIndex, 7, szText);
 
 	// 对象
+	szText.Format(_T("0x%02X"), (DWORD)(pSkill->bTargetType));
 	dwTargetTypeIndex = GetTargetTypeIndex(pSkill->bTargetType);
-	m_ctrlSkillList.SetItemText(wIndex, 8, rgSkillTargetTypes[dwTargetTypeIndex].szName);
+	m_ctrlSkillList.SetItemText(wIndex, 8, dwTargetTypeIndex < dwSkillTargetTypesCount ? rgSkillTargetTypes[dwTargetTypeIndex].szName : szText);
 
 	// 优先度
 	szText.Format(_T("%li"), (LONG)(pSkill->nPriority));
