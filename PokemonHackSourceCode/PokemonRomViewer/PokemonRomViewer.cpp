@@ -328,11 +328,15 @@ BOOL CPokemonRomViewerApp::InitInstance()
 
 	// initialize
 	if(bResult)
+	{
 		bResult = CreateDialogs();
+	}
 
 	#ifndef _DEBUG
 	if(bResult)
+	{
 		bResult = ReadStringLists();
+	}
 	#endif
 
 	if(bResult)
@@ -343,14 +347,20 @@ BOOL CPokemonRomViewerApp::InitInstance()
 
 	#ifdef _DEBUG
 	if(bResult)
+	{
 		bResult = ReadStringLists();
+	}
 	#endif
 
 	if(bResult)
+	{
 		ApplyConfig(TRUE, TRUE);
+	}
 
 	if(!bResult)
+	{
 		AfxMessageBox(IDS_ERR_INIT);
+	}
 
 	return bResult;
 }
@@ -412,11 +422,15 @@ BOOL CPokemonRomViewerApp::ReadStringLists()
 		/////////////////////////////////////////
 		cfg.pBreedNameList = new StringEntry[BREED_COUNT];
 		if(!cfg.pBreedNameList)
+		{
 			throw 0;
+		}
 
 		bResult = sr.BatchReadString(_T("BreedNameList.txt"), cfg.pBreedNameList, BREED_COUNT);
 		if(!bResult)
+		{
 			throw 0;
+		}
 
 		#ifdef _DEBUG
 		m_dlgWait.IncStep();
@@ -425,11 +439,15 @@ BOOL CPokemonRomViewerApp::ReadStringLists()
 		/////////////////////////////////////////
 		cfg.pSkillNameList = new StringEntry[SKILL_COUNT];
 		if(!cfg.pSkillNameList)
+		{
 			throw 0;
+		}
 
 		bResult = sr.BatchReadString(_T("SkillNameList.txt"), cfg.pSkillNameList, SKILL_COUNT);
 		if(!bResult)
+		{
 			throw 0;
+		}
 
 		#ifdef _DEBUG
 		m_dlgWait.IncStep();
@@ -438,11 +456,15 @@ BOOL CPokemonRomViewerApp::ReadStringLists()
 		/////////////////////////////////////////
 		cfg.pSkillEffList = new StringEntry[SKILL_EFFECT_COUNT];
 		if(!cfg.pSkillEffList)
+		{
 			throw 0;
+		}
 
 		bResult = sr.BatchReadString(_T("SkillEffList.txt"), cfg.pSkillEffList, SKILL_EFFECT_COUNT);
 		if(!bResult)
+		{
 			throw 0;
+		}
 
 		#ifdef _DEBUG
 		m_dlgWait.IncStep();
@@ -451,11 +473,15 @@ BOOL CPokemonRomViewerApp::ReadStringLists()
 		/////////////////////////////////////////
 		cfg.pSkillSpecList = new StringEntry[SKILL_COUNT];
 		if(!cfg.pSkillSpecList)
+		{
 			throw 0;
+		}
 
 		bResult = sr.BatchReadString(_T("SkillSpecList.txt"), cfg.pSkillSpecList, SKILL_COUNT);
 		if(!bResult)
+		{
 			throw 0;
+		}
 
 		#ifdef _DEBUG
 		m_dlgWait.IncStep();
@@ -464,11 +490,15 @@ BOOL CPokemonRomViewerApp::ReadStringLists()
 		/////////////////////////////////////////
 		cfg.pItemNameList = new StringEntry[ITEM_COUNT];
 		if(!cfg.pItemNameList)
+		{
 			throw 0;
+		}
 
 		bResult = sr.BatchReadString(_T("ItemNameList.txt"), cfg.pItemNameList, ITEM_COUNT);
 		if(!bResult)
+		{
 			throw 0;
+		}
 
 		#ifdef _DEBUG
 		m_dlgWait.IncStep();
@@ -477,11 +507,15 @@ BOOL CPokemonRomViewerApp::ReadStringLists()
 		/////////////////////////////////////////
 		cfg.pItemDescList = new StringEntry[ITEM_COUNT];
 		if(!cfg.pItemDescList)
+		{
 			throw 0;
+		}
 
 		bResult = sr.BatchReadString(_T("ItemDescList.txt"), cfg.pItemDescList, ITEM_COUNT);
 		if(!bResult)
+		{
 			throw 0;
+		}
 
 		#ifdef _DEBUG
 		m_dlgWait.IncStep();
@@ -490,11 +524,15 @@ BOOL CPokemonRomViewerApp::ReadStringLists()
 		/////////////////////////////////////////
 		cfg.pSpecNameList = new StringEntry[SPEC_COUNT];
 		if(!cfg.pSpecNameList)
+		{
 			throw 0;
+		}
 
 		bResult = sr.BatchReadString(_T("SpecNameList.txt"), cfg.pSpecNameList, SPEC_COUNT);
 		if(!bResult)
+		{
 			throw 0;
+		}
 
 		#ifdef _DEBUG
 		m_dlgWait.IncStep();
@@ -503,11 +541,15 @@ BOOL CPokemonRomViewerApp::ReadStringLists()
 		/////////////////////////////////////////
 		cfg.pSpecDescList = new StringEntry[SPEC_COUNT];
 		if(!cfg.pSpecDescList)
+		{
 			throw 0;
+		}
 
 		bResult = sr.BatchReadString(_T("SpecDescList.txt"), cfg.pSpecDescList, SPEC_COUNT);
 		if(!bResult)
+		{
 			throw 0;
+		}
 
 		#ifdef _DEBUG
 		m_dlgWait.IncStep();
@@ -516,11 +558,15 @@ BOOL CPokemonRomViewerApp::ReadStringLists()
 		/////////////////////////////////////////
 		cfg.pEncNameList = new StringEntry[ENC_COUNT];
 		if(!cfg.pEncNameList)
+		{
 			throw 0;
+		}
 
 		bResult = sr.BatchReadString(_T("EncNameList.txt"), cfg.pEncNameList, ENC_COUNT);
 		if(!bResult)
+		{
 			throw 0;
+		}
 
 		#ifdef _DEBUG
 		m_dlgWait.IncStep();
