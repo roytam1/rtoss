@@ -1,0 +1,68 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProcessHandler", "ProcessHandler\ProcessHandler.vcproj", "{095E88CC-325E-451C-9638-77BA068B841E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VisualBoyHandler", "VisualBoyHandler\VisualBoyHandler.vcproj", "{4171D1A4-A766-4327-A81B-C935B39D49E3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{095E88CC-325E-451C-9638-77BA068B841E} = {095E88CC-325E-451C-9638-77BA068B841E}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PokemonCodec", "PokemonCodec\PokemonCodec.vcproj", "{897A4131-EC22-41EC-A812-E6A07E71AACC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PokemonMemHack", "PokemonMemHack\PokemonMemHack.vcproj", "{5EDC5D46-F35E-413E-A794-3A650E239792}"
+	ProjectSection(ProjectDependencies) = postProject
+		{897A4131-EC22-41EC-A812-E6A07E71AACC} = {897A4131-EC22-41EC-A812-E6A07E71AACC}
+		{4171D1A4-A766-4327-A81B-C935B39D49E3} = {4171D1A4-A766-4327-A81B-C935B39D49E3}
+		{D71AD4C8-9511-4101-8039-17A1AF8954ED} = {D71AD4C8-9511-4101-8039-17A1AF8954ED}
+		{095E88CC-325E-451C-9638-77BA068B841E} = {095E88CC-325E-451C-9638-77BA068B841E}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PokemonRom", "PokemonRom\PokemonRom.vcproj", "{D71AD4C8-9511-4101-8039-17A1AF8954ED}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4171D1A4-A766-4327-A81B-C935B39D49E3} = {4171D1A4-A766-4327-A81B-C935B39D49E3}
+		{095E88CC-325E-451C-9638-77BA068B841E} = {095E88CC-325E-451C-9638-77BA068B841E}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PokemonRomViewer", "PokemonRomViewer\PokemonRomViewer.vcproj", "{67276B19-1E55-477A-96DC-46F1FE6528AD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4171D1A4-A766-4327-A81B-C935B39D49E3} = {4171D1A4-A766-4327-A81B-C935B39D49E3}
+		{D71AD4C8-9511-4101-8039-17A1AF8954ED} = {D71AD4C8-9511-4101-8039-17A1AF8954ED}
+		{095E88CC-325E-451C-9638-77BA068B841E} = {095E88CC-325E-451C-9638-77BA068B841E}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{095E88CC-325E-451C-9638-77BA068B841E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{095E88CC-325E-451C-9638-77BA068B841E}.Debug|Win32.Build.0 = Debug|Win32
+		{095E88CC-325E-451C-9638-77BA068B841E}.Release|Win32.ActiveCfg = Release|Win32
+		{095E88CC-325E-451C-9638-77BA068B841E}.Release|Win32.Build.0 = Release|Win32
+		{4171D1A4-A766-4327-A81B-C935B39D49E3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4171D1A4-A766-4327-A81B-C935B39D49E3}.Debug|Win32.Build.0 = Debug|Win32
+		{4171D1A4-A766-4327-A81B-C935B39D49E3}.Release|Win32.ActiveCfg = Release|Win32
+		{4171D1A4-A766-4327-A81B-C935B39D49E3}.Release|Win32.Build.0 = Release|Win32
+		{897A4131-EC22-41EC-A812-E6A07E71AACC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{897A4131-EC22-41EC-A812-E6A07E71AACC}.Debug|Win32.Build.0 = Debug|Win32
+		{897A4131-EC22-41EC-A812-E6A07E71AACC}.Release|Win32.ActiveCfg = Release|Win32
+		{897A4131-EC22-41EC-A812-E6A07E71AACC}.Release|Win32.Build.0 = Release|Win32
+		{5EDC5D46-F35E-413E-A794-3A650E239792}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5EDC5D46-F35E-413E-A794-3A650E239792}.Debug|Win32.Build.0 = Debug|Win32
+		{5EDC5D46-F35E-413E-A794-3A650E239792}.Release|Win32.ActiveCfg = Release|Win32
+		{5EDC5D46-F35E-413E-A794-3A650E239792}.Release|Win32.Build.0 = Release|Win32
+		{D71AD4C8-9511-4101-8039-17A1AF8954ED}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D71AD4C8-9511-4101-8039-17A1AF8954ED}.Debug|Win32.Build.0 = Debug|Win32
+		{D71AD4C8-9511-4101-8039-17A1AF8954ED}.Release|Win32.ActiveCfg = Release|Win32
+		{D71AD4C8-9511-4101-8039-17A1AF8954ED}.Release|Win32.Build.0 = Release|Win32
+		{67276B19-1E55-477A-96DC-46F1FE6528AD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{67276B19-1E55-477A-96DC-46F1FE6528AD}.Debug|Win32.Build.0 = Debug|Win32
+		{67276B19-1E55-477A-96DC-46F1FE6528AD}.Release|Win32.ActiveCfg = Release|Win32
+		{67276B19-1E55-477A-96DC-46F1FE6528AD}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
