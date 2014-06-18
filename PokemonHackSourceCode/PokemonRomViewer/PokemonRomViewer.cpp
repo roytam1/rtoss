@@ -135,7 +135,10 @@ VOID FormatSkillDesc(WORD wSkill, CString &szDesc)
 	if(pSkill)
 	{
 		// type
-		szTemp.Format(_T("属性：%s"), szTypes[pSkill->bType]);
+		if(pSkill->bType < dwTypesCount)
+			szTemp.Format(_T("属性：%s"), szTypes[pSkill->bType]);
+		else
+			szTemp.Format(_T("属性：？？？(0x%02x)"), pSkill->bType);
 		szDesc = szDesc + szTemp;
 
 		// target
@@ -143,7 +146,7 @@ VOID FormatSkillDesc(WORD wSkill, CString &szDesc)
 		if(dwTargetTypeIndex < dwSkillTargetTypesCount)
 			szTemp.Format(_T("对象：%s"), rgSkillTargetTypes[dwTargetTypeIndex].szName);
 		else
-			szTemp.Format(_T("对象：？？？"));
+			szTemp.Format(_T("对象：？？？(0x%02x)"), pSkill->bTargetType);
 		szDesc = szDesc + _T("\r\n") + szTemp;
 
 		// power
