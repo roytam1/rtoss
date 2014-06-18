@@ -139,6 +139,21 @@ BOOL CALLBACK CVisualBoyHandler::EnumVBAWindowProc(HWND hWnd, LPARAM lParam)
 				bContinue = FALSE;
 			}
 		}
+		/* VBA-M */
+		else if(lstrncmp(szWindowName+1, szName, cchNameLength - 1) == 0)
+		{
+			if(cchWindowName >= cchNameLength)
+			{
+				if(szWindowName[cchNameLength] == TEXT('-'))
+				{
+					bContinue = FALSE;
+				}
+			}
+			else
+			{
+				bContinue = FALSE;
+			}
+		}
 	}
 
 	if(bContinue == FALSE)
