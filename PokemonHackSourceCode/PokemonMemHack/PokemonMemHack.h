@@ -13,7 +13,8 @@
 #define AREA_COUNT	(0x100)	// (256)
 #define ITEM_COUNT	(0x179)	// (375)
 #define PS_COUNT	(25)
-#define SPEC_COUNT	(0x4E)	// (78)
+//#define SPEC_COUNT	(0x4E)	// (78)
+#define SPEC_COUNT	(0x8F)	// (143)
 
 /////////////////////////////////////////////////
 #include "resource.h"		// Ö÷·ûºÅ
