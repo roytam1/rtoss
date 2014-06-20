@@ -152,10 +152,53 @@ void CMemPmSkillPage::OnChangeUILang(VOID)
 void CMemPmSkillPage::SetSkillDesc(UINT uID)
 {
 	static WORD	wCurSkill = -1;
+	SkillListEntry * pSkill;
+	CString szDesc, szTemp;
 
 	if(uID == -1 && wCurSkill < SKILL_COUNT)
 	{
-		SetDlgItemText(IDC_SKILL_DESC, cfg.pSkillDescList[wCurSkill].rgszText[cfg.dwLang]);
+		pSkill = g_MemRom.GetSkillListEntry(wCurSkill);
+		szDesc.Format(_T("%s\n"),cfg.pSkillDescList[wCurSkill].rgszText[cfg.dwLang]);
+		if(pSkill)
+		{
+			// type
+			if(pSkill->bType < dwTypesCount)
+				szTemp.Format(_T("属性：%s"), szTypes[pSkill->bType]);
+			else
+				szTemp.Format(_T("属性：？？？(0x%02x)"), pSkill->bType);
+			szDesc = szDesc + szTemp;
+
+			// power
+			if(pSkill->bPower > 1)
+				szTemp.Format(_T("威力：%lu"), pSkill->bPower);
+			else
+				szTemp.Format(_T("威力："));
+			szDesc = szDesc + _T(" ") + szTemp;
+
+			// acc
+			if(pSkill->bAccuracy > 0)
+				szTemp.Format(_T("命中：%lu%%"), pSkill->bAccuracy);
+			else
+				szTemp.Format(_T("命中：必中"));
+			szDesc = szDesc + _T(" ") + szTemp;
+
+			// pp
+			szTemp.Format(_T("ＰＰ：%lu"), pSkill->bPP);
+			szDesc = szDesc + _T(" ") + szTemp;
+
+			// priority
+			szTemp.Format(_T("优先：%li"), (LONG)(pSkill->nPriority));
+			szDesc = szDesc + _T(" ") + szTemp;
+
+			// effect ratio
+			if(pSkill->bPower > 1)
+				szTemp.Format(_T("效果几率：%lu%%"), pSkill->bEffectRatio);
+			else
+				szTemp.Format(_T("效果几率：必然发动"));
+			szDesc = szDesc + _T(" ") + szTemp;
+
+		}
+		SetDlgItemText(IDC_SKILL_DESC, szDesc);
 	}
 	else
 	{
@@ -189,7 +232,48 @@ void CMemPmSkillPage::SetSkillDesc(UINT uID)
 		if(wSkill != wCurSkill && wSkill < SKILL_COUNT)
 		{
 			wCurSkill = wSkill;
-			SetDlgItemText(IDC_SKILL_DESC, cfg.pSkillDescList[wCurSkill].rgszText[cfg.dwLang]);
+			pSkill = g_MemRom.GetSkillListEntry(wCurSkill);
+			szDesc.Format(_T("%s\n"),cfg.pSkillDescList[wCurSkill].rgszText[cfg.dwLang]);
+			if(pSkill)
+			{
+				// type
+				if(pSkill->bType < dwTypesCount)
+					szTemp.Format(_T("属性：%s"), szTypes[pSkill->bType]);
+				else
+					szTemp.Format(_T("属性：？？？(0x%02x)"), pSkill->bType);
+				szDesc = szDesc + szTemp;
+
+				// power
+				if(pSkill->bPower > 1)
+					szTemp.Format(_T("威力：%lu"), pSkill->bPower);
+				else
+					szTemp.Format(_T("威力：-"));
+				szDesc = szDesc + _T(" ") + szTemp;
+
+				// acc
+				if(pSkill->bAccuracy > 0)
+					szTemp.Format(_T("命中：%lu%%"), pSkill->bAccuracy);
+				else
+					szTemp.Format(_T("命中：必中"));
+				szDesc = szDesc + _T(" ") + szTemp;
+
+				// pp
+				szTemp.Format(_T("ＰＰ：%lu"), pSkill->bPP);
+				szDesc = szDesc + _T(" ") + szTemp;
+
+				// priority
+				szTemp.Format(_T("优先：%li"), (LONG)(pSkill->nPriority));
+				szDesc = szDesc + _T(" ") + szTemp;
+
+				// effect ratio
+				if(pSkill->bPower > 1)
+					szTemp.Format(_T("效果几率：%lu%%"), pSkill->bEffectRatio);
+				else
+					szTemp.Format(_T("效果几率：必然发动"));
+				szDesc = szDesc + _T(" ") + szTemp;
+
+			}
+			SetDlgItemText(IDC_SKILL_DESC, szDesc);
 		}
 	}
 }
