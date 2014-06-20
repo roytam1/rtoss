@@ -21,6 +21,11 @@ public:
 protected:
 	CListBox	m_ctrlItemList[2];
 
+	CFont		m_Font;
+	CListBox *	m_ListBox;
+	CStatic *	m_Static;
+
+	virtual BOOL OnInitDialog();
 	afx_msg void SetItemDesc(UINT uID);
 
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö

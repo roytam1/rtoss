@@ -17,6 +17,40 @@ CBreedSpecPage::~CBreedSpecPage()
 {
 }
 
+BOOL CBreedSpecPage::OnInitDialog()
+{
+	CBreedTabPage::OnInitDialog();
+
+	// TODO:  在此添加额外的初始化
+	m_Font.CreateFont(
+	   GUI_FONT_HEIGHT,           // nHeight
+	   0,                         // nWidth
+	   0,                         // nEscapement
+	   0,                         // nOrientation
+	   FW_NORMAL,                 // nWeight
+	   FALSE,                     // bItalic
+	   FALSE,                     // bUnderline
+	   0,                         // cStrikeOut
+	   ANSI_CHARSET,              // nCharSet
+	   OUT_DEFAULT_PRECIS,        // nOutPrecision
+	   CLIP_DEFAULT_PRECIS,       // nClipPrecision
+	   DEFAULT_QUALITY,           // nQuality
+	   DEFAULT_PITCH | FF_SWISS,  // nPitchAndFamily
+	   _T(GUI_FONT_NAME));        // lpszFacename 
+
+	m_Static = (CStatic *) GetDlgItem(IDC_BRD_SPEC_DESC0);
+	m_Static->SetFont(&m_Font);
+	m_Static = (CStatic *) GetDlgItem(IDC_BRD_SPEC_DESC1);
+	m_Static->SetFont(&m_Font);
+	m_ComboBox = (CComboBox *) GetDlgItem(IDC_BRD_SPEC_LIST0);
+	m_ComboBox->SetFont(&m_Font);
+	m_ComboBox = (CComboBox *) GetDlgItem(IDC_BRD_SPEC_LIST1);
+	m_ComboBox->SetFont(&m_Font);
+
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// 异常: OCX 属性页应返回 FALSE
+}
+
 void CBreedSpecPage::DoDataExchange(CDataExchange* pDX)
 {
 	CBreedTabPage::DoDataExchange(pDX);

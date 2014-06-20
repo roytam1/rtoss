@@ -22,9 +22,14 @@ protected:
 	CComboBox	m_ctrlExpTypeList;
 	CComboBox	m_ctrlSpecList[2];
 
+	CFont		m_Font;
+	CStatic *		m_Static;
+	CComboBox *		m_ComboBox;
+
 	void SetSpecDesc(DWORD dwIndex);
 
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
+	virtual BOOL OnInitDialog();
 	afx_msg void OnCbnSelchangeBrdSpecList0();
 	afx_msg void OnCbnSelchangeBrdSpecList1();
 	DECLARE_MESSAGE_MAP()

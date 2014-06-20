@@ -38,6 +38,7 @@ COLORREF	g_rgBackClrTable[] =
 	RGB(112,56,248),	// 10、ドラゴン
 	RGB(112,88,112),	// 11、あく
 };
+DWORD	g_dwBackClrCount = sizeof(g_rgBackClrTable) / sizeof(g_rgBackClrTable[0]);
 
 COLORREF	g_rgForeClrTable[] =
 {
@@ -60,6 +61,7 @@ COLORREF	g_rgForeClrTable[] =
 	RGB(255,255,255),	// 10、ドラゴン
 	RGB(255,255,255),	// 11、あく
 };
+DWORD	g_dwForeClrCount = sizeof(g_rgForeClrTable) / sizeof(g_rgForeClrTable[0]);
 
 // CPokemonMemHackApp
 

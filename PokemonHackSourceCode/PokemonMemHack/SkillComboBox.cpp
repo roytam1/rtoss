@@ -43,6 +43,12 @@ void CSkillComboBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	ASSERT(lpDrawItemStruct->CtlType == ODT_COMBOBOX);
 	ASSERT(g_MemRom.m_bOpened);
 
+	COLORREF	rgDefClrTable[] =
+	{
+		RGB(255,255,255),	// Bg
+		RGB(0,0,0),		// Fg
+	};
+
 	WORD	wSkill = (WORD)(lpDrawItemStruct->itemData);
 	if(wSkill >= SKILL_COUNT)
 		return;
@@ -61,11 +67,11 @@ void CSkillComboBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	dc.Attach(lpDrawItemStruct->hDC);
 
 	// set text color
-	clrForeOld = dc.SetTextColor(g_rgForeClrTable[pSkill->bType]);
-	clrBackOld = dc.SetBkColor(g_rgBackClrTable[pSkill->bType]);
+	clrForeOld = dc.SetTextColor(pSkill->bType < g_dwForeClrCount ? g_rgForeClrTable[pSkill->bType] : rgDefClrTable[1]);
+	clrBackOld = dc.SetBkColor(pSkill->bType < g_dwBackClrCount ? g_rgBackClrTable[pSkill->bType] : rgDefClrTable[0]);
 
 	// draw rectangle
-	dc.FillSolidRect(&rect, g_rgBackClrTable[pSkill->bType]);
+	dc.FillSolidRect(&rect, pSkill->bType < g_dwBackClrCount ? g_rgBackClrTable[pSkill->bType] : rgDefClrTable[0]);
 	if(lpDrawItemStruct->itemState & ODS_SELECTED)
 		dc.DrawEdge(&rect, EDGE_SUNKEN, BF_ADJUST | BF_RECT);
 	else

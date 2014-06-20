@@ -24,6 +24,9 @@
 #include "PokemonMemHackCore.h"
 #include "PokemonMemHackDlg.h"
 
+#define GUI_FONT_NAME	"MS Gothic"
+#define GUI_FONT_HEIGHT	12
+
 enum { ui_count_none=0, ui_count_dec=1, ui_count_hex=2 };
 
 struct ConfigStruct
@@ -70,3 +73,5 @@ extern CPokemonRom g_MemRom;
 
 extern COLORREF	g_rgBackClrTable[];
 extern COLORREF	g_rgForeClrTable[];
+extern DWORD	g_dwBackClrCount;
+extern DWORD	g_dwForeClrCount;
