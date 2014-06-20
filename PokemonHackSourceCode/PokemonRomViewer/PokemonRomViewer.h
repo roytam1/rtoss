@@ -19,6 +19,9 @@
 
 #define APP_DLG_COUNT	(6)
 
+#define GUI_FONT_NAME	"MS Gothic"
+#define GUI_FONT_HEIGHT	12
+
 /////////////////////////////////////////////////
 enum { ui_count_none=0, ui_count_dec=1, ui_count_hex=2 };
 
