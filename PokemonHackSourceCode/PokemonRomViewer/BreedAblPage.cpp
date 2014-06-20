@@ -169,7 +169,14 @@ void CBreedAblPage::OnBnClickedExportBrd()
 		L"¥¨¥¹¥Ñ©`",	// 0E
 		L"¤³¤ª¤ê",		// 0F
 		L"¥É¥é¥´¥ó",	// 10
-		L"¤¢¤¯"			// 11
+		L"¤¢¤¯",		// 11
+		L"0x12",		// 12
+		L"0x13",		// 13
+		L"0x14",		// 14
+		L"0x15",		// 15
+		L"0x16",		// 16
+		L"0x17",		// 17
+		L"0x18"			// 18
 	};
 
 	static LPCTSTR szEggGroups[] =
@@ -823,7 +830,14 @@ void CBreedAblPage::OnBnClickedExportSkill()
 		L"¥¨¥¹¥Ñ©`",	// 0E
 		L"¤³¤ª¤ê",		// 0F
 		L"¥É¥é¥´¥ó",	// 10
-		L"¤¢¤¯"			// 11
+		L"¤¢¤¯",		// 11
+		L"0x12",		// 12
+		L"0x13",		// 13
+		L"0x14",		// 14
+		L"0x15",		// 15
+		L"0x16",		// 16
+		L"0x17",		// 17
+		L"0x18"			// 18
 	};
 
 	static LPCTSTR szTargets[] =
