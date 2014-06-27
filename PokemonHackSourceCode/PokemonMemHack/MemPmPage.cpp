@@ -294,6 +294,10 @@ void CMemPmPage::OnBnClickedRefresh()
 				CPokemonRom::rom_breed_list |
 				CPokemonRom::rom_skill_list |
 				CPokemonRom::rom_experience_list |
+				CPokemonRom::rom_lvlup_learn_list |
+				CPokemonRom::rom_derive_learn_list |
+				CPokemonRom::rom_machine_learn_list |
+				CPokemonRom::rom_machine_skill_list |
 				CPokemonRom::rom_tiny_image_list))
 	{
 		AfxMessageBox(IDS_ERR_MEM_ACCESS, MB_OK | MB_ICONERROR);

@@ -541,10 +541,13 @@ void CMemPmBasicPage::SetLevelList()
 		{
 			m_ctrlLevelList.ResetContent();
 			pdwExpList = g_MemRom.GetExpList(bExpType);
-			for(bLevel = 0; bLevel < EXP_COUNT; ++bLevel)
+			if(pdwExpList)
 			{
-				szText.Format(_T("%-3lu:%lu"), (DWORD)(bLevel), pdwExpList[bLevel]);
-				m_ctrlLevelList.AddString(szText);
+				for(bLevel = 0; bLevel < EXP_COUNT; ++bLevel)
+				{
+					szText.Format(_T("%-3lu:%lu"), (DWORD)(bLevel), pdwExpList[bLevel]);
+					m_ctrlLevelList.AddString(szText);
+				}
 			}
 		}
 
@@ -571,12 +574,15 @@ void CMemPmBasicPage::SetLevel()
 		pdwExpList = g_MemRom.GetExpList(bExpType);
 		dwExp = m_ppc->GetExp();
 
-		for(bLevel = 1; bLevel < EXP_COUNT; ++bLevel)
+		if(pdwExpList)
 		{
-			if(dwExp < pdwExpList[bLevel])
-				break;
+			for(bLevel = 1; bLevel < EXP_COUNT; ++bLevel)
+			{
+				if(dwExp < pdwExpList[bLevel])
+					break;
+			}
+			m_ctrlLevelList.SetCurSel(bLevel - 1);
 		}
-		m_ctrlLevelList.SetCurSel(bLevel - 1);
 	}
 }
 

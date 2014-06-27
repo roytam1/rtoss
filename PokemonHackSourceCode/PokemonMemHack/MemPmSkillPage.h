@@ -26,6 +26,7 @@ protected:
 	CComboBox	m_ctrlPPBoostList[4];
 	//CListBox	m_ctrlLegalSkillList;
 	CSkillListBox m_ctrlLegalSkillList;
+	BOOL	m_bROMLegelSkill;
 
 	void SetSkillLists(BOOL bChangeLang, BOOL bNeedSort);
 	void SetLegalSkillList(WORD wBreed);
@@ -38,5 +39,6 @@ protected:
 	afx_msg void OnStnDblclickPpBoostAll();
 	afx_msg void OnLbnSelchangeLegalSkillList();
 	afx_msg void OnStnDblclickMemPpMax();
+	afx_msg void OnStnDblclickLegelSkillLabel();
 	DECLARE_MESSAGE_MAP()
 };
