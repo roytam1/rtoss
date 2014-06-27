@@ -404,14 +404,6 @@ void CMemPmSkillPage::OnStnDblclickLegelSkillLabel()
 #endif
 
 		m_ctrlLegalSkillList.ResetContent();
-		for(wIndex = 0; wIndex < MACHINE_COUNT; ++wIndex)
-		{
-			wSkill = m_pMachineSkillList[wIndex];
-			if(GetBit(m_pMachineLearnList, wIndex))
-			{
-				m_ctrlLegalSkillList.AddString((LPCTSTR)(wSkill));
-			}
-		}
 
 		for(wIndex = 0; wIndex < m_dwDeriveLearnCount; ++wIndex)
 		{
@@ -424,6 +416,16 @@ void CMemPmSkillPage::OnStnDblclickLegelSkillLabel()
 			wSkill = m_pLvlupLearnList[wIndex].wSkill;
 			m_ctrlLegalSkillList.AddString((LPCTSTR)(wSkill));
 		}
+
+		for(wIndex = 0; wIndex < MACHINE_COUNT; ++wIndex)
+		{
+			wSkill = m_pMachineSkillList[wIndex];
+			if(GetBit(m_pMachineLearnList, wIndex))
+			{
+				m_ctrlLegalSkillList.AddString((LPCTSTR)(wSkill));
+			}
+		}
+
 		m_bROMLegelSkill = true;
 	}
 	else
