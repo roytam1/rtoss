@@ -369,7 +369,6 @@ void CMemPmSkillPage::OnStnDblclickLegelSkillLabel()
 		m_pLvlupLearnList = g_MemRom.GetLvlupLearnList(wBreed);
 		m_dwLvlupLearnCount = g_MemRom.GetLvlupLearnListEntryCount(wBreed);
 
-
 #if 0
 		CString szDbg;
 		CString szTmp;
