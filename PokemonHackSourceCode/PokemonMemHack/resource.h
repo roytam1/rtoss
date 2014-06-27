@@ -82,6 +82,7 @@
 #define IDC_MEM_PP_BOOST_ALL            1184
 #define IDC_SKILL_DESC                  1185
 #define IDC_LEGAL_SKILL_LIST            1186
+#define IDC_LEGAL_SKILL_LABEL           1187
 #define IDC_POKEBALL_LIST               1190
 #define IDC_POKERUS                     1191
 #define IDC_BLACK_POINT                 1192

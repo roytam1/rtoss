@@ -62,6 +62,8 @@ BEGIN_MESSAGE_MAP(CMemPmSkillPage, CMemPmTabPage)
 
 	ON_CONTROL_RANGE(STN_DBLCLK, IDC_MEM_SKILL_NAME0, IDC_MEM_SKILL_NAME3, &CMemPmSkillPage::SetSkillFromLegalSkillList)
 	ON_STN_DBLCLK(IDC_MEM_PP_MAX, &CMemPmSkillPage::OnStnDblclickMemPpMax)
+
+	ON_STN_DBLCLK(IDC_LEGAL_SKILL_LABEL, &CMemPmSkillPage::OnStnDblclickLegelSkillLabel)
 END_MESSAGE_MAP()
 
 
@@ -328,6 +330,108 @@ void CMemPmSkillPage::OnLbnSelchangeLegalSkillList()
 	SetSkillDesc(IDC_LEGAL_SKILL_LIST);
 }
 
+void CMemPmSkillPage::OnStnDblclickLegelSkillLabel()
+{
+	WORD	wBreed;
+
+	WORD *	m_pDeriveLearnList;
+	DWORD	m_dwDeriveLearnCount;
+
+	BYTE *	m_pMachineLearnList;
+	WORD *	m_pMachineSkillList;
+
+	LvlupLearnListEntry	*	m_pLvlupLearnList;
+	DWORD	m_dwLvlupLearnCount;
+
+	WORD	wSkill;
+	WORD	wIndex;
+
+
+	m_ppc = GetPokemonCodec();
+	if(m_ppc == NULL)
+		return;
+	wBreed = m_ppc->GetBreed();
+
+	if(!m_bROMLegelSkill)
+	{
+		if(g_MemRom.m_bOpened)
+			m_pMachineSkillList = g_MemRom.m_pMachineSkillList;
+		else
+			m_pMachineSkillList = NULL;
+		if(g_MemRom.m_bOpened && wBreed < BREED_COUNT)
+			m_pMachineLearnList = g_MemRom.GetMachineLearnList(wBreed);
+		else
+			m_pMachineLearnList = NULL;
+
+		m_pDeriveLearnList = g_MemRom.GetDeriveLearnList(wBreed);
+		m_dwDeriveLearnCount = g_MemRom.GetDeriveLearnListEntryCount(wBreed);
+
+		m_pLvlupLearnList = g_MemRom.GetLvlupLearnList(wBreed);
+		m_dwLvlupLearnCount = g_MemRom.GetLvlupLearnListEntryCount(wBreed);
+
+
+#if 0
+		CString szDbg;
+		CString szTmp;
+
+		for(wIndex = 0; wIndex < MACHINE_COUNT; ++wIndex)
+		{
+			wSkill = m_pMachineSkillList[wIndex];
+			if(GetBit(m_pMachineLearnList, wIndex))
+			{
+				szTmp.Format(_T("mskill=%d\n"),wSkill);
+				szDbg += szTmp;
+			}
+		}
+
+		for(wIndex = 0; wIndex < m_dwDeriveLearnCount; ++wIndex)
+		{
+			wSkill = m_pDeriveLearnList[wIndex];
+			szTmp.Format(_T("dskill=%d\n"),wSkill);
+			szDbg += szTmp;
+		}
+
+		for(wIndex = 0; wIndex < m_dwLvlupLearnCount; ++wIndex)
+		{
+			wSkill = m_pLvlupLearnList[wIndex].wSkill;
+			szTmp.Format(_T("lskill=%d\n"),wSkill);
+			szDbg += szTmp;
+		}
+
+		szTmp.Format(_T("breed=%d\n"),wBreed);
+		szDbg += szTmp;
+		MessageBox(szDbg,_T("debug"),MB_OK);
+#endif
+
+		m_ctrlLegalSkillList.ResetContent();
+		for(wIndex = 0; wIndex < MACHINE_COUNT; ++wIndex)
+		{
+			wSkill = m_pMachineSkillList[wIndex];
+			if(GetBit(m_pMachineLearnList, wIndex))
+			{
+				m_ctrlLegalSkillList.AddString((LPCTSTR)(wSkill));
+			}
+		}
+
+		for(wIndex = 0; wIndex < m_dwDeriveLearnCount; ++wIndex)
+		{
+			wSkill = m_pDeriveLearnList[wIndex];
+			m_ctrlLegalSkillList.AddString((LPCTSTR)(wSkill));
+		}
+
+		for(wIndex = 0; wIndex < m_dwLvlupLearnCount; ++wIndex)
+		{
+			wSkill = m_pLvlupLearnList[wIndex].wSkill;
+			m_ctrlLegalSkillList.AddString((LPCTSTR)(wSkill));
+		}
+		m_bROMLegelSkill = true;
+	}
+	else
+	{
+		SetLegalSkillList(wBreed);
+	}
+}
+
 void CMemPmSkillPage::SetSkillFromLegalSkillList(UINT uID)
 {
 	BYTE	bIndex = (BYTE)(uID - IDC_MEM_SKILL_NAME0);
@@ -404,6 +508,8 @@ void CMemPmSkillPage::SetLegalSkillList(WORD wBreed)
 {
 	INT		nCurSel;
 	WORD	wCurSkill = -1;
+
+	m_bROMLegelSkill = false;
 
 	if(wBreed >= BREED_COUNT)
 	{

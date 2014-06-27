@@ -393,7 +393,7 @@ void CEvoDlg::SetParam(DWORD dwIndex, BOOL bForceUpdate)
 	INT		iItemListShow, iParamShow;
 	BOOL	bBreedListEnable;
 
-	wEvoCond = m_pEvo[dwIndex].wCondition;
+	wEvoCond = m_pEvo[dwIndex].wCondition < dwEvoConditionsCount ? m_pEvo[dwIndex].wCondition : 0;
 	if(wEvoCond == 0)
 		bBreedListEnable = FALSE;
 	else
@@ -402,11 +402,6 @@ void CEvoDlg::SetParam(DWORD dwIndex, BOOL bForceUpdate)
 	pEvoCond = &(rgEvoConditions[wEvoCond]);
 	switch(pEvoCond->dwParamType)
 	{
-	case evo_none:
-		iParamShow = SW_HIDE;
-		iItemListShow = SW_HIDE;
-		break;
-
 	case evo_level:
 		iParamShow = SW_SHOW;
 		iItemListShow = SW_HIDE;
@@ -425,6 +420,12 @@ void CEvoDlg::SetParam(DWORD dwIndex, BOOL bForceUpdate)
 		wItemCount = rom.GetItemCount();
 		wItem = min(m_pEvo[dwIndex].wValue, wItemCount - 1);
 		m_ctrlEvoItemList[dwIndex].SetCurSel(wItem);
+		break;
+
+	case evo_none:
+	default:
+		iParamShow = SW_HIDE;
+		iItemListShow = SW_HIDE;
 		break;
 	}
 
