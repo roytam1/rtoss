@@ -55,6 +55,7 @@
 #define IDC_BB_SDEF                     1125
 #define IDC_BB_MAX                      1130
 #define IDC_BB_SUM                      1131
+#define IDC_BB_85                       1132
 #define IDC_AP_COOL                     1140
 #define IDC_AP_BEAUTIFUL                1141
 #define IDC_AP_CUTE                     1142

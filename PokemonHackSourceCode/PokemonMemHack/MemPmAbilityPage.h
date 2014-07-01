@@ -30,6 +30,7 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
 	afx_msg void OnBnClickedIndvMax();
 	afx_msg void OnBnClickedBbMax();
+	afx_msg void OnBnClickedBb85();
 	afx_msg void OnBnClickedApMax();
 	DECLARE_MESSAGE_MAP()
 };
