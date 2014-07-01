@@ -34,6 +34,7 @@ void CMemPmAbilityPage::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CMemPmAbilityPage, CMemPmTabPage)
 	ON_BN_CLICKED(IDC_INDV_MAX, OnBnClickedIndvMax)
+	ON_BN_CLICKED(IDC_BB_85, OnBnClickedBb85)
 	ON_BN_CLICKED(IDC_BB_MAX, OnBnClickedBbMax)
 	ON_BN_CLICKED(IDC_AP_MAX, OnBnClickedApMax)
 	ON_CONTROL_RANGE(EN_CHANGE, IDC_BB_HP, IDC_BB_SDEF, GetBB)
@@ -123,6 +124,21 @@ void CMemPmAbilityPage::OnBnClickedIndvMax()
 	{
 		m_ppc->SetMaxIndvAbilities();
 		TransData(TRUE);
+	}
+}
+
+void CMemPmAbilityPage::OnBnClickedBb85()
+{
+	BYTE	bIndex;
+	CString	szText;
+
+	if(m_ppc)
+	{
+		szText = _T("85");
+		for(bIndex = 0; bIndex < 6; ++bIndex)
+		{
+			SetDlgItemText(IDC_BB_HP + bIndex, szText);
+		}
 	}
 }
 
