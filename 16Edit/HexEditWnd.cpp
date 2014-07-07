@@ -92,6 +92,9 @@ void mymemcpy(void *dest, void *src, int count) {
 
 HexEditWnd::HexEditWnd() {
 	LOGFONT lf;
+	DWORD	fontHeight;
+	DWORD	fontQuality;
+	char	fontName[256];
 
 	hInst = GetModuleHandle(NULL);
 
@@ -119,11 +122,22 @@ HexEditWnd::HexEditWnd() {
 	CPathString::ForceEndBackslash( cInitialDir);
 	wsprintf(cIniPath, "%s"INI_NAME, cInitialDir);
 
+	fontHeight = GetPrivateProfileInt(INI_SECTION, "fh", 0, cIniPath);
+	fontQuality = GetPrivateProfileInt(INI_SECTION, "fq", 0, cIniPath);
+	GetPrivateProfileString(INI_SECTION, "fn", "", fontName, sizeof(fontName), cIniPath);
+
 	ZERO(lf);
-	lf.lfHeight     = DEF_FONT_HEIGHT;
-	lf.lfWidth      = DEF_FONT_WIDTH;
+	lf.lfHeight     = fontHeight ? -fontHeight : DEF_FONT_HEIGHT;
+	//lf.lfWidth      = DEF_FONT_WIDTH;
 	lf.lfWeight     = FW_LIGHT;
-	lstrcpy(lf.lfFaceName, "Courier New");
+	if(fontName[0])
+		lstrcpy(lf.lfFaceName, fontName);
+	else
+		lstrcpy(lf.lfFaceName, "Courier New");
+
+	if(fontQuality)
+		lf.lfQuality     = fontQuality;
+
 	hFont   = CreateFontIndirect(&lf);
 
 	lf.lfUnderline  = TRUE;
@@ -661,7 +675,7 @@ BOOL HexEditWnd::HESetFont(HFONT hf) {
 		goto Exit; // FAILURE
 
 	uFontHeight = tm.tmHeight;
-	uFontWidth  = tm.tmMaxCharWidth;
+	uFontWidth  = tm.tmAveCharWidth;
 
 	SendMessage(hMainWnd, WM_SETFONT, (WPARAM)HEdit.hFont, 0);
 
