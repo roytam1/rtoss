@@ -1,0 +1,416 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Neutral resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+#ifdef _WIN32
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(936)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_TOOLBAR             BITMAP  DISCARDABLE     "rsrc\\toolbar.bmp"
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,3,0
+ PRODUCTVERSION 1,0,3,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "Comments", "\0"
+            VALUE "CompanyName", "Slangmgh\0"
+            VALUE "FileDescription", "HexEditor\0"
+            VALUE "FileVersion", "1, 0, 4, 0\0"
+            VALUE "InternalName", "16Edit\0"
+            VALUE "LegalCopyright", "Copyright ? 2003\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "16Edit.exe\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "16Edit\0"
+            VALUE "ProductVersion", "1, 0, 4, 0\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SELBLOCK DIALOGEX 0, 0, 197, 65
+STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "[ Select Block ]"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    EDITTEXT        SB_START,77,12,42,12,ES_RIGHT | ES_MULTILINE | 
+                    ES_UPPERCASE | ES_AUTOHSCROLL
+    EDITTEXT        SB_END,77,25,42,12,ES_RIGHT | ES_MULTILINE | 
+                    ES_UPPERCASE | ES_AUTOHSCROLL
+    EDITTEXT        SB_SIZE,77,38,42,12,ES_RIGHT | ES_MULTILINE | 
+                    ES_UPPERCASE | ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "OK",SB_OK,140,5,51,14,0,WS_EX_STATICEDGE
+    PUSHBUTTON      "Cancel",SB_CANCEL,140,20,51,14,0,WS_EX_STATICEDGE
+    GROUPBOX        "Location",IDC_STATIC,5,0,127,60
+    LTEXT           "Start Offset:",IDC_STATIC,13,14,47,8
+    CONTROL         "End Offset:",SB_RADIOEND,"Button",BS_AUTORADIOBUTTON | 
+                    BS_LEFT | BS_PUSHLIKE | BS_FLAT,13,25,42,12
+    CONTROL         "Size:",SB_RADIOSIZE,"Button",BS_AUTORADIOBUTTON | 
+                    BS_LEFT | BS_PUSHLIKE | BS_FLAT,13,38,42,12
+END
+
+IDD_SEARCH DIALOGEX 0, 0, 282, 140
+STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "[ Seach String ]"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "ASCII string",SS_SEARCHASCII,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT | WS_TABSTOP,15,34,59,8
+    DEFPUSHBUTTON   "OK",SS_OK,215,5,51,14,0,WS_EX_STATICEDGE
+    PUSHBUTTON      "Cancel",SS_CANCEL,215,20,51,14,0,WS_EX_STATICEDGE
+    GROUPBOX        "Data",IDC_STATIC,5,0,200,60
+    LTEXT           "String:",IDC_STATIC,15,15,21,8
+    LTEXT           "Case Sensitive:",IDC_STATIC,84,34,50,8
+    RADIOBUTTON     "Yes",SS_CASESENSITIVE,138,32,25,12,BS_CENTER | 
+                    BS_PUSHLIKE | BS_FLAT
+    RADIOBUTTON     "No",SS_NOCASESENSITIVE,165,32,25,12,BS_CENTER | 
+                    BS_PUSHLIKE | BS_FLAT
+    GROUPBOX        "Location",IDC_STATIC,5,65,200,69
+    RADIOBUTTON     "...current position",SS_SEARCHFROMCURPOS,15,100,65,12,
+                    BS_CENTER | BS_PUSHLIKE | BS_FLAT
+    LTEXT           "Start Searching from...",IDC_STATIC,15,75,71,8
+    RADIOBUTTON     "...offset:",SS_SEARCHFROMOFF,15,114,65,12,BS_CENTER | 
+                    BS_PUSHLIKE | BS_FLAT
+    RADIOBUTTON     "...top",SS_SEARCHFROMTOP,15,87,65,12,BS_CENTER | 
+                    BS_PUSHLIKE | BS_FLAT
+    EDITTEXT        SS_OFFSET,104,114,42,12,ES_RIGHT | ES_UPPERCASE | 
+                    ES_AUTOHSCROLL | WS_DISABLED | NOT WS_TABSTOP
+    LTEXT           "Direction:",IDC_STATIC,103,75,31,8
+    RADIOBUTTON     "Down",SS_DOWN,104,87,41,12,BS_CENTER | BS_PUSHLIKE | 
+                    BS_FLAT
+    RADIOBUTTON     "Up",SS_UP,149,87,41,12,BS_CENTER | BS_PUSHLIKE | 
+                    BS_FLAT
+    LTEXT           "",SS_CUROFF,104,102,51,8
+    CONTROL         "UNICODE string",SS_SEARCHUNICODE,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT | WS_TABSTOP,15,47,66,8
+    COMBOBOX        SS_STR,38,13,153,114,CBS_DROPDOWN | WS_VSCROLL | 
+                    WS_TABSTOP
+END
+
+IDD_OPTION DIALOGEX 0, 0, 293, 47
+STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "[ Option ]"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "Add r-click menu",IDC_SHELLI,"Button",
+                    BS_AUTORADIOBUTTON | BS_PUSHLIKE | BS_FLAT | WS_GROUP | 
+                    WS_TABSTOP,31,15,78,14
+    CONTROL         "Remove r-click menu",IDC_SHELLR,"Button",
+                    BS_AUTORADIOBUTTON | BS_PUSHLIKE | BS_FLAT | WS_TABSTOP,
+                    128,15,78,14
+    PUSHBUTTON      "OK",IDOK,239,6,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,239,24,50,14
+    GROUPBOX        "Shell integration",IDC_STATIC,8,3,220,34
+END
+
+IDD_REPLACE DIALOGEX 0, 0, 267, 175
+STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "Dialog"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "ASCII string",SS_SEARCHASCII,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT | WS_TABSTOP,11,71,59,8
+    CONTROL         "UNICODE string",SS_SEARCHUNICODE,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT | WS_TABSTOP,11,85,66,8
+    RADIOBUTTON     "Yes",SS_CASESENSITIVE,135,70,25,12,BS_CENTER | 
+                    BS_PUSHLIKE | BS_FLAT
+    RADIOBUTTON     "No",SS_NOCASESENSITIVE,163,70,25,12,BS_CENTER | 
+                    BS_PUSHLIKE | BS_FLAT
+    DEFPUSHBUTTON   "Find",SS_FIND,210,7,51,14,0,WS_EX_STATICEDGE
+    PUSHBUTTON      "Replace",SS_REPLACE,210,26,51,14,0,WS_EX_STATICEDGE
+    PUSHBUTTON      "Replace All",SS_REPLACEALL,210,45,51,14,0,
+                    WS_EX_STATICEDGE
+    PUSHBUTTON      "Cancel",SS_CANCEL,210,64,51,14,0,WS_EX_STATICEDGE
+    RADIOBUTTON     "...top",SS_SEARCHFROMTOP,12,124,65,12,BS_CENTER | 
+                    BS_PUSHLIKE | BS_FLAT
+    RADIOBUTTON     "...current position",SS_SEARCHFROMCURPOS,12,139,65,12,
+                    BS_CENTER | BS_PUSHLIKE | BS_FLAT
+    RADIOBUTTON     "...offset:",SS_SEARCHFROMOFF,12,154,65,12,BS_CENTER | 
+                    BS_PUSHLIKE | BS_FLAT
+    RADIOBUTTON     "Down",SS_DOWN,101,124,41,12,BS_CENTER | BS_PUSHLIKE | 
+                    BS_FLAT
+    RADIOBUTTON     "Up",SS_UP,146,124,41,12,BS_CENTER | BS_PUSHLIKE | 
+                    BS_FLAT
+    EDITTEXT        SS_OFFSET,101,154,42,12,ES_RIGHT | ES_UPPERCASE | 
+                    ES_AUTOHSCROLL | WS_DISABLED | NOT WS_TABSTOP
+    GROUPBOX        "Condition",IDC_STATIC,3,56,200,45
+    LTEXT           "Case Sensitive:",IDC_STATIC,81,71,50,8
+    GROUPBOX        "Data",IDC_STATIC,3,2,200,53
+    LTEXT           "Find what:",IDC_STATIC,12,17,34,8
+    LTEXT           "Replace with:",IDC_STATIC,12,35,44,8
+    GROUPBOX        "Location",IDC_STATIC,4,103,200,69
+    LTEXT           "Start Searching from...",IDC_STATIC,12,113,71,8
+    LTEXT           "Direction:",IDC_STATIC,100,113,31,8
+    LTEXT           "",SS_CUROFF,101,141,51,8
+    COMBOBOX        SS_STR,59,14,135,112,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | 
+                    WS_TABSTOP
+    COMBOBOX        SS_STR2,59,34,135,132,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_SELBLOCK, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 190
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 58
+    END
+
+    IDD_SEARCH, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 275
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 133
+    END
+
+    IDD_OPTION, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 289
+        TOPMARGIN, 1
+        BOTTOMMARGIN, 41
+    END
+
+    IDD_REPLACE, DIALOG
+    BEGIN
+        LEFTMARGIN, 1
+        RIGHTMARGIN, 265
+        TOPMARGIN, 2
+        BOTTOMMARGIN, 173
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_ACCEL ACCELERATORS DISCARDABLE 
+BEGIN
+    "A",            TB_SELALL,              VIRTKEY, CONTROL, NOINVERT
+    "B",            TB_SELBLOCK,            VIRTKEY, CONTROL, NOINVERT
+    "C",            TB_COPY,                VIRTKEY, CONTROL, NOINVERT
+    "D",            TB_MULTI,               VIRTKEY, CONTROL, NOINVERT
+    "E",            TB_OFFSET,              VIRTKEY, CONTROL, NOINVERT
+    "F",            TB_SEARCH,              VIRTKEY, CONTROL, NOINVERT
+    "G",            TB_GOTO,                VIRTKEY, CONTROL, NOINVERT
+    "I",            TB_INSERT,              VIRTKEY, CONTROL, NOINVERT
+    "L",            TB_SIZE,                VIRTKEY, CONTROL, NOINVERT
+    "O",            TB_OPTION,              VIRTKEY, CONTROL, NOINVERT
+    "R",            TB_REPLACE,             VIRTKEY, CONTROL, NOINVERT
+    "S",            TB_SAVE,                VIRTKEY, CONTROL, NOINVERT
+    "T",            TB_WIN2TOP,             VIRTKEY, CONTROL, NOINVERT
+    "V",            TB_PASTE,               VIRTKEY, CONTROL, NOINVERT
+    VK_DELETE,      TB_DELETE,              VIRTKEY, NOINVERT
+    VK_F12,         TB_ABOUT,               VIRTKEY, NOINVERT
+    VK_F3,          TB_SEARCHDOWN,          VIRTKEY, NOINVERT
+    VK_F3,          TB_SEARCHUP,            VIRTKEY, CONTROL, NOINVERT
+    "W",            TB_READONLY,            VIRTKEY, CONTROL, NOINVERT
+    "X",            TB_CUT,                 VIRTKEY, CONTROL, NOINVERT
+    "Y",            TB_REDO,                VIRTKEY, CONTROL, NOINVERT
+    "Z",            TB_UNDO,                VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_16Edit              ICON    DISCARDABLE     "rsrc\\icon1.ico"
+#endif    // Neutral resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Neutral (Default) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUD)
+#ifdef _WIN32
+LANGUAGE LANG_NEUTRAL, SUBLANG_DEFAULT
+#pragma code_page(936)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_GOTO DIALOGEX 0, 0, 218, 57
+STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "[ Goto Offset ]"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "&File Offset",IDC_FO,"Button",BS_AUTORADIOBUTTON | 
+                    BS_PUSHLIKE | BS_FLAT | WS_TABSTOP,12,12,61,13
+    CONTROL         "&Virtual Address",IDC_VA,"Button",BS_AUTORADIOBUTTON | 
+                    BS_PUSHLIKE | BS_FLAT | WS_TABSTOP,12,30,61,13
+    DEFPUSHBUTTON   "OK",GO_OK,160,6,51,14,0,WS_EX_STATICEDGE
+    PUSHBUTTON      "Cancel",GO_CANCEL,160,21,51,14,0,WS_EX_STATICEDGE
+    GROUPBOX        "Goto",IDC_STATIC,5,0,144,51,WS_GROUP
+    COMBOBOX        GO_OFFSET,80,13,64,93,CBS_DROPDOWN | WS_VSCROLL | 
+                    WS_TABSTOP
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_GOTO, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 211
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 50
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_GOTO DLGINIT
+BEGIN
+    GO_OFFSET, 0x403, 4, 0
+0x3231, 0x0033, 
+    GO_OFFSET, 0x403, 4, 0
+0x3534, 0x0036, 
+    0
+END
+
+#endif    // Neutral (Default) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// German (Germany) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // German (Germany) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
