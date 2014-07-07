@@ -39,9 +39,9 @@ void RestoreFromProfile(HWND hWnd, char *key) {
 }
 
 void SaveToProfile(HWND hWnd, char *key) {
-	char items[8][16];
+	char items[8][64];
 	char buff[256];
-	char item[16];
+	char item[64];
 	buff[0] = 0;
 
 	int total = 0;
@@ -601,6 +601,7 @@ BOOL HexEditWnd::SSHandleWM_COMMAND(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM 
 		}
 		break;
 
+	case IDCANCEL:
 	case SS_CANCEL:
 		SendMessage(hDlg, WM_CLOSE, 0, 0);
 		return TRUE;
@@ -681,6 +682,7 @@ BOOL HexEditWnd::ReplaceHandleWM_COMMAND(HWND hDlg, UINT uMsg, WPARAM wParam, LP
 		}
 		break;
 
+	case IDCANCEL:
 	case SS_CANCEL:
 		SendMessage(hDlg, WM_CLOSE, 0, 0);
 		return TRUE;
@@ -806,7 +808,7 @@ BOOL HexEditWnd::SSHandleSS_OK(HWND hDlg)
 	HWND               hStrEdit;
 	HE_SEARCHOPTIONS   data, tmp;
 	DWORD              dwByte, dwOff;
-	char               cBuff[9];
+	char               cBuff[64];
 	UINT               u;
 	BOOL               bRet = FALSE;
 
