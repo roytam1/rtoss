@@ -19,6 +19,8 @@ public:
 protected:
 	BOOL		m_bCreated;
 	CComboBox	m_ctrlItemList;
+	CFont		m_Font;
+	CStatic *	m_Static;
 
 	afx_msg void SetItemDesc();
 
