@@ -58,6 +58,23 @@ BOOL CMemMiscPage2::OnInitDialog()
 	CheckDlgButton(IDC_PC_NAME_JP, BST_CHECKED);
 	CheckDlgButton(IDC_PC_SEX_RANDOM, BST_CHECKED);
 
+	m_Font.CreateFont(
+	   GUI_FONT_HEIGHT,           // nHeight
+	   0,                         // nWidth
+	   0,                         // nEscapement
+	   0,                         // nOrientation
+	   FW_NORMAL,                 // nWeight
+	   FALSE,                     // bItalic
+	   FALSE,                     // bUnderline
+	   0,                         // cStrikeOut
+	   ANSI_CHARSET,              // nCharSet
+	   OUT_DEFAULT_PRECIS,        // nOutPrecision
+	   CLIP_DEFAULT_PRECIS,       // nClipPrecision
+	   DEFAULT_QUALITY,           // nQuality
+	   DEFAULT_PITCH | FF_SWISS,  // nPitchAndFamily
+	   _T(GUI_FONT_NAME));        // lpszFacename 
+	m_ctrlGameVersionList.SetFont(&m_Font);
+
 	for(dwIndex = 0; dwIndex < dwGameVersionsCount; ++dwIndex)
 	{
 		szText.Format(_T("%lX: %s"), dwIndex, szGameVersions[dwIndex]);

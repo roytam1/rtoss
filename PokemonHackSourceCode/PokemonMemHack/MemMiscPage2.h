@@ -18,6 +18,7 @@ public:
 
 protected:
 	CComboBox	m_ctrlGameVersionList;
+	CFont		m_Font;
 
 	UINT_PTR	m_uTimerId;
 	DWORD		m_dwTimerFlags;
