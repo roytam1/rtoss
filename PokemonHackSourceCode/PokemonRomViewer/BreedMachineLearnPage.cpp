@@ -115,7 +115,10 @@ void CBreedMachineLearnPage::RefreshLearnList()
 
 		// skill
 		lvi.iSubItem = 1;
-		szText = cfg.pSkillNameList[wSkill].rgszText[cfg.dwLang];
+		if(wSkill < SKILL_COUNT)
+			szText = cfg.pSkillNameList[wSkill].rgszText[cfg.dwLang];
+		else
+			szText.Format(_T("0x%x"),wSkill);
 		lvi.pszText = szText.GetBuffer();
 		m_ctrlLearnList.SetItem(&lvi);
 		szText.ReleaseBuffer();

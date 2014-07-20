@@ -332,7 +332,9 @@ BOOL CPokemonRomViewerApp::InitInstance()
 	// initialize
 	if(bResult)
 	{
+#if 0
 OutputDebugString(_T("1\n"));
+#endif
 		bResult = CreateDialogs();
 	}
 
@@ -345,7 +347,9 @@ OutputDebugString(_T("1\n"));
 
 	if(bResult)
 	{
+#if 0
 OutputDebugString(_T("2\n"));
+#endif
 		pFrame->ShowWindow(SW_SHOW);
 		pFrame->UpdateWindow();
 	}
@@ -353,14 +357,18 @@ OutputDebugString(_T("2\n"));
 	#ifdef _DEBUG
 	if(bResult)
 	{
+#if 0
 OutputDebugString(_T("3\n"));
+#endif
 		bResult = ReadStringLists();
 	}
 	#endif
 
 	if(bResult)
 	{
+#if 0
 OutputDebugString(_T("4\n"));
+#endif
 		ApplyConfig(TRUE, TRUE);
 	}
 
