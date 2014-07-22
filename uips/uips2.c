@@ -38,7 +38,7 @@ void getrle(void);
 void closefiles(void);
 
 #define ADDRESSBYTES 3
-#define MAXARRAYSIZE 2147483648UL
+#define MAXARRAYSIZE 4294967295UL
 //char sourcename[1024], patchname[1024];
 char outname[1024];
 FILE *patchfile, *sourcefile, *f;
@@ -93,10 +93,10 @@ void isitanips(void)
 
 void getaddress(void)
 {
- size_t ppos;
- fread(addarray,4,1,patchfile);
+ size_t ppos,nsize;
+ nsize = fread(addarray,4,1,patchfile);
  ppos = ftell(patchfile);
- if (patchsize == ppos &&
+ if (!nsize || patchsize == ppos &&
      (addarray[0]=='_')&&
      (addarray[1]=='E')&&
      (addarray[2]=='O')&&
