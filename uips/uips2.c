@@ -93,8 +93,11 @@ void isitanips(void)
 
 void getaddress(void)
 {
+ size_t ppos;
  fread(addarray,4,1,patchfile);
- if ((addarray[0]=='_')&&
+ ppos = ftell(patchfile);
+ if (patchsize == ppos &&
+     (addarray[0]=='_')&&
      (addarray[1]=='E')&&
      (addarray[2]=='O')&&
      (addarray[3]=='F'))    closefiles();
