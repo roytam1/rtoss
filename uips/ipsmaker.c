@@ -2,10 +2,55 @@
 	ips.c
 	IPS Patch Maker
 */
-#include <windows.h>
+#include <stdio.h>
 
-#define EXPORT __export
+#ifndef EOF
 #define EOF -1
+#endif
+
+#ifndef BOOL
+#define BOOL unsigned int
+#endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef HANDLE
+#define HANDLE FILE*
+#endif
+
+#ifndef DWORD
+#define DWORD unsigned long
+#endif
+
+#ifndef WORD
+#define WORD unsigned short
+#endif
+
+#ifndef BYTE
+#define BYTE unsigned char
+#endif
+
+#ifndef LPCSTR
+#define LPCSTR unsigned char*
+#endif
+
+#ifndef LPSTR
+#define LPSTR unsigned char*
+#endif
+
+#ifndef LPBYTE
+#define LPBYTE unsigned char*
+#endif
+
+#ifndef LPDWORD
+#define LPDWORD unsigned long*
+#endif
 
 static unsigned char *buffer;
 static unsigned long address = 0;
@@ -25,27 +70,28 @@ typedef struct FILEINFO
 static HANDLE ips;
 static LPFILEINFO uf, cf;
 
-static LPFILEINFO WINAPI LoadFile(LPCSTR lpszFilename);
-static void WINAPI ReloadBuffer(LPFILEINFO f);
-static int WINAPI ReadByte(LPFILEINFO f);
-static void WINAPI flushBuf(void);
-static void WINAPI addByte(unsigned char c);
-static void WINAPI WriteBlock(DWORD Address,DWORD Length,LPBYTE Data);
-static void WINAPI WriteBlockRLE(DWORD Address,DWORD RunLength,BYTE RunByte);
-BOOL WINAPI EXPORT MakePatch(LPCSTR UnchangedFile,LPCSTR ChangedFile,LPCSTR OutputFile,LPSTR ErrorMsg,BOOL bUseRle);
+static LPFILEINFO LoadFile(LPCSTR lpszFilename);
+static void ReloadBuffer(LPFILEINFO f);
+static int ReadByte(LPFILEINFO f);
+static void flushBuf(void);
+static void addByte(unsigned char c);
+static void WriteBlock(DWORD Address,DWORD Length,LPBYTE Data);
+static void WriteBlockRLE(DWORD Address,DWORD RunLength,BYTE RunByte);
+BOOL MakePatch(LPCSTR UnchangedFile,LPCSTR ChangedFile,LPCSTR OutputFile,LPSTR ErrorMsg,BOOL bUseRle);
+static DWORD myGetFileSize(LPFILEINFO f, LPDWORD lpFileSizeHigh);
 
 // opens a file for reading
-static LPFILEINFO WINAPI LoadFile(LPCSTR lpszFilename)
+static LPFILEINFO LoadFile(LPCSTR lpszFilename)
 {
 	LPFILEINFO f;
 
 	// allocate FILEINFO
-	f = (LPFILEINFO)GlobalAlloc(GPTR,sizeof(FILEINFO));
+	f = (LPFILEINFO)malloc(sizeof(FILEINFO));
 	if(!f) return NULL;
 
 	// open file
-	f->hFile = CreateFile(lpszFilename,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,0,NULL);
-	if(f->hFile == INVALID_HANDLE_VALUE) return NULL;
+	f->hFile = fopen(lpszFilename,"rb");
+	if(f->hFile == NULL) return NULL;
 
 	ReloadBuffer(f);
 
@@ -53,23 +99,23 @@ static LPFILEINFO WINAPI LoadFile(LPCSTR lpszFilename)
 }
 
 // reloads the read buffer of a file
-static void WINAPI ReloadBuffer(LPFILEINFO f)
+static void ReloadBuffer(LPFILEINFO f)
 {
 	// refill the buffer
-	ReadFile(f->hFile,f->lpBuffer,1024,&f->nBufSize,NULL);
+	f->nBufSize = fread(f->lpBuffer,1,1024,f->hFile);
 	f->bEof = (f->nBufSize == 0);
 	f->nBufCount = 0;
 }
 
 // closes a file
-static void WINAPI CloseFile(LPFILEINFO f)
+static void CloseFile(LPFILEINFO f)
 {
-	CloseHandle(f->hFile);
-	GlobalFree(f);
+	fclose(f->hFile);
+	free(f);
 }
 
 // reads a byte from the file
-static int WINAPI ReadByte(LPFILEINFO f)
+static int ReadByte(LPFILEINFO f)
 {
 	int byte;
 
@@ -83,7 +129,7 @@ static int WINAPI ReadByte(LPFILEINFO f)
 }
 
 // write an [address, length, data] block to IPS
-static void WINAPI flushBuf(void)
+static void flushBuf(void)
 {
 	unsigned long start, end;
 	int i, j, runcount;
@@ -126,7 +172,7 @@ static void WINAPI flushBuf(void)
 }
 
 // writes an [address, length, data] block to IPS
-static void WINAPI WriteBlock(DWORD Address,DWORD Length,LPBYTE Data)
+static void WriteBlock(DWORD Address,DWORD Length,LPBYTE Data)
 {
 	DWORD addr, nSize;
 	WORD len;
@@ -134,17 +180,17 @@ static void WINAPI WriteBlock(DWORD Address,DWORD Length,LPBYTE Data)
 	if(Length) {
 		// reverse address from LSB->MSB
 		addr = ((Address >> 16) & 0xFF) | (Address & 0xFF00) | ((Address & 0xFF) << 16);
-		WriteFile(ips,&addr,3,&nSize,NULL);
+		nSize = fwrite(&addr,3,1,ips);
 		// LSB -> MSB
 		len = (WORD)(((Length >> 8) & 0xFF) | ((Length & 0xFF) << 8));
-		WriteFile(ips,&len,2,&nSize,NULL);
+		nSize = fwrite(&len,2,1,ips);
 		// write data
-		WriteFile(ips,Data,Length,&nSize,NULL);
+		nSize = fwrite(Data,Length,1,ips);
 	}
 }
 
 // writes an [address, runlength, runbyte] block to IPS
-static void WINAPI WriteBlockRLE(DWORD Address,DWORD RunLength,BYTE RunByte)
+static void WriteBlockRLE(DWORD Address,DWORD RunLength,BYTE RunByte)
 {
 	DWORD addr, nSize;
 	WORD len;
@@ -152,67 +198,78 @@ static void WINAPI WriteBlockRLE(DWORD Address,DWORD RunLength,BYTE RunByte)
 	if(RunLength) {
 		// reverse address from LSB->MSB
 		addr = ((Address >> 16) & 0xFF) | (Address & 0xFF00) | ((Address & 0xFF) << 16);
-		WriteFile(ips,&addr,3,&nSize,NULL);
+		nSize = fwrite(&addr,3,1,ips);
 		// write 0 count
 		len = 0;
-		WriteFile(ips,&len,2,&nSize,NULL);
+		nSize = fwrite(&len,2,1,ips);
 		// LSB -> MSB
 		len = (WORD)(((RunLength >> 8) & 0xFF) | ((RunLength & 0xFF) << 8));
-		WriteFile(ips,&len,2,&nSize,NULL);
+		nSize = fwrite(&len,2,1,ips);
 		// write data
-		WriteFile(ips,&RunByte,1,&nSize,NULL);
+		nSize = fwrite(&RunByte,1,1,ips);
 	}
 }
 
 // places a byte into the block buffer
-static void WINAPI addByte(unsigned char c)
+static void addByte(unsigned char c)
 {
 	if(count >= 65535L) flushBuf(), address += 65535L;
 	buffer[count++] = c;
 }
 
+// get file size
+static DWORD myGetFileSize(LPFILEINFO f, LPDWORD lpFileSizeHigh)
+{
+	size_t opos, npos;
+	opos = ftell(f->hFile);
+	fseek(f->hFile, 0, SEEK_END);
+	npos = ftell(f->hFile);
+	fseek(f->hFile, opos, SEEK_SET);
+	return npos;
+}
+
 // create a patch
-BOOL WINAPI EXPORT MakePatch(LPCSTR UnchangedFile,LPCSTR ChangedFile,LPCSTR OutputFile,LPSTR ErrorMsg,BOOL bUseRle)
+BOOL MakePatch(LPCSTR UnchangedFile,LPCSTR ChangedFile,LPCSTR OutputFile,LPSTR ErrorMsg,BOOL bUseRle)
 {
 	int byte1, byte2;
 	unsigned long offset;
 	DWORD nSize;
 
 	// allocate memory for buffer
-	buffer = (unsigned char *)GlobalAlloc(GPTR,65536);
+	buffer = (unsigned char *)malloc(65536);
 	if(!buffer) {
-		if(ErrorMsg) wsprintf(ErrorMsg,"Out of memory.");
+		if(ErrorMsg) sprintf(ErrorMsg,"Out of memory.");
 		return FALSE;
 	}
 
 	// load unchanged file
 	uf = LoadFile(UnchangedFile);
 	if(!uf) {
-		if(ErrorMsg) wsprintf(ErrorMsg,"%s: Can't find file.",UnchangedFile);
+		if(ErrorMsg) sprintf(ErrorMsg,"%s: Can't find file.",UnchangedFile);
 		goto err0;
 	}
 
 	// load changed file
 	cf = LoadFile(ChangedFile);
 	if(!cf) {
-		if(ErrorMsg) wsprintf(ErrorMsg,"%s: Can't find file.",ChangedFile);
+		if(ErrorMsg) sprintf(ErrorMsg,"%s: Can't find file.",ChangedFile);
 		goto err1;
 	}
 
-	if(GetFileSize(cf,NULL) < GetFileSize(uf,NULL)) {
-		if(ErrorMsg) wsprintf(ErrorMsg,"File size of changed file is less than the unchanged file.");
+	if(myGetFileSize(cf,NULL) < myGetFileSize(uf,NULL)) {
+		if(ErrorMsg) sprintf(ErrorMsg,"File size of changed file is less than the unchanged file.");
 		goto err2;
 	}
 
 	// create IPS for output
-	ips = CreateFile(OutputFile,GENERIC_WRITE,FILE_SHARE_WRITE,NULL,CREATE_ALWAYS,0,NULL);
-	if(ips == INVALID_HANDLE_VALUE) {
-		if(ErrorMsg) wsprintf(ErrorMsg,"%s: Can't write to file.",OutputFile);
+	ips = fopen(OutputFile,"wb");
+	if(ips == NULL) {
+		if(ErrorMsg) sprintf(ErrorMsg,"%s: Can't write to file.",OutputFile);
 		goto err2;
 	}
 
 	// write signature
-	WriteFile(ips,"PATCH",5,&nSize,NULL);
+	nSize = fwrite("PATCH",5,1,ips);
 
 	userle = bUseRle;
 
@@ -237,12 +294,12 @@ BOOL WINAPI EXPORT MakePatch(LPCSTR UnchangedFile,LPCSTR ChangedFile,LPCSTR Outp
 	flushBuf();
 
 	// write EOF
-	WriteFile(ips,"EOF",3,&nSize,NULL);
+	nSize = fwrite("EOF",3,1,ips);
 
-	CloseHandle(ips);
+	fclose(ips);
 	CloseFile(uf);
 	CloseFile(cf);
-	GlobalFree(buffer);
+	free(buffer);
 
 	return TRUE;
 
@@ -251,7 +308,7 @@ err2:
 err1:
 	CloseFile(uf);
 err0:
-	GlobalFree(buffer);
+	free(buffer);
 
 	return FALSE;
 }
