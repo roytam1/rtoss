@@ -39,9 +39,9 @@ void RestoreFromProfile(HWND hWnd, char *key) {
 }
 
 void SaveToProfile(HWND hWnd, char *key) {
-	char items[8][64];
+	char items[8][256];
 	char buff[256];
-	char item[64];
+	char item[256];
 	buff[0] = 0;
 
 	int total = 0;
