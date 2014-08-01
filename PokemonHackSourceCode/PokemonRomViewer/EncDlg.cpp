@@ -108,7 +108,7 @@ void CEncDlg::RefreshEncList()
 
 		lvi.iSubItem = 0;
 		wAreaId = rom.m_pEncAddressList[dwIndex].wAreaId;
-		szText.Format(_T("%04hX"), wAreaId);
+		szText.Format(_T("%02d-%03d"), wAreaId & 0xFF, wAreaId >> 8 & 0xFF);
 
 		lvi.pszText = szText.GetBuffer();
 		if(dwIndex < dwListCount)

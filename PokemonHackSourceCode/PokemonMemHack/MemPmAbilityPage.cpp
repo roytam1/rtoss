@@ -92,6 +92,7 @@ void CMemPmAbilityPage::SetBreedAbilities()
 	DWORD	dwBreedAblSum = 0;
 	BYTE	bIndex;
 	CString	szText;
+	BreedListEntry * bleTmp;
 
 	if(!m_ppc || !g_MemRom.m_bOpened)
 	{
@@ -104,10 +105,14 @@ void CMemPmAbilityPage::SetBreedAbilities()
 
 	for(bIndex = 0; bIndex < 6; ++bIndex)
 	{
-		dwAbl = (&(g_MemRom.GetBreedListEntry(m_ppc->GetBreed())->bHP))[bIndex];
-		szText.Format(_T("%lu"), dwAbl);
-		SetDlgItemText(IDC_BREED_HP + bIndex, szText);
-		dwBreedAblSum += dwAbl;
+		bleTmp = g_MemRom.GetBreedListEntry(m_ppc->GetBreed());
+		if(bleTmp)
+		{
+			dwAbl = (&(bleTmp->bHP))[bIndex];
+			szText.Format(_T("%lu"), dwAbl);
+			SetDlgItemText(IDC_BREED_HP + bIndex, szText);
+			dwBreedAblSum += dwAbl;
+		}
 	}
 
 	szText.Format(_T("%lu"), dwBreedAblSum);
