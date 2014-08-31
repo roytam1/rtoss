@@ -3044,10 +3044,12 @@ PHE_CLIPBOARD_DATA HexEditWnd::GetClipboardData() {
 		int		len;
 
 		pData = (char *)::GetClipboardData(CF_TEXT);
-		len = strlen(pData);
-		pcbd = (PHE_CLIPBOARD_DATA)malloc(len + 4);
-		pcbd->dwDataSize = len;
-		memcpy(&pcbd->byDataStart, pData, len);
+		if(pData) {
+			len = strlen(pData);
+			pcbd = (PHE_CLIPBOARD_DATA)malloc(len + 4);
+			pcbd->dwDataSize = len;
+			memcpy(&pcbd->byDataStart, pData, len);
+		}
 	}
 	CloseClipboard();
 	return pcbd;
