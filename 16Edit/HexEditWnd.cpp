@@ -1227,6 +1227,10 @@ void HexEditWnd::Beep() {
 }
 
 BOOL HexEditWnd::HEHandleWM_COMMAND(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	OFN          ofn;
+	char         *szCmdl;
+	int          iRet;
+
 	switch (LOWORD(wParam)) {
 	case TB_GOTO:
 		if (DialogBoxParam( GetInstance(), (PSTR)IDD_GOTO, hWnd, GotoDlgProc, 0) &&
@@ -1352,10 +1356,6 @@ BOOL HexEditWnd::HEHandleWM_COMMAND(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		ConfigureTB();
 		return TRUE;
 	case TB_OPEN:
-		OFN          ofn;
-		char         *szCmdl;
-		int          iRet;
-
 		if (CanSave()) {
 			iRet = MessageBox(hMainWnd, "File changed, save or not", "16Edit", MB_YESNOCANCEL);
 			if (iRet == IDYES) {
@@ -1380,6 +1380,30 @@ BOOL HexEditWnd::HEHandleWM_COMMAND(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 			ConfigureTB();
 			RepaintClientAreaNow();
 		}
+		return TRUE;
+	case TB_REFRESH:
+		if (CanSave()) {
+			iRet = MessageBox(hMainWnd, "File changed, save or not", "16Edit", MB_YESNOCANCEL);
+			if (iRet == IDYES) {
+				SaveChanges();
+			} else if (iRet == IDCANCEL) {
+				return TRUE;
+			}
+		}
+
+		szCmdl = fInput.GetFilePath();
+
+		QuitEdition();
+		if (!HEdit.DoSpecifySettings(szCmdl)) {
+			MessageBox(hMainWnd, "File access error!", "16Edit", MB_ICONERROR);
+			return TRUE;
+		}
+		SetCaret();
+		SetHEWndCaption();
+		SetupVScrollbar();
+		SetTopLine();
+		ConfigureTB();
+		RepaintClientAreaNow();
 		return TRUE;
 	}
 
@@ -2815,14 +2839,15 @@ void HexEditWnd::ShowAbout() {
 	args.hInstance      = GetInstance();
 	args.lpszIcon       = (PSTR)IDI_16Edit;
 	args.lpszCaption    = "About";
-	args.lpszText       = "16Edit 1.04 - HexEditor by slangmgh\n"\
+	args.lpszText       = "16Edit 1.04+ - HexEditor by slangmgh\n"\
 						  "Created from yoda's 16Edit module\n\n"\
-						  "Changelog 1.04:\n"
+						  "Changelog 1.04+:\n"
 						  "1. Copy text available in clipboard\n"
 						  "2. Goto offset save in profile\n"
 						  "3. Search/Replace text enable paste\n"
 						  "4. Search/Replace text save in profile\n"
-						  "5. Some small bugfix\n\n"
+						  "5. Add [F5] for reloading file\n"
+						  "6. Some small bugfix\n\n"
 						  "Feature:\n"\
 						  "1. Small/Green/Robust/Freeware\n"\
 						  "2. Unlimited undo/redo\n"\

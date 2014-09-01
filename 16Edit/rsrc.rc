@@ -35,8 +35,8 @@ IDB_TOOLBAR             BITMAP  DISCARDABLE     "rsrc\\toolbar.bmp"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,3,0
- PRODUCTVERSION 1,0,3,0
+ FILEVERSION 1,0,4,1
+ PRODUCTVERSION 1,0,4,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -54,14 +54,14 @@ BEGIN
             VALUE "Comments", "\0"
             VALUE "CompanyName", "Slangmgh\0"
             VALUE "FileDescription", "HexEditor\0"
-            VALUE "FileVersion", "1, 0, 4, 0\0"
+            VALUE "FileVersion", "1, 0, 4, 1\0"
             VALUE "InternalName", "16Edit\0"
-            VALUE "LegalCopyright", "Copyright ? 2003\0"
+            VALUE "LegalCopyright", "Copyright (C) 2003\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "16Edit.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "16Edit\0"
-            VALUE "ProductVersion", "1, 0, 4, 0\0"
+            VALUE "ProductVersion", "1, 0, 4, 1\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -273,6 +273,7 @@ BEGIN
     "T",            TB_WIN2TOP,             VIRTKEY, CONTROL, NOINVERT
     "V",            TB_PASTE,               VIRTKEY, CONTROL, NOINVERT
     VK_DELETE,      TB_DELETE,              VIRTKEY, NOINVERT
+    VK_F5,          TB_REFRESH,             VIRTKEY, NOINVERT
     VK_F12,         TB_ABOUT,               VIRTKEY, NOINVERT
     VK_F3,          TB_SEARCHDOWN,          VIRTKEY, NOINVERT
     VK_F3,          TB_SEARCHUP,            VIRTKEY, CONTROL, NOINVERT
