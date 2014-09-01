@@ -70,6 +70,7 @@
 #define TB_REPLACE                      40022
 #define TB_OFFSET                       40023
 #define TB_DELETE                       40024
+#define TB_REFRESH                      40025
 #define TB_COPY_TEXT                    40030
 
 // Next default values for new objects
