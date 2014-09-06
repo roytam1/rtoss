@@ -1232,7 +1232,7 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 
 //-- ¬‚³‚·‚¬‚éê‡‚Í‚±‚±‚ÅI—¹
 
-	if( siz <= 4 )
+	if( siz < 4 )
 		return cs==AutoDetect ? defCs : cs;
 
 //-- –¾¦w’è‚ª‚ ‚éê‡‚Í‚±‚±‚ÅI—¹
