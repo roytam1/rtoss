@@ -69,6 +69,7 @@ struct {
 	int offy; /* offset y */
 } font;
 int numcol; /*	numberOfColumns */
+int dwidth;
 char outfileBdfP[FILENAMECHARMAX];
 FILE *outP;
 
@@ -224,10 +225,10 @@ void readwriteBdf(char *infileBdfP, char *imgP, char *outfileBdfP){
 	if(inP == NULL)
 		exiterror("cannot open '%s'\n", infileBdfP);
 
-	if(stat(outfileBdfP, &fileinfo) == 0){
+	/*if(stat(outfileBdfP, &fileinfo) == 0){
 		printf("error: '%s' already exists\n", outfileBdfP);
 		exit(EXIT_FAILURE);
-	}
+	}*/
 	outP = fopen(outfileBdfP, "wb");
 	if(outP == NULL)
 		exiterror("cannot write '%s'\n", outfileBdfP);
@@ -266,6 +267,14 @@ void readwriteBdf(char *infileBdfP, char *imgP, char *outfileBdfP){
 				else if(strncmp(lineP, "BITMAP", 6)==0)
 					st = INBITMAP;
 				break; /* lines of BBX, BITMAP is written later */
+			case 'D':
+				if(strncmp(lineP, "DWIDTH ", 7)==0){
+					strcpy(strP, lineP);
+					tokenP = gettoken(strP);
+					tokenP = gettoken(tokenP + (int)strlen(tokenP) + 1);
+					dwidth = atoi(tokenP);
+				}
+				goto others;
 			case 'F':
 				if(strncmp(lineP, "FONTBOUNDINGBOX ", 16)==0){
 					strcpy(strP, lineP);
@@ -292,6 +301,7 @@ void readwriteBdf(char *infileBdfP, char *imgP, char *outfileBdfP){
 					d_printf("font.offy=%d\n", font.offy);
 				}
 				/*  go next */
+others:
 			default:
 				val = fwrite(lineP, 1, strlen(lineP), outP);
 				if(val != (int)strlen(lineP))
@@ -370,7 +380,8 @@ void newglyphwrite(FILE *outP, int nglyph, char *imgP){
 	/*
 	 * allocate 'box' area for a glyph image
 	 */
-	widthaligned = (font.w+7) / 8 * 8;
+	//widthaligned = (dwidth+7) / 8 * 8;
+	widthaligned = (dwidth+7) / 8 * 8;
 	boxP = malloc(widthaligned*font.h);
 	if(boxP == NULL)
 		exiterror("cannot allocate memory newglyphwrite %dbytes\n", widthaligned*font.h);
@@ -385,7 +396,7 @@ void newglyphwrite(FILE *outP, int nglyph, char *imgP){
 	x = (font.w+img.sp) * (nglyph%numcol) + img.sp;
 
 	for(i=0; i<font.h; i++)
-		for(j=0; j<font.w; j++)
+		for(j=0; j<dwidth; j++)
 			*(boxP + i*widthaligned + j) = *(imgP + (y+i)*img.w + x+j);
 
 	/*
@@ -398,7 +409,7 @@ void newglyphwrite(FILE *outP, int nglyph, char *imgP){
 
 	/* write BBX , BITMAP to tmpVariable */
 	sprintf(bitstrP, "BBX %d %d %d %d\nBITMAP\n",
-		font.w, font.h, font.offx, font.offy);
+		dwidth, font.h, font.offx, font.offy);
 
 	/* write bitmapData to tmpVariable */
 	for(i=0; i<font.h; i++){
