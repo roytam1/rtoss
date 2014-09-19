@@ -70,6 +70,7 @@ struct {
 } font;
 int numcol; /*	numberOfColumns */
 int dwidth;
+int bbx_w, bbx_h, bbx_offx, bbx_offy;
 char outfileBdfP[FILENAMECHARMAX];
 FILE *outP;
 
@@ -262,9 +263,18 @@ void readwriteBdf(char *infileBdfP, char *imgP, char *outfileBdfP){
 		}else{ /*  stat != INBITMAP */
 			switch(lineP[0]){
 			case 'B':
-				if(strncmp(lineP, "BBX", 3)==0)
-					; /*  do nothing */
-				else if(strncmp(lineP, "BITMAP", 6)==0)
+				if(strncmp(lineP, "BBX", 3)==0){
+					strcpy(strP, lineP);
+					tokenP = gettoken(strP);
+					tokenP = gettoken(tokenP + (int)strlen(tokenP) + 1);
+					bbx_w = atoi(tokenP);
+					tokenP = gettoken(tokenP + (int)strlen(tokenP) + 1);
+					bbx_h = atoi(tokenP);
+					tokenP = gettoken(tokenP + (int)strlen(tokenP) + 1);
+					bbx_offx = atoi(tokenP);
+					tokenP = gettoken(tokenP + (int)strlen(tokenP) + 1);
+					bbx_offy = atoi(tokenP);
+				} else if(strncmp(lineP, "BITMAP", 6)==0)
 					st = INBITMAP;
 				break; /* lines of BBX, BITMAP is written later */
 			case 'D':
@@ -274,7 +284,7 @@ void readwriteBdf(char *infileBdfP, char *imgP, char *outfileBdfP){
 					tokenP = gettoken(tokenP + (int)strlen(tokenP) + 1);
 					dwidth = atoi(tokenP);
 				}
-				goto others;
+				break;
 			case 'F':
 				if(strncmp(lineP, "FONTBOUNDINGBOX ", 16)==0){
 					strcpy(strP, lineP);
@@ -301,7 +311,6 @@ void readwriteBdf(char *infileBdfP, char *imgP, char *outfileBdfP){
 					d_printf("font.offy=%d\n", font.offy);
 				}
 				/*  go next */
-others:
 			default:
 				val = fwrite(lineP, 1, strlen(lineP), outP);
 				if(val != (int)strlen(lineP))
@@ -369,6 +378,7 @@ char *gettoken(char *strP){
 void newglyphwrite(FILE *outP, int nglyph, char *imgP){
 	char *boxP;
 	int i,j,k, x,y, val;
+	int width, delta; /* width of a glyph (abs.) */
 	int widthaligned; /* width of a glyph (byte-aligned) */
 	char *bitstrP; /* BITMAP strings */
 	char strP[LINECHARMAX]; /* tmp buffer */
@@ -380,8 +390,10 @@ void newglyphwrite(FILE *outP, int nglyph, char *imgP){
 	/*
 	 * allocate 'box' area for a glyph image
 	 */
-	//widthaligned = (dwidth+7) / 8 * 8;
-	widthaligned = (dwidth+7) / 8 * 8;
+	//widthaligned = (font.w+7) / 8 * 8;
+	delta = bbx_w-bbx_offx-font.offx;
+	width = delta>dwidth ? delta : dwidth-(font.offx < 0 ? font.offx : 0);
+	widthaligned = (width+7) / 8 * 8;
 	boxP = malloc(widthaligned*font.h);
 	if(boxP == NULL)
 		exiterror("cannot allocate memory newglyphwrite %dbytes\n", widthaligned*font.h);
@@ -396,7 +408,7 @@ void newglyphwrite(FILE *outP, int nglyph, char *imgP){
 	x = (font.w+img.sp) * (nglyph%numcol) + img.sp;
 
 	for(i=0; i<font.h; i++)
-		for(j=0; j<dwidth; j++)
+		for(j=0; j<width; j++)
 			*(boxP + i*widthaligned + j) = *(imgP + (y+i)*img.w + x+j);
 
 	/*
@@ -408,8 +420,8 @@ void newglyphwrite(FILE *outP, int nglyph, char *imgP){
 	memset(bitstrP, 0x00, LINECHARMAX*font.h);
 
 	/* write BBX , BITMAP to tmpVariable */
-	sprintf(bitstrP, "BBX %d %d %d %d\nBITMAP\n",
-		dwidth, font.h, font.offx, font.offy);
+	sprintf(bitstrP, "DWIDTH %d 0\nBBX %d %d %d %d\nBITMAP\n",
+		width, width, font.h, 0, font.offy);
 
 	/* write bitmapData to tmpVariable */
 	for(i=0; i<font.h; i++){
