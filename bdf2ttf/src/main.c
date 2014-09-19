@@ -14,6 +14,7 @@
 #include "bdf.h"
 #include "bdf2ttf.h"
 #include "debug.h"
+#include "version.h"
 
     int
 main(int argc, char** argv)
@@ -66,6 +67,7 @@ main(int argc, char** argv)
     }
 
     if (argc < 3) {
+	printf("bdf2ttf " VERSION "\n");
 	printf("Usage: %s [flags] {outname} {info} {infile} [infiles..]\n", progname);
 	goto FINISH;
     }

@@ -44,6 +44,7 @@ typedef struct _bdf_t
     bdf_boundingbox_t bbx;
     bdf_glyph_t* glyph[BDF_MAX_GLYPH];
     unsigned char cell_width[BDF_MAX_GLYPH];
+    unsigned char	glyph_dwidth[BDF_MAX_GLYPH];
 
     int numGlyph;
     int indexFirst;
@@ -97,6 +98,8 @@ typedef struct _bdf2_t
     int			glyph_id[BDF_MAX_GLYPH];
     unsigned char	glyph_flag[BDF_MAX_GLYPH];
     unsigned char	glyph_width[BDF_MAX_GLYPH];
+    unsigned char	glyph_dwidth[BDF_MAX_GLYPH];
+    int bboxX;
     int numGlyph;
     int indexFirst;
     int indexLast;
@@ -121,6 +124,7 @@ int*		bdf2_get_sizelist(bdf2_t* font);
 int		bdf2_get_glyph_id(bdf2_t* font, int id);
 unsigned char	bdf2_get_glyph_flag(bdf2_t* font, int id);
 unsigned char	bdf2_get_glyph_width(bdf2_t* font, int id);
+unsigned char	bdf2_get_glyph_dwidth(bdf2_t* font, int id);
 int		bdf2_is_glyph_available(bdf2_t* font, int id);
 
 #ifdef __cplusplus
