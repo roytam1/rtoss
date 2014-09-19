@@ -536,11 +536,11 @@ generate_eb_location(bdf2_t* font, bdf_t* bdf,
     int d = -bdf->descent;
 #else
     int a = width;
-    int d = height;
+    int d = 0;
 #endif
     int s = origsize;
     add_sbitLineMetric(eblc, a, d, s, 1, 0, 0, 0, s, a, d, 0, 0);
-    //TRACE("w=%d h=%d ascent=%d descent=%d origsize=%d\n", width, height, bdf->ascent, bdf->descent, origsize);
+    TRACE("w=%d h=%d ascent=%d descent=%d origsize=%d\n", width, height, bdf->ascent, bdf->descent, origsize);
     // sbitLineMetrics: vert
     add_sbitLineMetric(eblc, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
@@ -960,7 +960,7 @@ generate_HEAD_HHEA_HMTX_MAXP_POST(bdf2_t* font)
     {
 	if (!bdf2_is_glyph_available(font, i))
 	    continue;
-	tmp->addShort(emCalc(bdf2_get_glyph_width(font, i), 2));
+	tmp->addShort(emCalc(bdf2_get_glyph_dwidth(font, i), font->bboxX));
 	tmp->addShort(0);
     }
     tmp->calcSum();

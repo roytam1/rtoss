@@ -52,6 +52,7 @@ static width_table_t cell_width_table[] = {
     { "JISX0208",	2 },
     { "JISX0212",	2 },
     { "JISX0213",	2 },
+    { "KSX1001",	2 },
     { NULL,		0 },
 };
 
@@ -222,9 +223,9 @@ count_validglyph(bdf_t* font)
 }
 
     static char*
-parse_FONT(char* cmd)
+parse_FONT_backend(char* cmd, int c)
 {
-    int c = 13;
+    /* int c = 13; */
     int len;
 
     while (c && *cmd)
@@ -259,6 +260,32 @@ parse_FONT(char* cmd)
 	    cmd += 3;
     }
     return cmd;
+}
+
+    static char*
+parse_FONT(char* cmd)
+{
+    return parse_FONT_backend(cmd, 13);
+}
+
+    static char*
+removeQuote(char* str)
+{
+    size_t len;
+    char *noQuotes;
+    size_t i, j;
+    len = strlen(str);
+    j = 0;
+    noQuotes = (char*)malloc(str);
+    if(str[0] != '"') {
+	noQuotes[j++] = str[0];
+    }
+    for(i = 1; i < len; i++){
+	if(str[i] == '"' && str[i-1] != '\\')
+	    continue;
+	noQuotes[j++] = str[i];
+    }
+    return noQuotes;
 }
 
     static ucsconv_t*
@@ -357,7 +384,7 @@ bdf_load_fh(bdf_t * font, FILE* fp)
 		{
 		    width_table_t *p;
 
-		    TRACE("bdf_load: encoding is %s\n", cmd);
+		    TRACE("bdf_load: [#F] encoding is %s\n", cmd);
 		    init_conv(cmd, &conv);
 		    for (p = cell_width_table; p->name != NULL; ++p)
 			if (strcmp(p->name, cmd) == 0)
@@ -367,9 +394,34 @@ bdf_load_fh(bdf_t * font, FILE* fp)
 		}
 		else if (conv)
 		{
-		    ucsconv_close(conv);
-		    conv = NULL;
+			TRACE("bdf_load: disable usc #F\n");
+			ucsconv_close(conv);
+			conv = NULL;
 		}
+	    }
+	    else if (cmd = iscmd(buf, "CHARSET_REGISTRY"))
+	    {
+		char* charset_name = removeQuote(cmd);
+		TRACE("bdf_load: get CHARSET_REGISTRY = %s\n", charset_name);
+		if ((cmd = parse_FONT_backend(charset_name, 0)) && !conv)
+		{
+			width_table_t *p;
+
+			TRACE("bdf_load: [#CR] encoding is %s\n", cmd);
+			init_conv(cmd, &conv);
+			for (p = cell_width_table; p->name != NULL; ++p)
+			    if (strcmp(p->name, cmd) == 0)
+				break;
+			if (p->name != NULL)
+			    cell_width = p->width;
+		}
+		/*else if (conv)
+		{
+			TRACE("bdf_load: disable usc #CR\n");
+			ucsconv_close(conv);
+			conv = NULL;
+		}*/
+		free(charset_name);
 	    }
 	    else if (cmd = iscmd(buf, "FONT_ASCENT"))
 		font->ascent = atoi(cmd);
@@ -387,6 +439,7 @@ bdf_load_fh(bdf_t * font, FILE* fp)
 			glyph_close(font->glyph[encnum]);
 		    font->glyph[encnum] = ptmp;
 		    //font->cell_width[encnum] = cell_width;
+		    font->glyph_dwidth[encnum] = ptmp->dwidth.x;
 		    font->cell_width[encnum] = ptmp->dwidth.x > (font->size / 2)
 			? 2 : 1;
 		}
@@ -421,6 +474,10 @@ bdf_load_fh(bdf_t * font, FILE* fp)
 	    if (conv)
 	    {
 		int convnum = (int)ucsconv_toUCS(conv, (ucschar_t)encnum);
+#if 0
+		TRACE("bdf_load: ucs %04x => %04x\n", encnum, convnum);
+#endif
+
 		if (convnum)
 		    encnum = convnum;
 		else
@@ -672,6 +729,11 @@ bdf2_load(bdf2_t* font, char* filename)
 	qsort((void*)font->sizelist, font->count, sizeof(int), numsort);
     }
 
+    bdf = bdf2_get_bdf1(font, font->sizelist[0]);
+    font->bboxX = bdf->bbx.width;
+    for (i = 0; i < BDF_MAX_GLYPH; ++i)
+	font->glyph_dwidth[i] = bdf->glyph_dwidth[i];
+
 #ifndef USE_FLEXIBLE_GLYPHWIDTH
     /* Chech cell width */
     for (i = 0; i < font->count; ++i)
@@ -775,6 +837,15 @@ bdf2_get_glyph_width(bdf2_t* font, int id)
 	return 0;
     else
 	return font->glyph_width[id];
+}
+
+    unsigned char
+bdf2_get_glyph_dwidth(bdf2_t* font, int id)
+{
+    if (id < 0 || id >= BDF_MAX_GLYPH)
+	return 0;
+    else
+	return font->glyph_dwidth[id];
 }
 
     int

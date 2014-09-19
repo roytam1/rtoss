@@ -85,6 +85,9 @@ ucsconv_load_fh(ucsconv_t* conv, FILE* fp)
     int
 ucsconv_load(ucsconv_t* conv, char *filename)
 {
+#if 0
+	    printf("ucsconv: loading %s\n", filename);
+#endif
     if (conv)
     {
 	FILE *fp = fopen((filename), "rt");
