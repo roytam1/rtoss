@@ -7,6 +7,7 @@
  */
 
 //#define USE_CMAP_3RD_TABLE 1
+#define USE_GLYPH_OFFSET 1
 
 #include "version.h"
 
@@ -462,7 +463,7 @@ generate_eb_optbitmap(bdf2_t* font, bdf_t* bdf, table *ebdt, bigfirst* st)
 	    // table body
 	    sh->addLong(imgsize);	// imageSize
 	    // bigMetrics
-#if 0
+#ifdef USE_GLYPH_OFFSET
 	    /*
 	     * ベースラインを加味する方法。ビットマップフォントを扱う上では
 	     * 不利なので、現在は使っていない。
