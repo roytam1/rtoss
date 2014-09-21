@@ -393,6 +393,7 @@ void newglyphwrite(FILE *outP, int nglyph, char *imgP){
 	//widthaligned = (font.w+7) / 8 * 8;
 	delta = bbx_w-bbx_offx-font.offx;
 	width = delta>dwidth ? delta : dwidth-(font.offx < 0 ? font.offx : 0);
+	if(!width) width = 1; /* we can't have 0 width */
 	widthaligned = (width+7) / 8 * 8;
 	boxP = malloc(widthaligned*font.h);
 	if(boxP == NULL)
