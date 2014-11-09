@@ -23,6 +23,7 @@ BDF2TTF_EXTERN char	*g_version;
 BDF2TTF_EXTERN char	*g_version_cp;
 BDF2TTF_EXTERN char	*g_trademark;
 BDF2TTF_EXTERN char	*g_trademark_cp;
+BDF2TTF_EXTERN int	g_flag_glyph_offset;
 
 #ifdef __cplusplus
 extern "C" {
