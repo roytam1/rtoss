@@ -102,6 +102,7 @@ char *g_version		= VERSION;
 char *g_version_cp	= NULL;
 char *g_trademark	= TRADEMARK;
 char *g_trademark_cp	= NULL;
+int g_flag_glyph_offset	= 0;
 
     int
 emCalc(int pix, int base)
@@ -463,17 +464,12 @@ generate_eb_optbitmap(bdf2_t* font, bdf_t* bdf, table *ebdt, bigfirst* st)
 	    // table body
 	    sh->addLong(imgsize);	// imageSize
 	    // bigMetrics
-#ifdef USE_GLYPH_OFFSET
-	    /*
-	     * ベースラインを加味する方法。ビットマップフォントを扱う上では
-	     * 不利なので、現在は使っていない。
-	     */
-	    glyph = bdf_get_glyph(bdf, encStart);
-	    add_bigGlyphMetrics(sh, h, w, 0, h + glyph->bbx.offset.y, w,
-		    - w / 2, 0, h);
-#else
-	    add_bigGlyphMetrics(sh, h, w, 0, h, w, - w / 2, 0, h);
-#endif
+	    if (g_flag_glyph_offset) {
+		glyph = bdf_get_glyph(bdf, encStart);
+		add_bigGlyphMetrics(sh, h, w, 0, h + glyph->bbx.offset.y, w,
+			- w / 2, 0, h);
+	    } else
+		add_bigGlyphMetrics(sh, h, w, 0, h, w, - w / 2, 0, h);
 
 	    for (j = encStart; j <= encEnd; ++j)
 	    {
@@ -536,7 +532,7 @@ generate_eb_location(bdf2_t* font, bdf_t* bdf,
     int a = bdf->ascent;
     int d = -bdf->descent;
 #else
-    int a = width;
+    int a = height;
     int d = 0;
 #endif
     int s = origsize;
