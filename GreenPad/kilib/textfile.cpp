@@ -1372,6 +1372,19 @@ int TextFileR::MLangAutoDetection( const uchar* ptr, ulong siz )
 		DetectEncodingInfo detectEnc[5];
 		lang->DetectInputCodepage(MLDETECTCP_DBCS, 0, (char *)(ptr), (INT *)(&siz), detectEnc, &detectEncCount); // 2 ugly C-cast here
 
+# ifdef MLANG_DEBUG
+		TCHAR otmp[1024];
+		TCHAR stmp[64];
+		::wsprintf(otmp,TEXT("detectEncCount = %d\n"),detectEncCount);
+
+		for(int decCnt=0;decCnt<detectEncCount;decCnt++){
+			::wsprintf(stmp,TEXT("detectEnc[%d] = %d (Conf.: %d)\n"),detectEncCount, detectEnc[decCnt].nCodePage, detectEnc[decCnt].nConfidence);
+			::wsprintf(otmp,TEXT("%s%s\n"),otmp,stmp);
+
+		}
+		::MessageBox(NULL,otmp,TEXT("MLangDetect"),0);
+# endif
+
 		// MLang fine tunes
 		if ( detectEncCount > 1 && detectEnc[0].nCodePage == 1252 ) // sometimes it gives multiple results with 1252 in the first
 		{
@@ -1413,6 +1426,7 @@ int TextFileR::MLangAutoDetection( const uchar* ptr, ulong siz )
 # endif
 
 		if (cs == 20127) cs = 0; // 20127 == ASCII, 0 = unknown
+		if (cs == 65000) cs = 0; // 65000 == UTF-7, let's disable misdetecting as UTF-7
 
 		if (lang)
 			lang->Release();
