@@ -444,6 +444,7 @@ void ConfigManager::LoadLayout( ConfigManager::DocType* dt )
 		dt->wrapType  = ref->wrapType;
 		dt->showLN    = ref->showLN;
 		dt->fontCS    = ref->fontCS;
+		dt->fontQual  = ref->fontQual;
 	}
 	else
 	{
@@ -461,6 +462,7 @@ void ConfigManager::LoadLayout( ConfigManager::DocType* dt )
 		dt->wrapType   = -1;
 		dt->showLN     = false;
 		dt->fontCS     = DEFAULT_CHARSET;
+		dt->fontQual   = DEFAULT_QUALITY;
 		dt->vc.SetFont( TEXT("FixedSys"), 14, dt->fontCS );
 	}
 
@@ -532,13 +534,16 @@ void ConfigManager::LoadLayout( ConfigManager::DocType* dt )
 			case 0x006C006E: // ln: LINE-NO
 				dt->showLN = (0!=GetInt(ptr));
 				break;
+			case 0x00660071: // fq: Font Quality
+				dt->fontQual = GetInt(ptr);
+				break;
 			}
 		}
 
 		if( !clfound )
 			dt->vc.color[LN] = dt->vc.color[TXT];
 		if( fontname.len()!=0 && fontsize!=0 )
-			dt->vc.SetFont( fontname.c_str(), fontsize, dt->fontCS );
+			dt->vc.SetFont( fontname.c_str(), fontsize, dt->fontCS, dt->fontQual );
 	}
 }
 

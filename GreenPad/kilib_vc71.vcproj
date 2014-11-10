@@ -61,8 +61,10 @@
 				IgnoreAllDefaultLibraries="TRUE"
 				GenerateDebugInformation="FALSE"
 				ProgramDatabaseFile=".\release/GreenPad.pdb"
-				GenerateMapFile="TRUE"
+				GenerateMapFile="FALSE"
 				MapFileName=".\OBJ/vc71/reluni/GreenPad.map"
+				MapExports="FALSE"
+				MapLines="FALSE"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -146,6 +148,10 @@
 				IgnoreAllDefaultLibraries="FALSE"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\OBJ/GreenPad.pdb"
+				GenerateMapFile="TRUE"
+				MapFileName=".\OBJ/vc71/dbg/GreenPad.map"
+				MapExports="TRUE"
+				MapLines="TRUE"
 				SubSystem="2"/>
 			<Tool
 				Name="VCMIDLTool"
@@ -1093,17 +1099,17 @@
 							WholeProgramOptimization="FALSE"/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug Win32s|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							EnableIntrinsicFunctions="FALSE"
-							WholeProgramOptimization="FALSE"/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release Win32s|Win32">
 						<Tool
 							Name="VCCLCompilerTool"
 							Optimization="1"
+							EnableIntrinsicFunctions="FALSE"
+							WholeProgramOptimization="FALSE"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug Win32s|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
 							EnableIntrinsicFunctions="FALSE"
 							WholeProgramOptimization="FALSE"/>
 					</FileConfiguration>
@@ -1180,14 +1186,14 @@
 							UsePrecompiledHeader="1"/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug Win32s|Win32">
+						Name="Release Win32s|Win32">
 						<Tool
 							Name="VCCLCompilerTool"
 							EnableIntrinsicFunctions="TRUE"
 							UsePrecompiledHeader="1"/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Release Win32s|Win32">
+						Name="Debug Win32s|Win32">
 						<Tool
 							Name="VCCLCompilerTool"
 							EnableIntrinsicFunctions="TRUE"
