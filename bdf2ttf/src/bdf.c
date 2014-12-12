@@ -243,8 +243,21 @@ parse_FONT_backend(char* cmd, int c)
 				/* Remove year notification, and plane 0 */
 				int j, n;
 
-				for (j = i + 1; cmd[j] != '\0' && cmd[j] != '-'; ++j)
+				for (j = i + 1; cmd[j] != '\0' && cmd[j] != '-' && cmd[j] != '.'; ++j)
 					;
+
+				/* treat DEC.CNS11643.1986 encoding properly */
+				if (cmd[j] == '.' && (n = atoi(&cmd[j + 1]) > 0))
+				{
+					i = j;
+					for (n = j + 1; cmd[n] != '\0' && cmd[n] != '-'; ++n)
+						;
+					j = n;
+				}
+#if 0
+TRACE("parse_FONT_backend: cmd[i] = %s\n", cmd+i);
+TRACE("parse_FONT_backend: cmd[j] = %s\n", cmd+j);
+#endif
 				if (cmd[j] == '-' && (n = atoi(&cmd[j + 1])) > 0)
 				{
 					while (cmd[j] != '\0')
@@ -255,10 +268,16 @@ parse_FONT_backend(char* cmd, int c)
 			}
 			cmd[i] = toupper(cmd[i]);
 		}
+#if 0
+TRACE("parse_FONT_backend: res = %s\n", cmd);
+#endif
 		/* Remove prefix "ISO", if exists. */
 		if (strncmp(cmd, "ISO", 3) == 0)
 			cmd += 3;
 	}
+#if 0
+TRACE("parse_FONT_backend: out = %s\n", cmd);
+#endif
 	return cmd;
 }
 
