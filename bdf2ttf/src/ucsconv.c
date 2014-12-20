@@ -65,7 +65,7 @@ ucsconv_load_fh(ucsconv_t* conv, FILE* fp)
     while (fgets(buf, sizeof(buf), fp))
     {
 	char *p = is_valid(buf);
-	int from, to;
+	unsigned int from, to;
 	if (!p)
 	    continue;
 	if (sscanf(p, "%x %x", &from, &to) >= 2)

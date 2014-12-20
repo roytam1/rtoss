@@ -8,9 +8,9 @@
 #ifndef UCSCONV_H
 #define UCSCONV_H
 
-#define UCSCHAR_T_MAX 0x10000
+#define UCSCHAR_T_MAX 0x1000000
 
-typedef unsigned short ucschar_t;
+typedef unsigned int ucschar_t;
 typedef struct _ucsconv_t
 {
     ucschar_t fromUCS[UCSCHAR_T_MAX];
