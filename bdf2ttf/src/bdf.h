@@ -8,7 +8,7 @@
 #ifndef BDF_H
 #define BDF_H
 
-#define BDF_MAX_GLYPH 0x10000
+#define BDF_MAX_GLYPH 0x1000000
 
 typedef unsigned char bdf_byte_t;
 

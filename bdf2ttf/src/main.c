@@ -38,6 +38,7 @@ main(int argc, char** argv)
     int flag_stylecheck	= 1;
     int verbose_level	= 0;
     int flag_glyph_offset	= 0;
+    int flag_unicode_full	= 0;
 
     ++argv;
     --argc;
@@ -52,6 +53,8 @@ main(int argc, char** argv)
 	    flag_italic = 1;
 	else if (!strcmp(p, "g") || !strcmp(p, "-glyph-offset"))
 	    flag_glyph_offset = 1;
+	else if (!strcmp(p, "f") || !strcmp(p, "-unicode-full"))
+	    flag_unicode_full = 1;
 	else if (!strcmp(p, "v") || !strcmp(p, "-verbose"))
 	    ++verbose_level;
 	else if (!strcmp(p, "-no-autoname"))
@@ -107,6 +110,7 @@ main(int argc, char** argv)
     g_trademark_cp  = g_trademark_cp	? g_trademark_cp: g_trademark;
 
     g_flag_glyph_offset = flag_glyph_offset;
+    g_flag_unicode_full = flag_unicode_full;
 
     /* Read BDF files */
     font = bdf2_open();

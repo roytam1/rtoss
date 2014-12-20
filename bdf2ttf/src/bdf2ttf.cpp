@@ -6,7 +6,7 @@
  * Last Change: 12-Aug-2005.
  */
 
-//#define USE_CMAP_3RD_TABLE 1
+#define USE_CMAP_3RD_TABLE 1
 #define USE_GLYPH_OFFSET 1
 
 #include "version.h"
@@ -103,6 +103,7 @@ char *g_version_cp	= NULL;
 char *g_trademark	= TRADEMARK;
 char *g_trademark_cp	= NULL;
 int g_flag_glyph_offset	= 0;
+int g_flag_unicode_full	= 0;
 
     int
 emCalc(int pix, int base)
@@ -657,114 +658,160 @@ generate_LOCA_GLYF(bdf2_t* font)
     loca->commitLen();
 }
 
-    static void
+	static void
 generate_CMAP(bdf2_t* font)
 {
-    bigfirst fmat0, fmat4;
+	bigfirst fmat0, fmat4, fmat12;
 
-    // Make format 0
-    {
-	int i;
-
-	fmat0.addShort(0);			/* format */
-	fmat0.addShort(sizeof(short) * 3 + 256);
-	/* len */
-	fmat0.addShort(0);			/* Revision */
-	for (i = 0; i < 0x100; ++i)
+	// Make format 0
 	{
-	    int gid = bdf2_is_glyph_available(font, i) ?
-		bdf2_get_glyph_id(font, i) + 1 : 0;
-	    fmat0.addByte(gid);
-	    //printf("GLYPH_ID: %02x -> %d\n", i, bdf2_get_glyph_id(font, i));
-	}
-    }
+		int i;
 
-    // Make format 4
-    {
-	bigfirst endCount, startCount, idDeleta, idRangeOffset;
-	int segCount = 0;
-
-	for (int i = 0; i < BDF_MAX_GLYPH; ++i)
-	{
-	    if (!bdf2_is_glyph_available(font, i))
-	    {
-		if (i == BDF_MAX_GLYPH - 1)
+		fmat0.addShort(0);						/* format */
+		fmat0.addShort(sizeof(short) * 3 + 256);
+		/* len */
+		fmat0.addShort(0);						/* Revision */
+		for (i = 0; i < 0x100; ++i)
 		{
-		    ++segCount;
-		    endCount.addShort(BDF_MAX_GLYPH - 1);
-		    startCount.addShort(BDF_MAX_GLYPH - 1);
-		    idDeleta.addShort(1);
-		    idRangeOffset.addShort(0);
+			int gid = bdf2_is_glyph_available(font, i) ?
+				bdf2_get_glyph_id(font, i) + 1 : 0;
+			fmat0.addByte(gid);
+			//printf("GLYPH_ID: %02x -> %d\n", i, bdf2_get_glyph_id(font, i));
 		}
-		continue;
-	    }
-	    int j = i + 1;
-	    while (bdf2_is_glyph_available(font, j))
-		++j;
-	    j -= 1;
-	    endCount.addShort(j);
-	    startCount.addShort(i);
-	    idDeleta.addShort(bdf2_get_glyph_id(font, i) - i + 1);
-	    idRangeOffset.addShort(0);
-	    ++segCount;
-	    i = j + 1;
 	}
 
-	unsigned short segCountX2	= segCount * 2;
-	unsigned short entrySelector	= search_topbit(segCount);
-	unsigned short searchRange	= 1 << (entrySelector + 1);
+	// Make format 4 (UCS-2 BMP-only)
+	{
+		bigfirst endCount, startCount, idDeleta, idRangeOffset;
+		int segCount = 0;
 
-	fmat4.addShort(4);		// format
-	fmat4.addShort(sizeof(short) * 8 + segCount * sizeof(short) * 4);
-					// length
-	fmat4.addShort(0);		// language
-	fmat4.addShort(segCountX2);	// segCountX2
-	fmat4.addShort(searchRange);	// searchRange
-	fmat4.addShort(entrySelector);	// entrySelector
-	fmat4.addShort(segCountX2 - searchRange);
-					// rangeShift
-	fmat4.addArray(endCount);
-	fmat4.addShort(0);		// reservedPad
-	fmat4.addArray(startCount);
-	fmat4.addArray(idDeleta);
-	fmat4.addArray(idRangeOffset);
-    }
+		for (int i = 0; i < 0x10000; ++i)
+		{
+			if (!bdf2_is_glyph_available(font, i))
+			{
+				if (i == 0x10000 - 1)
+				{
+					++segCount;
+					endCount.addShort(0x10000 - 1);
+					startCount.addShort(0x10000 - 1);
+					idDeleta.addShort(1);
+					idRangeOffset.addShort(0);
+				}
+				continue;
+			}
+			int j = i + 1;
+			while (bdf2_is_glyph_available(font, j))
+				++j;
+			j -= 1;
+			endCount.addShort(j);
+			startCount.addShort(i);
+			idDeleta.addShort(bdf2_get_glyph_id(font, i) - i + 1);
+			idRangeOffset.addShort(0);
+			++segCount;
+			i = j + 1;
+		}
 
-    /* follow make cmap */
+		unsigned short segCountX2		= segCount * 2;
+		unsigned short entrySelector		= search_topbit(segCount);
+		unsigned short searchRange		= 1 << (entrySelector + 1);
+
+		fmat4.addShort(4);				// format
+		fmat4.addShort(sizeof(short) * 8 + segCount * sizeof(short) * 4);
+										// length
+		fmat4.addShort(0);				// language
+		fmat4.addShort(segCountX2);		// segCountX2
+		fmat4.addShort(searchRange);		// searchRange
+		fmat4.addShort(entrySelector);		// entrySelector
+		fmat4.addShort(segCountX2 - searchRange);
+										// rangeShift
+		fmat4.addArray(endCount);
+		fmat4.addShort(0);				// reservedPad
+		fmat4.addArray(startCount);
+		fmat4.addArray(idDeleta);
+		fmat4.addArray(idRangeOffset);
+	}
+
+	/* follow make cmap */
 #ifdef USE_CMAP_3RD_TABLE
-    /* for 3rd table */
-    int numtbl = 3;
+	int numtbl = 2;
+	if (g_flag_unicode_full) {
+		/* for 3rd table */
+		numtbl = 3;
+
+		// Make format 12
+		{
+			bigfirst segment12;
+			int segCount12 = 0;
+
+			for (int i = 0; i < BDF_MAX_GLYPH; ++i)
+			{
+				if (!bdf2_is_glyph_available(font, i))
+				{
+					/*if (i == BDF_MAX_GLYPH - 1)
+					{
+						++segCount12;
+						segment12.addLong(BDF_MAX_GLYPH - 1);
+						segment12.addLong(BDF_MAX_GLYPH - 1);
+						segment12.addLong(1);
+					}*/
+					continue;
+				}
+				int j = i + 1;
+				while (bdf2_is_glyph_available(font, j))
+					++j;
+				j -= 1;
+				segment12.addLong(i);
+				segment12.addLong(j);
+				segment12.addLong(bdf2_get_glyph_id(font, i)+1); // first glyph is blank non-bitmap defauly glyph
+				++segCount12;
+				i = j + 1;
+			}
+
+			fmat12.addShort(12);			// format
+			fmat12.addShort(0);				// reserved
+			fmat12.addLong(sizeof(short) * 2 + sizeof(long) * 3 + segCount12 * sizeof(long) * 3);
+											// length
+			fmat12.addLong(0);				// language
+			fmat12.addLong(segCount12);		// nGroups
+			fmat12.addArray(segment12);
+		}
+	}
 #else
-    int numtbl = 2;
+	int numtbl = 2;
 #endif
-    int offset = sizeof(short) * 2
-	+ (sizeof(short) * 2 + sizeof(long)) * numtbl;
+	int offset = sizeof(short) * 2
+		+ (sizeof(short) * 2 + sizeof(long)) * numtbl;
 
-    table *cmap = &ttfTbl[CMAP];
-    cmap->addShort(0);		/* Version */
-    cmap->addShort(numtbl);	/* #tbl */
-    /* Table 1 (format 0) */
-    cmap->addShort(1);		/* Platform ID = 1 -> Macintosh */
-    cmap->addShort(0);		/* Encoding ID = 0 -> Roman */
-    cmap->addLong(offset);
-    /* Table 2 (format 4) */
-    cmap->addShort(3);		/* Platform ID = 3 -> Microsoft */
-    cmap->addShort(1);		/* Encoding ID = 1 -> Unicode */
-    cmap->addLong(offset + fmat0.getLen());
+	table *cmap = &ttfTbl[CMAP];
+	cmap->addShort(0);				/* Version */
+	cmap->addShort(numtbl);		/* #tbl */
+	/* Table 1 (format 0) */
+	cmap->addShort(1);				/* Platform ID = 1 -> Macintosh */
+	cmap->addShort(0);				/* Encoding ID = 0 -> Roman */
+	cmap->addLong(offset);
+	/* Table 2 (format 4) */
+	cmap->addShort(3);				/* Platform ID = 3 -> Microsoft */
+	cmap->addShort(1);				/* Encoding ID = 1 -> Unicode */
+	cmap->addLong(offset + fmat0.getLen());
 #if USE_CMAP_3RD_TABLE
-    /* Table 3 (format X) */
-    cmap->addShort(0);		/* Platform ID = X -> Unknown */
-    cmap->addShort(0);		/* Encoding ID = X -> Unknown */
-    cmap->addLong(offset + fmat0.getLen());
-    //cmap->addLong(offset + fmat0.getLen());
+	if (g_flag_unicode_full) {
+		/* Table 3 (format 12) */
+		cmap->addShort(3);			/* Platform ID = 3 -> Microsoft */
+		cmap->addShort(10);			/* Encoding ID = 10 -> Unicode UCS-4 */
+		cmap->addLong(offset + fmat0.getLen() + fmat4.getLen());
+	}
 #endif
 
-    /* Add table main data stream */
-    cmap->addArray(fmat0);
-    cmap->addArray(fmat4);
+	/* Add table main data stream */
+	cmap->addArray(fmat0);
+	cmap->addArray(fmat4);
+#if USE_CMAP_3RD_TABLE
+	if (g_flag_unicode_full) 
+		cmap->addArray(fmat12);
+#endif
 
-    cmap->calcSum();
-    cmap->commitLen();
+	cmap->calcSum();
+	cmap->commitLen();
 }
 
     static void
