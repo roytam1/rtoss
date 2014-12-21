@@ -31,7 +31,7 @@ extern int otf2bdf_load_map(FILE *in);
 
 extern void otf2bdf_free_map(void);
 
-extern int otf2bdf_remap(unsigned short *code);
+extern int otf2bdf_remap(long *code);
 
 extern void otf2bdf_remap_charset(char **registry_name,
                                   char **encoding_name);

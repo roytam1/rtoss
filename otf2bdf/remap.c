@@ -373,8 +373,8 @@ static char *encoding;
  * Trie node structure.
  */
 typedef struct {
-    unsigned short key;	/* Key value.					*/
-    unsigned short val;	/* Data for the key.				*/
+    unsigned long key;	/* Key value.					*/
+    unsigned long val;	/* Data for the key.				*/
     unsigned long sibs;	/* Offset of siblings from trie beginning.	*/
     unsigned long kids; /* Offset of children from trie beginning.	*/
 } node_t;
@@ -584,10 +584,10 @@ otf2bdf_free_map(void)
  * The routine that actually remaps the code by looking it up in the trie.
  */
 int
-otf2bdf_remap(unsigned short *code)
+otf2bdf_remap(long *code)
 {
     unsigned long i, n, t;
-    unsigned short c, codes[2];
+    unsigned long c, codes[2];
 
     /*
      * If no mapping table was loaded, then simply return the code.
