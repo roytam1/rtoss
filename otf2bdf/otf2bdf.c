@@ -50,7 +50,7 @@
 /*
  * The version of otf2bdf.
  */
-#define OTF2BDF_VERSION "3.0"
+#define OTF2BDF_VERSION "3.1"
 
 /*
  * Set the default values used to generate a BDF font.
@@ -729,7 +729,9 @@ generate_font(FILE *out, char *iname, char *oname)
     FT_Short y_off, x_off;
     FT_Long sx, sy, ex, ey, wd, ht;
     FT_Long code, idx, ng, aw;
-    FT_UShort remapped_code;
+    FT_Long remapped_code;
+    FT_BBox ftbbox;
+    FT_Glyph glyph;
     unsigned char *bp;
     double dw;
     char *xp, xlfd[BUFSIZ];
@@ -747,7 +749,7 @@ generate_font(FILE *out, char *iname, char *oname)
      * Open a temporary file to store the bitmaps in until the exact number
      * of bitmaps are known.
      */
-    if ((tmpdir = getenv("TMPDIR")) == 0)
+    if (((tmpdir = getenv("TMPDIR")) == 0)&&((tmpdir = getenv("TMP")) == 0))
       tmpdir = "/tmp";
     sprintf(tmpfile, "%s/otf2bdf%ld", tmpdir, (long) getpid());
     if ((tmp = fopen(tmpfile, "w")) == 0) {
@@ -769,13 +771,12 @@ generate_font(FILE *out, char *iname, char *oname)
     wd = 0xffff;
     ismono = 1;
 
-    for (ng = code = 0, eof = 0, aw = 0; eof != EOF && code < 0xffff; code++) {
-
+    for (ng = code = 0, eof = 0, aw = 0; eof != EOF && code < 0x110000; code++) {
         /*
          * If a remap is indicated, attempt to remap the code.  If a remapped
          * code is not found, then skip generating the glyph.
          */
-        remapped_code = (FT_UShort) code;
+        remapped_code = code;
         if (do_remap && !otf2bdf_remap(&remapped_code))
           continue;
 
@@ -812,10 +813,10 @@ generate_font(FILE *out, char *iname, char *oname)
          * continue.
          */
 
-        if (idx <= 0 || FT_Load_Glyph(face, idx, load_flags))
+        if (idx <= 0 || FT_Load_Glyph(face, idx, load_flags) || FT_Get_Glyph(face->glyph, &glyph))
           continue;
 
-        if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_MONO))
+        if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_MONO)||FT_Glyph_To_Bitmap( &glyph, FT_RENDER_MODE_MONO, 0, 1 ))
           continue;
 
         /*
@@ -826,10 +827,18 @@ generate_font(FILE *out, char *iname, char *oname)
         dw = (double) dwidth;
         swidth = (FT_Short) ((dw * 72000.0) / swscale);
 
+        FT_Glyph_Get_CBox( glyph, FT_GLYPH_BBOX_PIXELS, &ftbbox );
+//        fprintf( stderr, "code = %04lx, bbox = [%ld %ld %ld %ld], bbx = %ld %ld %hd %hd\n",
+//            code, ftbbox.xMin, ftbbox.yMin, ftbbox.xMax, ftbbox.yMax, wd, ht, x_off, y_off );
+        ey = ftbbox.yMax-ftbbox.yMin;
+        sy = 0;
+        ex = ftbbox.xMax-ftbbox.xMin;
+        sx = 0;
+
         /*
          * Determine the actual bounding box of the glyph bitmap.  Do not
          * forget that the glyph is rendered upside down!
-         */
+         */ /*
         sx = sy = 0xffff;
         ex = ey = 0;
         bp = face->glyph->bitmap.buffer;
@@ -848,13 +857,13 @@ generate_font(FILE *out, char *iname, char *oname)
         /*
          * If the glyph is actually an empty bitmap, set the size to 0 all
          * around.
-         */
+         */ /*
         if (sx == 0xffff && sy == 0xffff && ex == 0 && ey == 0)
           sx = ex = sy = ey = 0;
         else {
             /*
              * Adjust the end points.
-             */
+             */ /*
             ex++;
             ey++;
         }
@@ -890,6 +899,7 @@ generate_font(FILE *out, char *iname, char *oname)
          * Add to the average width accumulator.
          */
         aw += wd;
+
 
         /*
          * Print the bitmap header.
@@ -1049,6 +1059,8 @@ generate_font(FILE *out, char *iname, char *oname)
     fprintf(out, "FONT_ASCENT %hd\nFONT_DESCENT %hd\n",
             (horizontal->Ascender * imetrics.y_ppem) / upm,
             -((horizontal->Descender * imetrics.y_ppem) / upm));
+
+    //printf("Ascender = %d, Descender = %d, y_ppem = %d, upm = %d\n", horizontal->Ascender, horizontal->Descender, imetrics.y_ppem, upm);
 
     /*
      * Get the copyright string from the font.
@@ -1231,6 +1243,10 @@ usage(int eval)
     printf("-l \"subset\"\tSpecify a subset of glyphs to generate.\n");
     printf("-m mapfile\tGlyph reencoding file.\n");
     printf("-n\t\tTurn off glyph hinting.\n");
+    printf("-a\t\tAuto-hinter is preferred over the font's native hinter.\n");
+    printf("-A\t\tDisable auto-hinter.\n");
+    printf("-B\t\tDisable embedded bitmaps.\n");
+    printf("-g n\t\tSelect a specific hinting algorithm (0-4, default: 0).\n");
     printf("-et\t\tDisplay the encoding tables available in the font.\n");
     printf("-c c\t\tSet the character spacing (default: from font).\n");
     printf("-f name\t\tSet the foundry name (default: freetype).\n");
@@ -1260,7 +1276,7 @@ usage(int eval)
 int
 main(int argc, char *argv[])
 {
-    int res, pet;
+    int res, pet, rmode;
     char *infile, *outfile, *iname, *oname;
     FILE *out, *mapin;
 
@@ -1294,6 +1310,25 @@ main(int argc, char *argv[])
                 break;
               case 'n': case 'N':
                 load_flags |= FT_LOAD_NO_HINTING;
+                break;
+              case 'a':
+                load_flags |= FT_LOAD_FORCE_AUTOHINT;
+                break;
+              case 'B':
+                load_flags |= FT_LOAD_NO_BITMAP;
+                break;
+              case 'g':
+                argc--;
+                argv++;
+                rmode = atoi(argv[0]);
+                if(rmode < 0 || rmode > 4)
+                  fprintf(stderr, "%s: invalid hinting algorithm value '%d'.\n",
+                          prog, rmode);
+                else
+                  load_flags |= ( (FT_Int32)( (rmode) & 15 ) << 16 );
+                break;
+              case 'A':
+                load_flags |= FT_LOAD_NO_AUTOHINT;
                 break;
               case 'c': case 'C':
                 argc--;
@@ -1555,7 +1590,7 @@ main(int argc, char *argv[])
         /*
          * Set the global units per em value for convenience.
          */
-        upm = face->units_per_EM;
+        upm = face->units_per_EM ? face->units_per_EM : 1000;
 
         /*
          * Generate the BDF font from the TrueType font.
