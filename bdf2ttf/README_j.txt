@@ -1,8 +1,8 @@
 bdf2ttf フォントコンバートツール 説明書
                                                             Since: 21-Aug-2002
-                                                                  Version: 1.0
+                                                                  Version: 2.1
                                                   Author: MURAOKA Taro (KoRoN)
-                                                     Last Change: 12-Aug-2005.
+                                                     Last Change: 21-Dec-2014.
 
 
 説明
@@ -22,6 +22,8 @@ bdf2ttf フォントコンバートツール 説明書
     省略可能。以下のオプションが指定できます。
     -b, --bold          太字フォントを生成します。
     -i, --italic        斜体フォントを生成します。
+    -g, --glyph-offset  プロポーショナルフォントを生成します。
+    -f, --unicode-full  Unicode BMP外(CJK Ext. Bなと)のフォント用のスイッチ。
     --no-autoname       -b/i指定時に、自動的に表示フォント名が修正されるのを回
                         避します。
     --no-stylecheck     -b/i指定時に、整合性チェックを行うのを抑制します。
@@ -176,6 +178,9 @@ bdf2ttf フォントコンバートツール 説明書
 
 
 更新履歴
+  ● 21-Dec-2014 (2.1)
+    Unicode BMP外(CJK Ext. Bなと)のフォント用のスイッチ(-f)を追加。
+    (2.0.1)プロポーショナルフォントを生成します(-p)。
   ● 12-Aug-2005 (2.0)
     スタイルチェックを無効化するオプションを追加
     斜体フォントのサイズがズレる問題を修正
