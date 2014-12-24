@@ -486,7 +486,7 @@ encoding_name(short pid, short eid)
       default: return "-Unknown-0";
     }
 
-    return (eid < nnames) ? names[eid] : "-Unknown-0";
+    return (eid < nnames) ? names[eid] : ((pid==3&&eid==10) ? "-Unicode UCS4-1" : "-Unknown-0");
 }
 
 static char *spaces = "              ";
@@ -711,7 +711,9 @@ make_xlfd_name(char *name, int name_size, FT_Long awidth, int ismono)
             /*
              * Microsoft platform, so choose from the MS encoding strings.
              */
-            if (eid < 0 || eid >= nms_encodings)
+            if (eid == 10) /* eid 10 = Unicode UCS-4 */
+              (void) strcpy(name, ms_encodings[1]);
+            else if (eid < 0 || eid >= nms_encodings)
               (void) strcpy(name, DEFAULT_XLFD_CSET);
             else
               (void) strcpy(name, ms_encodings[eid]);
