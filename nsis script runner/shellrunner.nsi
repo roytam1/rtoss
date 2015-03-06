@@ -32,6 +32,7 @@ Var argv7
 Var argv8
 Var argv9
 Var lineno
+Var skiplines
 
 Var retval
 Var var0
@@ -642,14 +643,36 @@ Function processLine
 				${EndIf}
 			${EndIf}
 			${Break}
+		${Case} '!shellctx'
+			${If} $argv0 == 'all'
+				SetShellVarContext all
+			${Else}
+				SetShellVarContext current
+			${EndIf}
+			${Break}
 		${Case} '!expendenv'
-			StrLen $retval $argv0
+			ExpandEnvStrings $retval $argv0
 			${Break}
 		${Case} '!readenv'
-			StrLen $retval $argv0
+			ReadEnvStr $retval $argv0
 			${Break}
+;		${Case} '!readregdword'
+;			ReadRegDWORD $retval $argv0 $argv1 $argv2
+;			${Break}
+;		${Case} '!readregstr'
+;			ReadRegStr $retval $argv0 $argv1 $argv2
+;			${Break}
+;		${Case} '!writeregstr'
+;			WriteRegStr $argv0 $argv1 $argv2
+;			${Break}
 		${Case} '!readini'
 			ReadINIStr $retval $argv0 $argv1 $argv2
+			${Break}
+		${Case} '!writeini'
+			WriteINIStr $argv0 $argv1 $argv2 $argv3
+			${Break}
+		${Case} '!mklink'
+			CreateShortcut $argv0 $argv1 $argv2 $argv3
 			${Break}
 		${Case} '!findwin'
 			${If} $argvc = 4
@@ -675,6 +698,9 @@ Function processLine
 			${Break}
 		${Case} '!sendmsg'
 			SendMessage $argv0 $argv1 $argv2 $argv3
+			${Break}
+		${Case} '!skip'
+			IntOp $skiplines $argv0 + 0
 			${Break}
 		${Case} '!vartoret'
 			${Switch} $argv0
@@ -783,8 +809,13 @@ Function readFile
 	FileRead $4 $oline
 !endif
 	StrCpy $lineno 1
+	StrCpy $skiplines 0
 	${DoUntil} ${Errors}
-		${processLine} $oline
+		${If} $skiplines = 0
+			${processLine} $oline
+		${Else}
+			IntOp $skiplines $skiplines - 1
+		${EndIf}
 		IntOp $lineno $lineno + 1
 !ifdef UTF16Script
 		FileReadUTF16LE $4 $oline
@@ -816,12 +847,12 @@ Section
 		${If} ${FileExists} `$EXEDIR\$SetupName.txt`
 			${readFile} "$EXEDIR\$SetupName.txt"
 		${EndIf}
-       	${Else}
+	${Else}
 		${StrRep} $args "$args" '"' ""
 
 		${If} ${FileExists} `$args`
 			${readFile} "$args"
-	       	${Else}
+		${Else}
 			${If} ${FileExists} `$EXEDIR\$args`
 				${readFile} "$EXEDIR\$args"
 			${Else}
