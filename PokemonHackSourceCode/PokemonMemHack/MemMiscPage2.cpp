@@ -128,6 +128,7 @@ void CMemMiscPage2::OnBnClickedGiveAllPokemon()
 	BOOL	bMaxAP;
 	BOOL	bMaxInti;
 	BOOL	bUseNumber;
+	BOOL	bAllPkmn;
 	DWORD	dwLang;
 	BYTE	bGameVersion;
 	BYTE	bSex;
@@ -147,6 +148,7 @@ void CMemMiscPage2::OnBnClickedGiveAllPokemon()
 	bMaxAP		= (IsDlgButtonChecked(IDC_MAX_AP)			== BST_CHECKED) ? TRUE : FALSE;
 	bMaxInti	= (IsDlgButtonChecked(IDC_MAX_INTI)			== BST_CHECKED) ? TRUE : FALSE;
 	bUseNumber	= (IsDlgButtonChecked(IDC_PC_NAME_NUMBER)	== BST_CHECKED) ? TRUE : FALSE;
+	bAllPkmn	= (IsDlgButtonChecked(IDC_ALLPKMN)			== BST_CHECKED) ? TRUE : FALSE;
 
 	if(IsDlgButtonChecked(IDC_PC_NAME_JP) == BST_CHECKED)
 		dwLang = lang_jp;
@@ -166,7 +168,7 @@ void CMemMiscPage2::OnBnClickedGiveAllPokemon()
 
 	BOOL	bResult = TRUE;
 	BOOL	bTrainerNameOk;
-	WORD	wIndex, wBreed;
+	WORD	wIndex, wBreed, wAllCount;
 	DWORD	dwPlayerId = 0;
 	CString	szName;
 	CPokemonCodec *	ppc = NULL;
@@ -183,12 +185,16 @@ void CMemMiscPage2::OnBnClickedGiveAllPokemon()
 	if(bResult)
 	{
 		bTrainerNameOk = g_MemHack.GetPlayerName(bTrainerName);
+		wAllCount = bAllPkmn ? 411 : 386;
 
-		for(wIndex = 0; wIndex < 386; ++wIndex)
+		for(wIndex = 0; wIndex < wAllCount; ++wIndex)
 		{
 			ppc = &(g_MemHack.m_pStoredPokeCodec[wIndex]);
 
-			wBreed = ConvertBreed(wIndex + 1, TRUE);
+			if(!bAllPkmn)
+				wBreed = ConvertBreed(wIndex + 1, TRUE);
+			else
+				wBreed = wIndex + 1;
 			pBreed = g_MemRom.GetBreedListEntry(wBreed);
 			ppc->CreatePokemon(wBreed, dwLang, bGameVersion);
 

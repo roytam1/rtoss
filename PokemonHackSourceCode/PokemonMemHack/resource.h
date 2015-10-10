@@ -211,6 +211,7 @@
 #define IDC_BREED_ABL_SUM               1516
 #define IDC_NO_NAME                     1900
 #define IDC_ENABLE_TEXT                 1901
+#define IDC_ALLPKMN                     1911
 #define IDC_SECRET                      2490
 #define IDC_DECODE                      2491
 #define IDC_ENCODE                      2492
@@ -234,7 +235,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        148
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1911
+#define _APS_NEXT_CONTROL_VALUE         1912
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif
