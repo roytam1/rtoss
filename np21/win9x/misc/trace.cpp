@@ -15,6 +15,8 @@
 #include "ini.h"
 #include "menu.h"
 
+#include	"cpucore.h"
+
 #ifdef TRACE
 
 #define	VIEW_FGCOLOR	0x000000
@@ -124,7 +126,8 @@ void CTraceWnd::Initialize()
 	}
 
 #if 1
-	m_nFlags = 4;
+	m_nFlags = 5;
+	//m_tfh = textfile_create(OEMTEXT("traceout.txt"), 0x800);
 #else
 	m_nFlags = 1;
 	m_tfh = textfile_create(OEMTEXT("traceout.txt"), 0x800);
@@ -219,7 +222,7 @@ void CTraceWnd::AddFormat(LPCSTR lpFormat, va_list argptr)
 {
 	USES_CONVERSION;
 
-	TCHAR szBuf[4096];
+	TCHAR szBuf[20192];
 	_vstprintf(szBuf, A2CT(lpFormat), argptr);
 	AddString(szBuf);
 }
@@ -241,11 +244,22 @@ void CTraceWnd::AddString(LPCTSTR lpString)
 
 		m_wndView.SendMessage(EM_REPLACESEL, FALSE, reinterpret_cast<LPARAM>(lpString));
 		m_wndView.SendMessage(EM_REPLACESEL, FALSE, reinterpret_cast<LPARAM>(crlf));
+
+		if(nLength>20000){
+			TCHAR temp[1] = {0};
+			int llength = m_wndView.SendMessage(EM_LINELENGTH, static_cast<WPARAM>(1), NULL);
+			m_wndView.SendMessage(EM_SETSEL, static_cast<WPARAM>(0), static_cast<LPARAM>(nLength));
+			m_wndView.SendMessage(EM_REPLACESEL, FALSE, reinterpret_cast<LPARAM>(temp));
+		}
+
 		m_wndView.SendMessage(EM_SETSEL, static_cast<WPARAM>(nStart), static_cast<LPARAM>(nEnd));
 	}
 	if (m_tfh != NULL)
 	{
+		TCHAR strtmp[50];
+		_stprintf(strtmp, _T(" PM=%d"), CPU_STAT_PM);
 		textfile_write(m_tfh, lpString);
+		textfile_write(m_tfh, strtmp);
 		textfile_write(m_tfh, crlf);
 	}
 }

@@ -337,9 +337,9 @@ UINT8 insttable_info[256] = {
 	0,
 };
 
-void (*insttable_1byte[2][256])(void) = {
+void (*insttable_1byte[2*256])(void) = {
 	/* 16bit */
-	{
+	//{
 		ADD_EbGb,		/* 00 */
 		ADD_EwGw,
 		ADD_GbEb,
@@ -611,10 +611,10 @@ void (*insttable_1byte[2][256])(void) = {
 		STD,
 		Grp4,
 		Grp5_Ew,
-	},
+	//},
 
 	/* 32bit */
-	{
+	//{
 		ADD_EbGb,		/* 00 */
 		ADD_EdGd,
 		ADD_GbEb,
@@ -886,12 +886,12 @@ void (*insttable_1byte[2][256])(void) = {
 		STD,
 		Grp4,
 		Grp5_Ed,
-	},
+	//},
 };
 
-void (*insttable_2byte[2][256])(void) = {
+void (*insttable_2byte[2*256])(void) = {
 	/* 16bit */
-	{
+	//{
 		Grp6,			/* 00 */
 		Grp7,
 		LAR_GwEw,
@@ -1163,10 +1163,10 @@ void (*insttable_2byte[2][256])(void) = {
 		undef_op,
 		undef_op,
 		undef_op,
-	},
+	//},
 
 	/* 32bit */
-	{
+	//{
 		Grp6,			/* 00 */
 		Grp7,
 		LAR_GdEw,
@@ -1438,7 +1438,7 @@ void (*insttable_2byte[2][256])(void) = {
 		undef_op,
 		undef_op,
 		undef_op,
-	},
+	//},
 };
 
 

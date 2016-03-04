@@ -50,8 +50,8 @@ inst##4(UINT32 dst, void *arg) \
 void CPUCALL \
 inst##_Eb(UINT32 op) \
 { \
-	UINT8 *out; \
-	UINT32 dst, madr; \
+	register UINT8 *out; \
+	register UINT32 dst, madr; \
 \
 	if (op >= 0xc0) { \
 		CPU_WORKCLOCK(2); \
@@ -69,8 +69,8 @@ inst##_Eb(UINT32 op) \
 void CPUCALL \
 inst##_Ew(UINT32 op) \
 { \
-	UINT16 *out; \
-	UINT32 dst, madr; \
+	register UINT16 *out; \
+	register UINT32 dst, madr; \
 \
 	if (op >= 0xc0) { \
 		CPU_WORKCLOCK(2); \
@@ -88,8 +88,8 @@ inst##_Ew(UINT32 op) \
 void CPUCALL \
 inst##_Ed(UINT32 op) \
 { \
-	UINT32 *out; \
-	UINT32 dst, madr; \
+	register UINT32 *out; \
+	register UINT32 dst, madr; \
 \
 	if (op >= 0xc0) { \
 		CPU_WORKCLOCK(2); \
@@ -109,21 +109,21 @@ inst##_Ed(UINT32 op) \
 static UINT32 CPUCALL \
 inst##1(UINT32 dst, void *arg) \
 { \
-	UINT32 src = PTR_TO_UINT32(arg); \
+	register UINT32 src = PTR_TO_UINT32(arg); \
 	BYTE_##inst(dst, src); \
 	return dst; \
 } \
 static UINT32 CPUCALL \
 inst##2(UINT32 dst, void *arg) \
 { \
-	UINT32 src = PTR_TO_UINT32(arg); \
+	register UINT32 src = PTR_TO_UINT32(arg); \
 	WORD_##inst(dst, src); \
 	return dst; \
 } \
 static UINT32 CPUCALL \
 inst##4(UINT32 dst, void *arg) \
 { \
-	UINT32 src = PTR_TO_UINT32(arg); \
+	register UINT32 src = PTR_TO_UINT32(arg); \
 	DWORD_##inst(dst, src); \
 	return dst; \
 } \
@@ -131,8 +131,8 @@ inst##4(UINT32 dst, void *arg) \
 void \
 inst##_EbGb(void) \
 { \
-	UINT8 *out; \
-	UINT32 op, src, dst, madr; \
+	register UINT8 *out; \
+	register UINT32 op, src, dst, madr; \
 \
 	PREPART_EA_REG8(op, src); \
 	if (op >= 0xc0) { \
@@ -151,8 +151,8 @@ inst##_EbGb(void) \
 void \
 inst##_EwGw(void) \
 { \
-	UINT16 *out; \
-	UINT32 op, src, dst, madr; \
+	register UINT16 *out; \
+	register UINT32 op, src, dst, madr; \
 \
 	PREPART_EA_REG16(op, src); \
 	if (op >= 0xc0) { \
@@ -171,8 +171,8 @@ inst##_EwGw(void) \
 void \
 inst##_EdGd(void) \
 { \
-	UINT32 *out; \
-	UINT32 op, src, dst, madr; \
+	register UINT32 *out; \
+	register UINT32 op, src, dst, madr; \
 \
 	PREPART_EA_REG32(op, src); \
 	if (op >= 0xc0) { \
@@ -191,8 +191,8 @@ inst##_EdGd(void) \
 void \
 inst##_GbEb(void) \
 { \
-	UINT8 *out; \
-	UINT32 op, src, dst; \
+	register UINT8 *out; \
+	register UINT32 op, src, dst; \
 \
 	PREPART_REG8_EA(op, src, out, 2, 7); \
 	dst = *out; \
@@ -203,8 +203,8 @@ inst##_GbEb(void) \
 void \
 inst##_GwEw(void) \
 { \
-	UINT16 *out; \
-	UINT32 op, src, dst; \
+	register UINT16 *out; \
+	register UINT32 op, src, dst; \
 \
 	PREPART_REG16_EA(op, src, out, 2, 7); \
 	dst = *out; \
@@ -215,8 +215,8 @@ inst##_GwEw(void) \
 void \
 inst##_GdEd(void) \
 { \
-	UINT32 *out; \
-	UINT32 op, src, dst; \
+	register UINT32 *out; \
+	register UINT32 op, src, dst; \
 \
 	PREPART_REG32_EA(op, src, out, 2, 7); \
 	dst = *out; \
@@ -227,7 +227,7 @@ inst##_GdEd(void) \
 void \
 inst##_ALIb(void) \
 { \
-	UINT32 src, dst; \
+	register UINT32 src, dst; \
 \
 	CPU_WORKCLOCK(3); \
 	GET_PCBYTE(src); \
@@ -239,7 +239,7 @@ inst##_ALIb(void) \
 void \
 inst##_AXIw(void) \
 { \
-	UINT32 src, dst; \
+	register UINT32 src, dst; \
 \
 	CPU_WORKCLOCK(3); \
 	GET_PCWORD(src); \
@@ -251,7 +251,7 @@ inst##_AXIw(void) \
 void \
 inst##_EAXId(void) \
 { \
-	UINT32 src, dst; \
+	register UINT32 src, dst; \
 \
 	CPU_WORKCLOCK(3); \
 	GET_PCDWORD(src); \
@@ -263,7 +263,7 @@ inst##_EAXId(void) \
 void CPUCALL \
 inst##_EbIb(UINT8 *regp, UINT32 src) \
 { \
-	UINT32 dst; \
+	register UINT32 dst; \
 \
 	dst = *regp; \
 	BYTE_##inst(dst, src); \
@@ -280,7 +280,7 @@ inst##_EbIb_ext(UINT32 madr, UINT32 src) \
 void CPUCALL \
 inst##_EwIx(UINT16 *regp, UINT32 src) \
 { \
-	UINT32 dst; \
+	register UINT32 dst; \
 \
 	dst = *regp; \
 	WORD_##inst(dst, src); \
@@ -297,7 +297,7 @@ inst##_EwIx_ext(UINT32 madr, UINT32 src) \
 void CPUCALL \
 inst##_EdIx(UINT32 *regp, UINT32 src) \
 { \
-	UINT32 dst; \
+	register UINT32 dst; \
 \
 	dst = *regp; \
 	DWORD_##inst(dst, src); \
@@ -316,24 +316,24 @@ inst##_EdIx_ext(UINT32 madr, UINT32 src) \
 static UINT32 CPUCALL \
 inst##1(UINT32 dst, void *arg) \
 { \
-	UINT32 src = PTR_TO_UINT32(arg); \
-	UINT32 res; \
+	register UINT32 src = PTR_TO_UINT32(arg); \
+	register UINT32 res; \
 	BYTE_##inst(res, dst, src); \
 	return res; \
 } \
 static UINT32 CPUCALL \
 inst##2(UINT32 dst, void *arg) \
 { \
-	UINT32 src = PTR_TO_UINT32(arg); \
-	UINT32 res; \
+	register UINT32 src = PTR_TO_UINT32(arg); \
+	register UINT32 res; \
 	WORD_##inst(res, dst, src); \
 	return res; \
 } \
 static UINT32 CPUCALL \
 inst##4(UINT32 dst, void *arg) \
 { \
-	UINT32 src = PTR_TO_UINT32(arg); \
-	UINT32 res; \
+	register UINT32 src = PTR_TO_UINT32(arg); \
+	register UINT32 res; \
 	DWORD_##inst(res, dst, src); \
 	return res; \
 } \
@@ -341,8 +341,8 @@ inst##4(UINT32 dst, void *arg) \
 void \
 inst##_EbGb(void) \
 { \
-	UINT8 *out; \
-	UINT32 op, src, dst, res, madr; \
+	register UINT8 *out; \
+	register UINT32 op, src, dst, res, madr; \
 \
 	PREPART_EA_REG8(op, src); \
 	if (op >= 0xc0) { \
@@ -361,8 +361,8 @@ inst##_EbGb(void) \
 void \
 inst##_EwGw(void) \
 { \
-	UINT16 *out; \
-	UINT32 op, src, dst, res, madr; \
+	register UINT16 *out; \
+	register UINT32 op, src, dst, res, madr; \
 \
 	PREPART_EA_REG16(op, src); \
 	if (op >= 0xc0) { \
@@ -381,8 +381,8 @@ inst##_EwGw(void) \
 void \
 inst##_EdGd(void) \
 { \
-	UINT32 *out; \
-	UINT32 op, src, dst, res, madr; \
+	register UINT32 *out; \
+	register UINT32 op, src, dst, res, madr; \
 \
 	PREPART_EA_REG32(op, src); \
 	if (op >= 0xc0) { \
@@ -401,8 +401,8 @@ inst##_EdGd(void) \
 void \
 inst##_GbEb(void) \
 { \
-	UINT8 *out; \
-	UINT32 op, src, dst, res; \
+	register UINT8 *out; \
+	register UINT32 op, src, dst, res; \
 \
 	PREPART_REG8_EA(op, src, out, 2, 7); \
 	dst = *out; \
@@ -413,8 +413,8 @@ inst##_GbEb(void) \
 void \
 inst##_GwEw(void) \
 { \
-	UINT16 *out; \
-	UINT32 op, src, dst, res; \
+	register UINT16 *out; \
+	register UINT32 op, src, dst, res; \
 \
 	PREPART_REG16_EA(op, src, out, 2, 7); \
 	dst = *out; \
@@ -425,8 +425,8 @@ inst##_GwEw(void) \
 void \
 inst##_GdEd(void) \
 { \
-	UINT32 *out; \
-	UINT32 op, src, dst, res; \
+	register UINT32 *out; \
+	register UINT32 op, src, dst, res; \
 \
 	PREPART_REG32_EA(op, src, out, 2, 7); \
 	dst = *out; \
@@ -437,7 +437,7 @@ inst##_GdEd(void) \
 void \
 inst##_ALIb(void) \
 { \
-	UINT32 src, dst, res; \
+	register UINT32 src, dst, res; \
 \
 	CPU_WORKCLOCK(2); \
 	GET_PCBYTE(src); \
@@ -449,7 +449,7 @@ inst##_ALIb(void) \
 void \
 inst##_AXIw(void) \
 { \
-	UINT32 src, dst, res; \
+	register UINT32 src, dst, res; \
 \
 	CPU_WORKCLOCK(2); \
 	GET_PCWORD(src); \
@@ -461,7 +461,7 @@ inst##_AXIw(void) \
 void \
 inst##_EAXId(void) \
 { \
-	UINT32 src, dst, res; \
+	register UINT32 src, dst, res; \
 \
 	CPU_WORKCLOCK(2); \
 	GET_PCDWORD(src); \
@@ -473,7 +473,7 @@ inst##_EAXId(void) \
 void CPUCALL \
 inst##_EbIb(UINT8 *regp, UINT32 src) \
 { \
-	UINT32 dst, res; \
+	register UINT32 dst, res; \
 \
 	dst = *regp; \
 	BYTE_##inst(res, dst, src); \
@@ -490,7 +490,7 @@ inst##_EbIb_ext(UINT32 madr, UINT32 src) \
 void CPUCALL \
 inst##_EwIx(UINT16 *regp, UINT32 src) \
 { \
-	UINT32 dst, res; \
+	register UINT32 dst, res; \
 \
 	dst = *regp; \
 	WORD_##inst(res, dst, src); \
@@ -507,7 +507,7 @@ inst##_EwIx_ext(UINT32 madr, UINT32 src) \
 void CPUCALL \
 inst##_EdIx(UINT32 *regp, UINT32 src) \
 { \
-	UINT32 dst, res; \
+	register UINT32 dst, res; \
 \
 	dst = *regp; \
 	DWORD_##inst(res, dst, src); \

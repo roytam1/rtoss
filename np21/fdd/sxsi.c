@@ -21,7 +21,7 @@ static BRESULT nc_reopen(SXSIDEV sxsi) {
 	return(FAILURE);
 }
 
-static REG8	nc_read(SXSIDEV sxsi, long pos, UINT8 *buf, UINT size) {
+static REG8	nc_read(SXSIDEV sxsi, FILEPOS pos, UINT8 *buf, UINT size) {
 
 	(void)sxsi;
 	(void)pos;
@@ -30,7 +30,7 @@ static REG8	nc_read(SXSIDEV sxsi, long pos, UINT8 *buf, UINT size) {
 	return(0x60);
 }
 
-static REG8 nc_write(SXSIDEV sxsi, long pos, const UINT8 *buf, UINT size) {
+static REG8 nc_write(SXSIDEV sxsi, FILEPOS pos, const UINT8 *buf, UINT size) {
 
 	(void)sxsi;
 	(void)pos;
@@ -39,7 +39,7 @@ static REG8 nc_write(SXSIDEV sxsi, long pos, const UINT8 *buf, UINT size) {
 	return(0x60);
 }
 
-static REG8 nc_format(SXSIDEV sxsi, long pos) {
+static REG8 nc_format(SXSIDEV sxsi, FILEPOS pos) {
 
 	(void)sxsi;
 	(void)pos;
@@ -227,25 +227,75 @@ UINT8 sxsi_getdevtype(REG8 drv) {
 	}
 }
 
+// CD入れ替えのタイムアウト（投げやり）
+char cdchange_flag = 0;
+REG8 cdchange_drv;
+OEMCHAR cdchange_fname[MAX_PATH];
+void cdchange_timeoutproc(NEVENTITEM item) {
+	cdchange_flag = 0;
+	sxsi_devopen(cdchange_drv, cdchange_fname);
+}
+static void cdchange_timeoutset(void) {
+
+	nevent_setbyms(NEVENT_CDWAIT, 5000, cdchange_timeoutproc, NEVENT_ABSOLUTE);
+}
+
+
 BRESULT sxsi_devopen(REG8 drv, const OEMCHAR *fname) {
 
 	SXSIDEV		sxsi;
 	BRESULT		r;
 
-	if ((fname == NULL) || (fname[0] == '\0')) {
-		goto sxsiope_err;
-	}
 	sxsi = sxsi_getptr(drv);
 	if (sxsi == NULL) {
 		goto sxsiope_err;
 	}
 	switch(sxsi->devtype) {
 		case SXSIDEV_HDD:
+			if ((fname == NULL) || (fname[0] == '\0')) {
+				goto sxsiope_err;
+			}
 			r = sxsihdd_open(sxsi, fname);
 			break;
 
 		case SXSIDEV_CDROM:
-			r = sxsicd_open(sxsi, fname);
+			if (cdchange_flag) {
+				// CD交換中
+				return(FAILURE);
+			}
+			if ((fname == NULL) || (fname[0] == '\0')) {
+				int num = drv & 0x0f;
+				ideio_notify(sxsi->drv, 0);
+				file_cpyname(sxsi->fname, "\0\0\0\0", 1);
+				sxsi->flag = 0;
+				file_cpyname(np2cfg.idecd[num-2], "\0\0\0\0", 1);
+				sysmng_updatecaption(1);
+				return(SUCCESS);
+			}
+			else {
+				if(sxsi->flag & SXSIFLAG_READY){
+					// いったん取り出す
+					ideio_notify(sxsi->drv, 0);
+					sxsi->flag = 0;
+					cdchange_drv = drv;
+					file_cpyname(cdchange_fname, fname, NELEMENTS(cdchange_fname));
+					cdchange_flag = 1;
+					cdchange_timeoutset();
+					return(FAILURE); // XXX: ここで失敗返してええの？
+				}
+				r = sxsicd_open(sxsi, fname);
+#if defined(SUPPORT_IDEIO)
+				if (r == SUCCESS) {
+					int num = drv & 0x0f;
+					file_cpyname(np2cfg.idecd[num-2], fname, NELEMENTS(cdchange_fname));
+					sysmng_updatecaption(1);
+				}else{
+					int num = drv & 0x0f;
+					file_cpyname(np2cfg.idecd[num-2], "\0\0\0\0", 1);
+					sysmng_updatecaption(1);
+				}
+#endif
+			}
 			break;
 
 		default:
@@ -330,7 +380,7 @@ BOOL sxsi_iside(void) {
 
 
 
-REG8 sxsi_read(REG8 drv, long pos, UINT8 *buf, UINT size) {
+REG8 sxsi_read(REG8 drv, FILEPOS pos, UINT8 *buf, UINT size) {
 
 	SXSIDEV	sxsi;
 
@@ -343,7 +393,7 @@ REG8 sxsi_read(REG8 drv, long pos, UINT8 *buf, UINT size) {
 	}
 }
 
-REG8 sxsi_write(REG8 drv, long pos, const UINT8 *buf, UINT size) {
+REG8 sxsi_write(REG8 drv, FILEPOS pos, const UINT8 *buf, UINT size) {
 
 	SXSIDEV	sxsi;
 
@@ -356,7 +406,7 @@ REG8 sxsi_write(REG8 drv, long pos, const UINT8 *buf, UINT size) {
 	}
 }
 
-REG8 sxsi_format(REG8 drv, long pos) {
+REG8 sxsi_format(REG8 drv, FILEPOS pos) {
 
 	SXSIDEV	sxsi;
 

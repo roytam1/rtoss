@@ -35,10 +35,10 @@ void newdisk_fdd(const OEMCHAR *fname, REG8 type, const OEMCHAR *label) {
 
 // ---- hdd
 
-static BRESULT writezero(FILEH fh, UINT size) {
+static BRESULT writezero(FILEH fh, FILELEN size) {
 
 	UINT8	work[256];
-	UINT	wsize;
+	FILELEN	wsize;
 
 	ZeroMemory(work, sizeof(work));
 	while(size) {
@@ -51,10 +51,10 @@ static BRESULT writezero(FILEH fh, UINT size) {
 	return(SUCCESS);
 }
 
-static BRESULT writehddipl(FILEH fh, UINT ssize, UINT32 tsize) {
+static BRESULT writehddipl(FILEH fh, UINT ssize, FILELEN tsize) {
 
-	UINT8	work[1024];
-	UINT	size;
+	UINT8	work[16384];
+	FILELEN	size;
 
 	ZeroMemory(work, sizeof(work));
 	CopyMemory(work, hdddiskboot, sizeof(hdddiskboot));
@@ -106,15 +106,48 @@ void newdisk_thd(const OEMCHAR *fname, UINT hddsize) {
 ndthd_err:
 	return;
 }
+//
+//void newdisk_nhd(const OEMCHAR *fname, UINT hddsize) {
+//
+//	FILEH	fh;
+//	NHDHDR	nhd;
+//	UINT	size;
+//	BRESULT	r;
+//
+//	if ((fname == NULL) || (hddsize < 5) || (hddsize > 4000)) {
+//		goto ndnhd_err;
+//	}
+//	fh = file_create(fname);
+//	if (fh == FILEH_INVALID) {
+//		goto ndnhd_err;
+//	}
+//	ZeroMemory(&nhd, sizeof(nhd));
+//	CopyMemory(&nhd.sig, sig_nhd, 15);
+//	STOREINTELDWORD(nhd.headersize, sizeof(nhd));
+//	size = hddsize * 15;
+//	STOREINTELDWORD(nhd.cylinders, size);
+//	STOREINTELWORD(nhd.surfaces, 8);
+//	STOREINTELWORD(nhd.sectors, 17);
+//	STOREINTELWORD(nhd.sectorsize, 512);
+//	r = (file_write(fh, &nhd, sizeof(nhd)) == sizeof(nhd)) ? SUCCESS : FAILURE;
+//	r |= writehddipl(fh, 512, size * 8 * 17 * 512);
+//	file_close(fh);
+//	if (r != SUCCESS) {
+//		file_delete(fname);
+//	}
+//
+//ndnhd_err:
+//	return;
+//}
 
 void newdisk_nhd(const OEMCHAR *fname, UINT hddsize) {
 
 	FILEH	fh;
 	NHDHDR	nhd;
-	UINT	size;
+	FILELEN	size;
 	BRESULT	r;
-
-	if ((fname == NULL) || (hddsize < 5) || (hddsize > 512)) {
+	
+	if ((fname == NULL) || (hddsize < 5) || (hddsize > NHD_MAXSIZE)) {
 		goto ndnhd_err;
 	}
 	fh = file_create(fname);
@@ -124,13 +157,32 @@ void newdisk_nhd(const OEMCHAR *fname, UINT hddsize) {
 	ZeroMemory(&nhd, sizeof(nhd));
 	CopyMemory(&nhd.sig, sig_nhd, 15);
 	STOREINTELDWORD(nhd.headersize, sizeof(nhd));
+#ifdef SUPPORT_LARGE_HDD
+	if(hddsize <= 4096){
+		size = hddsize * 15;
+		STOREINTELDWORD(nhd.cylinders, size);
+		STOREINTELWORD(nhd.surfaces, 8);
+		STOREINTELWORD(nhd.sectors, 17);
+		STOREINTELWORD(nhd.sectorsize, 512);
+		r = (file_write(fh, &nhd, sizeof(nhd)) == sizeof(nhd)) ? SUCCESS : FAILURE;
+		r |= writehddipl(fh, 512, size * 8 * 17 * 512);
+	}else{
+		size = hddsize * 15 * 17 / 2 / 63;
+		STOREINTELDWORD(nhd.cylinders, size);
+		STOREINTELWORD(nhd.surfaces, 16);
+		STOREINTELWORD(nhd.sectors, 63);
+		STOREINTELWORD(nhd.sectorsize, 512);
+		r = (file_write(fh, &nhd, sizeof(nhd)) == sizeof(nhd)) ? SUCCESS : FAILURE;
+		r |= writehddipl(fh, 512, (UINT64)size * 16 * 63 * 512);
+	}
+#else
 	size = hddsize * 15;
 	STOREINTELDWORD(nhd.cylinders, size);
 	STOREINTELWORD(nhd.surfaces, 8);
 	STOREINTELWORD(nhd.sectors, 17);
 	STOREINTELWORD(nhd.sectorsize, 512);
-	r = (file_write(fh, &nhd, sizeof(nhd)) == sizeof(nhd)) ? SUCCESS : FAILURE;
 	r |= writehddipl(fh, 512, size * 8 * 17 * 512);
+#endif
 	file_close(fh);
 	if (r != SUCCESS) {
 		file_delete(fname);

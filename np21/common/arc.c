@@ -24,7 +24,7 @@ static UINT plainfile_write(ARCFH arcfh, const void *buffer, UINT size) {
 	return(file_write(((PLAINFILE *)arcfh)->fh, buffer, size));
 }
 
-static long plainfile_seek(ARCFH arcfh, long pos, UINT method) {
+static FILEPOS plainfile_seek(ARCFH arcfh, FILEPOS pos, UINT method) {
 
 	return(file_seek(((PLAINFILE *)arcfh)->fh, pos, method));
 }
@@ -178,7 +178,7 @@ UINT arc_filewrite(ARCFH arcfh, const void *buffer, UINT size) {
 	return(0);
 }
 
-long arc_fileseek(ARCFH arcfh, long pos, UINT method) {
+FILEPOS arc_fileseek(ARCFH arcfh, FILEPOS pos, UINT method) {
 
 	if ((arcfh != NULL) && (arcfh->fileseek != NULL)) {
 		return((*arcfh->fileseek)(arcfh, pos, method));

@@ -467,11 +467,15 @@ static const PFTBL s_IniItems[] =
 
 	PFEXT("DIPswtch", PFTYPE_BIN,		np2cfg.dipsw,			3),
 	PFEXT("MEMswtch", PFTYPE_BIN,		np2cfg.memsw,			8),
-	PFMAX("ExMemory", PFTYPE_UINT8,		&np2cfg.EXTMEM,			63),
+	PFMAX("ExMemory", PFTYPE_UINT8,		&np2cfg.EXTMEM,			255),
 	PFVAL("ITF_WORK", PFRO_BOOL,		&np2cfg.ITF_WORK),
 
 	PFSTR("HDD1FILE", PFTYPE_STR,		np2cfg.sasihdd[0]),
 	PFSTR("HDD2FILE", PFTYPE_STR,		np2cfg.sasihdd[1]),
+#if defined(SUPPORT_IDEIO)
+	//PFSTR("IDE3FILE", PFTYPE_STR,		np2cfg.idecd[0]),
+	//PFSTR("IDE4FILE", PFTYPE_STR,		np2cfg.idecd[1]),
+#endif
 #if defined(SUPPORT_SCSI)
 	PFSTR("SCSIHDD0", PFTYPE_STR,		np2cfg.scsihdd[0]),
 	PFSTR("SCSIHDD1", PFTYPE_STR,		np2cfg.scsihdd[1]),
@@ -536,6 +540,13 @@ static const PFTBL s_IniItems[] =
 	PFEXT("FDDRIVE2", PFRO_BITMAP,		&np2cfg.fddequip,		1),
 	PFEXT("FDDRIVE3", PFRO_BITMAP,		&np2cfg.fddequip,		2),
 	PFEXT("FDDRIVE4", PFRO_BITMAP,		&np2cfg.fddequip,		3),
+	
+#if defined(SUPPORT_LGY98)
+	PFVAL("USELGY98", PFTYPE_BOOL,		&np2cfg.uselgy98),
+	PFMAX("LGY98_IO", PFTYPE_UINT16,	&np2cfg.lgy98io,		0x10D0),
+	PFMAX("LGY98IRQ", PFTYPE_UINT8,		&np2cfg.lgy98irq,		5),
+	PFSTR("LGY98TAP", PFTYPE_STR,		np2cfg.lgy98tap),
+#endif
 
 	// OSàÀë∂ÅH
 	PFVAL("keyboard", PFRO_KB,			&np2oscfg.KEYBOARD),

@@ -260,16 +260,33 @@ void bios_initialize(void) {
 	}
 
 #if defined(SUPPORT_PC9821)
-	getbiospath(path, OEMTEXT("bios9821.rom"), sizeof(path));
+	//getbiospath(path, OEMTEXT("bios9821.rom"), sizeof(path));
+	//fh = file_open_rb(path);
+	//if (fh != FILEH_INVALID) {
+	//	if (file_read(fh, mem + 0x0d8000, 0x10000) == 0x10000) {
+	//		// IDE BIOS‚ð’×‚·
+	//		TRACEOUT(("load bios9821.rom"));
+	//		STOREINTELWORD(mem + 0x0d8009, 0);
+	//	}
+	//	file_close(fh);
+	//}
+	getbiospath(path, OEMTEXT("pc98bank3.bin"), sizeof(path));
 	fh = file_open_rb(path);
 	if (fh != FILEH_INVALID) {
-		if (file_read(fh, mem + 0x0d8000, 0x2000) == 0x2000) {
+		if (file_read(fh, mem + 0x0d8000, 0x8000) == 0x8000) {
 			// IDE BIOS‚ð’×‚·
-			TRACEOUT(("load bios9821.rom"));
+			TRACEOUT(("load pc98bank3.bin"));
 			STOREINTELWORD(mem + 0x0d8009, 0);
 		}
 		file_close(fh);
 	}
+	/*getbiospath(path, OEMTEXT("b0.rom"), sizeof(path));
+	fh = file_open_rb(path);
+	if (fh != FILEH_INVALID) {
+		if (file_read(fh, mem + 0x0c0000, 0x18000) == 0x18000) {
+		}
+		file_close(fh);
+	}*/
 #if defined(BIOS_SIMULATE)
 	mem[0xf8e80] = 0x98;
 	mem[0xf8e81] = 0x21;
@@ -278,16 +295,22 @@ void bios_initialize(void) {
 	mem[0xf8e84] = 0x2c;
 	mem[0xf8e85] = 0xb0;
 
-	// mem[0xf8eaf] = 0x21;		// <- ‚±‚ê‚Á‚Ä‰½‚¾‚Á‚¯H
+	//mem[0xf8eaf] = 0x21;		// <- ‚±‚ê‚Á‚Ä‰½‚¾‚Á‚¯H
 #endif
 #endif
+	//fh = file_open_c("itf.rom");
+	//if (fh != FILEH_INVALID) {
+	//	file_read(fh, mem + ITF_ADRS, 0x8000);
+	//	file_close(fh);
+	//	TRACEOUT(("load itf.rom"));
+	//}
 
 #if defined(BIOS_SIMULATE)
 	CopyMemory(mem + BIOS_BASE, biosfd80, sizeof(biosfd80));
 	if (!biosrom) {
 		lio_initialize();
 	}
-
+	
 	for (i=0; i<8; i+=2) {
 		STOREINTELWORD(mem + 0xfd800 + 0x1aaf + i, 0x1ab7);
 		STOREINTELWORD(mem + 0xfd800 + 0x1ad7 + i, 0x1adf);
@@ -303,7 +326,7 @@ void bios_initialize(void) {
 	STOREINTELDWORD(mem + 0xffff1, 0xfd800000);
 
 	CopyMemory(mem + 0x0fd800 + 0x0e00, keytable[0], 0x300);
-
+	
 	CopyMemory(mem + ITF_ADRS, itfrom, sizeof(itfrom));
 	mem[ITF_ADRS + 0x7ff0] = 0xea;
 	STOREINTELDWORD(mem + ITF_ADRS + 0x7ff1, 0xf8000000);
@@ -366,7 +389,7 @@ UINT MEMCALL biosfunc(UINT32 adrs) {
 		return(0);
 	}
 
-//	TRACEOUT(("biosfunc(%x)", adrs));
+	//TRACEOUT(("biosfunc(%x, %x)", adrs, adrs-BIOS_BASE));
 #if defined(CPUCORE_IA32) && defined(TRACE)
 	if (CPU_STAT_PAGING) {
 		UINT32 pde = MEMP_READ32(CPU_STAT_PDE_BASE);

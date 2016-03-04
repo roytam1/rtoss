@@ -33,7 +33,7 @@ void trace_fileout(const OEMCHAR *fname);
 #define	TRACEINIT()		trace_init()
 #define	TRACETERM()		trace_term()
 #define	TRACEOUT(arg)	trace_fmt arg
-#define	VERBOSE(arg)	trace_fmt2 arg
+#define	VERBOSE(arg)	(void)arg /*trace_fmt2 arg*/
 #define	APPDEVOUT(arg)	trace_char(arg)
 
 #endif

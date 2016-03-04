@@ -785,6 +785,7 @@ void bios0x18(void) {
 				CPU_REMCLOCK = -1;
 				break;
 			}
+		//TRACEOUT(("int18 KEYREAD"));
 			break;
 
    		case 0x01:						// キー・バッファ状態のセンス
@@ -796,21 +797,26 @@ void bios0x18(void) {
 			else {
 				CPU_BH = 0;
 			}
+		//TRACEOUT(("int18 KEYBUF"));
 			break;
 
    		case 0x02:						// シフト・キー状態のセンス
+		//TRACEOUT(("int18 KEY"));
 			CPU_AL = mem[MEMB_SHIFT_STS];
 			break;
 
    		case 0x03:						// キーボード・インタフェイスの初期化
+		//TRACEOUT(("int18 KEYINIT"));
 			bios0x09_init();
 			break;
 
    		case 0x04:						// キー入力状態のセンス
+		//TRACEOUT(("int18 KEY"));
 			CPU_AH = mem[MEMX_KB_KY_STS + (CPU_AL & 0x0f)];
  			break;
 
    		case 0x05:						// キー入力センス
+		//TRACEOUT(("int18 KEY"));
 			if (mem[MEMB_KB_COUNT]) {
 				CPU_AX = keyget();
 				CPU_BH = 1;

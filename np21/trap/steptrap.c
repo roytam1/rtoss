@@ -34,6 +34,7 @@ void CPUCALL steptrap(UINT cs, UINT32 eip) {
 
 
 // ---- ここにトラップ条件コードを書きます
+#if 0
 {
 	static UINT32 x;
 	UINT32 tmp;
@@ -61,7 +62,8 @@ void CPUCALL steptrap(UINT cs, UINT32 eip) {
 	if (cs == 0x0d77) TRACEOUT(("%.4x:%.4x", cs, eip));
 	if (cs == 0x0f5d) TRACEOUT(("%.4x:%.4x", cs, eip));
 	if (cs == 0x0e91) TRACEOUT(("%.4x:%.4x", cs, eip));
-
+	
+#endif
 #if 0
 {
 	static UINT tmp = 0;
@@ -83,7 +85,7 @@ void CPUCALL steptrap(UINT cs, UINT32 eip) {
 	}
 	if (cs == 0xdf6) TRACEOUT(("%.4x:%.4x", CPU_CS, CPU_IP));
 #endif
-#if 1
+#if 0
 	if ((cs == 0x0620) && (eip == 0x1E97)) {
 		TRACEOUT(("-------- NECCD: function: %.2x", CPU_AL));
 	}

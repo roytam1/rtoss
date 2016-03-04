@@ -42,7 +42,7 @@ struct _arcfh {
 	ARCH	arch;
 	UINT	(*fileread)(ARCFH arcfh, void *buffer, UINT size);
 	UINT	(*filewrite)(ARCFH arcfh, const void *buffer, UINT size);
-	long	(*fileseek)(ARCFH arcfh, long pos, UINT method);
+	FILEPOS	(*fileseek)(ARCFH arcfh, FILEPOS pos, UINT method);
 	void	(*fileclose)(ARCFH arcfh);
 };
 
@@ -73,7 +73,7 @@ SINT16 arc_attr(ARCH arch, const OEMCHAR *fname);
 ARCFH arc_fileopen(ARCH arch, const OEMCHAR *fname);
 UINT arc_fileread(ARCFH arcfh, void *buffer, UINT size);
 UINT arc_filewrite(ARCFH arcfh, const void *buffer, UINT size);
-long arc_fileseek(ARCFH arcfh, long pos, UINT method);
+FILEPOS arc_fileseek(ARCFH arcfh, FILEPOS pos, UINT method);
 void arc_fileclose(ARCFH arcfh);
 
 SINT16 arcex_attr(const OEMCHAR *fname);

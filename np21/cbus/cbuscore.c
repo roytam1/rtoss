@@ -3,15 +3,20 @@
 #include	"iocore.h"
 #include	"cbuscore.h"
 #include	"ideio.h"
+#include	"network/lgy98.h"
 #include	"sasiio.h"
 #include	"scsiio.h"
 #include	"pc9861k.h"
 #include	"mpu98ii.h"
+#include	"video.h"
 
 
 static const FNIORESET resetfn[] = {
 #if defined(SUPPORT_IDEIO)
 			ideio_reset,
+#endif
+#if defined(SUPPORT_LGY98)
+			lgy98_reset,
 #endif
 #if defined(SUPPORT_SASI)
 			sasiio_reset,
@@ -28,6 +33,12 @@ static const FNIORESET resetfn[] = {
 static const FNIOBIND bindfn[] = {
 #if defined(SUPPORT_IDEIO)
 			ideio_bind,
+#endif
+#if defined(SUPPORT_LGY98)
+			lgy98_bind,
+#endif
+#if defined(SUPPORT_CL_GD5430)
+			pc98_cirrus_vga_bind,
 #endif
 #if defined(SUPPORT_SASI)
 			sasiio_bind,

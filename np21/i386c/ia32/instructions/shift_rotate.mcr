@@ -33,45 +33,45 @@
 static UINT32 CPUCALL \
 inst##1(UINT32 src, void *arg) \
 { \
-	UINT32 dst; \
+	register UINT32 dst; \
 	BYTE_##inst##1(dst, src); \
 	return dst; \
 } \
 static UINT32 CPUCALL \
 inst##2(UINT32 src, void *arg) \
 { \
-	UINT32 dst; \
+	register UINT32 dst; \
 	WORD_##inst##1(dst, src); \
 	return dst; \
 } \
 static UINT32 CPUCALL \
 inst##4(UINT32 src, void *arg) \
 { \
-	UINT32 dst; \
+	register UINT32 dst; \
 	DWORD_##inst##1(dst, src); \
 	return dst; \
 } \
 static UINT32 CPUCALL \
 inst##CL1(UINT32 src, void *arg) \
 { \
-	UINT32 cl = PTR_TO_UINT32(arg); \
-	UINT32 dst; \
+	register UINT32 cl = PTR_TO_UINT32(arg); \
+	register UINT32 dst; \
 	BYTE_##inst##CL(dst, src, cl); \
 	return dst; \
 } \
 static UINT32 CPUCALL \
 inst##CL2(UINT32 src, void *arg) \
 { \
-	UINT32 cl = PTR_TO_UINT32(arg); \
-	UINT32 dst; \
+	register UINT32 cl = PTR_TO_UINT32(arg); \
+	register UINT32 dst; \
 	WORD_##inst##CL(dst, src, cl); \
 	return dst; \
 } \
 static UINT32 CPUCALL \
 inst##CL4(UINT32 src, void *arg) \
 { \
-	UINT32 cl = PTR_TO_UINT32(arg); \
-	UINT32 dst; \
+	register UINT32 cl = PTR_TO_UINT32(arg); \
+	register UINT32 dst; \
 	DWORD_##inst##CL(dst, src, cl); \
 	return dst; \
 } \
@@ -79,7 +79,7 @@ inst##CL4(UINT32 src, void *arg) \
 void CPUCALL \
 inst##_Eb(UINT8 *out) \
 { \
-	UINT32 src, dst; \
+	register UINT32 src, dst; \
 \
 	src = *out; \
 	BYTE_##inst##1(dst, src); \
@@ -96,7 +96,7 @@ inst##_Eb_ext(UINT32 madr) \
 void CPUCALL \
 inst##_Ew(UINT16 *out) \
 { \
-	UINT32 src, dst; \
+	register UINT32 src, dst; \
 \
 	src = *out; \
 	WORD_##inst##1(dst, src); \
@@ -113,7 +113,7 @@ inst##_Ew_ext(UINT32 madr) \
 void CPUCALL \
 inst##_Ed(UINT32 *out) \
 { \
-	UINT32 src, dst; \
+	register UINT32 src, dst; \
 \
 	src = *out; \
 	DWORD_##inst##1(dst, src); \
@@ -131,7 +131,7 @@ inst##_Ed_ext(UINT32 madr) \
 void CPUCALL \
 inst##_EbCL(UINT8 *out, UINT32 cl) \
 { \
-	UINT32 src, dst; \
+	register UINT32 src, dst; \
 \
 	src = *out; \
 	BYTE_##inst##CL(dst, src, cl); \
@@ -148,7 +148,7 @@ inst##_EbCL_ext(UINT32 madr, UINT32 cl) \
 void CPUCALL \
 inst##_EwCL(UINT16 *out, UINT32 cl) \
 { \
-	UINT32 src, dst; \
+	register UINT32 src, dst; \
 \
 	src = *out; \
 	WORD_##inst##CL(dst, src, cl); \
@@ -165,7 +165,7 @@ inst##_EwCL_ext(UINT32 madr, UINT32 cl) \
 void CPUCALL \
 inst##_EdCL(UINT32 *out, UINT32 cl) \
 { \
-	UINT32 src, dst; \
+	register UINT32 src, dst; \
 \
 	src = *out; \
 	DWORD_##inst##CL(dst, src, cl); \

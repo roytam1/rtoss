@@ -90,7 +90,10 @@ void diskdrv_hddbind(void) {
 		if (sxsi_devopen(drv, np2cfg.sasihdd[i]) == SUCCESS) {
 			drv++;
 		}
-		else {
+		else if(np2cfg.sasihdd[i]!=NULL && np2cfg.sasihdd[i][0]!='\0'){
+			char	buf[2048];
+			vsnprintf(buf, sizeof(buf), "Cannot open file %s", np2cfg.sasihdd[i]);
+			msgbox("HDD file open error", buf); 
 			sxsi_setdevtype(drv, SXSIDEV_NC);
 		}
 	}

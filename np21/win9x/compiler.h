@@ -8,8 +8,12 @@
  * @date	$Date: 2011/03/09 00:22:18 $
  */
 
+#pragma once
+
 #include "targetver.h"
 #define _USE_MATH_DEFINES
+#include <winsock2.h>
+#pragma comment(lib, "Ws2_32.lib")
 #include <windows.h>
 #if !defined(__GNUC__)
 #include <tchar.h>
@@ -72,7 +76,8 @@ typedef	signed __int64		SINT64;
 #define	sigsetjmp(env, mask)	setjmp(env)
 #define	siglongjmp(env, val)	longjmp(env, val)
 #endif	// !defined(__GNUC__)
-#define	msgbox(title, msg)		MessageBox(NULL, msg, title, MB_OK)
+//#define	msgbox(title, msg)		MessageBox(NULL, msg, title, MB_OK)
+#define	msgbox(title, msg)		MessageBoxA(NULL, msg, title, MB_OK)
 
 #define	STRCALL		__stdcall
 
@@ -85,6 +90,7 @@ typedef	signed __int64		SINT64;
 #define	OEMSTRLEN			lstrlen
 
 #include "common.h"
+#include "memtool.h"
 #include "milstr.h"
 #include "_memory.h"
 #include "rect.h"
@@ -95,7 +101,8 @@ typedef	signed __int64		SINT64;
 
 #define	GETTICK()			GetTickCounter()
 #if defined(TRACE)
-#define	__ASSERT(s)			assert(s)
+//#define	__ASSERT(s)			assert(s)
+#define	__ASSERT(s)
 #else
 #define	__ASSERT(s)
 #endif
@@ -163,8 +170,8 @@ typedef	signed __int64		SINT64;
 #define	SUPPORT_DCLOCK
 #endif
 
-#define	SUPPORT_RESUME
-#define	SUPPORT_STATSAVE	10
+//#define	SUPPORT_RESUME
+//#define	SUPPORT_STATSAVE	10
 #define	SUPPORT_ROMEO
 
 #define	SOUNDRESERVE	20
@@ -173,4 +180,14 @@ typedef	signed __int64		SINT64;
 
 #if defined(CPUCORE_IA32)
 #pragma warning(disable: 4819)
+#endif
+
+#if defined(SUPPORT_LARGE_HDD)
+typedef INT64	FILEPOS;
+typedef INT64	FILELEN;
+#define	NHD_MAXSIZE	8000
+#else
+typedef long	FILEPOS;
+typedef long	FILELEN;
+#define	NHD_MAXSIZE	2000
 #endif

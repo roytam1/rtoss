@@ -371,8 +371,8 @@ UINT8 MEMCALL
 cpu_codefetch(UINT32 offset)
 {
 	const int ucrw = CPU_PAGE_READ_CODE | CPU_STAT_USER_MODE;
-	descriptor_t *sdp;
-	UINT32 addr;
+	register descriptor_t *sdp;
+	register UINT32 addr;
 
 	sdp = &CPU_CS_DESC;
 	addr = sdp->u.seg.segbase + offset;
@@ -390,8 +390,8 @@ UINT16 MEMCALL
 cpu_codefetch_w(UINT32 offset)
 {
 	const int ucrw = CPU_PAGE_READ_CODE | CPU_STAT_USER_MODE;
-	descriptor_t *sdp;
-	UINT32 addr;
+	register descriptor_t *sdp;
+	register UINT32 addr;
 
 	sdp = &CPU_CS_DESC;
 	addr = sdp->u.seg.segbase + offset;
@@ -409,8 +409,8 @@ UINT32 MEMCALL
 cpu_codefetch_d(UINT32 offset)
 {
 	const int ucrw = CPU_PAGE_READ_CODE | CPU_STAT_USER_MODE;
-	descriptor_t *sdp;
-	UINT32 addr;
+	register descriptor_t *sdp;
+	register UINT32 addr;
 
 	sdp = &CPU_CS_DESC;
 	addr = sdp->u.seg.segbase + offset;
@@ -431,7 +431,7 @@ cpu_codefetch_d(UINT32 offset)
 UINT64 MEMCALL
 cpu_memoryread_q(UINT32 paddr)
 {
-	UINT64 value;
+	register UINT64 value;
 
 	value = cpu_memoryread_d(paddr);
 	value += (UINT64)cpu_memoryread_d(paddr + 4) << 32;
@@ -450,8 +450,8 @@ cpu_memorywrite_q(UINT32 paddr, UINT64 value)
 REG80 MEMCALL
 cpu_memoryread_f(UINT32 paddr)
 {
-	REG80 value;
-	int i;
+	register REG80 value;
+	register int i;
 
 	for (i = 0; i < (int)sizeof(REG80); ++i) {
 		value.b[i] = cpu_memoryread(paddr + i);
@@ -462,7 +462,7 @@ cpu_memoryread_f(UINT32 paddr)
 void MEMCALL
 cpu_memorywrite_f(UINT32 paddr, const REG80 *value)
 {
-	int i;
+	register int i;
 
 	for (i = 0; i < (int)sizeof(REG80); ++i) {
 		cpu_memorywrite(paddr + i, value->b[i]);
@@ -488,9 +488,9 @@ DECLARE_VIRTUAL_ADDRESS_MEMORY_RW_FUNCTIONS(q, UINT64, 8)
 REG80 MEMCALL
 cpu_vmemoryread_f(int idx, UINT32 offset)
 {
-	descriptor_t *sdp;
-	UINT32 addr;
-	int exc;
+	register descriptor_t *sdp;
+	register UINT32 addr;
+	register int exc;
 
 	__ASSERT((unsigned int)idx < CPU_SEGREG_NUM);
 
@@ -527,9 +527,9 @@ err:
 void MEMCALL
 cpu_vmemorywrite_f(int idx, UINT32 offset, const REG80 *value)
 {
-	descriptor_t *sdp;
-	UINT32 addr;
-	int exc;
+	register descriptor_t *sdp;
+	register UINT32 addr;
+	register int exc;
 
 	__ASSERT((unsigned int)idx < CPU_SEGREG_NUM);
 

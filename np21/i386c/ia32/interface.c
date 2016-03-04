@@ -186,7 +186,7 @@ void CPUCALL
 ia32_interrupt(int vect, int soft)
 {
 
-//	TRACEOUT(("int (%x, %x) PE=%d VM=%d",  vect, soft, CPU_STAT_PM, CPU_STAT_VM86));
+	//TRACEOUT(("int (%x, %x) PE=%d VM=%d",  vect, soft, CPU_STAT_PM, CPU_STAT_VM86));
 	if (!soft) {
 		INTERRUPT(vect, INTR_TYPE_EXTINTR);
 	} else {

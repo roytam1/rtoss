@@ -33,8 +33,8 @@
 void
 LES_GwMp(void)
 {
-	UINT16 *out;
-	UINT32 op, dst, madr;
+	register UINT16 *out;
+	register UINT32 op, dst, madr;
 	UINT16 sreg;
 
 	GET_PCBYTE(op);
@@ -53,8 +53,8 @@ LES_GwMp(void)
 void
 LES_GdMp(void)
 {
-	UINT32 *out;
-	UINT32 op, dst, madr;
+	register UINT32 *out;
+	register UINT32 op, dst, madr;
 	UINT16 sreg;
 
 	GET_PCBYTE(op);
@@ -73,8 +73,8 @@ LES_GdMp(void)
 void
 LSS_GwMp(void)
 {
-	UINT16 *out;
-	UINT32 op, dst, madr;
+	register UINT16 *out;
+	register UINT32 op, dst, madr;
 	UINT16 sreg;
 
 	GET_PCBYTE(op);
@@ -93,8 +93,8 @@ LSS_GwMp(void)
 void
 LSS_GdMp(void)
 {
-	UINT32 *out;
-	UINT32 op, dst, madr;
+	register UINT32 *out;
+	register UINT32 op, dst, madr;
 	UINT16 sreg;
 
 	GET_PCBYTE(op);
@@ -113,8 +113,8 @@ LSS_GdMp(void)
 void
 LDS_GwMp(void)
 {
-	UINT16 *out;
-	UINT32 op, dst, madr;
+	register UINT16 *out;
+	register UINT32 op, dst, madr;
 	UINT16 sreg;
 
 	GET_PCBYTE(op);
@@ -133,8 +133,8 @@ LDS_GwMp(void)
 void
 LDS_GdMp(void)
 {
-	UINT32 *out;
-	UINT32 op, dst, madr;
+	register UINT32 *out;
+	register UINT32 op, dst, madr;
 	UINT16 sreg;
 
 	GET_PCBYTE(op);
@@ -153,8 +153,8 @@ LDS_GdMp(void)
 void
 LFS_GwMp(void)
 {
-	UINT16 *out;
-	UINT32 op, dst, madr;
+	register UINT16 *out;
+	register UINT32 op, dst, madr;
 	UINT16 sreg;
 
 	GET_PCBYTE(op);
@@ -173,8 +173,8 @@ LFS_GwMp(void)
 void
 LFS_GdMp(void)
 {
-	UINT32 *out;
-	UINT32 op, dst, madr;
+	register UINT32 *out;
+	register UINT32 op, dst, madr;
 	UINT16 sreg;
 
 	GET_PCBYTE(op);
@@ -193,8 +193,8 @@ LFS_GdMp(void)
 void
 LGS_GwMp(void)
 {
-	UINT16 *out;
-	UINT32 op, dst, madr;
+	register UINT16 *out;
+	register UINT32 op, dst, madr;
 	UINT16 sreg;
 
 	GET_PCBYTE(op);
@@ -213,8 +213,8 @@ LGS_GwMp(void)
 void
 LGS_GdMp(void)
 {
-	UINT32 *out;
-	UINT32 op, dst, madr;
+	register UINT32 *out;
+	register UINT32 op, dst, madr;
 	UINT16 sreg;
 
 	GET_PCBYTE(op);

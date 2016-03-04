@@ -15,10 +15,10 @@
 
 typedef REG8 (*SXSIFUNC)(UINT type, SXSIDEV sxsi);
 
-static REG8 sxsi_pos(UINT type, SXSIDEV sxsi, long *ppos) {
+static REG8 sxsi_pos(UINT type, SXSIDEV sxsi, FILEPOS *ppos) {
 
 	REG8	ret;
-	long	pos;
+	FILEPOS	pos;
 
 	ret = 0;
 	pos = 0;
@@ -52,7 +52,7 @@ static REG8 sxsibios_write(UINT type, SXSIDEV sxsi) {
 
 	REG8	ret;
 	UINT	size;
-	long	pos;
+	FILEPOS	pos;
 	UINT32	addr;
 	UINT	r;
 	UINT8	work[1024];
@@ -83,7 +83,7 @@ static REG8 sxsibios_read(UINT type, SXSIDEV sxsi) {
 
 	REG8	ret;
 	UINT	size;
-	long	pos;
+	FILEPOS	pos;
 	UINT32	addr;
 	UINT	r;
 	UINT8	work[1024];
@@ -113,16 +113,16 @@ static REG8 sxsibios_read(UINT type, SXSIDEV sxsi) {
 static REG8 sxsibios_format(UINT type, SXSIDEV sxsi) {
 
 	REG8	ret;
-	long	pos;
+	FILEPOS	pos;
 
 	if (CPU_AH & 0x80) {
 		if (type == SXSIBIOS_SCSI) {		// ‚Æ‚è‚ ‚¦‚¸SCSI‚Ì‚Ý
 			UINT count;
-			long posmax;
+			FILEPOS posmax;
 			count = timing_getcount();			// ŽžŠÔ‚ðŽ~‚ß‚é
 			ret = 0;
 			pos = 0;
-			posmax = sxsi->surfaces * sxsi->cylinders;
+			posmax = (FILEPOS)sxsi->surfaces * sxsi->cylinders;
 			while(pos < posmax) {
 				ret = sxsi_format(CPU_AL, pos * sxsi->sectors);
 				if (ret) {

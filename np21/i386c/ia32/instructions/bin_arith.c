@@ -46,9 +46,9 @@ ARITH_INSTRUCTION_3(SBB)
 void CPUCALL
 IMUL_ALEb(UINT32 op)
 {
-	UINT32 madr;
-	SINT32 res;
-	SINT8 src, dst;
+	register UINT32 madr;
+	register SINT32 res;
+	register SINT8 src, dst;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(13);
@@ -66,9 +66,9 @@ IMUL_ALEb(UINT32 op)
 void CPUCALL
 IMUL_AXEw(UINT32 op)
 {
-	UINT32 madr;
-	SINT32 res;
-	SINT16 src, dst;
+	register UINT32 madr;
+	register SINT32 res;
+	register SINT16 src, dst;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(21);
@@ -87,9 +87,9 @@ IMUL_AXEw(UINT32 op)
 void CPUCALL
 IMUL_EAXEd(UINT32 op)
 {
-	UINT32 madr;
-	SINT64 res;
-	SINT32 src, dst;
+	register UINT32 madr;
+	register SINT64 res;
+	register SINT32 src, dst;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(21);
@@ -108,10 +108,10 @@ IMUL_EAXEd(UINT32 op)
 void
 IMUL_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op;
-	SINT32 res;
-	SINT16 src, dst;
+	register UINT16 *out;
+	register UINT32 op;
+	register SINT32 res;
+	register SINT16 src, dst;
 
 	PREPART_REG16_EA(op, src, out, 21, 27);
 	dst = *out;
@@ -122,10 +122,10 @@ IMUL_GwEw(void)
 void
 IMUL_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op;
-	SINT64 res;
-	SINT32 src, dst;
+	register UINT32 *out;
+	register UINT32 op;
+	register SINT64 res;
+	register SINT32 src, dst;
 
 	PREPART_REG32_EA(op, src, out, 21, 27);
 	dst = *out;
@@ -136,10 +136,10 @@ IMUL_GdEd(void)
 void
 IMUL_GwEwIb(void)
 {
-	UINT16 *out;
-	UINT32 op;
-	SINT32 res;
-	SINT16 src, dst;
+	register UINT16 *out;
+	register UINT32 op;
+	register SINT32 res;
+	register SINT16 src, dst;
 
 	PREPART_REG16_EA(op, src, out, 21, 24);
 	GET_PCBYTES(dst);
@@ -150,10 +150,10 @@ IMUL_GwEwIb(void)
 void
 IMUL_GdEdIb(void)
 {
-	UINT32 *out;
-	UINT32 op;
-	SINT64 res;
-	SINT32 src, dst;
+	register UINT32 *out;
+	register UINT32 op;
+	register SINT64 res;
+	register SINT32 src, dst;
 
 	PREPART_REG32_EA(op, src, out, 21, 24);
 	GET_PCBYTESD(dst);
@@ -164,10 +164,10 @@ IMUL_GdEdIb(void)
 void
 IMUL_GwEwIw(void)
 {
-	UINT16 *out;
-	UINT32 op;
-	SINT32 res;
-	SINT16 src, dst;
+	register UINT16 *out;
+	register UINT32 op;
+	register SINT32 res;
+	register SINT16 src, dst;
 
 	PREPART_REG16_EA(op, src, out, 21, 24);
 	GET_PCWORD(dst);
@@ -178,10 +178,10 @@ IMUL_GwEwIw(void)
 void
 IMUL_GdEdId(void)
 {
-	UINT32 *out;
-	UINT32 op;
-	SINT64 res;
-	SINT32 src, dst;
+	register UINT32 *out;
+	register UINT32 op;
+	register SINT64 res;
+	register SINT32 src, dst;
 
 	PREPART_REG32_EA(op, src, out, 21, 24);
 	GET_PCDWORD(dst);
@@ -196,8 +196,8 @@ IMUL_GdEdId(void)
 void CPUCALL
 MUL_ALEb(UINT32 op)
 {
-	UINT32 res, madr;
-	UINT8 src, dst;
+	register UINT32 res, madr;
+	register UINT8 src, dst;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(13);
@@ -215,8 +215,8 @@ MUL_ALEb(UINT32 op)
 void CPUCALL
 MUL_AXEw(UINT32 op)
 {
-	UINT32 res, madr;
-	UINT16 src, dst;
+	register UINT32 res, madr;
+	register UINT16 src, dst;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(21);
@@ -235,8 +235,8 @@ MUL_AXEw(UINT32 op)
 void CPUCALL
 MUL_EAXEd(UINT32 op)
 {
-	UINT32 res, madr;
-	UINT32 src, dst;
+	register UINT32 res, madr;
+	register UINT32 src, dst;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(21);
@@ -259,9 +259,9 @@ MUL_EAXEd(UINT32 op)
 void CPUCALL
 IDIV_ALEb(UINT32 op)
 {
-	UINT32 madr;
-	SINT16 tmp, r;
-	SINT8 src;
+	register UINT32 madr;
+	register SINT16 tmp, r;
+	register SINT8 src;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(17);
@@ -289,9 +289,9 @@ IDIV_ALEb(UINT32 op)
 void CPUCALL
 IDIV_AXEw(UINT32 op)
 {
-	SINT32 tmp, r;
-	UINT32 madr;
-	SINT16 src;
+	register SINT32 tmp, r;
+	register UINT32 madr;
+	register SINT16 src;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(17);
@@ -319,9 +319,9 @@ IDIV_AXEw(UINT32 op)
 void CPUCALL
 IDIV_EAXEd(UINT32 op)
 {
-	SINT64 tmp, r;
-	SINT32 src;
-	UINT32 madr;
+	register SINT64 tmp, r;
+	register SINT32 src;
+	register UINT32 madr;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(17);
@@ -353,9 +353,9 @@ IDIV_EAXEd(UINT32 op)
 void CPUCALL
 DIV_ALEb(UINT32 op)
 {
-	UINT32 madr;
-	UINT16 tmp;
-	UINT8 src;
+	register UINT32 madr;
+	register UINT16 tmp;
+	register UINT8 src;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(17);
@@ -382,9 +382,9 @@ DIV_ALEb(UINT32 op)
 void CPUCALL
 DIV_AXEw(UINT32 op)
 {
-	UINT32 madr;
-	UINT32 tmp;
-	UINT16 src;
+	register UINT32 madr;
+	register UINT32 tmp;
+	register UINT16 src;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(17);
@@ -411,9 +411,9 @@ DIV_AXEw(UINT32 op)
 void CPUCALL
 DIV_EAXEd(UINT32 op)
 {
-	UINT32 madr;
-	UINT64 tmp;
-	UINT32 src;
+	register UINT32 madr;
+	register UINT64 tmp;
+	register UINT32 src;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(17);
@@ -493,7 +493,7 @@ void DEC_EDI(void) { DWORD_DEC(CPU_EDI); CPU_WORKCLOCK(2); }
 static UINT32 CPUCALL
 NEG1(UINT32 src, void *arg)
 {
-	UINT32 dst;
+	register UINT32 dst;
 	BYTE_NEG(dst, src);
 	return dst;
 }
@@ -501,7 +501,7 @@ NEG1(UINT32 src, void *arg)
 static UINT32 CPUCALL
 NEG2(UINT32 src, void *arg)
 {
-	UINT32 dst;
+	register UINT32 dst;
 	WORD_NEG(dst, src);
 	return dst;
 }
@@ -509,7 +509,7 @@ NEG2(UINT32 src, void *arg)
 static UINT32 CPUCALL
 NEG4(UINT32 src, void *arg)
 {
-	UINT32 dst;
+	register UINT32 dst;
 	DWORD_NEG(dst, src);
 	return dst;
 }
@@ -517,8 +517,8 @@ NEG4(UINT32 src, void *arg)
 void CPUCALL
 NEG_Eb(UINT32 op)
 {
-	UINT8 *out;
-	UINT32 src, dst, madr;
+	register UINT8 *out;
+	register UINT32 src, dst, madr;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(2);
@@ -536,8 +536,8 @@ NEG_Eb(UINT32 op)
 void CPUCALL
 NEG_Ew(UINT32 op)
 {
-	UINT16 *out;
-	UINT32 src, dst, madr;
+	register UINT16 *out;
+	register UINT32 src, dst, madr;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(2);
@@ -555,8 +555,8 @@ NEG_Ew(UINT32 op)
 void CPUCALL
 NEG_Ed(UINT32 op)
 {
-	UINT32 *out;
-	UINT32 src, dst, madr;
+	register UINT32 *out;
+	register UINT32 src, dst, madr;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(2);
@@ -578,8 +578,8 @@ NEG_Ed(UINT32 op)
 void
 CMP_EbGb(void)
 {
-	UINT8 *out;
-	UINT32 op, src, dst, res, madr;
+	register UINT8 *out;
+	register UINT32 op, src, dst, res, madr;
 
 	PREPART_EA_REG8(op, src);
 	if (op >= 0xc0) {
@@ -597,8 +597,8 @@ CMP_EbGb(void)
 void
 CMP_EwGw(void)
 {
-	UINT16 *out;
-	UINT32 op, src, dst, res, madr;
+	register UINT16 *out;
+	register UINT32 op, src, dst, res, madr;
 
 	PREPART_EA_REG16(op, src);
 	if (op >= 0xc0) {
@@ -616,8 +616,8 @@ CMP_EwGw(void)
 void
 CMP_EdGd(void)
 {
-	UINT32 *out;
-	UINT32 op, src, dst, res, madr;
+	register UINT32 *out;
+	register UINT32 op, src, dst, res, madr;
 
 	PREPART_EA_REG32(op, src);
 	if (op >= 0xc0) {
@@ -635,8 +635,8 @@ CMP_EdGd(void)
 void
 CMP_GbEb(void)
 {
-	UINT8 *out;
-	UINT32 op, src, dst, res;
+	register UINT8 *out;
+	register UINT32 op, src, dst, res;
 
 	PREPART_REG8_EA(op, src, out, 2, 5);
 	dst = *out;
@@ -646,8 +646,8 @@ CMP_GbEb(void)
 void
 CMP_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src, dst, res;
+	register UINT16 *out;
+	register UINT32 op, src, dst, res;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	dst = *out;
@@ -657,8 +657,8 @@ CMP_GwEw(void)
 void
 CMP_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src, dst, res;
+	register UINT32 *out;
+	register UINT32 op, src, dst, res;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	dst = *out;
@@ -668,7 +668,7 @@ CMP_GdEd(void)
 void
 CMP_ALIb(void)
 {
-	UINT32 src, dst, res;
+	register UINT32 src, dst, res;
 
 	CPU_WORKCLOCK(2);
 	GET_PCBYTE(src);
@@ -679,7 +679,7 @@ CMP_ALIb(void)
 void
 CMP_AXIw(void)
 {
-	UINT32 src, dst, res;
+	register UINT32 src, dst, res;
 
 	CPU_WORKCLOCK(2);
 	GET_PCWORD(src);
@@ -690,7 +690,7 @@ CMP_AXIw(void)
 void
 CMP_EAXId(void)
 {
-	UINT32 src, dst, res;
+	register UINT32 src, dst, res;
 
 	CPU_WORKCLOCK(2);
 	GET_PCDWORD(src);
@@ -701,7 +701,7 @@ CMP_EAXId(void)
 void CPUCALL
 CMP_EbIb(UINT8 *regp, UINT32 src)
 {
-	UINT32 dst, res;
+	register UINT32 dst, res;
 
 	dst = *regp;
 	BYTE_SUB(res, dst, src);
@@ -710,7 +710,7 @@ CMP_EbIb(UINT8 *regp, UINT32 src)
 void CPUCALL
 CMP_EbIb_ext(UINT32 madr, UINT32 src)
 {
-	UINT32 dst, res;
+	register UINT32 dst, res;
 
 	dst = cpu_vmemoryread(CPU_INST_SEGREG_INDEX, madr);
 	BYTE_SUB(res, dst, src);
@@ -719,7 +719,7 @@ CMP_EbIb_ext(UINT32 madr, UINT32 src)
 void CPUCALL
 CMP_EwIx(UINT16 *regp, UINT32 src)
 {
-	UINT32 dst, res;
+	register UINT32 dst, res;
 
 	dst = *regp;
 	WORD_SUB(res, dst, src);
@@ -728,7 +728,7 @@ CMP_EwIx(UINT16 *regp, UINT32 src)
 void CPUCALL
 CMP_EwIx_ext(UINT32 madr, UINT32 src)
 {
-	UINT32 dst, res;
+	register UINT32 dst, res;
 
 	dst = cpu_vmemoryread_w(CPU_INST_SEGREG_INDEX, madr);
 	WORD_SUB(res, dst, src);
@@ -737,7 +737,7 @@ CMP_EwIx_ext(UINT32 madr, UINT32 src)
 void CPUCALL
 CMP_EdIx(UINT32 *regp, UINT32 src)
 {
-	UINT32 dst, res;
+	register UINT32 dst, res;
 
 	dst = *regp;
 	DWORD_SUB(res, dst, src);
@@ -746,7 +746,7 @@ CMP_EdIx(UINT32 *regp, UINT32 src)
 void CPUCALL
 CMP_EdIx_ext(UINT32 madr, UINT32 src)
 {
-	UINT32 dst, res;
+	register UINT32 dst, res;
 
 	dst = cpu_vmemoryread_d(CPU_INST_SEGREG_INDEX, madr);
 	DWORD_SUB(res, dst, src);

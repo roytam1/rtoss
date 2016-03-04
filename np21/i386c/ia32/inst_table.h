@@ -30,12 +30,14 @@
 extern "C" {
 #endif
 
+void changeInstTable(int PM, int VM86);
+
 /* info of instruction */
 extern UINT8 insttable_info[256];
 
 /* table of instruction */
-extern void (*insttable_1byte[2][256])(void);
-extern void (*insttable_2byte[2][256])(void);
+extern void (*insttable_1byte[2*256])(void);
+extern void (*insttable_2byte[2*256])(void);
 
 
 /*

@@ -42,14 +42,14 @@ struct _sxsidev {
 	UINT8	__caps;
 
 	BRESULT	(*reopen)(SXSIDEV sxsi);
-	REG8	(*read)(SXSIDEV sxsi, long pos, UINT8 *buf, UINT size);
-	REG8	(*write)(SXSIDEV sxsi, long pos, const UINT8 *buf, UINT size);
-	REG8	(*format)(SXSIDEV sxsi, long pos);
+	REG8	(*read)(SXSIDEV sxsi, FILEPOS pos, UINT8 *buf, UINT size);
+	REG8	(*write)(SXSIDEV sxsi, FILEPOS pos, const UINT8 *buf, UINT size);
+	REG8	(*format)(SXSIDEV sxsi, FILEPOS pos);
 	void	(*close)(SXSIDEV sxsi);
 	void	(*destroy)(SXSIDEV sxsi);
 
 	INTPTR	hdl;
-	long	totals;
+	FILELEN	totals;
 	UINT16	cylinders;
 	UINT16	size;
 	UINT8	sectors;
@@ -79,9 +79,9 @@ BRESULT sxsi_setdevtype(REG8 drv, UINT8 dev);
 UINT8 sxsi_getdevtype(REG8 drv);
 BRESULT sxsi_devopen(REG8 drv, const OEMCHAR *fname);
 void sxsi_devclose(REG8 drv);
-REG8 sxsi_read(REG8 drv, long pos, UINT8 *buf, UINT size);
-REG8 sxsi_write(REG8 drv, long pos, const UINT8 *buf, UINT size);
-REG8 sxsi_format(REG8 drv, long pos);
+REG8 sxsi_read(REG8 drv, FILEPOS pos, UINT8 *buf, UINT size);
+REG8 sxsi_write(REG8 drv, FILEPOS pos, const UINT8 *buf, UINT size);
+REG8 sxsi_format(REG8 drv, FILEPOS pos);
 
 BOOL sxsi_issasi(void);
 BOOL sxsi_isscsi(void);

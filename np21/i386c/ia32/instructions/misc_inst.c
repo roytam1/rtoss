@@ -34,8 +34,8 @@
 void
 LEA_GwM(void)
 {
-	UINT16 *out;
-	UINT32 op, dst;
+	register UINT16 *out;
+	register UINT32 op, dst;
 
 	GET_PCBYTE(op);
 	if (op < 0xc0) {
@@ -51,8 +51,8 @@ LEA_GwM(void)
 void
 LEA_GdM(void)
 {
-	UINT32 *out;
-	UINT32 op, dst;
+	register UINT32 *out;
+	register UINT32 op, dst;
 
 	GET_PCBYTE(op);
 	if (op < 0xc0) {
@@ -162,19 +162,19 @@ AddrSize(void)
 void
 _2byte_ESC16(void)
 {
-	UINT32 op;
+	register UINT32 op;
 
 	GET_PCBYTE(op);
-	(*insttable_2byte[0][op])();
+	(*insttable_2byte[op])();
 }
 
 void
 _2byte_ESC32(void)
 {
-	UINT32 op;
+	register UINT32 op;
 
 	GET_PCBYTE(op);
-	(*insttable_2byte[1][op])();
+	(*insttable_2byte[op | 256])();
 }
 
 void

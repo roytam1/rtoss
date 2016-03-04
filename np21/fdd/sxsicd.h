@@ -11,13 +11,13 @@ enum {
 typedef struct {
 	UINT8	type;
 	UINT8	track;
-	UINT32	pos;
+	FILEPOS	pos;
 } _CDTRK, *CDTRK;
 
 BRESULT sxsicd_open(SXSIDEV sxsi, const OEMCHAR *fname);
 
 CDTRK sxsicd_gettrk(SXSIDEV sxsi, UINT *tracks);
-BRESULT sxsicd_readraw(SXSIDEV sxsi, long pos, void *buf);
+BRESULT sxsicd_readraw(SXSIDEV sxsi, FILEPOS pos, void *buf);
 
 #ifdef __cplusplus
 }

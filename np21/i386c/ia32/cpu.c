@@ -59,13 +59,18 @@ int cpu_debug_rep_cont = 0;
 CPU_REGS cpu_debug_rep_regs;
 #endif
 
-
+long long int timeuse_totalcount = 0;
+long long int timeuse_irq = 0;
+long long int timeuse_cpu = 0;
+long long int timeuse_nevent[8] = {0};
+long long int timeuse_tmpstart = 0;
+LARGE_INTEGER timeuse_li = {0};
 void
 exec_1step(void)
 {
-	int prefix;
-	UINT32 op;
-
+	register int prefix;
+	register UINT32 op;
+	
 	CPU_PREV_EIP = CPU_EIP;
 	CPU_STATSAVE.cpu_inst = CPU_STATSAVE.cpu_inst_default;
 
@@ -113,7 +118,7 @@ exec_1step(void)
 	}
 	ctx[ctx_index].opbytes = 0;
 #endif
-
+	
 	for (prefix = 0; prefix < MAX_PREFIX; prefix++) {
 		GET_PCBYTE(op);
 #if defined(IA32_INSTRUCTION_TRACE)
@@ -123,7 +128,7 @@ exec_1step(void)
 
 		/* prefix */
 		if (insttable_info[op] & INST_PREFIX) {
-			(*insttable_1byte[0][op])();
+			(*insttable_1byte[op])();
 			continue;
 		}
 		break;
@@ -131,6 +136,7 @@ exec_1step(void)
 	if (prefix == MAX_PREFIX) {
 		EXCEPTION(UD_EXCEPTION, 0);
 	}
+	
 
 #if defined(IA32_INSTRUCTION_TRACE)
 	if (op == 0x0f) {
@@ -141,121 +147,141 @@ exec_1step(void)
 	}
 	ctx_index = (ctx_index + 1) % NELEMENTS(ctx);
 #endif
-
+	
 	/* normal / rep, but not use */
 	if (!(insttable_info[op] & INST_STRING) || !CPU_INST_REPUSE) {
 #if defined(DEBUG)
 		cpu_debug_rep_cont = 0;
 #endif
-		(*insttable_1byte[CPU_INST_OP32][op])();
-		return;
-	}
+		//QueryPerformanceCounter(&timeuse_li);
+		//timeuse_tmpstart = timeuse_li.QuadPart;
 
-	/* rep */
-	CPU_WORKCLOCK(5);
+		(*insttable_1byte[op | (CPU_INST_OP32<<8)])();
+	}else{
+
+		/* rep */
+		CPU_WORKCLOCK(20);
+		
 #if defined(DEBUG)
-	if (!cpu_debug_rep_cont) {
-		cpu_debug_rep_cont = 1;
-		cpu_debug_rep_regs = CPU_STATSAVE.cpu_regs;
-	}
+		if (!cpu_debug_rep_cont) {
+			cpu_debug_rep_cont = 1;
+			cpu_debug_rep_regs = CPU_STATSAVE.cpu_regs;
+		}
 #endif
-	if (!CPU_INST_AS32) {
-		if (CPU_CX != 0) {
-			if (!(insttable_info[op] & REP_CHECKZF)) {
-				/* rep */
-				for (;;) {
-					(*insttable_1byte[CPU_INST_OP32][op])();
-					if (--CPU_CX == 0) {
+		if (!CPU_INST_AS32) {
+			if (CPU_CX != 0) {
+				if (!(insttable_info[op] & REP_CHECKZF)) {
+					/* rep */
+					for (;;) {
+						(*insttable_1byte[op | (CPU_INST_OP32<<8)])();
+						if (--CPU_CX == 0) {
 #if defined(DEBUG)
-						cpu_debug_rep_cont = 0;
+							cpu_debug_rep_cont = 0;
 #endif
-						break;
+							break;
+						}
+						if (CPU_REMCLOCK <= 0) {
+							CPU_EIP = CPU_PREV_EIP;
+							break;
+						}
 					}
-					if (CPU_REMCLOCK <= 0) {
-						CPU_EIP = CPU_PREV_EIP;
-						break;
+				} else if (CPU_INST_REPUSE != 0xf2) {
+					/* repe */
+					for (;;) {
+						(*insttable_1byte[op | (CPU_INST_OP32<<8)])();
+						if (--CPU_CX == 0 || CC_NZ) {
+#if defined(DEBUG)
+							cpu_debug_rep_cont = 0;
+#endif
+							break;
+						}
+						if (CPU_REMCLOCK <= 0) {
+							CPU_EIP = CPU_PREV_EIP;
+							break;
+						}
+					}
+				} else {
+					/* repne */
+					for (;;) {
+						(*insttable_1byte[op | (CPU_INST_OP32<<8)])();
+						if (--CPU_CX == 0 || CC_Z) {
+#if defined(DEBUG)
+							cpu_debug_rep_cont = 0;
+#endif
+							break;
+						}
+						if (CPU_REMCLOCK <= 0) {
+							CPU_EIP = CPU_PREV_EIP;
+							break;
+						}
 					}
 				}
-			} else if (CPU_INST_REPUSE != 0xf2) {
-				/* repe */
-				for (;;) {
-					(*insttable_1byte[CPU_INST_OP32][op])();
-					if (--CPU_CX == 0 || CC_NZ) {
+			}
+		} else {
+			if (CPU_ECX != 0) {
+				if (!(insttable_info[op] & REP_CHECKZF)) {
+					/* rep */
+					for (;;) {
+						(*insttable_1byte[op | (CPU_INST_OP32<<8)])();
+						if (--CPU_ECX == 0) {
 #if defined(DEBUG)
-						cpu_debug_rep_cont = 0;
+							cpu_debug_rep_cont = 0;
 #endif
-						break;
+							break;
+						}
+						if (CPU_REMCLOCK <= 0) {
+							CPU_EIP = CPU_PREV_EIP;
+							break;
+						}
 					}
-					if (CPU_REMCLOCK <= 0) {
-						CPU_EIP = CPU_PREV_EIP;
-						break;
-					}
-				}
-			} else {
-				/* repne */
-				for (;;) {
-					(*insttable_1byte[CPU_INST_OP32][op])();
-					if (--CPU_CX == 0 || CC_Z) {
+				} else if (CPU_INST_REPUSE != 0xf2) {
+					/* repe */
+					for (;;) {
+						(*insttable_1byte[op | (CPU_INST_OP32<<8)])();
+						if (--CPU_ECX == 0 || CC_NZ) {
 #if defined(DEBUG)
-						cpu_debug_rep_cont = 0;
+							cpu_debug_rep_cont = 0;
 #endif
-						break;
+							break;
+						}
+						if (CPU_REMCLOCK <= 0) {
+							CPU_EIP = CPU_PREV_EIP;
+							break;
+						}
 					}
-					if (CPU_REMCLOCK <= 0) {
-						CPU_EIP = CPU_PREV_EIP;
-						break;
+				} else {
+					/* repne */
+					for (;;) {
+						(*insttable_1byte[op | (CPU_INST_OP32<<8)])();
+						if (--CPU_ECX == 0 || CC_Z) {
+#if defined(DEBUG)
+							cpu_debug_rep_cont = 0;
+#endif
+							break;
+						}
+						if (CPU_REMCLOCK <= 0) {
+							CPU_EIP = CPU_PREV_EIP;
+							break;
+						}
 					}
 				}
 			}
 		}
-	} else {
-		if (CPU_ECX != 0) {
-			if (!(insttable_info[op] & REP_CHECKZF)) {
-				/* rep */
-				for (;;) {
-					(*insttable_1byte[CPU_INST_OP32][op])();
-					if (--CPU_ECX == 0) {
-#if defined(DEBUG)
-						cpu_debug_rep_cont = 0;
-#endif
-						break;
-					}
-					if (CPU_REMCLOCK <= 0) {
-						CPU_EIP = CPU_PREV_EIP;
-						break;
-					}
-				}
-			} else if (CPU_INST_REPUSE != 0xf2) {
-				/* repe */
-				for (;;) {
-					(*insttable_1byte[CPU_INST_OP32][op])();
-					if (--CPU_ECX == 0 || CC_NZ) {
-#if defined(DEBUG)
-						cpu_debug_rep_cont = 0;
-#endif
-						break;
-					}
-					if (CPU_REMCLOCK <= 0) {
-						CPU_EIP = CPU_PREV_EIP;
-						break;
-					}
-				}
-			} else {
-				/* repne */
-				for (;;) {
-					(*insttable_1byte[CPU_INST_OP32][op])();
-					if (--CPU_ECX == 0 || CC_Z) {
-#if defined(DEBUG)
-						cpu_debug_rep_cont = 0;
-#endif
-						break;
-					}
-					if (CPU_REMCLOCK <= 0) {
-						CPU_EIP = CPU_PREV_EIP;
-						break;
-					}
-				}
-			}
-		}
 	}
+	
+	//QueryPerformanceCounter(&timeuse_li);
+	//timeuse_nevent[op>>5] = timeuse_li.QuadPart - timeuse_tmpstart;
+	//timeuse_nevent[op>>5]++;
+	//if(timeuse_totalcount>10000000){
+	//	long long int total = timeuse_nevent[0]+timeuse_nevent[1]+timeuse_nevent[2]+timeuse_nevent[3]
+	//						+ timeuse_nevent[4]+timeuse_nevent[5]+timeuse_nevent[6]+timeuse_nevent[7];
+	//	if(total>0){
+	//		TRACEOUT(("0:%d%%, 1:%d%%, 2:%d%%, 3:%d%%, 4:%d%%, 5:%d%%, 6:%d%%, 7:%d%%", (int)(100*timeuse_nevent[0]/total), (int)(100*timeuse_nevent[1]/total), (int)(100*timeuse_nevent[2]/total), (int)(100*timeuse_nevent[3]/total)
+	//												   , (int)(100*timeuse_nevent[4]/total), (int)(100*timeuse_nevent[5]/total), (int)(100*timeuse_nevent[6]/total), (int)(100*timeuse_nevent[7]/total)));
+	//		timeuse_totalcount = timeuse_nevent[0] = timeuse_nevent[1] = timeuse_nevent[2] = timeuse_nevent[3]
+	//						   = timeuse_nevent[4] = timeuse_nevent[5] = timeuse_nevent[6] = timeuse_nevent[7] = 0;
+	//	}
+	//}else{
+	//	timeuse_totalcount++;
+	//}
 }

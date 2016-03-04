@@ -6,6 +6,7 @@
 #include	"sound.h"
 #include	"fmboard.h"
 #include	"ideio.h"
+#include	"network/lgy98.h"
 #include	"cs4231io.h"
 #include	"iocore16.tbl"
 
@@ -62,6 +63,36 @@ typedef struct {
 static	_IOCORE		iocore;
 static	UINT8		ioterminate[0x100];
 
+static REG8 PnP_initialized = 0;
+static REG8 PnP_RegAddr = 0x00;
+static UINT PnP_RD_Port = 0x0000;
+
+static REG8 PnP_RegisterBuf[256][256] = {0};
+static REG8 PnP_RegisterBufCSUM[256] = {0};
+static REG8 PnP_RegisterBufIsoFlg = 0;
+static REG8 PnP_RegisterBufSendPos = 0;
+
+extern UINT lgy98_baseaddr;
+
+void PnP_init(){
+	int i, j;
+	for(i=0;i<256;i++){
+		PnP_RegisterBuf[i][0x00] = i;
+		PnP_RegisterBuf[i][0x01] = i;
+		PnP_RegisterBufCSUM[i] = 0;
+		for(j=0;j<8;j++){
+			if((PnP_RegisterBuf[i][0x01]>>j)&0x1) PnP_RegisterBufCSUM[i]++;
+		}
+	}
+}
+int PnP_findRegAddrFromPort(UINT port){
+	REG8 ptmp = port >> 2;
+	int i;
+	for(i=0;i<256;i++){
+		if(PnP_RegisterBuf[i][0x00]==ptmp) return i;
+	}
+	return -1;
+}
 
 // ----
 
@@ -85,10 +116,54 @@ static void IOOUTCALL defout8(UINT port, REG8 dat) {
 		dipsw_w8(port, dat);
 		return;
 	}
-//	TRACEOUT(("defout8 - %x %x %.4x %.4x", port, dat, CPU_CS, CPU_IP));
+	//keytmp = (port & 0xfcff);
+	//if (0xE0 <= keytmp && keytmp <= 0xEE) {
+	//	//TRACEOUT(("out%X - %02X %.4x %.4x", port&0xff, dat, CPU_CS, CPU_IP));
+	//	//dipsw_w8(port, dat);
+	//	//keytmp = keytmp ^ 0xff;
+	//	return;
+	//}
+	//if ((port & 0xffff) == 0x0259) {
+	//	//TRACEOUT(("PnP 0259h Register Address = %02X %.4x %.4x", dat, CPU_CS, CPU_IP));
+	//	/*if(!PnP_initialized){
+	//		PnP_init();
+	//		PnP_initialized = 1;
+	//	}
+	//	PnP_RegAddr = dat;
+	//	switch(PnP_RegAddr){
+	//	case 0x01:
+	//		PnP_RegisterBufIsoFlg = 0;
+	//		PnP_RegisterBufSendPos = 0;
+	//		break;
+	//	}*/
+	//	//dipsw_w8(port, dat);
+	//	return;
+	//}
+	//if ((port & 0xffff) == 0x0A59) {
+	//	//TRACEOUT(("PnP 0A59h Register Write Data - %x %.4x %.4x", dat, CPU_CS, CPU_IP));
+	//	/*switch(PnP_RegAddr){
+	//	case 0x00:
+	//		PnP_RegisterBuf[dat][0x00] = dat;
+	//		PnP_RD_Port = (PnP_RegisterBuf[dat][0x00] << 2) | 0x3;
+	//		break;
+	//	case 0x02:
+	//		PnP_RegisterBufSendPos = 0;
+	//		PnP_RegisterBufIsoFlg = 0;
+	//		break;
+	//	default:
+	//		PnP_RegisterBuf[dat][PnP_RegAddr] = dat;
+	//		break;
+	//	}*/
+	//	//dipsw_w8(port, dat);
+	//	return;
+	//}
+	//if ((port&0xfff0) != 0x0140) {
+	//	TRACEOUT(("defout8 - %x %x %.4x %.4x", port, dat, CPU_CS, CPU_IP));
+	//}
 }
 
 static REG8 IOINPCALL definp8(UINT port) {
+	//static UINT	keytmp = 0xff;
 
 #if !defined(DISABLE_SOUND)
 	UINT	tmp;
@@ -105,7 +180,44 @@ static REG8 IOINPCALL definp8(UINT port) {
 	if ((port & 0xf0ff) == 0x801e) {
 		return(dipsw_r8(port));
 	}
-//	TRACEOUT(("definp8 - %x %.4x %.4x", port, CPU_CS, CPU_IP));
+	//keytmp = (port & 0xfcff);
+	//if (0xE0 <= keytmp && keytmp <= 0xEE) {
+	//	//TRACEOUT(("in%X - %.4x %.4x", port&0xff, CPU_CS, CPU_IP));
+	//	//dipsw_w8(port, dat);
+	//	//keytmp = keytmp ^ 0xff;
+	//	return(0xff);
+	//}
+	//if (PnP_RD_Port!=0 && port==PnP_RD_Port) {
+	//	int regport;
+	//	//TRACEOUT(("PnP %04X Register Read Data - %.4x %.4x", port, CPU_CS, CPU_IP));
+	//	/*regport = PnP_findRegAddrFromPort(port);
+	//	if(regport>=0){
+	//		REG8 ret = 0x00;
+	//		switch(PnP_RegAddr){
+	//		case 0x01: // Serial Isolation
+	//			if(!PnP_RegisterBufIsoFlg){
+	//				ret = 0x55;
+	//			}else{
+	//				if(PnP_RegisterBufSendPos & 0x8){
+	//					ret = ((7-(PnP_RegisterBufSendPos & 0x7)) <= PnP_RegisterBufCSUM[regport]) ? 0xAA : 0x00;
+	//					PnP_RegisterBufSendPos = (PnP_RegisterBufSendPos+1) & 0xf;
+	//				}else{
+	//					ret = ((PnP_RegisterBuf[regport][0x01] >> PnP_RegisterBufSendPos) & 0x1) ? 0xAA : 0x00;
+	//					PnP_RegisterBufSendPos = (PnP_RegisterBufSendPos+1) & 0xf;
+	//				}
+	//			}
+	//			PnP_RegisterBufIsoFlg = !PnP_RegisterBufIsoFlg;
+	//			return(ret);
+	//		default:
+	//			return(PnP_RegisterBuf[regport][PnP_RegAddr]);
+	//		}
+	//	}else{*/
+	//		return(0xff);
+	//	//}
+	//}
+	//if ((port&0xfff0) != 0x0140) {
+	//	TRACEOUT(("definp8 - %x %.4x %.4x", port, CPU_CS, CPU_IP));
+	//}
 	return(0xff);
 }
 
@@ -545,6 +657,16 @@ void IOOUTCALL iocore_out16(UINT port, REG16 dat) {
 		return;
 	}
 #endif
+#if defined(SUPPORT_LGY98)
+	if (port == lgy98_baseaddr + 0x200) {
+		lgy98_ob200_16(port, dat);
+		return;
+	}
+	//if (port == lgy98_baseaddr + 0x201) {
+	//	lgy98_ob200_8(port, dat);
+	//	return;
+	//}
+#endif
 	if ((port & 0xfff1) == 0x04a0) {
 		egc_w16(port, dat);
 		return;
@@ -580,6 +702,14 @@ REG16 IOINPCALL iocore_inp16(UINT port) {
 	if (port == 0x0640) {
 		return(ideio_r16(port));
 	}
+#endif
+#if defined(SUPPORT_LGY98)
+	if (port == lgy98_baseaddr + 0x200) {
+		return(lgy98_ib200_16(port));
+	}
+	//if (port == lgy98_baseaddr + 0x201) {
+	//	return(lgy98_ib200_8(port));
+	//}
 #endif
 	if ((port & 0xfffc) == 0x005c) {
 		return(artic_r16(port));

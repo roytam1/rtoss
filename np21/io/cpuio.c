@@ -3,22 +3,33 @@
 #include	"pccore.h"
 #include	"iocore.h"
 
+#if defined(SUPPORT_IDEIO)
+#include	"ideio.h"
+#endif
 
 // ---- I/O
 
 static void IOOUTCALL cpuio_of0(UINT port, REG8 dat) {
-
 #if defined(TRACE)
 	if (CPU_MSW & 1) {
 		TRACEOUT(("80286 ProtectMode Disable"));
 	}
 #endif
+	if (CPU_MSW & 1) {
+		//return;
+		TRACEOUT(("80286 ProtectMode Disable"));
+	}
 	epsonio.cpumode = (CPU_MSW & 1)?'P':'R';
 	CPU_A20EN(FALSE);
 	CPU_RESETREQ = 1;
 	nevent_forceexit();
 	(void)port;
 	(void)dat;
+}
+
+static void IOOUTCALL cpuio_of1(UINT port, REG8 dat) {
+	TRACEOUT(("IDE master/slave read"));
+	//f0_ide_status_read = 2; // IDE master/slave read
 }
 
 static void IOOUTCALL cpuio_of2(UINT port, REG8 dat) {
@@ -38,6 +49,41 @@ static REG8 IOINPCALL cpuio_if0(UINT port) {
 	else {				// for AMD-98
 		ret = 0x18;		// 0x14?
 	}
+#if defined(SUPPORT_IDEIO)
+	/*if(f0_ide_status_read){
+		REG8 bank = ideio.bank[1] & 0x7f;
+		if(bank < 2){
+			IDEDEV dev = ideio.dev + bank;
+			if (dev) {
+				IDEDRV drv = dev->drv + (f0_ide_status_read - 1);
+				if (drv->device != IDETYPE_NONE) {
+					ret = (ret & ~(1<<5))|(1<<5);
+				}else{
+					ret = (ret & ~(1<<5));
+				}
+			}
+		}
+		f0_ide_status_read--;
+	}*/
+	{
+		REG8 bank = ideio.bank[1] & 0x7f;
+		TRACEOUT(("IDE master/slave read"));
+		ret = (ret & ~0x60);
+		if(bank == 0){
+			IDEDEV dev = ideio.dev + bank;
+			if (dev) {
+				IDEDRV drv = dev->drv;
+				if (drv->device != IDETYPE_NONE) {
+					ret |= 0x20;
+				}
+				drv++;
+				if (drv->device != IDETYPE_NONE) {
+					ret |= 0x40;
+				}
+			}
+		}
+	}
+#endif
 	(void)port;
 	return(ret);
 }
@@ -96,18 +142,23 @@ static const IOINP cpuioif0[8] = {
 					cpuio_if0,	cpuio_if2,	NULL,		NULL,
 					NULL,		NULL,		NULL,		NULL};
 #else
-static const IOOUT cpuioof0[8] = {
-					cpuio_of0,	cpuio_of2,	NULL,		cpuio_of6,
-					NULL,		NULL,		NULL,		NULL};
+static const IOOUT cpuioof0[16] = {
+					cpuio_of0,	cpuio_of1,	cpuio_of2,	NULL,		NULL,		NULL,		cpuio_of6,	NULL,
+					NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL};
 
-static const IOINP cpuioif0[8] = {
-					cpuio_if0,	cpuio_if2,	NULL,		cpuio_if6,
-					NULL,		NULL,		NULL,		NULL};
+static const IOINP cpuioif0[16] = {
+					cpuio_if0,	NULL,		cpuio_if2,	NULL,		NULL,		NULL,		cpuio_if6,	NULL,
+					NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL};
 #endif
+//static const IOOUT cpuioof1[1] = {cpuio_of1};
 
 void cpuio_bind(void) {
-
-	iocore_attachsysoutex(0x00f0, 0x0cf1, cpuioof0, 8);
-	iocore_attachsysinpex(0x00f0, 0x0cf1, cpuioif0, 8);
+#if !defined(CPUCORE_IA32)
+	iocore_attachsysoutex(0x00f0, 0x0cf1, cpuioof0, 16);
+	iocore_attachsysinpex(0x00f0, 0x0cf1, cpuioif0, 16);
+#else
+	iocore_attachsysoutex(0x00f0, 0x0cf0, cpuioof0, 16);
+	iocore_attachsysinpex(0x00f0, 0x0cf0, cpuioif0, 16);
+#endif
 }
 

@@ -12,6 +12,13 @@
 void CPUCALL softinttrap(UINT cs, UINT32 eip, UINT vect) {
 
 // ---- ここにトラップ条件コードを書きます
+#if 0
+	if (vect == 0x10) {
+		TRACEOUT(("%.4x:%.4x INT-10 PM=%02X AH=%.2x STACK=%.4x", CPU_STAT_PM, cs, eip,
+								CPU_AH, MEMR_READ16(CPU_SS, CPU_SP + 2)));
+	}
+#endif
+#if 0
 	if (vect == 0x7f) {
 		switch(CPU_AH) {
 			case 0:
@@ -45,6 +52,7 @@ void CPUCALL softinttrap(UINT cs, UINT32 eip, UINT vect) {
 		TRACEOUT(("%.4x:%.4x INT-51 AX=%.4x BX=%.4x DX=%.4x", cs, eip, CPU_AX, CPU_BX, CPU_DX));
 	}
 	return;
+#endif
 
 #if 0
 //	if (vect == 0x2f) {
@@ -169,7 +177,7 @@ void CPUCALL softinttrap(UINT cs, UINT32 eip, UINT vect) {
 		TRACEOUT(("INT 40H - AL=%.2x", CPU_AL));
 	}
 #endif
-#if 1
+#if 0
 	if (vect == 0x21) {
 		char f[128];
 		UINT i;
@@ -236,7 +244,7 @@ void CPUCALL softinttrap(UINT cs, UINT32 eip, UINT vect) {
 		}
 	}
 #endif
-#if defined(TRACE)
+#if 0
 	if (vect == 0x7f) {
 		UINT i, j;
 		switch(CPU_AH) {

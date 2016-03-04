@@ -25,6 +25,8 @@
 
 #include "compiler.h"
 
+#if defined(USE_FPU)
+
 #include "cpu.h"
 #include "ia32.mcr"
 
@@ -1179,3 +1181,5 @@ fp_add_sub(FP_REG *t, FP_REG *d, FP_REG *s)
 	/* 正規化 */
 }
 #endif
+
+#endif /* USE_FPU */

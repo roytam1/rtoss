@@ -98,7 +98,7 @@ extern "C"
 FILEH DOSIOCALL file_open(const OEMCHAR* lpPathName);
 FILEH DOSIOCALL file_open_rb(const OEMCHAR* lpPathName);
 FILEH DOSIOCALL file_create(const OEMCHAR* lpPathName);
-long DOSIOCALL file_seek(FILEH hFile, long pointer, int method);
+FILEPOS DOSIOCALL file_seek(FILEH hFile, FILEPOS pointer, int method);
 UINT DOSIOCALL file_read(FILEH hFile, void *data, UINT length);
 UINT DOSIOCALL file_write(FILEH hFile, const void *data, UINT length);
 short DOSIOCALL file_close(FILEH hFile);

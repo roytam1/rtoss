@@ -44,7 +44,7 @@
 void
 BT_EwGw(void)
 {
-	UINT32 op, src, dst, madr;
+	register UINT32 op, src, dst, madr;
 
 	PREPART_EA_REG16(op, src);
 	if (op >= 0xc0) {
@@ -63,7 +63,7 @@ BT_EwGw(void)
 void
 BT_EdGd(void)
 {
-	UINT32 op, src, dst, madr;
+	register UINT32 op, src, dst, madr;
 
 	PREPART_EA_REG32(op, src);
 	if (op >= 0xc0) {
@@ -82,7 +82,7 @@ BT_EdGd(void)
 void CPUCALL
 BT_EwIb(UINT32 op)
 {
-	UINT32 src, dst, madr;
+	register UINT32 src, dst, madr;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(2);
@@ -101,7 +101,7 @@ BT_EwIb(UINT32 op)
 void CPUCALL
 BT_EdIb(UINT32 op)
 {
-	UINT32 src, dst, madr;
+	register UINT32 src, dst, madr;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(2);
@@ -123,9 +123,9 @@ BT_EdIb(UINT32 op)
 void
 BTS_EwGw(void)
 {
-	UINT16 *out;
-	UINT32 op, src, dst, res, madr;
-	UINT16 bit;
+	register UINT16 *out;
+	register UINT32 op, src, dst, res, madr;
+	register UINT16 bit;
 
 	PREPART_EA_REG16(op, src);
 	bit = BIT_MAKEBIT16(src);
@@ -158,9 +158,9 @@ BTS_EwGw(void)
 void
 BTS_EdGd(void)
 {
-	UINT32 *out;
-	UINT32 op, src, dst, res, madr;
-	UINT32 bit;
+	register UINT32 *out;
+	register UINT32 op, src, dst, res, madr;
+	register UINT32 bit;
 
 	PREPART_EA_REG32(op, src);
 	bit = BIT_MAKEBIT32(src);
@@ -193,9 +193,9 @@ BTS_EdGd(void)
 void CPUCALL
 BTS_EwIb(UINT32 op)
 {
-	UINT16 *out;
-	UINT32 src, dst, res, madr;
-	UINT16 bit;
+	register UINT16 *out;
+	register UINT32 src, dst, res, madr;
+	register UINT16 bit;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(2);
@@ -229,9 +229,9 @@ BTS_EwIb(UINT32 op)
 void CPUCALL
 BTS_EdIb(UINT32 op)
 {
-	UINT32 *out;
-	UINT32 src, dst, res, madr;
-	UINT32 bit;
+	register UINT32 *out;
+	register UINT32 src, dst, res, madr;
+	register UINT32 bit;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(2);
@@ -268,9 +268,9 @@ BTS_EdIb(UINT32 op)
 void
 BTR_EwGw(void)
 {
-	UINT16 *out;
-	UINT32 op, src, dst, res, madr;
-	UINT16 bit;
+	register UINT16 *out;
+	register UINT32 op, src, dst, res, madr;
+	register UINT16 bit;
 
 	PREPART_EA_REG16(op, src);
 	bit = BIT_MAKEBIT16(src);
@@ -303,9 +303,9 @@ BTR_EwGw(void)
 void
 BTR_EdGd(void)
 {
-	UINT32 *out;
-	UINT32 op, src, dst, res, madr;
-	UINT32 bit;
+	register UINT32 *out;
+	register UINT32 op, src, dst, res, madr;
+	register UINT32 bit;
 
 	PREPART_EA_REG32(op, src);
 	bit = BIT_MAKEBIT32(src);
@@ -338,9 +338,9 @@ BTR_EdGd(void)
 void CPUCALL
 BTR_EwIb(UINT32 op)
 {
-	UINT16 *out;
-	UINT32 src, dst, res, madr;
-	UINT16 bit;
+	register UINT16 *out;
+	register UINT32 src, dst, res, madr;
+	register UINT16 bit;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(2);
@@ -374,9 +374,9 @@ BTR_EwIb(UINT32 op)
 void CPUCALL
 BTR_EdIb(UINT32 op)
 {
-	UINT32 *out;
-	UINT32 src, dst, res, madr;
-	UINT32 bit;
+	register UINT32 *out;
+	register UINT32 src, dst, res, madr;
+	register UINT32 bit;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(2);
@@ -413,9 +413,9 @@ BTR_EdIb(UINT32 op)
 void
 BTC_EwGw(void)
 {
-	UINT16 *out;
-	UINT32 op, src, dst, res, madr;
-	UINT16 bit;
+	register UINT16 *out;
+	register UINT32 op, src, dst, res, madr;
+	register UINT16 bit;
 
 	PREPART_EA_REG16(op, src);
 	bit = BIT_MAKEBIT16(src);
@@ -448,9 +448,9 @@ BTC_EwGw(void)
 void
 BTC_EdGd(void)
 {
-	UINT32 *out;
-	UINT32 op, src, dst, res, madr;
-	UINT32 bit;
+	register UINT32 *out;
+	register UINT32 op, src, dst, res, madr;
+	register UINT32 bit;
 
 	PREPART_EA_REG32(op, src);
 	bit = BIT_MAKEBIT32(src);
@@ -483,9 +483,9 @@ BTC_EdGd(void)
 void CPUCALL
 BTC_EwIb(UINT32 op)
 {
-	UINT16 *out;
-	UINT32 src, dst, res, madr;
-	UINT16 bit;
+	register UINT16 *out;
+	register UINT32 src, dst, res, madr;
+	register UINT16 bit;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(2);
@@ -519,9 +519,9 @@ BTC_EwIb(UINT32 op)
 void CPUCALL
 BTC_EdIb(UINT32 op)
 {
-	UINT32 *out;
-	UINT32 src, dst, res, madr;
-	UINT32 bit;
+	register UINT32 *out;
+	register UINT32 src, dst, res, madr;
+	register UINT32 bit;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(2);
@@ -558,9 +558,9 @@ BTC_EdIb(UINT32 op)
 void
 BSF_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
-	int bit;
+	register UINT16 *out;
+	register UINT32 op, src;
+	register int bit;
 
 	PREPART_REG16_EA(op, src, out, 2, 7);
 	if (src == 0) {
@@ -579,9 +579,9 @@ BSF_GwEw(void)
 void
 BSF_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
-	int bit;
+	register UINT32 *out;
+	register UINT32 op, src;
+	register int bit;
 
 	PREPART_REG32_EA(op, src, out, 2, 7);
 	if (src == 0) {
@@ -603,9 +603,9 @@ BSF_GdEd(void)
 void
 BSR_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
-	int bit;
+	register UINT16 *out;
+	register UINT32 op, src;
+	register int bit;
 
 	PREPART_REG16_EA(op, src, out, 2, 7);
 	if (src == 0) {
@@ -624,9 +624,9 @@ BSR_GwEw(void)
 void
 BSR_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
-	int bit;
+	register UINT32 *out;
+	register UINT32 op, src;
+	register int bit;
 
 	PREPART_REG32_EA(op, src, out, 2, 7);
 	if (src == 0) {
@@ -648,8 +648,8 @@ BSR_GdEd(void)
 void
 SETO_Eb(void)
 {
-	UINT32 op, madr;
-	UINT8 v = CC_O?1:0;
+	register UINT32 op, madr;
+	register UINT8 v = CC_O?1:0;
 
 	GET_PCBYTE(op);
 	if (op >= 0xc0) {
@@ -665,8 +665,8 @@ SETO_Eb(void)
 void
 SETNO_Eb(void)
 {
-	UINT32 op, madr;
-	UINT8 v = CC_NO?1:0;
+	register UINT32 op, madr;
+	register UINT8 v = CC_NO?1:0;
 
 	GET_PCBYTE(op);
 	if (op >= 0xc0) {
@@ -682,8 +682,8 @@ SETNO_Eb(void)
 void
 SETC_Eb(void)
 {
-	UINT32 op, madr;
-	UINT8 v = CC_C?1:0;
+	register UINT32 op, madr;
+	register UINT8 v = CC_C?1:0;
 
 	GET_PCBYTE(op);
 	if (op >= 0xc0) {
@@ -699,8 +699,8 @@ SETC_Eb(void)
 void
 SETNC_Eb(void)
 {
-	UINT32 op, madr;
-	UINT8 v = CC_NC?1:0;
+	register UINT32 op, madr;
+	register UINT8 v = CC_NC?1:0;
 
 	GET_PCBYTE(op);
 	if (op >= 0xc0) {
@@ -716,8 +716,8 @@ SETNC_Eb(void)
 void
 SETZ_Eb(void)
 {
-	UINT32 op, madr;
-	UINT8 v = CC_Z?1:0;
+	register UINT32 op, madr;
+	register UINT8 v = CC_Z?1:0;
 
 	GET_PCBYTE(op);
 	if (op >= 0xc0) {
@@ -733,8 +733,8 @@ SETZ_Eb(void)
 void
 SETNZ_Eb(void)
 {
-	UINT32 op, madr;
-	UINT8 v = CC_NZ?1:0;
+	register UINT32 op, madr;
+	register UINT8 v = CC_NZ?1:0;
 
 	GET_PCBYTE(op);
 	if (op >= 0xc0) {
@@ -750,8 +750,8 @@ SETNZ_Eb(void)
 void
 SETA_Eb(void)
 {
-	UINT32 op, madr;
-	UINT8 v = CC_A?1:0;
+	register UINT32 op, madr;
+	register UINT8 v = CC_A?1:0;
 
 	GET_PCBYTE(op);
 	if (op >= 0xc0) {
@@ -767,8 +767,8 @@ SETA_Eb(void)
 void
 SETNA_Eb(void)
 {
-	UINT32 op, madr;
-	UINT8 v = CC_NA?1:0;
+	register UINT32 op, madr;
+	register UINT8 v = CC_NA?1:0;
 
 	GET_PCBYTE(op);
 	if (op >= 0xc0) {
@@ -784,8 +784,8 @@ SETNA_Eb(void)
 void
 SETS_Eb(void)
 {
-	UINT32 op, madr;
-	UINT8 v = CC_S?1:0;
+	register UINT32 op, madr;
+	register UINT8 v = CC_S?1:0;
 
 	GET_PCBYTE(op);
 	if (op >= 0xc0) {
@@ -801,8 +801,8 @@ SETS_Eb(void)
 void
 SETNS_Eb(void)
 {
-	UINT32 op, madr;
-	UINT8 v = CC_NS?1:0;
+	register UINT32 op, madr;
+	register UINT8 v = CC_NS?1:0;
 
 	GET_PCBYTE(op);
 	if (op >= 0xc0) {
@@ -818,8 +818,8 @@ SETNS_Eb(void)
 void
 SETP_Eb(void)
 {
-	UINT32 op, madr;
-	UINT8 v = CC_P?1:0;
+	register UINT32 op, madr;
+	register UINT8 v = CC_P?1:0;
 
 	GET_PCBYTE(op);
 	if (op >= 0xc0) {
@@ -835,8 +835,8 @@ SETP_Eb(void)
 void
 SETNP_Eb(void)
 {
-	UINT32 op, madr;
-	UINT8 v = CC_NP?1:0;
+	register UINT32 op, madr;
+	register UINT8 v = CC_NP?1:0;
 
 	GET_PCBYTE(op);
 	if (op >= 0xc0) {
@@ -852,8 +852,8 @@ SETNP_Eb(void)
 void
 SETL_Eb(void)
 {
-	UINT32 op, madr;
-	UINT8 v = CC_L?1:0;
+	register UINT32 op, madr;
+	register UINT8 v = CC_L?1:0;
 
 	GET_PCBYTE(op);
 	if (op >= 0xc0) {
@@ -869,8 +869,8 @@ SETL_Eb(void)
 void
 SETNL_Eb(void)
 {
-	UINT32 op, madr;
-	UINT8 v = CC_NL?1:0;
+	register UINT32 op, madr;
+	register UINT8 v = CC_NL?1:0;
 
 	GET_PCBYTE(op);
 	if (op >= 0xc0) {
@@ -886,8 +886,8 @@ SETNL_Eb(void)
 void
 SETLE_Eb(void)
 {
-	UINT32 op, madr;
-	UINT8 v = CC_LE?1:0;
+	register UINT32 op, madr;
+	register UINT8 v = CC_LE?1:0;
 
 	GET_PCBYTE(op);
 	if (op >= 0xc0) {
@@ -903,8 +903,8 @@ SETLE_Eb(void)
 void
 SETNLE_Eb(void)
 {
-	UINT32 op, madr;
-	UINT8 v = CC_NLE?1:0;
+	register UINT32 op, madr;
+	register UINT8 v = CC_NLE?1:0;
 
 	GET_PCBYTE(op);
 	if (op >= 0xc0) {
@@ -923,7 +923,7 @@ SETNLE_Eb(void)
 void
 TEST_EbGb(void)
 {
-	UINT32 op, src, tmp, madr;
+	register UINT32 op, src, tmp, madr;
 
 	PREPART_EA_REG8(op, src);
 	if (op >= 0xc0) {
@@ -940,7 +940,7 @@ TEST_EbGb(void)
 void
 TEST_EwGw(void)
 {
-	UINT32 op, src, tmp, madr;
+	register UINT32 op, src, tmp, madr;
 
 	PREPART_EA_REG16(op, src);
 	if (op >= 0xc0) {
@@ -957,7 +957,7 @@ TEST_EwGw(void)
 void
 TEST_EdGd(void)
 {
-	UINT32 op, src, tmp, madr;
+	register UINT32 op, src, tmp, madr;
 
 	PREPART_EA_REG32(op, src);
 	if (op >= 0xc0) {
@@ -974,7 +974,7 @@ TEST_EdGd(void)
 void
 TEST_ALIb(void)
 {
-	UINT32 src, tmp;
+	register UINT32 src, tmp;
 
 	CPU_WORKCLOCK(3);
 	tmp = CPU_AL;
@@ -985,7 +985,7 @@ TEST_ALIb(void)
 void
 TEST_AXIw(void)
 {
-	UINT32 src, tmp;
+	register UINT32 src, tmp;
 
 	CPU_WORKCLOCK(3);
 	tmp = CPU_AX;
@@ -996,7 +996,7 @@ TEST_AXIw(void)
 void
 TEST_EAXId(void)
 {
-	UINT32 src, tmp;
+	register UINT32 src, tmp;
 
 	CPU_WORKCLOCK(3);
 	tmp = CPU_EAX;
@@ -1007,7 +1007,7 @@ TEST_EAXId(void)
 void CPUCALL
 TEST_EbIb(UINT32 op)
 {
-	UINT32 src, tmp, madr;
+	register UINT32 src, tmp, madr;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(2);
@@ -1024,7 +1024,7 @@ TEST_EbIb(UINT32 op)
 void CPUCALL
 TEST_EwIw(UINT32 op)
 {
-	UINT32 src, tmp, madr;
+	register UINT32 src, tmp, madr;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(2);
@@ -1041,7 +1041,7 @@ TEST_EwIw(UINT32 op)
 void CPUCALL
 TEST_EdId(UINT32 op)
 {
-	UINT32 src, tmp, madr;
+	register UINT32 src, tmp, madr;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(2);

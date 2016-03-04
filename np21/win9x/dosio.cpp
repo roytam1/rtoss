@@ -68,9 +68,16 @@ FILEH DOSIOCALL file_create(const OEMCHAR* lpPathName)
  * @param[in] method 開始点
  * @return ファイルの位置
  */
-long DOSIOCALL file_seek(FILEH hFile, long pointer, int method)
+FILEPOS DOSIOCALL file_seek(FILEH hFile, FILEPOS pointer, int method)
 {
+#ifdef SUPPORT_LARGE_HDD
+	LARGE_INTEGER li, lires;
+	li.QuadPart = pointer;
+	::SetFilePointerEx(hFile, li, &lires, method);
+	return lires.QuadPart;
+#else
 	return static_cast<long>(::SetFilePointer(hFile, pointer, 0, method));
+#endif
 }
 
 /**

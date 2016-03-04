@@ -177,6 +177,9 @@ void ideio_reset(const NP2CFG *pConfig);
 void ideio_bind(void);
 void ideio_notify(REG8 sxsidrv, UINT action);
 
+void ideio_init();
+void ideio_shutdown();
+
 #ifdef __cplusplus
 }
 #endif

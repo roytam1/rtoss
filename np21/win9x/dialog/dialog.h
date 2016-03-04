@@ -6,6 +6,9 @@ LRESULT CALLBACK ClndDialogProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 
 void dialog_scropt(HWND hWnd);
 void dialog_sndopt(HWND hWnd);
+#if defined(SUPPORT_LGY98)
+void dialog_netopt(HWND hWnd);
+#endif
 void dialog_s98(HWND hWnd);
 #if defined(SUPPORT_WAVEREC)
 void dialog_waverec(HWND hWnd);

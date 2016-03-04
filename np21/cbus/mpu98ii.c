@@ -939,7 +939,7 @@ static void IOOUTCALL mpu98ii_o0(UINT port, REG8 dat) {
 
 	UINT	sent;
 
-TRACEOUT(("mpu98ii out %.4x %.2x", port, dat));
+//TRACEOUT(("mpu98ii out %.4x %.2x", port, dat));
 	if (cm_mpu98 == NULL) {
 		cm_mpu98 = commng_create(COMCREATE_MPU98II);
 	}
@@ -961,7 +961,7 @@ TRACEOUT(("mpu98ii out %.4x %.2x", port, dat));
 
 static void IOOUTCALL mpu98ii_o2(UINT port, REG8 dat) {
 
-TRACEOUT(("mpu98ii out %.4x %.2x", port, dat));
+//TRACEOUT(("mpu98ii out %.4x %.2x", port, dat));
 	if (cm_mpu98 == NULL) {
 		cm_mpu98 = commng_create(COMCREATE_MPU98II);
 	}
@@ -1021,7 +1021,7 @@ static REG8 IOINPCALL mpu98ii_i0(UINT port) {
 		}
 
 //		TRACEOUT(("recv data->%.2x", mpu98.data));
-TRACEOUT(("mpu98ii inp %.4x %.2x", port, mpu98.data));
+//TRACEOUT(("mpu98ii inp %.4x %.2x", port, mpu98.data));
 		return(mpu98.data);
 	}
 	(void)port;

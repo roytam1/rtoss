@@ -1,9 +1,5 @@
 #include	"compiler.h"
-
-#ifdef	TRACEOUT
-#undef	TRACEOUT
-#endif
-#define	TRACEOUT(s)	trace_fmt s
+#include	"win9x/misc/trace.h"
 
 // ‚±‚êAscsicmd‚Æ‚Ç‚¤“‡‚·‚é‚Ì‚æH
 
@@ -32,8 +28,8 @@ static const UINT8 cdrom_inquiry[] = {
 	0x00,0x00,0x00,	// Reserved
 	'N', 'E', 'C', ' ', ' ', ' ', ' ', ' ',	// Vendor ID
 	'C', 'D', '-', 'R', 'O', 'M', ' ', 'D',	// Product ID
-	'R', 'I', 'V', 'E', ':', '2', '5', '1',	// Product ID
-	'4', '.', '0', '9'	// Product Revision Level
+	'R', 'I', 'V', 'E', ':', '9', '8', ' ',	// Product ID
+	'1', '.', '0', ' '	// Product Revision Level
 #else
 	0x05,	// CD-ROM
 	0x80,	// bit7: Removable Medium Bit, other: Reserved
@@ -64,7 +60,7 @@ static void senddata(IDEDRV drv, UINT size, UINT limit) {
 	drv->bufsize = size;
 
 	if (!(drv->ctrl & IDECTRL_NIEN)) {
-		TRACEOUT(("atapicmd: senddata()"));
+		//TRACEOUT(("atapicmd: senddata()"));
 		ideio.bank[0] = ideio.bank[1] | 0x80;			// ????
 		pic_setirq(IDE_IRQ);
 	}
@@ -80,7 +76,7 @@ static void cmddone(IDEDRV drv) {
 	drv->asc = ATAPI_ASC_NO_ADDITIONAL_SENSE_INFORMATION;
 
 	if (!(drv->ctrl & IDECTRL_NIEN)) {
-		TRACEOUT(("atapicmd: cmddone()"));
+		//TRACEOUT(("atapicmd: cmddone()"));
 		ideio.bank[0] = ideio.bank[1] | 0x80;			// ????
 		pic_setirq(IDE_IRQ);
 	}
@@ -93,7 +89,7 @@ static void senderror(IDEDRV drv) {
 	drv->status |= IDESTAT_CHK;
 
 	if (!(drv->ctrl & IDECTRL_NIEN)) {
-		TRACEOUT(("atapicmd: senderror()"));
+		//TRACEOUT(("atapicmd: senderror()"));
 		ideio.bank[0] = ideio.bank[1] | 0x80;			// ????
 		pic_setirq(IDE_IRQ);
 	}
@@ -119,6 +115,7 @@ static void atapi_cmd_readsubch(IDEDRV drv);
 static void atapi_cmd_readtoc(IDEDRV drv);
 static void atapi_cmd_playaudiomsf(IDEDRV drv);
 static void atapi_cmd_pauseresume(IDEDRV drv);
+static void atapi_cmd_mechanismstatus(IDEDRV drv);
 
 void atapicmd_a0(IDEDRV drv) {
 
@@ -128,7 +125,7 @@ void atapicmd_a0(IDEDRV drv) {
 	cmd = drv->buf[0];
 	switch (cmd) {
 	case 0x00:		// test unit ready
-		TRACEOUT(("atapicmd: test unit ready"));
+		//TRACEOUT(("atapicmd: test unit ready"));
 		if (!(drv->media & IDEIO_MEDIA_LOADED)) {
 			/* medium not present */
 			ATAPI_SET_SENSE_KEY(drv, ATAPI_SK_NOT_READY);
@@ -148,7 +145,7 @@ void atapicmd_a0(IDEDRV drv) {
 		break;
 
 	case 0x03:		// request sense
-		TRACEOUT(("atapicmd: request sense"));
+		//TRACEOUT(("atapicmd: request sense"));
 		leng = drv->buf[4];
 		ZeroMemory(drv->buf, 18);
 		drv->buf[0] = 0x70;
@@ -176,12 +173,12 @@ void atapicmd_a0(IDEDRV drv) {
 		break;
 
 	case 0x25:		// read capacity
-		TRACEOUT(("atapicmd: read capacity"));
+		//TRACEOUT(("atapicmd: read capacity"));
 		atapi_cmd_read_capacity(drv);
 		break;
 
 	case 0x28:		// read(10)
-		TRACEOUT(("atapicmd: read(10)"));
+		//TRACEOUT(("atapicmd: read(10)"));
 		lba = (drv->buf[2] << 24) + (drv->buf[3] << 16) + (drv->buf[4] << 8) + drv->buf[5];
 		leng = (drv->buf[7] << 8) + drv->buf[8];
 		atapi_cmd_read(drv, lba, leng);
@@ -215,6 +212,20 @@ void atapicmd_a0(IDEDRV drv) {
 	case 0x4b:
 		TRACEOUT(("atapicmd: pause resume"));
 		atapi_cmd_pauseresume(drv);
+		break;
+		
+	case 0xbe:
+	//	//ATAPI_SET_SENSE_KEY(drv, ATAPI_SK_ILLEGAL_REQUEST);
+	//	//drv->asc = ATAPI_ASC_INVALID_COMMAND_OPERATION_CODE;
+	//	//senderror(drv);
+		TRACEOUT(("atapicmd: read cd"));
+		sendabort(drv);
+		break;
+	//	
+	case 0xbd:
+		TRACEOUT(("atapicmd: mechanism status"));
+		//atapi_cmd_mechanismstatus(drv);
+		sendabort(drv);
 		break;
 
 	default:
@@ -305,7 +316,7 @@ void atapi_dataread(IDEDRV drv) {
 	drv->bufsize = 2048;
 
 	if (!(drv->ctrl & IDECTRL_NIEN)) {
-		TRACEOUT(("atapicmd: senddata()"));
+		//TRACEOUT(("atapicmd: senddata()"));
 		ideio.bank[0] = ideio.bank[1] | 0x80;			// ????
 		pic_setirq(IDE_IRQ);
 	}
@@ -708,6 +719,54 @@ static void atapi_cmd_pauseresume(IDEDRV drv) {
 		}
 	}
 	cmddone(drv);
+}
+
+// 0xBD: MECHANISM STATUS
+static void atapi_cmd_mechanismstatus(IDEDRV drv) {
+
+	//const UINT8	*ptr;
+	//UINT	alloclen;
+	//UINT32	size;
+	//UINT32	pos = 0;
+
+	//alloclen = (drv->buf[8] << 8) | (drv->buf[9]);
+
+	///* Mechanism Status Header */
+	//ZeroMemory(drv->buf, 8);
+	//drv->buf[0] = 0;
+	//drv->buf[1] = (0x0)<<5;
+	//pos = drv->sn;
+	//pos |= (drv->cy << 8);
+	//pos |= (drv->hd << 24);
+	//drv->buf[2] = (pos >> 16) & 0xff;
+	//drv->buf[3] = (pos >>  8) & 0xff;
+	//drv->buf[4] = (pos      ) & 0xff;
+	//drv->buf[5] = 0;
+	//drv->buf[6] = 0;
+	//drv->buf[7] = 0;
+	
+	ATAPI_SET_SENSE_KEY(drv, ATAPI_SK_ILLEGAL_REQUEST);
+	drv->asc = ATAPI_ASC_INVALID_COMMAND_OPERATION_CODE;
+	senderror(drv);
+	
+	//size = min(8, alloclen);
+	//drv->sc = IDEINTR_IO;
+	//drv->cy = size;
+	//drv->status &= ~(IDESTAT_BSY|IDESTAT_DMRD|IDESTAT_SERV|IDESTAT_CHK);
+	//drv->status |= IDESTAT_DRQ;
+	//drv->error = 0;
+	//ATAPI_SET_SENSE_KEY(drv, ATAPI_SK_ILLEGAL_REQUEST);
+	//drv->asc = ATAPI_ASC_NO_ADDITIONAL_SENSE_INFORMATION;
+	//drv->bufdir = IDEDIR_IN;
+	//drv->buftc = IDETC_TRANSFEREND;
+	//drv->bufpos = 0;
+	//drv->bufsize = size;
+
+	//if (!(drv->ctrl & IDECTRL_NIEN)) {
+	//	//TRACEOUT(("atapicmd: senddata()"));
+	//	ideio.bank[0] = ideio.bank[1] | 0x80;			// ????
+	//	pic_setirq(IDE_IRQ);
+	//}
 }
 
 #endif	/* SUPPORT_IDEIO */

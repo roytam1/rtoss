@@ -46,7 +46,7 @@ void systimer(NEVENTITEM item) {
 			setsystimerevent(pitch->value, NEVENT_RELATIVE);
 		}
 		else {
-			setsystimerevent(0, NEVENT_RELATIVE);
+			setsystimerevent(1, NEVENT_RELATIVE);
 		}
 	}
 }
@@ -248,12 +248,14 @@ BOOL pit_setcount(PITCH pitch, REG8 value) {
 			flag = pitch->flag;
 			pitch->flag = flag ^ PIT_FLAG_W;
 			if (!(flag & PIT_FLAG_W)) {
-				pitch->value &= 0xff00;
-				pitch->value += value;
+				//pitch->value &= 0xff00;
+				//pitch->value += value;
+				pitch->value = (pitch->value & 0xff00) | (value);
 				return(TRUE);
 			}
-			pitch->value &= 0x00ff;
-			pitch->value += value << 8;
+			pitch->value = (pitch->value & 0x00ff) | (value << 8);
+			//pitch->value &= 0x00ff;
+			//pitch->value += value << 8;
 			break;
 	}
 	pitch->ctrl &= ~PIT_STAT_CMD;
@@ -387,7 +389,7 @@ static void IOOUTCALL pit_o77(UINT port, REG8 dat) {
 	}
 #if defined(uPD71054)
 	else {
-		TRACEOUT(("multiple latch commands - %x", dat));
+		//TRACEOUT(("multiple latch commands - %x", dat));
 		for (chnum=0; chnum<3; chnum++) {
 			if (dat & (2 << chnum)) {
 				latchcmd(pit.ch + chnum, dat);

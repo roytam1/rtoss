@@ -98,7 +98,7 @@ PUSHF_Fw(void)
 
 	CPU_WORKCLOCK(3);
 	if (!CPU_STAT_PM || !CPU_STAT_VM86 || (CPU_STAT_IOPL == CPU_IOPL3)) {
-		UINT16 flags = REAL_FLAGREG;
+		register UINT16 flags = REAL_FLAGREG;
 		flags = (flags & ALL_FLAG) | 2;
 		PUSH0_16(flags);
 		return;
@@ -113,7 +113,7 @@ PUSHFD_Fd(void)
 
 	CPU_WORKCLOCK(3);
 	if (!CPU_STAT_PM || !CPU_STAT_VM86 || (CPU_STAT_IOPL == CPU_IOPL3)) {
-		UINT32 flags = REAL_EFLAGREG & ~(RF_FLAG|VM_FLAG);
+		register UINT32 flags = REAL_EFLAGREG & ~(RF_FLAG|VM_FLAG);
 		flags = (flags & ALL_EFLAG) | 2;
 		PUSH0_32(flags);
 		return;
@@ -125,7 +125,7 @@ PUSHFD_Fd(void)
 void
 POPF_Fw(void)
 {
-	UINT16 flags, mask;
+	register UINT16 flags, mask;
 
 	CPU_WORKCLOCK(3);
 	CPU_SET_PREV_ESP();
@@ -161,7 +161,7 @@ POPF_Fw(void)
 void
 POPFD_Fd(void)
 {
-	UINT32 flags, mask;
+	register UINT32 flags, mask;
 
 	CPU_WORKCLOCK(3);
 	CPU_SET_PREV_ESP();

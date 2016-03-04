@@ -33,9 +33,9 @@
 void CPUCALL
 LGDT_Ms(UINT32 op)
 {
-	UINT32 madr;
-	UINT32 base;
-	UINT16 limit;
+	register UINT32 madr;
+	register UINT32 base;
+	register UINT16 limit;
 
 	if (op < 0xc0) {
 		if (!CPU_STAT_PM || (CPU_STAT_CPL == 0 && !CPU_STAT_VM86)) {
@@ -64,9 +64,9 @@ LGDT_Ms(UINT32 op)
 void CPUCALL
 SGDT_Ms(UINT32 op)
 {
-	UINT32 madr;
-	UINT32 base;
-	UINT16 limit;
+	register UINT32 madr;
+	register UINT32 base;
+	register UINT16 limit;
 
 	if (op < 0xc0) {
 		CPU_WORKCLOCK(11);
@@ -86,8 +86,8 @@ SGDT_Ms(UINT32 op)
 void CPUCALL
 LLDT_Ew(UINT32 op)
 {
-	UINT32 madr;
-	UINT16 src;
+	register UINT32 madr;
+	register UINT16 src;
 
 	if (CPU_STAT_PM && !CPU_STAT_VM86) {
 		if (CPU_STAT_CPL == 0) {
@@ -112,8 +112,8 @@ LLDT_Ew(UINT32 op)
 void CPUCALL
 SLDT_Ew(UINT32 op)
 {
-	UINT32 madr;
-	UINT16 ldtr;
+	register UINT32 madr;
+	register UINT16 ldtr;
 
 	if (CPU_STAT_PM && !CPU_STAT_VM86) {
 		ldtr = CPU_LDTR;
@@ -138,8 +138,8 @@ SLDT_Ew(UINT32 op)
 void CPUCALL
 LTR_Ew(UINT32 op)
 {
-	UINT32 madr;
-	UINT16 src;
+	register UINT32 madr;
+	register UINT16 src;
 
 	if (CPU_STAT_PM && !CPU_STAT_VM86) {
 		if (CPU_STAT_CPL == 0) {
@@ -164,8 +164,8 @@ LTR_Ew(UINT32 op)
 void CPUCALL
 STR_Ew(UINT32 op)
 {
-	UINT32 madr;
-	UINT16 tr;
+	register UINT32 madr;
+	register UINT16 tr;
 
 	if (CPU_STAT_PM && !CPU_STAT_VM86) {
 		tr = CPU_TR;
@@ -190,9 +190,9 @@ STR_Ew(UINT32 op)
 void CPUCALL
 LIDT_Ms(UINT32 op)
 {
-	UINT32 madr;
-	UINT32 base;
-	UINT16 limit;
+	register UINT32 madr;
+	register UINT32 base;
+	register UINT16 limit;
 
 	if (op < 0xc0) {
 		if (!CPU_STAT_PM || (CPU_STAT_CPL == 0 && !CPU_STAT_VM86)) {
@@ -221,9 +221,9 @@ LIDT_Ms(UINT32 op)
 void CPUCALL
 SIDT_Ms(UINT32 op)
 {
-	UINT32 madr;
-	UINT32 base;
-	UINT16 limit;
+	register UINT32 madr;
+	register UINT32 base;
+	register UINT16 limit;
 
 	if (op < 0xc0) {
 		CPU_WORKCLOCK(11);
@@ -243,9 +243,9 @@ SIDT_Ms(UINT32 op)
 void
 MOV_CdRd(void)
 {
-	UINT32 op, src;
-	UINT32 reg;
-	int idx;
+	register UINT32 op, src;
+	register UINT32 reg;
+	register int idx;
 
 	CPU_WORKCLOCK(11);
 	GET_PCBYTE(op);
@@ -383,9 +383,9 @@ MOV_CdRd(void)
 void
 MOV_RdCd(void)
 {
-	UINT32 *out;
-	UINT32 op;
-	int idx;
+	register UINT32 *out;
+	register UINT32 op;
+	register int idx;
 
 	CPU_WORKCLOCK(11);
 	GET_PCBYTE(op);
@@ -429,8 +429,8 @@ MOV_RdCd(void)
 void CPUCALL
 LMSW_Ew(UINT32 op)
 {
-	UINT32 src, madr;
-	UINT32 cr0;
+	register UINT32 src, madr;
+	register UINT32 cr0;
 
 	if (!CPU_STAT_PM || CPU_STAT_CPL == 0) {
 		if (op >= 0xc0) {
@@ -457,7 +457,7 @@ LMSW_Ew(UINT32 op)
 void CPUCALL
 SMSW_Ew(UINT32 op)
 {
-	UINT32 madr;
+	register UINT32 madr;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(2);
@@ -488,8 +488,8 @@ CLTS(void)
 void
 ARPL_EwGw(void)
 {
-	UINT32 op, madr;
-	UINT src, dst;
+	register UINT32 op, madr;
+	register UINT src, dst;
 
 	if (CPU_STAT_PM && !CPU_STAT_VM86) {
 		PREPART_EA_REG16(op, src);
@@ -530,11 +530,11 @@ void
 LAR_GwEw(void)
 {
 	selector_t sel;
-	UINT16 *out;
-	UINT32 op;
-	UINT32 h;
-	int rv;
-	UINT16 selector;
+	register UINT16 *out;
+	register UINT32 op;
+	register UINT32 h;
+	register int rv;
+	register UINT16 selector;
 
 	if (CPU_STAT_PM && !CPU_STAT_VM86) {
 		PREPART_REG16_EA(op, selector, out, 5, 11);
@@ -588,11 +588,11 @@ void
 LAR_GdEw(void)
 {
 	selector_t sel;
-	UINT32 *out;
-	UINT32 op;
-	UINT32 h;
-	int rv;
-	UINT32 selector;
+	register UINT32 *out;
+	register UINT32 op;
+	register UINT32 h;
+	register int rv;
+	register UINT32 selector;
 
 	if (CPU_STAT_PM && !CPU_STAT_VM86) {
 		PREPART_REG32_EA(op, selector, out, 5, 11);
@@ -646,10 +646,10 @@ void
 LSL_GwEw(void)
 {
 	selector_t sel;
-	UINT16 *out;
-	UINT32 op;
-	int rv;
-	UINT16 selector;
+	register UINT16 *out;
+	register UINT32 op;
+	register int rv;
+	register UINT16 selector;
 
 	if (CPU_STAT_PM && !CPU_STAT_VM86) {
 		PREPART_REG16_EA(op, selector, out, 5, 11);
@@ -699,10 +699,10 @@ void
 LSL_GdEw(void)
 {
 	selector_t sel;
-	UINT32 *out;
-	UINT32 op;
-	int rv;
-	UINT32 selector;
+	register UINT32 *out;
+	register UINT32 op;
+	register int rv;
+	register UINT32 selector;
 
 	if (CPU_STAT_PM && !CPU_STAT_VM86) {
 		PREPART_REG32_EA(op, selector, out, 5, 11);
@@ -752,9 +752,9 @@ void CPUCALL
 VERR_Ew(UINT32 op)
 {
 	selector_t sel;
-	UINT32 madr;
-	int rv;
-	UINT16 selector;
+	register UINT32 madr;
+	register int rv;
+	register UINT16 selector;
 
 	if (CPU_STAT_PM && !CPU_STAT_VM86) {
 		if (op >= 0xc0) {
@@ -805,9 +805,9 @@ void CPUCALL
 VERW_Ew(UINT32 op)
 {
 	selector_t sel;
-	UINT32 madr;
-	int rv;
-	UINT16 selector;
+	register UINT32 madr;
+	register int rv;
+	register UINT16 selector;
 
 	if (CPU_STAT_PM && !CPU_STAT_VM86) {
 		if (op >= 0xc0) {
@@ -851,9 +851,9 @@ VERW_Ew(UINT32 op)
 void
 MOV_DdRd(void)
 {
-	UINT32 src;
-	UINT op;
-	int idx;
+	register UINT32 src;
+	register UINT op;
+	register int idx;
 
 	CPU_WORKCLOCK(11);
 	GET_PCBYTE(op);
@@ -904,9 +904,9 @@ MOV_DdRd(void)
 void
 MOV_RdDd(void)
 {
-	UINT32 *out;
-	UINT op;
-	int idx;
+	register UINT32 *out;
+	register UINT op;
+	register int idx;
 
 	CPU_WORKCLOCK(11);
 	GET_PCBYTE(op);
@@ -978,8 +978,8 @@ void CPUCALL
 INVLPG(UINT32 op)
 {
 	descriptor_t *sdp;
-	UINT32 madr;
-	int idx;
+	register UINT32 madr;
+	register int idx;
 
 	if (CPU_STAT_PM && (CPU_STAT_VM86 || CPU_STAT_CPL != 0)) {
 		VERBOSE(("INVLPG: VM86(%s) or CPL(%d) != 0", CPU_STAT_VM86 ? "true" : "false", CPU_STAT_CPL));
@@ -1048,7 +1048,7 @@ RSM(void)
 void
 RDMSR(void)
 {
-	int idx;
+	register int idx;
 
 	if (CPU_STAT_PM && (CPU_STAT_VM86 || CPU_STAT_CPL != 0)) {
 		VERBOSE(("RDMSR: VM86(%s) or CPL(%d) != 0", CPU_STAT_VM86 ? "true" : "false", CPU_STAT_CPL));
@@ -1066,7 +1066,7 @@ RDMSR(void)
 void
 WRMSR(void)
 {
-	int idx;
+	register int idx;
 
 	if (CPU_STAT_PM && (CPU_STAT_VM86 || CPU_STAT_CPL != 0)) {
 		VERBOSE(("WRMSR: VM86(%s) or CPL(%d) != 0", CPU_STAT_VM86 ? "true" : "false", CPU_STAT_CPL));
@@ -1086,8 +1086,12 @@ WRMSR(void)
 void
 RDTSC(void)
 {
+	static LARGE_INTEGER li = {0};
+	QueryPerformanceCounter(&li);
+	CPU_STATSAVE.cpu_regs.reg[CPU_EDX_INDEX].d = li.HighPart;
+	CPU_STATSAVE.cpu_regs.reg[CPU_EAX_INDEX].d = li.LowPart;
 
-	ia32_panic("RDTSC: not implemented yet!");
+	//ia32_panic("RDTSC: not implemented yet!");
 }
 
 void

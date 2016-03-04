@@ -204,9 +204,9 @@ UINT8 MEMCALL
 cpu_memory_access_la_RMW_b(UINT32 laddr, UINT32 (CPUCALL *func)(UINT32, void *), void *arg)
 {
 	const int ucrw = CPU_PAGE_WRITE_DATA | CPU_STAT_USER_MODE;
-	UINT32 paddr;
-	UINT32 result;
-	UINT8 value;
+	register UINT32 paddr;
+	register UINT32 result;
+	register UINT8 value;
 
 	paddr = paging(laddr, ucrw);
 	value = cpu_memoryread(paddr);
@@ -220,8 +220,8 @@ cpu_memory_access_la_RMW_w(UINT32 laddr, UINT32 (CPUCALL *func)(UINT32, void *),
 {
 	const int ucrw = CPU_PAGE_WRITE_DATA | CPU_STAT_USER_MODE;
 	UINT32 paddr[2];
-	UINT32 result;
-	UINT16 value;
+	register UINT32 result;
+	register UINT16 value;
 
 	paddr[0] = paging(laddr, ucrw);
 	if ((laddr + 1) & CPU_PAGE_MASK) {
@@ -245,9 +245,9 @@ cpu_memory_access_la_RMW_d(UINT32 laddr, UINT32 (CPUCALL *func)(UINT32, void *),
 {
 	const int ucrw = CPU_PAGE_WRITE_DATA | CPU_STAT_USER_MODE;
 	UINT32 paddr[2];
-	UINT32 result;
-	UINT32 value;
-	int remain;
+	register UINT32 result;
+	register UINT32 value;
+	register int remain;
 
 	paddr[0] = paging(laddr, ucrw);
 	remain = CPU_PAGE_SIZE - (laddr & CPU_PAGE_MASK);
@@ -308,7 +308,7 @@ UINT16 MEMCALL
 cpu_linear_memory_read_w(UINT32 laddr, int ucrw)
 {
 	UINT32 paddr[2];
-	UINT16 value;
+	register UINT16 value;
 
 	paddr[0] = paging(laddr, ucrw);
 	if ((laddr + 1) & CPU_PAGE_MASK)
@@ -324,8 +324,8 @@ UINT32 MEMCALL
 cpu_linear_memory_read_d(UINT32 laddr, int ucrw)
 {
 	UINT32 paddr[2];
-	UINT32 value;
-	UINT remain;
+	register UINT32 value;
+	register UINT remain;
 
 	paddr[0] = paging(laddr, ucrw);
 	remain = CPU_PAGE_SIZE - (laddr & CPU_PAGE_MASK);
@@ -363,8 +363,8 @@ UINT64 MEMCALL
 cpu_linear_memory_read_q(UINT32 laddr, int ucrw)
 {
 	UINT32 paddr[2];
-	UINT64 value;
-	UINT remain;
+	register UINT64 value;
+	register UINT remain;
 
 	paddr[0] = paging(laddr, ucrw);
 	remain = CPU_PAGE_SIZE - (laddr & CPU_PAGE_MASK);
@@ -430,9 +430,9 @@ REG80 MEMCALL
 cpu_linear_memory_read_f(UINT32 laddr, int ucrw)
 {
 	UINT32 paddr[2];
-	REG80 value;
-	UINT remain;
-	UINT i, j;
+	register REG80 value;
+	register UINT remain;
+	register UINT i, j;
 
 	paddr[0] = paging(laddr, ucrw);
 	remain = CPU_PAGE_SIZE - (laddr & CPU_PAGE_MASK);
@@ -477,7 +477,7 @@ void MEMCALL
 cpu_linear_memory_write_d(UINT32 laddr, UINT32 value, int ucrw)
 {
 	UINT32 paddr[2];
-	UINT remain;
+	register UINT remain;
 
 	paddr[0] = paging(laddr, ucrw);
 	remain = CPU_PAGE_SIZE - (laddr & CPU_PAGE_MASK);
@@ -515,7 +515,7 @@ void MEMCALL
 cpu_linear_memory_write_q(UINT32 laddr, UINT64 value, int ucrw)
 {
 	UINT32 paddr[2];
-	UINT remain;
+	register UINT remain;
 
 	paddr[0] = paging(laddr, ucrw);
 	remain = CPU_PAGE_SIZE - (laddr & CPU_PAGE_MASK);
@@ -581,8 +581,8 @@ void MEMCALL
 cpu_linear_memory_write_f(UINT32 laddr, const REG80 *value, int ucrw)
 {
 	UINT32 paddr[2];
-	UINT remain;
-	UINT i, j;
+	register UINT remain;
+	register UINT i, j;
 
 	paddr[0] = paging(laddr, ucrw);
 	remain = CPU_PAGE_SIZE - (laddr & CPU_PAGE_MASK);
@@ -606,9 +606,9 @@ cpu_linear_memory_write_f(UINT32 laddr, const REG80 *value, int ucrw)
 void MEMCALL
 cpu_memory_access_la_region(UINT32 laddr, UINT length, int ucrw, UINT8 *data)
 {
-	UINT32 paddr;
-	UINT remain;	/* page remain */
-	UINT r;
+	register UINT32 paddr;
+	register UINT remain;	/* page remain */
+	register UINT r;
 
 	while (length > 0) {
 		remain = CPU_PAGE_SIZE - (laddr & CPU_PAGE_MASK);
@@ -645,13 +645,13 @@ static UINT32 MEMCALL
 paging(UINT32 laddr, int ucrw)
 {
 	struct tlb_entry *ep;
-	UINT32 paddr;		/* physical address */
-	UINT32 pde_addr;	/* page directory entry address */
-	UINT32 pde;		/* page directory entry */
-	UINT32 pte_addr;	/* page table entry address */
-	UINT32 pte;		/* page table entry */
-	UINT bit;
-	UINT err;
+	register UINT32 paddr;		/* physical address */
+	register UINT32 pde_addr;	/* page directory entry address */
+	register UINT32 pde;		/* page directory entry */
+	register UINT32 pte_addr;	/* page table entry address */
+	register UINT32 pte;		/* page table entry */
+	register UINT bit;
+	register UINT err;
 
 	ep = tlb_lookup(laddr, ucrw);
 	if (ep != NULL)
@@ -775,8 +775,8 @@ void MEMCALL
 tlb_flush(BOOL allflush)
 {
 	struct tlb_entry *ep;
-	int i;
-	int n;
+	register int i;
+	register int n;
 
 	if (allflush) {
 		tlb_init();
@@ -797,8 +797,8 @@ void MEMCALL
 tlb_flush_page(UINT32 laddr)
 {
 	struct tlb_entry *ep;
-	int idx;
-	int n;
+	register int idx;
+	register int n;
 
 	idx = (laddr >> TLB_ENTRY_SHIFT) & TLB_ENTRY_MASK;
 
@@ -816,9 +816,9 @@ struct tlb_entry * MEMCALL
 tlb_lookup(UINT32 laddr, int ucrw)
 {
 	struct tlb_entry *ep;
-	UINT bit;
-	int idx;
-	int n;
+	register UINT bit;
+	register int idx;
+	register int n;
 
 	n = (ucrw & CPU_PAGE_CODE) ? 1 : 0;
 	idx = (laddr >> TLB_ENTRY_SHIFT) & TLB_ENTRY_MASK;
@@ -848,8 +848,8 @@ static void MEMCALL
 tlb_update(UINT32 laddr, UINT entry, int bit)
 {
 	struct tlb_entry *ep;
-	int idx;
-	int n;
+	register int idx;
+	register int n;
 
 	n = bit & 1;
 	idx = (laddr >> TLB_ENTRY_SHIFT) & TLB_ENTRY_MASK;

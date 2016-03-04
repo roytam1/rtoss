@@ -1,8 +1,7 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
-// Used by np2.RC
+// Microsoft Visual C++ generated include file.
+// Used by H:\projects\vcp\xnp2-0.85-new1\win9x\resources\932\np2.rc
 //
-#define RESOURCE_VERSION                830
 #define IDR_MANIFEST                    1
 #define IRT_MANIFEST                    24
 #define IDI_ICON1                       101
@@ -30,6 +29,7 @@
 #define IDD_SNDPAD1                     157
 #define IDD_CALENDAR                    161
 #define IDD_ABOUT                       171
+#define IDD_LGY98                       190
 #define IDR_SYS                         201
 #define IDR_SYSKEYDISP                  202
 #define IDR_SYSSOFTKBD                  203
@@ -53,6 +53,8 @@
 #define IDR_KEYDISP                     321
 #define IDR_VIEW                        331
 #define IDR_TRACE                       341
+#define RESOURCE_VERSION                830
+#define IDC_EDIT1                       1001
 #define IDC_BASECLOCK                   11101
 #define IDC_MULTIPLE                    11102
 #define IDC_CLOCKMSG                    11103
@@ -266,6 +268,10 @@
 #define IDC_TOOL_FDD2EJECT              18009
 #define IDC_TOOL_RESET                  18010
 #define IDC_TOOL_POWER                  18011
+#define IDC_LGY98ENABLED                19001
+#define IDC_LGY98IO                     19002
+#define IDC_LGY98INT                    19003
+#define IDC_LGY98DEF                    19004
 #define IDS_APP_NAME2                   30001
 #define IDS_APP_NAME21                  30002
 #define IDS_FILENAME_HELP               30003
@@ -282,6 +288,7 @@
 #define IDS_SCREENOPTION                30041
 #define IDS_SOUNDOPTION                 30042
 #define IDS_SERIALOPTION                30043
+#define IDS_NETWORKOPTION               30044
 #define IDS_CAPTION_FDD1                30051
 #define IDS_CAPTION_FDD2                30052
 #define IDS_CAPTION_FDD3                30053
@@ -335,6 +342,14 @@
 #define IDS_5X                          30416
 #define IDS_6X                          30417
 #define IDS_7X                          30418
+#define IDS_00D0                        30421
+#define IDS_10D0                        30422
+#define IDS_20D0                        30423
+#define IDS_30D0                        30424
+#define IDS_40D0                        30425
+#define IDS_50D0                        30426
+#define IDS_60D0                        30427
+#define IDS_70D0                        30428
 #define IDS_PARITY_NONE                 30501
 #define IDS_PARITY_ODD                  30502
 #define IDS_PARITY_EVEN                 30503
@@ -519,6 +534,7 @@
 #define IDM_MPUPC98                     40673
 #define IDM_MIDIPANIC                   40674
 #define IDM_SNDOPT                      40675
+#define IDM_NETOPT                      40676
 #define IDM_BMPSAVE                     40701
 #define IDM_S98LOGGING                  40702
 #define IDM_WAVEREC                     40703
@@ -577,7 +593,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        101
 #define _APS_NEXT_COMMAND_VALUE         40135
-#define _APS_NEXT_CONTROL_VALUE         1001
+#define _APS_NEXT_CONTROL_VALUE         1002
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

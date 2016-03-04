@@ -35,7 +35,7 @@
 void
 MOV_EbGb(void)
 {
-	UINT32 op, src, madr;
+	register UINT32 op, src, madr;
 
 	PREPART_EA_REG8(op, src);
 	if (op >= 0xc0) {
@@ -51,7 +51,7 @@ MOV_EbGb(void)
 void
 MOV_EwGw(void)
 {
-	UINT32 op, src, madr;
+	register UINT32 op, src, madr;
 
 	PREPART_EA_REG16(op, src);
 	if (op >= 0xc0) {
@@ -67,7 +67,7 @@ MOV_EwGw(void)
 void
 MOV_EdGd(void)
 {
-	UINT32 op, src, madr;
+	register UINT32 op, src, madr;
 
 	PREPART_EA_REG32(op, src);
 	if (op >= 0xc0) {
@@ -83,8 +83,8 @@ MOV_EdGd(void)
 void
 MOV_GbEb(void)
 {
-	UINT8 *out;
-	UINT32 op, src;
+	register UINT8 *out;
+	register UINT32 op, src;
 
 	PREPART_REG8_EA(op, src, out, 2, 5);
 	*out = (UINT8)src;
@@ -93,8 +93,8 @@ MOV_GbEb(void)
 void
 MOV_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	*out = (UINT16)src;
@@ -103,8 +103,8 @@ MOV_GwEw(void)
 void
 MOV_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	*out = src;
@@ -113,8 +113,8 @@ MOV_GdEd(void)
 void
 MOV_EwSw(void)
 {
-	UINT32 op, src, madr;
-	UINT8 idx;
+	register UINT32 op, src, madr;
+	register UINT8 idx;
 
 	GET_PCBYTE(op);
 	idx = (UINT8)((op >> 3) & 7);
@@ -136,8 +136,8 @@ MOV_EwSw(void)
 void
 MOV_EdSw(void)
 {
-	UINT32 op, src, madr;
-	UINT8 idx;
+	register UINT32 op, src, madr;
+	register UINT8 idx;
 
 	GET_PCBYTE(op);
 	idx = (UINT8)((op >> 3) & 7);
@@ -159,8 +159,8 @@ MOV_EdSw(void)
 void
 MOV_SwEw(void)
 {
-	UINT32 op, src, madr;
-	UINT8 idx;
+	register UINT32 op, src, madr;
+	register UINT8 idx;
 
 	GET_PCBYTE(op);
 	idx = ((UINT8)(op >> 3) & 7);
@@ -185,7 +185,7 @@ MOV_SwEw(void)
 void
 MOV_ALOb(void)
 {
-	UINT32 madr;
+	register UINT32 madr;
 
 	CPU_WORKCLOCK(5);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -200,7 +200,7 @@ MOV_ALOb(void)
 void
 MOV_AXOw(void)
 {
-	UINT32 madr;
+	register UINT32 madr;
 
 	CPU_WORKCLOCK(5);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -215,7 +215,7 @@ MOV_AXOw(void)
 void
 MOV_EAXOd(void)
 {
-	UINT32 madr;
+	register UINT32 madr;
 
 	CPU_WORKCLOCK(5);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -230,7 +230,7 @@ MOV_EAXOd(void)
 void
 MOV_ObAL(void)
 {
-	UINT32 madr;
+	register UINT32 madr;
 
 	CPU_WORKCLOCK(3);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -245,7 +245,7 @@ MOV_ObAL(void)
 void
 MOV_OwAX(void)
 {
-	UINT32 madr;
+	register UINT32 madr;
 
 	CPU_WORKCLOCK(3);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -260,7 +260,7 @@ MOV_OwAX(void)
 void
 MOV_OdEAX(void)
 {
-	UINT32 madr;
+	register UINT32 madr;
 
 	CPU_WORKCLOCK(3);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -275,7 +275,7 @@ MOV_OdEAX(void)
 void
 MOV_EbIb(void)
 {
-	UINT32 op, src, res, madr;
+	register UINT32 op, src, res, madr;
 
 	PREPART_EA_REG8(op, src);
 	if (op >= 0xc0) {
@@ -293,7 +293,7 @@ MOV_EbIb(void)
 void
 MOV_EwIw(void)
 {
-	UINT32 op, src, res, madr;
+	register UINT32 op, src, res, madr;
 
 	PREPART_EA_REG16(op, src);
 	if (op >= 0xc0) {
@@ -311,7 +311,7 @@ MOV_EwIw(void)
 void
 MOV_EdId(void)
 {
-	UINT32 op, src, res, madr;
+	register UINT32 op, src, res, madr;
 
 	PREPART_EA_REG32(op, src);
 	if (op >= 0xc0) {
@@ -359,8 +359,8 @@ void MOV_EDIId(void) { CPU_WORKCLOCK(2); GET_PCDWORD(CPU_EDI); }
 void
 CMOVO_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	if (CC_O) {
@@ -371,8 +371,8 @@ CMOVO_GwEw(void)
 void
 CMOVO_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	if (CC_O) {
@@ -383,8 +383,8 @@ CMOVO_GdEd(void)
 void
 CMOVNO_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	if (CC_NO) {
@@ -395,8 +395,8 @@ CMOVNO_GwEw(void)
 void
 CMOVNO_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	if (CC_NO) {
@@ -407,8 +407,8 @@ CMOVNO_GdEd(void)
 void
 CMOVC_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	if (CC_C) {
@@ -419,8 +419,8 @@ CMOVC_GwEw(void)
 void
 CMOVC_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	if (CC_C) {
@@ -431,8 +431,8 @@ CMOVC_GdEd(void)
 void
 CMOVNC_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	if (CC_NC) {
@@ -443,8 +443,8 @@ CMOVNC_GwEw(void)
 void
 CMOVNC_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	if (CC_NC) {
@@ -455,8 +455,8 @@ CMOVNC_GdEd(void)
 void
 CMOVZ_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	if (CC_Z) {
@@ -467,8 +467,8 @@ CMOVZ_GwEw(void)
 void
 CMOVZ_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	if (CC_Z) {
@@ -479,8 +479,8 @@ CMOVZ_GdEd(void)
 void
 CMOVNZ_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	if (CC_NZ) {
@@ -491,8 +491,8 @@ CMOVNZ_GwEw(void)
 void
 CMOVNZ_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	if (CC_NZ) {
@@ -503,8 +503,8 @@ CMOVNZ_GdEd(void)
 void
 CMOVA_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	if (CC_A) {
@@ -515,8 +515,8 @@ CMOVA_GwEw(void)
 void
 CMOVA_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	if (CC_A) {
@@ -527,8 +527,8 @@ CMOVA_GdEd(void)
 void
 CMOVNA_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	if (CC_NA) {
@@ -539,8 +539,8 @@ CMOVNA_GwEw(void)
 void
 CMOVNA_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	if (CC_NA) {
@@ -551,8 +551,8 @@ CMOVNA_GdEd(void)
 void
 CMOVS_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	if (CC_S) {
@@ -563,8 +563,8 @@ CMOVS_GwEw(void)
 void
 CMOVS_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	if (CC_S) {
@@ -575,8 +575,8 @@ CMOVS_GdEd(void)
 void
 CMOVNS_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	if (CC_NS) {
@@ -587,8 +587,8 @@ CMOVNS_GwEw(void)
 void
 CMOVNS_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	if (CC_NS) {
@@ -599,8 +599,8 @@ CMOVNS_GdEd(void)
 void
 CMOVP_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	if (CC_P) {
@@ -611,8 +611,8 @@ CMOVP_GwEw(void)
 void
 CMOVP_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	if (CC_P) {
@@ -623,8 +623,8 @@ CMOVP_GdEd(void)
 void
 CMOVNP_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	if (CC_NP) {
@@ -635,8 +635,8 @@ CMOVNP_GwEw(void)
 void
 CMOVNP_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	if (CC_NP) {
@@ -647,8 +647,8 @@ CMOVNP_GdEd(void)
 void
 CMOVL_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	if (CC_L) {
@@ -659,8 +659,8 @@ CMOVL_GwEw(void)
 void
 CMOVL_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	if (CC_L) {
@@ -671,8 +671,8 @@ CMOVL_GdEd(void)
 void
 CMOVNL_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	if (CC_NL) {
@@ -683,8 +683,8 @@ CMOVNL_GwEw(void)
 void
 CMOVNL_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	if (CC_NL) {
@@ -695,8 +695,8 @@ CMOVNL_GdEd(void)
 void
 CMOVLE_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	if (CC_LE) {
@@ -707,8 +707,8 @@ CMOVLE_GwEw(void)
 void
 CMOVLE_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	if (CC_LE) {
@@ -719,8 +719,8 @@ CMOVLE_GdEd(void)
 void
 CMOVNLE_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	if (CC_NLE) {
@@ -731,8 +731,8 @@ CMOVNLE_GwEw(void)
 void
 CMOVNLE_GdEd(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA(op, src, out, 2, 5);
 	if (CC_NLE) {
@@ -746,7 +746,7 @@ CMOVNLE_GdEd(void)
 static UINT32 CPUCALL
 XCHG(UINT32 dst, void *arg)
 {
-	UINT32 src = PTR_TO_UINT32(arg);
+	register UINT32 src = PTR_TO_UINT32(arg);
 	(void)dst;
 	return src;
 }
@@ -754,8 +754,8 @@ XCHG(UINT32 dst, void *arg)
 void
 XCHG_EbGb(void)
 {
-	UINT8 *out, *src;
-	UINT32 op, madr;
+	register UINT8 *out, *src;
+	register UINT32 op, madr;
 
 	PREPART_EA_REG8P(op, src);
 	if (op >= 0xc0) {
@@ -772,8 +772,8 @@ XCHG_EbGb(void)
 void
 XCHG_EwGw(void)
 {
-	UINT16 *out, *src;
-	UINT32 op, madr;
+	register UINT16 *out, *src;
+	register UINT32 op, madr;
 
 	PREPART_EA_REG16P(op, src);
 	if (op >= 0xc0) {
@@ -790,8 +790,8 @@ XCHG_EwGw(void)
 void
 XCHG_EdGd(void)
 {
-	UINT32 *out, *src;
-	UINT32 op, madr;
+	register UINT32 *out, *src;
+	register UINT32 op, madr;
 
 	PREPART_EA_REG32P(op, src);
 	if (op >= 0xc0) {
@@ -829,7 +829,7 @@ void XCHG_EDIEAX(void) { CPU_WORKCLOCK(3); SWAP_DWORD(CPU_EDI, CPU_EAX); }
 static INLINE UINT32 CPUCALL
 BSWAP_DWORD(UINT32 val)
 {
-	UINT32 v;
+	register UINT32 v;
 	v  = (val & 0x000000ff) << 24;
 	v |= (val & 0x0000ff00) << 8;
 	v |= (val & 0x00ff0000) >> 8;
@@ -852,8 +852,8 @@ void BSWAP_EDI(void) { CPU_WORKCLOCK(2); CPU_EDI = BSWAP_DWORD(CPU_EDI); }
 static UINT32 CPUCALL
 XADD1(UINT32 dst, void *arg)
 {
-	UINT32 src = PTR_TO_UINT32(arg);
-	UINT32 res;
+	register UINT32 src = PTR_TO_UINT32(arg);
+	register UINT32 res;
 	BYTE_ADD(res, dst, src);
 	return res;
 }
@@ -861,8 +861,8 @@ XADD1(UINT32 dst, void *arg)
 static UINT32 CPUCALL
 XADD2(UINT32 dst, void *arg)
 {
-	UINT32 src = PTR_TO_UINT32(arg);
-	UINT32 res;
+	register UINT32 src = PTR_TO_UINT32(arg);
+	register UINT32 res;
 	WORD_ADD(res, dst, src);
 	return res;
 }
@@ -870,8 +870,8 @@ XADD2(UINT32 dst, void *arg)
 static UINT32 CPUCALL
 XADD4(UINT32 dst, void *arg)
 {
-	UINT32 src = PTR_TO_UINT32(arg);
-	UINT32 res;
+	register UINT32 src = PTR_TO_UINT32(arg);
+	register UINT32 res;
 	DWORD_ADD(res, dst, src);
 	return res;
 }
@@ -879,8 +879,8 @@ XADD4(UINT32 dst, void *arg)
 void
 XADD_EbGb(void)
 {
-	UINT8 *out, *src;
-	UINT32 op, dst, res, madr;
+	register UINT8 *out, *src;
+	register UINT32 op, dst, res, madr;
 
 	PREPART_EA_REG8P(op, src);
 	if (op >= 0xc0) {
@@ -900,8 +900,8 @@ XADD_EbGb(void)
 void
 XADD_EwGw(void)
 {
-	UINT16 *out, *src;
-	UINT32 op, dst, res, madr;
+	register UINT16 *out, *src;
+	register UINT32 op, dst, res, madr;
 
 	PREPART_EA_REG16P(op, src);
 	if (op >= 0xc0) {
@@ -921,8 +921,8 @@ XADD_EwGw(void)
 void
 XADD_EdGd(void)
 {
-	UINT32 *out, *src;
-	UINT32 op, dst, res, madr;
+	register UINT32 *out, *src;
+	register UINT32 op, dst, res, madr;
 
 	PREPART_EA_REG32P(op, src);
 	if (op >= 0xc0) {
@@ -945,9 +945,9 @@ XADD_EdGd(void)
 void
 CMPXCHG_EbGb(void)
 {
-	UINT8 *out;
-	UINT32 op, src, dst, madr, tmp;
-	UINT8 al;
+	register UINT8 *out;
+	register UINT32 op, src, dst, madr, tmp;
+	register UINT8 al;
 
 	PREPART_EA_REG8(op, src);
 	al = CPU_AL;
@@ -974,9 +974,9 @@ CMPXCHG_EbGb(void)
 void
 CMPXCHG_EwGw(void)
 {
-	UINT16 *out;
-	UINT32 op, src, dst, madr, tmp;
-	UINT16 ax;
+	register UINT16 *out;
+	register UINT32 op, src, dst, madr, tmp;
+	register UINT16 ax;
 
 	PREPART_EA_REG16(op, src);
 	ax = CPU_AX;
@@ -1003,9 +1003,9 @@ CMPXCHG_EwGw(void)
 void
 CMPXCHG_EdGd(void)
 {
-	UINT32 *out;
-	UINT32 op, src, dst, madr, tmp;
-	UINT32 eax;
+	register UINT32 *out;
+	register UINT32 op, src, dst, madr, tmp;
+	register UINT32 eax;
 
 	PREPART_EA_REG32(op, src);
 	eax = CPU_EAX;
@@ -1032,7 +1032,7 @@ CMPXCHG_EdGd(void)
 void CPUCALL
 CMPXCHG8B(UINT32 op)
 {
-	UINT32 madr, dst_l, dst_h;
+	register UINT32 madr, dst_l, dst_h;
 
 	if (op < 0xc0) {
 		CPU_WORKCLOCK(2);
@@ -1077,7 +1077,7 @@ void PUSH_EDI(void) { CPU_WORKCLOCK(3); PUSH0_32(CPU_EDI); }
 void CPUCALL
 PUSH_Ew(UINT32 op)
 {
-	UINT32 dst, madr;
+	register UINT32 dst, madr;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(2);
@@ -1093,7 +1093,7 @@ PUSH_Ew(UINT32 op)
 void CPUCALL
 PUSH_Ed(UINT32 op)
 {
-	UINT32 dst, madr;
+	register UINT32 dst, madr;
 
 	if (op >= 0xc0) {
 		CPU_WORKCLOCK(2);
@@ -1109,7 +1109,7 @@ PUSH_Ed(UINT32 op)
 void
 PUSH_Ib(void)
 {
-	SINT32 val;
+	register SINT32 val;
 
 	CPU_WORKCLOCK(3);
 	GET_PCBYTESD(val);
@@ -1119,7 +1119,7 @@ PUSH_Ib(void)
 void
 PUSH_Iw(void)
 {
-	UINT16 val;
+	register UINT16 val;
 
 	CPU_WORKCLOCK(3);
 	GET_PCWORD(val);
@@ -1129,7 +1129,7 @@ PUSH_Iw(void)
 void
 PUSH_Id(void)
 {
-	UINT32 val;
+	register UINT32 val;
 
 	CPU_WORKCLOCK(3);
 	GET_PCDWORD(val);
@@ -1174,8 +1174,8 @@ void POP_EDI(void) { CPU_WORKCLOCK(5); POP0_32(CPU_EDI); }
 void
 POP_Ew(void)
 {
-	UINT32 op, madr;
-	UINT16 src;
+	register UINT32 op, madr;
+	register UINT16 src;
 
 	CPU_WORKCLOCK(5);
 
@@ -1194,8 +1194,8 @@ POP_Ew(void)
 void CPUCALL
 POP_Ew_G5(UINT32 op)
 {
-	UINT32 madr;
-	UINT16 src;
+	register UINT32 madr;
+	register UINT16 src;
 
 	CPU_WORKCLOCK(5);
 
@@ -1213,8 +1213,8 @@ POP_Ew_G5(UINT32 op)
 void
 POP_Ed(void)
 {
-	UINT32 op, madr;
-	UINT32 src;
+	register UINT32 op, madr;
+	register UINT32 src;
 
 	CPU_WORKCLOCK(5);
 
@@ -1233,7 +1233,7 @@ POP_Ed(void)
 void CPUCALL
 POP_Ed_G5(UINT32 op)
 {
-	UINT32 src, madr;
+	register UINT32 src, madr;
 
 	CPU_WORKCLOCK(5);
 
@@ -1251,7 +1251,7 @@ POP_Ed_G5(UINT32 op)
 void
 POP16_ES(void)
 {
-	UINT16 src;
+	register UINT16 src;
 
 	CPU_WORKCLOCK(5);
 
@@ -1264,7 +1264,7 @@ POP16_ES(void)
 void
 POP32_ES(void)
 {
-	UINT32 src;
+	register UINT32 src;
 
 	CPU_WORKCLOCK(5);
 
@@ -1277,7 +1277,7 @@ POP32_ES(void)
 void
 POP16_SS(void)
 {
-	UINT16 src;
+	register UINT16 src;
 
 	CPU_WORKCLOCK(5);
 
@@ -1291,7 +1291,7 @@ POP16_SS(void)
 void
 POP32_SS(void)
 {
-	UINT32 src;
+	register UINT32 src;
 
 	CPU_WORKCLOCK(5);
 
@@ -1305,7 +1305,7 @@ POP32_SS(void)
 void
 POP16_DS(void)
 {
-	UINT16 src;
+	register UINT16 src;
 
 	CPU_WORKCLOCK(5);
 
@@ -1318,7 +1318,7 @@ POP16_DS(void)
 void
 POP32_DS(void)
 {
-	UINT32 src;
+	register UINT32 src;
 
 	CPU_WORKCLOCK(5);
 
@@ -1331,7 +1331,7 @@ POP32_DS(void)
 void
 POP16_FS(void)
 {
-	UINT16 src;
+	register UINT16 src;
 
 	CPU_WORKCLOCK(5);
 
@@ -1344,7 +1344,7 @@ POP16_FS(void)
 void
 POP32_FS(void)
 {
-	UINT32 src;
+	register UINT32 src;
 
 	CPU_WORKCLOCK(5);
 
@@ -1357,7 +1357,7 @@ POP32_FS(void)
 void
 POP16_GS(void)
 {
-	UINT16 src;
+	register UINT16 src;
 
 	CPU_WORKCLOCK(5);
 
@@ -1370,7 +1370,7 @@ POP16_GS(void)
 void
 POP32_GS(void)
 {
-	UINT32 src;
+	register UINT32 src;
 
 	CPU_WORKCLOCK(5);
 
@@ -1386,7 +1386,7 @@ POP32_GS(void)
 void
 PUSHA(void)
 {
-	UINT16 sp = CPU_SP;
+	register UINT16 sp = CPU_SP;
 
 	CPU_WORKCLOCK(17);
 	CPU_SET_PREV_ESP();
@@ -1415,7 +1415,7 @@ PUSHA(void)
 void
 PUSHAD(void)
 {
-	UINT32 esp = CPU_ESP;
+	register UINT32 esp = CPU_ESP;
 
 	CPU_WORKCLOCK(17);
 	CPU_SET_PREV_ESP();
@@ -1444,7 +1444,7 @@ PUSHAD(void)
 void
 POPA(void)
 {
-	UINT16 ax, cx, dx, bx, bp, si, di;
+	register UINT16 ax, cx, dx, bx, bp, si, di;
 
 	CPU_WORKCLOCK(19);
 	CPU_SET_PREV_ESP();
@@ -1481,7 +1481,7 @@ POPA(void)
 void
 POPAD(void)
 {
-	UINT32 eax, ecx, edx, ebx, ebp, esi, edi;
+	register UINT32 eax, ecx, edx, ebx, ebp, esi, edi;
 
 	CPU_WORKCLOCK(19);
 	CPU_SET_PREV_ESP();
@@ -1545,7 +1545,7 @@ IN_EAXDX(void)
 void
 IN_ALIb(void)
 {
-	UINT port;
+	register UINT port;
 
 	CPU_WORKCLOCK(12);
 	GET_PCBYTE(port);
@@ -1555,7 +1555,7 @@ IN_ALIb(void)
 void
 IN_AXIb(void)
 {
-	UINT port;
+	register UINT port;
 
 	CPU_WORKCLOCK(12);
 	GET_PCBYTE(port);
@@ -1565,7 +1565,7 @@ IN_AXIb(void)
 void
 IN_EAXIb(void)
 {
-	UINT port;
+	register UINT port;
 
 	CPU_WORKCLOCK(12);
 	GET_PCBYTE(port);
@@ -1612,7 +1612,7 @@ OUT_IbAL(void)
 void
 OUT_IbAX(void)
 {
-	UINT port;
+	register UINT port;
 
 	CPU_WORKCLOCK(10);
 	GET_PCBYTE(port);
@@ -1622,7 +1622,7 @@ OUT_IbAX(void)
 void
 OUT_IbEAX(void)
 {
-	UINT port;
+	register UINT port;
 
 	CPU_WORKCLOCK(10);
 	GET_PCBYTE(port);
@@ -1659,7 +1659,7 @@ CDQ(void)
 void
 CBW(void)
 {
-	UINT16 tmp;
+	register UINT16 tmp;
 
 	CPU_WORKCLOCK(2);
 	tmp = __CBW(CPU_AL);
@@ -1669,7 +1669,7 @@ CBW(void)
 void
 CWDE(void)
 {
-	UINT32 tmp;
+	register UINT32 tmp;
 
 	CPU_WORKCLOCK(2);
 	tmp = __CWDE(CPU_AX);
@@ -1682,8 +1682,8 @@ CWDE(void)
 void
 MOVSX_GwEb(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA8(op, src, out, 2, 5);
 	*out = __CBW(src);
@@ -1692,8 +1692,8 @@ MOVSX_GwEb(void)
 void
 MOVSX_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	*out = (UINT16)src;
@@ -1702,8 +1702,8 @@ MOVSX_GwEw(void)
 void
 MOVSX_GdEb(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA8(op, src, out, 2, 5);
 	*out = __CBD(src);
@@ -1712,8 +1712,8 @@ MOVSX_GdEb(void)
 void
 MOVSX_GdEw(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA16(op, src, out, 2, 5);
 	*out = __CWDE(src);
@@ -1725,8 +1725,8 @@ MOVSX_GdEw(void)
 void
 MOVZX_GwEb(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA8(op, src, out, 2, 5);
 	*out = (UINT8)src;
@@ -1735,8 +1735,8 @@ MOVZX_GwEb(void)
 void
 MOVZX_GwEw(void)
 {
-	UINT16 *out;
-	UINT32 op, src;
+	register UINT16 *out;
+	register UINT32 op, src;
 
 	PREPART_REG16_EA(op, src, out, 2, 5);
 	*out = (UINT16)src;
@@ -1745,8 +1745,8 @@ MOVZX_GwEw(void)
 void
 MOVZX_GdEb(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA8(op, src, out, 2, 5);
 	*out = (UINT8)src;
@@ -1755,8 +1755,8 @@ MOVZX_GdEb(void)
 void
 MOVZX_GdEw(void)
 {
-	UINT32 *out;
-	UINT32 op, src;
+	register UINT32 *out;
+	register UINT32 op, src;
 
 	PREPART_REG32_EA16(op, src, out, 2, 5);
 	*out = (UINT16)src;

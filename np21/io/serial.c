@@ -24,7 +24,7 @@ void keyboard_callback(NEVENTITEM item) {
 					keybrd.data = keybrd.buf[keybrd.bufpos];
 					keybrd.bufpos = (keybrd.bufpos + 1) & KB_BUFMASK;
 				}
-//				TRACEOUT(("recv -> %02x", keybrd.data));
+				//TRACEOUT(("recv -> %02x", keybrd.data));
 			}
 			pic_setirq(1);
 			nevent_set(NEVENT_KEYBOARD, keybrd.xferclock,
@@ -34,9 +34,10 @@ void keyboard_callback(NEVENTITEM item) {
 }
 
 static void IOOUTCALL keyboard_o41(UINT port, REG8 dat) {
-
+	
+	//TRACEOUT(("out41 -> %02x %.4x:%.8x PM=%d", dat, CPU_CS, CPU_EIP, CPU_STAT_PM));
 	if (keybrd.cmd & 1) {
-//		TRACEOUT(("send -> %02x", dat));
+		//TRACEOUT(("send -> %02x", dat));
 		keystat_ctrlsend(dat);
 	}
 	else {
@@ -47,8 +48,11 @@ static void IOOUTCALL keyboard_o41(UINT port, REG8 dat) {
 
 static void IOOUTCALL keyboard_o43(UINT port, REG8 dat) {
 
-//	TRACEOUT(("out43 -> %02x %.4x:%.8x", dat, CPU_CS, CPU_EIP));
+	//TRACEOUT(("out43 -> %02x %.4x:%.8x PM=%d", dat, CPU_CS, CPU_EIP, CPU_STAT_PM));
 	if ((!(dat & 0x08)) && (keybrd.cmd & 0x08)) {
+		keyboard_resetsignal();
+	}
+	if ((!(dat & 0x30)) && (keybrd.cmd & 0x30)) {
 		keyboard_resetsignal();
 	}
 	if (dat & 0x10) {
@@ -63,15 +67,39 @@ static REG8 IOINPCALL keyboard_i41(UINT port) {
 	(void)port;
 	keybrd.status &= ~2;
 	pic_resetirq(1);
-//	TRACEOUT(("in41 -> %02x %.4x:%.8x", keybrd.data, CPU_CS, CPU_EIP));
+	//TRACEOUT(("in41 -> %02x %.4x:%.8x PM=%d", keybrd.data, CPU_CS, CPU_EIP, CPU_STAT_PM));
 	return(keybrd.data);
 }
 
 static REG8 IOINPCALL keyboard_i43(UINT port) {
 
 	(void)port;
-//	TRACEOUT(("in43 -> %02x %.4x:%.8x", keybrd.status, CPU_CS, CPU_EIP));
+	//TRACEOUT(("in43 -> %02x %.4x:%.8x PM=%d", keybrd.status, CPU_CS, CPU_EIP, CPU_STAT_PM));
 	return(keybrd.status | 0x85);
+}
+
+
+
+
+static void IOOUTCALL keyboard_oE1(UINT port, REG8 dat) {
+	keyboard_o41(port, dat);
+	TRACEOUT(("outE0 -> %02x %.4x:%.8x", dat, CPU_CS, CPU_EIP));
+}
+static void IOOUTCALL keyboard_oE3(UINT port, REG8 dat) {
+	keyboard_o43(port, dat);
+	TRACEOUT(("outE1 -> %02x %.4x:%.8x", dat, CPU_CS, CPU_EIP));
+}
+static REG8 IOINPCALL keyboard_iE1(UINT port) {
+	static REG8 tmp = 0;
+	TRACEOUT(("inE1 -> %02x %.4x:%.8x", keybrd.data, CPU_CS, CPU_EIP));
+	tmp++;
+	return tmp;//keyboard_i41(port);
+}
+static REG8 IOINPCALL keyboard_iE3(UINT port) {
+	static REG8 tmp = 0;
+	TRACEOUT(("inE3 -> %02x %.4x:%.8x", keybrd.status, CPU_CS, CPU_EIP));
+	tmp++;
+	return tmp;//keyboard_i43(port);
 }
 
 
@@ -82,6 +110,13 @@ static const IOOUT keybrdo41[2] = {
 
 static const IOINP keybrdi41[2] = {
 					keyboard_i41,	keyboard_i43};
+
+					
+static const IOOUT keybrdoE1[2] = {
+					keyboard_oE1,	keyboard_oE3};
+
+static const IOINP keybrdiE1[2] = {
+					keyboard_iE1,	keyboard_iE3};
 
 
 void keyboard_reset(const NP2CFG *pConfig) {
@@ -97,8 +132,10 @@ void keyboard_bind(void) {
 
 	keystat_ctrlreset();
 	keybrd.xferclock = pccore.realclock / 1920;
-	iocore_attachsysoutex(0x0041, 0x0cf1, keybrdo41, 2);
-	iocore_attachsysinpex(0x0041, 0x0cf1, keybrdi41, 2);
+	iocore_attachsysoutex(0x0041, 0x00f1, keybrdo41, 2);
+	iocore_attachsysinpex(0x0041, 0x00f1, keybrdi41, 2);
+	//iocore_attachsysoutex(0x00E1, 0x0cf1, keybrdoE1, 2);
+	//iocore_attachsysinpex(0x00E1, 0x0cf1, keybrdiE1, 2);
 }
 
 void keyboard_resetsignal(void) {

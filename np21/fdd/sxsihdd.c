@@ -35,10 +35,10 @@ static BRESULT hdd_reopen(SXSIDEV sxsi) {
 	}
 }
 
-static REG8 hdd_read(SXSIDEV sxsi, long pos, UINT8 *buf, UINT size) {
+static REG8 hdd_read(SXSIDEV sxsi, FILEPOS pos, UINT8 *buf, UINT size) {
 
 	FILEH	fh;
-	long	r;
+	FILEPOS	r;
 	UINT	rsize;
 
 	if (sxsi_prepare(sxsi) != SUCCESS) {
@@ -65,10 +65,10 @@ static REG8 hdd_read(SXSIDEV sxsi, long pos, UINT8 *buf, UINT size) {
 	return(0x00);
 }
 
-static REG8 hdd_write(SXSIDEV sxsi, long pos, const UINT8 *buf, UINT size) {
+static REG8 hdd_write(SXSIDEV sxsi, FILEPOS pos, const UINT8 *buf, UINT size) {
 
 	FILEH	fh;
-	long	r;
+	FILEPOS	r;
 	UINT	wsize;
 
 	if (sxsi_prepare(sxsi) != SUCCESS) {
@@ -95,10 +95,10 @@ static REG8 hdd_write(SXSIDEV sxsi, long pos, const UINT8 *buf, UINT size) {
 	return(0x00);
 }
 
-static REG8 hdd_format(SXSIDEV sxsi, long pos) {
+static REG8 hdd_format(SXSIDEV sxsi, FILEPOS pos) {
 
 	FILEH	fh;
-	long	r;
+	FILEPOS	r;
 	UINT16	i;
 	UINT8	work[256];
 	UINT	size;
@@ -163,7 +163,7 @@ BRESULT sxsihdd_open(SXSIDEV sxsi, const OEMCHAR *fname) {
 	FILEH		fh;
 const OEMCHAR	*ext;
 	REG8		iftype;
-	long		totals;
+	FILEPOS		totals;
 	UINT32		headersize;
 	UINT32		surfaces;
 	UINT32		cylinders;
@@ -199,7 +199,7 @@ const OEMCHAR	*ext;
 		cylinders = LOADINTELDWORD(nhd.cylinders);
 		sectors = LOADINTELWORD(nhd.sectors);
 		size = LOADINTELWORD(nhd.sectorsize);
-		totals = cylinders * sectors * surfaces;
+		totals = (FILEPOS)cylinders * sectors * surfaces;
 	}
 	else if ((iftype == SXSIDRV_SASI) && (!file_cmpname(ext, str_hdi))) {
 		HDIHDR hdi;						// ANEX86 HDD (SASI) thanx Mamiya

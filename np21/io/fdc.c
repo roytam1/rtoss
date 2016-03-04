@@ -434,7 +434,7 @@ static void FDC_SenceintStatus(void) {					// cmd: 08
 			fdc.buf[1] = fdc.treg[fdc.us];
 			fdc.bufcnt = 2;
 			fdc.stat[fdc.us] = 0;
-//			TRACEOUT(("fdc stat - %d [%.2x]", fdc.us, fdc.buf[0]));
+//			//TRACEOUT(("fdc stat - %d [%.2x]", fdc.us, fdc.buf[0]));
 		}
 		else {
 			for (; i<4; i++) {
@@ -443,7 +443,7 @@ static void FDC_SenceintStatus(void) {					// cmd: 08
 					fdc.buf[1] = fdc.treg[i];
 					fdc.bufcnt = 2;
 					fdc.stat[i] = 0;
-//					TRACEOUT(("fdc stat - %d [%.2x]", i, fdc.buf[0]));
+//					//TRACEOUT(("fdc stat - %d [%.2x]", i, fdc.buf[0]));
 					break;
 				}
 			}
@@ -712,7 +712,7 @@ REG8 DMACCALL fdc_dataread(void) {
 
 static void IOOUTCALL fdc_o92(UINT port, REG8 dat) {
 
-//	TRACEOUT(("fdc out %.2x %.2x [%.4x:%.4x]", port, dat, CPU_CS, CPU_IP));
+	//TRACEOUT(("fdc out %.2x %.2x [%.4x:%.4x]", port, dat, CPU_CS, CPU_IP));
 
 	if (((port >> 4) ^ fdc.chgreg) & 1) {
 		return;
@@ -724,7 +724,7 @@ static void IOOUTCALL fdc_o92(UINT port, REG8 dat) {
 
 static void IOOUTCALL fdc_o94(UINT port, REG8 dat) {
 
-//	TRACEOUT(("fdc out %.2x %.2x [%.4x:%.4x]", port, dat, CPU_CS, CPU_IP));
+	//TRACEOUT(("fdc out %.2x %.2x [%.4x:%.4x]", port, dat, CPU_CS, CPU_IP));
 
 	if (((port >> 4) ^ fdc.chgreg) & 1) {
 		return;
@@ -738,14 +738,16 @@ static void IOOUTCALL fdc_o94(UINT port, REG8 dat) {
 }
 
 static REG8 IOINPCALL fdc_i90(UINT port) {
+	int ret;
 
-//	TRACEOUT(("fdc in %.2x %.2x [%.4x:%.4x]", port, fdc.status,
-//															CPU_CS, CPU_IP));
+	//TRACEOUT(("fdc in %.2x %.2x [%.4x:%.4x]", port, fdc.status, CPU_CS, CPU_IP));
 
 	if (((port >> 4) ^ fdc.chgreg) & 1) {
 		return(0xff);
 	}
-	return(fdc.status);
+	ret = fdc.status;
+	//fdc.status = fdc.status ^ 0xf;
+	return(ret);
 }
 
 static REG8 IOINPCALL fdc_i92(UINT port) {
@@ -762,7 +764,7 @@ static REG8 IOINPCALL fdc_i92(UINT port) {
 	else {
 		ret = fdc.lastdata;
 	}
-//	TRACEOUT(("fdc in %.2x %.2x [%.4x:%.4x]", port, ret, CPU_CS, CPU_IP));
+	////TRACEOUT(("fdc in %.2x %.2x [%.4x:%.4x]", port, ret, CPU_CS, CPU_IP));
 	return(ret);
 }
 
@@ -789,7 +791,8 @@ static REG8 IOINPCALL fdc_i94(UINT port) {
 	{
 		ret |= 0x08;		/* ŠO•t‚¯—Dæ */
 	}
-
+	
+	//TRACEOUT(("fdc in %.2x %.2x [%.4x:%.4x]", port, ret, CPU_CS, CPU_IP));
 	return ret;
 }
 
@@ -803,11 +806,12 @@ static void IOOUTCALL fdc_obe(UINT port, REG8 dat) {
 	else {
 		CTRL_FDMEDIA = DISKTYPE_2DD;
 	}
+	//TRACEOUT(("fdc out %.2x %.2x [%.4x:%.4x]", port, dat, CPU_CS, CPU_IP));
 	(void)port;
 }
 
 static REG8 IOINPCALL fdc_ibe(UINT port) {
-
+	//TRACEOUT(("fdc in %.2x %.2x [%.4x:%.4x]", port, (fdc.chgreg & 3) | 8, CPU_CS, CPU_IP));
 	(void)port;
 	return((fdc.chgreg & 3) | 8);
 }
@@ -818,11 +822,12 @@ static void IOOUTCALL fdc_o4be(UINT port, REG8 dat) {
 	if (dat & 0x10) {
 		fdc.rpm[(dat >> 5) & 3] = dat & 1;
 	}
+	//TRACEOUT(("fdc out %.2x %.2x [%.4x:%.4x]", port, dat, CPU_CS, CPU_IP));
 	(void)port;
 }
 
 static REG8 IOINPCALL fdc_i4be(UINT port) {
-
+	//TRACEOUT(("fdc in %.2x %.2x [%.4x:%.4x]", port, fdc.rpm[(fdc.reg144 >> 5) & 3] | 0xf0, CPU_CS, CPU_IP));
 	(void)port;
 	return(fdc.rpm[(fdc.reg144 >> 5) & 3] | 0xf0);
 }

@@ -118,7 +118,7 @@ void dialog_changehdd(HWND hWnd, REG8 drv) {
 			pfp = &fpSASI;
 		}
 #if defined(SUPPORT_IDEIO)
-		else if (num == 2)
+		else if (num >= 2)
 		{
 			pfp = &fpISO;
 		}
@@ -351,7 +351,7 @@ void dialog_newdisk(HWND hWnd) {
 	else if (!file_cmpname(ext, str_nhd)) {
 		hddsize = 0;
 		hddminsize = 5;
-		hddmaxsize = 512;
+		hddmaxsize = NHD_MAXSIZE;
 		if (DialogBox(hinst, MAKEINTRESOURCE(IDD_NEWHDDDISK),
 									hWnd, (DLGPROC)NewHddDlgProc) == IDOK) {
 			newdisk_nhd(path, hddsize);

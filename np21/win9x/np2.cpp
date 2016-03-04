@@ -8,7 +8,6 @@
 
 #include "compiler.h"
 #include <time.h>
-#include <winsock.h>
 #ifndef __GNUC__
 #include <winnls32.h>
 #endif
@@ -57,6 +56,16 @@
 #include "dclock.h"
 #endif
 #include "recvideo.h"
+#if defined(SUPPORT_IDEIO)
+#include "ideio.h"
+#endif
+#if defined(SUPPORT_LGY98)
+#include "network/net.h"
+#include "network/lgy98.h"
+#endif
+#if defined(SUPPORT_CL_GD5430)
+#include "video.h"
+#endif
 
 #ifdef BETA_RELEASE
 #define		OPENING_WAIT		1500
@@ -548,6 +557,16 @@ static void OnCommand(HWND hWnd, WPARAM wParam)
 		case IDM_IDE2EJECT:
 			diskdrv_sethdd(0x02, NULL);
 			break;
+			
+		case IDM_IDE3OPEN:
+			winuienter();
+			dialog_changehdd(hWnd, 0x03);
+			winuileave();
+			break;
+
+		case IDM_IDE3EJECT:
+			diskdrv_sethdd(0x03, NULL);
+			break;
 #endif
 
 #if defined(SUPPORT_SCSI)
@@ -915,6 +934,12 @@ static void OnCommand(HWND hWnd, WPARAM wParam)
 		case IDM_SNDOPT:
 			winuienter();
 			dialog_sndopt(hWnd);
+			winuileave();
+			break;
+			
+		case IDM_NETOPT:
+			winuienter();
+			dialog_netopt(hWnd);
 			winuileave();
 			break;
 
@@ -1391,6 +1416,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 		case WM_CLOSE:
 			b = FALSE;
+			//pccore_shutdown();
 			if (!np2oscfg.comfirm) {
 				b = TRUE;
 			}
@@ -1466,6 +1492,9 @@ static void ExecuteOneFrame(BOOL bDraw)
 #if defined(SUPPORT_DCLOCK)
 	DispClock::GetInstance()->Update();
 #endif
+#if defined(SUPPORT_CL_GD5430)
+	np2vga_drawframe();
+#endif
 }
 
 static void framereset(UINT cnt) {
@@ -1529,12 +1558,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst,
 	szClassName[1] = (TCHAR)np2oscfg.winid[1];
 	szClassName[2] = (TCHAR)np2oscfg.winid[2];
 
-	if ((hWnd = FindWindow(szClassName, NULL)) != NULL) {
+	/*if ((hWnd = FindWindow(szClassName, NULL)) != NULL) {
 		ShowWindow(hWnd, SW_RESTORE);
 		SetForegroundWindow(hWnd);
 		dosio_term();
 		return(FALSE);
-	}
+	}*/
 
 	g_hInstance = loadextinst(hInstance);
 	g_hPrevInst = hPrevInst;
@@ -1661,6 +1690,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst,
 
 	scrndraw_redraw();
 
+	ideio_init();
+#ifdef SUPPORT_LGY98
+	lgy98_init();
+#endif
+#ifdef SUPPORT_CL_GD5430
+	np2vga_init(g_hInstance);
+	pc98_cirrus_vga_init();
+#endif
+
 	pccore_reset();
 
 	np2opening = 0;
@@ -1708,7 +1746,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst,
 			kdispwin_create(g_hInstance);
 		}
 	}
-
+	
 	sysmng_workclockreset();
 	sysmng_updatecaption(3);
 
@@ -1791,6 +1829,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst,
 			DispatchMessage(&msg);
 		}
 	}
+	
+#ifdef SUPPORT_CL_GD5430
+	pc98_cirrus_vga_shutdown();
+	np2vga_shutdown();
+#endif
+#ifdef SUPPORT_LGY98
+	lgy98_shutdown();
+#endif
+	ideio_shutdown();
+
 	toolwin_destroy();
 	kdispwin_destroy();
 	skbdwin_destroy();

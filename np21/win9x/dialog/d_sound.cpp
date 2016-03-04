@@ -984,6 +984,7 @@ void dialog_sndopt(HWND hWnd)
 }
 
 
+
 // ----
 
 #if defined(SUPPORT_S98)

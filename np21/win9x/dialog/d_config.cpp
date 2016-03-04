@@ -31,7 +31,7 @@ static void setclock(HWND hWnd, UINT uMultiple)
 		uMultiple = (UINT)milstr_solveINT(szWork);
 	}
 	uMultiple = max(uMultiple, 1);
-	uMultiple = min(uMultiple, 32);
+	uMultiple = min(uMultiple, 256);
 
 	uClock = (uClock / 100) * uMultiple;
 	wsprintf(szWork, str_clockfmt, uClock / 10000, uClock % 10000);
@@ -127,8 +127,8 @@ static void cfgupdate(HWND hWnd)
 	if (val < 1) {
 		val = 1;
 	}
-	else if (val > 32) {
-		val = 32;
+	else if (val > 128) {
+		val = 128;
 	}
 	if (np2cfg.multiple != val) {
 		np2cfg.multiple = val;

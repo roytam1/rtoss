@@ -137,9 +137,9 @@ change_pm(BOOL onoff)
 {
 
 	if (onoff) {
-		VERBOSE(("change_pm: Entering to Protected-Mode..."));
+		//TRACEOUT(("change_pm: Entering to Protected-Mode..."));
 	} else {
-		VERBOSE(("change_pm: Leaveing from Protected-Mode..."));
+		//TRACEOUT(("change_pm: Leaveing from Protected-Mode..."));
 	}
 
 	CPU_INST_OP32 = CPU_INST_AS32 =
@@ -155,9 +155,9 @@ change_pg(BOOL onoff)
 {
 
 	if (onoff) {
-		VERBOSE(("change_pg: Entering to Paging-Mode..."));
+		//TRACEOUT(("change_pg: Entering to Paging-Mode..."));
 	} else {
-		VERBOSE(("change_pg: Leaveing from Paging-Mode..."));
+		//TRACEOUT(("change_pg: Leaveing from Paging-Mode..."));
 	}
 
 	CPU_STAT_PAGING = onoff;
@@ -170,7 +170,7 @@ change_vm(BOOL onoff)
 
 	CPU_STAT_VM86 = onoff;
 	if (onoff) {
-		VERBOSE(("change_vm: Entering to Virtual-8086-Mode..."));
+		//TRACEOUT(("change_vm: Entering to Virtual-8086-Mode..."));
 		for (i = 0; i < CPU_SEGREG_NUM; i++) {
 			LOAD_SEGREG(i, CPU_REGS_SREG(i));
 		}
@@ -180,7 +180,7 @@ change_vm(BOOL onoff)
 		CPU_STAT_SS32 = 0;
 		set_cpl(3);
 	} else {
-		VERBOSE(("change_vm: Leaveing from Virtual-8086-Mode..."));
+		//TRACEOUT(("change_vm: Leaveing from Virtual-8086-Mode..."));
 	}
 }
 

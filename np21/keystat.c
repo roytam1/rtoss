@@ -199,6 +199,7 @@ void keystat_ctrlsend(REG8 dat) {
 
 	if (!keyctrl.reqparam) {
 		keyctrl.mode = dat;
+				//TRACEOUT(("kbdat %02X", dat));
 		switch(dat) {
 #if defined(SUPPORT_PC9801_119)
 			case 0x95:
@@ -213,10 +214,13 @@ void keystat_ctrlsend(REG8 dat) {
 			case 0x96:
 				keyboard_ctrl(0xfa);
 				keyboard_ctrl(0xa0);
-				keyboard_ctrl(0x83);
+				keyboard_ctrl(0x85);
 				break;
 #endif
-
+			case 0x99:
+				keyboard_ctrl(0xfa);
+				keyboard_ctrl(0xfb);
+				break;
 			case 0x9f:
 				keyboard_ctrl(0xfa);
 				keyboard_ctrl(0xa0);
@@ -224,6 +228,7 @@ void keystat_ctrlsend(REG8 dat) {
 				break;
 
 			default:
+				//TRACEOUT(("kbdat %02X", dat));
 				keyboard_ctrl(0xfc);
 				break;
 		}

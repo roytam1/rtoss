@@ -75,10 +75,15 @@ const OEMCHAR np2version[] = OEMTEXT(NP2VER_CORE);
 				0, {0x17, 0x04, 0x1f}, {0x0c, 0x0c, 0x02, 0x10, 0x3f, 0x3f},
 				3, 1, 80, 0, 0,
 				{OEMTEXT(""), OEMTEXT("")},
+#if defined(SUPPORT_IDEIO)
+				{OEMTEXT(""), OEMTEXT("")},
+#endif
 #if defined(SUPPORT_SCSI)
 				{OEMTEXT(""), OEMTEXT(""), OEMTEXT(""), OEMTEXT("")},
 #endif
-				OEMTEXT(""), OEMTEXT(""), OEMTEXT("")};
+				OEMTEXT(""), OEMTEXT(""), OEMTEXT(""), 
+				0, 0x10D0, 5, OEMTEXT("TAP1")
+	};
 
 	PCCORE	pccore = {	PCBASECLOCK25, PCBASEMULTIPLE,
 						0, PCMODEL_VX, 0, 0, {0x3e, 0x73, 0x7b}, 0,
@@ -145,9 +150,9 @@ static void pccore_set(const NP2CFG *pConfig)
 	{
 		multiple = 1;
 	}
-	else if (multiple > 32)
+	else if (multiple > 256)
 	{
-		multiple = 32;
+		multiple = 256;
 	}
 	pccore.multiple = multiple;
 	pccore.realclock = pccore.baseclock * multiple;
@@ -158,11 +163,13 @@ static void pccore_set(const NP2CFG *pConfig)
 		pccore.hddif |= PCHDD_IDE;
 #if defined(SUPPORT_IDEIO)
 		sxsi_setdevtype(0x02, SXSIDEV_CDROM);
+		sxsi_setdevtype(0x03, SXSIDEV_CDROM);
 #endif
 	}
 	else
 	{
 		sxsi_setdevtype(0x02, SXSIDEV_NC);
+		sxsi_setdevtype(0x03, SXSIDEV_NC);
 	}
 
 	// Šg’£ƒƒ‚ƒŠ
@@ -171,7 +178,7 @@ static void pccore_set(const NP2CFG *pConfig)
 	{
 		extsize = np2cfg.EXTMEM;
 #if defined(CPUCORE_IA32)
-		extsize = min(extsize, 63);
+		extsize = min(extsize, 255);
 #else
 		extsize = min(extsize, 13);
 #endif
@@ -271,6 +278,7 @@ void pccore_init(void) {
 #if defined(SUPPORT_HOSTDRV)
 	hostdrv_initialize();
 #endif
+
 }
 
 void pccore_term(void) {
@@ -433,6 +441,7 @@ void pccore_reset(void) {
 #if 0 && defined(SUPPORT_IDEIO)	// Test!
 	sxsi_devopen(0x02, OEMTEXT("e:\\pn\\pn.iso"));
 #endif
+	
 }
 
 static void drawscreen(void) {
@@ -456,7 +465,7 @@ static void drawscreen(void) {
 	if (gdcs.textdisp & GDCSCRN_EXT) {
 		gdc_updateclock();
 	}
-
+	
 	if (!pcstat.drawframe) {
 		return;
 	}
@@ -637,31 +646,53 @@ void pccore_exec(BOOL draw) {
 	nevent_set(NEVENT_FLAMES, gdc.dispclock, screenvsync, NEVENT_RELATIVE);
 
 //	nevent_get1stevent();
-
-	while(pcstat.screendispflag) {
+	if (!(CPU_TYPE & CPUTYPE_V30)) {
+		while(pcstat.screendispflag) {
 #if defined(TRACE)
-		resetcnt++;
+			resetcnt++;
 #endif
-		pic_irq();
-		if (CPU_RESETREQ) {
-			CPU_RESETREQ = 0;
-			CPU_SHUT();
-		}
+			pic_irq();
+			if (CPU_RESETREQ) {
+				CPU_RESETREQ = 0;
+				CPU_SHUT();
+			}
 #if !defined(SINGLESTEPONLY)
-		if (CPU_REMCLOCK > 0) {
-			if (!(CPU_TYPE & CPUTYPE_V30)) {
+			if (CPU_REMCLOCK > 0) {
 				CPU_EXEC();
 			}
-			else {
+#else
+			while(CPU_REMCLOCK > 0) {
+				CPU_STEPEXEC();
+			}
+#endif
+
+			nevent_progress();
+		
+		}
+	}
+	else {
+		while(pcstat.screendispflag) {
+#if defined(TRACE)
+			resetcnt++;
+#endif
+			pic_irq();
+			if (CPU_RESETREQ) {
+				CPU_RESETREQ = 0;
+				CPU_SHUT();
+			}
+#if !defined(SINGLESTEPONLY)
+			if (CPU_REMCLOCK > 0) {
 				CPU_EXECV30();
 			}
-		}
 #else
-		while(CPU_REMCLOCK > 0) {
-			CPU_STEPEXEC();
-		}
+			while(CPU_REMCLOCK > 0) {
+				CPU_STEPEXEC();
+			}
 #endif
-		nevent_progress();
+
+			nevent_progress();
+		
+		}
 	}
 	artic_callback();
 	mpu98ii_callback();

@@ -6,6 +6,7 @@
 #include	"cpucore.h"
 #include	"pccore.h"
 #include	"sxsi.h"
+#include	"ideio.h"
 
 
 static const UINT8 cd001[7] = {0x01,'C','D','0','0','1',0x01};
@@ -23,7 +24,7 @@ typedef struct {
 
 static int issec2048(FILEH fh) {
 
-	long	fpos;
+	FILEPOS	fpos;
 	UINT8	buf[2048];
 	UINT	secsize;
 	UINT	fsize;
@@ -52,11 +53,11 @@ sec2048_err:
 	return(-1);
 }
 
-static REG8 sec2048_read(SXSIDEV sxsi, long pos, UINT8 *buf, UINT size) {
+static REG8 sec2048_read(SXSIDEV sxsi, FILEPOS pos, UINT8 *buf, UINT size) {
 
 	FILEH	fh;
 	UINT	rsize;
-
+	
 	if (sxsi_prepare(sxsi) != SUCCESS) {
 		return(0x60);
 	}
@@ -85,7 +86,7 @@ static REG8 sec2048_read(SXSIDEV sxsi, long pos, UINT8 *buf, UINT size) {
 
 static int issec2352(FILEH fh) {
 
-	long	fpos;
+	FILEPOS	fpos;
 	UINT8	buf[2048];
 	UINT	secsize;
 	UINT	fsize;
@@ -114,10 +115,10 @@ sec2352_err:
 	return(-1);
 }
 
-static REG8 sec2352_read(SXSIDEV sxsi, long pos, UINT8 *buf, UINT size) {
+static REG8 sec2352_read(SXSIDEV sxsi, FILEPOS pos, UINT8 *buf, UINT size) {
 
 	FILEH	fh;
-	long	fpos;
+	FILEPOS	fpos;
 	UINT	rsize;
 
 	if (sxsi_prepare(sxsi) != SUCCESS) {
@@ -192,7 +193,7 @@ static BRESULT openimg(SXSIDEV sxsi, const OEMCHAR *path,
 
 	FILEH	fh;
 	UINT	type;
-	int		totals;
+	FILEPOS		totals;
 	CDINFO	cdinfo;
 	UINT	mediatype;
 	UINT	i;
@@ -259,6 +260,11 @@ static BRESULT openimg(SXSIDEV sxsi, const OEMCHAR *path,
 	sxsi->surfaces = 1;
 	sxsi->headersize = 0;
 	sxsi->mediatype = mediatype;
+
+#if defined(SUPPORT_IDEIO)
+	ideio_notify(sxsi->drv, 1);
+#endif
+
 	return(SUCCESS);
 
 sxsiope_err2:
@@ -366,11 +372,11 @@ CDTRK sxsicd_gettrk(SXSIDEV sxsi, UINT *tracks) {
 	return(cdinfo->trk);
 }
 
-BRESULT sxsicd_readraw(SXSIDEV sxsi, long pos, void *buf) {
+BRESULT sxsicd_readraw(SXSIDEV sxsi, FILEPOS pos, void *buf) {
 
 	CDINFO	cdinfo;
 	FILEH	fh;
-	long	fpos;
+	FILEPOS	fpos;
 
 	cdinfo = (CDINFO)sxsi->hdl;
 	if (cdinfo->type != 2352) {
