@@ -602,7 +602,7 @@ static void atapi_cmd_readsubch(IDEDRV drv) {
 				drv->buf[6] = trk[r].track;
 				drv->buf[7] = 1;
 				storemsf(drv->buf + 8, pos + 150);
-				storemsf(drv->buf + 12, pos - trk[r].pos);
+				storemsf(drv->buf + 12, (UINT32)(pos - trk[r].pos));
 			}
 			senddata(drv, 16, leng);
 			break;
@@ -650,7 +650,7 @@ static void atapi_cmd_readtoc(IDEDRV drv) {
 			ptr[1] = trk[i].type;
 			ptr[2] = trk[i].track;
 			ptr[3] = 0;
-			storemsf(ptr + 4, trk[i].pos + 150);
+			storemsf(ptr + 4, (UINT32)(trk[i].pos + 150));
 			ptr += 8;
 		}
 		senddata(drv, (tracks * 8) + 12, leng);

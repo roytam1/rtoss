@@ -229,6 +229,7 @@ UINT8 sxsi_getdevtype(REG8 drv) {
 
 // CD入れ替えのタイムアウト（投げやり）
 char cdchange_flag = 0;
+DWORD cdchange_reqtime = 0;
 REG8 cdchange_drv;
 OEMCHAR cdchange_fname[MAX_PATH];
 void cdchange_timeoutproc(NEVENTITEM item) {
@@ -259,8 +260,13 @@ BRESULT sxsi_devopen(REG8 drv, const OEMCHAR *fname) {
 			break;
 
 		case SXSIDEV_CDROM:
+#if defined(SUPPORT_IDEIO)
 			if (cdchange_flag) {
 				// CD交換中
+				if(GetTickCount()-cdchange_reqtime>15000){
+					// 怪しいので再度要求
+					cdchange_timeoutset();
+				}
 				return(FAILURE);
 			}
 			if ((fname == NULL) || (fname[0] == '\0')) {
@@ -281,10 +287,10 @@ BRESULT sxsi_devopen(REG8 drv, const OEMCHAR *fname) {
 					file_cpyname(cdchange_fname, fname, NELEMENTS(cdchange_fname));
 					cdchange_flag = 1;
 					cdchange_timeoutset();
+					cdchange_reqtime = GetTickCount();
 					return(FAILURE); // XXX: ここで失敗返してええの？
 				}
 				r = sxsicd_open(sxsi, fname);
-#if defined(SUPPORT_IDEIO)
 				if (r == SUCCESS) {
 					int num = drv & 0x0f;
 					file_cpyname(np2cfg.idecd[num-2], fname, NELEMENTS(cdchange_fname));
@@ -294,8 +300,8 @@ BRESULT sxsi_devopen(REG8 drv, const OEMCHAR *fname) {
 					file_cpyname(np2cfg.idecd[num-2], "\0\0\0\0", 1);
 					sysmng_updatecaption(1);
 				}
-#endif
 			}
+#endif
 			break;
 
 		default:

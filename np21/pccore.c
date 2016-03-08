@@ -82,7 +82,12 @@ const OEMCHAR np2version[] = OEMTEXT(NP2VER_CORE);
 				{OEMTEXT(""), OEMTEXT(""), OEMTEXT(""), OEMTEXT("")},
 #endif
 				OEMTEXT(""), OEMTEXT(""), OEMTEXT(""), 
-				0, 0x10D0, 5, OEMTEXT("TAP1")
+#if defined(SUPPORT_LGY98)
+				0, 0x10D0, 5, OEMTEXT("TAP1"),
+#endif
+#if defined(SUPPORT_CL_GD5430)
+				0,
+#endif
 	};
 
 	PCCORE	pccore = {	PCBASECLOCK25, PCBASEMULTIPLE,
@@ -178,7 +183,7 @@ static void pccore_set(const NP2CFG *pConfig)
 	{
 		extsize = np2cfg.EXTMEM;
 #if defined(CPUCORE_IA32)
-		extsize = min(extsize, 255);
+		extsize = min(extsize, 1023);
 #else
 		extsize = min(extsize, 13);
 #endif

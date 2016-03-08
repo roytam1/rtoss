@@ -528,6 +528,14 @@ BEGIN
     PUSHBUTTON      "Defaults",IDC_LGY98DEF,136,102,40,14
 END
 
+IDD_GD5430 DIALOGEX 0, 0, 184, 124
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Xe10 CL-GD5430"
+FONT 9, "‚l‚r ‚oƒSƒVƒbƒN", 0, 0, 0x0
+BEGIN
+    CONTROL         "Enabled",IDC_GD5430ENABLED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,8,40,10
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -728,6 +736,14 @@ BEGIN
         TOPMARGIN, 8
         BOTTOMMARGIN, 112
     END
+	
+    IDD_GD5430, DIALOG
+    BEGIN
+        LEFTMARGIN, 8
+        RIGHTMARGIN, 176
+        TOPMARGIN, 8
+        BOTTOMMARGIN, 112
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -884,6 +900,12 @@ BEGIN
             MENUITEM "&1.6MB",                      IDM_MEM16
             MENUITEM "&3.6MB",                      IDM_MEM36
             MENUITEM "&7.6MB",                      IDM_MEM76
+            MENUITEM "&11.6MB",                     IDM_MEM116
+            MENUITEM "&13.6MB",                     IDM_MEM136
+            MENUITEM "&16.6MB",                     IDM_MEM166
+            MENUITEM "&32.6MB",                     IDM_MEM326
+            MENUITEM "&64.6MB",                     IDM_MEM646
+            MENUITEM "&120.6MB",                    IDM_MEM1206
         END
         MENUITEM "&Mouse",                      IDM_MOUSE
         MENUITEM SEPARATOR
@@ -895,6 +917,8 @@ BEGIN
         MENUITEM "So&und option...",            IDM_SNDOPT
         MENUITEM SEPARATOR
         MENUITEM "&Network option...",          IDM_NETOPT
+        MENUITEM SEPARATOR
+        MENUITEM "&Window Accelerator option...",IDM_WABOPT
     END
     POPUP "&Other"
     BEGIN
@@ -911,6 +935,7 @@ BEGIN
         MENUITEM "Joy re&verse",                IDM_JOYX
         MENUITEM "Joy &rapid",                  IDM_RAPID
         MENUITEM "&Mouse rapid",                IDM_MSRAPID
+        MENUITEM "&ITF work",				    IDM_ITFWORK
         MENUITEM SEPARATOR
         MENUITEM "&Help...",                    IDM_HELP
         MENUITEM "&About...",                   IDM_ABOUT
@@ -1179,6 +1204,7 @@ IDI_ICON2               ICON                    "..\\np2debug.ico"
 
 SEEKWAV                 EXTROM                  "..\\fddseek.wav"
 SEEK1WAV                EXTROM                  "..\\fddseek1.wav"
+RELAY1WAV               EXTROM                  "..\\relay1.wav"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1212,6 +1238,7 @@ BEGIN
     IDS_SOUNDOPTION         "Sound board option"
     IDS_SERIALOPTION        "Serial option"
     IDS_NETWORKOPTION       "Network option"
+	IDS_WABOPTION           "Window Accelerator board option"
 END
 
 STRINGTABLE

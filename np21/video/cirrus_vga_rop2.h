@@ -1,4 +1,3 @@
-#if defined(SUPPORT_CL_GD5430)
 
 /*
  * QEMU Cirrus CLGD 54xx VGA Emulator.
@@ -23,6 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
+#if defined(SUPPORT_CL_GD5430)
 
 #if DEPTH == 8
 #define PUTPIXEL()    ROP_OP(d[0], col)

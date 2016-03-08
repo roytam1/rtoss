@@ -1,10 +1,20 @@
-#pragma once
 
+
+#pragma once
+/*
 #define cpu_to_le16wu(p, v) STOREINTELWORD(p, v) // XXX: 
 #define cpu_to_le32wu(p, v) STOREINTELDWORD(p, v) // XXX: 
 
 #define le16_to_cpu(a)		LOADINTELWORD(a)
 #define le32_to_cpu(a)		LOADINTELDWORD(a)
+#define cpu_to_le16w(a,b)	STOREINTELWORD(a,b)
+#define cpu_to_le32w(a,b)	STOREINTELDWORD(a,b)
+*/
+#define cpu_to_le16wu(p, v) STOREINTELWORD(p, v) // XXX: 
+#define cpu_to_le32wu(p, v) STOREINTELDWORD(p, v) // XXX: 
+
+#define le16_to_cpu(a)		((UINT16)(a))
+#define le32_to_cpu(a)		((UINT32)(a))
 #define cpu_to_le16w(a,b)	STOREINTELWORD(a,b)
 #define cpu_to_le32w(a,b)	STOREINTELDWORD(a,b)
 
@@ -57,12 +67,6 @@ void qemu_console_copy(DisplayState *ds, int src_x, int src_y, int dst_x, int ds
 }*/
 void cpu_physical_sync_dirty_bitmap(target_phys_addr_t start_addr, target_phys_addr_t end_addr){}
 
-static int ds_get_bits_per_pixel(DisplayState *ds)
-{
-	return ds->surface->pf.bits_per_pixel;
-}
-
-
 int register_ioport_write(int start, int length, int size, IOPortWriteFunc *func, void *opaque){return 0;}
 int register_ioport_read(int start, int length, int size, IOPortReadFunc *func, void *opaque){return 0;}
 
@@ -72,14 +76,14 @@ int cpu_register_io_memory(int io_index,
                            CPUWriteMemoryFunc **mem_write,
                            void *opaque)
 {
-    int i, subwidth = 0;
+    //int i, subwidth = 0;
 
-    if (io_index <= 0) {
-        io_index = 0;
-    } else {
-        if (io_index >= IO_MEM_NB_ENTRIES)
-            return -1;
-    }
+    //if (io_index <= 0) {
+    //    io_index = 0;
+    //} else {
+    //    if (io_index >= IO_MEM_NB_ENTRIES)
+    //        return -1;
+    //}
 
     //for(i = 0;i < 3; i++) {
     //    if (!mem_read[i] || !mem_write[i])
@@ -88,8 +92,8 @@ int cpu_register_io_memory(int io_index,
     //    io_mem_write[io_index][i] = mem_write[i];
     //}
     //io_mem_opaque[io_index] = opaque;
-    return (io_index << IO_MEM_SHIFT) | subwidth;
-	//return 0;
+    //return (io_index << IO_MEM_SHIFT) | subwidth;
+	return 0;
 }
 
 void qemu_register_coalesced_mmio(target_phys_addr_t addr, ram_addr_t size){}

@@ -9,6 +9,9 @@ void dialog_sndopt(HWND hWnd);
 #if defined(SUPPORT_LGY98)
 void dialog_netopt(HWND hWnd);
 #endif
+#if defined(SUPPORT_CL_GD5430)
+void dialog_wabopt(HWND hWnd);
+#endif
 void dialog_s98(HWND hWnd);
 #if defined(SUPPORT_WAVEREC)
 void dialog_waverec(HWND hWnd);

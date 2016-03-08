@@ -16,8 +16,7 @@ static void IOOUTCALL cpuio_of0(UINT port, REG8 dat) {
 	}
 #endif
 	if (CPU_MSW & 1) {
-		//return;
-		TRACEOUT(("80286 ProtectMode Disable"));
+		//return; // noreset”Å‚É‚·‚éê‡‚Í‚±‚ÌƒRƒƒ“ƒg‚ğ‰ğœ‚µ‚Ä‚­‚¾‚³‚¢
 	}
 	epsonio.cpumode = (CPU_MSW & 1)?'P':'R';
 	CPU_A20EN(FALSE);

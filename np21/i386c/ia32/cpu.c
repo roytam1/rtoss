@@ -68,8 +68,8 @@ LARGE_INTEGER timeuse_li = {0};
 void
 exec_1step(void)
 {
-	register int prefix;
-	register UINT32 op;
+	int prefix;
+	UINT32 op;
 	
 	CPU_PREV_EIP = CPU_EIP;
 	CPU_STATSAVE.cpu_inst = CPU_STATSAVE.cpu_inst_default;
@@ -160,7 +160,7 @@ exec_1step(void)
 	}else{
 
 		/* rep */
-		CPU_WORKCLOCK(20);
+		CPU_WORKCLOCK(40);
 		
 #if defined(DEBUG)
 		if (!cpu_debug_rep_cont) {

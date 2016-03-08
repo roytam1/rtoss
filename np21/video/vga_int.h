@@ -183,6 +183,8 @@ typedef struct VGAState {
     VGA_STATE_COMMON
 } VGAState;
 
+typedef void vga_draw_line_func(VGAState *s1, uint8_t *d, const uint8_t *s, int width);
+
 static int c6_to_8(int v)
 {
     int b;
@@ -198,15 +200,310 @@ void vga_reset(void *s){}
 void vga_dirty_log_start(VGAState *s){}
 void vga_dirty_log_stop(VGAState *s){}
 
- 
+#define cbswap_32(__x) \
+((uint32_t_)( \
+		(((uint32_t_)(__x) & (uint32_t_)0x000000ffUL) << 24) | \
+		(((uint32_t_)(__x) & (uint32_t_)0x0000ff00UL) <<  8) | \
+		(((uint32_t_)(__x) & (uint32_t_)0x00ff0000UL) >>  8) | \
+		(((uint32_t_)(__x) & (uint32_t_)0xff000000UL) >> 24) ))
+
+#ifdef WORDS_BIGENDIAN
+#define PAT(x) x
+#else
+#define PAT(x) cbswap_32(x)
+#endif
+
+#ifdef WORDS_BIGENDIAN
+#define GET_PLANE(data, p) (((data) >> (24 - (p) * 8)) & 0xff)
+#else
+#define GET_PLANE(data, p) (((data) >> ((p) * 8)) & 0xff)
+#endif
+
+static const uint32_t_ mask16[16] = {
+    PAT(0x00000000),
+    PAT(0x000000ff),
+    PAT(0x0000ff00),
+    PAT(0x0000ffff),
+    PAT(0x00ff0000),
+    PAT(0x00ff00ff),
+    PAT(0x00ffff00),
+    PAT(0x00ffffff),
+    PAT(0xff000000),
+    PAT(0xff0000ff),
+    PAT(0xff00ff00),
+    PAT(0xff00ffff),
+    PAT(0xffff0000),
+    PAT(0xffff00ff),
+    PAT(0xffffff00),
+    PAT(0xffffffff),
+};
+
 uint32_t_ vga_mem_readb(void *opaque, target_phys_addr_t addr){
-	return 0;
+	
+    VGAState *s = (VGAState *)opaque;
+    int memory_map_mode, plane;
+    uint32_t_ ret;
+
+    /* convert to VGA memory offset */
+    memory_map_mode = (s->gr[6] >> 2) & 3;
+    addr &= 0x1ffff;
+    switch(memory_map_mode) {
+    case 0:
+        break;
+    case 1:
+        if (addr >= 0x10000)
+            return 0xff;
+        addr += s->bank_offset;
+        break;
+    case 2:
+        addr -= 0x10000;
+        if (addr >= 0x8000)
+            return 0xff;
+        break;
+    default:
+    case 3:
+        addr -= 0x18000;
+        if (addr >= 0x8000)
+            return 0xff;
+        break;
+    }
+
+    if (s->sr[4] & 0x08) {
+        /* chain 4 mode : simplest access */
+        ret = s->vram_ptr[addr];
+    } else if (s->gr[5] & 0x10) {
+        /* odd/even mode (aka text mode mapping) */
+        plane = (s->gr[4] & 2) | (addr & 1);
+        ret = s->vram_ptr[((addr & ~1) << 1) | plane];
+    } else {
+        /* standard VGA latched access */
+        s->latch = ((uint32_t_ *)s->vram_ptr)[addr];
+
+        if (!(s->gr[5] & 0x08)) {
+            /* read mode 0 */
+            plane = s->gr[4];
+            ret = GET_PLANE(s->latch, plane);
+        } else {
+            /* read mode 1 */
+            ret = (s->latch ^ mask16[s->gr[2]]) & mask16[s->gr[7]];
+            ret |= ret >> 16;
+            ret |= ret >> 8;
+            ret = (~ret) & 0xff;
+        }
+    }
+    return ret;
 }
 void vga_mem_writeb(void *opaque, target_phys_addr_t addr, uint32_t_ val){
-	
+    VGAState *s = (VGAState *)opaque;
+    int memory_map_mode, plane, write_mode, b, func_select, mask;
+    uint32_t_ write_mask, bit_mask, set_mask;
+
+#ifdef DEBUG_VGA_MEM
+    printf("vga: [0x%x] = 0x%02x\n", addr, val);
+#endif
+    /* convert to VGA memory offset */
+    memory_map_mode = (s->gr[6] >> 2) & 3;
+    addr &= 0x1ffff;
+    switch(memory_map_mode) {
+    case 0:
+        break;
+    case 1:
+        if (addr >= 0x10000)
+            return;
+        addr += s->bank_offset;
+        break;
+    case 2:
+        addr -= 0x10000;
+        if (addr >= 0x8000)
+            return;
+        break;
+    default:
+    case 3:
+        addr -= 0x18000;
+        if (addr >= 0x8000)
+            return;
+        break;
+    }
+
+    if (s->sr[4] & 0x08) {
+        /* chain 4 mode : simplest access */
+        plane = addr & 3;
+        mask = (1 << plane);
+        if (s->sr[2] & mask) {
+            s->vram_ptr[addr] = val;
+#ifdef DEBUG_VGA_MEM
+            printf("vga: chain4: [0x%x]\n", addr);
+#endif
+            s->plane_updated |= mask; /* only used to detect font change */
+            cpu_physical_memory_set_dirty(s->vram_offset + addr);
+        }
+    } else if (s->gr[5] & 0x10) {
+        /* odd/even mode (aka text mode mapping) */
+        plane = (s->gr[4] & 2) | (addr & 1);
+        mask = (1 << plane);
+        if (s->sr[2] & mask) {
+            addr = ((addr & ~1) << 1) | plane;
+            s->vram_ptr[addr] = val;
+#ifdef DEBUG_VGA_MEM
+            printf("vga: odd/even: [0x%x]\n", addr);
+#endif
+            s->plane_updated |= mask; /* only used to detect font change */
+            cpu_physical_memory_set_dirty(s->vram_offset + addr);
+        }
+    } else {
+        /* standard VGA latched access */
+        write_mode = s->gr[5] & 3;
+        switch(write_mode) {
+        default:
+        case 0:
+            /* rotate */
+            b = s->gr[3] & 7;
+            val = ((val >> b) | (val << (8 - b))) & 0xff;
+            val |= val << 8;
+            val |= val << 16;
+
+            /* apply set/reset mask */
+            set_mask = mask16[s->gr[1]];
+            val = (val & ~set_mask) | (mask16[s->gr[0]] & set_mask);
+            bit_mask = s->gr[8];
+            break;
+        case 1:
+            val = s->latch;
+            goto do_write;
+        case 2:
+            val = mask16[val & 0x0f];
+            bit_mask = s->gr[8];
+            break;
+        case 3:
+            /* rotate */
+            b = s->gr[3] & 7;
+            val = (val >> b) | (val << (8 - b));
+
+            bit_mask = s->gr[8] & val;
+            val = mask16[s->gr[0]];
+            break;
+        }
+
+        /* apply logical operation */
+        func_select = s->gr[3] >> 3;
+        switch(func_select) {
+        case 0:
+        default:
+            /* nothing to do */
+            break;
+        case 1:
+            /* and */
+            val &= s->latch;
+            break;
+        case 2:
+            /* or */
+            val |= s->latch;
+            break;
+        case 3:
+            /* xor */
+            val ^= s->latch;
+            break;
+        }
+
+        /* apply bit mask */
+        bit_mask |= bit_mask << 8;
+        bit_mask |= bit_mask << 16;
+        val = (val & bit_mask) | (s->latch & ~bit_mask);
+
+    do_write:
+        /* mask data according to sr[2] */
+        mask = s->sr[2];
+        s->plane_updated |= mask; /* only used to detect font change */
+        write_mask = mask16[mask];
+        ((uint32_t_ *)s->vram_ptr)[addr] =
+            (((uint32_t_ *)s->vram_ptr)[addr] & ~write_mask) |
+            (val & write_mask);
+#ifdef DEBUG_VGA_MEM
+            printf("vga: latch: [0x%x] mask=0x%08x val=0x%08x\n",
+                   addr * 4, write_mask, val);
+#endif
+            cpu_physical_memory_set_dirty(s->vram_offset + (addr << 2));
+    }
 }
-void vga_invalidate_scanlines(VGAState *s, int y1, int y2){}
+void vga_invalidate_scanlines(VGAState *s, int y1, int y2){
+    int y;
+    if (y1 >= VGA_MAX_HEIGHT)
+        return;
+    if (y2 >= VGA_MAX_HEIGHT)
+        y2 = VGA_MAX_HEIGHT;
+    for(y = y1; y < y2; y++) {
+        s->invalidated_y_table[y >> 5] |= 1 << (y & 0x1f);
+    }
+}
 int ppm_save(const char *filename, struct DisplaySurface *ds){return 0;}
+
+static void vga_draw_cursor_line(uint8_t *d1,
+ 
+                                 const uint8_t *src1,
+ 
+                                 int poffset, int w,
+ 
+                                 unsigned int color0,
+ 
+                                 unsigned int color1,
+ 
+                                 unsigned int color_xor)
+ 
+{
+ 
+    const uint8_t *plane0, *plane1;
+ 
+    int x, b0, b1;
+ 
+    uint8_t *d;
+ 
+
+ 
+    d = d1;
+ 
+    plane0 = src1;
+ 
+    plane1 = src1 + poffset;
+ 
+    for (x = 0; x < w; x++) {
+ 
+        b0 = (plane0[x >> 3] >> (7 - (x & 7))) & 1;
+
+        b1 = (plane1[x >> 3] >> (7 - (x & 7))) & 1;
+
+        switch (b0 | (b1 << 1)) {
+
+        case 0:
+
+            break;
+
+        case 1:
+
+            ((uint32_t_ *)d)[0] ^= color_xor;
+			((uint32_t_ *)d)[0] |= 0xff000000;
+
+            break;
+
+        case 2:
+
+            ((uint32_t_ *)d)[0] = color0;
+			((uint32_t_ *)d)[0] |= 0xff000000;
+            break;
+
+        case 3:
+
+            ((uint32_t_ *)d)[0] = color1;
+			((uint32_t_ *)d)[0] |= 0xff000000;
+
+            break;
+
+        }
+
+        d += 4;
+
+    }
+
+}
 
 void vga_draw_cursor_line_8(uint8_t *d1, const uint8_t *src1,
                             int poffset, int w,
@@ -219,7 +516,10 @@ void vga_draw_cursor_line_16(uint8_t *d1, const uint8_t *src1,
 void vga_draw_cursor_line_32(uint8_t *d1, const uint8_t *src1,
                              int poffset, int w,
                              unsigned int color0, unsigned int color1,
-							 unsigned int color_xor){}
+							 unsigned int color_xor)
+{
+	vga_draw_cursor_line(d1, src1, poffset, w, color0, color1, color_xor);
+}
 
 extern const uint8_t sr_mask[8];
 extern const uint8_t gr_mask[16];

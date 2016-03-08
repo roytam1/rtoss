@@ -161,9 +161,9 @@ typedef	signed __int64		SINT64;
 #define	SUPPORT_HOSTDRV
 #define	SUPPORT_SASI
 #define	SUPPORT_SCSI
-#if defined(TRACE)
-#define	SUPPORT_IDEIO
-#endif
+//#if defined(TRACE)
+//#define	SUPPORT_IDEIO
+//#endif
 #define SUPPORT_ARC
 #define SUPPORT_ZLIB
 #if !defined(_WIN64)
@@ -185,7 +185,7 @@ typedef	signed __int64		SINT64;
 #if defined(SUPPORT_LARGE_HDD)
 typedef INT64	FILEPOS;
 typedef INT64	FILELEN;
-#define	NHD_MAXSIZE	8000
+#define	NHD_MAXSIZE	32000
 #else
 typedef long	FILEPOS;
 typedef long	FILELEN;

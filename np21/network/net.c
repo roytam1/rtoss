@@ -1,3 +1,4 @@
+
 #include	"compiler.h"
 
 #if defined(SUPPORT_LGY98)
@@ -36,7 +37,7 @@ static CRITICAL_SECTION np2net_cs;
 
 CHAR *GetNetWorkDeviceGuid(CONST CHAR *, CHAR *, DWORD);
 
-static REG8		np2net_membuf[NET_ARYLEN][NET_BUFLEN];
+static REG8		np2net_membuf[NET_ARYLEN][NET_BUFLEN]; // 送信用バッファ
 static int		np2net_membuflen[NET_ARYLEN];
 //static int		np2net_membuf_datalen = 0;
 static int		np2net_membuf_readpos = 0;
@@ -84,6 +85,7 @@ int sendDataToBuffer(UCHAR *pSendBuf, DWORD len){
 	return 0;
 }
 
+//  非同期で通信してみる
 DWORD WINAPI np2net_ThreadFuncW(LPVOID vdParam) {
 	while (!np2net_hThreadexit) {
 		if(np2net_vc){
@@ -97,8 +99,6 @@ DWORD WINAPI np2net_ThreadFuncW(LPVOID vdParam) {
 	}
 	return 0;
 }
-
-
 DWORD WINAPI np2net_ThreadFunc(LPVOID vdParam) {
 	HANDLE hEvent = NULL;
 	DWORD dwLen;
@@ -284,6 +284,9 @@ void np2net_resume()
 	np2net_gsuspflag = 0;
 }
 
+
+
+// 参考文献: http://dsas.blog.klab.org/archives/51012690.html
 
 // ネットワークデバイス表示名からデバイス GUID 文字列を検索
 CHAR *GetNetWorkDeviceGuid(CONST CHAR *pDisplayName, CHAR *pszBuf, DWORD cbBuf)

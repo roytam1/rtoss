@@ -180,6 +180,10 @@ static REG8 IOINPCALL definp8(UINT port) {
 	if ((port & 0xf0ff) == 0x801e) {
 		return(dipsw_r8(port));
 	}
+	if ((port & 0xffff) == 0x043B) {
+		TRACEOUT(("in%X - %.4x %.4x", port&0xff, CPU_CS, CPU_IP));
+		return 0x00;
+	}
 	//keytmp = (port & 0xfcff);
 	//if (0xE0 <= keytmp && keytmp <= 0xEE) {
 	//	//TRACEOUT(("in%X - %.4x %.4x", port&0xff, CPU_CS, CPU_IP));

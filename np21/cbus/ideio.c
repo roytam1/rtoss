@@ -1,7 +1,5 @@
 #include	"compiler.h"
 
-// winでidentifyまでは取得に行くんだけどな…ってAnex86も同じか
-
 #if defined(SUPPORT_IDEIO)
 
 #include	"dosio.h"
@@ -16,7 +14,7 @@
 
 	IDEIO	ideio;
 	
-//#define IDEIO_ASYNC
+//#define IDEIO_ASYNC  // 非同期データ転送のつもりだったけど適当に作って途中放棄したので動きません
 #ifdef IDEIO_ASYNC
 HANDLE hIDEThread[4] = {NULL};
 int shutdownflg = 0;
@@ -404,15 +402,15 @@ static void IOOUTCALL ideio_o430(UINT port, REG8 dat) {
 	{
 		IDEDEV	dev;
 		dev = getidedev();
-		if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
-			TRACEOUT(("ideio setbank%d %.2x [%.4x:%.8x]", (port >> 1) & 1, dat, CPU_CS, CPU_EIP));
-		}
+		//if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
+		//	TRACEOUT(("ideio setbank%d %.2x [%.4x:%.8x]", (port >> 1) & 1, dat, CPU_CS, CPU_EIP));
+		//}
 	}
 	if (!(dat & 0x80)) {
 		//ideio.bank[(port >> 1) & 1] = dat;
 		if(!(dat&0xe))ideio.bank[1] = dat;
 	}else{
-		TRACEOUT(("ideio dummy%d %.2x [%.4x:%.8x]", (port >> 1) & 1, dat, CPU_CS, CPU_EIP));
+		//TRACEOUT(("ideio dummy%d %.2x [%.4x:%.8x]", (port >> 1) & 1, dat, CPU_CS, CPU_EIP));
 	}
 }
 
@@ -427,9 +425,9 @@ static REG8 IOINPCALL ideio_i430(UINT port) {
 	{
 		IDEDEV	dev;
 		dev = getidedev();
-		if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
-			TRACEOUT(("ideio getbank%d %.2x [%.4x:%.8x]", (port >> 1) & 1, (ideio.bank[1] & 0x1), CPU_CS, CPU_EIP));
-		}
+		//if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
+		//	TRACEOUT(("ideio getbank%d %.2x [%.4x:%.8x]", (port >> 1) & 1, (ideio.bank[1] & 0x1), CPU_CS, CPU_EIP));
+		//}
 	}
 	//return(ret & 0x81);
 	return(ideio.bank[1] & 0x1);
@@ -440,15 +438,15 @@ static void IOOUTCALL ideio_o432(UINT port, REG8 dat) {
 	{
 		IDEDEV	dev;
 		dev = getidedev();
-		if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
-			TRACEOUT(("ideio setbank%d %.2x [%.4x:%.8x]", (port >> 1) & 1, dat, CPU_CS, CPU_EIP));
-		}
+		//if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
+		//	TRACEOUT(("ideio setbank%d %.2x [%.4x:%.8x]", (port >> 1) & 1, dat, CPU_CS, CPU_EIP));
+		//}
 	}
 	if (!(dat & 0x80)) {
 		//ideio.bank[(port >> 1) & 1] = dat;
 		if(!(dat&0xe))ideio.bank[1] = dat;
 	}else{
-		TRACEOUT(("ideio dummy%d %.2x [%.4x:%.8x]", (port >> 1) & 1, dat, CPU_CS, CPU_EIP));
+		//TRACEOUT(("ideio dummy%d %.2x [%.4x:%.8x]", (port >> 1) & 1, dat, CPU_CS, CPU_EIP));
 	}
 }
 
@@ -465,9 +463,9 @@ static REG8 IOINPCALL ideio_i432(UINT port) {
 	{
 		IDEDEV	dev;
 		dev = getidedev();
-		if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
-			TRACEOUT(("ideio getbank%d %.2x [%.4x:%.8x]", (port >> 1) & 1, ret, CPU_CS, CPU_EIP));
-		}
+		//if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
+		//	TRACEOUT(("ideio getbank%d %.2x [%.4x:%.8x]", (port >> 1) & 1, ret, CPU_CS, CPU_EIP));
+		//}
 	}
 	return(ideio.bank[1] & 0x1);
 }
@@ -485,9 +483,9 @@ static void IOOUTCALL ideio_o642(UINT port, REG8 dat) {
 		{
 			IDEDEV	dev;
 			dev = getidedev();
-			if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
-				TRACEOUT(("ideio set WP %.2x [%.4x:%.8x]", dat, CPU_CS, CPU_EIP));
-			}
+			//if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
+			//	TRACEOUT(("ideio set WP %.2x [%.4x:%.8x]", dat, CPU_CS, CPU_EIP));
+			//}
 		}
 	}
 	(void)port;
@@ -504,9 +502,9 @@ static void IOOUTCALL ideio_o644(UINT port, REG8 dat) {
 		{
 			IDEDEV	dev;
 			dev = getidedev();
-			if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
-				TRACEOUT(("ideio set SC %.2x [%.4x:%.8x]", dat, CPU_CS, CPU_EIP));
-			}
+			//if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
+			//	TRACEOUT(("ideio set SC %.2x [%.4x:%.8x]", dat, CPU_CS, CPU_EIP));
+			//}
 		}
 	}
 	(void)port;
@@ -522,9 +520,9 @@ static void IOOUTCALL ideio_o646(UINT port, REG8 dat) {
 		{
 			IDEDEV	dev;
 			dev = getidedev();
-			if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
-				TRACEOUT(("ideio set SN %.2x [%.4x:%.8x]", dat, CPU_CS, CPU_EIP));
-			}
+			//if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
+			//	TRACEOUT(("ideio set SN %.2x [%.4x:%.8x]", dat, CPU_CS, CPU_EIP));
+			//}
 		}
 	}
 	(void)port;
@@ -542,9 +540,9 @@ static void IOOUTCALL ideio_o648(UINT port, REG8 dat) {
 		{
 			IDEDEV	dev;
 			dev = getidedev();
-			if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
-				TRACEOUT(("ideio set CYH %.2x [%.4x:%.8x]", dat, CPU_CS, CPU_EIP));
-			}
+			//if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
+			//	TRACEOUT(("ideio set CYH %.2x [%.4x:%.8x]", dat, CPU_CS, CPU_EIP));
+			//}
 		}
 	}
 	(void)port;
@@ -729,7 +727,10 @@ static void IOOUTCALL ideio_o64e(UINT port, REG8 dat) {
 				cmdabort(drv);
 			}
 			break;
-
+		case 0x40:		// read verify
+			drv->status = drv->status & ~IDESTAT_BSY;
+			setintr(drv);
+			break;
 		case 0x91:		// set parameters
 			TRACEOUT(("ideio: set parameters dh=%x sec=%x",
 											drv->dr | drv->hd, drv->sc));
@@ -868,6 +869,11 @@ static void IOOUTCALL ideio_o64e(UINT port, REG8 dat) {
 			cmdabort(drv);
 			break;
 			
+		case 0xf8:		// READ NATIVE MAX ADDRESS
+			TRACEOUT(("ideio: READ NATIVE MAX ADDRESS reg = %.2x", drv->wp));
+			cmdabort(drv);
+			break;
+			
 		default:
 			panic("ideio: unknown command %.2x", dat);
 			break;
@@ -992,9 +998,9 @@ static REG8 IOINPCALL ideio_i644(UINT port) {
 		{
 			IDEDEV	dev;
 			dev = getidedev();
-			if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
-				TRACEOUT(("ideio get SC %.2x [%.4x:%.8x]", drv->sc, CPU_CS, CPU_EIP));
-			}
+			//if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
+			//	TRACEOUT(("ideio get SC %.2x [%.4x:%.8x]", drv->sc, CPU_CS, CPU_EIP));
+			//}
 		}
 		return(drv->sc);
 	}
@@ -1014,9 +1020,9 @@ static REG8 IOINPCALL ideio_i646(UINT port) {
 		{
 			IDEDEV	dev;
 			dev = getidedev();
-			if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
-				TRACEOUT(("ideio get SN %.2x [%.4x:%.8x]", drv->sn, CPU_CS, CPU_EIP));
-			}
+			//if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
+			//	TRACEOUT(("ideio get SN %.2x [%.4x:%.8x]", drv->sn, CPU_CS, CPU_EIP));
+			//}
 		}
 		return(drv->sn);
 	}
@@ -1036,9 +1042,9 @@ static REG8 IOINPCALL ideio_i648(UINT port) {
 		{
 			IDEDEV	dev;
 			dev = getidedev();
-			if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
-				TRACEOUT(("ideio get CYL %.4x [%.4x:%.8x]", drv->cy, CPU_CS, CPU_EIP));
-			}
+			//if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
+			//	TRACEOUT(("ideio get CYL %.4x [%.4x:%.8x]", drv->cy, CPU_CS, CPU_EIP));
+			//}
 		}
 		return((UINT8)drv->cy);
 	}
@@ -1058,9 +1064,9 @@ static REG8 IOINPCALL ideio_i64a(UINT port) {
 		{
 			IDEDEV	dev;
 			dev = getidedev();
-			if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
-				TRACEOUT(("ideio get CYH %.4x [%.4x:%.8x]", drv->cy, CPU_CS, CPU_EIP));
-			}
+			//if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
+			//	TRACEOUT(("ideio get CYH %.4x [%.4x:%.8x]", drv->cy, CPU_CS, CPU_EIP));
+			//}
 		}
 		return((REG8)(drv->cy >> 8));
 	}
@@ -1081,9 +1087,9 @@ static REG8 IOINPCALL ideio_i64c(UINT port) {
 		{
 			IDEDEV	dev;
 			dev = getidedev();
-			if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
-				TRACEOUT(("ideio get DRHD %.2x [%.4x:%.8x]", ret, CPU_CS, CPU_EIP));
-			}
+			//if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
+			//	TRACEOUT(("ideio get DRHD %.2x [%.4x:%.8x]", ret, CPU_CS, CPU_EIP));
+			//}
 		}
 		return(ret);
 	}
@@ -1105,9 +1111,9 @@ static REG8 IOINPCALL ideio_i64e(UINT port) {
 	if (drv) {
 		//if(drv->device==IDETYPE_CDROM && drv->status!=0x40 && drv->status!=0x48){
 		{
-			if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
-				TRACEOUT(("ideio status %.2x [%.4x:%.8x]", drv->status, CPU_CS, CPU_EIP));
-			}
+			//if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
+			//	TRACEOUT(("ideio status %.2x [%.4x:%.8x]", drv->status, CPU_CS, CPU_EIP));
+			//}
 		}
 			//
 		//}
@@ -1133,9 +1139,9 @@ static REG8 IOINPCALL ideio_i74c(UINT port) {
 		{
 			IDEDEV	dev;
 			dev = getidedev();
-			if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
-				TRACEOUT(("ideio alt status %.2x [%.4x:%.8x]", drv->status, CPU_CS, CPU_EIP));
-			}
+			//if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
+			//	TRACEOUT(("ideio alt status %.2x [%.4x:%.8x]", drv->status, CPU_CS, CPU_EIP));
+			//}
 		}
 		//if(drv->device==IDETYPE_CDROM){
 			//TRACEOUT(("ideio alt status %.2x [%.4x:%.8x]", drv->status, CPU_CS, CPU_EIP));
@@ -1164,9 +1170,9 @@ void IOOUTCALL ideio_w16(UINT port, REG16 value) {
 		{
 			IDEDEV	dev;
 			dev = getidedev();
-			if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
-				TRACEOUT(("ide-data send %.4x (%.4x) [%.4x:%.8x]", value, drv->bufpos, CPU_CS, CPU_EIP));
-			}
+			//if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
+			//	TRACEOUT(("ide-data send %.4x (%.4x) [%.4x:%.8x]", value, drv->bufpos, CPU_CS, CPU_EIP));
+			//}
 		}
 		//TRACEOUT(("ide-data send %.4x (%.4x) [%.4x:%.8x]",
 		//								value, drv->bufpos, CPU_CS, CPU_EIP));
@@ -1226,7 +1232,7 @@ REG16 IOINPCALL ideio_r16(UINT port) {
 			IDEDEV	dev;
 			dev = getidedev();
 			if(dev->drivesel==1 && (ideio.bank[1] & 0x7f)==0){
-				TRACEOUT(("ide-data recv %.4x (%.4x) [%.4x:%.8x]", ret, drv->bufpos, CPU_CS, CPU_EIP));
+				//TRACEOUT(("ide-data recv %.4x (%.4x) [%.4x:%.8x]", ret, drv->bufpos, CPU_CS, CPU_EIP));
 			}
 		}
 		//if(rcvflg!=1){

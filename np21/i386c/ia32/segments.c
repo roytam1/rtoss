@@ -206,20 +206,20 @@ load_descriptor(descriptor_t *sdp, UINT32 addr)
 	memset(sdp, 0, sizeof(*sdp));
 	sdp->flag = 0;
 
-	sdp->p = (h & CPU_DESC_H_P) ? 1 : 0;
+	sdp->p = (h >> 15) & 1;//(h & CPU_DESC_H_P) ? 1 : 0;
 	sdp->type = (UINT8)((h & CPU_DESC_H_TYPE) >> CPU_DESC_H_TYPE_SHIFT);
 	sdp->dpl = (UINT8)((h & CPU_DESC_H_DPL) >> CPU_DESC_H_DPL_SHIFT);
-	sdp->s = (h & CPU_DESC_H_S) ? 1 : 0;
+	sdp->s = (h >> 12) & 1;//(h & CPU_DESC_H_S) ? 1 : 0;
 
 	if (!SEG_IS_SYSTEM(sdp)) {
 		/* code/data */
 		sdp->valid = 1;
-		sdp->d = (h & CPU_SEGDESC_H_D) ? 1 : 0;
+		sdp->d = (h >> 22) & 1;//(h & CPU_SEGDESC_H_D) ? 1 : 0;
 
-		sdp->u.seg.c = (h & CPU_SEGDESC_H_D_C) ? 1 : 0;
-		sdp->u.seg.g = (h & CPU_SEGDESC_H_G) ? 1 : 0;
-		sdp->u.seg.wr = (sdp->type & CPU_SEGDESC_TYPE_WR) ? 1 : 0;
-		sdp->u.seg.ec = (sdp->type & CPU_SEGDESC_TYPE_EC) ? 1 : 0;
+		sdp->u.seg.c = (h >> 11) & 1;//(h & CPU_SEGDESC_H_D_C) ? 1 : 0;
+		sdp->u.seg.g = (h >> 23) & 1;//(h & CPU_SEGDESC_H_G) ? 1 : 0;
+		sdp->u.seg.wr = (sdp->type & CPU_SEGDESC_TYPE_WR) >> 1;// ? 1 : 0;
+		sdp->u.seg.ec = (sdp->type & CPU_SEGDESC_TYPE_EC) >> 2;// ? 1 : 0;
 
 		sdp->u.seg.segbase  = (l >> 16) & 0xffff;
 		sdp->u.seg.segbase |= (h & 0xff) << 16;
@@ -237,7 +237,7 @@ load_descriptor(descriptor_t *sdp, UINT32 addr)
 		switch (sdp->type) {
 		case CPU_SYSDESC_TYPE_LDT:		/* LDT */
 			sdp->valid = 1;
-			sdp->u.seg.g = (h & CPU_SEGDESC_H_G) ? 1 : 0;
+			sdp->u.seg.g = (h >> 23) & 1;//(h & CPU_SEGDESC_H_G) ? 1 : 0;
 
 			sdp->u.seg.segbase  = h & 0xff000000;
 			sdp->u.seg.segbase |= (h & 0xff) << 16;
@@ -260,8 +260,8 @@ load_descriptor(descriptor_t *sdp, UINT32 addr)
 		case CPU_SYSDESC_TYPE_TSS_32:		/* 386 TSS */
 		case CPU_SYSDESC_TYPE_TSS_BUSY_32:	/* 386 TSS Busy */
 			sdp->valid = 1;
-			sdp->d = (h & CPU_GATEDESC_H_D) ? 1 : 0;
-			sdp->u.seg.g = (h & CPU_SEGDESC_H_G) ? 1 : 0;
+			sdp->d = (h >> 11) & 1;//(h & CPU_GATEDESC_H_D) ? 1 : 0;
+			sdp->u.seg.g = (h >> 23) & 1;//(h & CPU_SEGDESC_H_G) ? 1 : 0;
 
 			sdp->u.seg.segbase  = h & 0xff000000;
 			sdp->u.seg.segbase |= (h & 0xff) << 16;
@@ -282,7 +282,7 @@ load_descriptor(descriptor_t *sdp, UINT32 addr)
 		case CPU_SYSDESC_TYPE_TRAP_32:		/* 386 trap gate */
 			if ((h & 0x0000000e0) == 0) {
 				sdp->valid = 1;
-				sdp->d = (h & CPU_GATEDESC_H_D) ? 1 : 0;
+				sdp->d = (h >> 11) & 1;//(h & CPU_GATEDESC_H_D) ? 1 : 0;
 				sdp->u.gate.selector = (UINT16)(l >> 16);
 				sdp->u.gate.offset  = h & 0xffff0000;
 				sdp->u.gate.offset |= l & 0xffff;

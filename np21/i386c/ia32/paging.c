@@ -107,6 +107,7 @@
  * |  p  |  u  |  u  |  w  |  w  | o |
  * +-----+-----------+-----+-----+---+
  */
+//#define USE_PAGE_ACCESS_TABLE
 #if !defined(USE_PAGE_ACCESS_TABLE)
 #define	page_access	0xd0ddd0ff
 #else	/* USE_PAGE_ACCESS_TABLE */
@@ -204,9 +205,9 @@ UINT8 MEMCALL
 cpu_memory_access_la_RMW_b(UINT32 laddr, UINT32 (CPUCALL *func)(UINT32, void *), void *arg)
 {
 	const int ucrw = CPU_PAGE_WRITE_DATA | CPU_STAT_USER_MODE;
-	register UINT32 paddr;
-	register UINT32 result;
-	register UINT8 value;
+	UINT32 paddr;
+	UINT32 result;
+	UINT8 value;
 
 	paddr = paging(laddr, ucrw);
 	value = cpu_memoryread(paddr);
@@ -220,8 +221,8 @@ cpu_memory_access_la_RMW_w(UINT32 laddr, UINT32 (CPUCALL *func)(UINT32, void *),
 {
 	const int ucrw = CPU_PAGE_WRITE_DATA | CPU_STAT_USER_MODE;
 	UINT32 paddr[2];
-	register UINT32 result;
-	register UINT16 value;
+	UINT32 result;
+	UINT16 value;
 
 	paddr[0] = paging(laddr, ucrw);
 	if ((laddr + 1) & CPU_PAGE_MASK) {
@@ -245,9 +246,9 @@ cpu_memory_access_la_RMW_d(UINT32 laddr, UINT32 (CPUCALL *func)(UINT32, void *),
 {
 	const int ucrw = CPU_PAGE_WRITE_DATA | CPU_STAT_USER_MODE;
 	UINT32 paddr[2];
-	register UINT32 result;
-	register UINT32 value;
-	register int remain;
+	UINT32 result;
+	UINT32 value;
+	int remain;
 
 	paddr[0] = paging(laddr, ucrw);
 	remain = CPU_PAGE_SIZE - (laddr & CPU_PAGE_MASK);
@@ -308,7 +309,7 @@ UINT16 MEMCALL
 cpu_linear_memory_read_w(UINT32 laddr, int ucrw)
 {
 	UINT32 paddr[2];
-	register UINT16 value;
+	UINT16 value;
 
 	paddr[0] = paging(laddr, ucrw);
 	if ((laddr + 1) & CPU_PAGE_MASK)
@@ -324,8 +325,8 @@ UINT32 MEMCALL
 cpu_linear_memory_read_d(UINT32 laddr, int ucrw)
 {
 	UINT32 paddr[2];
-	register UINT32 value;
-	register UINT remain;
+	UINT32 value;
+	UINT remain;
 
 	paddr[0] = paging(laddr, ucrw);
 	remain = CPU_PAGE_SIZE - (laddr & CPU_PAGE_MASK);
@@ -363,8 +364,8 @@ UINT64 MEMCALL
 cpu_linear_memory_read_q(UINT32 laddr, int ucrw)
 {
 	UINT32 paddr[2];
-	register UINT64 value;
-	register UINT remain;
+	UINT64 value;
+	UINT remain;
 
 	paddr[0] = paging(laddr, ucrw);
 	remain = CPU_PAGE_SIZE - (laddr & CPU_PAGE_MASK);
@@ -430,9 +431,9 @@ REG80 MEMCALL
 cpu_linear_memory_read_f(UINT32 laddr, int ucrw)
 {
 	UINT32 paddr[2];
-	register REG80 value;
-	register UINT remain;
-	register UINT i, j;
+	REG80 value;
+	UINT remain;
+	UINT i, j;
 
 	paddr[0] = paging(laddr, ucrw);
 	remain = CPU_PAGE_SIZE - (laddr & CPU_PAGE_MASK);
@@ -477,7 +478,7 @@ void MEMCALL
 cpu_linear_memory_write_d(UINT32 laddr, UINT32 value, int ucrw)
 {
 	UINT32 paddr[2];
-	register UINT remain;
+	UINT remain;
 
 	paddr[0] = paging(laddr, ucrw);
 	remain = CPU_PAGE_SIZE - (laddr & CPU_PAGE_MASK);
@@ -515,7 +516,7 @@ void MEMCALL
 cpu_linear_memory_write_q(UINT32 laddr, UINT64 value, int ucrw)
 {
 	UINT32 paddr[2];
-	register UINT remain;
+	UINT remain;
 
 	paddr[0] = paging(laddr, ucrw);
 	remain = CPU_PAGE_SIZE - (laddr & CPU_PAGE_MASK);
@@ -581,8 +582,8 @@ void MEMCALL
 cpu_linear_memory_write_f(UINT32 laddr, const REG80 *value, int ucrw)
 {
 	UINT32 paddr[2];
-	register UINT remain;
-	register UINT i, j;
+	UINT remain;
+	UINT i, j;
 
 	paddr[0] = paging(laddr, ucrw);
 	remain = CPU_PAGE_SIZE - (laddr & CPU_PAGE_MASK);
@@ -606,9 +607,9 @@ cpu_linear_memory_write_f(UINT32 laddr, const REG80 *value, int ucrw)
 void MEMCALL
 cpu_memory_access_la_region(UINT32 laddr, UINT length, int ucrw, UINT8 *data)
 {
-	register UINT32 paddr;
-	register UINT remain;	/* page remain */
-	register UINT r;
+	UINT32 paddr;
+	UINT remain;	/* page remain */
+	UINT r;
 
 	while (length > 0) {
 		remain = CPU_PAGE_SIZE - (laddr & CPU_PAGE_MASK);
@@ -711,7 +712,7 @@ paging(UINT32 laddr, int ucrw)
 		cpu_memorywrite_d(pte_addr, pte);
 	}
 
-	tlb_update(laddr, pte, (bit & (CPU_PTE_WRITABLE|CPU_PTE_USER_MODE)) + ((ucrw & CPU_PAGE_CODE) ? 1 : 0));
+	tlb_update(laddr, pte, (bit & (CPU_PTE_WRITABLE|CPU_PTE_USER_MODE)) + ((ucrw & CPU_PAGE_CODE)>>1/* ? 1 : 0*/));
 
 	return paddr;
 
@@ -774,6 +775,7 @@ tlb_init(void)
 void MEMCALL
 tlb_flush(BOOL allflush)
 {
+	tlb_t *tt;
 	struct tlb_entry *ep;
 	register int i;
 	register int n;
@@ -783,13 +785,16 @@ tlb_flush(BOOL allflush)
 		return;
 	}
 
+	tt = tlb;
 	for (n = 0; n < NTLB; n++) {
+		ep = tt->entry;
 		for (i = 0; i < NENTRY ; i++) {
-			ep = &tlb[n].entry[i];
 			if (TLB_IS_VALID(ep) && !TLB_IS_GLOBAL(ep)) {
 				TLB_SET_INVALID(ep);
 			}
+			ep++;
 		}
+		tt++;
 	}
 }
 
@@ -820,7 +825,7 @@ tlb_lookup(UINT32 laddr, int ucrw)
 	register int idx;
 	register int n;
 
-	n = (ucrw & CPU_PAGE_CODE) ? 1 : 0;
+	n = (ucrw & CPU_PAGE_CODE)>>1;// ? 1 : 0;
 	idx = (laddr >> TLB_ENTRY_SHIFT) & TLB_ENTRY_MASK;
 	ep = &tlb[n].entry[idx];
 

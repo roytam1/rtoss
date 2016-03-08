@@ -11,7 +11,8 @@
 enum SoundPCMNumber
 {
 	SOUND_PCMSEEK		= 0,		/*!< ヘッド移動 */
-	SOUND_PCMSEEK1					/*!< 1クラスタ移動 */
+	SOUND_PCMSEEK1,					/*!< 1クラスタ移動 */
+	SOUND_RELAY1					/*!< リレー */
 };
 
 #ifdef __cplusplus

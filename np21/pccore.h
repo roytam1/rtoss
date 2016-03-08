@@ -152,6 +152,9 @@ struct tagNP2Config
 	UINT8	lgy98irq;
 	OEMCHAR	lgy98tap[MAX_PATH];
 #endif
+#ifdef SUPPORT_CL_GD5430
+	UINT8	usegd5430;
+#endif
 
 };
 typedef struct tagNP2Config  NP2CFG;		/*!< The define of config */

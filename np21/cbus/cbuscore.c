@@ -8,7 +8,7 @@
 #include	"scsiio.h"
 #include	"pc9861k.h"
 #include	"mpu98ii.h"
-#include	"video.h"
+#include	"video/video.h"
 
 
 static const FNIORESET resetfn[] = {

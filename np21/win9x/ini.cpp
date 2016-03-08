@@ -467,7 +467,7 @@ static const PFTBL s_IniItems[] =
 
 	PFEXT("DIPswtch", PFTYPE_BIN,		np2cfg.dipsw,			3),
 	PFEXT("MEMswtch", PFTYPE_BIN,		np2cfg.memsw,			8),
-	PFMAX("ExMemory", PFTYPE_UINT8,		&np2cfg.EXTMEM,			255),
+	PFMAX("ExMemory", PFTYPE_UINT8,		&np2cfg.EXTMEM,			1023),
 	PFVAL("ITF_WORK", PFRO_BOOL,		&np2cfg.ITF_WORK),
 
 	PFSTR("HDD1FILE", PFTYPE_STR,		np2cfg.sasihdd[0]),
@@ -543,9 +543,12 @@ static const PFTBL s_IniItems[] =
 	
 #if defined(SUPPORT_LGY98)
 	PFVAL("USELGY98", PFTYPE_BOOL,		&np2cfg.uselgy98),
-	PFMAX("LGY98_IO", PFTYPE_UINT16,	&np2cfg.lgy98io,		0x10D0),
-	PFMAX("LGY98IRQ", PFTYPE_UINT8,		&np2cfg.lgy98irq,		5),
+	PFVAL("LGY98_IO", PFTYPE_UINT16,	&np2cfg.lgy98io),
+	PFVAL("LGY98IRQ", PFTYPE_UINT8,		&np2cfg.lgy98irq),
 	PFSTR("LGY98TAP", PFTYPE_STR,		np2cfg.lgy98tap),
+#endif
+#if defined(SUPPORT_CL_GD5430)
+	PFVAL("USEGD5430", PFTYPE_BOOL,		&np2cfg.usegd5430),
 #endif
 
 	// OSàÀë∂ÅH

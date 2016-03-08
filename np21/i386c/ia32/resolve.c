@@ -334,9 +334,9 @@ ea32_ebx(void)
 static UINT32
 ea32_sib(void)
 {
-	UINT32 dst;
-	UINT32 op;
-	UINT32 base, idx, scale;
+	register UINT32 dst;
+	register UINT32 op;
+	register UINT32 base, idx, scale;
 
 	GET_PCBYTE(op);
 	base = op & 7;
@@ -372,7 +372,7 @@ ea32_sib(void)
 static UINT32
 ea32_disp32(void)
 {
-	UINT32 adrs;
+	register UINT32 adrs;
 
 	GET_PCDWORD(adrs);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -398,7 +398,7 @@ ea32_edi(void)
 static UINT32
 ea32_eax_disp8(void)
 {
-	SINT32 adrs;
+	register SINT32 adrs;
 
 	GET_PCBYTESD(adrs);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -408,7 +408,7 @@ ea32_eax_disp8(void)
 static UINT32
 ea32_ecx_disp8(void)
 {
-	SINT32 adrs;
+	register SINT32 adrs;
 
 	GET_PCBYTESD(adrs);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -418,7 +418,7 @@ ea32_ecx_disp8(void)
 static UINT32
 ea32_edx_disp8(void)
 {
-	SINT32 adrs;
+	register SINT32 adrs;
 
 	GET_PCBYTESD(adrs);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -428,7 +428,7 @@ ea32_edx_disp8(void)
 static UINT32
 ea32_ebx_disp8(void)
 {
-	SINT32 adrs;
+	register SINT32 adrs;
 
 	GET_PCBYTESD(adrs);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -438,9 +438,9 @@ ea32_ebx_disp8(void)
 static UINT32
 ea32_sib_disp8(void)
 {
-	SINT32 adrs;
-	UINT32 op;
-	UINT32 base, idx, scale;
+	register SINT32 adrs;
+	register UINT32 op;
+	register UINT32 base, idx, scale;
 
 	GET_PCBYTE(op);
 	base = op & 7;
@@ -466,7 +466,7 @@ ea32_sib_disp8(void)
 static UINT32
 ea32_ebp_disp8(void)
 {
-	SINT32 adrs;
+	register SINT32 adrs;
 
 	GET_PCBYTESD(adrs);
 	CPU_INST_SEGREG_INDEX = SS_FIX;
@@ -476,7 +476,7 @@ ea32_ebp_disp8(void)
 static UINT32
 ea32_esi_disp8(void)
 {
-	SINT32 adrs;
+	register SINT32 adrs;
 
 	GET_PCBYTESD(adrs);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -486,7 +486,7 @@ ea32_esi_disp8(void)
 static UINT32
 ea32_edi_disp8(void)
 {
-	SINT32 adrs;
+	register SINT32 adrs;
 
 	GET_PCBYTESD(adrs);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -496,7 +496,7 @@ ea32_edi_disp8(void)
 static UINT32
 ea32_eax_disp32(void)
 {
-	UINT32 adrs;
+	register UINT32 adrs;
 
 	GET_PCDWORD(adrs);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -506,7 +506,7 @@ ea32_eax_disp32(void)
 static UINT32
 ea32_ecx_disp32(void)
 {
-	UINT32 adrs;
+	register UINT32 adrs;
 
 	GET_PCDWORD(adrs);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -516,7 +516,7 @@ ea32_ecx_disp32(void)
 static UINT32
 ea32_edx_disp32(void)
 {
-	UINT32 adrs;
+	register UINT32 adrs;
 
 	GET_PCDWORD(adrs);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -526,7 +526,7 @@ ea32_edx_disp32(void)
 static UINT32
 ea32_ebx_disp32(void)
 {
-	UINT32 adrs;
+	register UINT32 adrs;
 
 	GET_PCDWORD(adrs);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -536,9 +536,9 @@ ea32_ebx_disp32(void)
 static UINT32
 ea32_sib_disp32(void)
 {
-	UINT32 adrs;
-	UINT32 op;
-	UINT32 base, idx, scale;
+	register UINT32 adrs;
+	register UINT32 op;
+	register UINT32 base, idx, scale;
 
 	GET_PCBYTE(op);
 	base = op & 7;
@@ -564,7 +564,7 @@ ea32_sib_disp32(void)
 static UINT32
 ea32_ebp_disp32(void)
 {
-	UINT32 adrs;
+	register UINT32 adrs;
 
 	GET_PCDWORD(adrs);
 	CPU_INST_SEGREG_INDEX = SS_FIX;
@@ -574,7 +574,7 @@ ea32_ebp_disp32(void)
 static UINT32
 ea32_esi_disp32(void)
 {
-	UINT32 adrs;
+	register UINT32 adrs;
 
 	GET_PCDWORD(adrs);
 	CPU_INST_SEGREG_INDEX = DS_FIX;
@@ -584,7 +584,7 @@ ea32_esi_disp32(void)
 static UINT32
 ea32_edi_disp32(void)
 {
-	UINT32 adrs;
+	register UINT32 adrs;
 
 	GET_PCDWORD(adrs);
 	CPU_INST_SEGREG_INDEX = DS_FIX;

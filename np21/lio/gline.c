@@ -309,7 +309,7 @@ REG8 lio_gline(GLIO lio) {
 	lp.x2 = (SINT16)LOADINTELWORD(dat.x2);
 	lp.y2 = (SINT16)LOADINTELWORD(dat.y2);
 
-	TRACEOUT(("lio_gline %d,%d-%d,%d [%d]", lp.x1, lp.y1, lp.x2, lp.y2, dat.type));
+	//TRACEOUT(("lio_gline %d,%d-%d,%d [%d]", lp.x1, lp.y1, lp.x2, lp.y2, dat.type));
 
 	if (dat.pal == 0xff) {
 		dat.pal = lio->work.fgcolor;

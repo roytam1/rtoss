@@ -1,3 +1,4 @@
+
 #if defined(SUPPORT_LGY98)
 
 typedef void IOReadHandler(void *opaque, const UINT8 *buf, int size);

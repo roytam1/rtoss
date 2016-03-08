@@ -61,6 +61,7 @@ void sysmng_updatecaption(UINT8 flag) {
 			milstr_ncat(title, file_getname(fdd_diskname(1)),
 															NELEMENTS(title));
 		}
+#ifdef SUPPORT_IDEIO
 		if (strlen(np2cfg.idecd[0])) {
 			milstr_ncat(title, OEMTEXT("  CD1:"), NELEMENTS(title));
 			milstr_ncat(title, file_getname(np2cfg.idecd[0]),
@@ -71,6 +72,7 @@ void sysmng_updatecaption(UINT8 flag) {
 			milstr_ncat(title, file_getname(np2cfg.idecd[1]),
 															NELEMENTS(title));
 		}
+#endif
 	}
 	if (flag & 2) {
 		clock[0] = '\0';

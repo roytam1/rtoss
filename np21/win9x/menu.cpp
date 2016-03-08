@@ -271,13 +271,21 @@ void xmenu_initialize(HMENU hMenu)
 #endif
 		InsertMenuString(hMenu, nPos, MF_BYPOSITION | MF_POPUP, (UINT_PTR)hmenuSub, IDS_HDD);
 	}
-
+	
 #if defined(SUPPORT_PX)
 	(void)menu_addmenubyid(hMenu, IDM_SPARKBOARD, IDR_PXMENU);
 #endif
 
 #if defined(SUPPORT_WAVEREC)
 	(void)menu_addmenubyid(hMenu, IDM_S98LOGGING, IDR_WAVEREC);
+#endif
+	
+#ifndef SUPPORT_LGY98
+	EnableMenuItem(hMenu, IDM_NETOPT, MF_BYCOMMAND|MFS_GRAYED);
+#endif
+	
+#ifndef SUPPORT_CL_GD5430
+	EnableMenuItem(hMenu, IDM_WABOPT, MF_BYCOMMAND|MFS_GRAYED);
 #endif
 
 	if (np2oscfg.I286SAVE)
@@ -366,11 +374,15 @@ void xmenu_update(HMENU hMenu)
 	// Device-Memory
 	const UINT8 EXTMEM = np2cfg.EXTMEM;
 	CheckMenuItem(hMenu, IDM_MEM640, MF_BYCOMMAND | MFCHECK(EXTMEM == 0));
-	CheckMenuItem(hMenu, IDM_MEM16, MF_BYCOMMAND | MFCHECK(EXTMEM == 1));
-	CheckMenuItem(hMenu, IDM_MEM36, MF_BYCOMMAND | MFCHECK(EXTMEM == 3));
-	CheckMenuItem(hMenu, IDM_MEM76, MF_BYCOMMAND | MFCHECK(EXTMEM == 7));
+	CheckMenuItem(hMenu, IDM_MEM16,  MF_BYCOMMAND | MFCHECK(EXTMEM == 1));
+	CheckMenuItem(hMenu, IDM_MEM36,  MF_BYCOMMAND | MFCHECK(EXTMEM == 3));
+	CheckMenuItem(hMenu, IDM_MEM76,  MF_BYCOMMAND | MFCHECK(EXTMEM == 7));
 	CheckMenuItem(hMenu, IDM_MEM116, MF_BYCOMMAND | MFCHECK(EXTMEM == 11));
 	CheckMenuItem(hMenu, IDM_MEM136, MF_BYCOMMAND | MFCHECK(EXTMEM == 13));
+	CheckMenuItem(hMenu, IDM_MEM166, MF_BYCOMMAND | MFCHECK(EXTMEM == 16));
+	CheckMenuItem(hMenu, IDM_MEM326, MF_BYCOMMAND | MFCHECK(EXTMEM == 32));
+	CheckMenuItem(hMenu, IDM_MEM646, MF_BYCOMMAND | MFCHECK(EXTMEM == 64));
+	CheckMenuItem(hMenu, IDM_MEM1206,MF_BYCOMMAND | MFCHECK(EXTMEM == 120));
 
 	// Device
 	CheckMenuItem(hMenu, IDM_MOUSE, MF_BYCOMMAND | MFCHECK(np2oscfg.MOUSE_SW));
@@ -393,4 +405,6 @@ void xmenu_update(HMENU hMenu)
 	CheckMenuItem(hMenu, IDM_JOYX, MF_BYCOMMAND | MFCHECK(np2cfg.BTN_MODE));
 	CheckMenuItem(hMenu, IDM_RAPID, MF_BYCOMMAND | MFCHECK(np2cfg.BTN_RAPID));
 	CheckMenuItem(hMenu, IDM_MSRAPID, MF_BYCOMMAND | MFCHECK(np2cfg.MOUSERAPID));
+	
+	CheckMenuItem(hMenu, IDM_ITFWORK, MF_BYCOMMAND | MFCHECK(np2cfg.ITF_WORK));
 }
