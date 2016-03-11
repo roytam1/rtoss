@@ -62,12 +62,12 @@ void sysmng_updatecaption(UINT8 flag) {
 															NELEMENTS(title));
 		}
 #ifdef SUPPORT_IDEIO
-		if (strlen(np2cfg.idecd[0])) {
+		if (*(np2cfg.idecd[0])) {
 			milstr_ncat(title, OEMTEXT("  CD1:"), NELEMENTS(title));
 			milstr_ncat(title, file_getname(np2cfg.idecd[0]),
 															NELEMENTS(title));
 		}
-		if (strlen(np2cfg.idecd[1])){//sxsi_getdevtype(3)!=SXSIDEV_NC) {
+		if (*(np2cfg.idecd[1])){//sxsi_getdevtype(3)!=SXSIDEV_NC) {
 			milstr_ncat(title, OEMTEXT("  CD2:"), NELEMENTS(title));
 			milstr_ncat(title, file_getname(np2cfg.idecd[1]),
 															NELEMENTS(title));

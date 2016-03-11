@@ -109,6 +109,91 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="..\bin\$(SolutionName)\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\obj\$(SolutionName)\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
+			ConfigurationType="1"
+			CharacterSet="1"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="NASM"
+				IncludePaths=".\x86\;..\i386c\x86\;..\io\x86\"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="YASM"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories=".\;.\x86;.\dialog;..\;..\common;..\i386c;..\i386c\ia32;..\i386c\ia32\instructions;..\i386c\ia32\instructions\fpu;..\mem;..\io;..\cbus;..\vram;..\sound;..\generic;..\zlib;&quot;F:\Microsoft DirectX SDK June 2010\Include&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;SUPPORT_PC9821;SUPPORT_LARGE_HDD;SUPPORT_IDEIO;SUPPORT_LGY98;SUPPORT_CL_GD5430"
+				RuntimeLibrary="0"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_UNICODE;UNICODE;SUPPORT_PC9821"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;F:\Microsoft DirectX SDK June 2010\Lib\x86&quot;"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
 			Name="Debug|x64"
 			OutputDirectory="..\bin\$(SolutionName)\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="..\obj\$(SolutionName)\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
@@ -168,90 +253,6 @@
 				SubSystem="2"
 				LargeAddressAware="1"
 				TargetMachine="17"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="..\bin\$(SolutionName)\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="..\obj\$(SolutionName)\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
-			ConfigurationType="1"
-			CharacterSet="1"
-			WholeProgramOptimization="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="NASM"
-				IncludePaths=".\x86\;..\i386c\x86\;..\io\x86\"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="YASM"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".\;.\x86;.\dialog;..\;..\common;..\i386c;..\i386c\ia32;..\i386c\ia32\instructions;..\i386c\ia32\instructions\fpu;..\mem;..\io;..\cbus;..\vram;..\sound;..\generic;..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;SUPPORT_PC9821"
-				RuntimeLibrary="0"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_UNICODE;UNICODE;SUPPORT_PC9821"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				LinkIncremental="1"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -592,7 +593,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|x64"
+						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -600,7 +601,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Release|Win32"
+						Name="Debug|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -899,6 +900,10 @@
 							>
 							<File
 								RelativePath="..\i386c\ia32\instructions\fpu\fpdummy.c"
+								>
+							</File>
+							<File
+								RelativePath="..\i386c\ia32\instructions\fpu\fpemul.c"
 								>
 							</File>
 						</Filter>
@@ -1272,7 +1277,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|x64"
+						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1280,7 +1285,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Release|Win32"
+						Name="Debug|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1496,6 +1501,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\dialog\d_network.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\dialog\d_screen.cpp"
 						>
 					</File>
@@ -1505,6 +1514,10 @@
 					</File>
 					<File
 						RelativePath=".\dialog\d_sound.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\dialog\d_wab.cpp"
 						>
 					</File>
 					<File
@@ -1750,6 +1763,30 @@
 				</File>
 				<File
 					RelativePath="..\zlib\zutil.c"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="network"
+				>
+				<File
+					RelativePath="..\network\lgy98.c"
+					>
+				</File>
+				<File
+					RelativePath="..\network\net.c"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="video"
+				>
+				<File
+					RelativePath="..\video\cirrus_vga.c"
+					>
+				</File>
+				<File
+					RelativePath="..\video\video.c"
 					>
 				</File>
 			</Filter>
@@ -2844,6 +2881,42 @@
 				</File>
 				<File
 					RelativePath="..\zlib\zutil.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="network"
+				>
+				<File
+					RelativePath="..\network\lgy98.h"
+					>
+				</File>
+				<File
+					RelativePath="..\network\lgy98dev.h"
+					>
+				</File>
+				<File
+					RelativePath="..\network\net.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="video"
+				>
+				<File
+					RelativePath="..\video\cirrus_vga_rop.h"
+					>
+				</File>
+				<File
+					RelativePath="..\video\cirrus_vga_rop2.h"
+					>
+				</File>
+				<File
+					RelativePath="..\video\vga_int.h"
+					>
+				</File>
+				<File
+					RelativePath="..\video\video.h"
 					>
 				</File>
 			</Filter>
