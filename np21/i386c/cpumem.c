@@ -317,7 +317,7 @@ static const MEMFNF memfnf = {
 	   
 #if defined(SUPPORT_CL_GD5430)
 #define VRAMWINDOW_SIZE	0x200000  // VRAM マッピングサイズ
-#define EXT_WINDOW_SIZE	0x200000  // 謎
+#define EXT_WINDOW_SIZE	0x400000  // 謎
 #define EXT_WINDOW_SHFT	0x000000  // 謎
 #define BBLTWINDOW_ADSH	0x1000000 // VRAM BITBLT
 #define BBLTWINDOW_SIZE	0x400000  // VRAM BITBLT マッピングサイズ

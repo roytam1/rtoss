@@ -1723,7 +1723,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst,
 #endif
 
 	scrndraw_redraw();
-	
+
 #ifdef SUPPORT_IDEIO
 	ideio_init();
 #endif

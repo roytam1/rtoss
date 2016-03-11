@@ -54,14 +54,14 @@ BEGIN
 #else
 #ifdef SUPPORT_PC9821
             VALUE "FileDescription", "PC-9821series emulator\0"
-            VALUE "ProductName", "Neko Project 21\0"
+            VALUE "ProductName", "Neko Project 21/W\0"
 #else
             VALUE "FileDescription", "PC-9801series emulator\0"
             VALUE "ProductName", "Neko Project II\0"
 #endif
 #ifdef SUPPORT_PC9821
-            VALUE "InternalName", "np21\0"
-            VALUE "OriginalFilename", "np21.exe\0"
+            VALUE "InternalName", "np21w\0"
+            VALUE "OriginalFilename", "np21w.exe\0"
 #else
             VALUE "InternalName", "np2\0"
             VALUE "OriginalFilename", "np2.exe\0"

@@ -147,7 +147,11 @@ static HBITMAP skinload(const OEMCHAR *path) {
 			return(ret);
 		}
 	}
+#ifdef SUPPORT_PC9821
+	return(LoadBitmap(g_hInstance, _T("NP21TOOL")));
+#else
 	return(LoadBitmap(g_hInstance, _T("NP2TOOL")));
+#endif
 }
 
 

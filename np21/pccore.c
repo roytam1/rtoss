@@ -48,6 +48,9 @@
 #include	"timing.h"
 #include	"keystat.h"
 #include	"debugsub.h"
+#if defined(SUPPORT_CL_GD5430)
+#include	"video/video.h"
+#endif
 
 
 const OEMCHAR np2version[] = OEMTEXT(NP2VER_CORE);
@@ -659,6 +662,9 @@ void pccore_exec(BOOL draw) {
 			pic_irq();
 			if (CPU_RESETREQ) {
 				CPU_RESETREQ = 0;
+#if defined(SUPPORT_CL_GD5430)
+				np2vga_resetRelay();
+#endif
 				CPU_SHUT();
 			}
 #if !defined(SINGLESTEPONLY)

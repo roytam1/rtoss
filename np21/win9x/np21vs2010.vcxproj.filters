@@ -1849,5 +1849,8 @@
     <None Include="resources\relay1.wav">
       <Filter>リソース ファイル</Filter>
     </None>
+    <None Include="resources\np21tool.bmp">
+      <Filter>リソース ファイル</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -10,6 +10,7 @@
 #include	"pccore.h"
 #include	"iocore.h"
 #include	"video.h"
+#include	"soundmng.h"
 
 BITMAPINFO bmpInfo = {0};
 DisplayState ds = {0};
@@ -161,5 +162,13 @@ DisplayState *graphic_console_init(vga_hw_update_ptr update,
 	return &ds;
 }
 
+void np2vga_resetRelay()
+{
+	ShowWindow(g_hWndVGA, SW_HIDE);
+	if(ga_relay){
+		soundmng_pcmplay(SOUND_RELAY1, FALSE);
+		ga_relay = 0;
+	}
+}
 
 #endif	/* SUPPORT_CL_GD5430 */

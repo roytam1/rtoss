@@ -127,6 +127,8 @@ void np2vga_init(HINSTANCE g_hInstance);
 void np2vga_drawframe();
 void np2vga_shutdown();
 
+void np2vga_resetRelay();
+
 void cirrusvga_drawGraphic();
 
 #ifdef __cplusplus

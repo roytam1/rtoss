@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>np21</ProjectName>
+    <ProjectName>np21w</ProjectName>
     <ProjectGuid>{5DA72513-B262-42D0-A420-EDDA228EE6DC}</ProjectGuid>
-    <RootNamespace>np21vs2010</RootNamespace>
+    <RootNamespace>np21vs2008</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -84,6 +84,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <NASM>
       <IncludePaths>.\x86\;..\i386c\x86\;..\io\x86\</IncludePaths>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
     </NASM>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -136,12 +137,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NASM>
       <IncludePaths>.\x86\;..\i386c\x86\;..\io\x86\</IncludePaths>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
     </NASM>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>.\;.\x86;.\dialog;..\;..\common;..\i386c;..\i386c\ia32;..\i386c\ia32\instructions;..\i386c\ia32\instructions\fpu;..\mem;..\io;..\cbus;..\vram;..\sound;..\generic;..\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NON_CONFORMING_SWPRINTFS;SUPPORT_PC9821;SUPPORT_LARGE_HDD;SUPPORT_IDEIO;SUPPORT_LGY98;SUPPORT_CL_GD5430;TRACE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NON_CONFORMING_SWPRINTFS;SUPPORT_PC9821;SUPPORT_LARGE_HDD;SUPPORT_IDEIO;SUPPORT_LGY98;SUPPORT_CL_GD5430;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <PrecompiledHeader>
@@ -785,6 +787,7 @@
     <None Include="resources\np2.ico" />
     <None Include="resources\np2debug.ico" />
     <None Include="resources\np2tool.bmp" />
+    <None Include="resources\np21tool.bmp" />
     <None Include="resources\relay1.wav" />
     <None Include="x64\np2asm.inc" />
     <None Include="x64\pccore.inc" />

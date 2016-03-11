@@ -1186,6 +1186,7 @@ END
 
 NP2BMP                  BITMAP                  "..\\nekop2.bmp"
 NP2TOOL                 BITMAP                  "..\\np2tool.bmp"
+NP21TOOL                BITMAP                  "..\\np21tool.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
