@@ -209,7 +209,7 @@ BOOL CVisualBoyHandler::Read(DWORD_PTR dwBaseAddr, DWORD_PTR dwSize, LPVOID lpBu
 {
 	CONST VBA_PtrEntry *ppe = reinterpret_cast<CONST VBA_PtrEntry *>(&m_PtrStruct);
 	DWORD_PTR	dwIndex = (dwBaseAddr & 0x0F000000) >> 24;
-	DWORD_PTR	dwOffset = dwBaseAddr & 0x00FFFFFF;
+	DWORD_PTR	dwOffset = dwBaseAddr & 0x01FFFFFF;
 
 	if(dwOffset + dwSize <= ppe[dwIndex].dwSize)
 	{
@@ -225,7 +225,7 @@ BOOL CVisualBoyHandler::ReadRom(DWORD_PTR dwBaseAddr, DWORD_PTR dwSize, LPVOID l
 {
 	CONST VBA_PtrEntry *ppe = reinterpret_cast<CONST VBA_PtrEntry *>(&m_PtrStruct);
 	DWORD_PTR	dwIndex = 0x08000000 >> 24;	// rom
-	DWORD_PTR	dwOffset = dwBaseAddr & 0x00FFFFFF;
+	DWORD_PTR	dwOffset = dwBaseAddr & 0x01FFFFFF;
 
 	if(dwOffset + dwSize <= ppe[dwIndex].dwSize)
 	{
@@ -241,7 +241,7 @@ BOOL CVisualBoyHandler::Write(DWORD_PTR dwBaseAddr, DWORD_PTR dwSize, LPCVOID lp
 {
 	CONST VBA_PtrEntry *ppe = reinterpret_cast<CONST VBA_PtrEntry *>(&m_PtrStruct);
 	DWORD_PTR	dwIndex = (dwBaseAddr & 0x0F000000) >> 24;
-	DWORD_PTR	dwOffset = dwBaseAddr & 0x00FFFFFF;
+	DWORD_PTR	dwOffset = dwBaseAddr & 0x01FFFFFF;
 
 	if(dwOffset + dwSize <= ppe[dwIndex].dwSize)
 	{
