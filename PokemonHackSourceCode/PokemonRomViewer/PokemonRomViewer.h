@@ -112,3 +112,4 @@ public:
 extern CPokemonRomViewerApp theApp;
 extern ConfigStruct	cfg;
 extern CPokemonRom	rom;
+extern DWORD	g_dwExtraBreeds;

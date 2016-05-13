@@ -73,7 +73,13 @@ void CEncWaterPage::OnConfigChanged(BOOL bRomChanged, BOOL bUILangChanged)
 				szText = szIndex + cfg.pBreedNameList[wBreed].rgszText[cfg.dwLang];
 				m_ctrlBrdList[dwIndex].AddString(szText);
 			}
-			if(wCurBreed < BREED_COUNT)
+			for(wBreed = BREED_COUNT; wBreed < BREED_COUNT+g_dwExtraBreeds; ++wBreed)
+			{
+				szIndex.Format(szFmt33[cfg.dwCount], wBreed);
+				szText = szIndex + _T("?");
+				m_ctrlBrdList[dwIndex].AddString(szText);
+			}
+			if(wCurBreed < BREED_COUNT+g_dwExtraBreeds)
 				m_ctrlBrdList[dwIndex].SetCurSel(wCurBreed);
 		}
 
@@ -160,7 +166,7 @@ void CEncWaterPage::GetBreed(DWORD dwIndex)
 	{
 		pEntry = &(m_pWaterList->rgEntry[dwIndex]);
 		wBreed = m_ctrlBrdList[dwIndex].GetCurSel();
-		if(wBreed < BREED_COUNT && wBreed != pEntry->wBreed)
+		if(wBreed < BREED_COUNT+g_dwExtraBreeds && wBreed != pEntry->wBreed)
 		{
 			pEntry->wBreed = wBreed;
 			SetBrdImage(dwIndex);
@@ -172,7 +178,7 @@ void CEncWaterPage::SetBreed(DWORD dwIndex)
 {
 	if(	m_pWaterList &&
 		dwIndex < ENC_WATER_ENTRY_COUNT &&
-		theApp.m_dlgBreed.m_wCurBreed < BREED_COUNT)
+		theApp.m_dlgBreed.m_wCurBreed < BREED_COUNT+g_dwExtraBreeds)
 	{
 		m_pWaterList->rgEntry[dwIndex].wBreed = theApp.m_dlgBreed.m_wCurBreed;
 		m_ctrlBrdList[dwIndex].SetCurSel(theApp.m_dlgBreed.m_wCurBreed);

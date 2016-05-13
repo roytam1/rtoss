@@ -10,6 +10,8 @@
 #define new DEBUG_NEW
 #endif
 
+DWORD	g_dwExtraBreeds = 0;
+
 StringEntry * GetEncNameEntry(WORD wAreaId)
 {
 	static DWORD	dwPreIndex = 0;
@@ -268,6 +270,7 @@ CPokemonRom		rom;
 #define VAL_ROM_PATH	_T("Rom Path")
 #define VAL_UI_LANG		_T("UI Language")
 #define VAL_UI_COUNT	_T("UI Count")
+#define VAL_EXTRABREEDS	_T("ExtraBreeds")
 
 // CPokemonRomViewerApp ≥ı ºªØ
 BOOL CPokemonRomViewerApp::InitInstance()
@@ -659,6 +662,7 @@ VOID CPokemonRomViewerApp::ReadConfig()
 	cfg.szRomPath = GetProfileString(SECTION_NAME, VAL_ROM_PATH, NULL);
 	cfg.dwCount = GetProfileInt(SECTION_NAME, VAL_UI_COUNT, ui_count_none);
 	cfg.dwLang = GetProfileInt(SECTION_NAME, VAL_UI_LANG, ui_lang_jp);
+	g_dwExtraBreeds = GetProfileInt(SECTION_NAME, VAL_EXTRABREEDS, 0);
 }
 
 VOID CPokemonRomViewerApp::WriteConfig()
