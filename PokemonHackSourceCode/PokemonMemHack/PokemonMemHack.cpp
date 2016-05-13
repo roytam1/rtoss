@@ -63,6 +63,7 @@ COLORREF	g_rgForeClrTable[] =
 };
 DWORD	g_dwForeClrCount = sizeof(g_rgForeClrTable) / sizeof(g_rgForeClrTable[0]);
 
+DWORD	g_dwExtraBreeds = 0;
 // CPokemonMemHackApp
 
 BEGIN_MESSAGE_MAP(CPokemonMemHackApp, CWinApp)
@@ -122,6 +123,7 @@ BOOL CPokemonMemHackApp::InitInstance()
 	{
 		CPokemonMemHackDlg dlg;
 		m_pMainWnd = &dlg;
+		ReadINI();
 		INT_PTR nResponse = dlg.DoModal();
 		if (nResponse == IDOK)
 		{
@@ -286,3 +288,13 @@ VOID CPokemonMemHackApp::DestroyStringLists()
 	}
 }
 
+VOID CPokemonMemHackApp::ReadINI()
+{
+	CString iniFile;
+
+	GetModuleFileName(NULL, iniFile.GetBufferSetLength(MAX_PATH), MAX_PATH);
+	iniFile = iniFile.Left(iniFile.ReverseFind(_T('.'))+1) + _T("ini");
+
+	g_dwExtraBreeds = GetPrivateProfileInt(_T("PokemonMemHack"),_T("ExtraBreeds"),0,iniFile.GetBuffer());
+
+}

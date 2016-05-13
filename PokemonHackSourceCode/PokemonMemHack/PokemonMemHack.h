@@ -60,6 +60,7 @@ public:
 
 	BOOL ReadStringLists();
 	VOID DestroyStringLists();
+	VOID ReadINI();
 
 // й╣ож
 
@@ -75,3 +76,4 @@ extern COLORREF	g_rgBackClrTable[];
 extern COLORREF	g_rgForeClrTable[];
 extern DWORD	g_dwBackClrCount;
 extern DWORD	g_dwForeClrCount;
+extern DWORD	g_dwExtraBreeds;

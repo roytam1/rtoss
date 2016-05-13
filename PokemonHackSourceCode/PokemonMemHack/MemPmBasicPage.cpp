@@ -160,6 +160,21 @@ void CMemPmBasicPage::OnChangeUILang(VOID)
 	{
 		m_ctrlBreedList.DeleteItem(BREED_COUNT);
 	}
+	/* HACK */
+	dwCount = m_ctrlBreedList.GetCount();
+	for(dwIndex = BREED_COUNT; dwIndex < BREED_COUNT+g_dwExtraBreeds; ++dwIndex)
+	{
+		cbei.iItem = dwIndex;
+		szText.Format(szFmt3[cfg.dwCount], dwIndex);
+		szText += _T("?");
+		cbei.pszText = szText.GetBuffer();
+		if(dwIndex < dwCount)
+			m_ctrlBreedList.SetItem(&cbei);
+		else if(dwIndex < BREED_COUNT+g_dwExtraBreeds)
+			m_ctrlBreedList.InsertItem(&cbei);
+		szText.ReleaseBuffer();
+	}
+	/* /HACK */
 	m_ctrlBreedList.SetCurSel(dwCurSel);
 
 	////////////////////////////////////////////////
