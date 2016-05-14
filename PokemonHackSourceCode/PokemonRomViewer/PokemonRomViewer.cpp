@@ -99,7 +99,7 @@ WORD TextToBreed(LPCTSTR szText)
 	LPCTSTR	szBreed = NULL;
 
 	wBreed = (WORD)(_tcstoul(szText, 0, 0));
-	if(wBreed >= BREED_COUNT)
+	if(wBreed >= BREED_COUNT+g_dwExtraBreeds)
 	{
 		wBreed = 0;
 	}

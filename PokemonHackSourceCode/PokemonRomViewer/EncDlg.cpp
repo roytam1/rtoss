@@ -458,7 +458,7 @@ BOOL CEncDlg::FindBreedInEnc(WORD wBreed, DWORD dwEncIndex, DWORD &dwEncType, DW
 	DWORD	dwEncEntryCount;
 	EncEntry *	pEncEntryList = NULL;
 
-	if(rom.m_bOpened && wBreed > 0 && wBreed < BREED_COUNT)
+	if(rom.m_bOpened && wBreed > 0 && wBreed < BREED_COUNT+g_dwExtraBreeds)
 	{
 		for(; dwEncType < ENC_PAGE_COUNT; ++dwEncType)
 		{
