@@ -53,6 +53,7 @@ typedef struct
   int proxy_port;
   const char *proxy_authorization;
   const char *user_agent;
+  const char *uri;
 } Http_destination;
 
 extern ssize_t http_get (int fd, Http_destination *dest);

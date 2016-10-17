@@ -1337,6 +1337,7 @@ tunnel_new_client (const char *host, int host_port,
   tunnel->dest.proxy_port = proxy_port;
   tunnel->dest.proxy_authorization = NULL;
   tunnel->dest.user_agent = NULL;
+  tunnel->dest.uri = NULL;
   /* -1 to allow for TUNNEL_DISCONNECT */
   tunnel->content_length = content_length - 1;
   tunnel->buf_ptr = tunnel->buf;
@@ -1438,6 +1439,24 @@ tunnel_opt (Tunnel *tunnel, const char *opt, void *data, int get_flag)
 	    free ((char *)tunnel->dest.user_agent);
 	  tunnel->dest.user_agent = strdup ((char *)data);
 	  if (tunnel->dest.user_agent == NULL)
+	    return -1;
+	}
+    }
+  else if (strcmp (opt, "uri") == 0)
+    {
+      if (get_flag)
+	{
+	  if (tunnel->dest.uri == NULL)
+	    *(char **)data = NULL;
+	  else
+	    *(char **)data = strdup (tunnel->dest.uri);
+	}
+      else
+	{
+	  if (tunnel->dest.uri != NULL)
+	    free ((char *)tunnel->dest.uri);
+	  tunnel->dest.uri = strdup ((char *)data);
+	  if (tunnel->dest.uri == NULL)
 	    return -1;
 	}
     }

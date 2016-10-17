@@ -115,6 +115,7 @@ write_all (int fd, void *data, size_t len)
   ssize_t n, m;
   char *wdata = data;
 
+//      log_annoying ("write (%s, %d) ...", wdata, len);
   for (n = 0; n < len; n += m)
     {
       log_annoying ("write (%d, %p, %d) ...", fd, wdata + n, len - n);
