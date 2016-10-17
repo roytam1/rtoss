@@ -11,7 +11,7 @@ two-way data path tunneled in HTTP requests.
 #include <stdlib.h>
 #include <unistd_.h>
 #include <signal.h>
-#include <sys/poll_.h>
+#include <poll.h>
 #include <sys/time.h>
 
 #include "common.h"
@@ -89,7 +89,11 @@ parse_arguments (int argc, char **argv, Arguments *arg)
   arg->content_length = DEFAULT_CONTENT_LENGTH;
   arg->pid_filename = NULL;
   arg->use_std = FALSE;
+#ifndef _WIN32
   arg->use_daemon = TRUE;
+#else
+  arg->use_daemon = FALSE;
+#endif
   arg->strict_content_length = FALSE;
   arg->keep_alive = DEFAULT_KEEP_ALIVE;
   arg->max_connection_age = DEFAULT_CONNECTION_MAX_TIME;
@@ -382,12 +386,17 @@ main (int argc, char **argv)
 	} else if (arg.use_std) {
 	  log_debug ("using stdin as fd");
 	  fd = 0;
+#ifndef _WIN32
 	  if (fcntl(fd,F_SETFL,O_NONBLOCK)==-1)
 	    {
 	      log_error ("couldn't set stdin to non-blocking mode: %s",
 			 strerror(errno));
 	      log_exit (1);
 	    }
+#else
+	  u_long mode = 1;
+	  ioctlsocket (fd, FIONBIO, &mode);
+#endif
 	  /* Usage of stdout (fd = 1) is checked later. */
 	}
 

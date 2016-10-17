@@ -1,0 +1,38 @@
+fd-hook.o: fd-hook.c ../config.h fd-hook.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/stdlib.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_mingw.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_mingw_mac.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/vadefs.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sdks/_mingw_directx.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sdks/_mingw_ddk.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/include-fixed/limits.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/include-fixed/syslimits.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/limits.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sec_api/stdlib_s.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/malloc.h
+
+../config.h:
+
+fd-hook.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/stdlib.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_mingw.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_mingw_mac.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/vadefs.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sdks/_mingw_directx.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sdks/_mingw_ddk.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/include-fixed/limits.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/include-fixed/syslimits.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/limits.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sec_api/stdlib_s.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/malloc.h:

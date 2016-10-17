@@ -1,0 +1,438 @@
+sockets.o: sockets.c ../config.h sockets.h sys/socket.h sys/uio.h \
+ sys/types.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sys/types.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_mingw.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_mingw_mac.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/vadefs.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sdks/_mingw_directx.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sdks/_mingw_ddk.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_mingw_off_t.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/include/stddef.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/stddef.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winsock2.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_mingw_unicode.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/windows.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sdkddkver.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/excpt.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/include/stdarg.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/stdarg.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_mingw_stdarg.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/windef.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winnt.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/ctype.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/specstrings.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/basetsd.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/guiddef.h \
+ string.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/string.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sec_api/string_s.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/pshpack4.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/poppack.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/pshpack4.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/pshpack2.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/poppack.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/pshpack2.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/pshpack8.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winbase.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winerror.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/wingdi.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/pshpack1.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winuser.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/tvout.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winnls.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/wincon.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winver.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winreg.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/reason.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winnetwk.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/virtdisk.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/cderr.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/dde.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/ddeml.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/dlgs.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/lzexpand.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/mmsystem.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/nb30.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpc.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpcdce.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpcdcep.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpcnsi.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpcnterr.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpcasync.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/shellapi.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winperf.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/pshpack8.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winsock.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/wincrypt.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/bcrypt.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/ncrypt.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winefs.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winscard.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/wtypes.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpc.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpcndr.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpcnsip.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/basetsd.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/guiddef.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/psdk_inc/_varenum.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winioctl.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winsmcrd.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winspool.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/prsht.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/ole2.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/objbase.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpcndr.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/stdlib.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/include-fixed/limits.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/include-fixed/syslimits.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/limits.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sec_api/stdlib_s.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/malloc.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/unknwn.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/windows.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/ole2.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/wtypes.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/objidl.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/unknwn.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/cguid.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/urlmon.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/objidl.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/oleidl.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/servprov.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/msxml.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/oaidl.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/propidl.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/oleauto.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/oaidl.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/oleidl.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/commdlg.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/stralign.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sec_api/stralign_s.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winsvc.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/mcx.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/imm.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/psdk_inc/_ws1_undef.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_timeval.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_bsd_types.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/inaddr.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/psdk_inc/_socket_types.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/psdk_inc/_fd_types.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/psdk_inc/_ip_types.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/psdk_inc/_wsadata.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/ws2def.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/psdk_inc/_wsa_errnos.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/qos.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/ws2tcpip.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/psdk_inc/_ip_mreq1.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/ws2ipdef.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/in6addr.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/mstcpip.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/io.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sec_api/io_s.h \
+ msvc-nothrow.h fd-hook.h w32sock.h errno.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/errno.h \
+ fcntl.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sys/stat.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_mingw_stat64.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/fcntl.h \
+ unistd.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/unistd.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/process.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/getopt.h \
+ d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/pthread_unistd.h
+
+../config.h:
+
+sockets.h:
+
+sys/socket.h:
+
+sys/uio.h:
+
+sys/types.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sys/types.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_mingw.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_mingw_mac.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/vadefs.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sdks/_mingw_directx.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sdks/_mingw_ddk.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_mingw_off_t.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/include/stddef.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/stddef.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winsock2.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_mingw_unicode.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/windows.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sdkddkver.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/excpt.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/include/stdarg.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/stdarg.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_mingw_stdarg.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/windef.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winnt.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/ctype.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/specstrings.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/basetsd.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/guiddef.h:
+
+string.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/string.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sec_api/string_s.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/pshpack4.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/poppack.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/pshpack4.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/pshpack2.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/poppack.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/pshpack2.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/pshpack8.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winbase.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winerror.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/wingdi.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/pshpack1.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winuser.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/tvout.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winnls.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/wincon.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winver.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winreg.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/reason.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winnetwk.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/virtdisk.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/cderr.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/dde.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/ddeml.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/dlgs.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/lzexpand.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/mmsystem.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/nb30.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpc.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpcdce.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpcdcep.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpcnsi.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpcnterr.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpcasync.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/shellapi.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winperf.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/pshpack8.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winsock.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/wincrypt.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/bcrypt.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/ncrypt.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winefs.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winscard.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/wtypes.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpc.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpcndr.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpcnsip.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/basetsd.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/guiddef.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/psdk_inc/_varenum.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winioctl.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winsmcrd.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winspool.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/prsht.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/ole2.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/objbase.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/rpcndr.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/stdlib.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/include-fixed/limits.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/include-fixed/syslimits.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/limits.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sec_api/stdlib_s.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/malloc.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/unknwn.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/windows.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/ole2.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/wtypes.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/objidl.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/unknwn.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/cguid.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/urlmon.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/objidl.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/oleidl.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/servprov.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/msxml.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/oaidl.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/propidl.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/oleauto.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/oaidl.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/oleidl.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/commdlg.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/stralign.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sec_api/stralign_s.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/winsvc.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/mcx.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/imm.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/psdk_inc/_ws1_undef.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_timeval.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_bsd_types.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/inaddr.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/psdk_inc/_socket_types.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/psdk_inc/_fd_types.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/psdk_inc/_ip_types.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/psdk_inc/_wsadata.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/ws2def.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/psdk_inc/_wsa_errnos.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/qos.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/ws2tcpip.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/psdk_inc/_ip_mreq1.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/ws2ipdef.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/in6addr.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/mstcpip.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/io.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sec_api/io_s.h:
+
+msvc-nothrow.h:
+
+fd-hook.h:
+
+w32sock.h:
+
+errno.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/errno.h:
+
+fcntl.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/sys/stat.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/_mingw_stat64.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/fcntl.h:
+
+unistd.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/unistd.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/process.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/getopt.h:
+
+d:\msys\mingw\bin\../lib/gcc/i686-w64-mingw32/4.7.1/../../../../i686-w64-mingw32/include/pthread_unistd.h:

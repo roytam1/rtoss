@@ -5,7 +5,7 @@ Copyright (C) 1999 Lars Brinkhoff.  See COPYING for terms and conditions.
 */
 
 #include "config.h"
-
+#if 0
 #ifndef HAVE_POLL
 
 #include <unistd_.h>
@@ -13,8 +13,12 @@ Copyright (C) 1999 Lars Brinkhoff.  See COPYING for terms and conditions.
 #include <sys/time.h>
 #include <sys/types.h>
 
+#ifdef _WIN32
+#include <winsock2.h>
+#else
 #ifndef HAVE_SELECT
 #error "Must have either poll() or select()."
+#endif
 #endif
 
 int
@@ -71,3 +75,4 @@ poll (struct pollfd *p, int n, int t)
 }
 
 #endif /* HAVE_POLL */
+#endif /* 0 */

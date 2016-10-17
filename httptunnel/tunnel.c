@@ -6,6 +6,8 @@ Copyright (C) 1999, 2000 Lars Brinkhoff.  See COPYING for terms and conditions.
 See tunnel.h for some documentation about the programming interface.
 */
 
+#include "config.h"
+
 #include <time.h>
 #include <stdio.h>
 #include <netdb_.h>
@@ -14,7 +16,10 @@ See tunnel.h for some documentation about the programming interface.
 #include <sys/poll_.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+
+#ifndef _WIN32
 #include <netinet/tcp.h>
+#endif
 
 #include "http.h"
 #include "tunnel.h"
@@ -1149,9 +1154,14 @@ tunnel_accept (Tunnel *tunnel)
 			    tunnel->in_total_raw);
 #endif
 
+#ifndef _WIN32
 	      fcntl (tunnel->in_fd,
 		     F_SETFL,
 		     fcntl (tunnel->in_fd, F_GETFL) | O_NONBLOCK);
+#else
+  u_long mode = 1;
+  ioctlsocket (tunnel->in_fd, FIONBIO, &mode);
+#endif
 
 	      tunnel_in_setsockopts (tunnel->in_fd);
 

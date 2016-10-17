@@ -72,8 +72,13 @@ read_all (int fd, void *buf, size_t len)
   long flags;
   char *rbuf = buf;
 
+#ifndef _WIN32
   flags = fcntl (fd, F_GETFL);
   fcntl (fd, F_SETFL, flags & ~O_NONBLOCK);
+#else
+  u_long mode = 0;
+  ioctlsocket (fd, FIONBIO, &mode);
+#endif
 
   r = len;
   for (n = 0; n < len; n += m)
@@ -98,7 +103,9 @@ read_all (int fd, void *buf, size_t len)
 	}
     }
 
+#ifndef _WIN32
   fcntl (fd, F_SETFL, flags);
+#endif
   return r;
 }
 

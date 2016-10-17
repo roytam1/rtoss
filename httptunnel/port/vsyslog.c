@@ -33,6 +33,17 @@ vsyslog (int level, const char *fmt0, va_list ap)
   char buffer[512];
 
   if (vsnprintf (buffer, sizeof buffer, fmt0, ap) > 0)
+#ifndef HAVE_SYSLOG
     syslog (level, buffer);
+#else
+//    fprintf(stderr,"[Log level %d] %s\n", level, buffer);
+  /* This system has neither syslog() nor vsyslog(), so do nothing. */
+  /* FIXME: this function could open a file and log messages in it. */
+#endif
 }
+
+#ifdef _WIN32
+void openlog (__const char *__ident, int __option, int __facility) {}
+#endif
+
 #endif /* HAVE_VSYSLOG */

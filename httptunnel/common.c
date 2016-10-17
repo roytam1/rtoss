@@ -6,6 +6,8 @@ Copyright (C) 1999, 2000 Lars Brinkhoff.  See COPYING for terms and conditions.
 Code common to both htc and hts.
 */
 
+#include "config.h"
+
 #include <time.h>
 #include <stdio.h>
 #include <netdb_.h>
@@ -13,7 +15,9 @@ Code common to both htc and hts.
 #include <stdlib.h>
 #include <signal.h>
 #include <syslog_.h>
+#ifndef _WIN32
 #include <termios.h>
+#endif
 #include <sys/poll_.h>
 
 #include "tunnel.h"
@@ -191,13 +195,17 @@ set_address (struct sockaddr_in *address, const char *host, int port)
 int
 open_device (char *device)
 {
-  struct termios t;
   int fd;
+
+#ifndef _WIN32
+  struct termios t;
+#endif
 
   fd = open (device, O_RDWR | O_NONBLOCK);
   if (fd == -1)
     return -1;
   
+#ifndef _WIN32
   if (tcgetattr (fd, &t) == -1)
     {
       if (errno == ENOTTY || errno == EINVAL)
@@ -210,6 +218,7 @@ open_device (char *device)
   t.c_lflag = 0;
   if (tcsetattr (fd, TCSANOW, &t) == -1)
     return -1;
+#endif
 
   return fd;
 }
@@ -282,7 +291,7 @@ handle_device_input (Tunnel *tunnel, int fd, int events)
   else if (events & POLLNVAL)
     log_error ("handle_device_input: POLLINVAL");
   else
-    log_error ("handle_device_input: none of the above");
+    log_error ("handle_device_input: none of the above, events=%d", events);
 
   errno = EIO;
   return -1;
@@ -325,7 +334,7 @@ log_annoying ("handle_tunnel_input: tunnel_read() = %d\n", n);
   else if (events & POLLNVAL)
     log_error ("handle_device_input: PULLINVAL");
   else
-    log_error ("handle_device_input: none of the above");
+    log_error ("handle_device_input: none of the above, events=%d", events);
 
   errno = EIO;
   return -1;

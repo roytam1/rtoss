@@ -16,6 +16,7 @@ Copyright (C) 1999 Lars Brinkhoff.  See COPYING for terms and conditions.
 int
 daemon (int nochdir, int noclose)
 {
+#ifndef _WIN32
   if (fork () != 0)
     exit (0);
 
@@ -32,6 +33,7 @@ daemon (int nochdir, int noclose)
       open ("/dev/null", O_WRONLY);
       open ("/dev/null", O_WRONLY);
     }
+#endif
 
   /* FIXME: disassociate from controlling terminal. */
 
