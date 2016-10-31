@@ -1,0 +1,1 @@
+tcc -O2 MediaInfo.c -lshell32 -L. -lmediainfo -Wl,-subsystem=gui
