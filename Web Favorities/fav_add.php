@@ -15,7 +15,7 @@ $db = new PDO('sqlite:./'.$sqlite_file, '', '', array(PDO::ATTR_PERSISTENT => tr
 if (isset($_SESSION['isLogined']) && isset($_POST["MM_insert"]) && $_POST["MM_insert"]=="form1"){
 	$qry="SELECT COUNT(id) FROM Fav";
 	$rs=$db->query($qry);
-	$rcnt=$db->fetchColumn($rs);
+	$rcnt=$rs->fetchColumn();
 	$sth = $db->prepare('INSERT INTO Fav (cat,name,addr,catid,protected,ord) VALUES (?, ?, ?, ?, ?, ?)');
 	$sth->execute(array($Command1__varcat, $Command1__varname, $Command1__varaddr, $Command1__varcatid, $Command1__varprot, $rcnt));
 //  $Command1_CommandText="INSERT INTO Fav (cat,name,addr,catid,protected,ord) VALUES (".sqlite_escape_string($Command1__varcat).",'".sqlite_escape_string($Command1__varname)."','".sqlite_escape_string($Command1__varaddr)."',".sqlite_escape_string($Command1__varcatid).",".sqlite_escape_string($Command1__varprot).",".sqlite_escape_string($rcnt).")";

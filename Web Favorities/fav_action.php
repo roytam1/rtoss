@@ -23,14 +23,14 @@ require("./fav_header.htm");
 if (!isset($_SESSION['isLogined']) && !viewAuth()) {
 	if (($iAction=="go") && ($iPass) && isset($_POST["h_id"]) && (($iPass==$FavPasswd) || ($iPass==$ViewPassword))) {
 		viewAuth('login',$iPass);
-    	$qry="SELECT * FROM Fav WHERE id = ".$_POST["h_id"];
+    	$qry="SELECT * FROM Fav WHERE id = ".intval($_POST["h_id"]);
 		$rs=$db->query($qry);
 		$row = $rs->fetch(PDO::FETCH_ASSOC);
 		header("Location: ".$row["addr"]);
 	} else {
 		if (($iAction=="go") && (!$iPass)) {
 			echo $MyFav_PasswdPrompt.'<form action="'.$_SERVER['PHP_SELF'].'?action=go" method="post">
-	<input type="hidden" name="h_id" value="'.$_GET["id"].'">
+	<input type="hidden" name="h_id" value="'.intval($_GET["id"]).'">
     <input type="password" name="pwd">
     <input type="submit" name="Submit" value="登入">
     '.$MyFav_BackHTML.'

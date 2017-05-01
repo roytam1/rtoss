@@ -18,7 +18,7 @@ $rcnt=is_array($row) ? 1 : 0;
 
 if (isset($_SESSION['isLogined']) && isset($_POST["MM_delete"]) && $_POST["MM_delete"]=="form1"){
   $Command1_CommandText="DELETE FROM Fav WHERE id = ".$Command1__varid;
-  $db->qexec($Command1_CommandText);
+  $db->exec($Command1_CommandText);
   header("Location: ".$MM_RedirectUrl);
   exit();
 } elseif (isset($_POST["MM_delete"]) && $_POST["MM_delete"]!=""){

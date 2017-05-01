@@ -25,7 +25,7 @@ if (isset($_SESSION['isLogined']) && isset($_POST["MM_reorder"]) && $_POST["MM_r
 //	array_pop($order);
 	foreach($order as $ord => $id)
     	$Command1_CommandText.="UPDATE Fav SET ord = ".intval($ord)." WHERE id = ".intval($id).";";
-    $db->exec($Command1_CommandText,$conn);
+    $db->exec($Command1_CommandText);
 
     header("Location: ".$MM_RedirectUrl);
     exit();
