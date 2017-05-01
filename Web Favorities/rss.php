@@ -8,7 +8,7 @@ $conn=sqlite_popen($sqlite_file);
 
 if (isset($_GET["catid"])) {
   $catqstr="AND catid = ".intval($_GET["catid"]);
-  $qry="SELECT * FROM Fav WHERE id = ".$_GET["catid"];
+  $qry="SELECT * FROM Fav WHERE id = ".intval($_GET["catid"]);
   $rs=sqlite_query($conn,$qry);
   $row = sqlite_fetch_array($rs);
   $homeTitle=$homeTitle." - ".$row["name"];

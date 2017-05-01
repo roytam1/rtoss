@@ -2,7 +2,7 @@
 require("./fav_settings.php");
 require("./fav_strings.php");
 
-$conn=sqlite_popen($sqlite_file);
+$db = new PDO('sqlite:./'.$sqlite_file, '', '', array(PDO::ATTR_PERSISTENT => true));
 
 $iPass=val($_POST,"pwd");
 $iAction=val($_GET,'action');
@@ -24,8 +24,8 @@ if (!isset($_SESSION['isLogined']) && !viewAuth()) {
 	if (($iAction=="go") && ($iPass) && isset($_POST["h_id"]) && (($iPass==$FavPasswd) || ($iPass==$ViewPassword))) {
 		viewAuth('login',$iPass);
     	$qry="SELECT * FROM Fav WHERE id = ".$_POST["h_id"];
-		$rs=sqlite_query($conn,$qry);
-		$row = sqlite_fetch_array($rs);
+		$rs=$db->query($qry);
+		$row = $rs->fetch(PDO::FETCH_ASSOC);
 		header("Location: ".$row["addr"]);
 	} else {
 		if (($iAction=="go") && (!$iPass)) {
@@ -51,7 +51,7 @@ if (!isset($_SESSION['isLogined']) && !viewAuth()) {
 if (isset($_SESSION['isLogined']) || viewAuth()) {
    switch ($iAction) {
     case "add":
-      $_GET['url']=urlencode($_GET['url']); // encodes url again
+      $_GET['url']=preg_replace('/%([0189a-fA-F])/','%25\1',urlencode($_GET['url'])); // encodes url again, preserve %00-%1F,%80-%FF
       $_GET['name']=urlencode(jsUCEsc2utf8($_GET['name'])); // encodes name again
       header("Location: ".$BaseURL."fav_add.php?".toQueryString("catid",'name','url').$SidebarSuffix2);
       break;
@@ -62,17 +62,17 @@ if (isset($_SESSION['isLogined']) || viewAuth()) {
       header("Location: ".$BaseURL."fav_del.php?".toQueryString('id').$SidebarSuffix2);
       break;
     case "order":
-      header("Location: ".$BaseURL."fav_reorder.php?".toQueryString('id').$SidebarSuffix2);
+      header("Location: ".$BaseURL."fav_reorder_2.php?".toQueryString('id').$SidebarSuffix2);
       break;
     case "go":
       $qry="SELECT * FROM Fav WHERE id = ".$_GET["id"];
-	  $rs=sqlite_query($conn,$qry);
-	  $row = sqlite_fetch_array($rs);
+	  $rs=$db->query($qry);
+	  $row = $rs->fetch(PDO::FETCH_ASSOC);
       header("Location: ".$row["addr"]);
       break;
     case "opt":
       $qry="VACUUM Fav";
-	  $rs=sqlite_exec($conn,$qry);
+	  $rs=$db->exec($qry);
       echo $MyFav_Action_Optimized.'<br><center>'.$MyFav_BackHTML.'</center>';
       break;
     default:

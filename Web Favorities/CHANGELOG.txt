@@ -1,6 +1,12 @@
 Web Favorities System Change Log
 ================================
+Version 0.06:
+* Upgrade from SQLite2 to PDO SQlite3
+
 Version 0.05:
+* Make "noxml=Y" as default
+* Add "jscroll=Y" useing JQuery NiceScroll (works well in NoXML mode only)
++ Add fav_reorder_2.php and ToolManDHTML-0.2 for Drag and Drop Reordering
 * Simplify some codes
 * Correct some variables
 * Move determination script out of fav_settings.php to fav_common.php

@@ -1,5 +1,6 @@
 <?php
 $NoNavi=$oldNetscape=$noXML=false;$mozver=$iever=$SidebarSuffix1=$admAppend=$aAppend='';
+$noXML=true;
 
 $ua=strtolower($_SERVER["HTTP_USER_AGENT"]);
 if(strpos($ua,'mozilla/')!==false) {
@@ -26,6 +27,7 @@ if (!isset($_GET["noxml"]))
   if ((strpos(strtoupper($_SERVER["HTTP_USER_AGENT"]),"MSIE") ? strpos(strtoupper($_SERVER["HTTP_USER_AGENT"]),"MSIE")+1 : 0)>0)
     $noXML=true;
 
+$jscroll = (isset($_GET["jscroll"]) && $_GET["jscroll"]=="Y") ? true : false;
 if (isset($_GET["noxml"]) && $_GET["noxml"]=="Y") $noXML=true;
 if (isset($_GET["noxml"]) && $_GET["noxml"]=="N") $noXML=false;
 if (isset($_GET["sidebar"]) && $_GET["sidebar"]=="Y") {
@@ -37,7 +39,8 @@ if (isset($_GET["sidebar"]) && $_GET["sidebar"]=="Y") {
 }
 if ($InSidebar) {
   $aAppend="target=\"_content\"";
-  $admAppend="target=\"_search\"";
+  //$admAppend="target=\"_search\"";
+  $admAppend="";
   $SidebarSuffix1="?sidebar=Y";
   $SidebarSuffix2="&sidebar=Y";
   $TextboxWidth=30;

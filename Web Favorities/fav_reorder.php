@@ -2,16 +2,20 @@
 require("./fav_settings.php");
 require("./fav_strings.php");
 
-$conn=sqlite_popen($sqlite_file);
-if($_GET['id']>0) {
-	$qry="SELECT name FROM Fav WHERE id=".$_GET['id'];
-	$container=sqlite_single_query($conn,$qry);
+$db = new PDO('sqlite:./'.$sqlite_file, '', '', array(PDO::ATTR_PERSISTENT => true));
+
+$getid=intval($_GET['id']);
+if($getid>0) {
+	$qry="SELECT name FROM Fav WHERE id=".$getid;
+	$rs=$db->query($qry);
+	$container=$rs->fetchColumn();
 } elseif($_GET['id']==-1) $container=$MyFav_Order_CatOrd;
 else $container=$MyFav_Order_RootOrd;
 
-$qry="SELECT id,name FROM Fav WHERE ".($_GET['id']==-1?'cat = 1':'catid='.$_GET['id']).(!$_GET['id']?' AND cat = 0':'')." ORDER BY ord,id";
-$rs=sqlite_query($conn,$qry);
-$rcnt=sqlite_num_rows($rs);
+$qry='SELECT id,name,addr FROM Fav WHERE '.($getid==-1?'cat = 1':'catid='.$getid).(!$getid?' AND cat = 0':'').' ORDER BY ord,id';
+$rs=$db->query($qry);
+$row = $rs->fetchAll(PDO::FETCH_ASSOC);
+$rcnt=count($row);
 
 $MM_RedirectUrl=$homeURL.$SidebarSuffix1;
 if (isset($_SESSION['isLogined']) && isset($_POST["MM_reorder"]) && $_POST["MM_reorder"]=="form1"){
@@ -19,8 +23,8 @@ if (isset($_SESSION['isLogined']) && isset($_POST["MM_reorder"]) && $_POST["MM_r
 	$order=explode("|",$_POST['newOrder']);
 	array_pop($order);
 	foreach($order as $ord => $id)
-    	$Command1_CommandText.="UPDATE Fav SET ord = ".sqlite_escape_string($ord)." WHERE id = ".sqlite_escape_string($id).";";
-    sqlite_exec($Command1_CommandText,$conn);
+    	$Command1_CommandText.="UPDATE Fav SET ord = ".intval($ord)." WHERE id = ".intval($id).";";
+    $db->exec($Command1_CommandText,$conn);
 
     header("Location: ".$MM_RedirectUrl);
     exit();
@@ -83,8 +87,8 @@ function placeInHidden(delim, selStr, hidStr)
 <table>
 <tr>
 <td align="middle">';
-echo '  <select id="ids" size="'.$rcnt.'">';
-  while($row2 = sqlite_fetch_array($rs)) {
+echo '  <select id="ids" size="'.$rcnt.'" multiple="multiple">';
+  foreach($row as $row2) {
 echo '    <option value="'.($row2["id"]).'" >'.$row2["name"].'</option>';
   } 
 echo '  </select>

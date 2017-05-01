@@ -4,7 +4,7 @@ session_register("isLogined_session");
 session_register("pwd_session");
 
 //Settings here:
-$sqlite_file='./myfav.sdb';
+$sqlite_file='./myfav.sdb3';
 
 $FavPasswd="Fav_pass";
 $ViewPassword="Fav+view";

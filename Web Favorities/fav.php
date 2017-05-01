@@ -11,15 +11,32 @@ function printAdmJs($id) {
 
 function printAdmTools($id) {
 	global $SidebarSuffix2,$admAppend,$MyFav_Edit,$MyFav_Delete;
-	return '<a href="'.text2xml("fav_action.php?action=edit&id=".$id.$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Edit.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=delete&id=".$id.$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Delete.'</a>';
+	return '<a href="'.text2xml("fav_action.php?action=edit&id=".$id.$SidebarSuffix2).'" class="admtool" '.$admAppend.' onclick="return true;">'.$MyFav_Edit.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=delete&id=".$id.$SidebarSuffix2).'" class="admtool" '.$admAppend.' onclick="return true;">'.$MyFav_Delete.'</a>';
 }
 
 if(isset($_POST['pwd'])||isset($_POST['logout'])) logInOut(val($_POST,'pwd'),isset($_POST['logout']));
 
-$conn=sqlite_popen($sqlite_file);
-$conn2=sqlite_popen($sqlite_file);
+// *** Read SQLite DB *** //
+$db = new PDO('sqlite:./'.$sqlite_file, '', '', array(PDO::ATTR_PERSISTENT => true));
+
 $qry="SELECT * FROM Fav WHERE cat = 1 ORDER BY ord,id";
-$rs=sqlite_query($conn,$qry);
+$rs=$db->query($qry);
+
+$ary=$rs->fetchAll(PDO::FETCH_ASSOC);
+
+foreach($ary as &$acat) {
+	$qry2="SELECT * FROM Fav WHERE cat = 0 AND catid = ".$acat['id']." ORDER BY ord,id";
+	$rs2=$db->query($qry2);
+	$ary2=$rs2->fetchAll(PDO::FETCH_ASSOC);
+	$acat['childs']=$ary2;
+
+}
+
+$qry2="SELECT * FROM Fav WHERE cat = 0 AND catid = 0 ORDER BY ord,id";
+$rs3=$db->query($qry2);
+$ary3=$rs3->fetchAll(PDO::FETCH_ASSOC);
+// *** Read SQLite DB *** //
+
 
 if (!($oldNetscape || $noXML))
   header('Content-type: application/xhtml+xml');
@@ -232,56 +249,63 @@ function set_cookie(name, value, days) {
 	document.cookie = name+"="+value+expires+"; path=/";
 }';
 if (!($oldNetscape || $noXML)) echo ']]>';
-echo '</script>
-</head>
+echo '</script>';
+if($jscroll) {
+	echo '<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="jquery.nicescroll.min.js"></script>
+<script type="text/javascript">';
+	if (!($oldNetscape || $noXML)) echo '<![CDATA[';
+	echo '$(document).ready(
+	function() {
+		$("html").niceScroll({cursorcolor:"#888",cursorwidth:7,cursoropacitymin:0.25,mousescrollstep:13,scrollspeed:40});
+		if(location.hash) document.getElementById("a"+location.hash.substring(1)).scrollIntoView(true);
+	}
+);';
+	if (!($oldNetscape || $noXML)) echo ']]>';
+	echo '</script>';
+}
+echo '</head>
 <body onload="moveNavi();">
-<center><h2>網上『我的最愛』</h2></center>
-<a name="top"></a>';
-if (isset($_SESSION['isLogined'])) echo '<a href="'.text2xml("fav_action.php?action=order&id=-1".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_CatOrder.'</a> ';
-if (!$oldNetscape) echo '<a id="aToggle" href="'.text2xml("javascript:toggleAllDiv('aToggle','force');").'" class="admtool">'.($shrinkFirst?$MyFav_ExpandAll:$MyFav_ShrinkAll).'</a> <a id="aToggle2" href="'.text2xml("javascript:toggleAllDiv('aToggle2','invert');").'" class="admtool">'.$MyFav_InvertAll.'</a>';
+<center><h2>'.$MyFav_Title.'</h2></center>
+<a name="top" id="atop"></a>';
+if (isset($_SESSION['isLogined'])) echo '<a href="'.text2xml("fav_action.php?action=order&id=-1".$SidebarSuffix2).'" class="admtool" onclick="return true;" '.$admAppend.'>'.$MyFav_CatOrder.'</a> ';
+if (!$oldNetscape) echo '<a id="aToggle" href="'.text2xml("javascript:toggleAllDiv('aToggle','force');").'" class="admtool" onclick="return true;">'.($shrinkFirst?$MyFav_ExpandAll:$MyFav_ShrinkAll).'</a> <a id="aToggle2" href="'.text2xml("javascript:toggleAllDiv('aToggle2','invert');").'" class="admtool" onclick="return true;">'.$MyFav_InvertAll.'</a>';
 echo '<div class="'.($NoNavi?'dh':($DispNavi?'divNavi':'divNavi-hide')).'" id="divNavi" onmouseover="restoreNavi()" onmouseout="NaviTimout()">';
 if (!$NoNavi) {
-	echo '<a href="#bottom" style="font-size:x-small;" onmouseover="restoreNavi()">'.$MyFav_GotoBottom."</a><br />\n";
-	while($row = sqlite_fetch_array($rs))
-		echo '<a href="#'.$row['id'].'" class="navi" onmouseover="restoreNavi()" '.((!$oldNetscape)?'onclick="'.text2xml("ExpandDiv('d".$row['id']."','a".$row['id']."');").'"':'').'>'.text2xml($row['name'])."</a><br />\n";
-echo '<a href="#top" style="font-size:x-small;">'.$MyFav_GotoTop."</a><br />\n";
-sqlite_rewind($rs);
-}
-echo '</div>
-<dl>';
-while($row = sqlite_fetch_array($rs)) {
-	echo '<dt>';
-	if(isset($_SESSION['isLogined'])) echo '<div onmouseover="toggleAdmTool(\'adm'.$row['id'].'\')" onmouseout="toggleAdmTool(\'adm'.$row['id'].'\')">';
-	if (!$oldNetscape)
-		echo '<a id="a'.$row['id'].'" href="'.text2xml("javascript:ToggleDiv('d".$row['id']."','a".$row['id']."');").'" class="toggle">'.($shrinkFirst?$MyFav_ExpandMark:$MyFav_ShrinkMark).'</a> ';
-	echo '<a name="'.$row['id'].'"'.($row['addr']?' href="'.text2xml($row['addr']).'" '.$aAppend:'').'>'.text2xml($row['name']).'</a>';
-	if (isset($_SESSION['isLogined'])) echo '<span class="admtools-hide" id="adm'.$row['id'].'"><a href="'.text2xml("fav_action.php?action=add&catid=".$row['id'].$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Add.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=order&id=".$row['id'].$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Order.'</a>&nbsp;'.printAdmTools($row['id']).'</span></div>';
-	echo '</dt>
-  <dd><div id="d'.$row['id'].'" class="'.$divShrink.'">';
-	$qry2="SELECT * FROM Fav WHERE cat = 0 AND catid = ".$row['id']." ORDER BY ord,id";
-	$rs2=sqlite_query($conn2,$qry2);
-	echo '<ul>';
-	while($row2 = sqlite_fetch_array($rs2)) {
-		if ($row2['protected']) echo '<li type="circle"'.(printAdmJs($row2['id'])).'><a href="'.text2xml("fav_action.php?action=go&id=".$row2['id']).'" '.$aAppend.'>'.text2xml($row2['name']).'</a>';
-		else echo'<li'.(printAdmJs($row2['id'])).'><a href="'.text2xml($row2['addr']).'" '.$aAppend.'>'.text2xml($row2['name']).'</a>';
-		if (isset($_SESSION['isLogined'])) echo '<span class="admtools-hide" id="adm'.$row2['id'].'">'.printAdmTools($row2['id']).'</span>';
-		echo "</li>\n";
+	echo '<a href="#bottom" style="font-size:x-small;" onmouseover="restoreNavi()" onclick="return true;">'.$MyFav_GotoBottom."</a><br />\n";
+	foreach($ary as $a) {
+		echo '<a href="#'.$a['id'].'" class="navi" onmouseover="restoreNavi()" '.((!$oldNetscape)?'onclick="'.text2xml("ExpandDiv('d".$a['id']."','a".$a['id']."');").'"':'').'>'.text2xml($a['name'])."</a><br />\n";
 	}
-echo '</ul>
-<br /></div></dd>
-<dt><br /></dt>';
+	echo '<a href="#top" style="font-size:x-small;" onclick="return true;">'.$MyFav_GotoTop."</a><br />\n";
+}
+echo '</div>';
+
+function ary2listOflinks($arr) {
+	global $oldNetscape,$divShrink,$shrinkFirst,$MyFav_ExpandMark,$MyFav_ShrinkMark,$SidebarSuffix2,$admAppend,$MyFav_Add,$MyFav_Order,$aAppend;
+	$txt='';
+	foreach($arr as $a) {
+		if($a['cat']=="1") {
+			$txt.= '<dt>';
+			if(isset($_SESSION['isLogined'])) $txt.= '<div onmouseover="toggleAdmTool(\'adm'.$a['id'].'\')" onmouseout="toggleAdmTool(\'adm'.$a['id'].'\')">';
+			if (!$oldNetscape)
+				$txt.= '<a id="a'.$a['id'].'" href="'.text2xml("javascript:ToggleDiv('d".$a['id']."','a".$a['id']."');").'" class="toggle">'.($shrinkFirst?$MyFav_ExpandMark:$MyFav_ShrinkMark).'</a> ';
+			$txt.= '<a name="'.$a['id'].'"'.($a['addr']?' href="'.text2xml($a['addr']).'" '.$aAppend:'').'>'.text2xml($a['name']).'</a>';
+
+			if (isset($_SESSION['isLogined'])) $txt.= '<span class="admtools-hide" id="adm'.$a['id'].'"><a href="'.text2xml("fav_action.php?action=add&catid=".$a['id'].$SidebarSuffix2).'" class="admtool" '.$admAppend.' onclick="return true;">'.$MyFav_Add.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=order&id=".$a['id'].$SidebarSuffix2).'" class="admtool" onclick="return true;" '.$admAppend.'>'.$MyFav_Order.'</a>&nbsp;'.printAdmTools($a['id']).'</span></div>';
+
+			
+			$txt .='</dt><dd><div id="d'.$a['id'].'" class="'.$divShrink.'"><ul>'.ary2listOflinks($a['childs']).'</ul><br /></div></dd><dt><br /></dt>';
+		} else {
+			if ($a['protected']) $txt .= '<li type="circle"'.(printAdmJs($a['id'])).'><a href="'.text2xml("fav_action.php?action=go&id=".$a['id']).'" '.$aAppend.'>'.text2xml($a['name']).'</a>';
+			else $txt .='<li'.(printAdmJs($a['id'])).'><a href="'.text2xml($a['addr']).'" '.$aAppend.'>'.text2xml($a['name']).'</a>';
+			if (isset($_SESSION['isLogined'])) $txt .= '<span class="admtools-hide" id="adm'.$a['id'].'">'.printAdmTools($a['id']).'</span>';
+		}
+	}
+	return $txt;
 }
 
-$qry="SELECT * FROM Fav WHERE cat = 0 AND catid = 0 ORDER BY ord,id";
-$rs=sqlite_query($conn,$qry);
-echo '<dd><ul>';
-while($row = sqlite_fetch_array($rs)) {
-	if ($row['protected']) echo '<li type="circle"'.(printAdmJs($row['id'])).'><a href="'.text2xml("fav_action.php?action=go&id=".$row['id']).'" '.$aAppend.'>'.$row['name'].'</a>';
-	else echo '<li'.(printAdmJs($row['id'])).'><a href="'.text2xml($row['addr']).'" '.$aAppend.'>'.text2xml($row['name']).'</a>';
-	if (isset($_SESSION['isLogined'])) echo '<span class="admtools-hide" id="adm'.$row['id'].'">'.printAdmTools($row['id']).'</span>';
-	echo "</li>\n";
-}
-echo '</ul></dd></dl>
+echo '<dl>'.ary2listOflinks($ary);
+echo '<dd><ul>'.ary2listOflinks($ary3).'</ul></dd></dl>
 <script type="text/javascript">';
 if (!($oldNetscape || $noXML)) echo '<![CDATA[';
 echo 'var showsubmenu = get_submenu();
@@ -290,10 +314,8 @@ for (submenu in showsubmenu) {
 }';
 if (!($oldNetscape || $noXML)) echo ']]>';
 echo '</script>
-<a name="bottom"></a>';
-sqlite_close($conn);
-sqlite_close($conn2);
-if (isset($_SESSION['isLogined'])) echo '<a href="'.text2xml("fav_action.php?action=add".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Add.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=order&id=0".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Order.'</a> <a href="'.text2xml("fav_action.php?action=opt".$SidebarSuffix2).'" class="admtool" '.$admAppend.'>'.$MyFav_Optimize.'</a> <a href="'.text2xml("javascript:location.href='".$BaseURL."fav_action.php?action=add&name='+escape(document.title)+'&url='+escape(document.location.href);").'" class="admtool" '.$admAppend.'>'.$MyFav_Bookmarklet.'</a>';
+<a name="bottom" id="abottom"></a>';
+if (isset($_SESSION['isLogined'])) echo '<a href="'.text2xml("fav_action.php?action=add".$SidebarSuffix2).'" class="admtool" onclick="return true;" '.$admAppend.'>'.$MyFav_Add.'</a>&nbsp;<a href="'.text2xml("fav_action.php?action=order&id=0".$SidebarSuffix2).'" class="admtool" onclick="return true;" '.$admAppend.'>'.$MyFav_Order.'</a> <a href="'.text2xml("fav_action.php?action=opt".$SidebarSuffix2).'" class="admtool" onclick="return true;" '.$admAppend.'>'.$MyFav_Optimize.'</a> <a href="'.text2xml("javascript:location.href='".$BaseURL."fav_action.php?action=add&name='+escape(document.title)+'&url='+escape(document.location.href);").'" class="admtool" onclick="return true;" '.$admAppend.'>'.$MyFav_Bookmarklet.'</a>';
 $uriSuffix=isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING']!=""?"?".$_SERVER['QUERY_STRING']:'';
 
 echo '<form action="'.text2xml($_SERVER['PHP_SELF'].$uriSuffix).'" method="post">';
@@ -308,4 +330,3 @@ echo '<a href="atom.php" class="admtool">[Atom 0.3 Feed]</a> <a href="rss.php" c
 require("./fav_footer.htm");
 echo '</body>
 </html>';
-?>

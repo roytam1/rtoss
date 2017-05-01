@@ -2,7 +2,7 @@
 require("./fav_settings.php");
 require("./fav_strings.php");
 
-  $Command1__varid=val($_POST,"id");
+  $Command1__varid=intval(val($_POST,"id"));
 
 $Recordset1__MMColParam="1";
 if (isset($_GET["id"])) $Recordset1__MMColParam=intval($_GET["id"]);
@@ -10,15 +10,15 @@ if (isset($_GET["id"])) $Recordset1__MMColParam=intval($_GET["id"]);
 
 $MM_RedirectUrl=$homeURL.$SidebarSuffix1;
 
-$conn=sqlite_popen($sqlite_file);
-$qry="SELECT * FROM Fav WHERE id = ".sqlite_escape_string($Recordset1__MMColParam);
-$rs=sqlite_query($conn,$qry);
-$rcnt=sqlite_num_rows($rs);
-$row = sqlite_fetch_array($rs);
+$db = new PDO('sqlite:./'.$sqlite_file, '', '', array(PDO::ATTR_PERSISTENT => true));
+$qry='SELECT * FROM Fav WHERE id = '.$Recordset1__MMColParam;
+$rs=$db->query($qry);
+$row = $rs->fetch(PDO::FETCH_ASSOC);
+$rcnt=is_array($row) ? 1 : 0;
 
 if (isset($_SESSION['isLogined']) && isset($_POST["MM_delete"]) && $_POST["MM_delete"]=="form1"){
-  $Command1_CommandText="DELETE FROM Fav WHERE id = ".sqlite_escape_string($Command1__varid);
-  sqlite_exec($Command1_CommandText,$conn);
+  $Command1_CommandText="DELETE FROM Fav WHERE id = ".$Command1__varid;
+  $db->qexec($Command1_CommandText);
   header("Location: ".$MM_RedirectUrl);
   exit();
 } elseif (isset($_POST["MM_delete"]) && $_POST["MM_delete"]!=""){

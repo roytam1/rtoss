@@ -14,15 +14,17 @@ $MM_RedirectUrl=$homeURL.$SidebarSuffix1;
 $Recordset1__MMColParam="1";
 if (isset($_GET["id"])) $Recordset1__MMColParam=intval($_GET["id"]);
 
-$conn=sqlite_popen($sqlite_file);
-$qry="SELECT * FROM Fav WHERE id = ".sqlite_escape_string($Recordset1__MMColParam);
-$rs=sqlite_query($conn,$qry);
-$rcnt=sqlite_num_rows($rs);
-$row = sqlite_fetch_array($rs);
+$db = new PDO('sqlite:./'.$sqlite_file, '', '', array(PDO::ATTR_PERSISTENT => true));
+$qry='SELECT * FROM Fav WHERE id = '.$Recordset1__MMColParam;
+$rs=$db->query($qry);
+$row = $rs->fetch(PDO::FETCH_ASSOC);
+$rcnt=is_array($row) ? 1 : 0;
 
 if (isset($_POST["MM_insert"]) && $_POST["MM_insert"]=="form1"){
-  $Command1_CommandText="UPDATE Fav SET cat = ".sqlite_escape_string($Command1__varcat)." , protected = ".sqlite_escape_string($Command1__varprot)." , catid = ".sqlite_escape_string($Command1__varcatid)." , name = '".sqlite_escape_string($Command1__varname)."' , addr = '".sqlite_escape_string($Command1__varaddr)."' WHERE id = ".sqlite_escape_string($Command1__varid);
-  sqlite_exec($Command1_CommandText,$conn);
+	$sth = $db->prepare('UPDATE Fav SET cat = ?, protected = ?, catid = ?, name = ?, addr = ? WHERE id = ?');
+	$sth->execute(array($Command1__varcat, $Command1__varprot, $Command1__varcatid, $Command1__varname. $Command1__varaddr, $Command1__varid));
+//  $Command1_CommandText="UPDATE Fav SET cat = ".sqlite_escape_string($Command1__varcat)." , protected = ".sqlite_escape_string($Command1__varprot)." , catid = ".sqlite_escape_string($Command1__varcatid)." , name = '".sqlite_escape_string($Command1__varname)."' , addr = '".sqlite_escape_string($Command1__varaddr)."' WHERE id = ".sqlite_escape_string($Command1__varid);
+//  sqlite_exec($Command1_CommandText,$conn);
 
   header("Location: ".$MM_RedirectUrl);
   exit();
@@ -86,9 +88,9 @@ echo '<h2>'.$MyFav_Mod_Header.'</h2>
   <select name="catid" id="catid" onChange="detSel();" '.($row['cat']?"disabled":'').'>';
 
 $qry="SELECT id,name FROM Fav WHERE cat = 1 ORDER BY ord,id";
-$rs=sqlite_query($conn,$qry);
+$rs=$db->query($qry);
 echo '    <option value="0">'.$MyFav_Cat_NoCategory.'</option>';
-  while($row2 = sqlite_fetch_array($rs)) {
+  while($row2 = $rs->fetch(PDO::FETCH_ASSOC)) {
 echo '    <option value="'.($row2["id"]).'" '.($row2["id"]==$row["catid"]?"selected":'').'>'.($row2["name"]).'</option>';
   } 
 echo '  </select>
