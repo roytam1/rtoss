@@ -16,8 +16,19 @@ if (isset($_SESSION['isLogined']) && isset($_POST["MM_insert"]) && $_POST["MM_in
 	$qry="SELECT COUNT(id) FROM Fav";
 	$rs=$db->query($qry);
 	$rcnt=$rs->fetchColumn();
-	$sth = $db->prepare('INSERT INTO Fav (cat,name,addr,catid,protected,ord) VALUES (?, ?, ?, ?, ?, ?)');
-	$sth->execute(array($Command1__varcat, $Command1__varname, $Command1__varaddr, $Command1__varcatid, $Command1__varprot, $rcnt));
+//	$sth = $db->prepare('INSERT INTO Fav (cat,name,addr,catid,protected,ord) VALUES (?, ?, ?, ?, ?, ?)');
+//	$sth->execute(array($Command1__varcat, $Command1__varname, $Command1__varaddr, $Command1__varcatid, $Command1__varprot, $rcnt));
+
+	$sth = $db->prepare('INSERT INTO Fav (cat,name,addr,catid,protected,ord) VALUES (:cat, :name, :addr, :catid, :protected, :ord)');
+
+	$sth->bindParam(':cat', $Command1__varcat);
+	$sth->bindParam(':protected', $Command1__varprot);
+	$sth->bindParam(':catid', $Command1__varcatid);
+	$sth->bindParam(':name', $Command1__varname);
+	$sth->bindParam(':addr', $Command1__varaddr);
+	$sth->bindParam(':ord', $rcnt);
+
+	$sth->execute();
 //  $Command1_CommandText="INSERT INTO Fav (cat,name,addr,catid,protected,ord) VALUES (".sqlite_escape_string($Command1__varcat).",'".sqlite_escape_string($Command1__varname)."','".sqlite_escape_string($Command1__varaddr)."',".sqlite_escape_string($Command1__varcatid).",".sqlite_escape_string($Command1__varprot).",".sqlite_escape_string($rcnt).")";
 //  sqlite_exec($Command1_CommandText,$conn);
 

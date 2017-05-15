@@ -21,11 +21,24 @@ $row = $rs->fetch(PDO::FETCH_ASSOC);
 $rcnt=is_array($row) ? 1 : 0;
 
 if (isset($_POST["MM_insert"]) && $_POST["MM_insert"]=="form1"){
-	$sth = $db->prepare('UPDATE Fav SET cat = ?, protected = ?, catid = ?, name = ?, addr = ? WHERE id = ?');
-	$sth->execute(array($Command1__varcat, $Command1__varprot, $Command1__varcatid, $Command1__varname. $Command1__varaddr, $Command1__varid));
+//	$sth = $db->prepare('UPDATE Fav SET cat = ?, protected = ?, catid = ?, name = ?, addr = ? WHERE id = ?');
+//	$sth->execute(array($Command1__varcat, $Command1__varprot, $Command1__varcatid, $Command1__varname. $Command1__varaddr, $Command1__varid));
+
+	$sth = $db->prepare('UPDATE Fav SET cat = :cat, protected = :protected, catid = :catid, name = :name, addr = :addr WHERE id = :id');
+	
+	$sth->bindParam(':cat', $Command1__varcat);
+	$sth->bindParam(':protected', $Command1__varprot);
+	$sth->bindParam(':catid', $Command1__varcatid);
+	$sth->bindParam(':name', $Command1__varname);
+	$sth->bindParam(':addr', $Command1__varaddr);
+	$sth->bindParam(':id', $Command1__varid);
+	
+	$sth->execute();
+	
 //  $Command1_CommandText="UPDATE Fav SET cat = ".sqlite_escape_string($Command1__varcat)." , protected = ".sqlite_escape_string($Command1__varprot)." , catid = ".sqlite_escape_string($Command1__varcatid)." , name = '".sqlite_escape_string($Command1__varname)."' , addr = '".sqlite_escape_string($Command1__varaddr)."' WHERE id = ".sqlite_escape_string($Command1__varid);
 //  sqlite_exec($Command1_CommandText,$conn);
 
+//	echo sprintf("%d",$sth->rowCount());
   header("Location: ".$MM_RedirectUrl);
   exit();
 } 
