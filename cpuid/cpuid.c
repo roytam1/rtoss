@@ -39,7 +39,8 @@ typedef struct CPUID_01_ValuesInEAX
 typedef struct CPUID_01_ValuesInECX
 {
 	unsigned int	iSSE3 : 1;
-	unsigned int	iReserved_1 : 2;
+	unsigned int	iPCLMUL : 1;
+	unsigned int	iDTES64 : 1;
 	unsigned int	iMWAIT : 1;
 	unsigned int	iQDS : 1;
 	unsigned int	iVMX : 1;
@@ -48,24 +49,27 @@ typedef struct CPUID_01_ValuesInECX
 	unsigned int	iTM2 : 1;
 	unsigned int	iSSSE3 : 1;
 	unsigned int	iCID : 1;
-	unsigned int	Reserved_11 : 1;
+	unsigned int	iSDBG : 1;
 	unsigned int	i256FMA : 1;
 	unsigned int	iCHG16B : 1;
 	unsigned int	ixTPRUpd : 1;
 	unsigned int	iPDMSR : 1;
-	unsigned int	Reserved_16 : 2;
+	unsigned int	Reserved_16 : 1;
+	unsigned int	iPCID : 1;
 	unsigned int	iDCA : 1;
 	unsigned int	iSSE41 : 1;
 	unsigned int	iSSE42 : 1;
 	unsigned int	ix2APIC : 1;
 	unsigned int	iMOVBE : 1;
 	unsigned int	iPOPCNT : 1;
-	unsigned int	Reserved_23 : 1;
+	unsigned int	iTSCD : 1;
 	unsigned int	iAES : 1;
 	unsigned int	iXSAVE : 1;
 	unsigned int	iOSXSAVE : 1;
 	unsigned int	iIAV256 : 1;
-	unsigned int	Reserved_28 : 3;
+	unsigned int	iF16C : 1;
+	unsigned int	iRDRAND : 1;
+	unsigned int	iHV : 1;
 } CPUID_01_ECX_t;
 
 typedef struct CPUID_01_ValuesInEDX
@@ -100,7 +104,7 @@ typedef struct CPUID_01_ValuesInEDX
 	unsigned int	iSS  : 1;
 	unsigned int	iHTT : 1;
 	unsigned int	iTM  : 1;
-	unsigned int	Reserved_30 : 1;
+	unsigned int	iIA64 : 1;
 	unsigned int	iPBE : 1;
 } CPUID_01_EDX_t;
 
@@ -120,7 +124,23 @@ typedef struct CPUID_80000001_ValuesInECX
 	unsigned int	iSSE5 : 1;
 	unsigned int	iSKINIT : 1;
 	unsigned int	iWDT : 1;
-	unsigned int	Reserved_14 : 18;
+	unsigned int	Reserved_14 : 1;
+	unsigned int	iLWP : 1;
+	unsigned int	iFMA4 : 1;
+	unsigned int	iTCE : 1;
+	unsigned int	Reserved_18 : 1;
+	unsigned int	iNODEID : 1;
+	unsigned int	Reserved_20 : 1;
+	unsigned int	iTBM : 1;
+	unsigned int	iTOPX : 1;
+	unsigned int	iPCXCORE : 1;
+	unsigned int	iPCXNB : 1;
+	unsigned int	Reserved_25 : 1;
+	unsigned int	iDBX : 1;
+	unsigned int	iPERFTSC : 1;
+	unsigned int	iPCXL2I : 1;
+	unsigned int	iMONX : 1;
+	unsigned int	Reserved_30 : 2;
 } CPUID_80000001_ECX_t;
 
 typedef struct CPUID_80000001_ValuesInEDX
@@ -144,14 +164,14 @@ typedef struct CPUID_80000001_ValuesInEDX
 	unsigned int	iPAT : 1;
 	unsigned int	iPSE36:1;
 	unsigned int	Reserved_18 : 1;
-	unsigned int	Reserved_19 : 1;
+	unsigned int	iMP : 1;
 	unsigned int	iNX : 1;
 	unsigned int	Reserved_21 : 1;
 	unsigned int	iMMXEx: 1;
 	unsigned int	iMMX : 1;
 	unsigned int	iFXSR: 1;
 	unsigned int	iFFXSR : 1;
-	unsigned int	Reserved_26: 1;
+	unsigned int	iPG1G: 1;
 	unsigned int	iRDTSCP  : 1;
 	unsigned int	Reserved_28 : 1;
 	unsigned int	iLM  : 1;
@@ -439,6 +459,7 @@ int main(int argc, char *argv[])
 	if( u8Ext2Flags.i3DN ) strcat(sMsg, "3DNow! ");	// 3DNow!
 	if( u8Ext2Flags.i3DNEx ) strcat(sMsg, "3DNow!+ ");	// 3DNow!+
 	if( u8Ext2Flags.iMMXEx ) strcat(sMsg, "MMX+ ");	// MMX+
+	if( u8ExtFlags.iFMA4 ) strcat(sMsg, "FMA4 ");	// FMA4
 	if( uExt2Flags.iSS   ) strcat(sMsg, "SS ");	// Self Snoop
 	if( uExt2Flags.iHTT  ) strcat(sMsg, "HTT ");	// Hyperthreading
 	if( uExt2Flags.iTM   ) strcat(sMsg, "TM ");	// Thermal Monitoring
@@ -449,10 +470,31 @@ int main(int argc, char *argv[])
 	if( uExtFlags.iEST ) strcat(sMsg, "EST ");	// Enhanced SpeedStep
 	if( uExtFlags.iCID ) strcat(sMsg, "CID ");	// Context-ID
 	if( uExtFlags.iVMX ) strcat(sMsg, "VMX ");	// Virtual Machine Extensions
-	if( u8ExtFlags.iSVM ) strcat(sMsg, "SVM ");	// LAHF
+	if( uExtFlags.iPCLMUL ) strcat(sMsg, "PCLMUL ");	// Carry-less Multiplication
+	if( uExtFlags.iDTES64 ) strcat(sMsg, "DTES64 ");	// 64-bit Debug Trace and EMON Store MSRs
+	if( uExtFlags.iSDBG ) strcat(sMsg, "SDBG ");	// DEBUG_INTERFACE MSR for silicon debug
+	if( uExtFlags.iPCID ) strcat(sMsg, "PCID ");	// Process-Context Identifiers Enable
+	if( uExtFlags.iTSCD ) strcat(sMsg, "TSCD ");	// local APIC supports one-shot operation using TSC deadline value
+	if( uExtFlags.iF16C ) strcat(sMsg, "F16C ");	// converting between half-precision and standard IEEE single-precision floating-point formats
+	if( uExtFlags.iRDRAND ) strcat(sMsg, "RDRAND ");	// Intel Digital Random Number Generator
+	if( uExtFlags.iHV ) strcat(sMsg, "HV ");	// hypervisor present
+	if( u8ExtFlags.iSVM ) strcat(sMsg, "SVM ");	// AMD Secure Virtual Machine
 	if( u8Ext2Flags.iLM ) strcat(sMsg, "x86-64 ");	// 64-bit technology
 	if( u8Ext2Flags.iNX ) strcat(sMsg, "NX ");	// No Execute
 	if( u8ExtFlags.iLAHF ) strcat(sMsg, "LAHF ");	// LAHF
+	if( u8Ext2Flags.iMP ) strcat(sMsg, "MP ");	// MP-capable
+	if( u8Ext2Flags.iPG1G ) strcat(sMsg, "PG1G ");	// 1GB Paging (PML3E.PS)
+	if( u8ExtFlags.iLWP ) strcat(sMsg, "LWP ");	// LWP
+	if( u8ExtFlags.iTCE ) strcat(sMsg, "TCE ");	// translation cache extension
+	if( u8ExtFlags.iTBM ) strcat(sMsg, "TBM ");	// TBM
+	if( u8ExtFlags.iNODEID ) strcat(sMsg, "NODEID ");	// node ID: MSR C001_100Ch
+	if( u8ExtFlags.iTOPX ) strcat(sMsg, "TOPX ");	// topology extensions: extended levels 8000_001Dh and 8000_001Eh
+	if( u8ExtFlags.iPCXCORE ) strcat(sMsg, "PCX_CORE ");	// core perf counter extensions (MSRs C001_020[0...B]h)
+	if( u8ExtFlags.iPCXNB ) strcat(sMsg, "PCX_NB ");	// NB perf counter extensions (MSRs C001_024[0...7]h)
+	if( u8ExtFlags.iDBX ) strcat(sMsg, "DBX ");	// data breakpoint extensions (MSRs C001_1027h and C001_10[19...1B]h)
+	if( u8ExtFlags.iPERFTSC ) strcat(sMsg, "PERFTSC ");	// performance TSC (MSR C001_0280h)
+	if( u8ExtFlags.iPCXL2I ) strcat(sMsg, "PCX_L2I ");	// L2I perf counter extensions (MSRs C001_023[0...7]h)
+	if( u8ExtFlags.iMONX ) strcat(sMsg, "MONX ");	// MONITORX/MWAITX
 
 	sprintf(cache,"\nL1 I-Cache: %d KB, L1 D-Cache: %d KB",uL1ICSize.iL1ICSize,uL1DCSize.iL1DCSize);
 	strcat(sMsg, cache);
