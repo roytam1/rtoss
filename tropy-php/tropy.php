@@ -14,7 +14,7 @@
 
 /* Config section */
 
-$thisurl_absolute = 'http://'.$_SERVER['HTTP_HOST'].preg_replace('/'.preg_replace('/.*\/+/','',$_SERVER['PHP_SELF']).'$/','',$_SERVER['PHP_SELF']); //Auto Setting
+$thisurl_absolute = ''; //'http://'.$_SERVER['HTTP_HOST'].preg_replace('/'.preg_replace('/.*\/+/','',$_SERVER['PHP_SELF']).'$/','',$_SERVER['PHP_SELF']); //Auto Setting
 $site_name = 'Tropy';
 $dir_html = 'html'; # Directory for Cached HTML files.
 $dir_files = 'files'; # Directory for user-written text files and the index file.
@@ -115,8 +115,9 @@ function print_editform($id,$msg) {
 	echo <<<EOD
   <form action="$tropy_self" method="post">
 	<input type="hidden" name="w$id" value="1">
-	<textarea cols="$maxcols" rows="$maxrows" name="mymsg">$mymsg</textarea><br><input type="submit" value="Write">
+	<textarea cols="$maxcols" rows="$maxrows" name="mymsg" id="msg">$mymsg</textarea><br><input type="submit" value="Write">&emsp;&emsp;<button onclick='document.getElementById("preview").innerHTML="<p>"+document.getElementById("msg").value.replace(/\\n\\n/g,"</p><p>").replace(/\\n/g,"<br>")+"</p>";return false;'>Preview</button>
   </form>
+  <div id="preview"></div>
 EOD;
 }
 
@@ -167,7 +168,7 @@ function delete_random_page() {
 
 function print_jumpto($id) {
 	global $content_type,$time_jumpto_sec,$thisurl_absolute,$dir_html,$site_name;
-	$meta = "<meta http-equiv='refresh' content='$time_jumpto_sec; url=${thisurl_absolute}${dir_html}/${id}.html'>\n";
+	$meta = "<meta http-equiv='refresh' content='$time_jumpto_sec; url=${thisurl_absolute}${dir_html}/${id}.html?t=".time()."'>\n";
 	$navi = '<div id="navi"></div>';
 	header($content_type);
 	header('Cache-Control: no-cache, must-revalidate'); // HTTP/1.1
@@ -239,7 +240,7 @@ function unlink_html($id) {
 }
 
 function build_html($id) {
-	global $dir_html,$allow_html,$site_name,$allow_edit,$auto_link;
+	global $dir_html,$allow_html,$site_name,$allow_edit,$auto_link,$return_url;
 	list($color, $bgcolor) = get_style($id);
 	$navi = get_navi($id, $allow_edit);
 
@@ -257,9 +258,9 @@ function build_html($id) {
 	if (!$allow_html) {
 		$content = htmlspecialchars($content);
 
-		if (strpos(strtolower($content),'=nbsp\n') !== -1) {
+		if (strpos(strtolower($content),'=nbsp\n') > -1) {
 			$content = preg_replace('/=nbsp\n/i','',$content);
-			$content = str_replace(' ','&nbsp;',$content);
+			$content = str_replace(' ',chr(0xc2).chr(0xa0),$content); // C2 A0 = nbsp in UTF-8
 		}
 		$content = preg_replace("/=pre\n?/i",'<pre>',$content);
 		$content = preg_replace('/=\/pre\n?/i','</pre>',$content);
@@ -274,7 +275,7 @@ function build_html($id) {
 	if (!$wfil=fopen("$dir_html/$id.html","wb")) {
 		print_error("build to $id");
 	}
-	fwrite($wfil,get_header("$caption - $site_name", $caption, $color, $bgcolor, $navi, ""));
+	fwrite($wfil,get_header("$caption - $site_name", $caption, $color, $bgcolor, $navi, "<base href=\"$return_url\">"));
 	fwrite($wfil,"<p>$content</p>");
 	fwrite($wfil,get_footer());
 	fclose($wfil);
@@ -298,7 +299,7 @@ function show_toc() {
 }
 
 function get_header($title, $caption, $color, $bgcolor, $navi, $meta) {
-	global $time_visible_msec,$thisurl_absolute;
+	global $time_visible_msec;
 	return <<<EOD
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
@@ -306,7 +307,7 @@ function get_header($title, $caption, $color, $bgcolor, $navi, $meta) {
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <meta http-equiv="content-style-type" content="text/css">
-$meta<base href="$thisurl_absolute">
+$meta
 <style type="text/css"><!--
 body{font-family:Verdana,sans-serif;margin:2% 20% 10% 20%;color:$color;background-color:$bgcolor;}
 input{font-family:Verdana,sans-serif;}
