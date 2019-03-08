@@ -45,6 +45,7 @@ TitleInfo::TitleInfo()
 	strTitleText.Empty();
 
 	bShowPlayStatus = false;
+	bODInited = false;
 
 	pSearchCaption = new CStdString[10];
 
@@ -266,6 +267,7 @@ void TitleInfo::drawCaption(HWND hForegroundWnd, unsigned int nStyle)
 		updateCaption(hForegroundWnd);
 
 		/* titlebar area cleanup hack */
+#if 0
 		sDrawRectTitle.top    -= 5;
 		sDrawRectTitle.left   -= 10;
 		sDrawRectTitle.right  += 10;
@@ -275,6 +277,17 @@ void TitleInfo::drawCaption(HWND hForegroundWnd, unsigned int nStyle)
 		sDrawRectTitle.left   += 10;
 		sDrawRectTitle.right  -= 10;
 		sDrawRectTitle.bottom -= 5;
+#endif
+		if(bODInited) {
+			rectOldDimension.top    -= 5;
+			rectOldDimension.left   -= 10;
+			rectOldDimension.right  += 10;
+			rectOldDimension.bottom += 5;
+			RedrawWindow(hForegroundWnd, &rectOldDimension, NULL, RDW_INVALIDATE | RDW_UPDATENOW | RDW_FRAME);
+		} else {
+			bODInited = true;
+		}
+		CopyRect(&rectOldDimension,&sDrawRectTitle);
 		/* titlebar area cleanup hack end */
 
 		DrawText(hDC, strTitleText, strTitleText.GetLength(), &sDrawRectTitle, DT_LEFT | DT_VCENTER | DT_NOPREFIX);

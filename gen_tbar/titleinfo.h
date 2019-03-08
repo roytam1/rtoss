@@ -78,6 +78,9 @@ private:
 
 	CStdString strTitleText;
 
+	RECT rectOldDimension;
+	bool bODInited;
+
 	bool bShowPlayStatus;
 
 	void drawCaption(HWND hForegroundWnd, unsigned int nStyle);
