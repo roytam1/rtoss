@@ -152,10 +152,10 @@ struct EGCState {
 struct VGAState {
     DisplayState *ds;
 
-    uint8_t tvram_buffer[480 * 640];
+    uint8_t tvram_buffer[400 * 641];
     uint8_t vram0_buffer[480 * 640];
     uint8_t vram1_buffer[480 * 640];
-    uint8_t null_buffer[480 * 640];
+    uint8_t null_buffer[480 * 641];
     int width;
     int height;
     int last_width;
@@ -163,7 +163,9 @@ struct VGAState {
     uint8_t dirty;
     uint8_t blink;
     uint32_t palette_chr[8];
-    uint32_t palette_gfx[256];
+    uint32_t palette_gfx8[8];
+    uint32_t palette_gfx16[16];
+    uint32_t palette_gfx256[256];
 
     uint8_t font[0x84000];
     uint8_t tvram[TVRAM_SIZE];
@@ -242,6 +244,7 @@ enum {
     MODE2_EGC           = 0x02,
     MODE2_WRITE_MASK    = 0x03,
     MODE2_256COLOR      = 0x10,
+    MODE2_TXTSHIFT      = 0x20,
     MODE2_480LINE       = 0x34,
 };
 
@@ -2902,13 +2905,13 @@ static void grcg_mem_writeb(VGAState *s, uint32_t addr1, uint8_t value)
             s->vram16_draw_b[addr] = s->grcg_tile_b[0];
         }
         if (!(s->grcg_mode & GRCG_PLANE_1)) {
-            s->vram16_draw_r[addr] = s->grcg_tile_b[0];
+            s->vram16_draw_r[addr] = s->grcg_tile_b[1];
         }
         if (!(s->grcg_mode & GRCG_PLANE_2)) {
-            s->vram16_draw_g[addr] = s->grcg_tile_b[0];
+            s->vram16_draw_g[addr] = s->grcg_tile_b[2];
         }
         if (!(s->grcg_mode & GRCG_PLANE_3)) {
-            s->vram16_draw_e[addr] = s->grcg_tile_b[0];
+            s->vram16_draw_e[addr] = s->grcg_tile_b[3];
         }
     }
 }
@@ -4165,14 +4168,14 @@ static void update_palette(VGAState *s)
             r = s->anapal[PALETTE_R][i];
             g = s->anapal[PALETTE_G][i];
             b = s->anapal[PALETTE_B][i];
-            s->palette_gfx[i] = rgb_to_pixel(depth, r, g, b);
+            s->palette_gfx256[i] = rgb_to_pixel(depth, r, g, b);
         }
     } else if (s->mode2[MODE2_16COLOR]) {
         for (i = 0; i < 16; i++) {
             r = s->anapal[PALETTE_R][i] << 4;
             g = s->anapal[PALETTE_G][i] << 4;
             b = s->anapal[PALETTE_B][i] << 4;
-            s->palette_gfx[i] = rgb_to_pixel(depth, r, g, b);
+            s->palette_gfx16[i] = rgb_to_pixel(depth, r, g, b);
         }
     } else {
         for (i = 0; i < 4; i++) {
@@ -4181,11 +4184,11 @@ static void update_palette(VGAState *s)
             r = (s->digipal[i] & 0x02) ? 0xff : 0;
             g = (s->digipal[i] & 0x04) ? 0xff : 0;
             b = (s->digipal[i] & 0x01) ? 0xff : 0;
-            s->palette_gfx[lo[i]] = rgb_to_pixel(depth, r, g, b);
+            s->palette_gfx8[lo[i]] = rgb_to_pixel(depth, r, g, b);
             r = (s->digipal[i] & 0x20) ? 0xff : 0;
             g = (s->digipal[i] & 0x40) ? 0xff : 0;
             b = (s->digipal[i] & 0x10) ? 0xff : 0;
-            s->palette_gfx[hi[i]] = rgb_to_pixel(depth, r, g, b);
+            s->palette_gfx8[hi[i]] = rgb_to_pixel(depth, r, g, b);
         }
     }
 }
@@ -4228,7 +4231,7 @@ static void render_chr_screen(VGAState *s)
         xofs = 8;
         addrofs = 1;
     }
-    memset(s->tvram_buffer, 0, 640 * 480);
+    memset(s->tvram_buffer, 0, sizeof(s->tvram_buffer));
 
     for (y = 0; y < 400; y += bl) {
         uint32_t gaiji1st = 0, last = 0, offset;
@@ -4267,19 +4270,21 @@ static void render_chr_screen(VGAState *s)
                     gaiji1st = 0;
                 }
             } else {
-                uint16_t lo = code & 0xff;
-                if (s->mode1[MODE1_FONTSEL]) {
-                    offset = 0x80000 | (lo << 4);
-                } else {
-                    offset = 0x82000 | (lo << 4);
+                offset = 0x80000 | ((code & 0xff) << 4);
+                if((attr & ATTR_VL) && s->mode1[MODE1_ATRSEL]) {
+                    offset |= 0x1000;
+                }
+                if(!s->mode1[MODE1_FONTSEL]) {
+                    offset |= 0x2000;
                 }
                 gaiji1st = 0;
             }
             last = offset;
+
             for (l = 0; l < cl && l < 16; l++) {
                 int yy = y + l + pl;
-                if (yy >= ytop && yy < 480) {
-                    uint8_t *dest = s->tvram_buffer + yy * 640 + x;
+                if (yy >= ytop && yy < 400) {
+                    uint8_t *dest = s->tvram_buffer + yy * 641 + x;
                     uint8_t pattern = s->font[offset + l];
                     if (!(attr & ATTR_ST)) {
                         pattern = 0;
@@ -4290,7 +4295,7 @@ static void render_chr_screen(VGAState *s)
                     if ((attr & ATTR_UL) && l == 15) {
                         pattern = 0xff;
                     }
-                    if (attr & ATTR_VL) {
+                    if ((attr & ATTR_VL)  && !s->mode1[MODE1_ATRSEL]) {
                         pattern |= 0x08;
                     }
                     if (cursor && l >= cursor_top && l < cursor_bottom) {
@@ -4363,11 +4368,11 @@ static void render_gfx_screen(VGAState *s)
         }
         for (y = 0; y < 400; y++) {
             for (x = 0; x < 640; x += 8) {
-                b = s->vram16_draw_b[*addr];
-                r = s->vram16_draw_r[*addr];
-                g = s->vram16_draw_g[*addr];
+                b = s->vram16_disp_b[*addr];
+                r = s->vram16_disp_r[*addr];
+                g = s->vram16_disp_g[*addr];
                 if (s->mode2[MODE2_16COLOR]) {
-                    e = s->vram16_draw_e[*addr];
+                    e = s->vram16_disp_e[*addr];
                 }
                 addr++;
                 *dest++ = ((b & 0x80) >> 7) | ((r & 0x80) >> 6) | ((g & 0x80) >> 5) | ((e & 0x80) >> 4);
@@ -4379,8 +4384,12 @@ static void render_gfx_screen(VGAState *s)
                 *dest++ = ((b & 0x02) >> 1) | ((r & 0x02) >> 0) | ((g & 0x02) << 1) | ((e & 0x02) << 2);
                 *dest++ = ((b & 0x01) >> 0) | ((r & 0x01) << 1) | ((g & 0x01) << 2) | ((e & 0x01) << 3);
             }
-            if (s->mode1[MODE1_200LINE]) {
-                memset(dest, 0, 640);
+            if ((s->gdc_gfx.cs[0] & 0x1f) == 1) {
+                if (s->mode1[MODE1_200LINE]) {
+                    memset(dest, 0, 640);
+                } else {
+                    memcpy(dest, dest - 640, 640);
+                }
                 dest += 640;
                 y++;
             }
@@ -4406,10 +4415,12 @@ static void render_gfx_screen(VGAState *s)
 static void update_display(void *opaque)
 {
     VGAState *s = opaque;
+    uint8_t chr_start = s->gdc_chr.start;
 
     /* render screen */
     if (s->mode2[MODE2_256COLOR] && s->mode2[MODE2_480LINE]) {
         s->height = 480;
+        chr_start = 0;
     } else {
         s->height = 400;
     }
@@ -4424,7 +4435,7 @@ static void update_display(void *opaque)
             s->gdc_chr.dirty &= ~GDC_DIRTY_START;
             s->dirty |= DIRTY_DISPLAY;
         }
-        if (s->gdc_chr.start) {
+        if (chr_start) {
             if ((s->gdc_chr.dirty & GDC_DIRTY_CHR) || (s->dirty & DIRTY_TVRAM)) {
                 /* update text screen */
                 render_chr_screen(s);
@@ -4469,14 +4480,19 @@ static void update_display(void *opaque)
         int size = ds_get_linesize(s->ds);
         uint8_t *dest1 = ds_get_data(s->ds);
 
-        if (s->mode1[MODE1_DISP]) {
+        if (s->mode1[MODE1_DISP] && (chr_start || s->gdc_gfx.start)) {
             /* output screen */
             uint8_t *src_chr;
             uint8_t *src_gfx;
-            if (!s->gdc_chr.start || s->mode2[MODE2_256COLOR]) {
+            uint32_t *palette_gfx;
+
+            if (!chr_start) {
                 src_chr = s->null_buffer;
             } else {
                 src_chr = s->tvram_buffer;
+                if (!s->mode2[MODE2_TXTSHIFT]) {
+                    src_chr++;
+                }
             }
             if (!s->gdc_gfx.start) {
                 src_gfx = s->null_buffer;
@@ -4487,6 +4503,13 @@ static void update_display(void *opaque)
             } else {
                 src_gfx = s->vram1_buffer;
             }
+            if (s->mode2[MODE2_256COLOR]) {
+                palette_gfx = s->palette_gfx256;
+            } else if (s->mode2[MODE2_16COLOR]) {
+                palette_gfx = s->palette_gfx16;
+            } else {
+                palette_gfx = s->palette_gfx8;
+            }
             for (y = 0; y < s->height; y++) {
                 uint8_t *dest = dest1;
                 switch(depth) {
@@ -4495,7 +4518,7 @@ static void update_display(void *opaque)
                         if (*src_chr) {
                             *((uint8_t *)dest) = s->palette_chr[*src_chr & 0x07];
                         } else {
-                            *((uint8_t *)dest) = s->palette_gfx[*src_gfx];
+                            *((uint8_t *)dest) = palette_gfx[*src_gfx];
                         }
                         src_chr++;
                         src_gfx++;
@@ -4508,7 +4531,7 @@ static void update_display(void *opaque)
                         if (*src_chr) {
                             *((uint16_t *)dest) = s->palette_chr[*src_chr & 0x07];
                         } else {
-                            *((uint16_t *)dest) = s->palette_gfx[*src_gfx];
+                            *((uint16_t *)dest) = palette_gfx[*src_gfx];
                         }
                         src_chr++;
                         src_gfx++;
@@ -4520,7 +4543,7 @@ static void update_display(void *opaque)
                         if (*src_chr) {
                             *((uint32_t *)dest) = s->palette_chr[*src_chr & 0x07];
                         } else {
-                            *((uint32_t *)dest) = s->palette_gfx[*src_gfx];
+                            *((uint32_t *)dest) = palette_gfx[*src_gfx];
                         }
                         src_chr++;
                         src_gfx++;
@@ -4528,6 +4551,7 @@ static void update_display(void *opaque)
                     }
                     break;
                 }
+                src_chr++; // width=641
                 dest1 += size;
             }
         } else {
@@ -4587,20 +4611,22 @@ static void font_init(VGAState *s)
     int i, j;
 
     p = s->font + 0x81000;
-    q = s->font + 0x82000;
+    q = s->font + 0x83000;
     for (i = 0; i < 256; i++) {
-        q += 8;
         for (j = 0; j < 4; j++) {
             uint32_t bit = 0;
-            if (i & (1 << j))
+            if (i & (1 << j)) {
                 bit |= 0xf0f0f0f0;
-            if (i & (0x10 << j))
+            }
+            if (i & (0x10 << j)) {
                 bit |= 0x0f0f0f0f;
+            }
             *(uint32_t *)p = bit;
             p += 4;
             *(uint16_t *)q = (uint16_t)bit;
             q += 2;
         }
+        q += 8;
     }
     for (i = 0; i < 0x80; i++) {
         q = s->font + (i << 12);

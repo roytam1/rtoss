@@ -1199,12 +1199,8 @@ QEMUMachine isapc_machine = {
 
 /* NEC PC-9821 */
 
+#ifdef HAS_AUDIO
 #define SUPPORT_PC98_FMSOUND
-
-#ifdef SUPPORT_PC98_FMSOUND
-#define PC98_NE2000_NB_MAX 1
-#else
-#define PC98_NE2000_NB_MAX 2
 #endif
 
 static void *pc98_sys;
@@ -1254,11 +1250,15 @@ static uint32_t pc98_ioport_9894_read(void *opaque, uint32_t addr)
     return 0x90; /* cpu wait */
 }
 
-#ifndef SUPPORT_PC98_FMSOUND
+#ifdef HAS_AUDIO
+#ifdef SUPPORT_PC98_FMSOUND
+    /* This port is assigned in pc98fmsound.c */
+#else
 static uint32_t pc98_ioport_a460_read(void *opaque, uint32_t addr)
 {
     return 0x7f; /* Mate-X PCM */
 }
+#endif
 #endif
 
 void pc98_cpu_shutdown(void)
@@ -1276,8 +1276,10 @@ void pc98_select_ems(uint32_t value)
 }
 
 /* LGY-98 */
+#define PC98_NE2000_NB_MAX 2
+
 static const int pc98_ne2000_io[2] = { 0xd0, 0x10d0 };
-static const int pc98_ne2000_irq[2] = { 6, 3 };
+static const int pc98_ne2000_irq[2] = { 6, 5 };
 
 static void pc98_init_ne2k_isa(NICInfo *nd, qemu_irq *pic)
 {
@@ -1375,9 +1377,8 @@ static void pc98_init1(ram_addr_t ram_size,
            1  KEYBOARD
            2  CRTV
            3  PC-9801-86
-              LGY-98 #2 (I/O=10D0h)
            4  RS-232C
-           5  (SCSI)
+           5  LGY-98 #2 (I/O=10D0h)
            6  LGY-98 #1 (I/O=00D0h)
            7  SLAVE PIC
            8  FPU
@@ -1401,10 +1402,12 @@ static void pc98_init1(ram_addr_t ram_size,
     register_ioport_write(0x534, 1, 1, pc98_ioport_534_write, NULL);
     register_ioport_read(0x534, 1, 1, pc98_ioport_534_read, NULL);
     register_ioport_read(0x9894, 1, 1, pc98_ioport_9894_read, NULL);
+#ifdef HAS_AUDIO
 #ifdef SUPPORT_PC98_FMSOUND
     /* This port is assigned in pc98fmsound.c */
 #else
     register_ioport_read(0xa460, 1, 1, pc98_ioport_a460_read, NULL);
+#endif
 #endif
 
     cpu_irq = qemu_allocate_irqs(pic_irq_request, NULL, 1);

@@ -220,7 +220,7 @@ static const fd_format_t fd_formats[] = {
     /* 1.23 MB 5"1/4 floppy disks */
     { FDRIVE_DRV_120, FDRIVE_DISK_288, 1024,  8, 77, 1, "1.23 MB 5\"1/4", },
     /* 1.2 MB 5"1/4 floppy disks */
-    { FDRIVE_DRV_120, FDRIVE_DISK_288,  512, 15, 80, 1,  "1.2 kB 5\"1/4", },
+    { FDRIVE_DRV_120, FDRIVE_DISK_288,  512, 15, 80, 1,  "1.2 MB 5\"1/4", },
     { FDRIVE_DRV_120, FDRIVE_DISK_288,  512, 18, 80, 1, "1.44 MB 5\"1/4", },
     { FDRIVE_DRV_120, FDRIVE_DISK_288,  512, 18, 82, 1, "1.48 MB 5\"1/4", },
     { FDRIVE_DRV_120, FDRIVE_DISK_288,  512, 18, 83, 1, "1.49 MB 5\"1/4", },

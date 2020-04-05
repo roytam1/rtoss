@@ -1426,70 +1426,84 @@ static void gen_shift_rm_T1(DisasContext *s, int ot, int op1,
 {
     target_ulong mask;
     int shift_label;
-    TCGv t0, t1;
+    TCGv t0, t1, t2;
 
-    if (ot == OT_QUAD)
+    if (ot == OT_QUAD) {
         mask = 0x3f;
-    else
+    } else {
         mask = 0x1f;
+    }
 
     /* load */
-    if (op1 == OR_TMP0)
+    if (op1 == OR_TMP0) {
         gen_op_ld_T0_A0(ot + s->mem_index);
-    else
+    } else {
         gen_op_mov_TN_reg(ot, 0, op1);
+    }
 
-    tcg_gen_andi_tl(cpu_T[1], cpu_T[1], mask);
+    t0 = tcg_temp_local_new();
+    t1 = tcg_temp_local_new();
+    t2 = tcg_temp_local_new();
 
-    tcg_gen_addi_tl(cpu_tmp5, cpu_T[1], -1);
+    tcg_gen_andi_tl(t2, cpu_T[1], mask);
 
     if (is_right) {
         if (is_arith) {
             gen_exts(ot, cpu_T[0]);
-            tcg_gen_sar_tl(cpu_T3, cpu_T[0], cpu_tmp5);
-            tcg_gen_sar_tl(cpu_T[0], cpu_T[0], cpu_T[1]);
+            tcg_gen_mov_tl(t0, cpu_T[0]);
+            tcg_gen_sar_tl(cpu_T[0], cpu_T[0], t2);
         } else {
             gen_extu(ot, cpu_T[0]);
-            tcg_gen_shr_tl(cpu_T3, cpu_T[0], cpu_tmp5);
-            tcg_gen_shr_tl(cpu_T[0], cpu_T[0], cpu_T[1]);
+            tcg_gen_mov_tl(t0, cpu_T[0]);
+            tcg_gen_shr_tl(cpu_T[0], cpu_T[0], t2);
         }
     } else {
-        tcg_gen_shl_tl(cpu_T3, cpu_T[0], cpu_tmp5);
-        tcg_gen_shl_tl(cpu_T[0], cpu_T[0], cpu_T[1]);
+        tcg_gen_mov_tl(t0, cpu_T[0]);
+        tcg_gen_shl_tl(cpu_T[0], cpu_T[0], t2);
     }
 
     /* store */
-    if (op1 == OR_TMP0)
+    if (op1 == OR_TMP0) {
         gen_op_st_T0_A0(ot + s->mem_index);
-    else
+    } else {
         gen_op_mov_reg_T0(ot, op1);
-        
+    }
+
     /* update eflags if non zero shift */
-    if (s->cc_op != CC_OP_DYNAMIC)
+    if (s->cc_op != CC_OP_DYNAMIC) {
         gen_op_set_cc_op(s->cc_op);
+    }
 
-    /* XXX: inefficient */
-    t0 = tcg_temp_local_new();
-    t1 = tcg_temp_local_new();
-
-    tcg_gen_mov_tl(t0, cpu_T[0]);
-    tcg_gen_mov_tl(t1, cpu_T3);
+    tcg_gen_mov_tl(t1, cpu_T[0]);
 
     shift_label = gen_new_label();
-    tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_T[1], 0, shift_label);
+    tcg_gen_brcondi_tl(TCG_COND_EQ, t2, 0, shift_label);
 
-    tcg_gen_mov_tl(cpu_cc_src, t1);
-    tcg_gen_mov_tl(cpu_cc_dst, t0);
-    if (is_right)
+    tcg_gen_addi_tl(t2, t2, -1);
+    tcg_gen_mov_tl(cpu_cc_dst, t1);
+
+    if (is_right) {
+        if (is_arith) {
+            tcg_gen_sar_tl(cpu_cc_src, t0, t2);
+        } else {
+            tcg_gen_shr_tl(cpu_cc_src, t0, t2);
+        }
+    } else {
+        tcg_gen_shl_tl(cpu_cc_src, t0, t2);
+    }
+
+    if (is_right) {
         tcg_gen_movi_i32(cpu_cc_op, CC_OP_SARB + ot);
-    else
+    } else {
         tcg_gen_movi_i32(cpu_cc_op, CC_OP_SHLB + ot);
-        
+    }
+
     gen_set_label(shift_label);
     s->cc_op = CC_OP_DYNAMIC; /* cannot predict flags after */
 
     tcg_temp_free(t0);
     tcg_temp_free(t1);
+    tcg_temp_free(t2);
 }
 
 static void gen_shift_rm_im(DisasContext *s, int ot, int op1, int op2,
@@ -4827,20 +4841,23 @@ static target_ulong disas_insn(DisasContext *s, target_ulong pc_start)
             tcg_gen_sub_tl(t2, t2, t0);
             gen_extu(ot, t2);
             tcg_gen_brcondi_tl(TCG_COND_EQ, t2, 0, label1);
+            label2 = gen_new_label();
             if (mod == 3) {
-                label2 = gen_new_label();
                 gen_op_mov_reg_v(ot, R_EAX, t0);
                 tcg_gen_br(label2);
                 gen_set_label(label1);
                 gen_op_mov_reg_v(ot, rm, t1);
-                gen_set_label(label2);
             } else {
-                tcg_gen_mov_tl(t1, t0);
+                /* perform no-op store cycle like physical cpu; must be
+                   before changing accumulator to ensure idempotency if
+                   the store faults and the instruction is restarted */
+                gen_op_st_v(ot + s->mem_index, t0, a0);
                 gen_op_mov_reg_v(ot, R_EAX, t0);
+                tcg_gen_br(label2);
                 gen_set_label(label1);
-                /* always store */
                 gen_op_st_v(ot + s->mem_index, t1, a0);
             }
+            gen_set_label(label2);
             tcg_gen_mov_tl(cpu_cc_src, t0);
             tcg_gen_mov_tl(cpu_cc_dst, t2);
             s->cc_op = CC_OP_SUBB + ot;
@@ -7477,7 +7494,7 @@ static target_ulong disas_insn(DisasContext *s, target_ulong pc_start)
             break;
         case 5: /* lfence */
         case 6: /* mfence */
-            if ((modrm & 0xc7) != 0xc0 || !(s->cpuid_features & CPUID_SSE))
+            if ((modrm & 0xc7) != 0xc0 || !(s->cpuid_features & CPUID_SSE2))
                 goto illegal_op;
             break;
         case 7: /* sfence / clflush */
