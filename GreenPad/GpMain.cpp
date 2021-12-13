@@ -511,12 +511,12 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 		::CheckMenuItem( menu, ID_CMD_WRAPWINDOW, MF_BYCOMMAND|(wrap_==0?MF_CHECKED:MF_UNCHECKED));
 	}
 
-#if defined(TARGET_VER) && TARGET_VER==310
+/*#if defined(TARGET_VER) && TARGET_VER==310
 	::EnableMenuItem( menu, ID_CMD_STATUSBAR, MF_BYCOMMAND|MF_GRAYED );
-#else
+#else*/
 	::CheckMenuItem( menu, ID_CMD_STATUSBAR,
 		cfg_.showStatusBar()?MF_CHECKED:MF_UNCHECKED );
-#endif
+//#endif
 	LOGGER("GreenPadWnd::ReloadConfig on_initmenu end");
 }
 
@@ -1070,11 +1070,11 @@ void GreenPadWnd::on_create( CREATESTRUCT* cs )
 	LOGGER("GreenPadWnd::on_create edit created");
 	edit_.getDoc().AddHandler( this );
 	edit_.getCursor().AddHandler( this );
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+//#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	stb_.SetStatusBarVisible( cfg_.showStatusBar() );
-#elif defined(TARGET_VER) && TARGET_VER==310
+/*#elif defined(TARGET_VER) && TARGET_VER==310
 	stb_.SetStatusBarVisible( false );
-#endif
+#endif*/
 
 	LOGGER("GreenPadWnd::on_create halfway");
 
