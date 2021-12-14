@@ -592,6 +592,7 @@ void GreenPadWnd::on_grep()
 
 void GreenPadWnd::on_datetime()
 {
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310) || (defined(TARGET_VER) && TARGET_VER==310 && defined(UNICODE))
 	String g = cfg_.dateFormat();
 	TCHAR buf[255], tmp[255];
 	::GetTimeFormat
@@ -599,6 +600,7 @@ void GreenPadWnd::on_datetime()
 	::GetDateFormat
 		( LOCALE_USER_DEFAULT, 0, NULL, buf, tmp,countof(tmp));
 	edit_.getCursor().Input( tmp, ::lstrlen(tmp) );
+#endif
 }
 
 void GreenPadWnd::on_doctype( int no )
