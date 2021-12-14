@@ -20,7 +20,7 @@ bool StatusBar::Create( HWND parent )
 		WS_CHILD|WS_VISIBLE|SBARS_SIZEGRIP,
 		TEXT(""), parent, 1787 );
 #else
-	if(App::getOSVer() == 310) {
+	if(App::getOSVer() == 310 || (App::getOSVer() == 350 && App::getOSBuild() < 807)) {
 	// Avoid using CreateStatusWindow that is not present on NT3.1.
 		h = ::CreateWindow(
 			TEXT("msctls_statusbar"),  // pointer to registered class name, N.B. no "32" suffix in NT 3.1's comctl32.dll
