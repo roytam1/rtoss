@@ -116,6 +116,12 @@ int App::getOSVer()
 	return v.dwMajorVersion*100+v.dwMinorVersion;
 }
 
+int App::getOSBuild()
+{
+	static const OSVERSIONINFO& v = osver();
+	return v.dwBuildNumber;
+}
+
 bool App::isNewTypeWindows()
 {
 	static const OSVERSIONINFO& v = osver();
