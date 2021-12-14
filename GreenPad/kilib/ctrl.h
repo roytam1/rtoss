@@ -56,6 +56,7 @@ inline void StatusBar::SetParts( int n, int* parts )
 	{ SendMsg( SB_SETPARTS, n, reinterpret_cast<LPARAM>(parts) ); }
 
 inline void StatusBar::SetText( const TCHAR* str, int part ) {
+#if defined(TARGET_VER) && TARGET_VER==310
 	if(App::getOSVer() == 310) {
 		// early builds of common controls status bar is ANSI only
 		int strlength = ::lstrlen(str)+1;
@@ -66,6 +67,9 @@ inline void StatusBar::SetText( const TCHAR* str, int part ) {
 	} else {
 		SendMsg( SB_SETTEXT, part, reinterpret_cast<LPARAM>(str) );
 	}
+#else
+	SendMsg( SB_SETTEXT, part, reinterpret_cast<LPARAM>(str) );
+#endif
 }
 
 inline void StatusBar::SetStatusBarVisible(bool b)
