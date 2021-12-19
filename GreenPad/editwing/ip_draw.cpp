@@ -162,6 +162,13 @@ LRESULT View::on_message( UINT msg, WPARAM wp, LPARAM lp )
 		break;
 
 	case WM_CONTEXTMENU:
+		if( LOWORD(lp) == 0xFFFF && HIWORD(lp) == 0xFFFF) 
+		{ // User pressed the MENU KEY, use caret pos as lp.
+			POINT pt;
+			::GetCaretPos(&pt);
+			ClientToScreen(hwnd(), &pt);
+			lp = MAKELPARAM(pt.x+1, pt.y+impl().fnt().H()/2);
+		}
 		if( !cur().on_contextmenu( LOWORD(lp), HIWORD(lp) ) )
 			return WndImpl::on_message( msg, wp, lp );
 		break;
