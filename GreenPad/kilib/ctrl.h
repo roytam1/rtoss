@@ -56,8 +56,9 @@ inline void StatusBar::SetParts( int n, int* parts )
 	{ SendMsg( SB_SETPARTS, n, reinterpret_cast<LPARAM>(parts) ); }
 
 inline void StatusBar::SetText( const TCHAR* str, int part ) {
-#if defined(TARGET_VER) && TARGET_VER==310
-	if(App::getOSVer() == 310) {
+//#if defined(TARGET_VER) && TARGET_VER==310
+#if defined(UNICODE)
+	if(App::getOSVer() == 310 || app().isOldCommCtrl()) {
 		// early builds of common controls status bar is ANSI only
 		int strlength = ::lstrlen(str)+1;
 		char *asciistr = new char[strlength];
