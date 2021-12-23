@@ -16,6 +16,7 @@ App* App::pUniqueInstance_;
 inline App::App()
 	: exitcode_    (-1)
 	, loadedModule_(0)
+	, isOldCommCtrl_(false)
 	, hInst_       (::GetModuleHandle(NULL))
 {
 	// 唯一のインスタンスは私です。
@@ -49,7 +50,17 @@ void App::InitModule( imflag what )
 	if( !(loadedModule_ & what) )
 		switch( what )
 		{
-		case CTL: ::InitCommonControls(); break;
+		case CTL: {
+			HINSTANCE hinstDll;
+			hinstDll = LoadLibrary(TEXT("comctl32.dll"));
+
+			::InitCommonControls();
+
+			isOldCommCtrl_ = GetProcAddress(hinstDll, "DllGetVersion") == NULL;
+			FreeLibrary(hinstDll);
+
+			break;
+		}
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 		case COM: ::CoInitialize( NULL ); break;
 		case OLE: ::OleInitialize( NULL );break;
@@ -154,6 +165,10 @@ bool App::isNewShell()
 	return v.dwMajorVersion>3;
 }
 
+bool App::isOldCommCtrl()
+{
+	return isOldCommCtrl_;
+}
 
 
 //=========================================================================
