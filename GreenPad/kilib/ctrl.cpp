@@ -55,6 +55,24 @@ bool StatusBar::Create( HWND parent )
 	return true;
 }
 
+void StatusBar::SetText( const TCHAR* str, int part ) {
+//#if defined(TARGET_VER) && TARGET_VER==310
+#if defined(UNICODE)
+	if(App::getOSVer() == 310 || app().isOldCommCtrl()) {
+		// early builds of common controls status bar is ANSI only
+		int strlength = ::lstrlen(str)+1;
+		char *asciistr = new char[strlength];
+		for(int i=0;i<strlength; ++i) asciistr[i]=*(str+i); // cheap conversion to ANSI
+		::SendMessageA( hwnd(), SB_SETTEXTA, part, reinterpret_cast<LPARAM>(asciistr) );
+		delete []asciistr;
+	} else {
+		SendMsg( SB_SETTEXT, part, reinterpret_cast<LPARAM>(str) );
+	}
+#else
+	SendMsg( SB_SETTEXT, part, reinterpret_cast<LPARAM>(str) );
+#endif
+}
+
 int StatusBar::AutoResize( bool maximized )
 {
 	// サイズ自動変更

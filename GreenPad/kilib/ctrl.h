@@ -55,24 +55,6 @@ inline bool StatusBar::isStatusBarVisible() const
 inline void StatusBar::SetParts( int n, int* parts )
 	{ SendMsg( SB_SETPARTS, n, reinterpret_cast<LPARAM>(parts) ); }
 
-inline void StatusBar::SetText( const TCHAR* str, int part ) {
-//#if defined(TARGET_VER) && TARGET_VER==310
-#if defined(UNICODE)
-	if(App::getOSVer() == 310 || app().isOldCommCtrl()) {
-		// early builds of common controls status bar is ANSI only
-		int strlength = ::lstrlen(str)+1;
-		char *asciistr = new char[strlength];
-		for(int i=0;i<strlength; ++i) asciistr[i]=*(str+i); // cheap conversion to ANSI
-		::SendMessageA( hwnd(), SB_SETTEXTA, part, reinterpret_cast<LPARAM>(asciistr) );
-		delete []asciistr;
-	} else {
-		SendMsg( SB_SETTEXT, part, reinterpret_cast<LPARAM>(str) );
-	}
-#else
-	SendMsg( SB_SETTEXT, part, reinterpret_cast<LPARAM>(str) );
-#endif
-}
-
 inline void StatusBar::SetStatusBarVisible(bool b)
 	{ ::ShowWindow( hwnd(), b?SW_SHOW:SW_HIDE ); visible_=b; }
 
