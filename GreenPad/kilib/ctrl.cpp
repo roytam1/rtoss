@@ -15,11 +15,11 @@ StatusBar::StatusBar()
 bool StatusBar::Create( HWND parent )
 {
 	HWND h = NULL;
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+/*#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	h = ::CreateStatusWindow(
 		WS_CHILD|WS_VISIBLE|SBARS_SIZEGRIP,
 		TEXT(""), parent, 1787 );
-#else
+#else*/
 	if(App::getOSVer() == 310 || (App::getOSVer() == 350 && App::getOSBuild() < 807)) {
 	// Avoid using CreateStatusWindow that is not present on NT3.1.
 		h = ::CreateWindow(
@@ -45,7 +45,7 @@ bool StatusBar::Create( HWND parent )
 			NULL // pointer to window-creation data
 		);
 	}
-#endif
+//#endif
 	if( h == NULL )
 		return false;
 
