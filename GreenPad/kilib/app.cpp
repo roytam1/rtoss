@@ -98,24 +98,18 @@ const OSVERSIONINFO& App::osver()
 
 		s_osVer.dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
 		s_osVer.dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
-		if (dwVersion < 0x80000000)              
-				s_osVer.dwBuildNumber = (DWORD)(HIWORD(dwVersion));
 
-		if(s_osVer.dwMajorVersion == 3) s_osVer.dwPlatformId=VER_PLATFORM_WIN32_NT;
-		else if(s_osVer.dwMajorVersion == 4)
-		{
-			if(s_osVer.dwMinorVersion == 0)
-			{
-				if(s_osVer.dwBuildNumber <= 950 || s_osVer.dwBuildNumber == 1111 || s_osVer.dwBuildNumber == 1214)
-					s_osVer.dwPlatformId=VER_PLATFORM_WIN32_WINDOWS;
-				else s_osVer.dwPlatformId=VER_PLATFORM_WIN32_NT;
-			}
-			else
-			{
-				s_osVer.dwPlatformId=VER_PLATFORM_WIN32_WINDOWS;
-			}
+		if (dwVersion < 0x80000000) {
+			s_osVer.dwBuildNumber = (DWORD)(HIWORD(dwVersion));
+			s_osVer.dwPlatformId = VER_PLATFORM_WIN32_NT;
 		}
-		else s_osVer.dwPlatformId=VER_PLATFORM_WIN32_NT;
+
+		if (s_osVer.dwPlatformId != VER_PLATFORM_WIN32_NT) {
+			if (s_osVer.dwMajorVersion == 3) s_osVer.dwPlatformId = VER_PLATFORM_WIN32s;
+			else s_osVer.dwPlatformId = VER_PLATFORM_WIN32_WINDOWS;
+
+			//s_osVer.dwBuildNumber = (DWORD)(HIWORD(dwVersion & 0x7FFFFFFF)); // when dwPlatformId == VER_PLATFORM_WIN32_WINDOWS, HIWORD(dwVersion) is reserved
+		}
 #endif
 	}
 	return s_osVer;
