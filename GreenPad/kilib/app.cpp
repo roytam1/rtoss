@@ -16,11 +16,21 @@ App* App::pUniqueInstance_;
 inline App::App()
 	: exitcode_    (-1)
 	, loadedModule_(0)
-	, isOldCommCtrl_(false)
+	, isOldCommCtrl_(true)
+	, isNewShell_(false)
 	, hInst_       (::GetModuleHandle(NULL))
 {
 	// 唯一のインスタンスは私です。
 	pUniqueInstance_ = this;
+
+	// lets check NewShell here
+	HINSTANCE hinstDll;
+	hinstDll = LoadLibrary(TEXT("shell32.dll"));
+
+	if(hinstDll) {
+		isNewShell_ = GetProcAddress(hinstDll, "SHGetSpecialFolderLocation") != NULL;
+		FreeLibrary(hinstDll);
+	}
 }
 
 #pragma warning( disable : 4722 ) // 警告：デストラクタに値が戻りません
@@ -56,8 +66,10 @@ void App::InitModule( imflag what )
 
 			::InitCommonControls();
 
-			isOldCommCtrl_ = GetProcAddress(hinstDll, "DllGetVersion") == NULL;
-			FreeLibrary(hinstDll);
+			if(hinstDll) {
+				isOldCommCtrl_ = GetProcAddress(hinstDll, "DllGetVersion") == NULL;
+				FreeLibrary(hinstDll);
+			}
 
 			break;
 		}
@@ -153,10 +165,15 @@ bool App::isNT()
 	return v.dwPlatformId==VER_PLATFORM_WIN32_NT;
 }
 
-bool App::isNewShell()
+bool App::isWin3later()
 {
 	static const OSVERSIONINFO& v = osver();
 	return v.dwMajorVersion>3;
+}
+
+ bool App::isNewShell()
+{
+	return isNewShell_;
 }
 
 bool App::isOldCommCtrl()

@@ -87,14 +87,15 @@ public:
 	HINSTANCE hinst() const;
 
 	bool isOldCommCtrl();
+	bool isNewShell();
 
 	//@{ WindowsÇÃÉoÅ[ÉWÉáÉì //@}
 	static const OSVERSIONINFO& osver();
 	static int  getOSVer();
 	static int  getOSBuild();
 	static bool isWin95();
+	static bool isWin3later();
 	static bool isNT();
-	static bool isNewShell();
 	static bool isNewTypeWindows();
 
 private:
@@ -108,6 +109,7 @@ private:
 	int             exitcode_;
 	ulong           loadedModule_;
 	bool            isOldCommCtrl_;
+	bool            isNewShell_;
 	const HINSTANCE hInst_;
 	static App*     pUniqueInstance_;
 
