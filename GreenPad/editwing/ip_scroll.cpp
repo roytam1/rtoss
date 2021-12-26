@@ -195,7 +195,7 @@ void ViewImpl::UpdateScrollBar()
 	::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
 	::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
 #elif defined(TARGET_VER) && TARGET_VER<=350 && TARGET_VER>310
-	if(app().isNewShell())
+	if(App::isWin3later())
 	{
 		::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
 		::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
@@ -370,7 +370,7 @@ void ViewImpl::ScrollView( int dx, int dy, bool update )
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
 		::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
 #elif defined(TARGET_VER) && TARGET_VER<=350 && TARGET_VER>310
-		if(app().isNewShell())
+		if(App::isWin3later())
 		{
 			::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
 		}
@@ -391,7 +391,7 @@ void ViewImpl::ScrollView( int dx, int dy, bool update )
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
 		::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
 #elif defined(TARGET_VER) && TARGET_VER<=350 && TARGET_VER>310
-		if(app().isNewShell())
+		if(App::isWin3later())
 		{
 			::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
 		}

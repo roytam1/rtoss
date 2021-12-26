@@ -437,7 +437,7 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 {
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	LOGGER("GreenPadWnd::ReloadConfig on_initmenu begin");
-	if(app().isNewShell())
+	if(App::isWin3later())
 	{
 		MENUITEMINFO mi = { sizeof(MENUITEMINFO), MIIM_STATE };
 

@@ -903,7 +903,7 @@ struct rMBCS : public TextFileRPimpl
 #ifndef _UNICODE
 		len = conv( cp, 0, fb, p-fb, buf, siz );
 #else
-		if(!app().isNewShell())
+		if(!App::isWin3later())
 		{
 			len = conv( cp, 0, fb, p-fb, buf, siz );
 		}
@@ -1293,7 +1293,7 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 	}
 
 //-- chardet and MLang detection
-	if( app().isNewShell() )
+	if( App::isWin3later() )
 	{ // chardet works better when size > 64
 		if( siz > 80 )
 		{
