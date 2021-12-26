@@ -405,7 +405,7 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 				OFN_ENABLESIZING  |
 				OFN_ENABLETEMPLATE;
 
-	if (app().isNewShell())
+	if (App::isWin3later())
 	{
 		// Include the OFN_EXPLORER flag to get the new look.
 		ofn.Flags |= OFN_EXPLORER;
@@ -514,7 +514,7 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 				OFN_ENABLETEMPLATE  |
 				OFN_OVERWRITEPROMPT;
 
-	if (app().isNewShell())
+	if (App::isWin3later())
 	{
 		// Include the OFN_EXPLORER flag to get the new look.
 		ofn.Flags |= OFN_EXPLORER;
