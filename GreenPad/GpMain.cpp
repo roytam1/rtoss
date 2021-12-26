@@ -698,7 +698,7 @@ void GreenPadWnd::on_move( const DPos& c, const DPos& s )
 		for( ulong i=0; i<c.ad; ++i )
 			if( cu[i] == L'\t' )
 				cad = (cad/tab+1)*tab;
-			else if( cu[i]<0x80 || 0xff60<=cu[i] && cu[i]<=0xff9f )
+			else if( cu[i]<0x80 || (cu[i]>0xff60 && cu[i]<=0xff9f) )
 				cad = cad + 1;
 			else
 				cad = cad + 2;
@@ -719,7 +719,7 @@ void GreenPadWnd::on_move( const DPos& c, const DPos& s )
 			const unicode* su = edit_.getDoc().tl(s.tl);
 			sad = 0;
 			for( ulong i=0; i<s.ad; ++i )
-				sad += (su[i]<0x80 || 0xff60<=su[i] && su[i]<=0xff9f ? 1 : 2);
+				sad += (su[i]<0x80 || (su[i]>0xff60 && su[i]<=0xff9f) ? 1 : 2);
 		}
 		str += TEXT(" - (");
 		str += String().SetInt(s.tl+1);
