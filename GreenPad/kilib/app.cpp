@@ -164,6 +164,11 @@ bool App::isNT()
 	static const OSVERSIONINFO& v = osver();
 	return v.dwPlatformId==VER_PLATFORM_WIN32_NT;
 }
+bool App::isWin32s()
+{
+	static const OSVERSIONINFO& v = osver();
+	return v.dwPlatformId==VER_PLATFORM_WIN32s;
+}
 
 bool App::isWin3later()
 {
