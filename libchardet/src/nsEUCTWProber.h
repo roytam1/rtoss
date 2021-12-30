@@ -48,7 +48,7 @@ public:
                       Reset();}
   virtual ~nsEUCTWProber(void){delete mCodingSM;}
   nsProbingState HandleData(const char* aBuf, PRUint32 aLen);
-  const char* GetCharSetName() {return "x-euc-tw";}
+  const char* GetCharSetName() {return "EUC-TW";};
   nsProbingState GetState(void) {return mState;}
   void      Reset(void);
   float     GetConfidence(void);
