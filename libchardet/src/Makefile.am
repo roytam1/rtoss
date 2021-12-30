@@ -53,7 +53,15 @@ tables/GB2312Freq.tab \
 tables/EUCKRFreq.tab \
 nsUTF8Prober.cpp \
 nsSJISProber.cpp \
-LangCyrillicModel.cpp
+LangCyrillicModel.cpp \
+LangArabicModel.cpp \
+LangDanishModel.cpp \
+LangEsperantoModel.cpp \
+LangFrenchModel.cpp \
+LangGermanModel.cpp \
+LangSpanishModel.cpp \
+LangTurkishModel.cpp \
+LangVietnameseModel.cpp
 
 AM_CXXFLAGS = -Wall -Wno-non-virtual-dtor -nostdinc++ -fno-rtti -fno-exceptions
 include_HEADERS = chardet.h

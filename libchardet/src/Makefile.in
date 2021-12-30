@@ -74,7 +74,15 @@ am_libchardet_la_OBJECTS = libchardet_la-CharDistribution.lo \
 	libchardet_la-LangHebrewModel.lo \
 	libchardet_la-nsLatin1Prober.lo libchardet_la-nsUTF8Prober.lo \
 	libchardet_la-nsSJISProber.lo \
-	libchardet_la-LangCyrillicModel.lo
+	libchardet_la-LangCyrillicModel.lo \
+	libchardet_la-LangArabicModel.lo \
+	libchardet_la-LangDanishModel.lo \
+	libchardet_la-LangEsperantoModel.lo \
+	libchardet_la-LangFrenchModel.lo \
+	libchardet_la-LangGermanModel.lo \
+	libchardet_la-LangSpanishModel.lo \
+	libchardet_la-LangTurkishModel.lo \
+	libchardet_la-LangVietnameseModel.lo
 libchardet_la_OBJECTS = $(am_libchardet_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
@@ -273,7 +281,15 @@ tables/GB2312Freq.tab \
 tables/EUCKRFreq.tab \
 nsUTF8Prober.cpp \
 nsSJISProber.cpp \
-LangCyrillicModel.cpp
+LangCyrillicModel.cpp \
+LangArabicModel.cpp \
+LangDanishModel.cpp \
+LangEsperantoModel.cpp \
+LangFrenchModel.cpp \
+LangGermanModel.cpp \
+LangSpanishModel.cpp \
+LangTurkishModel.cpp \
+LangVietnameseModel.cpp
 
 AM_CXXFLAGS = -Wall -Wno-non-virtual-dtor -nostdinc++ -fno-rtti -fno-exceptions
 include_HEADERS = chardet.h
@@ -390,6 +406,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchardet_la-LangHebrewModel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchardet_la-LangHungarianModel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchardet_la-LangThaiModel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchardet_la-LangArabicModel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchardet_la-LangDanishModel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchardet_la-LangEsperantoModel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchardet_la-LangFrenchModel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchardet_la-LangGermanModel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchardet_la-LangSpanishModel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchardet_la-LangTurkishModel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchardet_la-LangVietnameseModel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchardet_la-impl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchardet_la-nsBig5Prober.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchardet_la-nsCharSetProber.Plo@am__quote@
@@ -478,6 +502,62 @@ libchardet_la-LangThaiModel.lo: LangThaiModel.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LangThaiModel.cpp' object='libchardet_la-LangThaiModel.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libchardet_la-LangThaiModel.lo `test -f 'LangThaiModel.cpp' || echo '$(srcdir)/'`LangThaiModel.cpp
+
+libchardet_la-LangArabicModel.lo: LangArabicModel.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libchardet_la-LangArabicModel.lo -MD -MP -MF $(DEPDIR)/libchardet_la-LangArabicModel.Tpo -c -o libchardet_la-LangArabicModel.lo `test -f 'LangArabicModel.cpp' || echo '$(srcdir)/'`LangArabicModel.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libchardet_la-LangArabicModel.Tpo $(DEPDIR)/libchardet_la-LangArabicModel.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LangArabicModel.cpp' object='libchardet_la-LangArabicModel.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libchardet_la-LangArabicModel.lo `test -f 'LangArabicModel.cpp' || echo '$(srcdir)/'`LangArabicModel.cpp
+
+libchardet_la-LangDanishModel.lo: LangDanishModel.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libchardet_la-LangDanishModel.lo -MD -MP -MF $(DEPDIR)/libchardet_la-LangDanishModel.Tpo -c -o libchardet_la-LangDanishModel.lo `test -f 'LangDanishModel.cpp' || echo '$(srcdir)/'`LangDanishModel.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libchardet_la-LangDanishModel.Tpo $(DEPDIR)/libchardet_la-LangDanishModel.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LangDanishModel.cpp' object='libchardet_la-LangDanishModel.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libchardet_la-LangDanishModel.lo `test -f 'LangDanishModel.cpp' || echo '$(srcdir)/'`LangDanishModel.cpp
+
+libchardet_la-LangEsperantoModel.lo: LangEsperantoModel.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libchardet_la-LangEsperantoModel.lo -MD -MP -MF $(DEPDIR)/libchardet_la-LangEsperantoModel.Tpo -c -o libchardet_la-LangEsperantoModel.lo `test -f 'LangEsperantoModel.cpp' || echo '$(srcdir)/'`LangEsperantoModel.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libchardet_la-LangEsperantoModel.Tpo $(DEPDIR)/libchardet_la-LangEsperantoModel.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LangEsperantoModel.cpp' object='libchardet_la-LangEsperantoModel.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libchardet_la-LangEsperantoModel.lo `test -f 'LangEsperantoModel.cpp' || echo '$(srcdir)/'`LangEsperantoModel.cpp
+
+libchardet_la-LangFrenchModel.lo: LangFrenchModel.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libchardet_la-LangFrenchModel.lo -MD -MP -MF $(DEPDIR)/libchardet_la-LangFrenchModel.Tpo -c -o libchardet_la-LangFrenchModel.lo `test -f 'LangFrenchModel.cpp' || echo '$(srcdir)/'`LangFrenchModel.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libchardet_la-LangFrenchModel.Tpo $(DEPDIR)/libchardet_la-LangFrenchModel.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LangFrenchModel.cpp' object='libchardet_la-LangFrenchModel.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libchardet_la-LangFrenchModel.lo `test -f 'LangFrenchModel.cpp' || echo '$(srcdir)/'`LangFrenchModel.cpp
+
+libchardet_la-LangGermanModel.lo: LangGermanModel.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libchardet_la-LangGermanModel.lo -MD -MP -MF $(DEPDIR)/libchardet_la-LangGermanModel.Tpo -c -o libchardet_la-LangGermanModel.lo `test -f 'LangGermanModel.cpp' || echo '$(srcdir)/'`LangGermanModel.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libchardet_la-LangGermanModel.Tpo $(DEPDIR)/libchardet_la-LangGermanModel.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LangGermanModel.cpp' object='libchardet_la-LangGermanModel.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libchardet_la-LangGermanModel.lo `test -f 'LangGermanModel.cpp' || echo '$(srcdir)/'`LangGermanModel.cpp
+
+libchardet_la-LangSpanishModel.lo: LangSpanishModel.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libchardet_la-LangSpanishModel.lo -MD -MP -MF $(DEPDIR)/libchardet_la-LangSpanishModel.Tpo -c -o libchardet_la-LangSpanishModel.lo `test -f 'LangSpanishModel.cpp' || echo '$(srcdir)/'`LangSpanishModel.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libchardet_la-LangSpanishModel.Tpo $(DEPDIR)/libchardet_la-LangSpanishModel.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LangSpanishModel.cpp' object='libchardet_la-LangSpanishModel.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libchardet_la-LangSpanishModel.lo `test -f 'LangSpanishModel.cpp' || echo '$(srcdir)/'`LangSpanishModel.cpp
+
+libchardet_la-LangTurkishModel.lo: LangTurkishModel.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libchardet_la-LangTurkishModel.lo -MD -MP -MF $(DEPDIR)/libchardet_la-LangTurkishModel.Tpo -c -o libchardet_la-LangTurkishModel.lo `test -f 'LangTurkishModel.cpp' || echo '$(srcdir)/'`LangTurkishModel.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libchardet_la-LangTurkishModel.Tpo $(DEPDIR)/libchardet_la-LangTurkishModel.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LangTurkishModel.cpp' object='libchardet_la-LangTurkishModel.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libchardet_la-LangTurkishModel.lo `test -f 'LangTurkishModel.cpp' || echo '$(srcdir)/'`LangTurkishModel.cpp
+
+libchardet_la-LangVietnameseModel.lo: LangVietnameseModel.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libchardet_la-LangVietnameseModel.lo -MD -MP -MF $(DEPDIR)/libchardet_la-LangVietnameseModel.Tpo -c -o libchardet_la-LangVietnameseModel.lo `test -f 'LangVietnameseModel.cpp' || echo '$(srcdir)/'`LangVietnameseModel.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libchardet_la-LangVietnameseModel.Tpo $(DEPDIR)/libchardet_la-LangVietnameseModel.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LangVietnameseModel.cpp' object='libchardet_la-LangVietnameseModel.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libchardet_la-LangVietnameseModel.lo `test -f 'LangVietnameseModel.cpp' || echo '$(srcdir)/'`LangVietnameseModel.cpp
 
 libchardet_la-nsMBCSGroupProber.lo: nsMBCSGroupProber.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libchardet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libchardet_la-nsMBCSGroupProber.lo -MD -MP -MF $(DEPDIR)/libchardet_la-nsMBCSGroupProber.Tpo -c -o libchardet_la-nsMBCSGroupProber.lo `test -f 'nsMBCSGroupProber.cpp' || echo '$(srcdir)/'`nsMBCSGroupProber.cpp

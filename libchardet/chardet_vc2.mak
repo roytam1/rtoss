@@ -13,7 +13,7 @@ CFG=Win32 Debug
 !MESSAGE You can specify a configuration when running NMAKE on this makefile
 !MESSAGE by defining the macro CFG on the command line.  For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "chardet-vc2.mak" CFG="Win32 Debug"
+!MESSAGE NMAKE /f "chardet_vc2.mak" CFG="Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -43,7 +43,7 @@ RSC=rc.exe
 OUTDIR=.\WinRel
 INTDIR=.\WinRel
 
-ALL : $(OUTDIR)/chardet.dll $(OUTDIR)/"chardet-vc2.bsc"
+ALL : $(OUTDIR)/chardet.dll $(OUTDIR)/chardet_vc2.bsc
 
 $(OUTDIR) : 
     if not exist $(OUTDIR)/nul mkdir $(OUTDIR)
@@ -55,14 +55,14 @@ MTL_PROJ=/nologo /D "NDEBUG" /win32
 # ADD CPP /nologo /MT /W3 /GX /YX /O2 /I "src" /I "src\tables" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /FR /c
 CPP_PROJ=/nologo /MT /W3 /GX /YX /O2 /I "src" /I "src\tables" /D "NDEBUG" /D\
  "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /FR$(INTDIR)/\
- /Fp$(OUTDIR)/"chardet-vc2.pch" /Fo$(INTDIR)/ /c 
+ /Fp$(OUTDIR)/"chardet_vc2.pch" /Fo$(INTDIR)/ /c 
 CPP_OBJS=.\WinRel/
 # ADD BASE RSC /l 0x411 /d "NDEBUG"
 # ADD RSC /l 0x411 /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o$(OUTDIR)/"chardet-vc2.bsc" 
+BSC32_FLAGS=/nologo /o$(OUTDIR)/"chardet_vc2.bsc" 
 BSC32_SBRS= \
 	$(INTDIR)/nsMBCSSM.sbr \
 	$(INTDIR)/nsCharSetProber.sbr \
@@ -89,9 +89,17 @@ BSC32_SBRS= \
 	$(INTDIR)/LangHebrewModel.sbr \
 	$(INTDIR)/nsEUCKRProber.sbr \
 	$(INTDIR)/nsEscCharsetProber.sbr \
-	$(INTDIR)/nsUTF8Prober.sbr
+	$(INTDIR)/nsUTF8Prober.sbr \
+	$(INTDIR)/LangSpanishModel.sbr \
+	$(INTDIR)/LangEsperantoModel.sbr \
+	$(INTDIR)/LangDanishModel.sbr \
+	$(INTDIR)/LangTurkishModel.sbr \
+	$(INTDIR)/LangGermanModel.sbr \
+	$(INTDIR)/LangVietnameseModel.sbr \
+	$(INTDIR)/LangArabicModel.sbr \
+	$(INTDIR)/LangFrenchModel.sbr
 
-$(OUTDIR)/"chardet-vc2.bsc" : $(OUTDIR)  $(BSC32_SBRS)
+$(OUTDIR)/chardet_vc2.bsc : $(OUTDIR)  $(BSC32_SBRS)
     $(BSC32) @<<
   $(BSC32_FLAGS) $(BSC32_SBRS)
 <<
@@ -99,10 +107,11 @@ $(OUTDIR)/"chardet-vc2.bsc" : $(OUTDIR)  $(BSC32_SBRS)
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /NOLOGO /SUBSYSTEM:windows /DLL /MACHINE:I386
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /NOLOGO /SUBSYSTEM:windows /DLL /PDB:"WinRel/chardet.pdb" /MACHINE:I386 /OUT:"WinRel/chardet.dll"
+# SUBTRACT LINK32 /PDB:none
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /NOLOGO\
  /SUBSYSTEM:windows /DLL /INCREMENTAL:no /PDB:"WinRel/chardet.pdb" /MACHINE:I386\
- /OUT:"WinRel/chardet.dll" /IMPLIB:$(OUTDIR)/"chardet-vc2.lib" 
+ /OUT:"WinRel/chardet.dll" /IMPLIB:$(OUTDIR)/"chardet_vc2.lib" 
 DEF_FILE=
 LINK32_OBJS= \
 	$(INTDIR)/nsMBCSSM.obj \
@@ -130,7 +139,15 @@ LINK32_OBJS= \
 	$(INTDIR)/LangHebrewModel.obj \
 	$(INTDIR)/nsEUCKRProber.obj \
 	$(INTDIR)/nsEscCharsetProber.obj \
-	$(INTDIR)/nsUTF8Prober.obj
+	$(INTDIR)/nsUTF8Prober.obj \
+	$(INTDIR)/LangSpanishModel.obj \
+	$(INTDIR)/LangEsperantoModel.obj \
+	$(INTDIR)/LangDanishModel.obj \
+	$(INTDIR)/LangTurkishModel.obj \
+	$(INTDIR)/LangGermanModel.obj \
+	$(INTDIR)/LangVietnameseModel.obj \
+	$(INTDIR)/LangArabicModel.obj \
+	$(INTDIR)/LangFrenchModel.obj
 
 $(OUTDIR)/chardet.dll : $(OUTDIR)  $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -150,7 +167,7 @@ $(OUTDIR)/chardet.dll : $(OUTDIR)  $(DEF_FILE) $(LINK32_OBJS)
 OUTDIR=.\WinDebug
 INTDIR=.\WinDebug
 
-ALL : $(OUTDIR)/chardet.dll $(OUTDIR)/"chardet-vc2.bsc"
+ALL : $(OUTDIR)/chardet.dll $(OUTDIR)/chardet_vc2.bsc
 
 $(OUTDIR) : 
     if not exist $(OUTDIR)/nul mkdir $(OUTDIR)
@@ -162,14 +179,14 @@ MTL_PROJ=/nologo /D "_DEBUG" /win32
 # ADD CPP /nologo /MT /W3 /GX /Zi /YX /Od /I "src" /I "src\tables" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /FR /c
 CPP_PROJ=/nologo /MT /W3 /GX /Zi /YX /Od /I "src" /I "src\tables" /D "_DEBUG"\
  /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /FR$(INTDIR)/\
- /Fp$(OUTDIR)/"chardet-vc2.pch" /Fo$(INTDIR)/ /Fd$(OUTDIR)/"chardet-vc2.pdb" /c 
+ /Fp$(OUTDIR)/"chardet_vc2.pch" /Fo$(INTDIR)/ /Fd$(OUTDIR)/"chardet_vc2.pdb" /c 
 CPP_OBJS=.\WinDebug/
 # ADD BASE RSC /l 0x411 /d "_DEBUG"
 # ADD RSC /l 0x411 /d "_DEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o$(OUTDIR)/"chardet-vc2.bsc" 
+BSC32_FLAGS=/nologo /o$(OUTDIR)/"chardet_vc2.bsc" 
 BSC32_SBRS= \
 	$(INTDIR)/nsMBCSSM.sbr \
 	$(INTDIR)/nsCharSetProber.sbr \
@@ -196,9 +213,17 @@ BSC32_SBRS= \
 	$(INTDIR)/LangHebrewModel.sbr \
 	$(INTDIR)/nsEUCKRProber.sbr \
 	$(INTDIR)/nsEscCharsetProber.sbr \
-	$(INTDIR)/nsUTF8Prober.sbr
+	$(INTDIR)/nsUTF8Prober.sbr \
+	$(INTDIR)/LangSpanishModel.sbr \
+	$(INTDIR)/LangEsperantoModel.sbr \
+	$(INTDIR)/LangDanishModel.sbr \
+	$(INTDIR)/LangTurkishModel.sbr \
+	$(INTDIR)/LangGermanModel.sbr \
+	$(INTDIR)/LangVietnameseModel.sbr \
+	$(INTDIR)/LangArabicModel.sbr \
+	$(INTDIR)/LangFrenchModel.sbr
 
-$(OUTDIR)/"chardet-vc2.bsc" : $(OUTDIR)  $(BSC32_SBRS)
+$(OUTDIR)/chardet_vc2.bsc : $(OUTDIR)  $(BSC32_SBRS)
     $(BSC32) @<<
   $(BSC32_FLAGS) $(BSC32_SBRS)
 <<
@@ -206,10 +231,11 @@ $(OUTDIR)/"chardet-vc2.bsc" : $(OUTDIR)  $(BSC32_SBRS)
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /NOLOGO /SUBSYSTEM:windows /DLL /DEBUG /MACHINE:I386
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /NOLOGO /SUBSYSTEM:windows /DLL /PDB:"WinDebug/chardet.pdb" /DEBUG /MACHINE:I386 /OUT:"WinDebug/chardet.dll"
+# SUBTRACT LINK32 /PDB:none
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /NOLOGO\
  /SUBSYSTEM:windows /DLL /INCREMENTAL:yes /PDB:"WinDebug/chardet.pdb" /DEBUG\
- /MACHINE:I386 /OUT:"WinDebug/chardet.dll" /IMPLIB:$(OUTDIR)/"chardet-vc2.lib" 
+ /MACHINE:I386 /OUT:"WinDebug/chardet.dll" /IMPLIB:$(OUTDIR)/"chardet_vc2.lib" 
 DEF_FILE=
 LINK32_OBJS= \
 	$(INTDIR)/nsMBCSSM.obj \
@@ -237,7 +263,15 @@ LINK32_OBJS= \
 	$(INTDIR)/LangHebrewModel.obj \
 	$(INTDIR)/nsEUCKRProber.obj \
 	$(INTDIR)/nsEscCharsetProber.obj \
-	$(INTDIR)/nsUTF8Prober.obj
+	$(INTDIR)/nsUTF8Prober.obj \
+	$(INTDIR)/LangSpanishModel.obj \
+	$(INTDIR)/LangEsperantoModel.obj \
+	$(INTDIR)/LangDanishModel.obj \
+	$(INTDIR)/LangTurkishModel.obj \
+	$(INTDIR)/LangGermanModel.obj \
+	$(INTDIR)/LangVietnameseModel.obj \
+	$(INTDIR)/LangArabicModel.obj \
+	$(INTDIR)/LangFrenchModel.obj
 
 $(OUTDIR)/chardet.dll : $(OUTDIR)  $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -489,6 +523,78 @@ $(INTDIR)/nsEscCharsetProber.obj :  $(SOURCE)  $(INTDIR)
 SOURCE=.\src\nsUTF8Prober.cpp
 
 $(INTDIR)/nsUTF8Prober.obj :  $(SOURCE)  $(INTDIR)
+   $(CPP) $(CPP_PROJ)  $(SOURCE) 
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\src\LangSpanishModel.cpp
+
+$(INTDIR)/LangSpanishModel.obj :  $(SOURCE)  $(INTDIR)
+   $(CPP) $(CPP_PROJ)  $(SOURCE) 
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\src\LangEsperantoModel.cpp
+
+$(INTDIR)/LangEsperantoModel.obj :  $(SOURCE)  $(INTDIR)
+   $(CPP) $(CPP_PROJ)  $(SOURCE) 
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\src\LangDanishModel.cpp
+
+$(INTDIR)/LangDanishModel.obj :  $(SOURCE)  $(INTDIR)
+   $(CPP) $(CPP_PROJ)  $(SOURCE) 
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\src\LangTurkishModel.cpp
+
+$(INTDIR)/LangTurkishModel.obj :  $(SOURCE)  $(INTDIR)
+   $(CPP) $(CPP_PROJ)  $(SOURCE) 
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\src\LangGermanModel.cpp
+
+$(INTDIR)/LangGermanModel.obj :  $(SOURCE)  $(INTDIR)
+   $(CPP) $(CPP_PROJ)  $(SOURCE) 
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\src\LangVietnameseModel.cpp
+
+$(INTDIR)/LangVietnameseModel.obj :  $(SOURCE)  $(INTDIR)
+   $(CPP) $(CPP_PROJ)  $(SOURCE) 
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\src\LangArabicModel.cpp
+
+$(INTDIR)/LangArabicModel.obj :  $(SOURCE)  $(INTDIR)
+   $(CPP) $(CPP_PROJ)  $(SOURCE) 
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\src\LangFrenchModel.cpp
+
+$(INTDIR)/LangFrenchModel.obj :  $(SOURCE)  $(INTDIR)
    $(CPP) $(CPP_PROJ)  $(SOURCE) 
 
 # End Source File

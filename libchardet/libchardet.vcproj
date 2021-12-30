@@ -167,10 +167,25 @@
 				RelativePath=".\src\JpCntx.cpp">
 			</File>
 			<File
+				RelativePath=".\src\LangArabicModel.cpp">
+			</File>
+			<File
 				RelativePath=".\src\LangBulgarianModel.cpp">
 			</File>
 			<File
 				RelativePath=".\src\LangCyrillicModel.cpp">
+			</File>
+			<File
+				RelativePath=".\src\LangDanishModel.cpp">
+			</File>
+			<File
+				RelativePath=".\src\LangEsperantoModel.cpp">
+			</File>
+			<File
+				RelativePath=".\src\LangFrenchModel.cpp">
+			</File>
+			<File
+				RelativePath=".\src\LangGermanModel.cpp">
 			</File>
 			<File
 				RelativePath=".\src\LangGreekModel.cpp">
@@ -182,7 +197,16 @@
 				RelativePath=".\src\LangHungarianModel.cpp">
 			</File>
 			<File
+				RelativePath=".\src\LangSpanishModel.cpp">
+			</File>
+			<File
 				RelativePath=".\src\LangThaiModel.cpp">
+			</File>
+			<File
+				RelativePath=".\src\LangTurkishModel.cpp">
+			</File>
+			<File
+				RelativePath=".\src\LangVietnameseModel.cpp">
 			</File>
 			<File
 				RelativePath=".\src\nsBig5Prober.cpp">

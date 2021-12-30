@@ -34,9 +34,9 @@ NULL=nul
 ################################################################################
 # Begin Project
 # PROP Target_Last_Scanned "chardet_vc4 - Win32 Debug"
+RSC=rc.exe
 CPP=cl.exe
 MTL=mktyplib.exe
-RSC=rc.exe
 
 !IF  "$(CFG)" == "chardet_vc4 - Win32 Release"
 
@@ -59,12 +59,20 @@ CLEAN :
 	-@erase "$(INTDIR)\CharDistribution.obj"
 	-@erase "$(INTDIR)\impl.obj"
 	-@erase "$(INTDIR)\JpCntx.obj"
+	-@erase "$(INTDIR)\LangArabicModel.obj"
 	-@erase "$(INTDIR)\LangBulgarianModel.obj"
 	-@erase "$(INTDIR)\LangCyrillicModel.obj"
+	-@erase "$(INTDIR)\LangDanishModel.obj"
+	-@erase "$(INTDIR)\LangEsperantoModel.obj"
+	-@erase "$(INTDIR)\LangFrenchModel.obj"
+	-@erase "$(INTDIR)\LangGermanModel.obj"
 	-@erase "$(INTDIR)\LangGreekModel.obj"
 	-@erase "$(INTDIR)\LangHebrewModel.obj"
 	-@erase "$(INTDIR)\LangHungarianModel.obj"
+	-@erase "$(INTDIR)\LangSpanishModel.obj"
 	-@erase "$(INTDIR)\LangThaiModel.obj"
+	-@erase "$(INTDIR)\LangTurkishModel.obj"
+	-@erase "$(INTDIR)\LangVietnameseModel.obj"
 	-@erase "$(INTDIR)\nsBig5Prober.obj"
 	-@erase "$(INTDIR)\nsCharSetProber.obj"
 	-@erase "$(INTDIR)\nsEscCharsetProber.obj"
@@ -119,12 +127,20 @@ LINK32_OBJS= \
 	"$(INTDIR)\CharDistribution.obj" \
 	"$(INTDIR)\impl.obj" \
 	"$(INTDIR)\JpCntx.obj" \
+	"$(INTDIR)\LangArabicModel.obj" \
 	"$(INTDIR)\LangBulgarianModel.obj" \
 	"$(INTDIR)\LangCyrillicModel.obj" \
+	"$(INTDIR)\LangDanishModel.obj" \
+	"$(INTDIR)\LangEsperantoModel.obj" \
+	"$(INTDIR)\LangFrenchModel.obj" \
+	"$(INTDIR)\LangGermanModel.obj" \
 	"$(INTDIR)\LangGreekModel.obj" \
 	"$(INTDIR)\LangHebrewModel.obj" \
 	"$(INTDIR)\LangHungarianModel.obj" \
+	"$(INTDIR)\LangSpanishModel.obj" \
 	"$(INTDIR)\LangThaiModel.obj" \
+	"$(INTDIR)\LangTurkishModel.obj" \
+	"$(INTDIR)\LangVietnameseModel.obj" \
 	"$(INTDIR)\nsBig5Prober.obj" \
 	"$(INTDIR)\nsCharSetProber.obj" \
 	"$(INTDIR)\nsEscCharsetProber.obj" \
@@ -169,12 +185,20 @@ CLEAN :
 	-@erase "$(INTDIR)\CharDistribution.obj"
 	-@erase "$(INTDIR)\impl.obj"
 	-@erase "$(INTDIR)\JpCntx.obj"
+	-@erase "$(INTDIR)\LangArabicModel.obj"
 	-@erase "$(INTDIR)\LangBulgarianModel.obj"
 	-@erase "$(INTDIR)\LangCyrillicModel.obj"
+	-@erase "$(INTDIR)\LangDanishModel.obj"
+	-@erase "$(INTDIR)\LangEsperantoModel.obj"
+	-@erase "$(INTDIR)\LangFrenchModel.obj"
+	-@erase "$(INTDIR)\LangGermanModel.obj"
 	-@erase "$(INTDIR)\LangGreekModel.obj"
 	-@erase "$(INTDIR)\LangHebrewModel.obj"
 	-@erase "$(INTDIR)\LangHungarianModel.obj"
+	-@erase "$(INTDIR)\LangSpanishModel.obj"
 	-@erase "$(INTDIR)\LangThaiModel.obj"
+	-@erase "$(INTDIR)\LangTurkishModel.obj"
+	-@erase "$(INTDIR)\LangVietnameseModel.obj"
 	-@erase "$(INTDIR)\nsBig5Prober.obj"
 	-@erase "$(INTDIR)\nsCharSetProber.obj"
 	-@erase "$(INTDIR)\nsEscCharsetProber.obj"
@@ -233,12 +257,20 @@ LINK32_OBJS= \
 	"$(INTDIR)\CharDistribution.obj" \
 	"$(INTDIR)\impl.obj" \
 	"$(INTDIR)\JpCntx.obj" \
+	"$(INTDIR)\LangArabicModel.obj" \
 	"$(INTDIR)\LangBulgarianModel.obj" \
 	"$(INTDIR)\LangCyrillicModel.obj" \
+	"$(INTDIR)\LangDanishModel.obj" \
+	"$(INTDIR)\LangEsperantoModel.obj" \
+	"$(INTDIR)\LangFrenchModel.obj" \
+	"$(INTDIR)\LangGermanModel.obj" \
 	"$(INTDIR)\LangGreekModel.obj" \
 	"$(INTDIR)\LangHebrewModel.obj" \
 	"$(INTDIR)\LangHungarianModel.obj" \
+	"$(INTDIR)\LangSpanishModel.obj" \
 	"$(INTDIR)\LangThaiModel.obj" \
+	"$(INTDIR)\LangTurkishModel.obj" \
+	"$(INTDIR)\LangVietnameseModel.obj" \
 	"$(INTDIR)\nsBig5Prober.obj" \
 	"$(INTDIR)\nsCharSetProber.obj" \
 	"$(INTDIR)\nsEscCharsetProber.obj" \
@@ -544,6 +576,7 @@ DEP_CPP_NSESC=\
 	".\src\nscore.h"\
 	".\src\nsEscCharsetProber.h"\
 	".\src\nsPkgInt.h"\
+	".\src\nsUniversalDetector.h"\
 	
 
 "$(INTDIR)\nsEscCharsetProber.obj" : $(SOURCE) $(DEP_CPP_NSESC) "$(INTDIR)"
@@ -773,8 +806,8 @@ DEP_CPP_NSMBC=\
 	".\src\nsMBCSGroupProber.h"\
 	".\src\nsPkgInt.h"\
 	".\src\nsSJISProber.h"\
+	".\src\nsUniversalDetector.h"\
 	".\src\nsUTF8Prober.h"\
-	".\src\prmem.h"\
 	
 
 "$(INTDIR)\nsMBCSGroupProber.obj" : $(SOURCE) $(DEP_CPP_NSMBC) "$(INTDIR)"
@@ -996,13 +1029,133 @@ SOURCE=.\src\prmem.h
 # Begin Source File
 
 SOURCE=.\src\entry\impl.cpp
-NODEP_CPP_IMPL_=\
-	".\src\entry\chardet.h"\
-	".\src\entry\nscore.h"\
-	".\src\entry\nsUniversalDetector.h"\
+DEP_CPP_IMPL_=\
+	".\src\chardet.h"\
+	".\src\nscore.h"\
+	".\src\nsUniversalDetector.h"\
 	
 
-"$(INTDIR)\impl.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\impl.obj" : $(SOURCE) $(DEP_CPP_IMPL_) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\src\LangVietnameseModel.cpp
+DEP_CPP_LANGV=\
+	".\src\nsCharSetProber.h"\
+	".\src\nscore.h"\
+	".\src\nsSBCharSetProber.h"\
+	
+
+"$(INTDIR)\LangVietnameseModel.obj" : $(SOURCE) $(DEP_CPP_LANGV) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\src\LangEsperantoModel.cpp
+DEP_CPP_LANGE=\
+	".\src\nsCharSetProber.h"\
+	".\src\nscore.h"\
+	".\src\nsSBCharSetProber.h"\
+	
+
+"$(INTDIR)\LangEsperantoModel.obj" : $(SOURCE) $(DEP_CPP_LANGE) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\src\LangFrenchModel.cpp
+DEP_CPP_LANGF=\
+	".\src\nsCharSetProber.h"\
+	".\src\nscore.h"\
+	".\src\nsSBCharSetProber.h"\
+	
+
+"$(INTDIR)\LangFrenchModel.obj" : $(SOURCE) $(DEP_CPP_LANGF) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\src\LangGermanModel.cpp
+DEP_CPP_LANGGE=\
+	".\src\nsCharSetProber.h"\
+	".\src\nscore.h"\
+	".\src\nsSBCharSetProber.h"\
+	
+
+"$(INTDIR)\LangGermanModel.obj" : $(SOURCE) $(DEP_CPP_LANGGE) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\src\LangSpanishModel.cpp
+DEP_CPP_LANGS=\
+	".\src\nsCharSetProber.h"\
+	".\src\nscore.h"\
+	".\src\nsSBCharSetProber.h"\
+	
+
+"$(INTDIR)\LangSpanishModel.obj" : $(SOURCE) $(DEP_CPP_LANGS) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\src\LangTurkishModel.cpp
+DEP_CPP_LANGTU=\
+	".\src\nsCharSetProber.h"\
+	".\src\nscore.h"\
+	".\src\nsSBCharSetProber.h"\
+	
+
+"$(INTDIR)\LangTurkishModel.obj" : $(SOURCE) $(DEP_CPP_LANGTU) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\src\LangDanishModel.cpp
+DEP_CPP_LANGD=\
+	".\src\nsCharSetProber.h"\
+	".\src\nscore.h"\
+	".\src\nsSBCharSetProber.h"\
+	
+
+"$(INTDIR)\LangDanishModel.obj" : $(SOURCE) $(DEP_CPP_LANGD) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\src\LangArabicModel.cpp
+DEP_CPP_LANGA=\
+	".\src\nsCharSetProber.h"\
+	".\src\nscore.h"\
+	".\src\nsSBCharSetProber.h"\
+	
+
+"$(INTDIR)\LangArabicModel.obj" : $(SOURCE) $(DEP_CPP_LANGA) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
