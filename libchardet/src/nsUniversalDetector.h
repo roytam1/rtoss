@@ -80,6 +80,7 @@ protected:
    char    mLastChar;
    const char *  mDetectedCharset;
    float   mDetectedConfidence;
+   short   mDetectedIsBOM;
    PRInt32 mBestGuess;
    PRUint32 mLanguageFilter;
 
