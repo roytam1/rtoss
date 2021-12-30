@@ -44,11 +44,8 @@
 
 class nsEUCKRProber: public nsCharSetProber {
 public:
-  nsEUCKRProber(PRBool aIsPreferredLanguage)
-    :mIsPreferredLanguage(aIsPreferredLanguage)
-  {mCodingSM = new nsCodingStateMachine(&EUCKRSMModel);
-    Reset();
-  }
+  nsEUCKRProber(void){mCodingSM = new nsCodingStateMachine(&EUCKRSMModel);
+                      Reset();}
   virtual ~nsEUCKRProber(void){delete mCodingSM;}
   nsProbingState HandleData(const char* aBuf, PRUint32 aLen);
   const char* GetCharSetName() {return "EUC-KR";}
@@ -65,7 +62,6 @@ protected:
   //EUCKRContextAnalysis mContextAnalyser;
   EUCKRDistributionAnalysis mDistributionAnalyser;
   char mLastChar[2];
-  PRBool mIsPreferredLanguage;
 
 };
 

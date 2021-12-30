@@ -45,7 +45,7 @@
 #include "nsEscCharsetProber.h"
 #include "nsLatin1Prober.h"
 
-nsUniversalDetector::nsUniversalDetector(PRUint32 aLanguageFilter)
+nsUniversalDetector::nsUniversalDetector()
 {
   mDone = PR_FALSE;
   mBestGuess = -1;   //illegal value as signal
@@ -54,10 +54,10 @@ nsUniversalDetector::nsUniversalDetector(PRUint32 aLanguageFilter)
 
   mStart = PR_TRUE;
   mDetectedCharset = nsnull;
+  mDetectedConfidence = 0.0;
   mGotData = PR_FALSE;
   mInputState = ePureAscii;
   mLastChar = '\0';
-  mLanguageFilter = aLanguageFilter;
 
   PRUint32 i;
   for (i = 0; i < NUM_OF_CHARSET_PROBERS; i++)
@@ -82,6 +82,7 @@ nsUniversalDetector::Reset()
 
   mStart = PR_TRUE;
   mDetectedCharset = nsnull;
+  mDetectedConfidence = 0.0;
   mGotData = PR_FALSE;
   mInputState = ePureAscii;
   mLastChar = '\0';
@@ -115,33 +116,45 @@ nsresult nsUniversalDetector::HandleData(const char* aBuf, PRUint32 aLen)
       switch (aBuf[0])
         {
         case '\xEF':
-          if ((aLen > 2) && ('\xBB' == aBuf[1]) && ('\xBF' == aBuf[2]))
+          if ((aLen > 2) && ('\xBB' == aBuf[1]) && ('\xBF' == aBuf[2])) {
             // EF BB BF  UTF-8 encoded BOM
             mDetectedCharset = "UTF-8";
+            mDetectedConfidence = 1.0;
+          }
         break;
         case '\xFE':
-          if ((aLen >= 4) && ('\xFF' == aBuf[1]) && ('\x00' == aBuf[2]) && ('\x00' == aBuf[3]))
+          if ((aLen >= 4) && ('\xFF' == aBuf[1]) && ('\x00' == aBuf[2]) && ('\x00' == aBuf[3])) {
             // FE FF 00 00  UCS-4, unusual octet order BOM (3412)
             mDetectedCharset = "X-ISO-10646-UCS-4-3412";
-          else if ('\xFF' == aBuf[1])
+            mDetectedConfidence = 1.0;
+          } else if ('\xFF' == aBuf[1]) {
             // FE FF  UTF-16, big endian BOM
-            mDetectedCharset = "UTF-16";
+            mDetectedCharset = "UTF-16BE";
+            mDetectedConfidence = 1.0;
+          }
         break;
         case '\x00':
-          if ((aLen >= 4) && ('\x00' == aBuf[1]) && ('\xFE' == aBuf[2]) && ('\xFF' == aBuf[3]))
+          if ((aLen >= 4) && ('\x00' == aBuf[1]) && ('\xFE' == aBuf[2]) && ('\xFF' == aBuf[3])) {
             // 00 00 FE FF  UTF-32, big-endian BOM
-            mDetectedCharset = "UTF-32";
-          else if (('\x00' == aBuf[1]) && ('\xFF' == aBuf[2]) && ('\xFE' == aBuf[3]))
+            mDetectedCharset = "UTF-32BE";
+            mDetectedConfidence = 1.0;
+          } else if ((aLen >= 4) && ('\x00' == aBuf[1]) && ('\xFF' == aBuf[2]) && ('\xFE' == aBuf[3])) {
             // 00 00 FF FE  UCS-4, unusual octet order BOM (2143)
             mDetectedCharset = "X-ISO-10646-UCS-4-2143";
+            mDetectedConfidence = 1.0;
+          }
         break;
         case '\xFF':
-          if ((aLen >= 4) && ('\xFE' == aBuf[1]) && ('\x00' == aBuf[2]) && ('\x00' == aBuf[3]))
+          if ((aLen >= 4) && ('\xFE' == aBuf[1]) && ('\x00' == aBuf[2]) && ('\x00' == aBuf[3])) {
             // FF FE 00 00  UTF-32, little-endian BOM
             mDetectedCharset = "UTF-32";
-          else if ('\xFE' == aBuf[1])
+            mDetectedCharset = "UTF-32LE";
+            mDetectedConfidence = 1.0;
+          } else if ('\xFE' == aBuf[1]) {
             // FF FE  UTF-16, little endian BOM
-            mDetectedCharset = "UTF-16";
+            mDetectedCharset = "UTF-16LE";
+            mDetectedConfidence = 1.0;
+          }
         break;
       }  // switch
 
@@ -172,24 +185,16 @@ nsresult nsUniversalDetector::HandleData(const char* aBuf, PRUint32 aLen)
 
         //start multibyte and singlebyte charset prober
         if (nsnull == mCharSetProbers[0])
-        {
-          mCharSetProbers[0] = new nsMBCSGroupProber(mLanguageFilter);
-          if (nsnull == mCharSetProbers[0])
-            return NS_ERROR_OUT_OF_MEMORY;
-        }
-        if (nsnull == mCharSetProbers[1] &&
-            (mLanguageFilter & NS_FILTER_NON_CJK))
-        {
+          mCharSetProbers[0] = new nsMBCSGroupProber;
+        if (nsnull == mCharSetProbers[1])
           mCharSetProbers[1] = new nsSBCSGroupProber;
-          if (nsnull == mCharSetProbers[1])
-            return NS_ERROR_OUT_OF_MEMORY;
-        }
         if (nsnull == mCharSetProbers[2])
-        {
           mCharSetProbers[2] = new nsLatin1Prober; 
-          if (nsnull == mCharSetProbers[2])
+
+        if ((nsnull == mCharSetProbers[0]) ||
+            (nsnull == mCharSetProbers[1]) ||
+            (nsnull == mCharSetProbers[2]))
             return NS_ERROR_OUT_OF_MEMORY;
-        }
       }
     }
     else
@@ -210,7 +215,7 @@ nsresult nsUniversalDetector::HandleData(const char* aBuf, PRUint32 aLen)
   {
   case eEscAscii:
     if (nsnull == mEscCharSetProber) {
-      mEscCharSetProber = new nsEscCharSetProber(mLanguageFilter);
+      mEscCharSetProber = new nsEscCharSetProber;
       if (nsnull == mEscCharSetProber)
         return NS_ERROR_OUT_OF_MEMORY;
     }
@@ -219,25 +224,27 @@ nsresult nsUniversalDetector::HandleData(const char* aBuf, PRUint32 aLen)
     {
       mDone = PR_TRUE;
       mDetectedCharset = mEscCharSetProber->GetCharSetName();
+      mDetectedConfidence = mEscCharSetProber->GetConfidence();
     }
     break;
   case eHighbyte:
     for (i = 0; i < NUM_OF_CHARSET_PROBERS; i++)
     {
-      if (mCharSetProbers[i])
+      st = mCharSetProbers[i]->HandleData(aBuf, aLen);
+      if (st == eFoundIt) 
       {
-        st = mCharSetProbers[i]->HandleData(aBuf, aLen);
-        if (st == eFoundIt) 
-        {
-          mDone = PR_TRUE;
-          mDetectedCharset = mCharSetProbers[i]->GetCharSetName();
-          return NS_OK;
-        }
+        mDone = PR_TRUE;
+        mDetectedCharset = mCharSetProbers[i]->GetCharSetName();
+        mDetectedConfidence = mCharSetProbers[i]->GetConfidence();
+        return NS_OK;
       } 
     }
     break;
 
   default:  //pure ascii
+    mDone = PR_TRUE;
+    mDetectedCharset = "ASCII";
+    mDetectedConfidence = 1.0;
     ;//do nothing here
   }
   return NS_OK;
@@ -271,19 +278,19 @@ void nsUniversalDetector::DataEnd()
 
       for (PRInt32 i = 0; i < NUM_OF_CHARSET_PROBERS; i++)
       {
-        if (mCharSetProbers[i])
+        proberConfidence = mCharSetProbers[i]->GetConfidence();
+        if (proberConfidence > maxProberConfidence)
         {
-          proberConfidence = mCharSetProbers[i]->GetConfidence();
-          if (proberConfidence > maxProberConfidence)
-          {
-            maxProberConfidence = proberConfidence;
-            maxProber = i;
-          }
+          maxProberConfidence = proberConfidence;
+          maxProber = i;
         }
       }
+      mDetectedConfidence = maxProberConfidence;
       //do not report anything because we are not confident of it, that's in fact a negative answer
-      if (maxProberConfidence > MINIMUM_THRESHOLD)
+      if (maxProberConfidence > MINIMUM_THRESHOLD) {
         Report(mCharSetProbers[maxProber]->GetCharSetName());
+        mDetectedConfidence = mCharSetProbers[maxProber]->GetConfidence();
+      }
     }
     break;
   case eEscAscii:

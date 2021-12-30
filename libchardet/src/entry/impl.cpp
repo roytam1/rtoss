@@ -61,7 +61,7 @@ protected:
 
 public:
     DllDetector()
-	: nsUniversalDetector(NS_FILTER_ALL)
+	: nsUniversalDetector()
     {
 	charset_ = NULL;
     }

@@ -46,12 +46,12 @@
 #define MAX_REL_THRESHOLD     1000
 
 //hiragana frequency category table
-extern PRUint8 jp2CharContext[83][83];
+extern char jp2CharContext[83][83];
 
 class JapaneseContextAnalysis
 {
 public:
-  JapaneseContextAnalysis() {Reset(PR_FALSE);}
+  JapaneseContextAnalysis() {Reset();}
 
   void HandleData(const char* aBuf, PRUint32 aLen);
 
@@ -74,8 +74,8 @@ public:
     mLastCharOrder = order;
   }
 
-  float GetConfidence(void);
-  void      Reset(PRBool aIsPreferredLanguage);
+  float GetConfidence();
+  void      Reset(void);
   PRBool GotEnoughData() {return mTotalRel > ENOUGH_REL_THRESHOLD;}
 
 protected:
@@ -87,9 +87,6 @@ protected:
 
   //total sequence received
   PRUint32 mTotalRel;
-
-  //Number of sequences needed to trigger detection
-  PRUint32 mDataThreshold;
   
   //The order of previous char
   PRInt32  mLastCharOrder;

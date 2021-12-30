@@ -50,11 +50,9 @@
 
 class nsEUCJPProber: public nsCharSetProber {
 public:
-  nsEUCJPProber(PRBool aIsPreferredLanguage)
-    :mIsPreferredLanguage(aIsPreferredLanguage)
-  {mCodingSM = new nsCodingStateMachine(&EUCJPSMModel);
-    Reset();}
-  virtual ~nsEUCJPProber(void){delete mCodingSM;}
+  nsEUCJPProber(void){mCodingSM = new nsCodingStateMachine(&EUCJPSMModel);
+                      Reset();}
+  virtual ~nsEUCJPProber(void){delete mCodingSM;};
   nsProbingState HandleData(const char* aBuf, PRUint32 aLen);
   const char* GetCharSetName() {return "EUC-JP";}
   nsProbingState GetState(void) {return mState;}
@@ -69,7 +67,6 @@ protected:
   EUCJPDistributionAnalysis mDistributionAnalyser;
 
   char mLastChar[2];
-  PRBool mIsPreferredLanguage;
 };
 
 
