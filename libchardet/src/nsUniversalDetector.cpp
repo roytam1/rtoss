@@ -170,7 +170,7 @@ nsresult nsUniversalDetector::HandleData(const char* aBuf, PRUint32 aLen)
           }
         break;
         case '\x2B':
-          if (('\x2F' == aBuf[1]) && ('\x76' == aBuf[2])) {
+          if ((aLen >= 4) && ('\x2F' == aBuf[1]) && ('\x76' == aBuf[2])) {
             switch (aBuf[3]) {
               case '\x38':
               case '\x39':
@@ -189,7 +189,7 @@ nsresult nsUniversalDetector::HandleData(const char* aBuf, PRUint32 aLen)
           }
         break;
         case '\xE7':
-          if (('\x64' == aBuf[1]) && ('\x4C' == aBuf[2])) {
+          if ((aLen >= 3) && ('\x64' == aBuf[1]) && ('\x4C' == aBuf[2])) {
             // E7 64 4c  UTF-1 encoded BOM
             mDetectedCharset = "UTF-1";
             mDetectedConfidence = 1.0;
@@ -197,7 +197,7 @@ nsresult nsUniversalDetector::HandleData(const char* aBuf, PRUint32 aLen)
           }
         break;
         case '\xDD':
-          if (('\x73' == aBuf[1]) && ('\x66' == aBuf[2]) && ('\x73' == aBuf[3])) {
+          if ((aLen >= 4) && ('\x73' == aBuf[1]) && ('\x66' == aBuf[2]) && ('\x73' == aBuf[3])) {
             // DD 73 66 73  UTF-EBCDIC encoded BOM
             mDetectedCharset = "UTF-EBCDIC";
             mDetectedConfidence = 1.0;
@@ -205,7 +205,7 @@ nsresult nsUniversalDetector::HandleData(const char* aBuf, PRUint32 aLen)
           } 
         break;
         case '\x0E':
-          if (('\xFE' == aBuf[1]) && ('\xFF' == aBuf[2])) {
+          if ((aLen >= 3) && ('\xFE' == aBuf[1]) && ('\xFF' == aBuf[2])) {
             // 0E FE FF  SCSU encoded BOM
             mDetectedCharset = "SCSU";
             mDetectedConfidence = 1.0;
@@ -213,7 +213,7 @@ nsresult nsUniversalDetector::HandleData(const char* aBuf, PRUint32 aLen)
           }
         break;
         case '\xFB':
-          if (('\xEE' == aBuf[1]) && ('\x28' == aBuf[2])) {
+          if ((aLen >= 3) && ('\xEE' == aBuf[1]) && ('\x28' == aBuf[2])) {
             // FB EE 28  BOCU-1 encoded BOM
             mDetectedCharset = "BOCU-1";
             mDetectedConfidence = 1.0;
@@ -221,7 +221,7 @@ nsresult nsUniversalDetector::HandleData(const char* aBuf, PRUint32 aLen)
           }
         break;
         case '\x84':
-          if (('\x31' == aBuf[1]) && ('\x95' == aBuf[2]) && ('\x33' == aBuf[3])) {
+          if ((aLen >= 4) && ('\x31' == aBuf[1]) && ('\x95' == aBuf[2]) && ('\x33' == aBuf[3])) {
             // 84 31 95 33  GB18030 encoded BOM
             mDetectedCharset = "GB18030";
             mDetectedConfidence = 1.0;
