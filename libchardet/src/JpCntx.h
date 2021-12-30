@@ -51,7 +51,7 @@ extern char jp2CharContext[83][83];
 class JapaneseContextAnalysis
 {
 public:
-  JapaneseContextAnalysis() {Reset();}
+  JapaneseContextAnalysis() {Reset(PR_FALSE);}
 
   void HandleData(const char* aBuf, PRUint32 aLen);
 
@@ -74,8 +74,8 @@ public:
     mLastCharOrder = order;
   }
 
-  float GetConfidence();
-  void      Reset(void);
+  float GetConfidence(void);
+  void      Reset(PRBool aIsPreferredLanguage);
   PRBool GotEnoughData() {return mTotalRel > ENOUGH_REL_THRESHOLD;}
 
 protected:
@@ -87,7 +87,10 @@ protected:
 
   //total sequence received
   PRUint32 mTotalRel;
-  
+
+  //Number of sequences needed to trigger detection
+  PRUint32 mDataThreshold;
+
   //The order of previous char
   PRInt32  mLastCharOrder;
 
