@@ -85,7 +85,7 @@ BOOL IMEManager::CanReconv()
 {
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	HKL hKL = GetKeyboardLayout(GetCurrentThreadId());
-	DWORD nImeProps = ImmGetProperty( GetKeyboardLayout( 0 ), IGP_SETCOMPSTR );
+	DWORD nImeProps = ImmGetProperty( hKL, IGP_SETCOMPSTR );
 	#ifdef USEGLOBALIME
 		if( immApp_ )
 		{
