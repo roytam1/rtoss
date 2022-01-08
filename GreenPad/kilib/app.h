@@ -90,7 +90,7 @@ public:
 	bool isNewShell();
 
 	//@{ Windows‚Ìƒo[ƒWƒ‡ƒ“ //@}
-	static const OSVERSIONINFO& osver();
+	static const OSVERSIONINFOA& osver();
 	static int  getOSVer();
 	static int  getOSBuild();
 	static bool isWin95();

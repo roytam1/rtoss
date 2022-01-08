@@ -96,52 +96,66 @@ void App::Exit( int code )
 
 //-------------------------------------------------------------------------
 
-const OSVERSIONINFO& App::osver()
+const OSVERSIONINFOA& App::osver()
 {
-	static OSVERSIONINFO s_osVer;
+	typedef void (WINAPI *PGVEXA)(OSVERSIONINFOA*);
+
+	static OSVERSIONINFOA s_osVer;
+	PGVEXA pGVEXA;
+
 	if( s_osVer.dwOSVersionInfoSize == 0 )
 	{
 		// ‰‰ñ‚¾‚¯‚Íî•ñŽæ“¾
 		s_osVer.dwOSVersionInfoSize = sizeof( s_osVer );
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+
+		pGVEXA = (PGVEXA) ::GetProcAddress(::GetModuleHandle(TEXT("kernel32.dll")), "GetVersionExA");
+		if(pGVEXA)
+			pGVEXA(&s_osVer);
+/*#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 		::GetVersionEx( &s_osVer );
-#else
-		DWORD dwVersion = ::GetVersion();
+#else*/
+		else {
+			/*TCHAR tmp[128];
+			::wsprintf(tmp,TEXT("GetVersionExA not found. GetVersion returns 0x%08x."), ::GetVersion());
+			::MessageBox( NULL, tmp, TEXT("GreenPad"), MB_OK|MB_TASKMODAL );*/
 
-		s_osVer.dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
-		s_osVer.dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
+			DWORD dwVersion = ::GetVersion();
 
-		if (dwVersion < 0x80000000) {
-			s_osVer.dwBuildNumber = (DWORD)(HIWORD(dwVersion));
-			s_osVer.dwPlatformId = VER_PLATFORM_WIN32_NT;
+			s_osVer.dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
+			s_osVer.dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
+
+			if (dwVersion < 0x80000000) {
+				s_osVer.dwBuildNumber = (DWORD)(HIWORD(dwVersion));
+				s_osVer.dwPlatformId = VER_PLATFORM_WIN32_NT;
+			}
+
+			if (s_osVer.dwPlatformId != VER_PLATFORM_WIN32_NT) {
+				if (s_osVer.dwMajorVersion == 3) s_osVer.dwPlatformId = VER_PLATFORM_WIN32s;
+				else s_osVer.dwPlatformId = VER_PLATFORM_WIN32_WINDOWS;
+
+				//s_osVer.dwBuildNumber = (DWORD)(HIWORD(dwVersion & 0x7FFFFFFF)); // when dwPlatformId == VER_PLATFORM_WIN32_WINDOWS, HIWORD(dwVersion) is reserved
+			}
 		}
-
-		if (s_osVer.dwPlatformId != VER_PLATFORM_WIN32_NT) {
-			if (s_osVer.dwMajorVersion == 3) s_osVer.dwPlatformId = VER_PLATFORM_WIN32s;
-			else s_osVer.dwPlatformId = VER_PLATFORM_WIN32_WINDOWS;
-
-			//s_osVer.dwBuildNumber = (DWORD)(HIWORD(dwVersion & 0x7FFFFFFF)); // when dwPlatformId == VER_PLATFORM_WIN32_WINDOWS, HIWORD(dwVersion) is reserved
-		}
-#endif
+//#endif
 	}
 	return s_osVer;
 }
 
 int App::getOSVer()
 {
-	static const OSVERSIONINFO& v = osver();
+	static const OSVERSIONINFOA& v = osver();
 	return v.dwMajorVersion*100+v.dwMinorVersion;
 }
 
 int App::getOSBuild()
 {
-	static const OSVERSIONINFO& v = osver();
+	static const OSVERSIONINFOA& v = osver();
 	return v.dwBuildNumber;
 }
 
 bool App::isNewTypeWindows()
 {
-	static const OSVERSIONINFO& v = osver();
+	static const OSVERSIONINFOA& v = osver();
 	return (
 		( v.dwPlatformId==VER_PLATFORM_WIN32_NT && v.dwMajorVersion>=5 )
 	 || ( v.dwPlatformId==VER_PLATFORM_WIN32_WINDOWS &&
@@ -151,7 +165,7 @@ bool App::isNewTypeWindows()
 
 bool App::isWin95()
 {
-	static const OSVERSIONINFO& v = osver();
+	static const OSVERSIONINFOA& v = osver();
 	return (
 		v.dwPlatformId==VER_PLATFORM_WIN32_WINDOWS &&
 		v.dwMajorVersion==4 &&
@@ -161,18 +175,18 @@ bool App::isWin95()
 
 bool App::isNT()
 {
-	static const OSVERSIONINFO& v = osver();
+	static const OSVERSIONINFOA& v = osver();
 	return v.dwPlatformId==VER_PLATFORM_WIN32_NT;
 }
 bool App::isWin32s()
 {
-	static const OSVERSIONINFO& v = osver();
+	static const OSVERSIONINFOA& v = osver();
 	return v.dwPlatformId==VER_PLATFORM_WIN32s;
 }
 
 bool App::isWin3later()
 {
-	static const OSVERSIONINFO& v = osver();
+	static const OSVERSIONINFOA& v = osver();
 	return v.dwMajorVersion>3;
 }
 
