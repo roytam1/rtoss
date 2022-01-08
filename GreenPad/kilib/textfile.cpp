@@ -903,7 +903,7 @@ struct rMBCS : public TextFileRPimpl
 #ifndef _UNICODE
 		len = conv( cp, 0, fb, p-fb, buf, siz );
 #else
-		if(!App::isWin3later())
+		if(!App::isWin3later() || app().isWin95())
 		{
 			len = conv( cp, 0, fb, p-fb, buf, siz );
 		}
