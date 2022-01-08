@@ -4,6 +4,19 @@
 using namespace ki;
 
 
+typedef HKL (WINAPI *PGKL)(DWORD);
+
+
+static HKL MyGetKeyboardLayout(DWORD dwLayout)
+{
+	static PGKL pGKL_ = (PGKL)(-1);
+	if(pGKL_ == (PGKL)(-1)) {
+		pGKL_ = (PGKL) ::GetProcAddress(::GetModuleHandle(TEXT("user32.dll")), "GetKeyboardLayout");
+	}
+	if (pGKL_) return pGKL_(dwLayout);
+
+	return NULL;
+}
 
 //=========================================================================
 // IME‚ÉŠÖ‚·‚é‚ ‚ê‚±‚ê
@@ -65,7 +78,7 @@ void IMEManager::EnableGlobalIME( bool enable )
 BOOL IMEManager::IsIME()
 {
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-	HKL hKL = GetKeyboardLayout(GetCurrentThreadId());
+	HKL hKL = MyGetKeyboardLayout(GetCurrentThreadId());
 	#ifdef USEGLOBALIME
 		if( immApp_ )
 		{
@@ -84,7 +97,7 @@ BOOL IMEManager::IsIME()
 BOOL IMEManager::CanReconv()
 {
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-	HKL hKL = GetKeyboardLayout(GetCurrentThreadId());
+	HKL hKL = MyGetKeyboardLayout(GetCurrentThreadId());
 	DWORD nImeProps = ImmGetProperty( hKL, IGP_SETCOMPSTR );
 	#ifdef USEGLOBALIME
 		if( immApp_ )
