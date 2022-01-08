@@ -20,31 +20,18 @@ bool StatusBar::Create( HWND parent )
 		WS_CHILD|WS_VISIBLE|SBARS_SIZEGRIP,
 		TEXT(""), parent, 1787 );
 #else*/
-	if((App::getOSVer() == 310 && !App::isWin32s()) || (App::getOSVer() == 350 && App::getOSBuild() < 711)) {
 	// Avoid using CreateStatusWindow that is not present on NT3.1.
-		h = ::CreateWindow(
-			TEXT("msctls_statusbar"),  // pointer to registered class name, N.B. no "32" suffix in NT 3.1's comctl32.dll
-			NULL, // pointer to window name
-			WS_CHILD|WS_VISIBLE|SBARS_SIZEGRIP , // window style
-			0, 0, 0, 0, //x, y, w, h
-			parent, // handle to parent or owner window
-			(struct HMENU__ *)1787,          // handle to menu or child-window identifier
-			app().hinst(), // handle to application instance
-			NULL // pointer to window-creation data
-		);
-	} else {
-	// Avoid using CreateStatusWindow that is not present on NT3.1.
-		h = ::CreateWindow(
-			TEXT("msctls_statusbar32"),  // pointer to registered class name
-			NULL, // pointer to window name
-			WS_CHILD|WS_VISIBLE|SBARS_SIZEGRIP , // window style
-			0, 0, 0, 0, //x, y, w, h
-			parent, // handle to parent or owner window
-			(struct HMENU__ *)1787,          // handle to menu or child-window identifier
-			app().hinst(), // handle to application instance
-			NULL // pointer to window-creation data
-		);
-	}
+	h = ::CreateWindowEx(
+		0,  // extended window style
+		(App::getOSVer() == 310 && !App::isWin32s()) || (App::getOSVer() == 350 && App::getOSBuild() < 711) ? TEXT("msctls_statusbar") : STATUSCLASSNAME,  // pointer to registered class name
+		NULL, // pointer to window name
+		WS_CHILD|WS_VISIBLE|SBARS_SIZEGRIP , // window style
+		0, 0, 0, 0, //x, y, w, h
+		parent, // handle to parent or owner window
+		(struct HMENU__ *)1787,          // handle to menu or child-window identifier
+		app().hinst(), // handle to application instance
+		NULL // pointer to window-creation data
+	);
 //#endif
 	if( h == NULL )
 		return false;
