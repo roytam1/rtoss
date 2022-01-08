@@ -98,7 +98,7 @@ void App::Exit( int code )
 
 const OSVERSIONINFOA& App::osver()
 {
-	typedef void (WINAPI *PGVEXA)(OSVERSIONINFOA*);
+	typedef BOOL (WINAPI *PGVEXA)(OSVERSIONINFOA*);
 
 	static OSVERSIONINFOA s_osVer;
 	PGVEXA pGVEXA;
