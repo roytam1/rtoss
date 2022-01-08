@@ -876,6 +876,10 @@ struct rMBCS : public TextFileRPimpl
 
 	size_t ReadLine( unicode* buf, ulong siz )
 	{
+		int readcp = cp;
+		if(readcp!=UTF8N && !::IsValidCodePage(readcp))
+			readcp = ::GetACP(); // input codepage in not available in OS
+
 		// バッファの終端か、ファイルの終端の近い方まで読み込む
 		const char *p, *end = Min( fb+siz/2, fe );
 		state = (end==fe ? EOF : EOB);
@@ -890,7 +894,7 @@ struct rMBCS : public TextFileRPimpl
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
 			else if( (*p) & 0x80 && p+1<fe )
 			{
-				p = next(cp,p,0);
+				p = next(readcp,p,0);
 			}
 #endif
 			else
@@ -901,15 +905,15 @@ struct rMBCS : public TextFileRPimpl
 		// Unicodeへ変換
 		ulong len;
 #ifndef _UNICODE
-		len = conv( cp, 0, fb, p-fb, buf, siz );
+		len = conv( readcp, 0, fb, p-fb, buf, siz );
 #else
 		if(!App::isWin3later() || app().isWin95())
 		{
-			len = conv( cp, 0, fb, p-fb, buf, siz );
+			len = conv( readcp, 0, fb, p-fb, buf, siz );
 		}
 		else
 		{
-			len = ::MultiByteToWideChar( cp, 0, fb, int(p-fb), buf, siz );
+			len = ::MultiByteToWideChar( readcp, 0, fb, int(p-fb), buf, siz );
 		}
 #endif
 		// 改行コードスキップ処理
