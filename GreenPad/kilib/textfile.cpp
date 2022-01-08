@@ -854,6 +854,7 @@ struct rMBCS : public TextFileRPimpl
 	const char* fb;
 	const char* fe;
 	const int   cp;
+	int   readcp;
 	uNextFunc next;
 	uConvFunc conv;
 
@@ -872,14 +873,14 @@ struct rMBCS : public TextFileRPimpl
 		if( cp==UTF8N && fe-fb>=3
 		 && b[0]==0xef && b[1]==0xbb && b[2]==0xbf )
 			fb += 3; // BOMスキップ
+
+		readcp = cp;
+		if(readcp!=UTF8N && !::IsValidCodePage(readcp))
+			readcp = ::GetACP(); // input codepage in not available in OS
 	}
 
 	size_t ReadLine( unicode* buf, ulong siz )
 	{
-		int readcp = cp;
-		if(readcp!=UTF8N && !::IsValidCodePage(readcp))
-			readcp = ::GetACP(); // input codepage in not available in OS
-
 		// バッファの終端か、ファイルの終端の近い方まで読み込む
 		const char *p, *end = Min( fb+siz/2, fe );
 		state = (end==fe ? EOF : EOB);
