@@ -408,19 +408,18 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 				OFN_ENABLESIZING  |
 				OFN_ENABLETEMPLATE;
 
-	// maybe we don't need this if/else block anymore, just let it try both
-	//if (App::isWin3later())
+	if (App::isWin3later())
 	{
 		// Include the OFN_EXPLORER flag to get the new look.
 		ofn.Flags |= OFN_EXPLORER;
 		// Use the new template sans the Open File controls.
 		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_OPENFILEHOOK);
 	}
-	/*else
+	else
 	{
 		// Running under Windows NT, use the old look template.
 		ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
-	}*/
+	}
 
 	pThis = this;
 	ret = ::GetOpenFileName(&ofn);
@@ -429,7 +428,7 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 
 		if(ErrCode == ERROR_NO_MORE_FILES) {
 			// user pressed Cancel button
-		} else if((ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_CALL_NOT_IMPLEMENTED) && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
+		} else if((ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_CALL_NOT_IMPLEMENTED || ErrCode == ERROR_INVALID_ACCEL_HANDLE) && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
 			// maybe Common Dialog DLL doesn't like OFN_EXPLORER, try again without it
 			ofn.Flags &= ~OFN_EXPLORER;
 			ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
@@ -540,20 +539,19 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 				OFN_ENABLETEMPLATE  |
 				OFN_OVERWRITEPROMPT;
 
-	// maybe we don't need this if/else block, just let it try both
-	//if (App::isWin3later())
+	if (App::isWin3later())
 	{
 		// Include the OFN_EXPLORER flag to get the new look.
 		ofn.Flags |= OFN_EXPLORER;
 		// Use the new template sans the Open File controls.
 		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_SAVEFILEHOOK);
 	}
-	/*else
+	else
 	{
 	    ofn.lpstrTitle     = TEXT("Save File As");
 		// Running under Windows NT, use the old look template.
 		ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
-	}*/
+	}
 
 	pThis        = this;
 	ret = ::GetSaveFileName(&ofn);
