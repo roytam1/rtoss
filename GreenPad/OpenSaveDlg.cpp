@@ -427,7 +427,9 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	if(ret != TRUE) {
 		ErrCode = ::GetLastError();
 
-		if(ErrCode == ERROR_INVALID_PARAMETER && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
+		if(ErrCode == ERROR_NO_MORE_FILES) {
+			// user pressed Cancel button
+		} else if(ErrCode == ERROR_INVALID_PARAMETER && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
 			// maybe Common Dialog DLL doesn't like OFN_EXPLORER, try again without it
 			ofn.Flags &= ~OFN_EXPLORER;
 			ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
@@ -558,7 +560,9 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	if(ret != TRUE) {
 		ErrCode = ::GetLastError();
 
-		if(ErrCode == ERROR_INVALID_PARAMETER && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
+		if(ErrCode == ERROR_NO_MORE_FILES) {
+			// user pressed Cancel button
+		} else if(ErrCode == ERROR_INVALID_PARAMETER && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
 			// maybe Common Dialog DLL doesn't like OFN_EXPLORER, try again without it
 			ofn.Flags &= ~OFN_EXPLORER;
 		    ofn.lpstrTitle     = TEXT("Save File As");
