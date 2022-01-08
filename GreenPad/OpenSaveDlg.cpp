@@ -360,6 +360,9 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	CurrentDirRecovery cdr;
 	TCHAR filepath_[MAX_PATH];
 
+	BOOL ret;
+	DWORD ErrCode;
+
 	if( fnm == NULL )
 	{
 		filename_[0] = TEXT('\0');
@@ -405,21 +408,39 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 				OFN_ENABLESIZING  |
 				OFN_ENABLETEMPLATE;
 
-	if (App::isWin3later())
+	// maybe we don't need this if/else block anymore, just let it try both
+	//if (App::isWin3later())
 	{
 		// Include the OFN_EXPLORER flag to get the new look.
 		ofn.Flags |= OFN_EXPLORER;
 		// Use the new template sans the Open File controls.
 		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_OPENFILEHOOK);
 	}
-	else
+	/*else
 	{
 		// Running under Windows NT, use the old look template.
 		ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
-	}
+	}*/
 
 	pThis = this;
-	return ( ::GetOpenFileName(&ofn) != 0 );
+	ret = ::GetOpenFileName(&ofn);
+	if(ret != TRUE) {
+		ErrCode = ::GetLastError();
+
+		if(ErrCode == ERROR_INVALID_PARAMETER && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
+			// maybe Common Dialog DLL doesn't like OFN_EXPLORER, try again without it
+			ofn.Flags &= ~OFN_EXPLORER;
+			ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
+
+			// try again!
+			ret = ::GetOpenFileName(&ofn);
+		} else {
+			TCHAR tmp[128];
+			::wsprintf(tmp,TEXT("GetOpenFileName Error #%d."),ErrCode);
+			::MessageBox( NULL, tmp, String(IDS_APPNAME).c_str(), MB_OK|MB_TASKMODAL );
+		}
+	}
+	return ( ret != 0 );
 }
 
 UINT_PTR CALLBACK OpenFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM wp, LPARAM lp )
@@ -468,6 +489,9 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	CurrentDirRecovery cdr;
 	TCHAR filepath_[MAX_PATH];
 
+	BOOL ret;
+	DWORD ErrCode;
+
 	if( fnm == NULL )
 	{
 		filename_[0] = TEXT('\0');
@@ -514,22 +538,41 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 				OFN_ENABLETEMPLATE  |
 				OFN_OVERWRITEPROMPT;
 
-	if (App::isWin3later())
+	// maybe we don't need this if/else block, just let it try both
+	//if (App::isWin3later())
 	{
 		// Include the OFN_EXPLORER flag to get the new look.
 		ofn.Flags |= OFN_EXPLORER;
 		// Use the new template sans the Open File controls.
 		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_SAVEFILEHOOK);
 	}
-	else
+	/*else
 	{
 	    ofn.lpstrTitle     = TEXT("Save File As");
 		// Running under Windows NT, use the old look template.
 		ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
-	}
+	}*/
 
 	pThis        = this;
-	return ( ::GetSaveFileName(&ofn) != 0 );
+	ret = ::GetSaveFileName(&ofn);
+	if(ret != TRUE) {
+		ErrCode = ::GetLastError();
+
+		if(ErrCode == ERROR_INVALID_PARAMETER && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
+			// maybe Common Dialog DLL doesn't like OFN_EXPLORER, try again without it
+			ofn.Flags &= ~OFN_EXPLORER;
+		    ofn.lpstrTitle     = TEXT("Save File As");
+			ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
+
+			// try again!
+			ret = ::GetSaveFileName(&ofn);
+		} else {
+			TCHAR tmp[128];
+			::wsprintf(tmp,TEXT("GetSaveFileName Error #%d."),ErrCode);
+			::MessageBox( NULL, tmp, String(IDS_APPNAME).c_str(), MB_OK|MB_TASKMODAL );
+		}
+	}
+	return ( ret != 0 );
 }
 
 UINT_PTR CALLBACK SaveFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM wp, LPARAM lp )
