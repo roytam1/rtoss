@@ -18,7 +18,34 @@ using namespace editwing::view;
 //---- ip_cursor.cpp カーソルコントロール
 //=========================================================================
 
+typedef int (WINAPI *SSCRINF)(HWND, int, LPSCROLLINFO, BOOL);
+static int MySetScrollInfo(HWND hwnd, int nBar, LPSCROLLINFO lpsi, BOOL redraw)
+{
+	// Should be supported since Windows NT 3.51...
+	static SSCRINF pSSCRINF_ = (SSCRINF)(-1);
+	if( pSSCRINF_ == (SSCRINF)(-1) )
+		pSSCRINF_ = (SSCRINF)GetProcAddress(GetModuleHandleA("USER32.DLL"), "SetScrollInfo");
 
+	if( pSSCRINF_ )
+		return pSSCRINF_( hwnd, nBar, lpsi, redraw );
+
+	// don't fallback
+	else return NULL;
+}
+typedef int (WINAPI *GSCRINF)(HWND, int, LPSCROLLINFO);
+static int MyGetScrollInfo(HWND hwnd, int nBar, LPSCROLLINFO lpsi)
+{
+	// Should be supported since Windows NT 3.51...
+	static GSCRINF pGSCRINF_ = (GSCRINF)(-1);
+	if( pGSCRINF_ == (GSCRINF)(-1) )
+		pGSCRINF_ = (GSCRINF)GetProcAddress(GetModuleHandleA("USER32.DLL"), "GetScrollInfo");
+
+	if( pGSCRINF_ )
+		return pGSCRINF_( hwnd, nBar, lpsi );
+
+	// don't fallback
+	else return NULL;
+}
 
 //-------------------------------------------------------------------------
 // 描画領域サイズ管理
@@ -191,14 +218,14 @@ ulong ViewImpl::tl2vl( ulong tl ) const
 
 void ViewImpl::UpdateScrollBar()
 {
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
-	::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
-	::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
-#elif defined(TARGET_VER) && TARGET_VER<=350 && TARGET_VER>310
-	if(App::isWin3later())
+/*#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
+	MySetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
+	MySetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
+#elif defined(TARGET_VER) && TARGET_VER<=350 && TARGET_VER>310*/
+	if(app().hasScrollInfo() && ((!App::isNT() && App::getOSBuild()>225) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) )
 	{
-		::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
-		::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
+		MySetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
+		MySetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
 	}
 	else
 	{
@@ -207,12 +234,12 @@ void ViewImpl::UpdateScrollBar()
 		::SetScrollRange( hwnd_, SB_VERT, udScr_.nMin, udScr_.nMax, FALSE );
 		::SetScrollPos( hwnd_, SB_VERT, udScr_.nPos, TRUE );
 	}
-#else
+/*#else
 	::SetScrollRange( hwnd_, SB_HORZ, rlScr_.nMin, rlScr_.nMax, FALSE );
 	::SetScrollPos( hwnd_, SB_HORZ, rlScr_.nPos, TRUE );
 	::SetScrollRange( hwnd_, SB_VERT, udScr_.nMin, udScr_.nMax, FALSE );
 	::SetScrollPos( hwnd_, SB_VERT, udScr_.nPos, TRUE );
-#endif
+#endif*/
 }
 
 ReDrawType ViewImpl::TextUpdate_ScrollBar
@@ -367,20 +394,20 @@ void ViewImpl::ScrollView( int dx, int dy, bool update )
 			dx = rlScr_.nMax-rlScr_.nPage-rlScr_.nPos+1;
 
 		rlScr_.nPos += dx;
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
-		::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
-#elif defined(TARGET_VER) && TARGET_VER<=350 && TARGET_VER>310
-		if(App::isWin3later())
+/*#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
+		MySetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
+#elif defined(TARGET_VER) && TARGET_VER<=350 && TARGET_VER>310*/
+		if(app().hasScrollInfo() && ((!App::isNT() && App::getOSBuild()>225) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) )
 		{
-			::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
+			MySetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
 		}
 		else
 		{
 			::SetScrollPos( hwnd_, SB_HORZ, rlScr_.nPos, TRUE );
 		}
-#else
+/*#else
 		::SetScrollPos( hwnd_, SB_HORZ, rlScr_.nPos, TRUE );
-#endif
+#endif*/
 		dx = -dx;
 	}
 	if( dy != 0 )
@@ -388,20 +415,20 @@ void ViewImpl::ScrollView( int dx, int dy, bool update )
 		// 範囲チェック…は前処理で終わってる。
 
 		udScr_.nPos += dy;
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
-		::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
-#elif defined(TARGET_VER) && TARGET_VER<=350 && TARGET_VER>310
-		if(App::isWin3later())
+/*#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
+		MySetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
+#elif defined(TARGET_VER) && TARGET_VER<=350 && TARGET_VER>310*/
+		if(app().hasScrollInfo() && ((!App::isNT() && App::getOSBuild()>225) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) )
 		{
-			::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
+			MySetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
 		}
 		else
 		{
 			::SetScrollPos( hwnd_, SB_VERT, udScr_.nPos, TRUE );
 		}
-#else
+/*#else
 		::SetScrollPos( hwnd_, SB_VERT, udScr_.nPos, TRUE );
-#endif
+#endif*/
 		dy *= -H;
 	}
 	if( dx!=0 || dy!=0 )
@@ -459,16 +486,18 @@ void ViewImpl::on_hscroll( int code, int pos )
 	case SB_PAGELEFT:  dx= -(cx()>>1); break;
 	case SB_PAGERIGHT: dx= +(cx()>>1); break;
 	case SB_THUMBTRACK:
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
+//#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
+		if(app().hasScrollInfo() && ((!App::isNT() && App::getOSBuild()>225) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) )
 		{
 			SCROLLINFO si = { sizeof(SCROLLINFO), SIF_TRACKPOS };
-			::GetScrollInfo( hwnd_, SB_HORZ, &si );
+			MyGetScrollInfo( hwnd_, SB_HORZ, &si );
 			dx = si.nTrackPos - rlScr_.nPos;
 			break;
+		} else {
+//#else
+			dx = pos - rlScr_.nPos; break;
 		}
-#else
-		dx = pos - rlScr_.nPos; break;
-#endif
+//#endif
 	case SB_LEFT:    dx = -rlScr_.nPos; break;
 	case SB_RIGHT:   dx = rlScr_.nMax+1-(signed)rlScr_.nPage-rlScr_.nPos; break;
 	}
@@ -489,16 +518,18 @@ void ViewImpl::on_vscroll( int code, int pos )
 	case SB_PAGEUP:   dy= -(cy() / cvs_.getPainter().H()); break;
 	case SB_PAGEDOWN: dy= +(cy() / cvs_.getPainter().H()); break;
 	case SB_THUMBTRACK:
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
+//#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
+		if(app().hasScrollInfo() && ((!App::isNT() && App::getOSBuild()>225) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) )
 		{
 			SCROLLINFO si = { sizeof(SCROLLINFO), SIF_TRACKPOS };
-			::GetScrollInfo( hwnd_, SB_VERT, &si );
+			MyGetScrollInfo( hwnd_, SB_VERT, &si );
 			dy = si.nTrackPos - udScr_.nPos;
 			break;
+		} else {
+//#else
+			dy = pos - udScr_.nPos; break;
 		}
-#else
-		dy = pos - udScr_.nPos; break;
-#endif
+//#endif
 	case SB_TOP:      dy = -udScr_.nPos; break;
 	case SB_BOTTOM:   dy = udScr_.nMax+1-(signed)udScr_.nPage-udScr_.nPos; break;
 	}
