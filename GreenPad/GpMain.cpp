@@ -920,7 +920,7 @@ bool GreenPadWnd::OpenByMyself( const ki::Path& fn, int cs, bool needReConf )
 	{
 		csi_      = charSets_.findCsi( tf->codepage() );
 		if( csi_ == 0xffffffff )
-			csi_       = 0xf0f00000 & tf->codepage();
+			csi_       = 0xf0f00000 | tf->codepage();
 
 		if( tf->nolb_found() )
 			lb_       = cfg_.GetNewfileLB();
@@ -1028,7 +1028,7 @@ bool GreenPadWnd::Save()
 {
 	int save_Csi;
 	
-	if(csi_ == 0xffffffff)
+	if(!csi_ || csi_ == 0xffffffff)
 		save_Csi = ::GetACP();
 	else if(csi_ >= 0xf0f00000 && csi_ < 0xf1000000)
 		save_Csi = csi_ & 0xfffff;
