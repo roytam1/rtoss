@@ -781,7 +781,7 @@ void GreenPadWnd::UpdateWindowName()
 	SetText( name.c_str() );
 
 	if(csi_ >= 0xf0f00000 && csi_ < 0xf1000000) {
-		::wsprintf(cpname,TEXT("CP%d"),csi_ & 0xfffff);
+		::wsprintf(cpname,TEXT("CP%d%c"),csi_ & 0xfffff, ::IsValidCodePage(csi_ & 0xfffff) ? ' ' : '*');
 		stb_.SetCsText( cpname );
 	} else 
 		stb_.SetCsText( csi_==0xffffffff?TEXT("UNKN"):charSets_[csi_].shortName );
