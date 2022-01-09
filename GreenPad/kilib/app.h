@@ -86,7 +86,8 @@ public:
 	//@{ インスタンスハンドル //@}
 	HINSTANCE hinst() const;
 
-	bool isOldCommCtrl();
+	bool hasOldCommCtrl();
+	bool hasScrollInfo();
 	bool isNewShell();
 
 	//@{ Windowsのバージョン //@}
@@ -109,8 +110,9 @@ private:
 
 	int             exitcode_;
 	ulong           loadedModule_;
-	bool            isOldCommCtrl_;
 	bool            isNewShell_;
+	bool            hasScrollInfo_;
+	bool            hasOldCommCtrl_;
 	const HINSTANCE hInst_;
 	static App*     pUniqueInstance_;
 

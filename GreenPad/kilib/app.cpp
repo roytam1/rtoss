@@ -16,7 +16,8 @@ App* App::pUniqueInstance_;
 inline App::App()
 	: exitcode_    (-1)
 	, loadedModule_(0)
-	, isOldCommCtrl_(true)
+	, hasOldCommCtrl_(true)
+	, hasScrollInfo_(false)
 	, isNewShell_(false)
 	, hInst_       (::GetModuleHandle(NULL))
 {
@@ -31,6 +32,10 @@ inline App::App()
 		isNewShell_ = GetProcAddress(hinstDll, "SHGetSpecialFolderLocation") != NULL;
 		FreeLibrary(hinstDll);
 	}
+
+	// check for ScrollInfo APIs
+	hasScrollInfo_ = GetProcAddress(GetModuleHandleA("USER32.DLL"), "SetScrollInfo") != NULL;
+
 }
 
 #pragma warning( disable : 4722 ) // 警告：デストラクタに値が戻りません
@@ -67,7 +72,7 @@ void App::InitModule( imflag what )
 			::InitCommonControls();
 
 			if(hinstDll) {
-				isOldCommCtrl_ = GetProcAddress(hinstDll, "DllGetVersion") == NULL;
+				hasOldCommCtrl_ = GetProcAddress(hinstDll, "DllGetVersion") == NULL;
 				FreeLibrary(hinstDll);
 			}
 
@@ -109,12 +114,17 @@ const OSVERSIONINFOA& App::osver()
 		s_osVer.dwOSVersionInfoSize = sizeof( s_osVer );
 
 		pGVEXA = (PGVEXA) ::GetProcAddress(::GetModuleHandle(TEXT("kernel32.dll")), "GetVersionExA");
-		if(pGVEXA)
+		if(pGVEXA) {
 			pGVEXA(&s_osVer);
+
+			if (s_osVer.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
+				s_osVer.dwBuildNumber &= 0xffff; // fixup broken build number in early 9x builds
+			}
+
 /*#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 		::GetVersionEx( &s_osVer );
 #else*/
-		else {
+		} else {
 			/*TCHAR tmp[128];
 			::wsprintf(tmp,TEXT("GetVersionExA not found. GetVersion returns 0x%08x."), ::GetVersion());
 			::MessageBox( NULL, tmp, TEXT("GreenPad"), MB_OK|MB_TASKMODAL );*/
@@ -178,6 +188,7 @@ bool App::isNT()
 	static const OSVERSIONINFOA& v = osver();
 	return v.dwPlatformId==VER_PLATFORM_WIN32_NT;
 }
+
 bool App::isWin32s()
 {
 	static const OSVERSIONINFOA& v = osver();
@@ -195,9 +206,14 @@ bool App::isWin3later()
 	return isNewShell_;
 }
 
-bool App::isOldCommCtrl()
+bool App::hasOldCommCtrl()
 {
-	return isOldCommCtrl_;
+	return hasOldCommCtrl_;
+}
+
+bool App::hasScrollInfo()
+{
+	return hasScrollInfo_;
 }
 
 

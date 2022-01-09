@@ -45,7 +45,7 @@ bool StatusBar::Create( HWND parent )
 void StatusBar::SetText( const TCHAR* str, int part ) {
 //#if defined(TARGET_VER) && TARGET_VER==310
 #if defined(UNICODE)
-	if(App::getOSVer() == 310 || app().isOldCommCtrl()) {
+	if(App::getOSVer() == 310 || app().hasOldCommCtrl()) {
 		// early builds of common controls status bar is ANSI only
 		int strlength = ::lstrlen(str)+1;
 		char *asciistr = new char[strlength];
