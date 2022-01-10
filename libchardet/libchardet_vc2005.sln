@@ -1,0 +1,33 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libchardet", "libchardet_vc2005.vcproj", "{FC834BEA-E940-4771-B63F-CADD7FE712C3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "chardet", "chardet_vc2005.vcproj", "{ABBB798D-95CF-4745-8B96-9EA628794AB7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FC834BEA-E940-4771-B63F-CADD7FE712C3} = {FC834BEA-E940-4771-B63F-CADD7FE712C3}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+		Static Release|Win32 = Static Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FC834BEA-E940-4771-B63F-CADD7FE712C3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FC834BEA-E940-4771-B63F-CADD7FE712C3}.Debug|Win32.Build.0 = Debug|Win32
+		{FC834BEA-E940-4771-B63F-CADD7FE712C3}.Release|Win32.ActiveCfg = Release|Win32
+		{FC834BEA-E940-4771-B63F-CADD7FE712C3}.Release|Win32.Build.0 = Release|Win32
+		{FC834BEA-E940-4771-B63F-CADD7FE712C3}.Static Release|Win32.ActiveCfg = Static Release|Win32
+		{FC834BEA-E940-4771-B63F-CADD7FE712C3}.Static Release|Win32.Build.0 = Static Release|Win32
+		{ABBB798D-95CF-4745-8B96-9EA628794AB7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{ABBB798D-95CF-4745-8B96-9EA628794AB7}.Debug|Win32.Build.0 = Debug|Win32
+		{ABBB798D-95CF-4745-8B96-9EA628794AB7}.Release|Win32.ActiveCfg = Release|Win32
+		{ABBB798D-95CF-4745-8B96-9EA628794AB7}.Release|Win32.Build.0 = Release|Win32
+		{ABBB798D-95CF-4745-8B96-9EA628794AB7}.Static Release|Win32.ActiveCfg = Static Release|Win32
+		{ABBB798D-95CF-4745-8B96-9EA628794AB7}.Static Release|Win32.Build.0 = Static Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
