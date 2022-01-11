@@ -222,7 +222,7 @@ void ViewImpl::UpdateScrollBar()
 	MySetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
 	MySetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
 #elif defined(TARGET_VER) && TARGET_VER<=350 && TARGET_VER>310*/
-	if(app().hasScrollInfo() && ((!App::isNT() && App::getOSBuild()>225) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) )
+	if(app().hasScrollInfo() && ((!App::isNT() && App::getOSBuild()>=275) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) )
 	{
 		MySetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
 		MySetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
@@ -397,7 +397,7 @@ void ViewImpl::ScrollView( int dx, int dy, bool update )
 /*#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
 		MySetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
 #elif defined(TARGET_VER) && TARGET_VER<=350 && TARGET_VER>310*/
-		if(app().hasScrollInfo() && ((!App::isNT() && App::getOSBuild()>225) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) )
+		if(app().hasScrollInfo() && ((!App::isNT() && App::getOSBuild()>=275) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) )
 		{
 			MySetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
 		}
@@ -418,7 +418,7 @@ void ViewImpl::ScrollView( int dx, int dy, bool update )
 /*#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
 		MySetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
 #elif defined(TARGET_VER) && TARGET_VER<=350 && TARGET_VER>310*/
-		if(app().hasScrollInfo() && ((!App::isNT() && App::getOSBuild()>225) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) )
+		if(app().hasScrollInfo() && ((!App::isNT() && App::getOSBuild()>=275) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) )
 		{
 			MySetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
 		}
@@ -487,7 +487,7 @@ void ViewImpl::on_hscroll( int code, int pos )
 	case SB_PAGERIGHT: dx= +(cx()>>1); break;
 	case SB_THUMBTRACK:
 //#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
-		if(app().hasScrollInfo() && ((!App::isNT() && App::getOSBuild()>225) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) )
+		if(app().hasScrollInfo() && ((!App::isNT() && App::getOSBuild()>=275) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) )
 		{
 			SCROLLINFO si = { sizeof(SCROLLINFO), SIF_TRACKPOS };
 			MyGetScrollInfo( hwnd_, SB_HORZ, &si );
@@ -519,7 +519,7 @@ void ViewImpl::on_vscroll( int code, int pos )
 	case SB_PAGEDOWN: dy= +(cy() / cvs_.getPainter().H()); break;
 	case SB_THUMBTRACK:
 //#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
-		if(app().hasScrollInfo() && ((!App::isNT() && App::getOSBuild()>225) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) )
+		if(app().hasScrollInfo() && ((!App::isNT() && App::getOSBuild()>=275) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) )
 		{
 			SCROLLINFO si = { sizeof(SCROLLINFO), SIF_TRACKPOS };
 			MyGetScrollInfo( hwnd_, SB_VERT, &si );
