@@ -86,6 +86,8 @@ public:
 	//@{ インスタンスハンドル //@}
 	HINSTANCE hinst() const;
 
+	bool hasOldCommCtrl();
+
 	//@{ Windowsのバージョン //@}
 	static const OSVERSIONINFOA& osver();
 	static int  getOSVer();
@@ -106,6 +108,7 @@ private:
 
 	int             exitcode_;
 	ulong           loadedModule_;
+	bool            hasOldCommCtrl_;
 	const HINSTANCE hInst_;
 	static App*     pUniqueInstance_;
 
