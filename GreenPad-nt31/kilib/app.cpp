@@ -157,6 +157,12 @@ bool App::isNT()
 	return v.dwPlatformId==VER_PLATFORM_WIN32_NT;
 }
 
+bool App::isWin32s()
+{
+	static const OSVERSIONINFOA& v = osver();
+	return v.dwPlatformId==VER_PLATFORM_WIN32s;
+}
+
 bool App::isNewShell()
 {
 	static const OSVERSIONINFOA& v = osver();

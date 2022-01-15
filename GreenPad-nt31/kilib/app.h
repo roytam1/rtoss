@@ -91,6 +91,7 @@ public:
 	static int  getOSVer();
 	static int  getOSBuild();
 	static bool isWin95();
+	static bool isWin32s();
 	static bool isNT();
 	static bool isNewShell();
 	static bool isNewTypeWindows();
