@@ -391,7 +391,8 @@ MemoryManager* MemoryManager::pUniqueInstance_;
 MemoryManager::MemoryManager()
 {
 #ifdef SUPERTINY
-	g_heap = ::GetProcessHeap();
+	//g_heap = ::GetProcessHeap();
+	g_heap = ::HeapCreate(0, 0, 0);
 #endif
 
 	// メモリプールをZEROクリア
@@ -411,7 +412,11 @@ MemoryManager::~MemoryManager()
 #if defined(SUPERTINY) && defined(_DEBUG)
 	// リーク検出用
 	if( allocCounter != 0 )
-		::MessageBox( NULL, TEXT("MemoryLeak!"), NULL, MB_OK );
+		::MessageBoxEx( NULL, TEXT("MemoryLeak!"), NULL, MB_OK, 0 );
+#endif
+
+#ifdef SUPERTINY
+	::HeapDestroy(g_heap);
 #endif
 }
 
@@ -469,7 +474,8 @@ MemoryManager* MemoryManager::pUniqueInstance_;
 MemoryManager::MemoryManager()
 {
 #ifdef SUPERTINY
-	g_heap = ::GetProcessHeap();
+	//g_heap = ::GetProcessHeap();
+	g_heap = ::HeapCreate(0, 0, 0);
 #endif
 
 	// 唯一のインスタンスは私です
@@ -481,7 +487,11 @@ MemoryManager::~MemoryManager()
 #if defined(SUPERTINY) && defined(_DEBUG)
 	// リーク検出用
 	if( allocCounter != 0 )
-		::MessageBox( NULL, TEXT("MemoryLeak!"), NULL, MB_OK );
+		::MessageBoxEx( NULL, TEXT("MemoryLeak!"), NULL, MB_OK, 0 );
+#endif
+
+#ifdef SUPERTINY
+	::HeapDestroy(g_heap);
 #endif
 }
 

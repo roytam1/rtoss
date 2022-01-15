@@ -108,7 +108,7 @@ const OSVERSIONINFOA& App::osver()
 		} else {
 			/*TCHAR tmp[128];
 			::wsprintf(tmp,TEXT("GetVersionExA not found. GetVersion returns 0x%08x."), ::GetVersion());
-			::MessageBox( NULL, tmp, TEXT("GreenPad"), MB_OK|MB_TASKMODAL );*/
+			::MessageBoxEx( NULL, tmp, TEXT("GreenPad"), MB_OK|MB_TASKMODAL, 0 );*/
 
 			DWORD dwVersion = ::GetVersion();
 

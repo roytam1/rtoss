@@ -53,7 +53,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386 /SUBSYSTEM:WINDOWS,3.10 /merge:.rdata=.text"
-				AdditionalDependencies="libunicows-vc.lib kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib imm32.lib uuid.lib"
+				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib imm32.lib uuid.lib"
 				OutputFile="release/GreenPad_vc71.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"

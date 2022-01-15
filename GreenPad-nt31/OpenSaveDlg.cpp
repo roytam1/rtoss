@@ -323,7 +323,7 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 		} else {
 			TCHAR tmp[128];
 			::wsprintf(tmp,TEXT("GetOpenFileName Error #%d."),ErrCode);
-			::MessageBox( NULL, tmp, String(IDS_APPNAME).c_str(), MB_OK|MB_TASKMODAL );
+			::MessageBoxEx( NULL, tmp, String(IDS_APPNAME).c_str(), MB_OK|MB_TASKMODAL, 0 );
 		}
 	}
 	return ( ret != 0 );
@@ -456,7 +456,7 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 		} else {
 			TCHAR tmp[128];
 			::wsprintf(tmp,TEXT("GetSaveFileName Error #%d."),ErrCode);
-			::MessageBox( NULL, tmp, String(IDS_APPNAME).c_str(), MB_OK|MB_TASKMODAL );
+			::MessageBoxEx( NULL, tmp, String(IDS_APPNAME).c_str(), MB_OK|MB_TASKMODAL, 0 );
 		}
 	}
 	return ( ret != 0 );

@@ -97,7 +97,7 @@ public:
 				if( isHighSurrogate(ch) )
 				{
 					SIZE sz;
-					if( ::GetTextExtentPoint32W( dc_, pch, 2, &sz ) )
+					if( ::GetTextExtentPointW( dc_, pch, 2, &sz ) )
 						return sz.cx;
 					int w = 0;
 #ifdef WIN32S

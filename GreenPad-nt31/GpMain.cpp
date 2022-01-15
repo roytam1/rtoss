@@ -63,17 +63,17 @@ int GpStBar::AutoResize( bool maximized )
 	HDC dc = ::GetDC( hwnd() );
 	SIZE s;
 
-	if(App::isWin32s() || (App::isNewShell() && !App::getOSBuild())) {
+	//if(App::isWin32s() || (App::isNewShell() && !App::getOSBuild())) {
 		if( ::GetTextExtentPoint( dc, TEXT("BBBBM"), 5, &s ) ) // Line Ending
 			w[1] = w[2] - s.cx;
 		if( ::GetTextExtentPoint( dc, TEXT("BBBWWWW"), 7, &s ) ) // Charset
 			w[0] = w[1] - s.cx;
-	}else {
+	/*}else {
 		if( ::GetTextExtentPoint32( dc, TEXT("BBBBM"), 5, &s ) ) // Line Ending
 			w[1] = w[2] - s.cx;
 		if( ::GetTextExtentPoint32( dc, TEXT("BBBWWWW"), 7, &s ) ) // Charset
 			w[0] = w[1] - s.cx;
-	}
+	}*/
 	::ReleaseDC( hwnd(), dc );
 
 	SetParts( countof(w), w );

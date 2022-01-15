@@ -319,7 +319,7 @@ void SearchManager::FindNextImpl()
 void SearchManager::NotFound()
 {
 	//MsgBox( String(IDS_NOTFOUND).c_str() );
-	::MessageBox( NULL, String(IDS_NOTFOUND).c_str(), NULL, MB_OK|MB_TASKMODAL );
+	::MessageBoxEx( NULL, String(IDS_NOTFOUND).c_str(), NULL, MB_OK|MB_TASKMODAL, 0 );
 }
 
 void SearchManager::FindPrevImpl()

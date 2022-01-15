@@ -1387,7 +1387,7 @@ int TextFileR::MLangAutoDetection( const uchar* ptr, ulong siz )
 			::wsprintf(otmp,TEXT("%s%s\n"),otmp,stmp);
 
 		}
-		::MessageBox(NULL,otmp,TEXT("MLangDetect"),0);
+		::MessageBoxEx(NULL,otmp,TEXT("MLangDetect"),0,0);
 # endif
 
 		// MLang fine tunes
@@ -1427,7 +1427,7 @@ int TextFileR::MLangAutoDetection( const uchar* ptr, ulong siz )
 # ifdef MLANG_DEBUG
 		TCHAR tmp[10];
 		::wsprintf(tmp,TEXT("%d"),cs);
-		::MessageBox(NULL,tmp,TEXT("MLangDetect"),0);
+		::MessageBoxEx(NULL,tmp,TEXT("MLangDetect"),0,0);
 # endif
 
 		if (cs == 20127) cs = 0; // 20127 == ASCII, 0 = unknown
@@ -1939,7 +1939,7 @@ bool TextFileR::CheckUTFConfidence(const uchar* ptr, ulong siz, unsigned int uCh
 # ifdef UTF_DEBUG
 	TCHAR utfTmp[80];
 	::wsprintf(utfTmp,TEXT("uChrSize=%d,LE=%d,usize=%d, confidence=%d, unconfidence=%d, result=%d"),uChrSize,LE,usize,confidence,unconfidence,(impossible?0:(confidence-unconfidence > usize)));
-	::MessageBox(NULL,utfTmp,TEXT("UTFDetect"),0);
+	::MessageBoxEx(NULL,utfTmp,TEXT("UTFDetect"),0,0);
 # endif
 
 	if( impossible ) return false;
