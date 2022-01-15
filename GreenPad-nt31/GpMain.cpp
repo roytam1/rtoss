@@ -199,7 +199,7 @@ bool GreenPadWnd::on_command( UINT id, HWND ctrl )
 	case ID_CMD_WRAPWIDTH:  edit_.getView().SetWrapType( wrap_=cfg_.wrapWidth() ); break;
 	case ID_CMD_WRAPWINDOW: edit_.getView().SetWrapType( wrap_=0 ); break;
 	case ID_CMD_CONFIG:     on_config();    break;
-	//case ID_CMD_STATUSBAR:  on_statusBar(); break;
+	case ID_CMD_STATUSBAR:  on_statusBar(); break;
 
 	// DocType
 	default: if( ID_CMD_DOCTYPE <= id ) {
@@ -885,7 +885,7 @@ void GreenPadWnd::on_create( CREATESTRUCT* cs )
 	LOGGER("GreenPadWnd::on_create edit created");
 	edit_.getDoc().AddHandler( this );
 	edit_.getCursor().AddHandler( this );
-	stb_.SetStatusBarVisible( false );
+	stb_.SetStatusBarVisible( cfg_.showStatusBar() );
 
 	LOGGER("GreenPadWnd::on_create halfway");
 
