@@ -62,10 +62,18 @@ int GpStBar::AutoResize( bool maximized )
 
 	HDC dc = ::GetDC( hwnd() );
 	SIZE s;
-	if( ::GetTextExtentPoint32( dc, TEXT("BBBBM"), 5, &s ) )
-		w[1] = w[2] - s.cx;
-	if( ::GetTextExtentPoint32( dc, TEXT("BBBWW"), 5, &s ) )
-		w[0] = w[1] - s.cx;
+
+	if(App::isWin32s() || (App::isNewShell() && !App::getOSBuild())) {
+		if( ::GetTextExtentPoint( dc, TEXT("BBBBM"), 5, &s ) ) // Line Ending
+			w[1] = w[2] - s.cx;
+		if( ::GetTextExtentPoint( dc, TEXT("BBBWWWW"), 7, &s ) ) // Charset
+			w[0] = w[1] - s.cx;
+	}else {
+		if( ::GetTextExtentPoint32( dc, TEXT("BBBBM"), 5, &s ) ) // Line Ending
+			w[1] = w[2] - s.cx;
+		if( ::GetTextExtentPoint32( dc, TEXT("BBBWWWW"), 7, &s ) ) // Charset
+			w[0] = w[1] - s.cx;
+	}
 	::ReleaseDC( hwnd(), dc );
 
 	SetParts( countof(w), w );
@@ -350,7 +358,7 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 	}
 
 	::CheckMenuItem( menu, ID_CMD_STATUSBAR,
-		cfg_.showStatusBar()?MFS_CHECKED:MFS_UNCHECKED );
+		cfg_.showStatusBar()?MF_CHECKED:MF_UNCHECKED );
 	LOGGER("GreenPadWnd::ReloadConfig on_initmenu end");
 }
 
@@ -426,6 +434,7 @@ void GreenPadWnd::on_grep()
 
 void GreenPadWnd::on_datetime()
 {
+#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310) || (defined(TARGET_VER) && TARGET_VER==310 && defined(UNICODE))
 	String g = cfg_.dateFormat();
 	TCHAR buf[255], tmp[255];
 	::GetTimeFormat
@@ -433,6 +442,7 @@ void GreenPadWnd::on_datetime()
 	::GetDateFormat
 		( LOCALE_USER_DEFAULT, 0, NULL, buf, tmp,countof(tmp));
 	edit_.getCursor().Input( tmp, ::lstrlen(tmp) );
+#endif
 }
 
 void GreenPadWnd::on_doctype( int no )
@@ -463,7 +473,8 @@ static inline void MyShowWnd( HWND wnd )
 
 void GreenPadWnd::on_nextwnd()
 {
-	/*if( HWND next = ::FindWindowEx( NULL, hwnd(), className_, NULL ) )
+#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	if( HWND next = ::FindWindowEx( NULL, hwnd(), className_, NULL ) )
 	{
 		HWND last=next, pos;
 		while( last != NULL )
@@ -472,12 +483,14 @@ void GreenPadWnd::on_nextwnd()
 			::SetWindowPos( hwnd(), pos,
 				0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE|SWP_SHOWWINDOW );
 		MyShowWnd( next );
-	}*/
+	}
+#endif
 }
 
 void GreenPadWnd::on_prevwnd()
 {
-	/*HWND pos=NULL, next=::FindWindowEx( NULL,NULL,className_,NULL );
+#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	HWND pos=NULL, next=::FindWindowEx( NULL,NULL,className_,NULL );
 	if( next==hwnd() )
 	{
 		while( next != NULL )
@@ -491,7 +504,8 @@ void GreenPadWnd::on_prevwnd()
 			next = ::FindWindowEx( NULL,pos=next,className_,NULL );
 		if( next!=NULL )
 			MyShowWnd( pos );
-	}*/
+	}
+#endif
 }
 
 void GreenPadWnd::on_statusBar()
@@ -526,7 +540,7 @@ void GreenPadWnd::on_move( const DPos& c, const DPos& s )
 		for( ulong i=0; i<c.ad; ++i )
 			if( cu[i] == L'\t' )
 				cad = (cad/tab+1)*tab;
-			else if( cu[i]<0x80 || 0xff60<=cu[i] && cu[i]<=0xff9f )
+			else if( cu[i]<0x80 || (cu[i]>0xff60 && cu[i]<=0xff9f) )
 				cad = cad + 1;
 			else
 				cad = cad + 2;
@@ -547,7 +561,7 @@ void GreenPadWnd::on_move( const DPos& c, const DPos& s )
 			const unicode* su = edit_.getDoc().tl(s.tl);
 			sad = 0;
 			for( ulong i=0; i<s.ad; ++i )
-				sad += (su[i]<0x80 || 0xff60<=su[i] && su[i]<=0xff9f ? 1 : 2);
+				sad += (su[i]<0x80 || (su[i]>0xff60 && su[i]<=0xff9f) ? 1 : 2);
 		}
 		str += TEXT(" - (");
 		str += String().SetInt(s.tl+1);
@@ -582,6 +596,8 @@ void GreenPadWnd::UpdateWindowName()
 {
 	// タイトルバーに表示される文字列の調整
 	// [FileName *] - GreenPad
+	TCHAR cpname[10];
+
 	String name;
 	name += TEXT('[');
 	name += isUntitled() ? TEXT("untitled") : filename_.name();
@@ -590,7 +606,12 @@ void GreenPadWnd::UpdateWindowName()
 	name += String(IDS_APPNAME).c_str();
 
 	SetText( name.c_str() );
-	stb_.SetCsText( csi_==0xffffffff?TEXT("UNKN"):charSets_[csi_].shortName );
+
+	if(csi_ >= 0xf0f00000 && csi_ < 0xf1000000) {
+		::wsprintf(cpname,TEXT("CP%d%c"),csi_ & 0xfffff, ::IsValidCodePage(csi_ & 0xfffff) ? ' ' : '*');
+		stb_.SetCsText( cpname );
+	} else 
+		stb_.SetCsText( csi_==0xffffffff?TEXT("UNKN"):charSets_[csi_].shortName );
 	stb_.SetLbText( lb_ );
 }
 
@@ -725,6 +746,9 @@ bool GreenPadWnd::OpenByMyself( const ki::Path& fn, int cs, bool needReConf )
 	if( tf->size() )
 	{
 		csi_      = charSets_.findCsi( tf->codepage() );
+		if( csi_ == 0xffffffff )
+			csi_       = 0xf0f00000 | tf->codepage();
+
 		if( tf->nolb_found() )
 			lb_       = cfg_.GetNewfileLB();
 		else
@@ -755,8 +779,10 @@ bool GreenPadWnd::OpenByMyself( const ki::Path& fn, int cs, bool needReConf )
 	// [最近使ったファイル]へ追加
 	cfg_.AddMRU( filename_ );
 	HWND wnd = NULL;
-	/*while( NULL!=(wnd=::FindWindowEx( NULL, wnd, className_, NULL )) )
-		SendMessage( wnd, GPM_MRUCHANGED, 0, 0 );*/
+#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	while( NULL!=(wnd=::FindWindowEx( NULL, wnd, className_, NULL )) )
+		SendMessage( wnd, GPM_MRUCHANGED, 0, 0 );
+#endif
 
 	return true;
 }
@@ -827,7 +853,16 @@ bool GreenPadWnd::AskToSave()
 
 bool GreenPadWnd::Save()
 {
-	TextFileW tf( charSets_[csi_].ID, lb_ );
+	int save_Csi;
+	
+	if(!csi_ || csi_ == 0xffffffff)
+		save_Csi = ::GetACP();
+	else if(csi_ >= 0xf0f00000 && csi_ < 0xf1000000)
+		save_Csi = csi_ & 0xfffff;
+	else
+		save_Csi = charSets_[csi_].ID;
+
+	TextFileW tf( save_Csi, lb_ );
 	if( tf.Open( filename_.c_str() ) )
 	{
 		// 無事ファイルに保存できた場合
@@ -836,8 +871,10 @@ bool GreenPadWnd::Save()
 		// [最近使ったファイル]更新
 		cfg_.AddMRU( filename_ );
 		HWND wnd = NULL;
-		/*while( NULL!=(wnd=::FindWindowEx( NULL, wnd, className_, NULL )) )
-			SendMessage( wnd, GPM_MRUCHANGED, 0, 0 );*/
+#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+		while( NULL!=(wnd=::FindWindowEx( NULL, wnd, className_, NULL )) )
+			SendMessage( wnd, GPM_MRUCHANGED, 0, 0 );
+#endif
 		return true;
 	}
 

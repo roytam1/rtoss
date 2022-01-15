@@ -191,18 +191,10 @@ ulong ViewImpl::tl2vl( ulong tl ) const
 
 void ViewImpl::UpdateScrollBar()
 {
-/*	if(app().isNewShell())
-	{
-		::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
-		::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
-	}
-	else
-	{*/
-		::SetScrollRange( hwnd_, SB_HORZ, rlScr_.nMin, rlScr_.nMax, FALSE );
-		::SetScrollPos( hwnd_, SB_HORZ, rlScr_.nPos, TRUE );
-		::SetScrollRange( hwnd_, SB_VERT, udScr_.nMin, udScr_.nMax, FALSE );
-		::SetScrollPos( hwnd_, SB_VERT, udScr_.nPos, TRUE );
-	//}
+	::SetScrollRange( hwnd_, SB_HORZ, rlScr_.nMin, rlScr_.nMax, FALSE );
+	::SetScrollPos( hwnd_, SB_HORZ, rlScr_.nPos, TRUE );
+	::SetScrollRange( hwnd_, SB_VERT, udScr_.nMin, udScr_.nMax, FALSE );
+	::SetScrollPos( hwnd_, SB_VERT, udScr_.nPos, TRUE );
 }
 
 ReDrawType ViewImpl::TextUpdate_ScrollBar
@@ -357,14 +349,7 @@ void ViewImpl::ScrollView( int dx, int dy, bool update )
 			dx = rlScr_.nMax-rlScr_.nPage-rlScr_.nPos+1;
 
 		rlScr_.nPos += dx;
-		/*if(app().isNewShell())
-		{
-			::SetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
-		}
-		else
-		{*/
-			::SetScrollPos( hwnd_, SB_HORZ, rlScr_.nPos, TRUE );
-		//}
+		::SetScrollPos( hwnd_, SB_HORZ, rlScr_.nPos, TRUE );
 		dx = -dx;
 	}
 	if( dy != 0 )
@@ -372,14 +357,7 @@ void ViewImpl::ScrollView( int dx, int dy, bool update )
 		// 範囲チェック…は前処理で終わってる。
 
 		udScr_.nPos += dy;
-		/*if(app().isNewShell())
-		{
-			::SetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
-		}
-		else
-		{*/
-			::SetScrollPos( hwnd_, SB_VERT, udScr_.nPos, TRUE );
-		//}
+		::SetScrollPos( hwnd_, SB_VERT, udScr_.nPos, TRUE );
 		dy *= -H;
 	}
 	if( dx!=0 || dy!=0 )

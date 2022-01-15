@@ -863,6 +863,10 @@ struct rMBCS : public TextFileRPimpl
 		: fb( reinterpret_cast<const char*>(b) )
 		, fe( reinterpret_cast<const char*>(b+s) )
 		, cp( c==UTF8 ? UTF8N : c )
+#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
+		, next( cp==UTF8N ?   CharNextUtf8 : cp==GB18030 ? CharNextGB18030 :
+							CharNextExA )
+#endif
 		, conv( cp==UTF8N && (app().isWin95()||!::IsValidCodePage(65001))
 		                  ? Utf8ToWideChar : MultiByteToWideChar )
 	{
@@ -888,6 +892,12 @@ struct rMBCS : public TextFileRPimpl
 				state = EOL;
 				break;
 			}
+#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
+			else if( (*p) & 0x80 && p+1<fe )
+			{
+				p = next(readcp,p,0);
+			}
+#endif
 			else
 			{
 				++p;

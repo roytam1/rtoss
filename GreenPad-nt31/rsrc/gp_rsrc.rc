@@ -354,5 +354,5 @@ BEGIN
     IDS_OKTODEL             " will be removed. OK?"
 END
 
-#endif    // âpåÍ (ïƒçë) resources
+#endif    // English (US) resources
 /////////////////////////////////////////////////////////////////////////////

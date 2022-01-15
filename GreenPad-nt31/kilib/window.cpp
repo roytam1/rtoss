@@ -40,9 +40,16 @@ IMEManager::~IMEManager()
 {
 	#ifdef USEGLOBALIME
 		if( immMsg_ != NULL )
+		{
 			immMsg_->Release();
+			immMsg_ = NULL;
+		}
 		if( immApp_ != NULL )
+		{
+			immApp_->Deactivate();
 			immApp_->Release();
+			immApp_ = NULL;
+		}
 	#endif
 }
 
@@ -104,6 +111,7 @@ inline void IMEManager::MsgLoopEnd()
 
 void IMEManager::SetFont( HWND wnd, const LOGFONT& lf )
 {
+#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	HIMC ime;
 	LOGFONT* plf = const_cast<LOGFONT*>(&lf);
 
@@ -121,14 +129,16 @@ void IMEManager::SetFont( HWND wnd, const LOGFONT& lf )
 	else
 	#endif
 	{
-		/*ime = ::ImmGetContext( wnd );
+		ime = ::ImmGetContext( wnd );
 		::ImmSetCompositionFont( ime, plf );
-		::ImmReleaseContext( wnd, ime );*/
+		::ImmReleaseContext( wnd, ime );
 	}
+#endif
 }
 
 void IMEManager::SetPos( HWND wnd, int x, int y )
 {
+#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	HIMC ime;
 	COMPOSITIONFORM cf;
 	cf.dwStyle = CFS_POINT;
@@ -145,14 +155,16 @@ void IMEManager::SetPos( HWND wnd, int x, int y )
 	else
 	#endif
 	{
-		/*ime = ::ImmGetContext( wnd );
+		ime = ::ImmGetContext( wnd );
 		::ImmSetCompositionWindow( ime, &cf );
-		::ImmReleaseContext( wnd, ime );*/
+		::ImmReleaseContext( wnd, ime );
 	}
+#endif
 }
 
 void IMEManager::GetString( HWND wnd, unicode** str, ulong* len )
 {
+#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	*str = NULL;
 	HIMC ime;
 
@@ -169,7 +181,7 @@ void IMEManager::GetString( HWND wnd, unicode** str, ulong* len )
 	else
 	#endif
 	{
-		/*ime = ::ImmGetContext( wnd );
+		ime = ::ImmGetContext( wnd );
 		long s = ::ImmGetCompositionStringW( ime,GCS_RESULTSTR,NULL,0 );
 
 		#ifndef _UNICODE
@@ -193,8 +205,9 @@ void IMEManager::GetString( HWND wnd, unicode** str, ulong* len )
 				::ImmGetCompositionStringW( ime, GCS_RESULTSTR, *str, s );
 			}
 
-		::ImmReleaseContext( wnd, ime );*/
+		::ImmReleaseContext( wnd, ime );
 	}
+#endif
 }
 
 

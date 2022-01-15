@@ -21,7 +21,7 @@ Path& Path::BeSpecialPath( int nPATH, bool bs )
 	default:
 		*buf = TEXT('\0');
 		{
-#if 0
+#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
 			LPITEMIDLIST il;
 			if( NOERROR==::SHGetSpecialFolderLocation( NULL, nPATH, &il ) )
 			{
@@ -89,9 +89,11 @@ Path& Path::BeDriveOnly()
 
 Path& Path::BeShortStyle()
 {
-	/*TCHAR* buf = ReallocMem( len()+1 );
+#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	TCHAR* buf = ReallocMem( len()+1 );
 	::GetShortPathName( buf, buf, len()+1 );
-	UnlockMem();*/
+	UnlockMem();
+#endif
 	return *this;
 }
 
