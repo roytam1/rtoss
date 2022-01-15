@@ -14,9 +14,18 @@ StatusBar::StatusBar()
 
 bool StatusBar::Create( HWND parent )
 {
-	HWND h = NULL /*::CreateStatusWindow(
-		WS_CHILD|WS_VISIBLE|SBARS_SIZEGRIP,
-		TEXT(""), parent, 1787 )*/;
+	HWND h = NULL;
+	h = ::CreateWindowEx(
+		0,  // extended window style
+		(App::getOSVer() == 310 && !App::isWin32s()) || (App::getOSVer() == 350 && App::getOSBuild() < 711) ? TEXT("msctls_statusbar") : STATUSCLASSNAME,  // pointer to registered class name
+		NULL, // pointer to window name
+		WS_CHILD|WS_VISIBLE|SBARS_SIZEGRIP , // window style
+		0, 0, 0, 0, //x, y, w, h
+		parent, // handle to parent or owner window
+		(struct HMENU__ *)1787,          // handle to menu or child-window identifier
+		app().hinst(), // handle to application instance
+		NULL // pointer to window-creation data
+	);
 	if( h == NULL )
 		return false;
 
@@ -24,6 +33,24 @@ bool StatusBar::Create( HWND parent )
 	SetHwnd( h );
 	AutoResize( false );
 	return true;
+}
+
+void StatusBar::SetText( const TCHAR* str, int part ) {
+//#if defined(TARGET_VER) && TARGET_VER==310
+#if defined(UNICODE)
+	if(App::getOSVer() == 310 || app().hasOldCommCtrl()) {
+		// early builds of common controls status bar is ANSI only
+		int strlength = ::lstrlen(str)+1;
+		char *asciistr = new char[strlength];
+		for(int i=0;i<strlength; ++i) asciistr[i]=*(str+i); // cheap conversion to ANSI
+		::SendMessageA( hwnd(), SB_SETTEXTA, part, reinterpret_cast<LPARAM>(asciistr) );
+		delete []asciistr;
+	} else {
+		SendMsg( SB_SETTEXT, part, reinterpret_cast<LPARAM>(str) );
+	}
+#else
+	SendMsg( SB_SETTEXT, part, reinterpret_cast<LPARAM>(str) );
+#endif
 }
 
 int StatusBar::AutoResize( bool maximized )
