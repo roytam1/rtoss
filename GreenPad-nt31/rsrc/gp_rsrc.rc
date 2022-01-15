@@ -68,11 +68,11 @@ END
 // remains consistent on all systems.
 IDR_MAIN                ICON                    "exefile.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
-
 
 /////////////////////////////////////////////////////////////////////////////
 // English (US) resources
@@ -158,11 +158,11 @@ FONT 9, "MS Sans Serif"
 BEGIN
     LTEXT           "",1119,0,0,187,13,SS_SUNKEN | NOT WS_VISIBLE | NOT 
                     WS_GROUP
-    LTEXT           "&Charactor Encode:",IDC_STATIC,7,18,58,8
-    COMBOBOX        IDC_CODELIST,69,16,108,103,CBS_DROPDOWNLIST | WS_VSCROLL | 
+    LTEXT           "&Character Encoding:",IDC_STATIC,6,18,70,8
+    COMBOBOX        IDC_CODELIST,76,16,120,103,CBS_DROPDOWNLIST | WS_VSCROLL | 
                     WS_TABSTOP
-    LTEXT           "&Line-end:",IDC_STATIC,7,37,41,8
-    COMBOBOX        IDC_CRLFLIST,69,35,57,103,CBS_DROPDOWNLIST | WS_VSCROLL | 
+    LTEXT           "&Line ending:",IDC_STATIC,6,37,70,8
+    COMBOBOX        IDC_CRLFLIST,76,35,60,103,CBS_DROPDOWNLIST | WS_VSCROLL | 
                     WS_TABSTOP
 END
 
@@ -172,8 +172,8 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_VISIBLE |
 CAPTION "ReOpen File"
 FONT 9, "MS Sans Serif"
 BEGIN
-    LTEXT           "&Charactor Encode:",IDC_STATIC,9,13,54,8
-    COMBOBOX        IDC_CODELIST,72,11,105,103,CBS_DROPDOWNLIST | WS_VSCROLL | 
+    LTEXT           "&Character Encoding:",IDC_STATIC,4,13,68,8
+    COMBOBOX        IDC_CODELIST,70,11,112,103,CBS_DROPDOWNLIST | WS_VSCROLL | 
                     WS_TABSTOP
     PUSHBUTTON      "OK",IDOK,66,32,56,14
     PUSHBUTTON      "Cancel",IDCANCEL,125,32,56,14
@@ -185,8 +185,8 @@ FONT 9, "MS Sans Serif"
 BEGIN
     LTEXT           "",1119,0,0,187,13,SS_SUNKEN | NOT WS_VISIBLE | NOT 
                     WS_GROUP
-    LTEXT           "&Charactor Encode:",IDC_STATIC,7,18,54,8
-    COMBOBOX        IDC_CODELIST,66,16,111,103,CBS_DROPDOWNLIST | WS_VSCROLL | 
+    LTEXT           "&Character Encoding:",IDC_STATIC,4,18,68,8
+    COMBOBOX        IDC_CODELIST,76,16,120,103,CBS_DROPDOWNLIST | WS_VSCROLL | 
                     WS_TABSTOP
 END
 
@@ -242,24 +242,24 @@ CAPTION "Config"
 FONT 9, "MS Sans Serif"
 BEGIN
     GROUPBOX        "Common",IDC_STATIC,7,7,273,106
-    LTEXT           "&Undo:",IDC_STATIC,62,21,25,8
+    RTEXT           "&Undo:",IDC_STATIC,62,21,25,8
     CONTROL         "Infinite",IDC_UNDOLIM1,"Button",BS_AUTORADIOBUTTON | 
                     WS_GROUP | WS_TABSTOP,88,20,33,10
     CONTROL         "",IDC_UNDOLIM2,"Button",BS_AUTORADIOBUTTON,124,20,11,8
     EDITTEXT        IDC_UNDO_CT,135,18,24,12,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "times",IDC_STATIC,163,21,17,8
-    LTEXT           "&Column by:",IDC_STATIC,46,33,40,8
+    RTEXT           "&Column by:",IDC_STATIC,46,33,40,8
     CONTROL         "Letters",IDC_COUNTBYLETTER,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP | WS_TABSTOP,88,32,33,10
+                    WS_GROUP | WS_TABSTOP,88,33,33,10
     CONTROL         "Positions",IDC_COUNTBYLETTER2,"Button",
-                    BS_AUTORADIOBUTTON | WS_TABSTOP,124,32,49,10
-    LTEXT           "M&RU File Num:",IDC_STATIC,34,45,52,8
+                    BS_AUTORADIOBUTTON | WS_TABSTOP,124,33,49,10
+    RTEXT           "M&RU File Num:",IDC_STATIC,34,45,52,8
     EDITTEXT        IDC_LATEST_NUM,88,43,32,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "TextFile &Filter:",IDC_STATIC,36,63,44,8
+    RTEXT           "TextFile &Filter:",IDC_STATIC,36,61,51,8
     EDITTEXT        IDC_TXTFILT,88,59,176,12,ES_AUTOHSCROLL
-    LTEXT           "Extrenal &Grep Program:",IDC_STATIC,12,77,77,8
+    RTEXT           "Extrenal &Grep Program:",IDC_STATIC,10,77,76,8
     EDITTEXT        IDC_EXTGREP,88,75,176,12,ES_AUTOHSCROLL
-    LTEXT           "&New File Mode:",IDC_STATIC,34,93,53,8
+    RTEXT           "&New File Mode:",IDC_STATIC,34,92,53,8
     COMBOBOX        IDC_NEWCS,88,90,76,167,CBS_DROPDOWNLIST | WS_VSCROLL | 
                     WS_TABSTOP
     COMBOBOX        IDC_NEWLB,166,90,39,166,CBS_DROPDOWNLIST | WS_VSCROLL | 
@@ -267,23 +267,23 @@ BEGIN
     COMBOBOX        IDC_NEWDT,206,90,65,165,CBS_DROPDOWNLIST | WS_VSCROLL | 
                     WS_TABSTOP
     CONTROL         "Open in Same &Window",IDC_OPENSAME,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,186,17,90,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,186,19,90,10
     CONTROL         "Remember Window &Size",IDC_REMSIZE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,186,27,92,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,186,31,92,10
     CONTROL         "Remember Window &Pos",IDC_REMPLACE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,186,38,90,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,186,43,90,10
     GROUPBOX        "Document Types",IDC_STATIC,6,118,274,92
     LISTBOX         IDC_DOCTYPELIST,14,133,89,53,LBS_NOINTEGRALHEIGHT | 
                     WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Add",IDC_NEWDOCTYPE,17,191,29,14
     PUSHBUTTON      "Del",IDC_DELDOCTYPE,50,191,29,14
-    LTEXT           "Pattern:",IDC_STATIC,117,138,23,8
+    RTEXT           "Pattern:",IDC_STATIC,117,138,27,8
     EDITTEXT        IDC_DT_PAT,149,135,123,12,ES_AUTOHSCROLL
-    LTEXT           "Keyword:",IDC_STATIC,114,155,27,8
+    RTEXT           "Keyword:",IDC_STATIC,114,155,31,8
     COMBOBOX        IDC_PAT_KWD,149,152,72,172,CBS_DROPDOWNLIST | CBS_SORT | 
                     CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "edit",IDC_EDITKWD,229,151,19,14
-    LTEXT           "Layout: ",IDC_STATIC,118,172,24,8
+    RTEXT           "Layout:",IDC_STATIC,118,172,28,8
     COMBOBOX        IDC_PAT_LAY,149,169,72,172,CBS_DROPDOWNLIST | CBS_SORT | 
                     CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "edit",IDC_EDITLAY,229,169,19,14
