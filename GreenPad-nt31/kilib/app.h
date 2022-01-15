@@ -87,7 +87,9 @@ public:
 	HINSTANCE hinst() const;
 
 	//@{ Windows‚Ìƒo[ƒWƒ‡ƒ“ //@}
-	static const OSVERSIONINFO& osver();
+	static const OSVERSIONINFOA& osver();
+	static int  getOSVer();
+	static int  getOSBuild();
 	static bool isWin95();
 	static bool isNT();
 	static bool isNewShell();
