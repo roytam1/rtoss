@@ -1463,8 +1463,15 @@ int TextFileR::chardetAutoDetection( const uchar* ptr, ulong siz )
 					return b; \
 				}
 
+#ifdef _M_AMD64
+# define CHARDET_DLL "chardet_x64.dll"
+#elif defined(_M_ARM64)
+# define CHARDET_DLL "chardet_arm64.dll"
+#else
+# define CHARDET_DLL "chardet.dll"
+#endif
 
-	if(hIL = ::LoadLibrary(TEXT("chardet.dll")))
+	if(hIL = ::LoadLibrary(TEXT(CHARDET_DLL)))
 	{
 		chardet_create = (int(__cdecl*)(chardet_t*))::GetProcAddress(hIL, "chardet_create");
 		chardet_destroy = (void(__cdecl*)(chardet_t))::GetProcAddress(hIL, "chardet_destroy");
