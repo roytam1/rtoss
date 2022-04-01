@@ -272,13 +272,10 @@ inline void Painter::CharOut( unicode ch, int x, int y )
 {
 #ifdef WIN32S
 	DWORD dwNum;
-	char *psText;
-	if(dwNum = WideCharToMultiByte(CP_ACP,NULL,&ch,-1,NULL,0,NULL,FALSE))
+	char psText[16]; // Buffer for a SINGLE multibyte character
+	if(dwNum = WideCharToMultiByte(CP_ACP,0, &ch,1, psText,countof(psText), NULL,NULL))
 	{
-		psText = new char[dwNum];
-		WideCharToMultiByte(CP_ACP,NULL,&ch,-1,psText,dwNum,NULL,FALSE);
-		::TextOutA( dc_, x, y, psText, dwNum-1 );
-		delete []psText;
+		::TextOutA( dc_, x, y, psText, dwNum );
 	}
 #else
 	::TextOutW( dc_, x, y, &ch, 1 );
@@ -290,14 +287,29 @@ inline void Painter::StringOut
 {
 #ifdef WIN32S
 	DWORD dwNum;
-	char *psText;
-	if(dwNum = WideCharToMultiByte(CP_ACP,NULL,str,-1,NULL,0,NULL,FALSE))
-	{
-		psText = new char[dwNum];
-		WideCharToMultiByte(CP_ACP,NULL,str,-1,psText,dwNum,NULL,FALSE);
-		::TextOutA( dc_, x, y, psText, dwNum-1 );
-		delete []psText;
+	char psTXT1K[1024];
+	char *psText = psTXT1K;
+	if(!len) return;
+	// 1st try to convert to ANSI with a small stack buffer...
+	dwNum = WideCharToMultiByte(CP_ACP,0, str,len, psText,countof(psTXT1K), NULL,NULL);
+	if (!dwNum)
+	{	// If the small buffer failed, then properly allocate buffer.
+		// This happens verty rarely because token length is typically
+		// a single word, hence less than 128chars.
+		dwNum = WideCharToMultiByte(CP_ACP,0, str,len, NULL,0, NULL,NULL);
+		if (dwNum)
+		{
+			psText = new char[dwNum];
+			WideCharToMultiByte(CP_ACP,0 ,str,len ,psText,dwNum ,NULL,NULL);
+		}
+		else
+		{
+			return;
+		}
 	}
+	::TextOutA( dc_, x, y, psText, dwNum );
+	if (psText != psTXT1K)
+		delete []psText;
 #else
 	::TextOutW( dc_, x, y, str, len );
 #endif
