@@ -89,6 +89,41 @@ $indexfiles = array (
 			);
 
 /*
+MIME database based on file extension
+*/
+$extmime = array(
+				'txt' => 'text/plain',
+				'log' => 'text/plain',
+				'c' => 'text/plain',
+				'html' => 'text/html',
+				'htm' => 'text/html',
+				'7z' => 'application/x-7z-compressed',
+				'lzh' => 'application/x-lzh-compressed',
+				'gz' => 'application/gzip',
+				'tgz' => 'application/gzip',
+				'bz2' => 'application/x-bzip2',
+				'tbz' => 'application/x-bzip2',
+				'xz' => 'application/x-xz',
+				'tar' => 'application/x-tar',
+				'zip' => 'application/zip',
+				'xpi' => 'application/zip',
+				'jpg' => 'image/jpeg',
+				'jpeg' => 'image/jpeg',
+				'png' => 'image/png',
+				'gif' => 'image/gif',
+				'tif' => 'image/tiff',
+				'tiff' => 'image/tiff',
+				'mkv' => 'video/x-matroska',
+				'mp4' => 'video/mp4',
+				'avi' => 'video/x-msvideo',
+				'flv' => 'video/x-flv',
+				'mov' => 'video/quicktime',
+			);
+/*
+use MIME type finder if file extension is not in list?
+*/
+$find_system_mime = false;
+/*
 That's it! You are now ready to upload this script to the server.
 
 Only edit what is below this line if you are sure that you know what you
@@ -107,7 +142,7 @@ if(strpos($_SERVER['PATH_INFO'],$_SERVER['SCRIPT_NAME'])!==false) $_SERVER['PATH
 
 // No MIME Type in win32
 $iswin32=(substr (PHP_OS, 0, 3)== 'WIN');
-if($showmime && $iswin32) $showmime = false;
+//if($showmime && $iswin32) $showmime = false;
 
 function properSize($size,$maxcnt=0) {
 	$suffix=''; $suxAry=array("K","M","G","T");
@@ -127,6 +162,13 @@ function my_pathinfo($path, $type='dirname') {
 function remove_qs($uri) {
 	if(($pos = strpos($uri, '?'))!==false) return substr($uri,0,$pos);
 	else return $uri;
+}
+function _mime_content_type($f) {
+	global $extmime, $find_system_mime;
+	$fname = basename($f);
+	$dot = strrpos($fname, '.');
+	$ext = ($dot === false) ? '' : substr($fname, $dot+1);
+	return ($ext !== '' && isset($extmime[$ext])) ? $extmime[$ext] : ($find_system_mime ? mime_content_type($f) : 'application/octet-stream');
 }
 
 $self=isset($_SERVER['SCRIPT_NAME'])&&!empty($_SERVER['SCRIPT_NAME'])?remove_qs($_SERVER['SCRIPT_NAME']):$_SERVER['PHP_SELF'];
@@ -304,7 +346,7 @@ div.foot { font: 90% monospace; color: #787878; padding-top: 4px;}
 			$fileurl = $_SESSION['PHP_SELF'] . '?dir=' . urlencode($leadon) . '&amp;download=' . urlencode($files[$i]);
 		}
 	?>
-<tr><td class="n"><a href="<?=$fileurl;?>"><?=$files[$i];?></a></td><td class="m"><?=date ("Y-M-d H:i:s", filemtime($leadon.$files[$i]));?></td><td class="s"><?=properSize(filesize($leadon.$files[$i]),2);?></td><?php echo $showmime?'<td class="t">'.(preg_match('/\.log$/',$files[$i]) ? 'text/plain' : mime_content_type($leadon.$files[$i])).'</td>':'';?></tr>
+<tr><td class="n"><a href="<?=$fileurl;?>"><?=$files[$i];?></a></td><td class="m"><?=date ("Y-M-d H:i:s", filemtime($leadon.$files[$i]));?></td><td class="s"><?=properSize(filesize($leadon.$files[$i]),2);?></td><?php echo $showmime?'<td class="t">'._mime_content_type($leadon.$files[$i]).'</td>':'';?></tr>
 	<?
 	}
 	?></tbody>
