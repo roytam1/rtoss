@@ -99,6 +99,9 @@ error_reporting(0);
 // cgi.fix_pathinfo Workaround
 if(isset($_SERVER['ORIG_PATH_INFO'])) $_SERVER['PATH_INFO'] = $_SERVER['ORIG_PATH_INFO'];
 
+// Abyss Web Server Workaround
+if($_SERVER['SCRIPT_URL'] != $_SERVER['SCRIPT_NAME']) $_SERVER['PATH_INFO'] = substr($_SERVER['SCRIPT_URL'],strlen($_SERVER['SCRIPT_NAME']));
+
 // IIS Workaround
 if(strpos($_SERVER['PATH_INFO'],$_SERVER['SCRIPT_NAME'])!==false) $_SERVER['PATH_INFO'] = substr($_SERVER['PATH_INFO'],strlen($_SERVER['SCRIPT_NAME']));
 
