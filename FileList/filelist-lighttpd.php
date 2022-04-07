@@ -129,7 +129,7 @@ function remove_qs($uri) {
 	else return $uri;
 }
 
-$self=isset($_SERVER['REQUEST_URI'])&&!empty($_SERVER['REQUEST_URI'])?remove_qs($_SERVER['REQUEST_URI']):$_SERVER['PHP_SELF'];
+$self=isset($_SERVER['SCRIPT_NAME'])&&!empty($_SERVER['SCRIPT_NAME'])?remove_qs($_SERVER['SCRIPT_NAME']):$_SERVER['PHP_SELF'];
 $myname=preg_replace('/.*\/+/', '', $self);
 $mypath=preg_replace("/$myname$/", '', $self);
 $myfilespath='http://'.$_SERVER['HTTP_HOST'].$mypath.'dlf';
