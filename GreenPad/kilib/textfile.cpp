@@ -1175,7 +1175,7 @@ bool TextFileR::Open( const TCHAR* fname )
 	const ulong  siz = fp_.size();
 
 	// 必要なら自動判定
-	cs_ = AutoDetection( cs_, buf, Min<ulong>(siz,16<<10) ); // 先頭16KB
+	cs_ = AutoDetection( cs_, buf, Min<ulong>(siz,256<<10) ); // 先頭256KB
 
 	// 対応するデコーダを作成
 	switch( cs_ )
