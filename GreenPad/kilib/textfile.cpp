@@ -2,6 +2,8 @@
 #include "app.h"
 #include "textfile.h"
 #include "ktlarray.h"
+#include "string.h"
+#include "path.h"
 using namespace ki;
 
 #ifndef NO_CHARDET
@@ -1470,6 +1472,14 @@ int TextFileR::chardetAutoDetection( const uchar* ptr, ulong siz )
 #else
 # define CHARDET_DLL "chardet.dll"
 #endif
+
+	if( App::isWin32s() )
+	{	// On Win32s we must check if CHARDET.DLL exist before trying LoadLibrary()
+		// Otherwise we would get a system  message
+		Path chardet_in_gp_dir = Path(Path::ExeName).BeDirOnly() + String(TEXT(CHARDET_DLL));
+		if( !chardet_in_gp_dir.exist() )
+			return 0;
+	}
 
 	if(hIL = ::LoadLibrary(TEXT(CHARDET_DLL)))
 	{
