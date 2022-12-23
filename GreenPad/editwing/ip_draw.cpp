@@ -285,6 +285,8 @@ inline void Painter::CharOut( unicode ch, int x, int y )
 inline void Painter::StringOut
 	( const unicode* str, int len, int x, int y )
 {
+	BOOL ret;
+	DWORD dwTimes;
 #ifdef WIN32S
 	DWORD dwNum;
 	char psTXT1K[1024];
@@ -307,11 +309,30 @@ inline void Painter::StringOut
 			return;
 		}
 	}
-	::TextOutA( dc_, x, y, psText, dwNum );
+	dwTimes=0; do {
+		ret = ::TextOutA( dc_, x, y, psText, dwNum );
+		++dwTimes;
+	} while(
+# ifdef USE_ORIGINAL_MEMMAN
+		!ret && dwTimes < 2
+# else
+		false
+# endif
+		);
+
 	if (psText != psTXT1K)
 		delete []psText;
 #else
-	::TextOutW( dc_, x, y, str, len );
+	dwTimes=0; do {
+		ret = ::TextOutW( dc_, x, y, str, len );
+		++dwTimes;
+	} while(
+# ifdef USE_ORIGINAL_MEMMAN
+		!ret && dwTimes < 2
+# else
+		false
+# endif
+		);
 #endif
 }
 
