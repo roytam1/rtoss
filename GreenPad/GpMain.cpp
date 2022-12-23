@@ -135,9 +135,19 @@ LRESULT GreenPadWnd::on_message( UINT msg, WPARAM wp, LPARAM lp )
 				pt.x -= wnd.left;
 				pt.y -= wnd.top;
 
+
+				// Calculat right and bottom margins
+				long rmargin = GetSystemMetrics(SM_CXVSCROLL) + GetSystemMetrics(SM_CXSIZEFRAME) + GetSystemMetrics(SM_CXEDGE);
+				long bmargin = GetSystemMetrics(SM_CYSIZEFRAME) + GetSystemMetrics(SM_CYEDGE);
+				RECT rcSB;
+				if (stb_.isStatusBarVisible() && GetWindowRect(stb_.hwnd(), &rcSB))
+					bmargin += rcSB.bottom-rcSB.top; // Add height of status bar if present.
+				if(GetWindowLongPtr(edit_.getView().hwnd(), GWL_STYLE)&WS_HSCROLL)
+					bmargin += GetSystemMetrics(SM_CYHSCROLL); // Add HSCOLL bar height if needed.
+
 				// Adjust rects so that it does not include SB nor scrollbars.
-				nc->rgrc[2].right  -= Max(24, int((wnd.right-wnd.left) - nc->lppos->cx+24));
-				nc->rgrc[2].bottom -= Max(45, int((wnd.bottom-wnd.top) - nc->lppos->cy+45));
+				nc->rgrc[2].right  -= Max(rmargin, (wnd.right-wnd.left) - nc->lppos->cx + rmargin);
+				nc->rgrc[2].bottom -= Max(bmargin, (wnd.bottom-wnd.top) - nc->lppos->cy + bmargin);
 
 				// Do not include caption+menu in BitBlt
 				nc->rgrc[1].left = nc->lppos->x + pt.x;
