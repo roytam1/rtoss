@@ -300,7 +300,7 @@ inline void Painter::StringOut
 		if (dwNum)
 		{
 			psText = new char[dwNum];
-			WideCharToMultiByte(CP_ACP,0 ,str,len ,psText,dwNum ,NULL,NULL);
+			dwNum = WideCharToMultiByte(CP_ACP,0 ,str,len ,psText,dwNum ,NULL,NULL);
 		}
 		else
 		{
