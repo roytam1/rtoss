@@ -422,7 +422,7 @@ public:
 		// シフト無しでTokenTypeに流用出来るようにするため、
 		// 値が４飛びになってます
 		enum { T=0, W=4, A=8, S=12, O=0 };
-		static const uchar letter_type[688] = {
+		static const uchar letter_type[768] = {
 			O,O,O,O,O,O,O,O,O,T,O,O,O,O,O,O,
 			O,O,O,O,O,O,O,O,O,O,O,O,O,O,O,O,
 			W,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,
@@ -470,6 +470,12 @@ public:
 			A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,
 			A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,
 			A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,
+			// Spacing Modifier Letters (0x02b0-0x02ff)
+			A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,
+			A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,
+			A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,
+			A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,
+			A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,
 		};
 
 		// PosInToken算出用の距離エンコーダ( 5bitシフト済み )
@@ -495,23 +501,23 @@ public:
 			j = i;
 
 			// ASCII文字でない場合
-			// was 0x007f (ASCII) I replaced by 0x2B0
+			// was 0x007f (ASCII) I replaced by 0x2FF
 			// that corresponds to all extended latin charatcter.
 			// This is needed if yu want to ctrl+select words that
 			// have a mix of ASCII and other LATIN characters.
-			if( str[i] >= 0x02B0 ) // Non latin
+			if( str[i] > 0x02FF ) // Non latin
 			{
 				f = (ALP | commentbit);
 				if( str[i] == 0x3000 )//L'　' )
 					while( str[++j] == 0x3000 )
 						flg[j] = f;
 				else
-					while( str[++j] >= 0x2B0 && str[j]!=0x3000 )
+					while( str[++j] > 0x2FF && str[j]!=0x3000 )
 						flg[j] = f;
 				flg[i] = static_cast<uchar>(tkenc(j-i) | f);
 			}
 			// ASCII文字の場合??
-			// All latin chars up to IPA Extensions 0x0000-0x02AF
+			// All latin chars up to Spacing Modifier Letters 0x0000-0x02FF
 			else
 			{
 				t = letter_type[str[i]];
@@ -521,7 +527,7 @@ public:
 							j++;
 					while( str[++j]<0x7f && S==letter_type[str[j]] );
 				else
-					while( ++j<ie && str[j]<0x02B0 && t==letter_type[str[j]] );
+					while( ++j<ie && str[j]<=0x02FF && t==letter_type[str[j]] );
 
 				f = (t | commentbit);
 
