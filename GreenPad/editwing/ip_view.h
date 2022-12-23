@@ -388,6 +388,7 @@ private:
 	gapbufobj<WLine> wrap_;
 	ulong            vlNum_;
 	ulong            textCx_;
+	short            accdelta_;
 
 private:
 
