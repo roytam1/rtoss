@@ -1289,7 +1289,7 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 		return UTF5;
 
 //-- UTF-16/32 detection
-	if( freq[ 0 ] ) // nulls in content?
+	if( freq[ 0 ] && !(siz&1)) // nulls in content and file size is even number?
 	{ // then it may be UTF-16/32 without BOM
 		if(CheckUTFConfidence(ptr,siz,sizeof(dbyte),true)) return UTF16LE;
 		if(CheckUTFConfidence(ptr,siz,sizeof(dbyte),false)) return UTF16BE;
