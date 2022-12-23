@@ -756,7 +756,7 @@ void GreenPadWnd::on_move( const DPos& c, const DPos& s )
 	{
 		// ShiftJIS•—‚ÌByte”ƒJƒEƒ“ƒg
 		const unicode* cu = edit_.getDoc().tl(c.tl);
-		const ulong tab = cfg_.vConfig().tabstep;
+		const ulong tab = NZero(cfg_.vConfig().tabstep);
 		cad = 0;
 		for( ulong i=0; i<c.ad; ++i )
 			if( cu[i] == L'\t' )

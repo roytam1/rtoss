@@ -237,7 +237,7 @@ Painter::Painter( HDC hdc, const VConfig& vc )
 #else
 	::GetCharWidthW( dc_, L' ', L'~', widthTable_+L' ' );
 #endif
-	widthTable_[L'\t'] = W() * Max(1,vc.tabstep);
+	widthTable_[L'\t'] = NZero(W() * Max(1,vc.tabstep));
 	// ‰ºˆÊƒTƒƒQ[ƒg‚Í•¶š•ƒ[ƒ
 	mem00( widthTable_+0xDC00, (0xE000 - 0xDC00)*sizeof(int) );
 
