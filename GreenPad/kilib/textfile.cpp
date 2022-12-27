@@ -1177,7 +1177,7 @@ bool TextFileR::Open( const TCHAR* fname )
 	const ulong  siz = fp_.size();
 
 	// 必要なら自動判定
-	cs_ = AutoDetection( cs_, buf, Min<ulong>(siz,256<<10) ); // 先頭256KB
+	cs_ = AutoDetection( cs_, buf, siz );
 
 	// 対応するデコーダを作成
 	switch( cs_ )
@@ -1212,12 +1212,13 @@ bool TextFileR::Open( const TCHAR* fname )
 	return true;
 }
 
-int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
+int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong totalsiz )
 {
 //-- まず、文字の出現回数の統計を取る
 
 	int  freq[256];
 	bool bit8 = false;
+	ulong siz = Min<ulong>(totalsiz,256<<10); // 先頭256KB
 	mem00( freq, sizeof(freq) );
 	for( ulong i=0; i<siz; ++i )
 	{
@@ -1291,7 +1292,7 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong siz )
 		return UTF5;
 
 //-- UTF-16/32 detection
-	if( freq[ 0 ] && !(siz&1)) // nulls in content and file size is even number?
+	if( freq[ 0 ] && !(totalsiz&1)) // nulls in content and file size is even number?
 	{ // then it may be UTF-16/32 without BOM
 		if(CheckUTFConfidence(ptr,siz,sizeof(dbyte),true)) return UTF16LE;
 		if(CheckUTFConfidence(ptr,siz,sizeof(dbyte),false)) return UTF16BE;
