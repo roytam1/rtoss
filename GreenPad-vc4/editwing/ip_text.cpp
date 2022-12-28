@@ -719,7 +719,8 @@ void DocImpl::OpenFile( aptr<TextFileR> tf )
 
 	for( ulong i=0; tf->state(); )
 	{
-		if( size_t L = tf->ReadLine( buf, countof(buf) ) )
+		size_t L;
+		if( L = tf->ReadLine( buf, countof(buf) ) )
 		{
 			DPos p(i,0xffffffff);
 			InsertingOperation( p, buf, (ulong)L, e );

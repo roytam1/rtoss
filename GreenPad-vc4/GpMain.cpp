@@ -595,8 +595,6 @@ void GreenPadWnd::on_drop( HDROP hd )
 	::DragFinish( hd );
 }
 
-void GreenPadWnd::on_jump()
-{
 	struct JumpDlg : public DlgImpl {
 		JumpDlg(HWND w) : DlgImpl(IDD_JUMP), w_(w) { GoModal(w); }
 		void on_init() {
@@ -608,8 +606,11 @@ void GreenPadWnd::on_jump()
 			return true;
 		}
 		int LineNo; HWND w_;
-	} dlg(hwnd());
+	};
 
+void GreenPadWnd::on_jump()
+{
+	JumpDlg dlg(hwnd());
 	if( IDOK == dlg.endcode() )
 		JumpToLine( dlg.LineNo );
 }
@@ -668,7 +669,8 @@ void GreenPadWnd::on_datetime()
 
 void GreenPadWnd::on_doctype( int no )
 {
-	if( HMENU m = ::GetSubMenu( ::GetSubMenu(::GetMenu(hwnd()),3),4 ) )
+	HMENU m;
+	if( m = ::GetSubMenu( ::GetSubMenu(::GetMenu(hwnd()),3),4 ) )
 	{
 		cfg_.SetDocTypeByMenu( no, m );
 		ReloadConfig( true );
@@ -813,7 +815,8 @@ void GreenPadWnd::JumpToLine( ulong ln )
 
 void GreenPadWnd::SetupSubMenu()
 {
-	if( HMENU m = ::GetSubMenu( ::GetSubMenu(::GetMenu(hwnd()),3),4 ) )
+	HMENU m;
+	if( m = ::GetSubMenu( ::GetSubMenu(::GetMenu(hwnd()),3),4 ) )
 	{
 		cfg_.SetDocTypeMenu( m, ID_CMD_DOCTYPE );
 		::DrawMenuBar( hwnd() );
@@ -845,7 +848,8 @@ void GreenPadWnd::UpdateWindowName()
 
 void GreenPadWnd::SetupMRUMenu()
 {
-	if( HMENU m = ::GetSubMenu( ::GetSubMenu(::GetMenu(hwnd()),0),8 ) )
+	HMENU m;
+	if( m = ::GetSubMenu( ::GetSubMenu(::GetMenu(hwnd()),0),8 ) )
 	{
 		cfg_.SetUpMRUMenu( m, ID_CMD_MRU );
 		::DrawMenuBar( hwnd() );
@@ -870,8 +874,9 @@ void GreenPadWnd::ReloadConfig( bool noSetDocType )
 	// 文書タイプロード
 	if( !noSetDocType )
 	{
+		HMENU m;
 		int t = cfg_.SetDocType( filename_ );
-		if( HMENU m = ::GetSubMenu( ::GetSubMenu(::GetMenu(hwnd()),3),4 ) )
+		if( m = ::GetSubMenu( ::GetSubMenu(::GetMenu(hwnd()),3),4 ) )
 			cfg_.CheckMenu( m, t );
 	}
 	LOGGER("GreenPadWnd::ReloadConfig DocTypeLoaded");

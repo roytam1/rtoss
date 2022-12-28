@@ -485,8 +485,6 @@ void ViewImpl::on_paint( const PAINTSTRUCT& ps )
 // 行番号ゾーン描画
 //-------------------------------------------------------------------------
 
-void ViewImpl::DrawLNA( const VDrawInfo& v, Painter& p )
-{
 	//
 	// 文字列のまま足し算を行うルーチン
 	//
@@ -513,6 +511,8 @@ void ViewImpl::DrawLNA( const VDrawInfo& v, Painter& p )
 		unicode digit[11];
 	};
 
+void ViewImpl::DrawLNA( const VDrawInfo& v, Painter& p )
+{
 	// 背面消去
 	RECT rc = { v.rc.left, v.rc.top, lna(), v.rc.bottom };
 	p.Fill( rc );

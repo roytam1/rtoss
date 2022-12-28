@@ -154,8 +154,7 @@ private:
 			SendMsgToItem( IDC_NEWDT, CB_SETCURSEL );
 		SendMsgToItem( IDC_NEWDT, CB_DELETESTRING, ct+1 );
 	}
-	void on_newdoctype()
-	{
+
 		struct NewDocTypeDlg : public DlgImpl
 		{
 			NewDocTypeDlg(HWND wnd)
@@ -173,7 +172,11 @@ private:
 			}
 			String name;
 			String ext;
-		} dlg( hwnd() );
+		};
+
+	void on_newdoctype()
+	{
+		NewDocTypeDlg dlg( hwnd() );
 		if( IDOK == dlg.endcode() )
 		{
 			ConfigManager::DocType ndt;

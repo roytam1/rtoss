@@ -69,7 +69,8 @@ void Runnable::FinalizeThread()
 
 void Runnable::PleaseExit()
 {
-	if( HANDLE ht = hThread_ )
+	HANDLE ht;
+	if( ht = hThread_ )
 	{
 		::SetEvent( hEvent_ );
 		::WaitForSingleObject( ht, INFINITE );
