@@ -58,10 +58,25 @@ typedef struct tagRECONVERTSTRING {
 #ifndef WM_IME_REQUEST
 #define WM_IME_REQUEST                  0x0288
 #endif
+#ifndef SPI_GETWHEELSCROLLLINES
+#define SPI_GETWHEELSCROLLLINES         104
+#endif
+#ifndef WHEEL_DELTA
+#define WHEEL_DELTA                     120
+#endif
 
 #ifdef _MSC_VER
 #pragma warning( disable: 4355 )
 #endif
+
+#if defined(_MSC_VER) && _MSC_VER < 1100
+#define typename class
+#define mutable 
+#define explicit 
+
+#include <yvals.h>
+#endif
+
 
 #if defined(__DMC__) || (defined(_MSC_VER) && _MSC_VER < 1300)
 	#define SetWindowLongPtr SetWindowLong
