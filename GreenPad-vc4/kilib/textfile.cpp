@@ -1218,7 +1218,7 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong totalsiz )
 
 	int  freq[256];
 	bool bit8 = false;
-	ulong siz = Min<ulong>(totalsiz,256<<10); // æ“ª256KB
+	ulong siz = Min(totalsiz,(ulong)(256<<10)); // æ“ª256KB
 	mem00( freq, sizeof(freq) );
 	for( ulong i=0; i<siz; ++i )
 	{
