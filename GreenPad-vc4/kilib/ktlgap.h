@@ -48,8 +48,9 @@ public:
 		: alen_( Max(alloc_size, 10UL) )
 		, gs_  ( 0 )
 		, ge_  ( alen_ )
-		, buf_ ( new T[alen_] )
-		{}
+		{
+		buf_ = new T[alen_];
+	}
 	~gapbuf()
 		{ delete [] buf_; }
 

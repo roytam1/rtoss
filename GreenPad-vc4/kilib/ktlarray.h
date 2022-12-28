@@ -35,8 +35,9 @@ public:
 	explicit storage( ulong allocSize=20 )
 		: alen_( Max( allocSize, 1UL ) )
 		, len_ ( 0 )
-		, buf_ ( static_cast<T*>(mem().Alloc(alen_*sizeof(T))) )
-		{}
+		{
+		buf_ = static_cast<T*>(mem().Alloc(alen_*sizeof(T)));
+	}
 
 	~storage()
 		{ mem().DeAlloc( buf_, alen_*sizeof(T) ); }
