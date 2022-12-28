@@ -45,10 +45,10 @@ public:
 		enum Tp { NEW, GALLOC } mem_;
 
 		Text( unicode* s, Tp m ) : str_(s), mem_(m) {}
-		void operator=( const Text& );
+		void operator=( Text& );
 
 	public:
-		Text( const Text& t )
+		Text( Text& t )
 			: str_(t.str_), mem_(t.mem_) { t.str_=NULL; }
 		~Text()
 			{
@@ -56,7 +56,7 @@ public:
 					if( mem_==NEW ) delete [] str_;
 					else      GlobalUnlock( str_ );
 			}
-		const unicode* data() const { return str_; }
+		unicode* data() const { return str_; }
 	};
 
 	//@{ テキスト読み込み //@}
