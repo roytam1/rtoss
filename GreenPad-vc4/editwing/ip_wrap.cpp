@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "../kilib/stdafx.h"
 #include "ip_view.h"
 using namespace editwing;
 using namespace editwing::view;
