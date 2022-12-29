@@ -7,6 +7,7 @@
 using namespace ki;
 using namespace editwing;
 using view::VPos;
+using editwing::doc::MacroCommand;
 
 
 
@@ -432,7 +433,7 @@ void SearchManager::ReplaceImpl()
 void SearchManager::ReplaceAllImpl()
 {
 	// まず、実行する置換を全てここに登録する
-	doc::MacroCommand mcr;
+	MacroCommand mcr;
 
 	// 置換後文字列
 	const wchar_t* ustr = replStr_.ConvToWChar();
