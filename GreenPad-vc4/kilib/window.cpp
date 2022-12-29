@@ -528,6 +528,7 @@ LRESULT CALLBACK WndImpl::StartProc(
 	ThisAndParam* pz   = static_cast<ThisAndParam*>(cs->lpCreateParams);
 	WndImpl*   pThis   = pz->pThis;
 	cs->lpCreateParams = pz->pParam;
+	::SetWindowLongPtr(wnd, GWL_USERDATA, reinterpret_cast<LONG>(pThis));
 
 	// ƒTƒ“ƒN
 	pThis->SetUpThunk( wnd );
@@ -537,10 +538,20 @@ LRESULT CALLBACK WndImpl::StartProc(
 	return 0;
 }
 
+LRESULT CALLBACK TrunkMainProc( HWND wnd, UINT msg, WPARAM wp, LPARAM lp )
+{
+	WndImpl*   pThis  = reinterpret_cast<WndImpl*>(GetWindowLong(wnd, GWL_USERDATA));
+	if(pThis) {
+		return WndImpl::MainProc(pThis, msg, wp, lp);
+	} else {
+		return DefWindowProc(wnd, msg, wp, lp);
+	}
+}
+
 void WndImpl::SetUpThunk( HWND wnd )
 {
 	SetHwnd( wnd );
-
+/*
 	// ‚±‚±‚Å“®“I‚Éx86‚Ì–½—ß—ñ
 	//   | mov dword ptr [esp+4] this
 	//   | jmp MainProc
@@ -571,7 +582,8 @@ void WndImpl::SetUpThunk( HWND wnd )
 #endif
 
 	::FlushInstructionCache( ::GetCurrentProcess(), thunk_, THUNK_SIZE );
-	::SetWindowLongPtr( wnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&thunk_[0]) );
+	::SetWindowLongPtr( wnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&thunk_[0]) );*/
+	::SetWindowLongPtr( wnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(TrunkMainProc) );
 }
 
 LRESULT CALLBACK WndImpl::MainProc(
