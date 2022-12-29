@@ -77,7 +77,7 @@ typedef struct tagRECONVERTSTRING {
 #define mutable 
 #define explicit 
 
-#include <yvals.h>
+#include "yvals.h"
 #endif
 
 
