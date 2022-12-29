@@ -35,7 +35,9 @@ Revision History:
 
 #ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#if defined(_MSC_VER) && _MSC_VER >= 1100
 #pragma code_page(1252)
+#endif
 #endif //_WIN32
 
 //
