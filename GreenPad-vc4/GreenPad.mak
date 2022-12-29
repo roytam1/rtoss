@@ -64,6 +64,7 @@ CLEAN :
 	-@erase "$(INTDIR)\file.sbr"
 	-@erase "$(INTDIR)\find.obj"
 	-@erase "$(INTDIR)\find.sbr"
+	-@erase "$(INTDIR)\gp_rsrc.res"
 	-@erase "$(INTDIR)\GpMain.obj"
 	-@erase "$(INTDIR)\GpMain.sbr"
 	-@erase "$(INTDIR)\ip_ctrl1.obj"
@@ -113,9 +114,9 @@ CLEAN :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FR /YX /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I ".." /I "..\kilib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "NO_MLANG" /D TARGET_VER=310 /Fr /YX"stdafx.h" /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I ".." /I "..\kilib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "NO_MLANG" /D TARGET_VER=351 /Fr /YX"stdafx.h" /c
 CPP_PROJ=/nologo /MT /W3 /GX /O2 /I ".." /I "..\kilib" /D "NDEBUG" /D "WIN32"\
- /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "NO_MLANG" /D TARGET_VER=310\
+ /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "NO_MLANG" /D TARGET_VER=351\
  /Fr"$(INTDIR)/" /Fp"$(INTDIR)/GreenPad.pch" /YX"stdafx.h" /Fo"$(INTDIR)/" /c 
 CPP_OBJS=.\WinRel/
 CPP_SBRS=.\WinRel/
@@ -124,6 +125,7 @@ CPP_SBRS=.\WinRel/
 MTL_PROJ=/nologo /D "NDEBUG" /win32 
 # ADD BASE RSC /l 0x411 /d "NDEBUG"
 # ADD RSC /l 0x411 /d "NDEBUG"
+RSC_PROJ=/l 0x411 /fo"$(INTDIR)/gp_rsrc.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -164,10 +166,10 @@ BSC32_SBRS= \
 
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib imm32.lib /nologo /subsystem:windows /machine:I386
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
- odbccp32.lib /nologo /subsystem:windows /incremental:no\
+ odbccp32.lib comctl32.lib imm32.lib /nologo /subsystem:windows /incremental:no\
  /pdb:"$(OUTDIR)/GreenPad.pdb" /machine:I386 /out:"$(OUTDIR)/GreenPad.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\app.obj" \
@@ -176,6 +178,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\ctrl.obj" \
 	"$(INTDIR)\file.obj" \
 	"$(INTDIR)\find.obj" \
+	"$(INTDIR)\gp_rsrc.res" \
 	"$(INTDIR)\GpMain.obj" \
 	"$(INTDIR)\ip_ctrl1.obj" \
 	"$(INTDIR)\ip_cursor.obj" \
@@ -225,6 +228,7 @@ CLEAN :
 	-@erase "$(INTDIR)\ctrl.obj"
 	-@erase "$(INTDIR)\file.obj"
 	-@erase "$(INTDIR)\find.obj"
+	-@erase "$(INTDIR)\gp_rsrc.res"
 	-@erase "$(INTDIR)\GpMain.obj"
 	-@erase "$(INTDIR)\ip_ctrl1.obj"
 	-@erase "$(INTDIR)\ip_cursor.obj"
@@ -256,11 +260,11 @@ CLEAN :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
 # ADD BASE CPP /nologo /ML /W3 /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FR /YX /c
-# ADD CPP /nologo /MT /W3 /Gm /GX /Zi /Od /I ".." /I "..\kilib" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "NO_MLANG" /D TARGET_VER=310 /YX"stdafx.h" /c
+# ADD CPP /nologo /MT /W3 /Gm /GX /Zi /Od /I ".." /I "..\kilib" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "NO_MLANG" /D TARGET_VER=351 /YX"stdafx.h" /c
 # SUBTRACT CPP /Fr
 CPP_PROJ=/nologo /MT /W3 /Gm /GX /Zi /Od /I ".." /I "..\kilib" /D "_DEBUG" /D\
  "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "NO_MLANG" /D\
- TARGET_VER=310 /Fp"$(INTDIR)/GreenPad.pch" /YX"stdafx.h" /Fo"$(INTDIR)/"\
+ TARGET_VER=351 /Fp"$(INTDIR)/GreenPad.pch" /YX"stdafx.h" /Fo"$(INTDIR)/"\
  /Fd"$(INTDIR)/" /c 
 CPP_OBJS=.\WinDebug/
 CPP_SBRS=.\.
@@ -269,6 +273,7 @@ CPP_SBRS=.\.
 MTL_PROJ=/nologo /D "_DEBUG" /win32 
 # ADD BASE RSC /l 0x411 /d "_DEBUG"
 # ADD RSC /l 0x411 /d "_DEBUG"
+RSC_PROJ=/l 0x411 /fo"$(INTDIR)/gp_rsrc.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -277,10 +282,10 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib imm32.lib /nologo /subsystem:windows /debug /machine:I386
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
- odbccp32.lib /nologo /subsystem:windows /incremental:yes\
+ odbccp32.lib comctl32.lib imm32.lib /nologo /subsystem:windows /incremental:yes\
  /pdb:"$(OUTDIR)/GreenPad.pdb" /debug /machine:I386\
  /out:"$(OUTDIR)/GreenPad.exe" 
 LINK32_OBJS= \
@@ -290,6 +295,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\ctrl.obj" \
 	"$(INTDIR)\file.obj" \
 	"$(INTDIR)\find.obj" \
+	"$(INTDIR)\gp_rsrc.res" \
 	"$(INTDIR)\GpMain.obj" \
 	"$(INTDIR)\ip_ctrl1.obj" \
 	"$(INTDIR)\ip_cursor.obj" \
@@ -357,8 +363,23 @@ DEP_CPP_IP_PA=\
 	".\editwing\ewCommon.h"\
 	".\editwing\ewDoc.h"\
 	".\editwing\ip_doc.h"\
+	".\kilib\app.h"\
+	".\kilib\cmdarg.h"\
+	".\kilib\ctrl.h"\
+	".\kilib\file.h"\
+	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\ktlarray.h"\
+	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -392,12 +413,34 @@ SOURCE=.\GpMain.cpp
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
 
 DEP_CPP_GPMAI=\
+	".\ConfigManager.h"\
 	".\editwing\editwing.h"\
 	".\editwing\ewCommon.h"\
 	".\editwing\ewCtrl1.h"\
+	".\editwing\ewDoc.h"\
+	".\editwing\ewView.h"\
 	".\GpMain.h"\
+	".\kilib\app.h"\
+	".\kilib\cmdarg.h"\
+	".\kilib\ctrl.h"\
+	".\kilib\file.h"\
+	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\ktlarray.h"\
+	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\memory.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
+	".\kilib\string.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
+	".\OpenSaveDlg.h"\
+	".\Search.h"\
 	
 
 "$(INTDIR)\GpMain.obj" : $(SOURCE) $(DEP_CPP_GPMAI) "$(INTDIR)"
@@ -415,12 +458,27 @@ DEP_CPP_GPMAI=\
 	".\editwing\ewDoc.h"\
 	".\editwing\ewView.h"\
 	".\GpMain.h"\
+	".\kilib\app.h"\
+	".\kilib\cmdarg.h"\
+	".\kilib\ctrl.h"\
+	".\kilib\file.h"\
+	".\kilib\find.h"\
 	".\kilib\kilib.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
+	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\memory.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
 	".\kilib\string.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
 	".\OpenSaveDlg.h"\
+	".\Search.h"\
 	
 
 "$(INTDIR)\GpMain.obj" : $(SOURCE) $(DEP_CPP_GPMAI) "$(INTDIR)"
@@ -501,10 +559,24 @@ SOURCE=.\OpenSaveDlg.cpp
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
 
 DEP_CPP_OPENS=\
+	".\kilib\app.h"\
+	".\kilib\cmdarg.h"\
+	".\kilib\ctrl.h"\
+	".\kilib\file.h"\
+	".\kilib\find.h"\
 	".\kilib\kilib.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
+	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
+	".\kilib\string.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
 	".\OpenSaveDlg.h"\
 	
 
@@ -516,11 +588,24 @@ DEP_CPP_OPENS=\
 !ELSEIF  "$(CFG)" == "GreenPad - Win32 Debug"
 
 DEP_CPP_OPENS=\
+	".\kilib\app.h"\
+	".\kilib\cmdarg.h"\
+	".\kilib\ctrl.h"\
+	".\kilib\file.h"\
+	".\kilib\find.h"\
 	".\kilib\kilib.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
+	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
 	".\kilib\string.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
 	".\OpenSaveDlg.h"\
 	
 
@@ -744,9 +829,6 @@ DEP_CPP_IP_CT=\
 	".\kilib\window.h"\
 	".\kilib\winutil.h"\
 	
-NODEP_CPP_IP_CT=\
-	".\editwing\stdafx.h"\
-	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
 
@@ -887,8 +969,23 @@ DEP_CPP_IP_CU=\
 	".\editwing\ewView.h"\
 	".\editwing\ip_doc.h"\
 	".\editwing\ip_view.h"\
+	".\kilib\app.h"\
+	".\kilib\cmdarg.h"\
+	".\kilib\ctrl.h"\
+	".\kilib\file.h"\
+	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\ktlarray.h"\
+	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -1093,8 +1190,23 @@ DEP_CPP_IP_SC=\
 	".\editwing\ewView.h"\
 	".\editwing\ip_doc.h"\
 	".\editwing\ip_view.h"\
+	".\kilib\app.h"\
+	".\kilib\cmdarg.h"\
+	".\kilib\ctrl.h"\
+	".\kilib\file.h"\
+	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\ktlarray.h"\
+	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -1317,8 +1429,23 @@ DEP_CPP_IP_DR=\
 	".\editwing\ewView.h"\
 	".\editwing\ip_doc.h"\
 	".\editwing\ip_view.h"\
+	".\kilib\app.h"\
+	".\kilib\cmdarg.h"\
+	".\kilib\ctrl.h"\
+	".\kilib\file.h"\
+	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\ktlarray.h"\
+	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -1390,6 +1517,28 @@ DEP_CPP_SEARC=\
 
 
 "$(INTDIR)\Search.obj" : $(SOURCE) $(DEP_CPP_SEARC) "$(INTDIR)"
+
+
+!ENDIF 
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\rsrc\gp_rsrc.rc
+
+!IF  "$(CFG)" == "GreenPad - Win32 Release"
+
+
+"$(INTDIR)\gp_rsrc.res" : $(SOURCE) "$(INTDIR)"
+   $(RSC) /l 0x411 /fo"$(INTDIR)/gp_rsrc.res" /i "rsrc" /d "NDEBUG" $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "GreenPad - Win32 Debug"
+
+
+"$(INTDIR)\gp_rsrc.res" : $(SOURCE) "$(INTDIR)"
+   $(RSC) /l 0x411 /fo"$(INTDIR)/gp_rsrc.res" /i "rsrc" /d "_DEBUG" $(SOURCE)
 
 
 !ENDIF 
