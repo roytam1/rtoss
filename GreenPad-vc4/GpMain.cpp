@@ -697,7 +697,8 @@ static inline void MyShowWnd( HWND wnd )
 void GreenPadWnd::on_nextwnd()
 {
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-	if( HWND next = ::FindWindowEx( NULL, hwnd(), className_, NULL ) )
+	HWND next;
+	if( next = ::FindWindowEx( NULL, hwnd(), className_, NULL ) )
 	{
 		HWND last=next, pos;
 		while( last != NULL )
