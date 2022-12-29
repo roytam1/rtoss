@@ -64,6 +64,9 @@ typedef struct tagRECONVERTSTRING {
 #ifndef WHEEL_DELTA
 #define WHEEL_DELTA                     120
 #endif
+#ifndef SCS_CAP_SETRECONVERTSTRING
+#define SCS_CAP_SETRECONVERTSTRING      0x00000004
+#endif
 
 #ifdef _MSC_VER
 #pragma warning( disable: 4355 )
