@@ -1,4 +1,4 @@
-# Microsoft Developer Studio Generated NMAKE File, Format Version 4.20
+# Microsoft Developer Studio Generated NMAKE File, Format Version 4.10
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (MIPS) Dynamic-Link Library" 0x0502
@@ -14,7 +14,7 @@ CFG=chardet_vc4 - Win32 Debug
 !MESSAGE You can specify a configuration when running NMAKE on this makefile
 !MESSAGE by defining the macro CFG on the command line.  For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "chardet_vc4.mak" CFG="chardet_vc4 - Win32 Debug"
+!MESSAGE NMAKE /f "cdetmips.mak" CFG="chardet_vc4 - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -90,6 +90,7 @@ CLEAN :
 	-@erase "$(INTDIR)\nsSJISProber.obj"
 	-@erase "$(INTDIR)\nsUniversalDetector.obj"
 	-@erase "$(INTDIR)\nsUTF8Prober.obj"
+	-@erase "$(INTDIR)\vc40.pdb"
 	-@erase "$(OUTDIR)\chardet.dll"
 	-@erase "$(OUTDIR)\chardet.exp"
 	-@erase "$(OUTDIR)\chardet.lib"
@@ -97,24 +98,18 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-# ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "src" /I "src\tables" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /YX /c
-CPP_PROJ=/nologo /MT /W3 /GX /O2 /I "src" /I "src\tables" /D "NDEBUG" /D\
- "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /Fp"$(INTDIR)/chardet_vc4.pch" /YX\
- /Fo"$(INTDIR)/" /c 
-CPP_OBJS=.\Release/
-CPP_SBRS=.\.
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
 # ADD MTL /nologo /D "NDEBUG" /win32
 MTL_PROJ=/nologo /D "NDEBUG" /win32 
+# ADD BASE CPP /nologo /MT /Gt0 /QMOb2000 /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
+# ADD CPP /nologo /Gt0 /QMOb2000 /W3 /GX- /Zi /O1 /I "src" /I "src\tables" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /YX /c
+CPP_PROJ=/nologo /ML /Gt0 /QMOb2000 /W3 /GX- /Zi /O1 /I "src" /I "src\tables"\
+ /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS"\
+ /Fp"$(INTDIR)/cdetmips.pch" /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
+CPP_OBJS=.\Release/
+CPP_SBRS=.\.
 # ADD BASE RSC /l 0x411 /d "NDEBUG"
 # ADD RSC /l 0x411 /d "NDEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/chardet_vc4.bsc" 
-BSC32_SBRS= \
-	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:MIPS
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:MIPS /out:"Release/chardet.dll"
@@ -163,6 +158,13 @@ LINK32_OBJS= \
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
+
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+BSC32_FLAGS=/nologo /o"$(OUTDIR)/cdetmips.bsc" 
+BSC32_SBRS= \
+	
 
 !ELSEIF  "$(CFG)" == "chardet_vc4 - Win32 Debug"
 
@@ -216,7 +218,6 @@ CLEAN :
 	-@erase "$(INTDIR)\nsSJISProber.obj"
 	-@erase "$(INTDIR)\nsUniversalDetector.obj"
 	-@erase "$(INTDIR)\nsUTF8Prober.obj"
-	-@erase "$(INTDIR)\vc40.idb"
 	-@erase "$(INTDIR)\vc40.pdb"
 	-@erase "$(OUTDIR)\chardet.dll"
 	-@erase "$(OUTDIR)\chardet.exp"
@@ -227,24 +228,18 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /I "src" /I "src\tables" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /YX /c
-CPP_PROJ=/nologo /MTd /W3 /Gm /GX /Zi /Od /I "src" /I "src\tables" /D "_DEBUG"\
- /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /Fp"$(INTDIR)/chardet_vc4.pch" /YX\
- /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
-CPP_OBJS=.\Debug/
-CPP_SBRS=.\.
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /win32
 MTL_PROJ=/nologo /D "_DEBUG" /win32 
+# ADD BASE CPP /nologo /MTd /Gt0 /QMOb2000 /W3 /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
+# ADD CPP /nologo /ML /Gt0 /QMOb2000 /W3 /GX- /Zi /O1 /I "src" /I "src\tables" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /YX /c
+CPP_PROJ=/nologo /ML /Gt0 /QMOb2000 /W3 /GX- /Zi /O1 /I "src" /I "src\tables"\
+ /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS"\
+ /Fp"$(INTDIR)/cdetmips.pch" /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
+CPP_OBJS=.\Debug/
+CPP_SBRS=.\.
 # ADD BASE RSC /l 0x411 /d "_DEBUG"
 # ADD RSC /l 0x411 /d "_DEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/chardet_vc4.bsc" 
-BSC32_SBRS= \
-	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:MIPS
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:MIPS /out:"Debug/chardet.dll"
@@ -293,6 +288,13 @@ LINK32_OBJS= \
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
+
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+BSC32_FLAGS=/nologo /o"$(OUTDIR)/cdetmips.bsc" 
+BSC32_SBRS= \
+	
 
 !ENDIF 
 
