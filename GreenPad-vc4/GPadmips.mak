@@ -1,4 +1,4 @@
-# Microsoft Developer Studio Generated NMAKE File, Format Version 4.00
+# Microsoft Developer Studio Generated NMAKE File, Format Version 4.10
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (MIPS) Application" 0x0501
@@ -14,7 +14,7 @@ CFG=GreenPad - Win32 Debug
 !MESSAGE You can specify a configuration when running NMAKE on this makefile
 !MESSAGE by defining the macro CFG on the command line.  For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "GreenPad_mips.mak" CFG="GreenPad - Win32 Debug"
+!MESSAGE NMAKE /f "GPadmips.mak" CFG="GreenPad - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -51,66 +51,67 @@ MTL=mktyplib.exe
 OUTDIR=.\MIPSRel
 INTDIR=.\MIPSRel
 
-ALL : "$(OUTDIR)\GreenPad_mips.exe" "$(OUTDIR)\GreenPad_mips.bsc"
+ALL : "$(OUTDIR)\GPadmips.exe" "$(OUTDIR)\GPadmips.bsc"
 
 CLEAN : 
-	-@erase ".\MIPSRel\GreenPad_mips.exe"
-	-@erase ".\MIPSRel\ip_text.obj"
-	-@erase ".\MIPSRel\GpMain.obj"
-	-@erase ".\MIPSRel\find.obj"
-	-@erase ".\MIPSRel\ip_parse.obj"
-	-@erase ".\MIPSRel\ip_ctrl1.obj"
-	-@erase ".\MIPSRel\ip_draw.obj"
-	-@erase ".\MIPSRel\ip_wrap.obj"
-	-@erase ".\MIPSRel\ip_cursor.obj"
-	-@erase ".\MIPSRel\ctrl.obj"
-	-@erase ".\MIPSRel\log.obj"
-	-@erase ".\MIPSRel\OpenSaveDlg.obj"
-	-@erase ".\MIPSRel\app.obj"
-	-@erase ".\MIPSRel\Search.obj"
-	-@erase ".\MIPSRel\memory.obj"
-	-@erase ".\MIPSRel\string.obj"
-	-@erase ".\MIPSRel\file.obj"
-	-@erase ".\MIPSRel\ip_scroll.obj"
-	-@erase ".\MIPSRel\cmdarg.obj"
-	-@erase ".\MIPSRel\path.obj"
-	-@erase ".\MIPSRel\ConfigManager.obj"
-	-@erase ".\MIPSRel\window.obj"
-	-@erase ".\MIPSRel\textfile.obj"
-	-@erase ".\MIPSRel\stdafx.obj"
-	-@erase ".\MIPSRel\winutil.obj"
-	-@erase ".\MIPSRel\RSearch.obj"
-	-@erase ".\MIPSRel\thread.obj"
-	-@erase ".\MIPSRel\registry.obj"
-	-@erase ".\MIPSRel\gp_rsrc.res"
-	-@erase ".\MIPSRel\GreenPad_mips.bsc"
-	-@erase ".\MIPSRel\find.sbr"
-	-@erase ".\MIPSRel\ip_parse.sbr"
-	-@erase ".\MIPSRel\ip_ctrl1.sbr"
-	-@erase ".\MIPSRel\ip_draw.sbr"
-	-@erase ".\MIPSRel\ip_wrap.sbr"
-	-@erase ".\MIPSRel\ip_cursor.sbr"
-	-@erase ".\MIPSRel\ctrl.sbr"
-	-@erase ".\MIPSRel\log.sbr"
-	-@erase ".\MIPSRel\OpenSaveDlg.sbr"
-	-@erase ".\MIPSRel\app.sbr"
-	-@erase ".\MIPSRel\Search.sbr"
-	-@erase ".\MIPSRel\memory.sbr"
-	-@erase ".\MIPSRel\string.sbr"
-	-@erase ".\MIPSRel\file.sbr"
-	-@erase ".\MIPSRel\ip_scroll.sbr"
-	-@erase ".\MIPSRel\cmdarg.sbr"
-	-@erase ".\MIPSRel\path.sbr"
-	-@erase ".\MIPSRel\ConfigManager.sbr"
-	-@erase ".\MIPSRel\window.sbr"
-	-@erase ".\MIPSRel\textfile.sbr"
-	-@erase ".\MIPSRel\stdafx.sbr"
-	-@erase ".\MIPSRel\winutil.sbr"
-	-@erase ".\MIPSRel\RSearch.sbr"
-	-@erase ".\MIPSRel\thread.sbr"
-	-@erase ".\MIPSRel\registry.sbr"
-	-@erase ".\MIPSRel\ip_text.sbr"
-	-@erase ".\MIPSRel\GpMain.sbr"
+	-@erase "$(INTDIR)\app.obj"
+	-@erase "$(INTDIR)\app.sbr"
+	-@erase "$(INTDIR)\cmdarg.obj"
+	-@erase "$(INTDIR)\cmdarg.sbr"
+	-@erase "$(INTDIR)\ConfigManager.obj"
+	-@erase "$(INTDIR)\ConfigManager.sbr"
+	-@erase "$(INTDIR)\ctrl.obj"
+	-@erase "$(INTDIR)\ctrl.sbr"
+	-@erase "$(INTDIR)\file.obj"
+	-@erase "$(INTDIR)\file.sbr"
+	-@erase "$(INTDIR)\find.obj"
+	-@erase "$(INTDIR)\find.sbr"
+	-@erase "$(INTDIR)\gp_rsrc.res"
+	-@erase "$(INTDIR)\GpMain.obj"
+	-@erase "$(INTDIR)\GpMain.sbr"
+	-@erase "$(INTDIR)\ip_ctrl1.obj"
+	-@erase "$(INTDIR)\ip_ctrl1.sbr"
+	-@erase "$(INTDIR)\ip_cursor.obj"
+	-@erase "$(INTDIR)\ip_cursor.sbr"
+	-@erase "$(INTDIR)\ip_draw.obj"
+	-@erase "$(INTDIR)\ip_draw.sbr"
+	-@erase "$(INTDIR)\ip_parse.obj"
+	-@erase "$(INTDIR)\ip_parse.sbr"
+	-@erase "$(INTDIR)\ip_scroll.obj"
+	-@erase "$(INTDIR)\ip_scroll.sbr"
+	-@erase "$(INTDIR)\ip_text.obj"
+	-@erase "$(INTDIR)\ip_text.sbr"
+	-@erase "$(INTDIR)\ip_wrap.obj"
+	-@erase "$(INTDIR)\ip_wrap.sbr"
+	-@erase "$(INTDIR)\log.obj"
+	-@erase "$(INTDIR)\log.sbr"
+	-@erase "$(INTDIR)\memory.obj"
+	-@erase "$(INTDIR)\memory.sbr"
+	-@erase "$(INTDIR)\OpenSaveDlg.obj"
+	-@erase "$(INTDIR)\OpenSaveDlg.sbr"
+	-@erase "$(INTDIR)\path.obj"
+	-@erase "$(INTDIR)\path.sbr"
+	-@erase "$(INTDIR)\registry.obj"
+	-@erase "$(INTDIR)\registry.sbr"
+	-@erase "$(INTDIR)\RSearch.obj"
+	-@erase "$(INTDIR)\RSearch.sbr"
+	-@erase "$(INTDIR)\Search.obj"
+	-@erase "$(INTDIR)\Search.sbr"
+	-@erase "$(INTDIR)\stdafx.obj"
+	-@erase "$(INTDIR)\stdafx.sbr"
+	-@erase "$(INTDIR)\string.obj"
+	-@erase "$(INTDIR)\string.sbr"
+	-@erase "$(INTDIR)\textfile.obj"
+	-@erase "$(INTDIR)\textfile.sbr"
+	-@erase "$(INTDIR)\thread.obj"
+	-@erase "$(INTDIR)\thread.sbr"
+	-@erase "$(INTDIR)\vc40.pdb"
+	-@erase "$(INTDIR)\window.obj"
+	-@erase "$(INTDIR)\window.sbr"
+	-@erase "$(INTDIR)\winutil.obj"
+	-@erase "$(INTDIR)\winutil.sbr"
+	-@erase "$(OUTDIR)\GPadmips.bsc"
+	-@erase "$(OUTDIR)\GPadmips.exe"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -119,11 +120,11 @@ CLEAN :
 # ADD MTL /nologo /D "NDEBUG" /mips
 MTL_PROJ=/nologo /D "NDEBUG" /mips 
 # ADD BASE CPP /nologo /Gt0 /QMOb2000 /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FR /YX /c
-# ADD CPP /nologo /MT /Gt0 /QMOb2000 /W3 /GX /O2 /I ".." /I "..\kilib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "NO_MLANG" /D TARGET_VER=310 /Fr /YX"stdafx.h" /c
-CPP_PROJ=/nologo /MT /Gt0 /QMOb2000 /W3 /GX /O2 /I ".." /I "..\kilib" /D\
+# ADD CPP /nologo /Gt0 /QMOb2000 /W3 /GX- /Zi /O1 /I ".." /I "..\kilib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "NO_MLANG" /D TARGET_VER=310 /Fr /YX"stdafx.h" /c
+CPP_PROJ=/nologo /ML /Gt0 /QMOb2000 /W3 /GX- /Zi /O1 /I ".." /I "..\kilib" /D\
  "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "NO_MLANG" /D\
- TARGET_VER=310 /Fr"$(INTDIR)/" /Fp"$(INTDIR)/GreenPad_mips.pch" /YX"stdafx.h"\
- /Fo"$(INTDIR)/" /c 
+ TARGET_VER=310 /Fr"$(INTDIR)/" /Fp"$(INTDIR)/GPadmips.pch" /YX"stdafx.h"\
+ /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
 CPP_OBJS=.\MIPSRel/
 CPP_SBRS=.\MIPSRel/
 # ADD BASE RSC /l 0x411 /d "NDEBUG"
@@ -135,39 +136,38 @@ LINK32=link.exe
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
  odbccp32.lib comctl32.lib /nologo /subsystem:windows /incremental:no\
- /pdb:"$(OUTDIR)/GreenPad_mips.pdb" /machine:MIPS\
- /out:"$(OUTDIR)/GreenPad_mips.exe" 
+ /pdb:"$(OUTDIR)/GPadmips.pdb" /machine:MIPS /out:"$(OUTDIR)/GPadmips.exe" 
 LINK32_OBJS= \
-	"$(INTDIR)/ip_text.obj" \
-	"$(INTDIR)/GpMain.obj" \
-	"$(INTDIR)/find.obj" \
-	"$(INTDIR)/ip_parse.obj" \
-	"$(INTDIR)/ip_ctrl1.obj" \
-	"$(INTDIR)/ip_draw.obj" \
-	"$(INTDIR)/ip_wrap.obj" \
-	"$(INTDIR)/ip_cursor.obj" \
-	"$(INTDIR)/ctrl.obj" \
-	"$(INTDIR)/log.obj" \
-	"$(INTDIR)/OpenSaveDlg.obj" \
-	"$(INTDIR)/app.obj" \
-	"$(INTDIR)/Search.obj" \
-	"$(INTDIR)/memory.obj" \
-	"$(INTDIR)/string.obj" \
-	"$(INTDIR)/file.obj" \
-	"$(INTDIR)/ip_scroll.obj" \
-	"$(INTDIR)/cmdarg.obj" \
-	"$(INTDIR)/path.obj" \
-	"$(INTDIR)/ConfigManager.obj" \
-	"$(INTDIR)/window.obj" \
-	"$(INTDIR)/textfile.obj" \
-	"$(INTDIR)/stdafx.obj" \
-	"$(INTDIR)/winutil.obj" \
-	"$(INTDIR)/RSearch.obj" \
-	"$(INTDIR)/thread.obj" \
-	"$(INTDIR)/registry.obj" \
-	"$(INTDIR)/gp_rsrc.res"
+	"$(INTDIR)\app.obj" \
+	"$(INTDIR)\cmdarg.obj" \
+	"$(INTDIR)\ConfigManager.obj" \
+	"$(INTDIR)\ctrl.obj" \
+	"$(INTDIR)\file.obj" \
+	"$(INTDIR)\find.obj" \
+	"$(INTDIR)\gp_rsrc.res" \
+	"$(INTDIR)\GpMain.obj" \
+	"$(INTDIR)\ip_ctrl1.obj" \
+	"$(INTDIR)\ip_cursor.obj" \
+	"$(INTDIR)\ip_draw.obj" \
+	"$(INTDIR)\ip_parse.obj" \
+	"$(INTDIR)\ip_scroll.obj" \
+	"$(INTDIR)\ip_text.obj" \
+	"$(INTDIR)\ip_wrap.obj" \
+	"$(INTDIR)\log.obj" \
+	"$(INTDIR)\memory.obj" \
+	"$(INTDIR)\OpenSaveDlg.obj" \
+	"$(INTDIR)\path.obj" \
+	"$(INTDIR)\registry.obj" \
+	"$(INTDIR)\RSearch.obj" \
+	"$(INTDIR)\Search.obj" \
+	"$(INTDIR)\stdafx.obj" \
+	"$(INTDIR)\string.obj" \
+	"$(INTDIR)\textfile.obj" \
+	"$(INTDIR)\thread.obj" \
+	"$(INTDIR)\window.obj" \
+	"$(INTDIR)\winutil.obj"
 
-"$(OUTDIR)\GreenPad_mips.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\GPadmips.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -175,37 +175,37 @@ LINK32_OBJS= \
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/GreenPad_mips.bsc" 
+BSC32_FLAGS=/nologo /o"$(OUTDIR)/GPadmips.bsc" 
 BSC32_SBRS= \
-	"$(INTDIR)/find.sbr" \
-	"$(INTDIR)/ip_parse.sbr" \
-	"$(INTDIR)/ip_ctrl1.sbr" \
-	"$(INTDIR)/ip_draw.sbr" \
-	"$(INTDIR)/ip_wrap.sbr" \
-	"$(INTDIR)/ip_cursor.sbr" \
-	"$(INTDIR)/ctrl.sbr" \
-	"$(INTDIR)/log.sbr" \
-	"$(INTDIR)/OpenSaveDlg.sbr" \
-	"$(INTDIR)/app.sbr" \
-	"$(INTDIR)/Search.sbr" \
-	"$(INTDIR)/memory.sbr" \
-	"$(INTDIR)/string.sbr" \
-	"$(INTDIR)/file.sbr" \
-	"$(INTDIR)/ip_scroll.sbr" \
-	"$(INTDIR)/cmdarg.sbr" \
-	"$(INTDIR)/path.sbr" \
-	"$(INTDIR)/ConfigManager.sbr" \
-	"$(INTDIR)/window.sbr" \
-	"$(INTDIR)/textfile.sbr" \
-	"$(INTDIR)/stdafx.sbr" \
-	"$(INTDIR)/winutil.sbr" \
-	"$(INTDIR)/RSearch.sbr" \
-	"$(INTDIR)/thread.sbr" \
-	"$(INTDIR)/registry.sbr" \
-	"$(INTDIR)/ip_text.sbr" \
-	"$(INTDIR)/GpMain.sbr"
+	"$(INTDIR)\app.sbr" \
+	"$(INTDIR)\cmdarg.sbr" \
+	"$(INTDIR)\ConfigManager.sbr" \
+	"$(INTDIR)\ctrl.sbr" \
+	"$(INTDIR)\file.sbr" \
+	"$(INTDIR)\find.sbr" \
+	"$(INTDIR)\GpMain.sbr" \
+	"$(INTDIR)\ip_ctrl1.sbr" \
+	"$(INTDIR)\ip_cursor.sbr" \
+	"$(INTDIR)\ip_draw.sbr" \
+	"$(INTDIR)\ip_parse.sbr" \
+	"$(INTDIR)\ip_scroll.sbr" \
+	"$(INTDIR)\ip_text.sbr" \
+	"$(INTDIR)\ip_wrap.sbr" \
+	"$(INTDIR)\log.sbr" \
+	"$(INTDIR)\memory.sbr" \
+	"$(INTDIR)\OpenSaveDlg.sbr" \
+	"$(INTDIR)\path.sbr" \
+	"$(INTDIR)\registry.sbr" \
+	"$(INTDIR)\RSearch.sbr" \
+	"$(INTDIR)\Search.sbr" \
+	"$(INTDIR)\stdafx.sbr" \
+	"$(INTDIR)\string.sbr" \
+	"$(INTDIR)\textfile.sbr" \
+	"$(INTDIR)\thread.sbr" \
+	"$(INTDIR)\window.sbr" \
+	"$(INTDIR)\winutil.sbr"
 
-"$(OUTDIR)\GreenPad_mips.bsc" : "$(OUTDIR)" $(BSC32_SBRS)
+"$(OUTDIR)\GPadmips.bsc" : "$(OUTDIR)" $(BSC32_SBRS)
     $(BSC32) @<<
   $(BSC32_FLAGS) $(BSC32_SBRS)
 <<
@@ -225,41 +225,41 @@ BSC32_SBRS= \
 OUTDIR=.\MIPSDbg
 INTDIR=.\MIPSDbg
 
-ALL : "$(OUTDIR)\GreenPad_mips.exe"
+ALL : "$(OUTDIR)\GPadmips.exe"
 
 CLEAN : 
-	-@erase ".\MIPSDbg\vc40.pdb"
-	-@erase ".\MIPSDbg\GreenPad_mips.exe"
-	-@erase ".\MIPSDbg\ip_parse.obj"
-	-@erase ".\MIPSDbg\find.obj"
-	-@erase ".\MIPSDbg\window.obj"
-	-@erase ".\MIPSDbg\ip_ctrl1.obj"
-	-@erase ".\MIPSDbg\thread.obj"
-	-@erase ".\MIPSDbg\OpenSaveDlg.obj"
-	-@erase ".\MIPSDbg\app.obj"
-	-@erase ".\MIPSDbg\winutil.obj"
-	-@erase ".\MIPSDbg\RSearch.obj"
-	-@erase ".\MIPSDbg\ip_scroll.obj"
-	-@erase ".\MIPSDbg\file.obj"
-	-@erase ".\MIPSDbg\GpMain.obj"
-	-@erase ".\MIPSDbg\ip_text.obj"
-	-@erase ".\MIPSDbg\ip_cursor.obj"
-	-@erase ".\MIPSDbg\path.obj"
-	-@erase ".\MIPSDbg\stdafx.obj"
-	-@erase ".\MIPSDbg\textfile.obj"
-	-@erase ".\MIPSDbg\ConfigManager.obj"
-	-@erase ".\MIPSDbg\ip_draw.obj"
-	-@erase ".\MIPSDbg\ip_wrap.obj"
-	-@erase ".\MIPSDbg\Search.obj"
-	-@erase ".\MIPSDbg\ctrl.obj"
-	-@erase ".\MIPSDbg\log.obj"
-	-@erase ".\MIPSDbg\registry.obj"
-	-@erase ".\MIPSDbg\memory.obj"
-	-@erase ".\MIPSDbg\string.obj"
-	-@erase ".\MIPSDbg\cmdarg.obj"
-	-@erase ".\MIPSDbg\gp_rsrc.res"
-	-@erase ".\MIPSDbg\GreenPad_mips.ilk"
-	-@erase ".\MIPSDbg\GreenPad_mips.pdb"
+	-@erase "$(INTDIR)\app.obj"
+	-@erase "$(INTDIR)\cmdarg.obj"
+	-@erase "$(INTDIR)\ConfigManager.obj"
+	-@erase "$(INTDIR)\ctrl.obj"
+	-@erase "$(INTDIR)\file.obj"
+	-@erase "$(INTDIR)\find.obj"
+	-@erase "$(INTDIR)\gp_rsrc.res"
+	-@erase "$(INTDIR)\GpMain.obj"
+	-@erase "$(INTDIR)\ip_ctrl1.obj"
+	-@erase "$(INTDIR)\ip_cursor.obj"
+	-@erase "$(INTDIR)\ip_draw.obj"
+	-@erase "$(INTDIR)\ip_parse.obj"
+	-@erase "$(INTDIR)\ip_scroll.obj"
+	-@erase "$(INTDIR)\ip_text.obj"
+	-@erase "$(INTDIR)\ip_wrap.obj"
+	-@erase "$(INTDIR)\log.obj"
+	-@erase "$(INTDIR)\memory.obj"
+	-@erase "$(INTDIR)\OpenSaveDlg.obj"
+	-@erase "$(INTDIR)\path.obj"
+	-@erase "$(INTDIR)\registry.obj"
+	-@erase "$(INTDIR)\RSearch.obj"
+	-@erase "$(INTDIR)\Search.obj"
+	-@erase "$(INTDIR)\stdafx.obj"
+	-@erase "$(INTDIR)\string.obj"
+	-@erase "$(INTDIR)\textfile.obj"
+	-@erase "$(INTDIR)\thread.obj"
+	-@erase "$(INTDIR)\vc40.pdb"
+	-@erase "$(INTDIR)\window.obj"
+	-@erase "$(INTDIR)\winutil.obj"
+	-@erase "$(OUTDIR)\GPadmips.exe"
+	-@erase "$(OUTDIR)\GPadmips.ilk"
+	-@erase "$(OUTDIR)\GPadmips.pdb"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -268,14 +268,14 @@ CLEAN :
 # ADD MTL /nologo /D "_DEBUG" /mips
 MTL_PROJ=/nologo /D "_DEBUG" /mips 
 # ADD BASE CPP /nologo /ML /Gt0 /QMOb2000 /W3 /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FR /YX /c
-# ADD CPP /nologo /MT /Gt0 /QMOb2000 /W3 /GX /Zi /Od /I ".." /I "..\kilib" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "NO_MLANG" /D TARGET_VER=310 /YX"stdafx.h" /c
+# ADD CPP /nologo /ML /Gt0 /QMOb2000 /W3 /GX- /Zi /O1 /I ".." /I "..\kilib" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "NO_MLANG" /D TARGET_VER=310 /YX"stdafx.h" /c
 # SUBTRACT CPP /Fr
-CPP_PROJ=/nologo /MT /Gt0 /QMOb2000 /W3 /GX /Zi /Od /I ".." /I "..\kilib" /D\
+CPP_PROJ=/nologo /ML /Gt0 /QMOb2000 /W3 /GX- /Zi /O1 /I ".." /I "..\kilib" /D\
  "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "NO_MLANG" /D\
- TARGET_VER=310 /Fp"$(INTDIR)/GreenPad_mips.pch" /YX"stdafx.h" /Fo"$(INTDIR)/"\
+ TARGET_VER=310 /Fp"$(INTDIR)/GPadmips.pch" /YX"stdafx.h" /Fo"$(INTDIR)/"\
  /Fd"$(INTDIR)/" /c 
 CPP_OBJS=.\MIPSDbg/
-CPP_SBRS=
+CPP_SBRS=.\.
 # ADD BASE RSC /l 0x411 /d "_DEBUG"
 # ADD RSC /l 0x411 /d "_DEBUG"
 RSC_PROJ=/l 0x411 /fo"$(INTDIR)/gp_rsrc.res" /d "_DEBUG" 
@@ -285,39 +285,39 @@ LINK32=link.exe
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
  odbccp32.lib comctl32.lib /nologo /subsystem:windows /incremental:yes\
- /pdb:"$(OUTDIR)/GreenPad_mips.pdb" /debug /machine:MIPS\
- /out:"$(OUTDIR)/GreenPad_mips.exe" 
+ /pdb:"$(OUTDIR)/GPadmips.pdb" /debug /machine:MIPS\
+ /out:"$(OUTDIR)/GPadmips.exe" 
 LINK32_OBJS= \
-	"$(INTDIR)/ip_parse.obj" \
-	"$(INTDIR)/find.obj" \
-	"$(INTDIR)/window.obj" \
-	"$(INTDIR)/ip_ctrl1.obj" \
-	"$(INTDIR)/thread.obj" \
-	"$(INTDIR)/OpenSaveDlg.obj" \
-	"$(INTDIR)/app.obj" \
-	"$(INTDIR)/winutil.obj" \
-	"$(INTDIR)/RSearch.obj" \
-	"$(INTDIR)/ip_scroll.obj" \
-	"$(INTDIR)/file.obj" \
-	"$(INTDIR)/GpMain.obj" \
-	"$(INTDIR)/ip_text.obj" \
-	"$(INTDIR)/ip_cursor.obj" \
-	"$(INTDIR)/path.obj" \
-	"$(INTDIR)/stdafx.obj" \
-	"$(INTDIR)/textfile.obj" \
-	"$(INTDIR)/ConfigManager.obj" \
-	"$(INTDIR)/ip_draw.obj" \
-	"$(INTDIR)/ip_wrap.obj" \
-	"$(INTDIR)/Search.obj" \
-	"$(INTDIR)/ctrl.obj" \
-	"$(INTDIR)/log.obj" \
-	"$(INTDIR)/registry.obj" \
-	"$(INTDIR)/memory.obj" \
-	"$(INTDIR)/string.obj" \
-	"$(INTDIR)/cmdarg.obj" \
-	"$(INTDIR)/gp_rsrc.res"
+	"$(INTDIR)\app.obj" \
+	"$(INTDIR)\cmdarg.obj" \
+	"$(INTDIR)\ConfigManager.obj" \
+	"$(INTDIR)\ctrl.obj" \
+	"$(INTDIR)\file.obj" \
+	"$(INTDIR)\find.obj" \
+	"$(INTDIR)\gp_rsrc.res" \
+	"$(INTDIR)\GpMain.obj" \
+	"$(INTDIR)\ip_ctrl1.obj" \
+	"$(INTDIR)\ip_cursor.obj" \
+	"$(INTDIR)\ip_draw.obj" \
+	"$(INTDIR)\ip_parse.obj" \
+	"$(INTDIR)\ip_scroll.obj" \
+	"$(INTDIR)\ip_text.obj" \
+	"$(INTDIR)\ip_wrap.obj" \
+	"$(INTDIR)\log.obj" \
+	"$(INTDIR)\memory.obj" \
+	"$(INTDIR)\OpenSaveDlg.obj" \
+	"$(INTDIR)\path.obj" \
+	"$(INTDIR)\registry.obj" \
+	"$(INTDIR)\RSearch.obj" \
+	"$(INTDIR)\Search.obj" \
+	"$(INTDIR)\stdafx.obj" \
+	"$(INTDIR)\string.obj" \
+	"$(INTDIR)\textfile.obj" \
+	"$(INTDIR)\thread.obj" \
+	"$(INTDIR)\window.obj" \
+	"$(INTDIR)\winutil.obj"
 
-"$(OUTDIR)\GreenPad_mips.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\GPadmips.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -325,8 +325,9 @@ LINK32_OBJS= \
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/GreenPad_mips.bsc" 
-BSC32_SBRS=
+BSC32_FLAGS=/nologo /o"$(OUTDIR)/GPadmips.bsc" 
+BSC32_SBRS= \
+	
 
 !ENDIF 
 
@@ -365,27 +366,27 @@ BSC32_SBRS=
 
 SOURCE=.\editwing\ip_parse.cpp
 DEP_CPP_IP_PA=\
-	".\kilib\stdafx.h"\
-	".\editwing\ip_doc.h"\
-	".\kilib\yvals.h"\
-	".\editwing\ewDoc.h"\
 	".\editwing\ewCommon.h"\
-	".\kilib\kilib.h"\
+	".\editwing\ewDoc.h"\
+	".\editwing\ip_doc.h"\
 	".\kilib\app.h"\
-	".\kilib\thread.h"\
-	".\kilib\window.h"\
 	".\kilib\cmdarg.h"\
-	".\kilib\path.h"\
-	".\kilib\file.h"\
 	".\kilib\ctrl.h"\
-	".\kilib\textfile.h"\
-	".\kilib\winutil.h"\
+	".\kilib\file.h"\
 	".\kilib\find.h"\
-	".\kilib\registry.h"\
-	".\kilib\log.h"\
+	".\kilib\kilib.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
+	".\kilib\yvals.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -416,35 +417,35 @@ BuildCmds= \
 
 SOURCE=.\GpMain.cpp
 DEP_CPP_GPMAI=\
-	".\kilib\stdafx.h"\
-	".\GpMain.h"\
-	".\kilib\yvals.h"\
-	".\kilib\kilib.h"\
-	".\editwing\editwing.h"\
-	".\OpenSaveDlg.h"\
 	".\ConfigManager.h"\
-	".\Search.h"\
-	".\kilib\app.h"\
-	".\kilib\thread.h"\
-	".\kilib\window.h"\
-	".\kilib\cmdarg.h"\
-	".\kilib\path.h"\
-	".\kilib\file.h"\
-	".\kilib\ctrl.h"\
-	".\kilib\textfile.h"\
-	".\kilib\winutil.h"\
-	".\kilib\find.h"\
-	".\kilib\registry.h"\
-	".\kilib\log.h"\
-	".\kilib\ktlaptr.h"\
-	".\kilib\ktlarray.h"\
-	".\kilib\ktlgap.h"\
+	".\editwing\editwing.h"\
 	".\editwing\ewCommon.h"\
 	".\editwing\ewCtrl1.h"\
 	".\editwing\ewDoc.h"\
 	".\editwing\ewView.h"\
-	".\kilib\string.h"\
+	".\GpMain.h"\
+	".\kilib\app.h"\
+	".\kilib\cmdarg.h"\
+	".\kilib\ctrl.h"\
+	".\kilib\file.h"\
+	".\kilib\find.h"\
+	".\kilib\kilib.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\ktlarray.h"\
+	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
 	".\kilib\memory.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\string.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
+	".\kilib\yvals.h"\
+	".\OpenSaveDlg.h"\
+	".\Search.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -501,10 +502,10 @@ BuildCmds= \
 
 SOURCE=.\kilib\find.cpp
 DEP_CPP_FIND_=\
-	".\kilib\stdafx.h"\
 	".\kilib\find.h"\
-	".\kilib\yvals.h"\
 	".\kilib\path.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\yvals.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -535,26 +536,26 @@ BuildCmds= \
 
 SOURCE=.\OpenSaveDlg.cpp
 DEP_CPP_OPENS=\
-	".\kilib\stdafx.h"\
-	".\kilib\kilib.h"\
-	".\OpenSaveDlg.h"\
-	".\kilib\yvals.h"\
 	".\kilib\app.h"\
-	".\kilib\thread.h"\
-	".\kilib\window.h"\
 	".\kilib\cmdarg.h"\
-	".\kilib\path.h"\
-	".\kilib\file.h"\
 	".\kilib\ctrl.h"\
-	".\kilib\textfile.h"\
-	".\kilib\winutil.h"\
+	".\kilib\file.h"\
 	".\kilib\find.h"\
-	".\kilib\registry.h"\
-	".\kilib\log.h"\
+	".\kilib\kilib.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
+	".\kilib\stdafx.h"\
 	".\kilib\string.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
+	".\kilib\yvals.h"\
+	".\OpenSaveDlg.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -579,13 +580,13 @@ DEP_CPP_OPENS=\
 
 SOURCE=.\kilib\app.cpp
 DEP_CPP_APP_C=\
-	".\kilib\stdafx.h"\
 	".\kilib\app.h"\
+	".\kilib\ktlaptr.h"\
 	".\kilib\log.h"\
+	".\kilib\stdafx.h"\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
 	".\kilib\yvals.h"\
-	".\kilib\ktlaptr.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -616,27 +617,27 @@ BuildCmds= \
 
 SOURCE=.\editwing\ip_text.cpp
 DEP_CPP_IP_TE=\
-	".\kilib\stdafx.h"\
-	".\editwing\ip_doc.h"\
-	".\kilib\yvals.h"\
-	".\editwing\ewDoc.h"\
 	".\editwing\ewCommon.h"\
-	".\kilib\kilib.h"\
+	".\editwing\ewDoc.h"\
+	".\editwing\ip_doc.h"\
 	".\kilib\app.h"\
-	".\kilib\thread.h"\
-	".\kilib\window.h"\
 	".\kilib\cmdarg.h"\
-	".\kilib\path.h"\
-	".\kilib\file.h"\
 	".\kilib\ctrl.h"\
-	".\kilib\textfile.h"\
-	".\kilib\winutil.h"\
+	".\kilib\file.h"\
 	".\kilib\find.h"\
-	".\kilib\registry.h"\
-	".\kilib\log.h"\
+	".\kilib\kilib.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
+	".\kilib\yvals.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -667,10 +668,10 @@ BuildCmds= \
 
 SOURCE=.\kilib\registry.cpp
 DEP_CPP_REGIS=\
-	".\kilib\stdafx.h"\
-	".\kilib\registry.h"\
-	".\kilib\yvals.h"\
 	".\kilib\path.h"\
+	".\kilib\registry.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\yvals.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -701,8 +702,8 @@ BuildCmds= \
 
 SOURCE=.\kilib\path.cpp
 DEP_CPP_PATH_=\
-	".\kilib\stdafx.h"\
 	".\kilib\path.h"\
+	".\kilib\stdafx.h"\
 	".\kilib\yvals.h"\
 	
 
@@ -734,13 +735,13 @@ BuildCmds= \
 
 SOURCE=.\kilib\ctrl.cpp
 DEP_CPP_CTRL_=\
-	".\kilib\stdafx.h"\
 	".\kilib\app.h"\
 	".\kilib\ctrl.h"\
-	".\kilib\yvals.h"\
-	".\kilib\log.h"\
-	".\kilib\window.h"\
 	".\kilib\ktlaptr.h"\
+	".\kilib\log.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\window.h"\
+	".\kilib\yvals.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -771,28 +772,28 @@ BuildCmds= \
 
 SOURCE=.\editwing\ip_ctrl1.cpp
 DEP_CPP_IP_CT=\
-	".\kilib\stdafx.h"\
+	".\editwing\ewCommon.h"\
 	".\editwing\ewCtrl1.h"\
-	".\kilib\yvals.h"\
 	".\editwing\ewDoc.h"\
 	".\editwing\ewView.h"\
-	".\editwing\ewCommon.h"\
-	".\kilib\kilib.h"\
 	".\kilib\app.h"\
-	".\kilib\thread.h"\
-	".\kilib\window.h"\
 	".\kilib\cmdarg.h"\
-	".\kilib\path.h"\
-	".\kilib\file.h"\
 	".\kilib\ctrl.h"\
-	".\kilib\textfile.h"\
-	".\kilib\winutil.h"\
+	".\kilib\file.h"\
 	".\kilib\find.h"\
-	".\kilib\registry.h"\
-	".\kilib\log.h"\
+	".\kilib\kilib.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
+	".\kilib\yvals.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -823,29 +824,29 @@ BuildCmds= \
 
 SOURCE=.\editwing\ip_wrap.cpp
 DEP_CPP_IP_WR=\
-	".\kilib\stdafx.h"\
-	".\editwing\ip_view.h"\
-	".\kilib\yvals.h"\
-	".\editwing\ewView.h"\
-	".\editwing\ip_doc.h"\
 	".\editwing\ewCommon.h"\
 	".\editwing\ewDoc.h"\
-	".\kilib\kilib.h"\
+	".\editwing\ewView.h"\
+	".\editwing\ip_doc.h"\
+	".\editwing\ip_view.h"\
 	".\kilib\app.h"\
-	".\kilib\thread.h"\
-	".\kilib\window.h"\
 	".\kilib\cmdarg.h"\
-	".\kilib\path.h"\
-	".\kilib\file.h"\
 	".\kilib\ctrl.h"\
-	".\kilib\textfile.h"\
-	".\kilib\winutil.h"\
+	".\kilib\file.h"\
 	".\kilib\find.h"\
-	".\kilib\registry.h"\
-	".\kilib\log.h"\
+	".\kilib\kilib.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
+	".\kilib\yvals.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -876,34 +877,34 @@ BuildCmds= \
 
 SOURCE=.\RSearch.cpp
 DEP_CPP_RSEAR=\
-	".\kilib\stdafx.h"\
-	".\RSearch.h"\
-	".\kilib\ktlaptr.h"\
-	".\kilib\yvals.h"\
-	".\NSearch.h"\
-	".\Search.h"\
 	".\editwing\editwing.h"\
-	".\kilib\window.h"\
-	".\kilib\memory.h"\
-	".\kilib\string.h"\
 	".\editwing\ewCommon.h"\
 	".\editwing\ewCtrl1.h"\
-	".\kilib\kilib.h"\
-	".\kilib\app.h"\
-	".\kilib\thread.h"\
-	".\kilib\cmdarg.h"\
-	".\kilib\path.h"\
-	".\kilib\file.h"\
-	".\kilib\ctrl.h"\
-	".\kilib\textfile.h"\
-	".\kilib\winutil.h"\
-	".\kilib\find.h"\
-	".\kilib\registry.h"\
-	".\kilib\log.h"\
-	".\kilib\ktlarray.h"\
-	".\kilib\ktlgap.h"\
 	".\editwing\ewDoc.h"\
 	".\editwing\ewView.h"\
+	".\kilib\app.h"\
+	".\kilib\cmdarg.h"\
+	".\kilib\ctrl.h"\
+	".\kilib\file.h"\
+	".\kilib\find.h"\
+	".\kilib\kilib.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\ktlarray.h"\
+	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\memory.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\string.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
+	".\kilib\yvals.h"\
+	".\NSearch.h"\
+	".\RSearch.h"\
+	".\Search.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -928,29 +929,29 @@ DEP_CPP_RSEAR=\
 
 SOURCE=.\editwing\ip_cursor.cpp
 DEP_CPP_IP_CU=\
-	".\kilib\stdafx.h"\
-	".\editwing\ip_view.h"\
-	".\kilib\yvals.h"\
-	".\editwing\ewView.h"\
-	".\editwing\ip_doc.h"\
 	".\editwing\ewCommon.h"\
 	".\editwing\ewDoc.h"\
-	".\kilib\kilib.h"\
+	".\editwing\ewView.h"\
+	".\editwing\ip_doc.h"\
+	".\editwing\ip_view.h"\
 	".\kilib\app.h"\
-	".\kilib\thread.h"\
-	".\kilib\window.h"\
 	".\kilib\cmdarg.h"\
-	".\kilib\path.h"\
-	".\kilib\file.h"\
 	".\kilib\ctrl.h"\
-	".\kilib\textfile.h"\
-	".\kilib\winutil.h"\
+	".\kilib\file.h"\
 	".\kilib\find.h"\
-	".\kilib\registry.h"\
-	".\kilib\log.h"\
+	".\kilib\kilib.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
+	".\kilib\yvals.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -1014,15 +1015,15 @@ BuildCmds= \
 
 SOURCE=.\kilib\textfile.cpp
 DEP_CPP_TEXTF=\
-	".\kilib\stdafx.h"\
 	".\kilib\app.h"\
-	".\kilib\textfile.h"\
-	".\kilib\ktlarray.h"\
-	".\kilib\path.h"\
-	".\kilib\yvals.h"\
-	".\kilib\log.h"\
-	".\kilib\ktlaptr.h"\
 	".\kilib\file.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\ktlarray.h"\
+	".\kilib\log.h"\
+	".\kilib\path.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\textfile.h"\
+	".\kilib\yvals.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -1053,10 +1054,10 @@ BuildCmds= \
 
 SOURCE=.\kilib\string.cpp
 DEP_CPP_STRIN=\
-	".\kilib\stdafx.h"\
 	".\kilib\app.h"\
-	".\kilib\yvals.h"\
 	".\kilib\log.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\yvals.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -1087,12 +1088,12 @@ BuildCmds= \
 
 SOURCE=.\kilib\window.cpp
 DEP_CPP_WINDO=\
-	".\kilib\stdafx.h"\
 	".\kilib\app.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\log.h"\
+	".\kilib\stdafx.h"\
 	".\kilib\window.h"\
 	".\kilib\yvals.h"\
-	".\kilib\log.h"\
-	".\kilib\ktlaptr.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -1155,29 +1156,29 @@ BuildCmds= \
 
 SOURCE=.\editwing\ip_scroll.cpp
 DEP_CPP_IP_SC=\
-	".\kilib\stdafx.h"\
-	".\editwing\ip_view.h"\
-	".\kilib\yvals.h"\
-	".\editwing\ewView.h"\
-	".\editwing\ip_doc.h"\
 	".\editwing\ewCommon.h"\
 	".\editwing\ewDoc.h"\
-	".\kilib\kilib.h"\
+	".\editwing\ewView.h"\
+	".\editwing\ip_doc.h"\
+	".\editwing\ip_view.h"\
 	".\kilib\app.h"\
-	".\kilib\thread.h"\
-	".\kilib\window.h"\
 	".\kilib\cmdarg.h"\
-	".\kilib\path.h"\
-	".\kilib\file.h"\
 	".\kilib\ctrl.h"\
-	".\kilib\textfile.h"\
-	".\kilib\winutil.h"\
+	".\kilib\file.h"\
 	".\kilib\find.h"\
-	".\kilib\registry.h"\
-	".\kilib\log.h"\
+	".\kilib\kilib.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
+	".\kilib\yvals.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -1208,9 +1209,9 @@ BuildCmds= \
 
 SOURCE=.\kilib\log.cpp
 DEP_CPP_LOG_C=\
-	".\kilib\stdafx.h"\
-	".\kilib\log.h"\
 	".\kilib\app.h"\
+	".\kilib\log.h"\
+	".\kilib\stdafx.h"\
 	".\kilib\yvals.h"\
 	
 
@@ -1242,36 +1243,36 @@ BuildCmds= \
 
 SOURCE=.\ConfigManager.cpp
 DEP_CPP_CONFI=\
-	".\kilib\stdafx.h"\
 	".\ConfigManager.h"\
-	".\RSearch.h"\
-	".\kilib\yvals.h"\
 	".\editwing\editwing.h"\
-	".\OpenSaveDlg.h"\
 	".\editwing\ewCommon.h"\
 	".\editwing\ewCtrl1.h"\
-	".\kilib\kilib.h"\
+	".\editwing\ewDoc.h"\
+	".\editwing\ewView.h"\
 	".\kilib\app.h"\
-	".\kilib\thread.h"\
-	".\kilib\window.h"\
 	".\kilib\cmdarg.h"\
-	".\kilib\path.h"\
-	".\kilib\file.h"\
 	".\kilib\ctrl.h"\
-	".\kilib\textfile.h"\
-	".\kilib\winutil.h"\
+	".\kilib\file.h"\
 	".\kilib\find.h"\
-	".\kilib\registry.h"\
-	".\kilib\log.h"\
+	".\kilib\kilib.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
-	".\editwing\ewDoc.h"\
-	".\editwing\ewView.h"\
-	".\kilib\string.h"\
-	".\NSearch.h"\
-	".\Search.h"\
+	".\kilib\log.h"\
 	".\kilib\memory.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\string.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
+	".\kilib\yvals.h"\
+	".\NSearch.h"\
+	".\OpenSaveDlg.h"\
+	".\RSearch.h"\
+	".\Search.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -1296,12 +1297,12 @@ DEP_CPP_CONFI=\
 
 SOURCE=.\kilib\winutil.cpp
 DEP_CPP_WINUT=\
-	".\kilib\stdafx.h"\
 	".\kilib\app.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\log.h"\
+	".\kilib\stdafx.h"\
 	".\kilib\winutil.h"\
 	".\kilib\yvals.h"\
-	".\kilib\log.h"\
-	".\kilib\ktlaptr.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -1332,11 +1333,11 @@ BuildCmds= \
 
 SOURCE=.\kilib\cmdarg.cpp
 DEP_CPP_CMDAR=\
-	".\kilib\stdafx.h"\
 	".\kilib\cmdarg.h"\
-	".\kilib\yvals.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\yvals.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -1367,8 +1368,8 @@ BuildCmds= \
 
 SOURCE=.\kilib\file.cpp
 DEP_CPP_FILE_=\
-	".\kilib\stdafx.h"\
 	".\kilib\file.h"\
+	".\kilib\stdafx.h"\
 	".\kilib\yvals.h"\
 	
 
@@ -1400,29 +1401,29 @@ BuildCmds= \
 
 SOURCE=.\editwing\ip_draw.cpp
 DEP_CPP_IP_DR=\
-	".\kilib\stdafx.h"\
-	".\editwing\ip_view.h"\
-	".\kilib\yvals.h"\
-	".\editwing\ewView.h"\
-	".\editwing\ip_doc.h"\
 	".\editwing\ewCommon.h"\
 	".\editwing\ewDoc.h"\
-	".\kilib\kilib.h"\
+	".\editwing\ewView.h"\
+	".\editwing\ip_doc.h"\
+	".\editwing\ip_view.h"\
 	".\kilib\app.h"\
-	".\kilib\thread.h"\
-	".\kilib\window.h"\
 	".\kilib\cmdarg.h"\
-	".\kilib\path.h"\
-	".\kilib\file.h"\
 	".\kilib\ctrl.h"\
-	".\kilib\textfile.h"\
-	".\kilib\winutil.h"\
+	".\kilib\file.h"\
 	".\kilib\find.h"\
-	".\kilib\registry.h"\
-	".\kilib\log.h"\
+	".\kilib\kilib.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
+	".\kilib\yvals.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
@@ -1453,34 +1454,34 @@ BuildCmds= \
 
 SOURCE=.\Search.cpp
 DEP_CPP_SEARC=\
-	".\kilib\stdafx.h"\
-	".\Search.h"\
-	".\NSearch.h"\
-	".\RSearch.h"\
-	".\kilib\yvals.h"\
 	".\editwing\editwing.h"\
-	".\kilib\window.h"\
-	".\kilib\memory.h"\
-	".\kilib\ktlaptr.h"\
-	".\kilib\string.h"\
 	".\editwing\ewCommon.h"\
 	".\editwing\ewCtrl1.h"\
-	".\kilib\kilib.h"\
-	".\kilib\app.h"\
-	".\kilib\thread.h"\
-	".\kilib\cmdarg.h"\
-	".\kilib\path.h"\
-	".\kilib\file.h"\
-	".\kilib\ctrl.h"\
-	".\kilib\textfile.h"\
-	".\kilib\winutil.h"\
-	".\kilib\find.h"\
-	".\kilib\registry.h"\
-	".\kilib\log.h"\
-	".\kilib\ktlarray.h"\
-	".\kilib\ktlgap.h"\
 	".\editwing\ewDoc.h"\
 	".\editwing\ewView.h"\
+	".\kilib\app.h"\
+	".\kilib\cmdarg.h"\
+	".\kilib\ctrl.h"\
+	".\kilib\file.h"\
+	".\kilib\find.h"\
+	".\kilib\kilib.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\ktlarray.h"\
+	".\kilib\ktlgap.h"\
+	".\kilib\log.h"\
+	".\kilib\memory.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\string.h"\
+	".\kilib\textfile.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\winutil.h"\
+	".\kilib\yvals.h"\
+	".\NSearch.h"\
+	".\RSearch.h"\
+	".\Search.h"\
 	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
