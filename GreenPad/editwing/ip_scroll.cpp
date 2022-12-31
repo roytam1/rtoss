@@ -29,66 +29,81 @@ using namespace editwing::view;
 #endif
 
 typedef int (WINAPI *SSCRINF)(HWND, int, LPSCROLLINFO, BOOL);
-static int MySetScrollInfo(HWND hwnd, int nBar, LPSCROLLINFO lpsi, BOOL redraw)
+static int MySetScrollInfo_fallback(HWND hwnd, int nBar, LPSCROLLINFO lpsi, BOOL redraw)
 {
-	// Should be supported since Windows NT 3.51...
-	static SSCRINF pSSCRINF_ = (SSCRINF)(-1);
-	if( pSSCRINF_ == (SSCRINF)(-1) )
-		pSSCRINF_ = (SSCRINF)GetProcAddress(GetModuleHandleA("USER32.DLL"), "SetScrollInfo");
-
-	if( pSSCRINF_ && ((!App::isNT() && App::getOSBuild()>=275) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) )
-		return pSSCRINF_( hwnd, nBar, lpsi, redraw );
-
 	// Smart Fallback...
 	// We must use SetScrollRange but it is mimited to 65535.
 	// So we can avoid oveflow by dividing range and position values
 	// In GreenPad we can assume that only nMax can go beyond range.
-	else {
-		int MULT=1;
-		int nMax = lpsi->nMax;
-		// If we go beyond 65400 then we use a divider
-		if (nMax > MAX_SCROLL)
-		{   // 65501 - 65535 = 35 values MULT from 2-136
-			// Like this the new range is around 8912896 instead of 65535
-			MULT = Min( (nMax / MAX_SCROLL) + 1,  MAX_MULT );
-			// We store the divider in the last 135 values
-			// of the max scroll range.
-			nMax = MAX_SCROLL + MULT - 1 ; // 65401 => MULT = 2
-		}
-
-		if (lpsi->fMask|SIF_RANGE)
-			::SetScrollRange( hwnd, nBar, lpsi->nMin, nMax, FALSE );
-
-		return ::SetScrollPos( hwnd, nBar, lpsi->nPos/MULT, redraw );
+	int MULT=1;
+	int nMax = lpsi->nMax;
+	// If we go beyond 65400 then we use a divider
+	if (nMax > MAX_SCROLL)
+	{   // 65501 - 65535 = 35 values MULT from 2-136
+		// Like this the new range is around 8912896 instead of 65535
+		MULT = Min( (nMax / MAX_SCROLL) + 1,  MAX_MULT );
+		// We store the divider in the last 135 values
+		// of the max scroll range.
+		nMax = MAX_SCROLL + MULT - 1 ; // 65401 => MULT = 2
 	}
+
+	if (lpsi->fMask|SIF_RANGE)
+		::SetScrollRange( hwnd, nBar, lpsi->nMin, nMax, FALSE );
+
+	return ::SetScrollPos( hwnd, nBar, lpsi->nPos/MULT, redraw );
 }
+static int MySetScrollInfo(HWND hwnd, int nBar, LPSCROLLINFO lpsi, BOOL redraw)
+{
+	static SSCRINF pSSCRINF_ = NULL;
+	static int iSSIConditionPassed = -1;
+	if( iSSIConditionPassed == -1 ) {
+		pSSCRINF_ = (SSCRINF)GetProcAddress(GetModuleHandleA("USER32.DLL"), "SetScrollInfo");
+
+		// Should be supported since Windows NT 3.51...
+		if( pSSCRINF_ && ((!App::isNT() && App::getOSBuild()>=275) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) ) {
+			iSSIConditionPassed = 1;
+		} else {
+			iSSIConditionPassed = 0;
+		}
+	}
+
+	return iSSIConditionPassed ? pSSCRINF_( hwnd, nBar, lpsi, redraw ) : MySetScrollInfo_fallback( hwnd, nBar, lpsi, redraw );
+}
+
 typedef int (WINAPI *GSCRINF)(HWND, int, LPSCROLLINFO);
+static int MyGetScrollInfo_fallback(HWND hwnd, int nBar, LPSCROLLINFO lpsi)
+{
+	// Smart Fallback...
+	if( lpsi->fMask|SIF_RANGE )
+		::GetScrollRange( hwnd, nBar, &lpsi->nMin, &lpsi->nMax);
+
+	lpsi->nPos = ::GetScrollPos( hwnd, nBar );
+	// Scroll range indicates a multiplier was used...
+	if( lpsi->nMax > MAX_SCROLL )
+	{ // Apply multipler
+		int MULT = lpsi->nMax - MAX_SCROLL + 1; // 65401 => MULT = 2
+		lpsi->nMax      *= MULT;
+		lpsi->nPos      *= MULT;
+		lpsi->nTrackPos *= MULT; // This has to be set by the user.
+	}
+	return 1; // sucess!
+}
 static int MyGetScrollInfo(HWND hwnd, int nBar, LPSCROLLINFO lpsi)
 {
-	// Should be supported since Windows NT 3.51...
-	static GSCRINF pGSCRINF_ = (GSCRINF)(-1);
-	if( pGSCRINF_ == (GSCRINF)(-1) )
+	static GSCRINF pGSCRINF_ = NULL;
+	static int iGSIConditionPassed = -1;
+	if( iGSIConditionPassed == -1 ) {
 		pGSCRINF_ = (GSCRINF)GetProcAddress(GetModuleHandleA("USER32.DLL"), "GetScrollInfo");
 
-	if( pGSCRINF_ && ((!App::isNT() && App::getOSBuild()>=275) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) )
-		return pGSCRINF_( hwnd, nBar, lpsi );
-
-	// Smart Fallback...
-	else {
-		if( lpsi->fMask|SIF_RANGE )
-			::GetScrollRange( hwnd, nBar, &lpsi->nMin, &lpsi->nMax);
-
-		lpsi->nPos = ::GetScrollPos( hwnd, nBar );
-		// Scroll range indicates a multiplier was used...
-		if( lpsi->nMax > MAX_SCROLL )
-		{ // Apply multipler
-			int MULT = lpsi->nMax - MAX_SCROLL + 1; // 65401 => MULT = 2
-			lpsi->nMax      *= MULT;
-			lpsi->nPos      *= MULT;
-			lpsi->nTrackPos *= MULT; // This has to be set by the user.
+		// Should be supported since Windows NT 3.51...
+		if( pGSCRINF_ && ((!App::isNT() && App::getOSBuild()>=275) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) ) {
+			iGSIConditionPassed = 1;
+		} else {
+			iGSIConditionPassed = 0;
 		}
-		return 1; // sucess!
 	}
+
+	return iGSIConditionPassed ? pGSCRINF_( hwnd, nBar, lpsi ) : MyGetScrollInfo_fallback( hwnd, nBar, lpsi );
 }
 
 //-------------------------------------------------------------------------
