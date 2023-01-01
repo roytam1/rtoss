@@ -89,6 +89,7 @@ public:
 	bool hasOldCommCtrl();
 	bool hasScrollInfo();
 	bool isNewShell();
+	bool isCommCtrlAvailable();
 
 	//@{ Windows‚Ìƒo[ƒWƒ‡ƒ“ //@}
 	static const OSVERSIONINFOA& osver();

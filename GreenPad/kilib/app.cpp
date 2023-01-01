@@ -19,6 +19,7 @@ inline App::App()
 	, hasOldCommCtrl_(true)
 	, hasScrollInfo_(false)
 	, isNewShell_(false)
+	, hInstComCtl_(NULL)
 	, hInst_       (::GetModuleHandle(NULL))
 {
 	// 唯一のインスタンスは私です。
@@ -219,6 +220,11 @@ bool App::hasOldCommCtrl()
 bool App::hasScrollInfo()
 {
 	return hasScrollInfo_;
+}
+
+bool App::isCommCtrlAvailable()
+{
+	return hInstComCtl_ != NULL;
 }
 
 
