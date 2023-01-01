@@ -17,7 +17,6 @@ inline App::App()
 	: exitcode_    (-1)
 	, loadedModule_(0)
 	, hasOldCommCtrl_(true)
-	, hasScrollInfo_(false)
 	, isNewShell_(false)
 	, hInstComCtl_(NULL)
 	, hInst_       (::GetModuleHandle(NULL))
@@ -33,10 +32,6 @@ inline App::App()
 		isNewShell_ = GetProcAddress(hinstDll, "SHGetSpecialFolderLocation") != NULL;
 		FreeLibrary(hinstDll);
 	}
-
-	// check for ScrollInfo APIs
-	hasScrollInfo_ = GetProcAddress(GetModuleHandleA("USER32.DLL"), "SetScrollInfo") != NULL;
-
 }
 
 #pragma warning( disable : 4722 ) // 警告：デストラクタに値が戻りません

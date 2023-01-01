@@ -87,7 +87,6 @@ public:
 	HINSTANCE hinst() const;
 
 	bool hasOldCommCtrl();
-	bool hasScrollInfo();
 	bool isNewShell();
 	bool isCommCtrlAvailable();
 
@@ -112,7 +111,6 @@ private:
 	int             exitcode_;
 	ulong           loadedModule_;
 	bool            isNewShell_;
-	bool            hasScrollInfo_;
 	bool            hasOldCommCtrl_;
 	const HINSTANCE hInst_;
 	static App*     pUniqueInstance_;
