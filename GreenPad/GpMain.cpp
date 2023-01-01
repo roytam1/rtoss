@@ -574,12 +574,13 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 		::CheckMenuItem( menu, ID_CMD_WRAPWINDOW, MF_BYCOMMAND|(wrap_==0?MF_CHECKED:MF_UNCHECKED));
 	}
 
-/*#if defined(TARGET_VER) && TARGET_VER==310
-	::EnableMenuItem( menu, ID_CMD_STATUSBAR, MF_BYCOMMAND|MF_GRAYED );
-#else*/
-	::CheckMenuItem( menu, ID_CMD_STATUSBAR,
-		cfg_.showStatusBar()?MF_CHECKED:MF_UNCHECKED );
-//#endif
+	if (app().isCommCtrlAvailable()) {
+		::CheckMenuItem( menu, ID_CMD_STATUSBAR,
+			cfg_.showStatusBar()?MF_CHECKED:MF_UNCHECKED );
+	} else {
+		::EnableMenuItem( menu, ID_CMD_STATUSBAR, MF_BYCOMMAND|MF_GRAYED );
+	}
+
 	LOGGER("GreenPadWnd::ReloadConfig on_initmenu end");
 }
 

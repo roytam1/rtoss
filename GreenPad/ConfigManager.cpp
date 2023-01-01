@@ -666,11 +666,11 @@ void ConfigManager::LoadIni()
 	grepExe_   = ini_.GetStr( TEXT("GrepExe"), TEXT("") );
 	openSame_  = ini_.GetBool( TEXT("OpenSame"), false );
 	countbyunicode_ = ini_.GetBool( TEXT("CountUni"), false );
-/*#if defined(TARGET_VER) && TARGET_VER==310
-	showStatusBar_ = false;
-#else*/
-	showStatusBar_ = ini_.GetBool( TEXT("StatusBar"), true );
-//#endif
+	if (app().isCommCtrlAvailable()) {
+		showStatusBar_ = ini_.GetBool( TEXT("StatusBar"), true );
+	} else {
+		showStatusBar_ = false;
+	}
 
 	dateFormat_   = ini_.GetStr( TEXT("DateFormat"), TEXT("HH:mm yyyy/MM/dd") );
 
