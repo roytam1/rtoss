@@ -69,9 +69,13 @@ void App::InitModule( imflag what )
 			HINSTANCE hinstDll;
 			hinstDll = LoadLibrary(TEXT("comctl32.dll"));
 
-			::InitCommonControls();
+			//::InitCommonControls();
 
 			if(hinstDll) {
+				void (WINAPI *dyn_InitCommonControls)(void) = ( void (WINAPI *)(void) )
+					GetProcAddress( hinstDll, "InitCommonControls" );
+				if (dyn_InitCommonControls)
+					dyn_InitCommonControls();
 				hasOldCommCtrl_ = GetProcAddress(hinstDll, "DllGetVersion") == NULL;
 				FreeLibrary(hinstDll);
 			}
