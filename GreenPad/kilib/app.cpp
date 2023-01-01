@@ -65,15 +65,15 @@ void App::InitModule( imflag what )
 		switch( what )
 		{
 		case CTL: {
-			hInstComCtl_ = LoadLibrary(TEXT("comctl32.dll"));
-
-			//::InitCommonControls();
+			if(!hInstComCtl_)
+				hInstComCtl_ = LoadLibrary(TEXT("comctl32.dll"));
 
 			if(hInstComCtl_) {
 				void (WINAPI *dyn_InitCommonControls)(void) = ( void (WINAPI *)(void) )
 					GetProcAddress( hInstComCtl_, "InitCommonControls" );
 				if (dyn_InitCommonControls)
 					dyn_InitCommonControls();
+
 				hasOldCommCtrl_ = GetProcAddress(hInstComCtl_, "DllGetVersion") == NULL;
 			}
 
