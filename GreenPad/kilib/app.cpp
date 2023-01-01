@@ -49,6 +49,9 @@ App::~App()
 		::OleUninitialize();
 #endif
 
+	// only free library when program quits
+	if(hInstComCtl_) FreeLibrary(hInstComCtl_);
+
 	// èIÅ`óπÅ`
 	::ExitProcess( exitcode_ );
 }
@@ -66,18 +69,16 @@ void App::InitModule( imflag what )
 		switch( what )
 		{
 		case CTL: {
-			HINSTANCE hinstDll;
-			hinstDll = LoadLibrary(TEXT("comctl32.dll"));
+			hInstComCtl_ = LoadLibrary(TEXT("comctl32.dll"));
 
 			//::InitCommonControls();
 
-			if(hinstDll) {
+			if(hInstComCtl_) {
 				void (WINAPI *dyn_InitCommonControls)(void) = ( void (WINAPI *)(void) )
-					GetProcAddress( hinstDll, "InitCommonControls" );
+					GetProcAddress( hInstComCtl_, "InitCommonControls" );
 				if (dyn_InitCommonControls)
 					dyn_InitCommonControls();
-				hasOldCommCtrl_ = GetProcAddress(hinstDll, "DllGetVersion") == NULL;
-				FreeLibrary(hinstDll);
+				hasOldCommCtrl_ = GetProcAddress(hInstComCtl_, "DllGetVersion") == NULL;
 			}
 
 			break;

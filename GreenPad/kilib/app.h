@@ -115,6 +115,7 @@ private:
 	bool            hasOldCommCtrl_;
 	const HINSTANCE hInst_;
 	static App*     pUniqueInstance_;
+	HINSTANCE       hInstComCtl_;
 
 private:
 
