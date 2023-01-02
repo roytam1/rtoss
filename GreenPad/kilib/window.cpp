@@ -448,8 +448,10 @@ WndImpl::WndImpl( LPCTSTR className, DWORD style, DWORD styleEx )
 	: className_( className )
 	, style_    ( style )
 	, styleEx_  ( styleEx )
+#ifndef NO_ASMTHUNK
 	, thunk_    ( static_cast<byte*>(
 	                ::VirtualAlloc( NULL, THUNK_SIZE, MEM_COMMIT, PAGE_EXECUTE_READWRITE )) )
+#endif
 {
 }
 
@@ -460,7 +462,9 @@ WndImpl::~WndImpl()
 	// 正しい on_destroy が呼ばれる保証は全くない。あくまで
 	// 緊急脱出用(^^; と考えること。
 	Destroy();
+#ifndef NO_ASMTHUNK
 	::VirtualFree( thunk_, 0, MEM_RELEASE );
+#endif
 }
 
 void WndImpl::Destroy()
@@ -529,6 +533,10 @@ LRESULT CALLBACK WndImpl::StartProc(
 	WndImpl*   pThis   = pz->pThis;
 	cs->lpCreateParams = pz->pParam;
 
+#ifdef NO_ASMTHUNK
+	::SetWindowLongPtr(wnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pThis));
+#endif
+
 	// サンク
 	pThis->SetUpThunk( wnd );
 
@@ -537,10 +545,24 @@ LRESULT CALLBACK WndImpl::StartProc(
 	return 0;
 }
 
+#ifdef NO_ASMTHUNK
+// To avoid ASM thunking we can use GWLP_USERDATA in the window structure
+LRESULT CALLBACK WndImpl::TrunkMainProc( HWND wnd, UINT msg, WPARAM wp, LPARAM lp )
+{
+	WndImpl*   pThis  = reinterpret_cast<WndImpl*>(::GetWindowLongPtr(wnd, GWLP_USERDATA));
+	if(pThis) {
+		return WndImpl::MainProc(pThis, msg, wp, lp);
+	} else {
+		return DefWindowProc(wnd, msg, wp, lp);
+	}
+}
+#endif // NO_ASMTHUNK
+
 void WndImpl::SetUpThunk( HWND wnd )
 {
 	SetHwnd( wnd );
 
+#ifndef NO_ASMTHUNK
 	// ここで動的にx86の命令列
 	//   | mov dword ptr [esp+4] this
 	//   | jmp MainProc
@@ -556,22 +578,29 @@ void WndImpl::SetUpThunk( HWND wnd )
 	//
 	// 参考資料：ATLのソース
 
-#ifdef _M_AMD64
+	// replacing 1st param with `this` and call `MainProc`
+
+#if defined(_M_AMD64) || defined(_M_X64)
 	*reinterpret_cast<dbyte*>   (thunk_+ 0) = 0xb948;
 	*reinterpret_cast<WndImpl**>(thunk_+ 2) = this;
 	*reinterpret_cast<dbyte*>   (thunk_+10) = 0xb848;
 	*reinterpret_cast<void**>   (thunk_+12) = MainProc;
 	*reinterpret_cast<dbyte*>   (thunk_+20) = 0xe0ff;
-#else
+#elif defined(_M_IX86)
 	*reinterpret_cast<qbyte*>   (thunk_+0) = 0x042444C7;
 	*reinterpret_cast<WndImpl**>(thunk_+4) = this;
 	*reinterpret_cast< byte*>   (thunk_+8) = 0xE9;
 	*reinterpret_cast<qbyte*>   (thunk_+9) =
 		reinterpret_cast<byte*>((void*)MainProc)-(thunk_+13);
+#else
+	#error Unsupported processor type, please implement assembly code or consider defining NO_ASMTHUNK
 #endif
 
 	::FlushInstructionCache( ::GetCurrentProcess(), thunk_, THUNK_SIZE );
 	::SetWindowLongPtr( wnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&thunk_[0]) );
+#else // !NO_ASMTHUNK
+	::SetWindowLongPtr( wnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(TrunkMainProc) );
+#endif
 }
 
 LRESULT CALLBACK WndImpl::MainProc(
