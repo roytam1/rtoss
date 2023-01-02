@@ -86,9 +86,10 @@ public:
 	//@{ インスタンスハンドル //@}
 	HINSTANCE hinst() const;
 
+	void loadCommCtrl();
+	bool isCommCtrlAvailable();
 	bool hasOldCommCtrl();
 	bool isNewShell();
-	bool isCommCtrlAvailable();
 
 	//@{ Windowsのバージョン //@}
 	static const OSVERSIONINFOA& osver();
@@ -99,6 +100,8 @@ public:
 	static bool isNT();
 	static bool isWin32s();
 	static bool isNewTypeWindows();
+
+	static const TCHAR* checkDLLExist(TCHAR* dllname);
 
 private:
 
@@ -115,6 +118,7 @@ private:
 	const HINSTANCE hInst_;
 	static App*     pUniqueInstance_;
 	HINSTANCE       hInstComCtl_;
+	bool            triedLoadingCommCtrl_;
 
 private:
 

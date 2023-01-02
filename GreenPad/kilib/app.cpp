@@ -5,6 +5,7 @@
 #include "thread.h"
 #include "window.h"
 #include "string.h"
+#include "path.h"
 using namespace ki;
 
 
@@ -17,15 +18,13 @@ inline App::App()
 	: exitcode_    (-1)
 	, loadedModule_(0)
 	, hasOldCommCtrl_(true)
+	, triedLoadingCommCtrl_(false)
 	, isNewShell_(false)
 	, hInstComCtl_(NULL)
 	, hInst_       (::GetModuleHandle(NULL))
 {
 	// 唯一のインスタンスは私です。
 	pUniqueInstance_ = this;
-
-	if(!hInstComCtl_)
-		hInstComCtl_ = LoadLibrary(TEXT("comctl32.dll"));
 
 	// lets check NewShell here
 	HINSTANCE hinstDll;
@@ -207,16 +206,49 @@ bool App::isWin3later()
 	return isNewShell_;
 }
 
+void App::loadCommCtrl()
+{
+	if(!triedLoadingCommCtrl_) {
+		if(App::checkDLLExist(TEXT("comctl32.dll")))
+			hInstComCtl_ = LoadLibrary(TEXT("comctl32.dll"));
+		triedLoadingCommCtrl_ = true;
+	}
+}
+
 bool App::hasOldCommCtrl()
 {
+	app().loadCommCtrl();
 	return hasOldCommCtrl_;
 }
 
 bool App::isCommCtrlAvailable()
 {
+	app().loadCommCtrl();
 	return hInstComCtl_ != NULL;
 }
 
+const TCHAR* App::checkDLLExist(TCHAR* dllname)
+{
+	bool dllexist = false;
+
+	// sys dir
+	Path dll_in_dir = Path(Path::Sys) + String(dllname);
+	dllexist = dll_in_dir.exist();
+	if(dllexist) return dll_in_dir.c_str();
+
+	if(App::isWin32s()) {
+		// win32s dir
+		dll_in_dir = Path(Path::Sys) + String(TEXT("win32s\\")) + String(dllname);
+		dllexist = dll_in_dir.exist();
+		if(dllexist) return dll_in_dir.c_str();
+	}
+
+	// exe dir
+	dll_in_dir = Path(Path::Exe) + String(dllname);
+	dllexist = dll_in_dir.exist();
+	if(dllexist) return dll_in_dir.c_str();
+	else return NULL;
+}
 
 //=========================================================================
 
