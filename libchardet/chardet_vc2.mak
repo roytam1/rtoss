@@ -52,8 +52,8 @@ $(OUTDIR) :
 # ADD MTL /nologo /D "NDEBUG" /win32
 MTL_PROJ=/nologo /D "NDEBUG" /win32 
 # ADD BASE CPP /nologo /MT /W3 /GX /YX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FR /c
-# ADD CPP /nologo /MT /W3 /GX /YX /O2 /I "src" /I "src\tables" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /FR /c
-CPP_PROJ=/nologo /MT /W3 /GX /YX /O2 /I "src" /I "src\tables" /D "NDEBUG" /D\
+# ADD CPP /nologo /ML /W3 /GX- /YX /O2 /I "src" /I "src\tables" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /FR /c
+CPP_PROJ=/nologo /ML /W3 /GX- /YX /O2 /I "src" /I "src\tables" /D "NDEBUG" /D\
  "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /FR$(INTDIR)/\
  /Fp$(OUTDIR)/"chardet_vc2.pch" /Fo$(INTDIR)/ /c 
 CPP_OBJS=.\WinRel/
