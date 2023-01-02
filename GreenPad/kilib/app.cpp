@@ -212,11 +212,6 @@ bool App::hasOldCommCtrl()
 	return hasOldCommCtrl_;
 }
 
-bool App::hasScrollInfo()
-{
-	return hasScrollInfo_;
-}
-
 bool App::isCommCtrlAvailable()
 {
 	return hInstComCtl_ != NULL;
