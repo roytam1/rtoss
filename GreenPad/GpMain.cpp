@@ -955,7 +955,21 @@ bool GreenPadWnd::Open( const ki::Path& fn, int cs )
 		return true;
 	}
 }
-
+BOOL CALLBACK GreenPadWnd::SendMsgToFriendsProc(HWND hwnd, LPARAM lPmsg)
+{
+	TCHAR classn[256];
+	if(IsWindow(hwnd)) 
+	{
+		GetClassName(hwnd, classn, countof(classn));
+		if (!lstrcmp(classn, className_))
+			SendMessage(hwnd, (UINT)lPmsg, 0, 0);
+	}
+	return TRUE; // Next hwnd
+}
+bool GreenPadWnd::SendMsgToAllFriends(UINT msg)
+{
+	return !!EnumWindows(SendMsgToFriendsProc, (LPARAM)msg);
+}
 bool GreenPadWnd::OpenByMyself( const ki::Path& fn, int cs, bool needReConf )
 {
 	// ファイルを開けなかったらそこでおしまい。
@@ -1007,11 +1021,7 @@ bool GreenPadWnd::OpenByMyself( const ki::Path& fn, int cs, bool needReConf )
 
 	// [最近使ったファイル]へ追加
 	cfg_.AddMRU( filename_ );
-	HWND wnd = NULL;
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-	while( NULL!=(wnd=::FindWindowEx( NULL, wnd, className_, NULL )) )
-		SendMessage( wnd, GPM_MRUCHANGED, 0, 0 );
-#endif
+	SendMsgToAllFriends(GPM_MRUCHANGED);
 
 	return true;
 }
@@ -1099,11 +1109,7 @@ bool GreenPadWnd::Save()
 		UpdateWindowName();
 		// [最近使ったファイル]更新
 		cfg_.AddMRU( filename_ );
-		HWND wnd = NULL;
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-		while( NULL!=(wnd=::FindWindowEx( NULL, wnd, className_, NULL )) )
-			SendMessage( wnd, GPM_MRUCHANGED, 0, 0 );
-#endif
+		SendMsgToAllFriends(GPM_MRUCHANGED);
 		return true;
 	}
 
