@@ -1457,6 +1457,7 @@ int TextFileR::chardetAutoDetection( const uchar* ptr, ulong siz )
 	//int (__cdecl*chardet_reset)(chardet_t) = 0;
 	HINSTANCE hIL;
 
+	Path chardet_path = Path(Path::Exe);
 	chardet_t pdet = NULL;
 	char charset[128];
 
@@ -1474,15 +1475,14 @@ int TextFileR::chardetAutoDetection( const uchar* ptr, ulong siz )
 # define CHARDET_DLL "chardet.dll"
 #endif
 
-	if( App::isWin32s() )
+	chardet_path += String(TEXT(CHARDET_DLL));
+	if( !chardet_path.exist() )
 	{	// On Win32s we must check if CHARDET.DLL exist before trying LoadLibrary()
 		// Otherwise we would get a system  message
-		Path chardet_in_gp_dir = Path(Path::ExeName).BeDirOnly() + String(TEXT(CHARDET_DLL));
-		if( !chardet_in_gp_dir.exist() )
-			return 0;
+		return 0;
 	}
 
-	if(hIL = ::LoadLibrary(TEXT(CHARDET_DLL)))
+	if(hIL = ::LoadLibrary(chardet_path.c_str()))
 	{
 		chardet_create = (int(__cdecl*)(chardet_t*))::GetProcAddress(hIL, "chardet_create");
 		chardet_destroy = (void(__cdecl*)(chardet_t))::GetProcAddress(hIL, "chardet_destroy");
