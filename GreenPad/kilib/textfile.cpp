@@ -741,6 +741,11 @@ namespace
 		return const_cast<char*>( p+GetMaskIndex(uchar(*p)) );
 	}
 
+	static char* WINAPI SimpleCharNext( WORD, const char* p, DWORD )
+	{
+		return const_cast<char*>(++p);
+	}
+
 	// CharNextExAはGB18030の４バイト文字列を扱えないそうだ。
 	static char* WINAPI CharNextGB18030( WORD, const char* p, DWORD )
 	{
@@ -866,8 +871,9 @@ struct rMBCS : public TextFileRPimpl
 		, fe( reinterpret_cast<const char*>(b+s) )
 		, cp( c==UTF8 ? UTF8N : c )
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
-		, next( cp==UTF8N ?   CharNextUtf8 : cp==GB18030 ? CharNextGB18030 :
-							CharNextExA )
+        , next( cp==UTF8N ? CharNextUtf8 :
+                            cp==GB18030 ? CharNextGB18030 :
+                                          (!App::isNT() || (App::isNT() && App::getOSVer()>=400 && App::getOSBuild()>=1381) ? CharNextExA : SimpleCharNext) )
 #endif
 		, conv( cp==UTF8N && (app().isWin95()||!::IsValidCodePage(65001))
 		                  ? Utf8ToWideChar : MultiByteToWideChar )
