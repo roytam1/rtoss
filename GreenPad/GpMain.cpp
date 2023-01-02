@@ -825,7 +825,7 @@ void GreenPadWnd::UpdateWindowName()
 {
 	// タイトルバーに表示される文字列の調整
 	// [FileName *] - GreenPad
-	TCHAR cpname[10];
+	static TCHAR cpname[10];
 
 	String name;
 	name += TEXT('[');
