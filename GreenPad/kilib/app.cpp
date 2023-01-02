@@ -24,6 +24,9 @@ inline App::App()
 	// 唯一のインスタンスは私です。
 	pUniqueInstance_ = this;
 
+	if(!hInstComCtl_)
+		hInstComCtl_ = LoadLibrary(TEXT("comctl32.dll"));
+
 	// lets check NewShell here
 	HINSTANCE hinstDll;
 	hinstDll = LoadLibrary(TEXT("shell32.dll"));
@@ -65,9 +68,6 @@ void App::InitModule( imflag what )
 		switch( what )
 		{
 		case CTL: {
-			if(!hInstComCtl_)
-				hInstComCtl_ = LoadLibrary(TEXT("comctl32.dll"));
-
 			if(hInstComCtl_) {
 				void (WINAPI *dyn_InitCommonControls)(void) = ( void (WINAPI *)(void) )
 					GetProcAddress( hInstComCtl_, "InitCommonControls" );
