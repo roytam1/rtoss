@@ -117,61 +117,6 @@ LRESULT GreenPadWnd::on_message( UINT msg, WPARAM wp, LPARAM lp )
 		}
 		break;
 
-
-	case WM_NCCALCSIZE:
-		{
-			// Handle WM_NCCALCSIZE to avoid ugly resizing
-			int ret = WndImpl::on_message( msg, wp, lp );
-			NCCALCSIZE_PARAMS *nc = (NCCALCSIZE_PARAMS *)lp;
-			RECT wnd;
-			GetWindowRect(hwnd(), &wnd);
-			if( wp && (wnd.left != nc->lppos->x || wnd.top != nc->lppos->y))
-			{ // Resized from the top or left (or both)
-				// Window will BitBlt between those two rects:
-				CopyRect(&nc->rgrc[1], &wnd); // Destination
-				CopyRect(&nc->rgrc[2], &wnd); // Source
-				POINT pt = { 0, 0 };
-				ClientToScreen(hwnd(), &pt); // client coord
-				pt.x -= wnd.left;
-				pt.y -= wnd.top;
-
-
-				// Calculat right and bottom margins
-				long rmargin = GetSystemMetrics(SM_CXVSCROLL) + GetSystemMetrics(SM_CXSIZEFRAME) + GetSystemMetrics(SM_CXEDGE);
-				long bmargin = GetSystemMetrics(SM_CYSIZEFRAME) + GetSystemMetrics(SM_CYEDGE);
-				RECT rcSB;
-				if (stb_.isStatusBarVisible() && GetWindowRect(stb_.hwnd(), &rcSB))
-					bmargin += rcSB.bottom-rcSB.top; // Add height of status bar if present.
-				if(GetWindowLongPtr(edit_.getView().hwnd(), GWL_STYLE)&WS_HSCROLL)
-					bmargin += GetSystemMetrics(SM_CYHSCROLL); // Add HSCOLL bar height if needed.
-
-				// Adjust rects so that it does not include SB nor scrollbars.
-				nc->rgrc[2].right  -= Max(rmargin, (wnd.right-wnd.left) - nc->lppos->cx + rmargin);
-				nc->rgrc[2].bottom -= Max(bmargin, (wnd.bottom-wnd.top) - nc->lppos->cy + bmargin);
-
-				// Do not include caption+menu in BitBlt
-				nc->rgrc[1].left = nc->lppos->x + pt.x;
-				nc->rgrc[1].top  = nc->lppos->y + pt.y;
-				nc->rgrc[2].top  += pt.y;
-				nc->rgrc[2].left += pt.x;
-
-				return WVR_VALIDRECTS;
-			}
-			return ret;
-		}
-		break;
-
-	case WM_ERASEBKGND:
-		{
-//			// Uncomment to see in black the area that will be repainted
-//			RECT rc;
-//			GetClientRect(hwnd(), &rc);
-//			Sleep(100);
-//			FillRect((HDC)wp, &rc,  (HBRUSH)GetStockObject(BLACK_BRUSH));
-			return 1;
-		}
-		break;
-
 	// システムコマンド。終了ボタンとか。
 	case WM_SYSCOMMAND:
 		if( wp==SC_CLOSE || wp==SC_DEFAULT )
@@ -574,12 +519,13 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 		::CheckMenuItem( menu, ID_CMD_WRAPWINDOW, MF_BYCOMMAND|(wrap_==0?MF_CHECKED:MF_UNCHECKED));
 	}
 
-/*#if defined(TARGET_VER) && TARGET_VER==310
-	::EnableMenuItem( menu, ID_CMD_STATUSBAR, MF_BYCOMMAND|MF_GRAYED );
-#else*/
-	::CheckMenuItem( menu, ID_CMD_STATUSBAR,
-		cfg_.showStatusBar()?MF_CHECKED:MF_UNCHECKED );
-//#endif
+	if (app().isCommCtrlAvailable()) {
+		::CheckMenuItem( menu, ID_CMD_STATUSBAR,
+			cfg_.showStatusBar()?MF_CHECKED:MF_UNCHECKED );
+	} else {
+		::EnableMenuItem( menu, ID_CMD_STATUSBAR, MF_BYCOMMAND|MF_GRAYED );
+	}
+
 	LOGGER("GreenPadWnd::ReloadConfig on_initmenu end");
 }
 
@@ -828,7 +774,7 @@ void GreenPadWnd::UpdateWindowName()
 {
 	// タイトルバーに表示される文字列の調整
 	// [FileName *] - GreenPad
-	TCHAR cpname[10];
+	static TCHAR cpname[10];
 
 	String name;
 	name += TEXT('[');
@@ -960,7 +906,21 @@ bool GreenPadWnd::Open( const ki::Path& fn, int cs )
 		return true;
 	}
 }
-
+BOOL CALLBACK GreenPadWnd::SendMsgToFriendsProc(HWND hwnd, LPARAM lPmsg)
+{
+	TCHAR classn[256];
+	if(IsWindow(hwnd)) 
+	{
+		GetClassName(hwnd, classn, countof(classn));
+		if (!lstrcmp(classn, className_))
+			SendMessage(hwnd, (UINT)lPmsg, 0, 0);
+	}
+	return TRUE; // Next hwnd
+}
+bool GreenPadWnd::SendMsgToAllFriends(UINT msg)
+{
+	return !!EnumWindows(SendMsgToFriendsProc, (LPARAM)msg);
+}
 bool GreenPadWnd::OpenByMyself( const ki::Path& fn, int cs, bool needReConf )
 {
 	// ファイルを開けなかったらそこでおしまい。
@@ -1012,11 +972,7 @@ bool GreenPadWnd::OpenByMyself( const ki::Path& fn, int cs, bool needReConf )
 
 	// [最近使ったファイル]へ追加
 	cfg_.AddMRU( filename_ );
-	HWND wnd = NULL;
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-	while( NULL!=(wnd=::FindWindowEx( NULL, wnd, className_, NULL )) )
-		SendMessage( wnd, GPM_MRUCHANGED, 0, 0 );
-#endif
+	SendMsgToAllFriends(GPM_MRUCHANGED);
 
 	return true;
 }
@@ -1104,11 +1060,7 @@ bool GreenPadWnd::Save()
 		UpdateWindowName();
 		// [最近使ったファイル]更新
 		cfg_.AddMRU( filename_ );
-		HWND wnd = NULL;
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-		while( NULL!=(wnd=::FindWindowEx( NULL, wnd, className_, NULL )) )
-			SendMessage( wnd, GPM_MRUCHANGED, 0, 0 );
-#endif
+		SendMsgToAllFriends(GPM_MRUCHANGED);
 		return true;
 	}
 

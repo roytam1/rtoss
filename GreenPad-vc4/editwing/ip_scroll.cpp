@@ -262,7 +262,7 @@ bool ViewImpl::ReSetScrollInfo()
 	if( vln()*cvs_.getPainter().H() < cy )
 		udScr_.nMax  = vln() + udScr_.nPage - 2;
 	else
-		udScr_.nMax  = vln() + udScr_.nPage - Max( 2, Min( (int)(udScr_.nPage-1), (int)(vln()+1) ) );
+		udScr_.nMax  = vln() + udScr_.nPage - Max( 2, (int)Min( udScr_.nPage-1, (uint)(vln()+1) ) );
 
 	// 横スクロールが起きたらtrue
 	return (prevRlPos != rlScr_.nPos);

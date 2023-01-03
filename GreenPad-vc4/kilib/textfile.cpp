@@ -741,6 +741,11 @@ namespace
 		return const_cast<char*>( p+GetMaskIndex(uchar(*p)) );
 	}
 
+	static char* WINAPI SimpleCharNext( WORD, const char* p, DWORD )
+	{
+		return const_cast<char*>(++p);
+	}
+
 	// CharNextExAはGB18030の４バイト文字列を扱えないそうだ。
 	static char* WINAPI CharNextGB18030( WORD, const char* p, DWORD )
 	{
@@ -761,6 +766,40 @@ namespace
 		else // DBCS
 			q = p+2;
 		return const_cast<char*>( q );
+	}
+
+	static uNextFunc GetCharNextExA( int cp )
+	{
+		static uNextFunc pCharNextExA = NULL;
+		static bool triedToFindCharNextExA = false;
+
+		if ( cp == UTF8N )
+			return CharNextUtf8;
+		else if ( cp == GB18030 )
+			return CharNextGB18030;
+
+		// Only for Windows >= 4 (NT4/95+) because
+		// CharNextExA is not here on NT3.1 and is a stub on NT3.5
+		if (!triedToFindCharNextExA)
+		{
+			pCharNextExA = (uNextFunc)::GetProcAddress(::GetModuleHandleA("USER32.DLL"), "CharNextExA");
+			triedToFindCharNextExA = true;
+		}
+
+        // limiting NT versions of 3.51 to RTM and 4.0 to >=RTM only
+        if ( pCharNextExA &&
+             (!App::isNT() ||
+              (App::isNT() &&
+                (
+                 (App::getOSVer()==351 && App::getOSBuild()==1057) ||
+                 (App::getOSVer()>=400 && App::getOSBuild()>=1381)
+                )
+              )
+             )
+            )
+            return pCharNextExA;
+        else
+            return SimpleCharNext;
 	}
 
 	// IMultiLanguage2::DetectInputCodepageはGB18030のことを認識できません。
@@ -865,10 +904,7 @@ struct rMBCS : public TextFileRPimpl
 		: fb( reinterpret_cast<const char*>(b) )
 		, fe( reinterpret_cast<const char*>(b+s) )
 		, cp( c==UTF8 ? UTF8N : c )
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
-		, next( cp==UTF8N ?   CharNextUtf8 : cp==GB18030 ? CharNextGB18030 :
-							CharNextExA )
-#endif
+		, next( GetCharNextExA(cp) )
 		, conv( cp==UTF8N && (app().isWin95()||!::IsValidCodePage(65001))
 		                  ? Utf8ToWideChar : MultiByteToWideChar )
 	{
@@ -1457,6 +1493,7 @@ int TextFileR::chardetAutoDetection( const uchar* ptr, ulong siz )
 	//int (__cdecl*chardet_reset)(chardet_t) = 0;
 	HINSTANCE hIL;
 
+	Path chardet_path = Path(Path::Exe);
 	chardet_t pdet = NULL;
 	char charset[128];
 
@@ -1466,7 +1503,7 @@ int TextFileR::chardetAutoDetection( const uchar* ptr, ulong siz )
 					return b; \
 				}
 
-#ifdef _M_AMD64
+#if defined(_M_AMD64) || defined(_M_X64)
 # define CHARDET_DLL "chardet_x64.dll"
 #elif defined(_M_ARM64)
 # define CHARDET_DLL "chardet_arm64.dll"
@@ -1476,15 +1513,14 @@ int TextFileR::chardetAutoDetection( const uchar* ptr, ulong siz )
 # define CHARDET_DLL "chardet.dll"
 #endif
 
-	if( App::isWin32s() )
+	chardet_path += String(TEXT(CHARDET_DLL));
+	if( !chardet_path.exist() )
 	{	// On Win32s we must check if CHARDET.DLL exist before trying LoadLibrary()
 		// Otherwise we would get a system  message
-		Path chardet_in_gp_dir = Path(Path::ExeName).BeDirOnly() + String(TEXT(CHARDET_DLL));
-		if( !chardet_in_gp_dir.exist() )
-			return 0;
+		return 0;
 	}
 
-	if(hIL = ::LoadLibrary(TEXT(CHARDET_DLL)))
+	if(hIL = ::LoadLibrary(chardet_path.c_str()))
 	{
 		chardet_create = (int(__cdecl*)(chardet_t*))::GetProcAddress(hIL, "chardet_create");
 		chardet_destroy = (void(__cdecl*)(chardet_t))::GetProcAddress(hIL, "chardet_destroy");

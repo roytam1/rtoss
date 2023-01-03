@@ -86,8 +86,9 @@ public:
 	//@{ インスタンスハンドル //@}
 	HINSTANCE hinst() const;
 
+	void loadCommCtrl();
+	bool isCommCtrlAvailable();
 	bool hasOldCommCtrl();
-	bool hasScrollInfo();
 	bool isNewShell();
 
 	//@{ Windowsのバージョン //@}
@@ -100,6 +101,8 @@ public:
 	static bool isWin32s();
 	static bool isNewTypeWindows();
 
+	static const TCHAR* checkDLLExist(TCHAR* dllname);
+
 private:
 
 	App();
@@ -111,10 +114,11 @@ private:
 	int             exitcode_;
 	ulong           loadedModule_;
 	bool            isNewShell_;
-	bool            hasScrollInfo_;
 	bool            hasOldCommCtrl_;
 	const HINSTANCE hInst_;
 	static App*     pUniqueInstance_;
+	HINSTANCE       hInstComCtl_;
+	bool            triedLoadingCommCtrl_;
 
 private:
 

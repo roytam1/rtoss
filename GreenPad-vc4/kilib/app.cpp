@@ -5,6 +5,7 @@
 #include "thread.h"
 #include "window.h"
 #include "string.h"
+#include "path.h"
 using namespace ki;
 
 
@@ -17,8 +18,9 @@ inline App::App()
 	: exitcode_    (-1)
 	, loadedModule_(0)
 	, hasOldCommCtrl_(true)
-	, hasScrollInfo_(false)
+	, triedLoadingCommCtrl_(false)
 	, isNewShell_(false)
+	, hInstComCtl_(NULL)
 	, hInst_       (::GetModuleHandle(NULL))
 {
 	// 唯一のインスタンスは私です。
@@ -32,10 +34,6 @@ inline App::App()
 		isNewShell_ = GetProcAddress(hinstDll, "SHGetSpecialFolderLocation") != NULL;
 		FreeLibrary(hinstDll);
 	}
-
-	// check for ScrollInfo APIs
-	hasScrollInfo_ = GetProcAddress(GetModuleHandleA("USER32.DLL"), "SetScrollInfo") != NULL;
-
 }
 
 #pragma warning( disable : 4722 ) // 警告：デストラクタに値が戻りません
@@ -48,6 +46,9 @@ App::~App()
 	if( loadedModule_ & OLE )
 		::OleUninitialize();
 #endif
+
+	// only free library when program quits
+	if(hInstComCtl_) FreeLibrary(hInstComCtl_);
 
 	// 終～了～
 	::ExitProcess( exitcode_ );
@@ -66,14 +67,13 @@ void App::InitModule( imflag what )
 		switch( what )
 		{
 		case CTL: {
-			HINSTANCE hinstDll;
-			hinstDll = LoadLibrary(TEXT("comctl32.dll"));
+			if(hInstComCtl_) {
+				void (WINAPI *dyn_InitCommonControls)(void) = ( void (WINAPI *)(void) )
+					GetProcAddress( hInstComCtl_, "InitCommonControls" );
+				if (dyn_InitCommonControls)
+					dyn_InitCommonControls();
 
-			::InitCommonControls();
-
-			if(hinstDll) {
-				hasOldCommCtrl_ = GetProcAddress(hinstDll, "DllGetVersion") == NULL;
-				FreeLibrary(hinstDll);
+				hasOldCommCtrl_ = GetProcAddress(hInstComCtl_, "DllGetVersion") == NULL;
 			}
 
 			break;
@@ -206,16 +206,49 @@ bool App::isWin3later()
 	return isNewShell_;
 }
 
+void App::loadCommCtrl()
+{
+	if(!triedLoadingCommCtrl_) {
+		if(App::checkDLLExist(TEXT("comctl32.dll")))
+			hInstComCtl_ = LoadLibrary(TEXT("comctl32.dll"));
+		triedLoadingCommCtrl_ = true;
+	}
+}
+
 bool App::hasOldCommCtrl()
 {
+	app().loadCommCtrl();
 	return hasOldCommCtrl_;
 }
 
-bool App::hasScrollInfo()
+bool App::isCommCtrlAvailable()
 {
-	return hasScrollInfo_;
+	app().loadCommCtrl();
+	return hInstComCtl_ != NULL;
 }
 
+const TCHAR* App::checkDLLExist(TCHAR* dllname)
+{
+	bool dllexist = false;
+
+	// sys dir
+	Path dll_in_dir = Path(Path::Sys) + String(dllname);
+	dllexist = dll_in_dir.exist();
+	if(dllexist) return dll_in_dir.c_str();
+
+	if(App::isWin32s()) {
+		// win32s dir
+		dll_in_dir = Path(Path::Sys) + String(TEXT("win32s\\")) + String(dllname);
+		dllexist = dll_in_dir.exist();
+		if(dllexist) return dll_in_dir.c_str();
+	}
+
+	// exe dir
+	dll_in_dir = Path(Path::Exe) + String(dllname);
+	dllexist = dll_in_dir.exist();
+	if(dllexist) return dll_in_dir.c_str();
+	else return NULL;
+}
 
 //=========================================================================
 
