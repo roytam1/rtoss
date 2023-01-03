@@ -768,6 +768,40 @@ namespace
 		return const_cast<char*>( q );
 	}
 
+	static uNextFunc GetCharNextExA( int cp )
+	{
+		static uNextFunc pCharNextExA = NULL;
+		static bool triedToFindCharNextExA = false;
+
+		if ( cp == UTF8N )
+			return CharNextUtf8;
+		else if ( cp == GB18030 )
+			return CharNextGB18030;
+
+		// Only for Windows >= 4 (NT4/95+) because
+		// CharNextExA is not here on NT3.1 and is a stub on NT3.5
+		if (!triedToFindCharNextExA)
+		{
+			pCharNextExA = (uNextFunc)::GetProcAddress(::GetModuleHandleA("USER32.DLL"), "CharNextExA");
+			triedToFindCharNextExA = true;
+		}
+
+        // limiting NT versions of 3.51 to RTM and 4.0 to >=RTM only
+        if ( pCharNextExA &&
+             (!App::isNT() ||
+              (App::isNT() &&
+                (
+                 (App::getOSVer()==351 && App::getOSBuild()==1057) ||
+                 (App::getOSVer()>=400 && App::getOSBuild()>=1381)
+                )
+              )
+             )
+            )
+            return pCharNextExA;
+        else
+            return SimpleCharNext;
+	}
+
 	// IMultiLanguage2::DetectInputCodepageÇÕGB18030ÇÃÇ±Ç∆ÇîFéØÇ≈Ç´Ç‹ÇπÇÒÅB
 	static bool IsGB18030Like( const uchar* ptr, ulong siz, int refcs )
 	{
@@ -870,11 +904,7 @@ struct rMBCS : public TextFileRPimpl
 		: fb( reinterpret_cast<const char*>(b) )
 		, fe( reinterpret_cast<const char*>(b+s) )
 		, cp( c==UTF8 ? UTF8N : c )
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
-        , next( cp==UTF8N ? CharNextUtf8 :
-                            cp==GB18030 ? CharNextGB18030 :
-                                          (!App::isNT() || (App::isNT() && App::getOSVer()>=400 && App::getOSBuild()>=1381) ? CharNextExA : SimpleCharNext) )
-#endif
+		, next( GetCharNextExA(cp) )
 		, conv( cp==UTF8N && (app().isWin95()||!::IsValidCodePage(65001))
 		                  ? Utf8ToWideChar : MultiByteToWideChar )
 	{
