@@ -29,7 +29,9 @@ void Logger::WriteLine( const TCHAR* str, int siz )
 	// ファイル名
 	TCHAR fname[MAX_PATH];
 	::GetModuleFileName( ::GetModuleHandle(NULL), fname, countof(fname) );
-	::lstrcat( fname, TEXT("_log") );
+	dummy = ::lstrlen(fname);
+	fname[dummy-4] = 0;
+	::lstrcat( fname, TEXT(".log") );
 
 	// ファイルを書き込み専用で開く
 	HANDLE h = ::CreateFile( fname,
