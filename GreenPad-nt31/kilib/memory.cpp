@@ -14,12 +14,14 @@ using namespace ki;
 
 		void* __cdecl operator new( size_t siz )
 		{
-			return ::HeapAlloc( g_heap, HEAP_GENERATE_EXCEPTIONS, siz );
+			//return ::HeapAlloc( g_heap, HEAP_GENERATE_EXCEPTIONS, siz );
+			return ::LocalAlloc( LPTR, siz );
 		}
 
 		void __cdecl operator delete( void* ptr )
 		{
-			::HeapFree( g_heap, 0, ptr );
+			//::HeapFree( g_heap, 0, ptr );
+			::LocalFree( ptr );
 		}
 
 	#else
@@ -29,11 +31,13 @@ using namespace ki;
 		void* __cdecl operator new( size_t siz )
 		{
 			++allocCounter;
-			return ::HeapAlloc( g_heap, HEAP_GENERATE_EXCEPTIONS, siz );
+			//return ::HeapAlloc( g_heap, HEAP_GENERATE_EXCEPTIONS, siz );
+			return ::LocalAlloc( LPTR, siz );
 		}
 		void __cdecl operator delete( void* ptr )
 		{
-			::HeapFree( g_heap, 0, ptr );
+			//::HeapFree( g_heap, 0, ptr );
+			::LocalFree( ptr );
 			if( ptr != NULL )
 				--allocCounter;
 		}
@@ -392,7 +396,6 @@ MemoryManager::MemoryManager()
 {
 #ifdef SUPERTINY
 	//g_heap = ::GetProcessHeap();
-	g_heap = ::HeapCreate(0, 0, 0);
 #endif
 
 	// メモリプールをZEROクリア
@@ -416,7 +419,7 @@ MemoryManager::~MemoryManager()
 #endif
 
 #ifdef SUPERTINY
-	::HeapDestroy(g_heap);
+	//::HeapDestroy(g_heap);
 #endif
 }
 
@@ -475,7 +478,6 @@ MemoryManager::MemoryManager()
 {
 #ifdef SUPERTINY
 	//g_heap = ::GetProcessHeap();
-	g_heap = ::HeapCreate(0, 0, 0);
 #endif
 
 	// 唯一のインスタンスは私です
@@ -491,7 +493,7 @@ MemoryManager::~MemoryManager()
 #endif
 
 #ifdef SUPERTINY
-	::HeapDestroy(g_heap);
+	//::HeapDestroy(g_heap);
 #endif
 }
 
