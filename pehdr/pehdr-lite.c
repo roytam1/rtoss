@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 int main(int argc, char *argv[])
 {
@@ -7,10 +9,12 @@ int main(int argc, char *argv[])
 	unsigned int hdr_pos, ohdr_pos;
     unsigned char buf[128] = {0};
     char tmpstr[64];
-    unsigned int tmp_ui;
-    unsigned short tmp_us;
+    unsigned int tmp_ui = 0;
+    unsigned short tmp_us = 0;
+    unsigned short num_sects = 0;
+    unsigned long uninit_datasize = 0;
 
-	unsigned int dllflag, subsysflag;
+	unsigned int dllflag, subsysflag, bssflag;
 	unsigned long subsysver, osver, bin_size, oldchksum, newchksum;
 	int subsysver_set, osver_set, hdr_changed, bin_changed;
 
@@ -20,11 +24,11 @@ int main(int argc, char *argv[])
 	int i,j,k;
     //int mm = byteorder_mm();
 
-	dllflag = subsysflag = subsysver = osver = subsysver_set = osver_set = hdr_changed = bin_changed = oldchksum = newchksum = 0;
+	dllflag = subsysflag = bssflag = subsysver = osver = subsysver_set = osver_set = hdr_changed = bin_changed = oldchksum = newchksum = 0;
 
     if (argc < 2) {
         fprintf(stderr,
-            "Missing input file.\n\nUsage: %s <PE-file> [+|-dll] [+|-win] [+|-con] [-osver <number.number>] [-subsysver <number.number>]",argv[0]);
+            "Missing input file.\n\nUsage: %s <PE-file> [+|-dll] [+|-win] [+|-con] [-bssfix] [-osver <number.number>] [-subsysver <number.number>]",argv[0]);
         return 1;
     }
 
@@ -37,6 +41,10 @@ int main(int argc, char *argv[])
     }
 
 	for(i = 2; i<argc; i++) {
+		if(strncmp(argv[i],"-bssfix",7) == 0) {
+			fprintf(stdout, " -> -bssfix set\n");
+			bssflag = 1; continue;
+		}
 		if(strncmp(argv[i],"+dll",4) == 0) {
 			fprintf(stdout, " -> +DLL set\n");
 			dllflag = 1; continue;
@@ -167,6 +175,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+	num_sects = *(unsigned short*)(buf+2);
     /* Bittype */
     /*tmp_us = *(unsigned short*)(buf);
 
@@ -262,6 +271,7 @@ int main(int argc, char *argv[])
         fclose(fh);
         return 1;
     }
+	uninit_datasize = *(unsigned long*)(buf+12);
 	/*fprintf(stdout, "Linker = %d.%d\n", buf[2], buf[3]);
 	fprintf(stdout, "SizeOfUninitializedData = 0x%p\n", *(unsigned long*)(buf+12));
 	fprintf(stdout, "AddressOfEntryPoint = 0x%p\n", *(unsigned long*)(buf+16));
@@ -308,8 +318,11 @@ int main(int argc, char *argv[])
 	if(hdr_changed) {
 		fseek(fh, ohdr_pos,SEEK_SET);
 		fwrite(buf, 1, 96, fh);
+		fseek(fh, ohdr_pos+96,SEEK_SET);
+		hdr_changed = 0;
 	}
 
+	ohdr_pos = ftell(fh);
 	/* (c)
 	#define IMAGE_NUMBEROF_DIRECTORY_ENTRIES    16
 	typedef struct _IMAGE_DATA_DIRECTORY {
@@ -345,6 +358,33 @@ int main(int argc, char *argv[])
 	    DWORD   Characteristics;				// 36-39
 	} IMAGE_SECTION_HEADER, *PIMAGE_SECTION_HEADER;
 	*/
+	for(i=0; i< num_sects; i++) {
+		ohdr_pos = ftell(fh);
+	    if (!fread(buf, 40, 1, fh)) {
+	        fprintf(stderr,
+	            "Unable to read %d bytes, @%ld.\n",
+	            40, ohdr_pos);
+	        perror(0);
+	        fclose(fh);
+	        return 1;
+	    }
+		fprintf(stdout, "Header '%s' @ 0x%08x\n", (unsigned char*)(buf), ohdr_pos);
+		if(strncmp(".bss",(unsigned char*)(buf),8)==0 && bssflag) {
+			fprintf(stdout, "Found BSS section!\n");
+			fprintf(stdout, "Old SizeOfRawData = %08X\n", *(unsigned long *)(buf+16));
+			*(unsigned long *)(buf+16) = uninit_datasize;
+			fprintf(stdout, "New SizeOfRawData = %08X\n", *(unsigned long *)(buf+16));
+			hdr_changed = 1;
+			bin_changed = 1;
+		}
+		if(hdr_changed) {
+			fseek(fh, ohdr_pos,SEEK_SET);
+			fwrite(buf, 1, 40, fh);
+			hdr_changed = 0;
+			fseek(fh, ohdr_pos+40,SEEK_SET);
+		}
+	}
+
 
 	/* recalculate PE checksum */
 	if(bin_changed) {
