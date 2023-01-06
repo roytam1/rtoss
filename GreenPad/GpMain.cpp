@@ -608,7 +608,7 @@ void GreenPadWnd::on_datetime()
 		( LOCALE_USER_DEFAULT, 0, NULL, g.len()?const_cast<TCHAR*>(g.c_str()):TEXT("HH:mm yyyy/MM/dd"), buf, countof(buf));
 	::GetDateFormat
 		( LOCALE_USER_DEFAULT, 0, NULL, buf, tmp,countof(tmp));
-	edit_.getCursor().Input( tmp, ::lstrlen(tmp) );
+	if( tmp[0] ) edit_.getCursor().Input( tmp, ::lstrlen(tmp) );
 #endif
 }
 
