@@ -841,7 +841,7 @@ void GreenPadWnd::ReloadConfig( bool noSetDocType )
 	// キーワードファイル
 	Path kwd = cfg_.kwdFile();
 	FileR fp;
-	if( kwd.len()!=0 && fp.Open(kwd.c_str()) )
+	if( kwd.len()!=0 && kwd.isFile() && fp.Open(kwd.c_str()) )
 		edit_.getDoc().SetKeyword((const unicode*)fp.base(),fp.size()/2);
 	else
 		edit_.getDoc().SetKeyword(NULL,0);
