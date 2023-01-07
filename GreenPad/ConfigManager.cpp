@@ -791,8 +791,6 @@ namespace {
 
 void ConfigManager::AddMRU( const ki::Path& fname )
 {
-	Mutex mx(s_mrulock);
-
 	// メモリ内のMRUリストを更新
 	{
 		int i;
@@ -805,26 +803,30 @@ void ConfigManager::AddMRU( const ki::Path& fname )
 	}
 
 	// iniへ保存
-	{
-		ini_.SetSectionAsUserName();
-		const String key = TEXT("MRU");
-		for( int i=0; i<countof(mru_); ++i )
-			ini_.PutPath(
-				(key+String().SetInt(i+1)).c_str(), mru_[i] );
+	{ // Restrict Mutex context
+		Mutex mx(s_mrulock);
+		if( mx.isLocked() ) {
+			ini_.SetSectionAsUserName();
+			const String key = TEXT("MRU");
+			for( int i=0; i<mrus_; ++i ) //countof(mru_)
+				ini_.PutPath(
+					(key+String().SetInt(i+1)).c_str(), mru_[i] );
+		}
 	}
 }
 
 void ConfigManager::SetUpMRUMenu( HMENU m, UINT id )
 {
-	Mutex mx(s_mrulock);
-
 	// iniから読み込み
-	{
-		ini_.SetSectionAsUserName();
-		const String key = TEXT("MRU");
-		for( int i=0; i<countof(mru_); ++i )
-			mru_[i] = ini_.GetPath(
-				(key+String().SetInt(i+1)).c_str(), Path() );
+	{ // Restrict Mutex context
+		Mutex mx(s_mrulock);
+		if( mx.isLocked() ) {
+			ini_.SetSectionAsUserName();
+			const String key = TEXT("MRU");
+			for( int i=0; i<mrus_; ++i )
+				mru_[i] = ini_.GetPath(
+					(key+String().SetInt(i+1)).c_str(), Path() );
+		}
 	}
 
 	// 全項目を削除
