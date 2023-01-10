@@ -39,6 +39,11 @@
 #define ___CHARDET_H___
 
 #ifdef _WIN32
+#   ifdef SUPERTINY
+	extern "C" int  _purecall(){return 0;} 
+	extern "C" int  _fltused=0;
+#   endif
+
 #   ifdef DLL_EXPORTS
 #	define CHARDET_IMEXPORT extern _declspec(dllexport)
 #   elif defined(STATICLIB)
