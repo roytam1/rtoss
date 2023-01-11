@@ -1101,12 +1101,12 @@ void GreenPadWnd::on_create( CREATESTRUCT* cs )
 	LOGGER("GreenPadWnd::on_create begin");
 
 	accel_ = app().LoadAccel( IDR_MAIN );
-	stb_.Create( hwnd() );
 	edit_.Create( NULL, hwnd(), 0, 0, 100, 100 );
 	LOGGER("GreenPadWnd::on_create edit created");
 	edit_.getDoc().AddHandler( this );
 	edit_.getCursor().AddHandler( this );
 //#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	stb_.SetParent( hwnd() );
 	stb_.SetStatusBarVisible( cfg_.showStatusBar() );
 /*#elif defined(TARGET_VER) && TARGET_VER==310
 	stb_.SetStatusBarVisible( false );
