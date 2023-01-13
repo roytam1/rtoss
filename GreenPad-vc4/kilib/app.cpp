@@ -9,6 +9,31 @@
 using namespace ki;
 
 
+BOOL GetNtVersionNumbers(DWORD* dwMajorVer, DWORD* dwMinorVer,DWORD* dwBuildNumber)
+{
+	// call NTDLL.RtlGetNtVersionNumbers for real version numbers
+	// it is firstly existed as `RtlGetNtVersionInfo` in XP Beta Build 2495 and quickly renamed to retail name in Build 2517
+	BOOL bRet = FALSE;
+	HMODULE hModNtdll = NULL;
+	if (hModNtdll = LoadLibrary(TEXT("ntdll.dll")))
+	{
+		typedef void (WINAPI *pfRTLGETNTVERSIONNUMBERS)(DWORD*, DWORD*, DWORD*);
+		pfRTLGETNTVERSIONNUMBERS pfRtlGetNtVersionNumbers;
+		pfRtlGetNtVersionNumbers = (pfRTLGETNTVERSIONNUMBERS)GetProcAddress(hModNtdll, "RtlGetNtVersionNumbers");
+
+		if (pfRtlGetNtVersionNumbers)
+		{
+			pfRtlGetNtVersionNumbers(dwMajorVer, dwMinorVer, dwBuildNumber);
+			*dwBuildNumber &= 0x0ffff;
+			bRet = TRUE;
+		}
+
+		FreeLibrary(hModNtdll);
+		hModNtdll = NULL;
+	}
+	return bRet;
+}
+
 
 //=========================================================================
 
@@ -25,6 +50,8 @@ inline App::App()
 {
 	// 唯一のインスタンスは私です。
 	pUniqueInstance_ = this;
+
+	init_osver();
 
 	// lets check NewShell here
 	HINSTANCE hinstDll;
@@ -101,104 +128,103 @@ void App::Exit( int code )
 
 //-------------------------------------------------------------------------
 
-const OSVERSIONINFOA& App::osver()
+void App::init_osver()
 {
-	typedef BOOL (WINAPI *PGVEXA)(OSVERSIONINFOA*);
+	OSVERSIONINFOA osvi;
 
-	static OSVERSIONINFOA s_osVer;
-	PGVEXA pGVEXA;
+	// zero-filling structs for safety
+	mem00(&mvi_, sizeof(MYVERINFO));
+	mem00(&osvi, sizeof(OSVERSIONINFOA));
 
-	if( s_osVer.dwOSVersionInfoSize == 0 )
-	{
-		// 初回だけは情報取得
-		s_osVer.dwOSVersionInfoSize = sizeof( s_osVer );
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
 
-		pGVEXA = (PGVEXA) ::GetProcAddress(::GetModuleHandle(TEXT("kernel32.dll")), "GetVersionExA");
+	if(GetNtVersionNumbers(&osvi.dwMajorVersion, &osvi.dwMinorVersion,&osvi.dwBuildNumber)) {
+		mvi_.MVI_MINOR = (BYTE)osvi.dwMinorVersion;
+		mvi_.MVI_MAJOR = (BYTE)osvi.dwMajorVersion;
+		mvi_.MVI_BUILD = (WORD)osvi.dwBuildNumber;
+		mvi_.wPlatform = VER_PLATFORM_WIN32_NT;
+		mvi_.wType = 2;
+	} else {
+		typedef BOOL (WINAPI *PGVEXA)(OSVERSIONINFOA*);
+		PGVEXA pGVEXA;
+		pGVEXA = (PGVEXA) GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetVersionExA");
 		if(pGVEXA) {
-			pGVEXA(&s_osVer);
+			pGVEXA(&osvi);
 
-			if (s_osVer.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
-				s_osVer.dwBuildNumber &= 0xffff; // fixup broken build number in early 9x builds
-			}
-
-/*#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-		::GetVersionEx( &s_osVer );
-#else*/
+			mvi_.MVI_MINOR = (BYTE)osvi.dwMinorVersion;
+			mvi_.MVI_MAJOR = (BYTE)osvi.dwMajorVersion;
+			mvi_.MVI_BUILD = (WORD)osvi.dwBuildNumber;
+			mvi_.wPlatform = (WORD)osvi.dwPlatformId;
+			mvi_.wType = 1;
 		} else {
-			/*TCHAR tmp[128];
-			::wsprintf(tmp,TEXT("GetVersionExA not found. GetVersion returns 0x%08x."), ::GetVersion());
-			::MessageBox( NULL, tmp, TEXT("GreenPad"), MB_OK|MB_TASKMODAL );*/
+			osvi.dwBuildNumber = GetVersion();
 
-			DWORD dwVersion = ::GetVersion();
+			mvi_.MVI_MAJOR = (LOBYTE(LOWORD(osvi.dwBuildNumber)));
+			mvi_.MVI_MINOR = (HIBYTE(LOWORD(osvi.dwBuildNumber)));
 
-			s_osVer.dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
-			s_osVer.dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
-
-			if (dwVersion < 0x80000000) {
-				s_osVer.dwBuildNumber = (DWORD)(HIWORD(dwVersion));
-				s_osVer.dwPlatformId = VER_PLATFORM_WIN32_NT;
+			if (osvi.dwBuildNumber < 0x80000000) {
+				mvi_.MVI_BUILD = (HIWORD(osvi.dwBuildNumber));
+				mvi_.wPlatform = VER_PLATFORM_WIN32_NT;
 			}
 
-			if (s_osVer.dwPlatformId != VER_PLATFORM_WIN32_NT) {
-				if (s_osVer.dwMajorVersion == 3) s_osVer.dwPlatformId = VER_PLATFORM_WIN32s;
-				else s_osVer.dwPlatformId = VER_PLATFORM_WIN32_WINDOWS;
+			if (mvi_.wPlatform != VER_PLATFORM_WIN32_NT) {
+				if (mvi_.MVI_MAJOR == 3) mvi_.wPlatform = VER_PLATFORM_WIN32s;
+				else mvi_.wPlatform = VER_PLATFORM_WIN32_WINDOWS;
 
-				//s_osVer.dwBuildNumber = (DWORD)(HIWORD(dwVersion & 0x7FFFFFFF)); // when dwPlatformId == VER_PLATFORM_WIN32_WINDOWS, HIWORD(dwVersion) is reserved
+				//mvi_.MVI_BUILD = (DWORD)(HIWORD(osvi.dwBuildNumber & 0x7FFFFFFF)); // when dwPlatformId == VER_PLATFORM_WIN32_WINDOWS, HIWORD(dwVersion) is reserved
 			}
+
 		}
-//#endif
 	}
-	return s_osVer;
 }
 
-int App::getOSVer()
+WORD App::getOSVer()
 {
-	static const OSVERSIONINFOA& v = osver();
-	return v.dwMajorVersion*100+v.dwMinorVersion;
+	return mvi_.MVI_VER;
 }
 
-int App::getOSBuild()
+WORD App::getOSBuild()
 {
-	static const OSVERSIONINFOA& v = osver();
-	return v.dwBuildNumber;
+	return mvi_.MVI_BUILD;
 }
 
 bool App::isNewTypeWindows()
 {
-	static const OSVERSIONINFOA& v = osver();
 	return (
-		( v.dwPlatformId==VER_PLATFORM_WIN32_NT && v.dwMajorVersion>=5 )
-	 || ( v.dwPlatformId==VER_PLATFORM_WIN32_WINDOWS &&
-	          v.dwMajorVersion*100+v.dwMinorVersion>=410 )
+		( mvi_.wPlatform==VER_PLATFORM_WIN32_NT && mvi_.MVI_MAJOR >= 5 )
+	 || ( mvi_.wPlatform==VER_PLATFORM_WIN32_WINDOWS && mvi_.MVI_BUILD >= MKVER(4, 10) )
 	);
+}
+
+bool App::isBuildEqual(DWORD dwTarget)
+{
+	return mvi_.MVI_VBN == dwTarget;
+}
+
+bool App::isBuildGreater(DWORD dwTarget)
+{
+	return mvi_.MVI_VBN >= dwTarget;
 }
 
 bool App::isWin95()
 {
-	static const OSVERSIONINFOA& v = osver();
-	return (
-		v.dwPlatformId==VER_PLATFORM_WIN32_WINDOWS &&
-		v.dwMajorVersion==4 &&
-		v.dwMinorVersion==0
-	);
+	MYVERINFO_PV* pv = (MYVERINFO_PV*)&mvi_;
+	return pv->MPV_PV == MKPV(VER_PLATFORM_WIN32_WINDOWS, 4, 0);
 }
 
 bool App::isNT()
 {
-	static const OSVERSIONINFOA& v = osver();
-	return v.dwPlatformId==VER_PLATFORM_WIN32_NT;
+	return mvi_.wPlatform==VER_PLATFORM_WIN32_NT;
 }
 
 bool App::isWin32s()
 {
-	static const OSVERSIONINFOA& v = osver();
-	return v.dwPlatformId==VER_PLATFORM_WIN32s;
+	return mvi_.wPlatform==VER_PLATFORM_WIN32s;
 }
 
 bool App::isWin3later()
 {
-	static const OSVERSIONINFOA& v = osver();
-	return v.dwMajorVersion>3;
+	return mvi_.MVI_MAJOR>3;
 }
 
  bool App::isNewShell()
@@ -236,7 +262,7 @@ const TCHAR* App::checkDLLExist(TCHAR* dllname)
 	dllexist = dll_in_dir.exist();
 	if(dllexist) return dll_in_dir.c_str();
 
-	if(App::isWin32s()) {
+	if(app().isWin32s()) {
 		// win32s dir
 		dll_in_dir = Path(Path::Sys) + String(TEXT("win32s\\")) + String(dllname);
 		dllexist = dll_in_dir.exist();

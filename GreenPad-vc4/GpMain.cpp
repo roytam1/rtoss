@@ -63,7 +63,7 @@ int GpStBar::AutoResize( bool maximized )
 	HDC dc = ::GetDC( hwnd() );
 	SIZE s;
 
-	if(App::isWin32s() || (App::isWin3later() && !App::getOSBuild())) {
+	if(app().isWin32s() || (app().isWin3later() && !app().getOSBuild())) { // old win95 betas may not have GVEx and leaving build number unsetted
 		if( ::GetTextExtentPoint( dc, TEXT("BBBBM"), 5, &s ) ) // Line Ending
 			w[1] = w[2] - s.cx;
 		if( ::GetTextExtentPoint( dc, TEXT("BBBWWWW"), 7, &s ) ) // Charset
@@ -445,7 +445,7 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 {
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	LOGGER("GreenPadWnd::ReloadConfig on_initmenu begin");
-	if(App::isWin3later())
+	if(app().isWin3later())
 	{
 		MENUITEMINFO mi = { sizeof(MENUITEMINFO), MIIM_STATE };
 
@@ -1107,12 +1107,12 @@ void GreenPadWnd::on_create( CREATESTRUCT* cs )
 	LOGGER("GreenPadWnd::on_create begin");
 
 	accel_ = app().LoadAccel( IDR_MAIN );
-	stb_.Create( hwnd() );
 	edit_.Create( NULL, hwnd(), 0, 0, 100, 100 );
 	LOGGER("GreenPadWnd::on_create edit created");
 	edit_.getDoc().AddHandler( this );
 	edit_.getCursor().AddHandler( this );
 //#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	stb_.SetParent( hwnd() );
 	stb_.SetStatusBarVisible( cfg_.showStatusBar() );
 /*#elif defined(TARGET_VER) && TARGET_VER==310
 	stb_.SetStatusBarVisible( false );

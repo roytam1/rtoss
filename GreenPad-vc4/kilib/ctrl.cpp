@@ -9,13 +9,14 @@ using namespace ki;
 
 StatusBar::StatusBar()
 {
-	app().InitModule( App::CTL );
+	//app().InitModule( App::CTL );
 }
 
-bool StatusBar::Create( HWND parent )
+bool StatusBar::Create(  )
 {
 	HWND h = NULL;
 	WNDCLASS wc;
+	app().InitModule( App::CTL );
 /*#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	h = ::CreateStatusWindow(
 		WS_CHILD|WS_VISIBLE|SBARS_SIZEGRIP,
@@ -28,7 +29,7 @@ bool StatusBar::Create( HWND parent )
 		NULL, // pointer to window name
 		WS_CHILD|WS_VISIBLE|SBARS_SIZEGRIP , // window style
 		0, 0, 0, 0, //x, y, w, h
-		parent, // handle to parent or owner window
+		parent_, // handle to parent or owner window
 		(struct HMENU__ *)1787,          // handle to menu or child-window identifier
 		app().hinst(), // handle to application instance
 		NULL // pointer to window-creation data
@@ -37,7 +38,6 @@ bool StatusBar::Create( HWND parent )
 	if( h == NULL )
 		return false;
 
-	SetStatusBarVisible();
 	SetHwnd( h );
 	AutoResize( false );
 	return true;
@@ -46,7 +46,7 @@ bool StatusBar::Create( HWND parent )
 void StatusBar::SetText( const TCHAR* str, int part ) {
 //#if defined(TARGET_VER) && TARGET_VER==310
 #if defined(UNICODE)
-	if(App::getOSVer() == 310 || app().hasOldCommCtrl()) {
+	if(app().getOSVer() == MKVER(3,10) || app().hasOldCommCtrl()) {
 		// early builds of common controls status bar is ANSI only
 		char buf[256];
 		long len = ::WideCharToMultiByte(CP_ACP, 0, str, -1 , buf, countof(buf), NULL, NULL);
