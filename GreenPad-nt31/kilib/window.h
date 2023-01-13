@@ -193,8 +193,23 @@ public:
 	//@{ 確定文字列ゲット。受け取ったら delete すること。 //@}
 	void GetString( HWND wnd, unicode** str, ulong* len );
 
+	//@{ 再変換 //@}
+	void SetString( HWND wnd, unicode* str, ulong len );
+
 	//@{ GlobalIMEを利用可能状態にする //@}
 	void EnableGlobalIME( bool enable );
+
+	//@{ IMEをON/OFFにする //@}
+	void SetState( HWND wnd, bool enable );
+
+	//@{ IME ON/OFF判定 //@}
+	BOOL GetState( HWND wnd );
+
+	//@{ IMEを持つかどうかを調べる //@}
+	BOOL IsIME();
+
+	//@{ 逆変換をサポートを調べる //@}
+	BOOL CanReconv();
 
 	//@{ GlobalIMEを使えるWindowのリストを登録 //@}
 	void FilterWindows( ATOM* lst, UINT siz );
@@ -280,7 +295,11 @@ protected:
 	typedef const TCHAR* const ClsName;
 
 	//@{ ウインドウクラス登録 //@}
+#if !defined(TARGET_VER) || TARGET_VER>350
+	static ATOM Register( WNDCLASSEX* cls );
+#else
 	static ATOM Register( WNDCLASS* cls );
+#endif
 
 	// てけとーに実装して反応してください。
 	// on_commandは、処理しなかったらfalseを返すこと。
@@ -295,6 +314,7 @@ protected:
 private:
 
 	static LRESULT CALLBACK StartProc( HWND, UINT, WPARAM, LPARAM );
+	static LRESULT CALLBACK TrunkMainProc( HWND, UINT, WPARAM, LPARAM );
 	static LRESULT CALLBACK MainProc( WndImpl*, UINT, WPARAM, LPARAM );
 	void SetUpThunk( HWND wnd );
 
@@ -302,7 +322,10 @@ private:
 
 	LPCTSTR     className_;
 	const DWORD style_, styleEx_;
+
+#ifndef NO_ASMTHUNK
 	byte*       thunk_;
+#endif
 };
 
 

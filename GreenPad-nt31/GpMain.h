@@ -54,6 +54,8 @@ private:
 	bool ShowOpenDlg( ki::Path* fn, int* cs );
 	bool Open( const ki::Path& fn, int cs );
 	bool OpenByMyself( const ki::Path& fn, int cs, bool needReConf=true );
+	static BOOL CALLBACK PostMsgToFriendsProc(HWND hwnd, LPARAM lPmsg);
+	bool PostMsgToAllFriends(UINT msg);
 
 	bool AskToSave();
 	bool Save_showDlgIfNeeded();
@@ -95,6 +97,7 @@ private:
 	void    on_reopenfile();
 	void    on_savefile();
 	void    on_savefileas();
+	void    on_print();
 	void    on_exit();
 	void    on_initmenu( HMENU menu, bool editmenu_only );
 	void    on_drop( HDROP hd );
@@ -109,6 +112,8 @@ private:
 	void    on_prevwnd();
 	void    on_mru( int no );
 	void    on_statusBar();
+	void    on_reconv();
+	void    on_toggleime();
 	bool    PreTranslateMessage( MSG* msg );
 };
 

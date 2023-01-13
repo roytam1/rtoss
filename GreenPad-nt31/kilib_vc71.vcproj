@@ -280,7 +280,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				WholeProgramOptimization="FALSE"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN32,NDEBUG,_WINDOWS,SUPERTINY,WIN32S"
+				PreprocessorDefinitions="WIN32,NDEBUG,_WINDOWS,SUPERTINY,TARGET_VER=310,WIN32S,DO_LOGGING"
 				StringPooling="TRUE"
 				ExceptionHandling="FALSE"
 				RuntimeLibrary="0"

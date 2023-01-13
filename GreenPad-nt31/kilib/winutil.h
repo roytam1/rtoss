@@ -119,9 +119,11 @@ class Mutex : public Object
 public:
 	Mutex( const TCHAR* name );
 	~Mutex();
+	bool isLocked() const;
 
 private:
 	const HANDLE mtx_;
+	bool locked_;
 
 private:
 	NOCOPY(Mutex);
@@ -132,10 +134,41 @@ private:
 //-------------------------------------------------------------------------
 
 inline Mutex::Mutex( const TCHAR* name )
-	: mtx_( ::CreateMutex( NULL, TRUE, name ) ) {}
+	: mtx_( ::CreateMutex( NULL, TRUE, name ) )
+	, locked_ (false)
+ 	{
+		DWORD dwError = ::GetLastError();
+		if( mtx_ )
+		{
+			// Wait for Mutex ownership, in case it was already created.
+			if( dwError == ERROR_ALREADY_EXISTS ) {
+				// Wait 10 second for ownership or fail.
+				DWORD dwWatiStatus = ::WaitForSingleObject(mtx_, 1000);
+				locked_ = (dwWatiStatus == WAIT_OBJECT_0 || dwWatiStatus == WAIT_ABANDONED);
+			} else {
+				locked_ = true; // The mutex is ours.
+			}
+		}
+		else if ( dwError == ERROR_CALL_NOT_IMPLEMENTED )
+		{	// In case Mutex are not implemented
+			// This is required for Win32s 1.1.
+			// On Win32s 1.15a CreateMutexA is smartly implemented as
+			// mov eax, 1; retn Ch;
+			locked_ = true;
+		}
+	}
+
+inline bool Mutex::isLocked() const
+	{ return locked_; }
 
 inline Mutex::~Mutex()
-	{ if( mtx_ != NULL ) ::ReleaseMutex( mtx_ ), ::CloseHandle( mtx_ ); }
+	{
+		if( mtx_ != NULL )
+		{
+			if( locked_ ) ::ReleaseMutex( mtx_ );
+			::CloseHandle( mtx_ );
+		}
+	}
 
 
 

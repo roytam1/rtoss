@@ -29,6 +29,8 @@ template<typename T> inline T Max(T x,T y) { return (y<x ? x : y); }
 #define for if(0);else for 
 #endif
 
+template<typename T> inline T NZero(T x) { return (x==0 ? 1 : x); }
+
 // コピー禁止オブジェクト
 #define NOCOPY(T) T( const T& ); T& operator=( const T& )
 

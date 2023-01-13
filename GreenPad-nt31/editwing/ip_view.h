@@ -367,6 +367,7 @@ public:
 	void ConvDPosToVPos( DPos dp, VPos* vp, const VPos* base=NULL ) const;
 	void ScrollTo( const VPos& vp );
 	int  GetLastWidth( ulong tl ) const;
+	int  getNumScrollLines( void );
 
 public:
 
@@ -387,6 +388,7 @@ private:
 	gapbufobj<WLine> wrap_;
 	ulong            vlNum_;
 	ulong            textCx_;
+	short            accdelta_;
 
 private:
 

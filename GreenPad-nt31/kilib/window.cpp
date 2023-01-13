@@ -4,6 +4,19 @@
 using namespace ki;
 
 
+typedef HKL (WINAPI *PGKL)(DWORD);
+
+
+static HKL MyGetKeyboardLayout(DWORD dwLayout)
+{
+	static PGKL pGKL_ = (PGKL)(-1);
+	if(pGKL_ == (PGKL)(-1)) {
+		pGKL_ = (PGKL) ::GetProcAddress(::GetModuleHandle(TEXT("user32.dll")), "GetKeyboardLayout");
+	}
+	if (pGKL_) return pGKL_(dwLayout);
+
+	return NULL;
+}
 
 //=========================================================================
 // IMEに関するあれこれ
@@ -62,6 +75,90 @@ void IMEManager::EnableGlobalIME( bool enable )
 	#endif
 }
 
+BOOL IMEManager::IsIME()
+{
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	HKL hKL = MyGetKeyboardLayout(GetCurrentThreadId());
+	#ifdef USEGLOBALIME
+		if( immApp_ )
+		{
+			return immApp_->IsIME( hKL );
+		}
+		else
+	#endif
+		{
+			return ::ImmIsIME( hKL );
+		}
+#else
+	return FALSE;
+#endif
+}
+
+BOOL IMEManager::CanReconv()
+{
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	HKL hKL = MyGetKeyboardLayout(GetCurrentThreadId());
+	DWORD nImeProps = ImmGetProperty( hKL, IGP_SETCOMPSTR );
+	#ifdef USEGLOBALIME
+		if( immApp_ )
+		{
+			immApp_->GetProperty( hKL, IGP_SETCOMPSTR, &nImeProps );
+		}
+		else
+	#endif
+		{
+			nImeProps = ::ImmGetProperty( hKL, IGP_SETCOMPSTR );
+		}
+		return (nImeProps & SCS_CAP_SETRECONVERTSTRING) != 0;
+#else
+	return FALSE;
+#endif
+}
+
+BOOL IMEManager::GetState( HWND wnd )
+{
+	BOOL imeStatus = FALSE;
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	HIMC ime;
+	#ifdef USEGLOBALIME
+		if( immApp_ )
+		{
+			immApp_->GetContext( wnd, &ime );
+			imeStatus = immApp_->GetOpenStatus( ime );
+			immApp_->ReleaseContext( wnd, ime );
+		}
+		else
+	#endif
+		{
+			ime = ::ImmGetContext( wnd );
+			imeStatus = ::ImmGetOpenStatus(ime );
+			::ImmReleaseContext( wnd, ime );
+		}
+#endif
+	return imeStatus;
+}
+
+void IMEManager::SetState( HWND wnd, bool enable )
+{
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	HIMC ime;
+	#ifdef USEGLOBALIME
+		if( immApp_ )
+		{
+			immApp_->GetContext( wnd, &ime );
+			immApp_->SetOpenStatus( ime, (enable ? TRUE : FALSE) );
+			immApp_->ReleaseContext( wnd, ime );
+		}
+		else
+	#endif
+		{
+			ime = ::ImmGetContext( wnd );
+			::ImmSetOpenStatus(ime, (enable ? TRUE : FALSE) );
+			::ImmReleaseContext( wnd, ime );
+		}
+#endif
+}
+
 void IMEManager::FilterWindows( ATOM* lst, UINT siz )
 {
 	#ifdef USEGLOBALIME
@@ -111,7 +208,7 @@ inline void IMEManager::MsgLoopEnd()
 
 void IMEManager::SetFont( HWND wnd, const LOGFONT& lf )
 {
-#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	HIMC ime;
 	LOGFONT* plf = const_cast<LOGFONT*>(&lf);
 
@@ -138,7 +235,7 @@ void IMEManager::SetFont( HWND wnd, const LOGFONT& lf )
 
 void IMEManager::SetPos( HWND wnd, int x, int y )
 {
-#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	HIMC ime;
 	COMPOSITIONFORM cf;
 	cf.dwStyle = CFS_POINT;
@@ -164,7 +261,7 @@ void IMEManager::SetPos( HWND wnd, int x, int y )
 
 void IMEManager::GetString( HWND wnd, unicode** str, ulong* len )
 {
-#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	*str = NULL;
 	HIMC ime;
 
@@ -205,6 +302,48 @@ void IMEManager::GetString( HWND wnd, unicode** str, ulong* len )
 				::ImmGetCompositionStringW( ime, GCS_RESULTSTR, *str, s );
 			}
 
+		::ImmReleaseContext( wnd, ime );
+	}
+#endif
+}
+
+void IMEManager::SetString( HWND wnd, unicode* str, ulong len )
+{
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	HIMC ime;
+
+	#ifdef USEGLOBALIME
+	if( immApp_ )
+	{
+		long s=0;
+		immApp_->GetContext( wnd, &ime );
+		immApp_->SetCompositionStringW( ime, SCS_SETSTR, str, len*sizeof(unicode), NULL, 0 );
+		immApp_->NotifyIME( ime, NI_COMPOSITIONSTR, CPS_CONVERT, 0 );
+		immApp_->NotifyIME( ime, NI_OPENCANDIDATE, 0, 0 );
+		immApp_->ReleaseContext( wnd, ime );
+	}
+	else
+	#endif
+	{
+		ime = ::ImmGetContext( wnd );
+		long s = ::ImmSetCompositionStringW( ime,SCS_SETSTR,str,len*sizeof(unicode),NULL,0 );
+
+		#ifndef _UNICODE
+			if( s == 0 )
+			{
+				BOOL defchr = TRUE;
+				len = ::WideCharToMultiByte( CP_ACP,MB_PRECOMPOSED,str,-1,NULL,NULL,"?",&defchr );
+				char* tmp = new char[len];
+				
+				::WideCharToMultiByte( CP_ACP,MB_PRECOMPOSED,str,-1,tmp,len,"?",&defchr );
+				s = ::ImmSetCompositionStringA(ime,SCS_SETSTR,tmp,len,NULL,0);
+				delete [] tmp;
+			}
+			else
+		#endif
+
+		::ImmNotifyIME( ime, NI_COMPOSITIONSTR, CPS_CONVERT, 0); // 変換実行
+		::ImmNotifyIME( ime, NI_OPENCANDIDATE, 0, 0 ); // 変換候補リスト表示
 		::ImmReleaseContext( wnd, ime );
 	}
 #endif
@@ -309,8 +448,10 @@ WndImpl::WndImpl( LPCTSTR className, DWORD style, DWORD styleEx )
 	: className_( className )
 	, style_    ( style )
 	, styleEx_  ( styleEx )
+#ifndef NO_ASMTHUNK
 	, thunk_    ( static_cast<byte*>(
 	                ::VirtualAlloc( NULL, THUNK_SIZE, MEM_COMMIT, PAGE_EXECUTE_READWRITE )) )
+#endif
 {
 }
 
@@ -321,7 +462,9 @@ WndImpl::~WndImpl()
 	// 正しい on_destroy が呼ばれる保証は全くない。あくまで
 	// 緊急脱出用(^^; と考えること。
 	Destroy();
+#ifndef NO_ASMTHUNK
 	::VirtualFree( thunk_, 0, MEM_RELEASE );
+#endif
 }
 
 void WndImpl::Destroy()
@@ -330,14 +473,24 @@ void WndImpl::Destroy()
 		::DestroyWindow( hwnd() );
 }
 
+#if !defined(TARGET_VER) || TARGET_VER>350
+ATOM WndImpl::Register( WNDCLASSEX* cls )
+#else
 ATOM WndImpl::Register( WNDCLASS* cls )
+#endif
 {
 	// WndImpl派生クラスで使うWndClassを登録。
 	// プロシージャはkilib謹製のものに書き換えちゃいます。
-//	cls->cbSize      = sizeof(WNDCLASSEX);
+#if !defined(TARGET_VER) || TARGET_VER>350
+	cls->cbSize      = sizeof(WNDCLASSEX);
+#endif
 	cls->hInstance   = app().hinst();
 	cls->lpfnWndProc = StartProc;
+#if !defined(TARGET_VER) || TARGET_VER>350
+	return ::RegisterClassEx( cls );
+#else
 	return ::RegisterClass( cls );
+#endif
 }
 
 struct ThisAndParam
@@ -380,6 +533,10 @@ LRESULT CALLBACK WndImpl::StartProc(
 	WndImpl*   pThis   = pz->pThis;
 	cs->lpCreateParams = pz->pParam;
 
+#ifdef NO_ASMTHUNK
+	::SetWindowLongPtr(wnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pThis));
+#endif
+
 	// サンク
 	pThis->SetUpThunk( wnd );
 
@@ -388,10 +545,24 @@ LRESULT CALLBACK WndImpl::StartProc(
 	return 0;
 }
 
+#ifdef NO_ASMTHUNK
+// To avoid ASM thunking we can use GWLP_USERDATA in the window structure
+LRESULT CALLBACK WndImpl::TrunkMainProc( HWND wnd, UINT msg, WPARAM wp, LPARAM lp )
+{
+	WndImpl*   pThis  = reinterpret_cast<WndImpl*>(::GetWindowLongPtr(wnd, GWLP_USERDATA));
+	if(pThis) {
+		return WndImpl::MainProc(pThis, msg, wp, lp);
+	} else {
+		return DefWindowProc(wnd, msg, wp, lp);
+	}
+}
+#endif // NO_ASMTHUNK
+
 void WndImpl::SetUpThunk( HWND wnd )
 {
 	SetHwnd( wnd );
 
+#ifndef NO_ASMTHUNK
 	// ここで動的にx86の命令列
 	//   | mov dword ptr [esp+4] this
 	//   | jmp MainProc
@@ -407,22 +578,29 @@ void WndImpl::SetUpThunk( HWND wnd )
 	//
 	// 参考資料：ATLのソース
 
-#ifdef _M_AMD64
+	// replacing 1st param with `this` and call `MainProc`
+
+#if defined(_M_AMD64) || defined(_M_X64)
 	*reinterpret_cast<dbyte*>   (thunk_+ 0) = 0xb948;
 	*reinterpret_cast<WndImpl**>(thunk_+ 2) = this;
 	*reinterpret_cast<dbyte*>   (thunk_+10) = 0xb848;
 	*reinterpret_cast<void**>   (thunk_+12) = MainProc;
 	*reinterpret_cast<dbyte*>   (thunk_+20) = 0xe0ff;
-#else
+#elif defined(_M_IX86)
 	*reinterpret_cast<qbyte*>   (thunk_+0) = 0x042444C7;
 	*reinterpret_cast<WndImpl**>(thunk_+4) = this;
 	*reinterpret_cast< byte*>   (thunk_+8) = 0xE9;
 	*reinterpret_cast<qbyte*>   (thunk_+9) =
 		reinterpret_cast<byte*>((void*)MainProc)-(thunk_+13);
+#else
+	#error Unsupported processor type, please implement assembly code or consider defining NO_ASMTHUNK
 #endif
 
 	::FlushInstructionCache( ::GetCurrentProcess(), thunk_, THUNK_SIZE );
 	::SetWindowLongPtr( wnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&thunk_[0]) );
+#else // !NO_ASMTHUNK
+	::SetWindowLongPtr( wnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(TrunkMainProc) );
+#endif
 }
 
 LRESULT CALLBACK WndImpl::MainProc(

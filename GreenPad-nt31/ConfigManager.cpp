@@ -444,6 +444,7 @@ void ConfigManager::LoadLayout( ConfigManager::DocType* dt )
 		dt->wrapType  = ref->wrapType;
 		dt->showLN    = ref->showLN;
 		dt->fontCS    = ref->fontCS;
+		dt->fontQual  = ref->fontQual;
 	}
 	else
 	{
@@ -461,6 +462,7 @@ void ConfigManager::LoadLayout( ConfigManager::DocType* dt )
 		dt->wrapType   = -1;
 		dt->showLN     = false;
 		dt->fontCS     = DEFAULT_CHARSET;
+		dt->fontQual   = DEFAULT_QUALITY;
 		dt->vc.SetFont( TEXT("FixedSys"), 14, dt->fontCS );
 	}
 
@@ -532,13 +534,16 @@ void ConfigManager::LoadLayout( ConfigManager::DocType* dt )
 			case 0x006C006E: // ln: LINE-NO
 				dt->showLN = (0!=GetInt(ptr));
 				break;
+			case 0x00660071: // fq: Font Quality
+				dt->fontQual = GetInt(ptr);
+				break;
 			}
 		}
 
 		if( !clfound )
 			dt->vc.color[LN] = dt->vc.color[TXT];
 		if( fontname.len()!=0 && fontsize!=0 )
-			dt->vc.SetFont( fontname.c_str(), fontsize, dt->fontCS );
+			dt->vc.SetFont( fontname.c_str(), fontsize, dt->fontCS, dt->fontQual );
 	}
 }
 
@@ -661,7 +666,11 @@ void ConfigManager::LoadIni()
 	grepExe_   = ini_.GetStr( TEXT("GrepExe"), TEXT("") );
 	openSame_  = ini_.GetBool( TEXT("OpenSame"), false );
 	countbyunicode_ = ini_.GetBool( TEXT("CountUni"), false );
-	showStatusBar_ = ini_.GetBool( TEXT("StatusBar"), true );
+	if (app().isCommCtrlAvailable()) {
+		showStatusBar_ = ini_.GetBool( TEXT("StatusBar"), true );
+	} else {
+		showStatusBar_ = false;
+	}
 
 	dateFormat_   = ini_.GetStr( TEXT("DateFormat"), TEXT("HH:mm yyyy/MM/dd") );
 
@@ -782,8 +791,6 @@ namespace {
 
 void ConfigManager::AddMRU( const ki::Path& fname )
 {
-	Mutex mx(s_mrulock);
-
 	// メモリ内のMRUリストを更新
 	{
 		int i;
@@ -796,34 +803,38 @@ void ConfigManager::AddMRU( const ki::Path& fname )
 	}
 
 	// iniへ保存
-	{
-		ini_.SetSectionAsUserName();
-		const String key = TEXT("MRU");
-		for( int i=0; i<countof(mru_); ++i )
-			ini_.PutPath(
-				(key+String().SetInt(i+1)).c_str(), mru_[i] );
+	{ // Restrict Mutex context
+		Mutex mx(s_mrulock);
+		if( mx.isLocked() ) {
+			ini_.SetSectionAsUserName();
+			const String key = TEXT("MRU");
+			for( int i=0; i<mrus_; ++i ) //countof(mru_)
+				ini_.PutPath(
+					(key+String().SetInt(i+1)).c_str(), mru_[i] );
+		}
 	}
 }
 
 void ConfigManager::SetUpMRUMenu( HMENU m, UINT id )
 {
-	Mutex mx(s_mrulock);
-
 	// iniから読み込み
-	{
-		ini_.SetSectionAsUserName();
-		const String key = TEXT("MRU");
-		for( int i=0; i<countof(mru_); ++i )
-			mru_[i] = ini_.GetPath(
-				(key+String().SetInt(i+1)).c_str(), Path() );
+	{ // Restrict Mutex context
+		Mutex mx(s_mrulock);
+		if( mx.isLocked() ) {
+			ini_.SetSectionAsUserName();
+			const String key = TEXT("MRU");
+			for( int i=0; i<mrus_; ++i )
+				mru_[i] = ini_.GetPath(
+					(key+String().SetInt(i+1)).c_str(), Path() );
+		}
 	}
 
 	// 全項目を削除
 	while( ::DeleteMenu( m, 0, MF_BYPOSITION ) );
 
 	// メニュー構築
-#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-	if(App::isNewShell())
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	if(app().isWin3later())
 	{
 		MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
 		mi.fMask = MIIM_ID | MIIM_TYPE;
@@ -908,8 +919,8 @@ void ConfigManager::SetDocTypeMenu( HMENU m, UINT idstart )
 	// 全項目を削除
 	while( ::DeleteMenu( m, 0, MF_BYPOSITION ) );
 
-#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-	if(App::isNewShell())
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	if(app().isWin3later())
 	{
 		// 順に追加
 		MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
@@ -939,8 +950,8 @@ void ConfigManager::SetDocTypeMenu( HMENU m, UINT idstart )
 
 void ConfigManager::SetDocTypeByMenu( int pos, HMENU m )
 {
-#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-	if(App::isNewShell())
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	if(app().isWin3later())
 	{
 		MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
 		mi.fMask  = MIIM_STATE;
@@ -980,8 +991,8 @@ void ConfigManager::SetDocTypeByMenu( int pos, HMENU m )
 
 void ConfigManager::CheckMenu( HMENU m, int pos )
 {
-#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-	if(App::isNewShell())
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	if(app().isWin3later())
 	{
 		MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
 		mi.fMask  = MIIM_STATE;

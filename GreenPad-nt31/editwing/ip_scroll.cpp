@@ -18,7 +18,93 @@ using namespace editwing::view;
 //---- ip_cursor.cpp カーソルコントロール
 //=========================================================================
 
+#ifdef WIN32S
+// Win32s scroll range is mimited to 32767
+#define MAX_SCROLL 32500
+#define MAX_MULT (32768-MAX_SCROLL)
+#else
+// Windows NT: scrollrange is limited to 65535
+#define MAX_SCROLL 65400
+#define MAX_MULT (65536-MAX_SCROLL)
+#endif
 
+typedef int (WINAPI *SSCRINF)(HWND, int, LPSCROLLINFO, BOOL);
+static int MySetScrollInfo_fallback(HWND hwnd, int nBar, LPSCROLLINFO lpsi, BOOL redraw)
+{
+	// Smart Fallback...
+	// We must use SetScrollRange but it is mimited to 65535.
+	// So we can avoid oveflow by dividing range and position values
+	// In GreenPad we can assume that only nMax can go beyond range.
+	int MULT=1;
+	int nMax = lpsi->nMax;
+	// If we go beyond 65400 then we use a divider
+	if (nMax > MAX_SCROLL)
+	{   // 65501 - 65535 = 35 values MULT from 2-136
+		// Like this the new range is around 8912896 instead of 65535
+		MULT = Min( (nMax / MAX_SCROLL) + 1,  MAX_MULT );
+		// We store the divider in the last 135 values
+		// of the max scroll range.
+		nMax = MAX_SCROLL + MULT - 1 ; // 65401 => MULT = 2
+	}
+
+	if (lpsi->fMask|SIF_RANGE)
+		::SetScrollRange( hwnd, nBar, lpsi->nMin, nMax, FALSE );
+
+	return ::SetScrollPos( hwnd, nBar, lpsi->nPos/MULT, redraw );
+}
+static int MySetScrollInfo(HWND hwnd, int nBar, LPSCROLLINFO lpsi, BOOL redraw)
+{
+	static SSCRINF pSSCRINF_ = NULL;
+	static int iSSIConditionPassed = -1;
+	if( iSSIConditionPassed == -1 ) {
+		pSSCRINF_ = (SSCRINF)GetProcAddress(GetModuleHandleA("USER32.DLL"), "SetScrollInfo");
+
+		// Should be supported since Windows NT 3.51...
+		if( pSSCRINF_ && ((!app().isNT() && app().getOSBuild()>=275) || (app().isNT() && app().isBuildGreater(MKVBN(3,51,944)))) ) {
+			iSSIConditionPassed = 1;
+		} else {
+			iSSIConditionPassed = 0;
+		}
+	}
+
+	return iSSIConditionPassed ? pSSCRINF_( hwnd, nBar, lpsi, redraw ) : MySetScrollInfo_fallback( hwnd, nBar, lpsi, redraw );
+}
+
+typedef int (WINAPI *GSCRINF)(HWND, int, LPSCROLLINFO);
+static int MyGetScrollInfo_fallback(HWND hwnd, int nBar, LPSCROLLINFO lpsi)
+{
+	// Smart Fallback...
+	if( lpsi->fMask|SIF_RANGE )
+		::GetScrollRange( hwnd, nBar, &lpsi->nMin, &lpsi->nMax);
+
+	lpsi->nPos = ::GetScrollPos( hwnd, nBar );
+	// Scroll range indicates a multiplier was used...
+	if( lpsi->nMax > MAX_SCROLL )
+	{ // Apply multipler
+		int MULT = lpsi->nMax - MAX_SCROLL + 1; // 65401 => MULT = 2
+		lpsi->nMax      *= MULT;
+		lpsi->nPos      *= MULT;
+		lpsi->nTrackPos *= MULT; // This has to be set by the user.
+	}
+	return 1; // sucess!
+}
+static int MyGetScrollInfo(HWND hwnd, int nBar, LPSCROLLINFO lpsi)
+{
+	static GSCRINF pGSCRINF_ = NULL;
+	static int iGSIConditionPassed = -1;
+	if( iGSIConditionPassed == -1 ) {
+		pGSCRINF_ = (GSCRINF)GetProcAddress(GetModuleHandleA("USER32.DLL"), "GetScrollInfo");
+
+		// Should be supported since Windows NT 3.51...
+		if( pGSCRINF_ && ((!app().isNT() && app().getOSBuild()>=275) || (app().isNT() && app().isBuildGreater(MKVBN(3,51,944)))) ) {
+			iGSIConditionPassed = 1;
+		} else {
+			iGSIConditionPassed = 0;
+		}
+	}
+
+	return iGSIConditionPassed ? pGSCRINF_( hwnd, nBar, lpsi ) : MyGetScrollInfo_fallback( hwnd, nBar, lpsi );
+}
 
 //-------------------------------------------------------------------------
 // 描画領域サイズ管理
@@ -66,7 +152,7 @@ void Canvas::CalcWrapWidth()
 		wrapWidth_ = 0xffffffff;
 		break;
 	case RIGHTEDGE:
-		wrapWidth_ = txtZone_.right - txtZone_.left - 3;
+		wrapWidth_ = txtZone_.right - txtZone_.left - font_->W()/2 - 1;
 		break; //Caretの分-3補正
 	default:
 		wrapWidth_ = wrapType_ * font_->W();
@@ -159,13 +245,24 @@ bool ViewImpl::ReSetScrollInfo()
 //	rlScr_.nMax  = Max( textCx_, cx );
 //	rlScr_.nPos  = Min<int>( rlScr_.nPos, rlScr_.nMax-rlScr_.nPage+1 );
 	rlScr_.nPage = cx + 1;
-	rlScr_.nMax  = Max( textCx_+3, cx );
-	rlScr_.nPos  = Min<int>( rlScr_.nPos, rlScr_.nMax-rlScr_.nPage+1 );
+	rlScr_.nMax  = Max( textCx_+cvs_.getPainter().W()/2+1, cx );
+	rlScr_.nPos  = Min( rlScr_.nPos, (int)(rlScr_.nMax-rlScr_.nPage+1) );
 
 	// 縦はnPageとnMaxはとりあえず補正
 	// nPosは場合によって直し方が異なるので別ルーチンにて
 	udScr_.nPage = cy / cvs_.getPainter().H() + 1;
-	udScr_.nMax  = vln() + udScr_.nPage - 2;
+	//udScr_.nMax  = vln() + udScr_.nPage - 2; // Old code (not so nice)
+
+	// WIP: Adjust so that scroll bar appears only when we are shy oneline from the page.
+	// PB: Drawing problem when adding/removing line and scroll bar did not kick in.
+	// We need to do a proper InvalidateRect in the TextUpdate_ScrollBar()?
+	// udScr_.nMax  = vln() + udScr_.nPage - Max( 2, Min<int>( udScr_.nPage-1, vln()+1 ) );
+
+	// Limit more scrolling when there is more tha a single page
+	if( vln()*cvs_.getPainter().H() < cy )
+		udScr_.nMax  = vln() + udScr_.nPage - 2;
+	else
+		udScr_.nMax  = vln() + udScr_.nPage - Max( 2, (int)Min( udScr_.nPage-1, (uint)(vln()+1) ) );
 
 	// 横スクロールが起きたらtrue
 	return (prevRlPos != rlScr_.nPos);
@@ -191,10 +288,8 @@ ulong ViewImpl::tl2vl( ulong tl ) const
 
 void ViewImpl::UpdateScrollBar()
 {
-	::SetScrollRange( hwnd_, SB_HORZ, rlScr_.nMin, rlScr_.nMax, FALSE );
-	::SetScrollPos( hwnd_, SB_HORZ, rlScr_.nPos, TRUE );
-	::SetScrollRange( hwnd_, SB_VERT, udScr_.nMin, udScr_.nMax, FALSE );
-	::SetScrollPos( hwnd_, SB_VERT, udScr_.nPos, TRUE );
+	MySetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
+	MySetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
 }
 
 ReDrawType ViewImpl::TextUpdate_ScrollBar
@@ -349,15 +444,14 @@ void ViewImpl::ScrollView( int dx, int dy, bool update )
 			dx = rlScr_.nMax-rlScr_.nPage-rlScr_.nPos+1;
 
 		rlScr_.nPos += dx;
-		::SetScrollPos( hwnd_, SB_HORZ, rlScr_.nPos, TRUE );
+		MySetScrollInfo( hwnd_, SB_HORZ, &rlScr_, TRUE );
 		dx = -dx;
 	}
 	if( dy != 0 )
 	{
 		// 範囲チェック…は前処理で終わってる。
-
 		udScr_.nPos += dy;
-		::SetScrollPos( hwnd_, SB_VERT, udScr_.nPos, TRUE );
+		MySetScrollInfo( hwnd_, SB_VERT, &udScr_, TRUE );
 		dy *= -H;
 	}
 	if( dx!=0 || dy!=0 )
@@ -372,9 +466,15 @@ void ViewImpl::ScrollView( int dx, int dy, bool update )
 		}
 		else
 		{
+			#ifdef WIN32S
+			// On Win32s 1.1 ScrollWindowEx does not work!
+			// In our case ScrollWindow() is perfectly fine.
+			::ScrollWindow( hwnd_, dx, dy, NULL, clip);
+			#else
 			// 再描画の不要な領域をスクロール
 			::ScrollWindowEx( hwnd_, dx, dy, NULL, 
 					clip, NULL, NULL, SW_INVALIDATE );
+			#endif
 
 			// 即時再描画？
 			if( update )
@@ -414,13 +514,14 @@ void ViewImpl::on_hscroll( int code, int pos )
 	case SB_LINERIGHT: dx= +cvs_.getPainter().W(); break;
 	case SB_PAGELEFT:  dx= -(cx()>>1); break;
 	case SB_PAGERIGHT: dx= +(cx()>>1); break;
-	case SB_THUMBTRACK: dx = pos - rlScr_.nPos; break;
-		/*{
+	case SB_THUMBTRACK:
+		{
 			SCROLLINFO si = { sizeof(SCROLLINFO), SIF_TRACKPOS };
-			::GetScrollInfo( hwnd_, SB_HORZ, &si );
+			si.nTrackPos = pos;
+			MyGetScrollInfo( hwnd_, SB_HORZ, &si );
 			dx = si.nTrackPos - rlScr_.nPos;
 			break;
-		}*/
+		}
 	case SB_LEFT:    dx = -rlScr_.nPos; break;
 	case SB_RIGHT:   dx = rlScr_.nMax+1-(signed)rlScr_.nPage-rlScr_.nPos; break;
 	}
@@ -440,13 +541,14 @@ void ViewImpl::on_vscroll( int code, int pos )
 	case SB_LINEDOWN: dy= +1; break;
 	case SB_PAGEUP:   dy= -(cy() / cvs_.getPainter().H()); break;
 	case SB_PAGEDOWN: dy= +(cy() / cvs_.getPainter().H()); break;
-	case SB_THUMBTRACK: dy = pos - udScr_.nPos; break;
-		/*{
+	case SB_THUMBTRACK:
+		{
 			SCROLLINFO si = { sizeof(SCROLLINFO), SIF_TRACKPOS };
-			::GetScrollInfo( hwnd_, SB_VERT, &si );
+			si.nTrackPos = pos;
+			MyGetScrollInfo( hwnd_, SB_VERT, &si );
 			dy = si.nTrackPos - udScr_.nPos;
 			break;
-		}*/
+		}
 	case SB_TOP:      dy = -udScr_.nPos; break;
 	case SB_BOTTOM:   dy = udScr_.nMax+1-(signed)udScr_.nPage-udScr_.nPos; break;
 	}
@@ -455,10 +557,46 @@ void ViewImpl::on_vscroll( int code, int pos )
 	UpDown( dy, code==SB_THUMBTRACK );
 }
 
+int ViewImpl::getNumScrollLines( void )
+{
+	uint scrolllines = 3; // Number of lines to scroll (default 3).
+	if( app().getOSVer() >= MKVER(4,0) )
+	{   // Read the system value for the wheel scroll lines.
+		UINT numlines;
+		if( ::SystemParametersInfo( SPI_GETWHEELSCROLLLINES, 0, &numlines, 0 ) )
+			scrolllines = numlines; // Sucess!
+	}
+	// If the number of lines is larger than a single page then we only scroll a page.
+	// This automatically takes into account the page scroll mode where
+	// SPI_GETWHEELSCROLLLINES value if 0xFFFFFFFF.
+	uint nlpage;
+	nlpage = Max( (uint)cy() / (uint)NZero(cvs_.getPainter().H()), 1U );
+	// scrolllines can be zero, in this case no scroll should occur.
+	return (int)Min( scrolllines, nlpage );
+}
+
 void ViewImpl::on_wheel( short delta )
 {
 	// スクロール
-	UpDown( -delta / WHEEL_DELTA * 3, false );
+	int nl = getNumScrollLines();
+	int step = (-(int)delta * nl) / WHEEL_DELTA;
+
+	if( step == 0 )
+	{ // step is too small, we need to accumulate delta
+		accdelta_ += delta;
+		// Recalculate the step.
+		step = (-(int)accdelta_ * nl) / WHEEL_DELTA;
+		if( step )
+		{
+			UpDown( step, false );
+			// set accumulator to the remainder.
+			accdelta_ -= (-step * WHEEL_DELTA) / nl;
+		}
+	}
+	else
+	{
+		UpDown( step, false );
+	}
 }
 
 void ViewImpl::UpDown( int dy, bool thumb )

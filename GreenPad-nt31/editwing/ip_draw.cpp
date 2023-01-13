@@ -37,7 +37,11 @@ View::View( doc::Document& d, HWND wnd )
 	{
 		// èââÒç\ízéûÇÃÇ›ÅAÉNÉâÉXìoò^ÇçsÇ§
 		ClassRegistered = true;
+#if !defined(TARGET_VER) || TARGET_VER>350
+		WNDCLASSEX wc    = {0};
+#else
 		WNDCLASS wc    = {0};
+#endif
 		wc.lpszClassName = className_;
 		wc.style         = CS_DBLCLKS | CS_OWNDC;
 		wc.hCursor       = app().LoadOemCursor( IDC_IBEAM );
@@ -233,7 +237,7 @@ Painter::Painter( HDC hdc, const VConfig& vc )
 #else
 	::GetCharWidthW( dc_, L' ', L'~', widthTable_+L' ' );
 #endif
-	widthTable_[L'\t'] = W() * Max(1,vc.tabstep);
+	widthTable_[L'\t'] = NZero(W() * Max(1,vc.tabstep));
 	// â∫à ÉTÉçÉQÅ[ÉgÇÕï∂éöïùÉ[Éç
 	mem00( widthTable_+0xDC00, (0xE000 - 0xDC00)*sizeof(int) );
 
@@ -268,14 +272,15 @@ inline void Painter::CharOut( unicode ch, int x, int y )
 {
 #ifdef WIN32S
 	DWORD dwNum;
-	char *psText;
-	if(dwNum = WideCharToMultiByte(CP_ACP,NULL,&ch,-1,NULL,0,NULL,FALSE))
+	char psText[16]; // Buffer for a SINGLE multibyte character
+	if(!(dwNum = WideCharToMultiByte(CP_ACP,0, &ch,1, psText,countof(psText), NULL,NULL)))
 	{
-		psText = new char[dwNum];
-		WideCharToMultiByte(CP_ACP,NULL,&ch,-1,psText,dwNum,NULL,FALSE);
-		::TextOutA( dc_, x, y, psText, dwNum-1 );
-		delete []psText;
+		// Last fallback: truncate each widechar to a byte.
+		// Needed for Win32s beta 61.
+		dwNum = 1;
+		psText[0] = (char)ch;
 	}
+		::TextOutA( dc_, x, y, psText, dwNum );
 #else
 	::TextOutW( dc_, x, y, &ch, 1 );
 #endif
@@ -284,18 +289,63 @@ inline void Painter::CharOut( unicode ch, int x, int y )
 inline void Painter::StringOut
 	( const unicode* str, int len, int x, int y )
 {
+	BOOL ret;
+	DWORD dwTimes;
 #ifdef WIN32S
 	DWORD dwNum;
-	char *psText;
-	if(dwNum = WideCharToMultiByte(CP_ACP,NULL,str,-1,NULL,0,NULL,FALSE))
+	char psTXT1K[1024];
+	char *psText = psTXT1K;
+	if(!len) return;
+	// 1st try to convert to ANSI with a small stack buffer...
+	dwNum = WideCharToMultiByte(CP_ACP,0, str,len, psText,countof(psTXT1K), NULL,NULL);
+	if( !dwNum )
 	{
-		psText = new char[dwNum];
-		WideCharToMultiByte(CP_ACP,NULL,str,-1,psText,dwNum,NULL,FALSE);
-		::TextOutA( dc_, x, y, psText, dwNum-1 );
-		delete []psText;
+		if (::GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+		{	// If the small buffer failed, then properly allocate buffer.
+			// This happens verty rarely because token length is typically
+			// a single word, hence less than 128chars.
+			dwNum = ::WideCharToMultiByte(CP_ACP,0, str,len, NULL,0, NULL,NULL);
+			if (dwNum)
+			{
+				psText = new char[dwNum]; if( !psText ) return;
+				dwNum = ::WideCharToMultiByte(CP_ACP,0 ,str,len ,psText,dwNum ,NULL,NULL);
+			}
+		}
+
+		// still not converting
+		if( !dwNum )
+		{
+			// Last fallback: truncate each widechar to a byte.
+			// Needed for Win32s beta 61.
+			dwNum = Min( len, (int)countof(psTXT1K) );
+			for( DWORD i=0; i<dwNum; i++)
+				psText[i] = (char)str[i];
+		}
 	}
+	dwTimes=0; do {
+		ret = ::TextOutA( dc_, x, y, psText, dwNum );
+		++dwTimes;
+	} while(
+# ifdef USE_ORIGINAL_MEMMAN
+		!ret && dwTimes < 2
+# else
+		false
+# endif
+		);
+
+	if (psText != psTXT1K)
+		delete []psText;
 #else
-	::TextOutW( dc_, x, y, str, len );
+	dwTimes=0; do {
+		ret = ::TextOutW( dc_, x, y, str, len );
+		++dwTimes;
+	} while(
+# ifdef USE_ORIGINAL_MEMMAN
+		!ret && dwTimes < 2
+# else
+		false
+# endif
+		);
 #endif
 }
 
@@ -533,7 +583,7 @@ void ViewImpl::DrawTXT( const VDrawInfo v, Painter& p )
 		// íËêîÇQ
 		const unicode* str = doc_.tl(tl);
 		const uchar*   flg = doc_.pl(tl);
-		const int rYMAX = Min<int>( v.YMAX, a.top+rln(tl)*H );
+		const int rYMAX = Min( v.YMAX, (int)(a.top+rln(tl)*H) );
 
 		// çÏã∆ópïœêîÇQ
 		ulong stt=0, end, t, n;

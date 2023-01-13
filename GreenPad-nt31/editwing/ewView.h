@@ -155,6 +155,10 @@ public:
 	void SetInsMode( bool bIns );
 	void SetROMode( bool bRO );
 
+	// IME
+	void Reconv();
+	void ToggleIME();
+
 public:
 
 	bool isInsMode() const;

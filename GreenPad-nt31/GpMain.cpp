@@ -63,7 +63,7 @@ int GpStBar::AutoResize( bool maximized )
 	HDC dc = ::GetDC( hwnd() );
 	SIZE s;
 
-	//if(App::isWin32s() || (App::isNewShell() && !App::getOSBuild())) {
+	//if(app().isWin32s() || (app().isWin3later() && !app().getOSBuild())) { // old win95 betas may not have GVEx and leaving build number unsetted
 		if( ::GetTextExtentPoint( dc, TEXT("BBBBM"), 5, &s ) ) // Line Ending
 			w[1] = w[2] - s.cx;
 		if( ::GetTextExtentPoint( dc, TEXT("BBBWWWW"), 7, &s ) ) // Charset
@@ -181,6 +181,9 @@ bool GreenPadWnd::on_command( UINT id, HWND ctrl )
 	case ID_CMD_REOPENFILE: on_reopenfile();break;
 	case ID_CMD_SAVEFILE:   on_savefile();  break;
 	case ID_CMD_SAVEFILEAS: on_savefileas();break;
+	case ID_CMD_PRINT:      on_print();     break;
+	case ID_CMD_SAVEEXIT:   if(Save_showDlgIfNeeded()) on_exit();  break;
+	case ID_CMD_DISCARDEXIT: Destroy();     break;
 	case ID_CMD_EXIT:       on_exit();      break;
 
 	// Edit
@@ -194,6 +197,8 @@ bool GreenPadWnd::on_command( UINT id, HWND ctrl )
 	case ID_CMD_SELECTALL:  edit_.getCursor().Home(true,false);
 	                        edit_.getCursor().End(true,true);   break;
 	case ID_CMD_DATETIME:   on_datetime();                      break;
+	case ID_CMD_RECONV:     on_reconv();                        break;
+	case ID_CMD_TOGGLEIME:  on_toggleime();                     break;
 
 	// Search
 	case ID_CMD_FIND:       search_.ShowDlg();  break;
@@ -282,6 +287,153 @@ void GreenPadWnd::on_savefileas()
 	}
 }
 
+void GreenPadWnd::on_print()
+{
+	TCHAR tmp[128];
+
+	doc::Document& d = edit_.getDoc();
+	const unicode* buf;
+	ulong dpStart = 0, len = 0;
+	short procCopies = 0, totalCopies = 0;
+
+	PRINTDLG thePrintDlg = { sizeof(thePrintDlg) };
+	thePrintDlg.Flags = PD_RETURNDC | PD_NOPAGENUMS | PD_NOSELECTION | PD_HIDEPRINTTOFILE;
+	thePrintDlg.nCopies = 1;
+
+	if (PrintDlg(&thePrintDlg) == 0) {
+		// cancelled
+		return;
+	}
+
+	totalCopies = thePrintDlg.nCopies;
+
+	// タイトルに表示される文字列の調整
+	// FileName * - GreenPad
+	String name;
+	name += isUntitled() ? TEXT("untitled") : filename_.name();
+	if( edit_.getDoc().isModified() ) name += TEXT(" *");
+	name += TEXT(" - ");
+	name += String(IDS_APPNAME).c_str();
+
+	// Set DOCINFO structure
+	DOCINFO di = { sizeof(DOCINFO) };
+	di.lpszDocName = name.c_str();
+	di.lpszOutput = (LPTSTR) NULL;
+	di.lpszDatatype = (LPTSTR) NULL;
+	di.fwType = 0;
+	RECT rctmp = { 0, 0, 0, 0 };
+
+	int nError = ::StartDoc(thePrintDlg.hDC, &di);
+	if (nError == SP_ERROR)
+	{
+		::wsprintf(tmp,TEXT("StartDoc Error #%d - please check printer."),::GetLastError());
+		::MessageBoxEx( NULL, tmp, String(IDS_APPNAME).c_str(), MB_OK|MB_TASKMODAL, 0 );
+		return;
+		// Handle the error intelligently
+	}
+	::StartPage(thePrintDlg.hDC);
+
+	// Get Printer Caps
+	int cWidthPels, cHeightPels, cLineHeight;
+	cWidthPels = ::GetDeviceCaps(thePrintDlg.hDC, HORZRES);
+	cHeightPels = ::GetDeviceCaps(thePrintDlg.hDC, VERTRES);
+
+	// Get Line height
+	rctmp.right = cWidthPels;
+	rctmp.bottom = cHeightPels;
+	::DrawTextW(thePrintDlg.hDC, L"#", 1, &rctmp, DT_CALCRECT|DT_LEFT|DT_WORDBREAK|DT_EXPANDTABS|DT_EDITCONTROL);
+	cLineHeight = rctmp.bottom-rctmp.top;
+
+	RECT rcPrinter = { 5, 5, cWidthPels - 10, cHeightPels - 10 };
+
+	int nThisLineHeight, nChars = 0, nHi = 0, nLo = 0;
+	const unicode* uStart;
+
+	// Process with multiple copies
+	do {
+		if(procCopies) 
+		{
+			::StartPage(thePrintDlg.hDC);
+			rcPrinter.top = 5;
+			rcPrinter.left = 5;
+			rcPrinter.right = cWidthPels - 10;
+			rcPrinter.bottom = cHeightPels - 10;
+		}
+		// Print
+		for( ulong e=d.tln(), dpStart=0; dpStart<e; )
+		{
+			len = d.len(dpStart);
+			buf = d.tl(dpStart);
+			if(!len)
+			{	// Empty Line
+				rcPrinter.top += cLineHeight;
+				++dpStart;
+			}
+			else
+			{
+				rctmp = rcPrinter;
+				nHi = len; 
+				nLo = 0;
+				if(!nChars)
+				{
+					uStart = buf;
+					nChars = len;
+				}
+				else
+				{
+					uStart += nChars;
+					nHi = nChars = len-nChars;
+				}
+
+				while (nLo < nHi) { // Find maximum number of chars can be printed
+					rctmp.top = rcPrinter.top;
+					nThisLineHeight = ::DrawTextW(thePrintDlg.hDC, uStart, nChars, &rctmp, DT_CALCRECT|DT_WORDBREAK|DT_NOCLIP|DT_EXPANDTABS|DT_NOPREFIX|DT_EDITCONTROL);
+					if (rcPrinter.top+nThisLineHeight < rcPrinter.bottom)
+						nLo = nChars;
+					if (rcPrinter.top+nThisLineHeight > rcPrinter.bottom)
+						nHi = nChars;
+					if (nLo == nHi - 1)
+						nChars = nHi = nLo;
+					if (nLo < nHi)
+						nChars = nLo + (nHi - nLo)/2;
+				}
+				rcPrinter.top += ::DrawTextW(thePrintDlg.hDC, uStart, nChars, &rcPrinter, DT_WORDBREAK|DT_NOCLIP|DT_EXPANDTABS|DT_NOPREFIX|DT_EDITCONTROL);
+				if(uStart+nChars == buf+len) // Line end
+				{
+					nChars = 0;
+					++dpStart;
+				}
+			}
+
+			// turn to new page
+			if( (dpStart<e) && (rcPrinter.top + cLineHeight + 5 > rcPrinter.bottom) )
+			{
+				::EndPage(thePrintDlg.hDC);
+				::StartPage(thePrintDlg.hDC);
+				rcPrinter.top = 5;
+				rcPrinter.left = 5;
+				rcPrinter.right = cWidthPels - 10;
+				rcPrinter.bottom = cHeightPels - 10;
+			}
+		}
+
+		::EndPage(thePrintDlg.hDC);
+	} while(++procCopies < totalCopies);
+
+	// Close Printer
+	::EndDoc(thePrintDlg.hDC);
+	::DeleteDC(thePrintDlg.hDC);
+
+	/*
+	::GlobalUnlock(thePrintDlg.hDevNames);
+	::GlobalUnlock(thePrintDlg.hDevMode);
+
+	// 解放する。
+	::GlobalFree(thePrintDlg.hDevNames);
+	::GlobalFree(thePrintDlg.hDevMode);
+	*/
+}
+
 void GreenPadWnd::on_exit()
 {
 	search_.SaveToINI( cfg_.getImpl() );
@@ -291,8 +443,9 @@ void GreenPadWnd::on_exit()
 
 void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 {
-#if 0
-	if(app().isNewShell())
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	LOGGER("GreenPadWnd::ReloadConfig on_initmenu begin");
+	if(app().isWin3later())
 	{
 		MENUITEMINFO mi = { sizeof(MENUITEMINFO), MIIM_STATE };
 
@@ -305,6 +458,13 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 		mi.fState =
 			(edit_.getDoc().isUndoAble() ? MFS_ENABLED : MFS_DISABLED);
 		::SetMenuItemInfo( menu, ID_CMD_UNDO, FALSE, &mi );
+
+		mi.fState =
+			(edit_.getCursor().isSelected() && ime().IsIME() && ime().CanReconv() ? MFS_ENABLED : MFS_DISABLED);
+		::SetMenuItemInfo( menu, ID_CMD_RECONV, FALSE, &mi );
+		mi.fState =
+			(ime().IsIME() ? MFS_ENABLED : MFS_DISABLED);
+		::SetMenuItemInfo( menu, ID_CMD_TOGGLEIME, FALSE, &mi );
 
 		mi.fState =
 			(edit_.getDoc().isRedoAble() ? MFS_ENABLED : MFS_DISABLED);
@@ -341,6 +501,8 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 		::EnableMenuItem( menu, ID_CMD_DELETE, MF_BYCOMMAND|(edit_.getCursor().isSelected() ? MF_ENABLED : MF_GRAYED) );
 		::EnableMenuItem( menu, ID_CMD_UNDO, MF_BYCOMMAND|(edit_.getDoc().isUndoAble() ? MF_ENABLED : MF_GRAYED) );
 		::EnableMenuItem( menu, ID_CMD_REDO, MF_BYCOMMAND|(edit_.getDoc().isRedoAble() ? MF_ENABLED : MF_GRAYED) );
+		::EnableMenuItem( menu, ID_CMD_RECONV, MF_BYCOMMAND|(edit_.getCursor().isSelected() && ime().IsIME() && ime().CanReconv() ? MF_ENABLED : MF_GRAYED) );
+		::EnableMenuItem( menu, ID_CMD_TOGGLEIME, MF_BYCOMMAND|(ime().IsIME() ? MF_ENABLED : MF_GRAYED) );
 
 		if( editmenu_only )
 		{
@@ -357,8 +519,13 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 		::CheckMenuItem( menu, ID_CMD_WRAPWINDOW, MF_BYCOMMAND|(wrap_==0?MF_CHECKED:MF_UNCHECKED));
 	}
 
-	::CheckMenuItem( menu, ID_CMD_STATUSBAR,
-		cfg_.showStatusBar()?MF_CHECKED:MF_UNCHECKED );
+	if (app().isCommCtrlAvailable()) {
+		::CheckMenuItem( menu, ID_CMD_STATUSBAR,
+			cfg_.showStatusBar()?MF_CHECKED:MF_UNCHECKED );
+	} else {
+		::EnableMenuItem( menu, ID_CMD_STATUSBAR, MF_BYCOMMAND|MF_GRAYED );
+	}
+
 	LOGGER("GreenPadWnd::ReloadConfig on_initmenu end");
 }
 
@@ -434,14 +601,14 @@ void GreenPadWnd::on_grep()
 
 void GreenPadWnd::on_datetime()
 {
-#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310) || (defined(TARGET_VER) && TARGET_VER==310 && defined(UNICODE))
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310) || (defined(TARGET_VER) && TARGET_VER==310 && defined(UNICODE))
 	String g = cfg_.dateFormat();
 	TCHAR buf[255], tmp[255];
 	::GetTimeFormat
 		( LOCALE_USER_DEFAULT, 0, NULL, g.len()?const_cast<TCHAR*>(g.c_str()):TEXT("HH:mm yyyy/MM/dd"), buf, countof(buf));
 	::GetDateFormat
 		( LOCALE_USER_DEFAULT, 0, NULL, buf, tmp,countof(tmp));
-	edit_.getCursor().Input( tmp, ::lstrlen(tmp) );
+	if( tmp[0] ) edit_.getCursor().Input( tmp, ::lstrlen(tmp) );
 #endif
 }
 
@@ -473,7 +640,7 @@ static inline void MyShowWnd( HWND wnd )
 
 void GreenPadWnd::on_nextwnd()
 {
-#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	if( HWND next = ::FindWindowEx( NULL, hwnd(), className_, NULL ) )
 	{
 		HWND last=next, pos;
@@ -489,7 +656,7 @@ void GreenPadWnd::on_nextwnd()
 
 void GreenPadWnd::on_prevwnd()
 {
-#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	HWND pos=NULL, next=::FindWindowEx( NULL,NULL,className_,NULL );
 	if( next==hwnd() )
 	{
@@ -535,7 +702,7 @@ void GreenPadWnd::on_move( const DPos& c, const DPos& s )
 	{
 		// ShiftJIS風のByte数カウント
 		const unicode* cu = edit_.getDoc().tl(c.tl);
-		const ulong tab = cfg_.vConfig().tabstep;
+		const ulong tab = NZero(cfg_.vConfig().tabstep);
 		cad = 0;
 		for( ulong i=0; i<c.ad; ++i )
 			if( cu[i] == L'\t' )
@@ -572,7 +739,14 @@ void GreenPadWnd::on_move( const DPos& c, const DPos& s )
 	stb_.SetText( str.c_str() );
 }
 
-
+void GreenPadWnd::on_reconv()
+{
+	edit_.getCursor().Reconv();
+}
+void GreenPadWnd::on_toggleime()
+{
+	edit_.getCursor().ToggleIME();
+}
 
 //-------------------------------------------------------------------------
 // ユーティリティー
@@ -596,7 +770,7 @@ void GreenPadWnd::UpdateWindowName()
 {
 	// タイトルバーに表示される文字列の調整
 	// [FileName *] - GreenPad
-	TCHAR cpname[10];
+	static TCHAR cpname[10];
 
 	String name;
 	name += TEXT('[');
@@ -667,7 +841,7 @@ void GreenPadWnd::ReloadConfig( bool noSetDocType )
 	// キーワードファイル
 	Path kwd = cfg_.kwdFile();
 	FileR fp;
-	if( kwd.len()!=0 && fp.Open(kwd.c_str()) )
+	if( kwd.len()!=0 && kwd.isFile() && fp.Open(kwd.c_str()) )
 		edit_.getDoc().SetKeyword((const unicode*)fp.base(),fp.size()/2);
 	else
 		edit_.getDoc().SetKeyword(NULL,0);
@@ -726,7 +900,21 @@ bool GreenPadWnd::Open( const ki::Path& fn, int cs )
 		return true;
 	}
 }
-
+BOOL CALLBACK GreenPadWnd::PostMsgToFriendsProc(HWND hwnd, LPARAM lPmsg)
+{
+	TCHAR classn[256];
+	if(IsWindow(hwnd)) 
+	{
+		GetClassName(hwnd, classn, countof(classn));
+		if (!lstrcmp(classn, className_))
+			PostMessage(hwnd, (UINT)lPmsg, 0, 0);
+	}
+	return TRUE; // Next hwnd
+}
+bool GreenPadWnd::PostMsgToAllFriends(UINT msg)
+{
+	return !!EnumWindows(PostMsgToFriendsProc, (LPARAM)msg);
+}
 bool GreenPadWnd::OpenByMyself( const ki::Path& fn, int cs, bool needReConf )
 {
 	// ファイルを開けなかったらそこでおしまい。
@@ -778,11 +966,7 @@ bool GreenPadWnd::OpenByMyself( const ki::Path& fn, int cs, bool needReConf )
 
 	// [最近使ったファイル]へ追加
 	cfg_.AddMRU( filename_ );
-	HWND wnd = NULL;
-#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-	while( NULL!=(wnd=::FindWindowEx( NULL, wnd, className_, NULL )) )
-		SendMessage( wnd, GPM_MRUCHANGED, 0, 0 );
-#endif
+	PostMsgToAllFriends(GPM_MRUCHANGED);
 
 	return true;
 }
@@ -870,11 +1054,7 @@ bool GreenPadWnd::Save()
 		UpdateWindowName();
 		// [最近使ったファイル]更新
 		cfg_.AddMRU( filename_ );
-		HWND wnd = NULL;
-#if 0//!defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-		while( NULL!=(wnd=::FindWindowEx( NULL, wnd, className_, NULL )) )
-			SendMessage( wnd, GPM_MRUCHANGED, 0, 0 );
-#endif
+		PostMsgToAllFriends(GPM_MRUCHANGED);
 		return true;
 	}
 
@@ -900,7 +1080,11 @@ GreenPadWnd::GreenPadWnd()
 {
 	LOGGER( "GreenPadWnd::Construct begin" );
 
+#if !defined(TARGET_VER) || TARGET_VER>350
+	static WNDCLASSEX wc;
+#else
 	static WNDCLASS wc;
+#endif
 	wc.hIcon         = app().LoadIcon( IDR_MAIN );
 	wc.hCursor       = app().LoadOemCursor( IDC_ARROW );
 	wc.lpszMenuName  = MAKEINTRESOURCE( IDR_MAIN );
@@ -917,12 +1101,16 @@ void GreenPadWnd::on_create( CREATESTRUCT* cs )
 	LOGGER("GreenPadWnd::on_create begin");
 
 	accel_ = app().LoadAccel( IDR_MAIN );
-	stb_.Create( hwnd() );
 	edit_.Create( NULL, hwnd(), 0, 0, 100, 100 );
 	LOGGER("GreenPadWnd::on_create edit created");
 	edit_.getDoc().AddHandler( this );
 	edit_.getCursor().AddHandler( this );
+//#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+	stb_.SetParent( hwnd() );
 	stb_.SetStatusBarVisible( cfg_.showStatusBar() );
+/*#elif defined(TARGET_VER) && TARGET_VER==310
+	stb_.SetStatusBarVisible( false );
+#endif*/
 
 	LOGGER("GreenPadWnd::on_create halfway");
 
