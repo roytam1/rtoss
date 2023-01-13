@@ -834,7 +834,7 @@ void ConfigManager::SetUpMRUMenu( HMENU m, UINT id )
 
 	// ƒƒjƒ…[\’z
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-	if(App::isWin3later())
+	if(app().isWin3later())
 	{
 		MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
 		mi.fMask = MIIM_ID | MIIM_TYPE;
@@ -920,7 +920,7 @@ void ConfigManager::SetDocTypeMenu( HMENU m, UINT idstart )
 	while( ::DeleteMenu( m, 0, MF_BYPOSITION ) );
 
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-	if(App::isWin3later())
+	if(app().isWin3later())
 	{
 		// ‡‚É’Ç‰Á
 		MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
@@ -951,7 +951,7 @@ void ConfigManager::SetDocTypeMenu( HMENU m, UINT idstart )
 void ConfigManager::SetDocTypeByMenu( int pos, HMENU m )
 {
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-	if(App::isWin3later())
+	if(app().isWin3later())
 	{
 		MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
 		mi.fMask  = MIIM_STATE;
@@ -992,7 +992,7 @@ void ConfigManager::SetDocTypeByMenu( int pos, HMENU m )
 void ConfigManager::CheckMenu( HMENU m, int pos )
 {
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
-	if(App::isWin3later())
+	if(app().isWin3later())
 	{
 		MENUITEMINFO mi = { sizeof(MENUITEMINFO) };
 		mi.fMask  = MIIM_STATE;

@@ -60,7 +60,7 @@ static int MySetScrollInfo(HWND hwnd, int nBar, LPSCROLLINFO lpsi, BOOL redraw)
 		pSSCRINF_ = (SSCRINF)GetProcAddress(GetModuleHandleA("USER32.DLL"), "SetScrollInfo");
 
 		// Should be supported since Windows NT 3.51...
-		if( pSSCRINF_ && ((!App::isNT() && App::getOSBuild()>=275) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) ) {
+		if( pSSCRINF_ && ((!app().isNT() && app().getOSBuild()>=275) || (app().isNT() && app().isBuildGreater(MKVBN(3,51,944)))) ) {
 			iSSIConditionPassed = 1;
 		} else {
 			iSSIConditionPassed = 0;
@@ -96,7 +96,7 @@ static int MyGetScrollInfo(HWND hwnd, int nBar, LPSCROLLINFO lpsi)
 		pGSCRINF_ = (GSCRINF)GetProcAddress(GetModuleHandleA("USER32.DLL"), "GetScrollInfo");
 
 		// Should be supported since Windows NT 3.51...
-		if( pGSCRINF_ && ((!App::isNT() && App::getOSBuild()>=275) || (App::isNT() && App::getOSVer()>=351 && App::getOSBuild()>=944)) ) {
+		if( pGSCRINF_ && ((!app().isNT() && app().getOSBuild()>=275) || (app().isNT() && app().isBuildGreater(MKVBN(3,51,944)))) ) {
 			iGSIConditionPassed = 1;
 		} else {
 			iGSIConditionPassed = 0;
@@ -560,7 +560,7 @@ void ViewImpl::on_vscroll( int code, int pos )
 int ViewImpl::getNumScrollLines( void )
 {
 	uint scrolllines = 3; // Number of lines to scroll (default 3).
-	if( App::getOSVer() >= 400 )
+	if( app().getOSVer() >= MKVER(4,0) )
 	{   // Read the system value for the wheel scroll lines.
 		UINT numlines;
 		if( ::SystemParametersInfo( SPI_GETWHEELSCROLLLINES, 0, &numlines, 0 ) )

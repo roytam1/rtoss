@@ -63,7 +63,7 @@ int GpStBar::AutoResize( bool maximized )
 	HDC dc = ::GetDC( hwnd() );
 	SIZE s;
 
-	if(App::isWin32s() || (App::isWin3later() && !App::getOSBuild())) {
+	if(app().isWin32s() || (app().isWin3later() && !app().getOSBuild())) { // old win95 betas may not have GVEx and leaving build number unsetted
 		if( ::GetTextExtentPoint( dc, TEXT("BBBBM"), 5, &s ) ) // Line Ending
 			w[1] = w[2] - s.cx;
 		if( ::GetTextExtentPoint( dc, TEXT("BBBWWWW"), 7, &s ) ) // Charset
@@ -445,7 +445,7 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 {
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	LOGGER("GreenPadWnd::ReloadConfig on_initmenu begin");
-	if(App::isWin3later())
+	if(app().isWin3later())
 	{
 		MENUITEMINFO mi = { sizeof(MENUITEMINFO), MIIM_STATE };
 

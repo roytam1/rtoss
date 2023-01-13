@@ -46,7 +46,7 @@ bool StatusBar::Create(  )
 void StatusBar::SetText( const TCHAR* str, int part ) {
 //#if defined(TARGET_VER) && TARGET_VER==310
 #if defined(UNICODE)
-	if(App::getOSVer() == 310 || app().hasOldCommCtrl()) {
+	if(app().getOSVer() == MKVER(3,10) || app().hasOldCommCtrl()) {
 		// early builds of common controls status bar is ANSI only
 		char buf[256];
 		long len = ::WideCharToMultiByte(CP_ACP, 0, str, -1 , buf, countof(buf), NULL, NULL);

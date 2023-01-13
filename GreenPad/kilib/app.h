@@ -2,10 +2,57 @@
 #define _KILIB_APP_H_
 #include "types.h"
 #include "log.h"
+
+#pragma pack(push,1)
+typedef struct _MYVERINFO {
+	union {
+		DWORD dwVersionAndBuild;
+		struct {
+			WORD wBuild;
+			union {
+				WORD wVer;
+				struct {
+					BYTE cMinor;
+					BYTE cMajor;
+				} u;
+			} ver;
+		} vb;
+	} verbuild;
+	WORD wPlatform;
+	WORD wType;
+} MYVERINFO;
+
+typedef struct _MYVERINFO_PV {
+	WORD wBuild;
+	union {
+		DWORD dwPlatformAndVersion;
+		struct {
+			WORD wVer;
+			WORD wPlatform;
+		} pv;
+	} platver;
+	WORD wType;
+} MYVERINFO_PV;
+#pragma pack(pop)
+
+#define MVI_MAJOR	verbuild.vb.ver.u.cMajor
+#define MVI_MINOR	verbuild.vb.ver.u.cMinor
+#define MVI_VER		verbuild.vb.ver.wVer
+#define MVI_BUILD	verbuild.vb.wBuild
+#define MVI_VBN		verbuild.dwVersionAndBuild
+
+#define MPV_PV		platver.dwPlatformAndVersion
+
+// generate WORD of MMmm (for example Win7(NT 6.1) = 0601)
+#define MKVER(M, m) ( (WORD)( (BYTE)(M)<<8 | (BYTE)(m) ) )
+// generate DWORD of MMmmbbbb (for example Win7(NT 6.1.7601) = 06011db1)
+#define MKVBN(M, m, b) ( (DWORD)( (BYTE)(M)<<24 | (BYTE)(m)<<16 | (WORD)(b) ) )
+// generate DWORD of PPPPMMmm (for example Win7(NT 6.1.7601) = 00020601)
+#define MKPV(P, M, m) ( (DWORD)( (WORD)(P)<<16 | (BYTE)(M)<<8 | (BYTE)(m) ) )
+
 #ifndef __ccdoc__
 namespace ki {
 #endif
-
 
 
 //=========================================================================
@@ -92,14 +139,16 @@ public:
 	bool isNewShell();
 
 	//@{ Windows‚Ìƒo[ƒWƒ‡ƒ“ //@}
-	static const OSVERSIONINFOA& osver();
-	static int  getOSVer();
-	static int  getOSBuild();
-	static bool isWin95();
-	static bool isWin3later();
-	static bool isNT();
-	static bool isWin32s();
-	static bool isNewTypeWindows();
+	void init_osver();
+	WORD getOSVer();
+	WORD getOSBuild();
+	bool isBuildEqual(DWORD dwTarget);
+	bool isBuildGreater(DWORD dwTarget);
+	bool isWin95();
+	bool isWin3later();
+	bool isNT();
+	bool isWin32s();
+	bool isNewTypeWindows();
 
 	static const TCHAR* checkDLLExist(TCHAR* dllname);
 
@@ -119,6 +168,7 @@ private:
 	static App*     pUniqueInstance_;
 	HINSTANCE       hInstComCtl_;
 	bool            triedLoadingCommCtrl_;
+	MYVERINFO		mvi_;
 
 private:
 

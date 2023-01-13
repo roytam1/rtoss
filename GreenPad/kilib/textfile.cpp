@@ -788,15 +788,14 @@ namespace
 
         // limiting NT versions of 3.51 to RTM and 4.0 to >=RTM only
         if ( pCharNextExA &&
-             (!App::isNT() ||
-              (App::isNT() &&
+             (!app().isNT() ||
+              app().isNT() &&
                 (
-                 (App::getOSVer()==351 && App::getOSBuild()==1057) ||
-                 (App::getOSVer()>=400 && App::getOSBuild()>=1381)
+                 app().isBuildEqual(MKVBN(3,51,1057)) ||
+                 app().isBuildGreater(MKVBN(4,0,1381))
                 )
-              )
              )
-            )
+           )
             return pCharNextExA;
         else
             return SimpleCharNext;
@@ -946,7 +945,7 @@ struct rMBCS : public TextFileRPimpl
 #ifndef _UNICODE
 		len = conv( readcp, 0, fb, p-fb, buf, siz );
 #else
-		if(!App::isWin3later() || app().isWin95())
+		if(!app().isWin3later() || app().isWin95())
 		{
 			len = conv( readcp, 0, fb, p-fb, buf, siz );
 		}
@@ -1337,7 +1336,7 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong totalsiz )
 	}
 
 //-- chardet and MLang detection
-	if( App::isWin3later() )
+	if( app().isWin3later() )
 	{ // chardet works better when size > 64
 		if( siz > 80 )
 		{
