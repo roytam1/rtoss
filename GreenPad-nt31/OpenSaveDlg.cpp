@@ -248,6 +248,9 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	BOOL ret;
 	DWORD ErrCode;
 
+	// clear last error
+	::SetLastError(0);
+
 	if( fnm == NULL )
 	{
 		filename_[0] = TEXT('\0');
@@ -311,7 +314,7 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	if(ret != TRUE) {
 		ErrCode = ::GetLastError();
 
-		if(!ErrCode || ErrCode == ERROR_NO_MORE_FILES || ErrCode == ERROR_INVALID_HANDLE) {
+		if(!ErrCode || ErrCode == ERROR_NO_MORE_FILES) {
 			// user pressed Cancel button
 		} else if((ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_CALL_NOT_IMPLEMENTED || ErrCode == ERROR_INVALID_ACCEL_HANDLE) && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
 			// maybe Common Dialog DLL doesn't like OFN_EXPLORER, try again without it
@@ -378,6 +381,9 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	BOOL ret;
 	DWORD ErrCode;
 
+	// clear last error
+	::SetLastError(0);
+
 	if( fnm == NULL )
 	{
 		filename_[0] = TEXT('\0');
@@ -443,7 +449,7 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	if(ret != TRUE) {
 		ErrCode = ::GetLastError();
 
-		if(!ErrCode || ErrCode == ERROR_NO_MORE_FILES || ErrCode == ERROR_INVALID_HANDLE) {
+		if(!ErrCode || ErrCode == ERROR_NO_MORE_FILES) {
 			// user pressed Cancel button
 		} else if((ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_CALL_NOT_IMPLEMENTED) && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
 			// maybe Common Dialog DLL doesn't like OFN_EXPLORER, try again without it
