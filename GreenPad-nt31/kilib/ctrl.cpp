@@ -89,7 +89,7 @@ void ComboBox::Select( const TCHAR* str )
 	// SELECTSTRING は先頭が合ってる物に全てにマッチするので使えない。
 	// おそらくインクリメンタルサーチとかに使うべきものなのだろう。
 	size_t i =
-		SendMsg( CB_FINDSTRING, ~0, reinterpret_cast<LPARAM>(str) );
+		SendMsg( (app().isNT() && app().getOSBuild() < 404 ? CB_FINDSTRING : CB_FINDSTRINGEXACT), ~0, reinterpret_cast<LPARAM>(str) );
 	if( i != CB_ERR )
 		SendMsg( CB_SETCURSEL, i );
 }
