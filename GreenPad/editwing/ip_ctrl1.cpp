@@ -26,6 +26,7 @@ EwEdit::EwEdit()
 		WNDCLASS wc    = {0};
 #endif
 		wc.lpszClassName = className_;
+		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 		WndImpl::Register( &wc );
 	}
 }

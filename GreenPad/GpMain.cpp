@@ -1089,6 +1089,7 @@ GreenPadWnd::GreenPadWnd()
 	wc.hCursor       = app().LoadOemCursor( IDC_ARROW );
 	wc.lpszMenuName  = MAKEINTRESOURCE( IDR_MAIN );
 	wc.lpszClassName = className_;
+	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	WndImpl::Register( &wc );
 
 	ime().EnableGlobalIME( true );

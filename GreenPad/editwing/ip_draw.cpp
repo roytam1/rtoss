@@ -45,6 +45,7 @@ View::View( doc::Document& d, HWND wnd )
 		wc.lpszClassName = className_;
 		wc.style         = CS_DBLCLKS | CS_OWNDC;
 		wc.hCursor       = app().LoadOemCursor( IDC_IBEAM );
+		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 
 		// GlobalIME‚ð—LŒø‚É‚·‚é
 		ATOM a = WndImpl::Register( &wc );
