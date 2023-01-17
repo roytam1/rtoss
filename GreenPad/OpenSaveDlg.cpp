@@ -302,24 +302,27 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	}
 	else
 	{
-		// Running under Windows NT, use the old look template.
+		// Running under Windows NT 3.x, use the old look template.
 		ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
 	}
 
 	pThis = this;
+
+OpenTryAgain:
+	::SetLastError(0);
 	ret = ::GetOpenFileName(&ofn);
 	if(ret != TRUE) {
 		ErrCode = ::GetLastError();
 
-		if(!ErrCode || ErrCode == ERROR_NO_MORE_FILES) {
-			// user pressed Cancel button
-		} else if((ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_CALL_NOT_IMPLEMENTED || ErrCode == ERROR_INVALID_ACCEL_HANDLE) && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
+		if((ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_CALL_NOT_IMPLEMENTED || ErrCode == ERROR_INVALID_ACCEL_HANDLE) && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
 			// maybe Common Dialog DLL doesn't like OFN_EXPLORER, try again without it
 			ofn.Flags &= ~OFN_EXPLORER;
 			ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
 
 			// try again!
-			ret = ::GetOpenFileName(&ofn);
+			goto OpenTryAgain;
+		} else if(!ErrCode || ErrCode == ERROR_NO_MORE_FILES) {
+			// user pressed Cancel button
 		} else {
 			TCHAR tmp[128];
 			::wsprintf(tmp,TEXT("GetOpenFileName Error #%d."),ErrCode);
@@ -434,25 +437,28 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	else
 	{
 	    ofn.lpstrTitle     = TEXT("Save File As");
-		// Running under Windows NT, use the old look template.
+		// Running under Windows NT 3.x, use the old look template.
 		ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
 	}
 
 	pThis        = this;
+
+SaveTryAgain:
+	::SetLastError(0);
 	ret = ::GetSaveFileName(&ofn);
 	if(ret != TRUE) {
 		ErrCode = ::GetLastError();
 
-		if(!ErrCode || ErrCode == ERROR_NO_MORE_FILES) {
-			// user pressed Cancel button
-		} else if((ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_CALL_NOT_IMPLEMENTED) && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
+		if((ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_CALL_NOT_IMPLEMENTED) && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
 			// maybe Common Dialog DLL doesn't like OFN_EXPLORER, try again without it
 			ofn.Flags &= ~OFN_EXPLORER;
 		    ofn.lpstrTitle     = TEXT("Save File As");
 			ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
 
 			// try again!
-			ret = ::GetSaveFileName(&ofn);
+			goto SaveTryAgain;
+		} else if(!ErrCode || ErrCode == ERROR_NO_MORE_FILES) {
+			// user pressed Cancel button
 		} else {
 			TCHAR tmp[128];
 			::wsprintf(tmp,TEXT("GetSaveFileName Error #%d."),ErrCode);
