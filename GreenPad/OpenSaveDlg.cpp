@@ -293,7 +293,7 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 				OFN_ENABLESIZING  |
 				OFN_ENABLETEMPLATE;
 
-	if (app().isWin3later())
+	if (app().isWin3later() && (app().isNT() || (!app().isNT() && app().getOSBuild())))
 	{
 		// Include the OFN_EXPLORER flag to get the new look.
 		ofn.Flags |= OFN_EXPLORER;
@@ -424,7 +424,7 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 				OFN_ENABLETEMPLATE  |
 				OFN_OVERWRITEPROMPT;
 
-	if (app().isWin3later())
+	if (app().isWin3later() && (app().isNT() || (!app().isNT() && app().getOSBuild())))
 	{
 		// Include the OFN_EXPLORER flag to get the new look.
 		ofn.Flags |= OFN_EXPLORER;
