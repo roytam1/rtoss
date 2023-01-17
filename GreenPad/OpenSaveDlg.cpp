@@ -337,6 +337,7 @@ UINT_PTR CALLBACK OpenFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM wp, LPARAM lp
 
 	if( msg==WM_INITDIALOG )
 	{
+		HWND hCRLFCombo, hCRLFlbl;
 		// コンボボックスを埋めて、「自動選択」を選ぶ
 		ComboBox cb( dlg, IDC_CODELIST );
 		const CharSetList& csl = pThis->csl_;
@@ -344,6 +345,12 @@ UINT_PTR CALLBACK OpenFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM wp, LPARAM lp
 			if( csl[i].type & 2 ) // 2:=LOAD
 				cb.Add( csl[i].longName );
 		cb.Select( csl[0].longName );
+
+		hCRLFCombo = ::GetDlgItem( dlg,IDC_CRLFLIST );
+		hCRLFlbl = ::GetDlgItem( dlg,IDC_CRLFLBL );
+
+		if(hCRLFCombo) ::ShowWindow( hCRLFCombo, SW_HIDE );
+		if(hCRLFlbl) ::ShowWindow( hCRLFlbl, SW_HIDE );
 	}
 	else if( msg==WM_NOTIFY ||( msg==WM_COMMAND && LOWORD(wp)==1 ))
 	{
