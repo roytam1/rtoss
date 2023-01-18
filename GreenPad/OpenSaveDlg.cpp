@@ -512,9 +512,8 @@ UINT_PTR CALLBACK SaveFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM wp, LPARAM lp
 		// older NT wants OfnHook returning TRUE in WM_INITDIALOG
 		return TRUE;
 	}
-	else if( msg==WM_NOTIFY ||( msg==WM_COMMAND && (LOWORD(wp)==1||LOWORD(wp)==2) ))
+	else if( msg==WM_NOTIFY ||( msg==WM_COMMAND && LOWORD(wp)==1 ))
 	{
-		pThis->dlgEverOpened_ = true;
 		if(( msg==WM_COMMAND && LOWORD(wp)==1 ) || ((LPOFNOTIFY)lp)->hdr.code==CDN_FILEOK )
 		{
 			// OKが押されたら、文字コードの選択状況を記録
@@ -530,6 +529,10 @@ UINT_PTR CALLBACK SaveFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM wp, LPARAM lp
 			// 改行コードも
 			pThis->lb_ = ComboBox(dlg,IDC_CRLFLIST).GetCurSel();
 		}
+	}
+	else if( msg==WM_PAINT )
+	{
+		pThis->dlgEverOpened_ = true;
 	}
 	return FALSE;
 }
