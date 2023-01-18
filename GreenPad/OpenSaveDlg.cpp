@@ -316,7 +316,7 @@ OpenTryAgain:
 		ErrCode = ::GetLastError();
 		CDErr = ::CommDlgExtendedError();
 
-		if(!ErrCode || ErrCode == ERROR_NO_MORE_FILES || (pThis->dlgEverOpened_ && ErrCode == ERROR_CALL_NOT_IMPLEMENTED)) {
+		if(pThis->dlgEverOpened_ && (!ErrCode || ErrCode == ERROR_NO_MORE_FILES || ErrCode == ERROR_CALL_NOT_IMPLEMENTED || ErrCode == ERROR_INVALID_HANDLE)) {
 			// user pressed Cancel button
 		} else if((ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_CALL_NOT_IMPLEMENTED || ErrCode == ERROR_INVALID_ACCEL_HANDLE) && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
 			// maybe Common Dialog DLL doesn't like OFN_EXPLORER, try again without it
@@ -354,8 +354,10 @@ UINT_PTR CALLBACK OpenFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM wp, LPARAM lp
 		if(hCRLFCombo) ::ShowWindow( hCRLFCombo, SW_HIDE );
 		if(hCRLFlbl) ::ShowWindow( hCRLFlbl, SW_HIDE );
 
+		// older NT wants OfnHook returning TRUE in WM_INITDIALOG
+		return TRUE;
 	}
-	else if( msg==WM_NOTIFY ||( msg==WM_COMMAND && LOWORD(wp)==1 ))
+	else if( msg==WM_NOTIFY ||( msg==WM_COMMAND && (LOWORD(wp)==1||LOWORD(wp)==2) ))
 	{
 		pThis->dlgEverOpened_ = true;
 		// OKが押されたら、文字コードの選択状況を記録
@@ -462,7 +464,7 @@ SaveTryAgain:
 		ErrCode = ::GetLastError();
 		CDErr = ::CommDlgExtendedError();
 
-		if(!ErrCode || ErrCode == ERROR_NO_MORE_FILES || (pThis->dlgEverOpened_ && ErrCode == ERROR_CALL_NOT_IMPLEMENTED)) {
+		if(pThis->dlgEverOpened_ && (!ErrCode || ErrCode == ERROR_NO_MORE_FILES || ErrCode == ERROR_CALL_NOT_IMPLEMENTED || ErrCode == ERROR_INVALID_HANDLE)) {
 			// user pressed Cancel button
 		} else if((ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_CALL_NOT_IMPLEMENTED) && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
 			// maybe Common Dialog DLL doesn't like OFN_EXPLORER, try again without it
@@ -507,8 +509,10 @@ UINT_PTR CALLBACK SaveFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM wp, LPARAM lp
 				cb.Add( lbList[i] );
 			cb.Select( lbList[pThis->lb_] );
 		}
+		// older NT wants OfnHook returning TRUE in WM_INITDIALOG
+		return TRUE;
 	}
-	else if( msg==WM_NOTIFY ||( msg==WM_COMMAND && LOWORD(wp)==1 ))
+	else if( msg==WM_NOTIFY ||( msg==WM_COMMAND && (LOWORD(wp)==1||LOWORD(wp)==2) ))
 	{
 		pThis->dlgEverOpened_ = true;
 		if(( msg==WM_COMMAND && LOWORD(wp)==1 ) || ((LPOFNOTIFY)lp)->hdr.code==CDN_FILEOK )
