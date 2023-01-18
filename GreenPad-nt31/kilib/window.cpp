@@ -796,5 +796,5 @@ bool DlgImpl::on_message( UINT, WPARAM, LPARAM )
 bool DlgImpl::PreTranslateMessage( MSG* msg )
 {
 	// モードレスの時用。ダイアログメッセージ処理。
-	return (FALSE != ::IsDialogMessage( hwnd(), msg ));
+	return (FALSE != ::IsDialogMessageA( hwnd(), msg ));
 }

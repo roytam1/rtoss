@@ -235,7 +235,7 @@ bool GreenPadWnd::PreTranslateMessage( MSG* msg )
 	if( search_.TrapMsg(msg) )
 		return true;
 	// キーボードショートカット処理
-	return 0 != ::TranslateAccelerator( hwnd(), accel_, msg );
+	return 0 != ::TranslateAcceleratorA( hwnd(), accel_, msg );
 }
 
 
@@ -531,12 +531,20 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 
 void GreenPadWnd::on_drop( HDROP hd )
 {
-	UINT iMax = ::DragQueryFile( hd, 0xffffffff, NULL, 0 );
+	UINT iMax = ::DragQueryFileA( hd, 0xffffffff, NULL, 0 );
 	for( UINT i=0; i<iMax; ++i )
 	{
-		TCHAR str[MAX_PATH];
-		::DragQueryFile( hd, i, str, countof(str) );
+#ifdef _UNICODE
+		TCHAR w_str[MAX_PATH];
+#endif
+		char str[MAX_PATH];
+		::DragQueryFileA( hd, i, str, countof(str) );
+#ifdef _UNICODE
+		::MultiByteToWideChar(CP_ACP,0,str,MAX_PATH,w_str,MAX_PATH);
+		Open( w_str, AutoDetect );
+#else
 		Open( str, AutoDetect );
+#endif
 	}
 	::DragFinish( hd );
 }
@@ -601,7 +609,7 @@ void GreenPadWnd::on_grep()
 
 void GreenPadWnd::on_datetime()
 {
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310) || (defined(TARGET_VER) && TARGET_VER==310 && defined(UNICODE))
+#if 0// !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310) || (defined(TARGET_VER) && TARGET_VER==310 && defined(UNICODE))
 	String g = cfg_.dateFormat();
 	TCHAR buf[255], tmp[255];
 	::GetTimeFormat
