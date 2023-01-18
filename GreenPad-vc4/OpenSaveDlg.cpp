@@ -246,7 +246,7 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	TCHAR filepath_[MAX_PATH];
 
 	BOOL ret;
-	DWORD ErrCode;
+	DWORD ErrCode, CDErr;
 
 	if( fnm == NULL )
 	{
@@ -293,7 +293,7 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 				OFN_ENABLESIZING  |
 				OFN_ENABLETEMPLATE;
 
-	if (app().isWin3later())
+	if (app().isWin3later() && (app().isNT() || (!app().isNT() && app().getOSBuild())))
 	{
 		// Include the OFN_EXPLORER flag to get the new look.
 		ofn.Flags |= OFN_EXPLORER;
@@ -302,16 +302,21 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	}
 	else
 	{
-		// Running under Windows NT, use the old look template.
+		// Running under Windows NT 3.x, use the old look template.
 		ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
 	}
 
 	pThis = this;
+
+OpenTryAgain:
+	pThis->dlgEverOpened_ = false;
+	::SetLastError(0);
 	ret = ::GetOpenFileName(&ofn);
 	if(ret != TRUE) {
 		ErrCode = ::GetLastError();
+		CDErr = ::CommDlgExtendedError();
 
-		if(!ErrCode || ErrCode == ERROR_NO_MORE_FILES) {
+		if(pThis->dlgEverOpened_ && (!ErrCode || ErrCode == ERROR_NO_MORE_FILES || ErrCode == ERROR_CALL_NOT_IMPLEMENTED || ErrCode == ERROR_INVALID_HANDLE)) {
 			// user pressed Cancel button
 		} else if((ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_CALL_NOT_IMPLEMENTED || ErrCode == ERROR_INVALID_ACCEL_HANDLE) && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
 			// maybe Common Dialog DLL doesn't like OFN_EXPLORER, try again without it
@@ -319,10 +324,10 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 			ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
 
 			// try again!
-			ret = ::GetOpenFileName(&ofn);
+			goto OpenTryAgain;
 		} else {
 			TCHAR tmp[128];
-			::wsprintf(tmp,TEXT("GetOpenFileName Error #%d."),ErrCode);
+			::wsprintf(tmp,TEXT("GetOpenFileName Error #%d, extended error #%d."),ErrCode,CDErr);
 			::MessageBox( NULL, tmp, String(IDS_APPNAME).c_str(), MB_OK|MB_TASKMODAL );
 		}
 	}
@@ -334,6 +339,7 @@ UINT_PTR CALLBACK OpenFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM wp, LPARAM lp
 
 	if( msg==WM_INITDIALOG )
 	{
+		HWND hCRLFCombo, hCRLFlbl;
 		// コンボボックスを埋めて、「自動選択」を選ぶ
 		ComboBox cb( dlg, IDC_CODELIST );
 		const CharSetList& csl = pThis->csl_;
@@ -341,9 +347,19 @@ UINT_PTR CALLBACK OpenFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM wp, LPARAM lp
 			if( csl[i].type & 2 ) // 2:=LOAD
 				cb.Add( csl[i].longName );
 		cb.Select( csl[0].longName );
+
+		hCRLFCombo = ::GetDlgItem( dlg,IDC_CRLFLIST );
+		hCRLFlbl = ::GetDlgItem( dlg,IDC_CRLFLBL );
+
+		if(hCRLFCombo) ::ShowWindow( hCRLFCombo, SW_HIDE );
+		if(hCRLFlbl) ::ShowWindow( hCRLFlbl, SW_HIDE );
+
+		// older NT wants OfnHook returning TRUE in WM_INITDIALOG
+		return TRUE;
 	}
-	else if( msg==WM_NOTIFY ||( msg==WM_COMMAND && LOWORD(wp)==1 ))
+	else if( msg==WM_NOTIFY ||( msg==WM_COMMAND && (LOWORD(wp)==1||LOWORD(wp)==2) ))
 	{
+		pThis->dlgEverOpened_ = true;
 		// OKが押されたら、文字コードの選択状況を記録
 		if(( msg==WM_COMMAND && LOWORD(wp)==1 ) || ((LPOFNOTIFY)lp)->hdr.code==CDN_FILEOK )
 		{
@@ -376,7 +392,7 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	TCHAR filepath_[MAX_PATH];
 
 	BOOL ret;
-	DWORD ErrCode;
+	DWORD ErrCode, CDErr;
 
 	if( fnm == NULL )
 	{
@@ -424,7 +440,7 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 				OFN_ENABLETEMPLATE  |
 				OFN_OVERWRITEPROMPT;
 
-	if (app().isWin3later())
+	if (app().isWin3later() && (app().isNT() || (!app().isNT() && app().getOSBuild())))
 	{
 		// Include the OFN_EXPLORER flag to get the new look.
 		ofn.Flags |= OFN_EXPLORER;
@@ -434,16 +450,21 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	else
 	{
 	    ofn.lpstrTitle     = TEXT("Save File As");
-		// Running under Windows NT, use the old look template.
+		// Running under Windows NT 3.x, use the old look template.
 		ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
 	}
 
 	pThis        = this;
+
+SaveTryAgain:
+	pThis->dlgEverOpened_ = false;
+	::SetLastError(0);
 	ret = ::GetSaveFileName(&ofn);
 	if(ret != TRUE) {
 		ErrCode = ::GetLastError();
+		CDErr = ::CommDlgExtendedError();
 
-		if(!ErrCode || ErrCode == ERROR_NO_MORE_FILES) {
+		if(pThis->dlgEverOpened_ && (!ErrCode || ErrCode == ERROR_NO_MORE_FILES || ErrCode == ERROR_CALL_NOT_IMPLEMENTED || ErrCode == ERROR_INVALID_HANDLE)) {
 			// user pressed Cancel button
 		} else if((ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_CALL_NOT_IMPLEMENTED) && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
 			// maybe Common Dialog DLL doesn't like OFN_EXPLORER, try again without it
@@ -452,10 +473,10 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 			ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
 
 			// try again!
-			ret = ::GetSaveFileName(&ofn);
+			goto SaveTryAgain;
 		} else {
 			TCHAR tmp[128];
-			::wsprintf(tmp,TEXT("GetSaveFileName Error #%d."),ErrCode);
+			::wsprintf(tmp,TEXT("GetSaveFileName Error #%d, extended error #%d."),ErrCode,CDErr);
 			::MessageBox( NULL, tmp, String(IDS_APPNAME).c_str(), MB_OK|MB_TASKMODAL );
 		}
 	}
@@ -488,9 +509,12 @@ UINT_PTR CALLBACK SaveFileDlg::OfnHook( HWND dlg, UINT msg, WPARAM wp, LPARAM lp
 				cb.Add( lbList[i] );
 			cb.Select( lbList[pThis->lb_] );
 		}
+		// older NT wants OfnHook returning TRUE in WM_INITDIALOG
+		return TRUE;
 	}
-	else if( msg==WM_NOTIFY ||( msg==WM_COMMAND && LOWORD(wp)==1 ))
+	else if( msg==WM_NOTIFY ||( msg==WM_COMMAND && (LOWORD(wp)==1||LOWORD(wp)==2) ))
 	{
+		pThis->dlgEverOpened_ = true;
 		if(( msg==WM_COMMAND && LOWORD(wp)==1 ) || ((LPOFNOTIFY)lp)->hdr.code==CDN_FILEOK )
 		{
 			// OKが押されたら、文字コードの選択状況を記録
