@@ -38,8 +38,10 @@ private:
 
 #ifdef DO_LOGGING
 	#define LOGGER(str) Logger().WriteLine(TEXT(str))
+	#define LOGGERV(var) Logger().WriteLine(var)
 #else
 	#define LOGGER(x)
+	#define LOGGERV(x)
 #endif
 
 //=========================================================================
