@@ -62,6 +62,9 @@ public:
 	//@{ 全角スペース用記号描画 //@}
 	void DrawZSP( int x, int y, int times );
 
+	void SetupDC(HDC hdc);
+	void RestoreDC();
+
 public:
 
 	//@{ 高さ(pixel) //@}
@@ -77,15 +80,15 @@ public:
 #ifdef WIN32S
 				if(ch > 0x100)
 				{
-					::GetCharWidthA( dc_, 'x', 'x', widthTable_+ch );
+					::GetCharWidthA( cdc_, 'x', 'x', widthTable_+ch );
 					widthTable_[ ch ] *= 2;
 				}
 				else
 				{
-					::GetCharWidthA( dc_, ch, ch, widthTable_+ch );
+					::GetCharWidthA( cdc_, ch, ch, widthTable_+ch );
 				}
 #else
-				::GetCharWidthW( dc_, ch, ch, widthTable_+ch );
+				::GetCharWidthW( cdc_, ch, ch, widthTable_+ch );
 #endif
 			return widthTable_[ ch ];
 		}
@@ -97,36 +100,36 @@ public:
 				if( isHighSurrogate(ch) )
 				{
 					SIZE sz;
-					if( ::GetTextExtentPointW( dc_, pch, 2, &sz ) )
+					if( ::GetTextExtentPointW( cdc_, pch, 2, &sz ) )
 						return sz.cx;
 					int w = 0;
 #ifdef WIN32S
 					if(ch > 0x100)
 					{
-						::GetCharWidthA( dc_, 'x', 'x', &w );
+						::GetCharWidthA( cdc_, 'x', 'x', &w );
 						w *= 2;
 					}
 					else
 					{
-						::GetCharWidthA( dc_, ch, ch, &w );
+						::GetCharWidthA( cdc_, ch, ch, &w );
 					}
 #else
-					::GetCharWidthW( dc_, ch, ch, &w );
+					::GetCharWidthW( cdc_, ch, ch, &w );
 #endif
 					return w;
 				}
 #ifdef WIN32S
 				if(ch > 0x100)
 				{
-					::GetCharWidthA( dc_, 'x', 'x', widthTable_+ch );
+					::GetCharWidthA( cdc_, 'x', 'x', widthTable_+ch );
 					widthTable_[ ch ] *= 2;
 				}
 				else
 				{
-					::GetCharWidthA( dc_, ch, ch, widthTable_+ch );
+					::GetCharWidthA( cdc_, ch, ch, widthTable_+ch );
 				}
 #else
-				::GetCharWidthW( dc_, ch, ch, widthTable_+ch );
+				::GetCharWidthW( cdc_, ch, ch, widthTable_+ch );
 #endif
 			}
 			return widthTable_[ ch ];
@@ -148,10 +151,15 @@ public:
 
 private:
 
-	const HDC    dc_;
+	const HWND   hwnd_;// Window in which we paint
+	HDC          dc_;  // Device context used for Painting (non const)
+	const HDC    cdc_; // Compatible DC used for W() (const)
 	const HFONT  font_;
 	const HPEN   pen_;
 	const HBRUSH brush_;
+	HFONT  oldfont_;   // Old objects to be released before
+	HPEN   oldpen_;    // the EndPaint() call.
+	HBRUSH oldbrush_;  //
 	int          height_;
 	int*         widthTable_;
 	int          figWidth_;
@@ -161,8 +169,8 @@ private:
 
 private:
 
-	Painter( HDC hdc, const VConfig& vc );
-	HDC getDC() { return dc_; }
+	Painter( HWND hwnd, const VConfig& vc );
+	HWND getWHND() { return hwnd_; }
 	friend class Canvas;
 	NOCOPY(Painter);
 };

@@ -207,14 +207,20 @@ LRESULT View::on_message( UINT msg, WPARAM wp, LPARAM lp )
 // 線を引くとか四角く塗るとか、そーいう基本的な処理
 //-------------------------------------------------------------------------
 
-Painter::Painter( HDC hdc, const VConfig& vc )
-	: dc_        ( hdc )
+Painter::Painter( HWND hwnd, const VConfig& vc )
+	: hwnd_      ( hwnd )
+	, dc_        ( ::GetDC(hwnd) )
+	, cdc_       ( ::CreateCompatibleDC( dc_ ) )
 	, font_      ( ::CreateFontIndirect( &vc.font ) )
 	, pen_       ( ::CreatePen( PS_SOLID, 0, vc.color[CTL] ) )
 	, brush_     ( ::CreateSolidBrush( vc.color[BG] ) )
 	, widthTable_( new int[65536] )
 {
-	// 制御文字を描画するか否か？のフラグを記憶
+	// Release the DC that was captured just to make cdc_.
+	::ReleaseDC( NULL, dc_ ); dc_ = NULL;
+
+	// 制御文字を描画するか否か？のフラグを記憶,
+	// Whether to draw control characters or not? flag is stored.
 	for( int i=0; i<countof(scDraw_); ++i )
 		scDraw_[i] = vc.sc[i];
 
@@ -223,19 +229,19 @@ Painter::Painter( HDC hdc, const VConfig& vc )
 		colorTable_[i] = vc.color[i];
 		colorTable_[3] = vc.color[CMT];
 
-	// DCにセット
-	::SelectObject( dc_, font_  );
-	::SelectObject( dc_, pen_   );
-	::SelectObject( dc_, brush_ );
-	::SetBkMode(    dc_, TRANSPARENT );
-	::SetMapMode(   dc_, MM_TEXT );
+	// DCにセット, Setup a Compatible Device Context (CDC)
+	::SelectObject( cdc_, font_  );
+	::SelectObject( cdc_, pen_   );
+	::SelectObject( cdc_, brush_ );
+	::SetBkMode(    cdc_, TRANSPARENT );
+	::SetMapMode(   cdc_, MM_TEXT );
 
 	// 文字幅テーブル初期化（ASCII範囲の文字以外は遅延処理）
 	memFF( widthTable_, 65536*sizeof(int) );
 #ifdef WIN32S
-	::GetCharWidthA( dc_, ' ', '~', widthTable_+' ' );
+	::GetCharWidthA( cdc_, ' ', '~', widthTable_+' ' );
 #else
-	::GetCharWidthW( dc_, L' ', L'~', widthTable_+L' ' );
+	::GetCharWidthW( cdc_, L' ', L'~', widthTable_+L' ' );
 #endif
 	widthTable_[L'\t'] = NZero(W() * Max(1,vc.tabstep));
 	// 下位サロゲートは文字幅ゼロ
@@ -249,19 +255,45 @@ Painter::Painter( HDC hdc, const VConfig& vc )
 
 	// 高さの情報
 	TEXTMETRIC met;
-	::GetTextMetrics( dc_, &met );
+	::GetTextMetrics( cdc_, &met );
 	height_ = met.tmHeight;
 
 	// LOGFONT
 	::GetObject( font_, sizeof(LOGFONT), &logfont_ );
 }
 
+void Painter::SetupDC(HDC hdc)
+{
+	//Setup Device Context (DC)
+	dc_ = hdc;
+	oldfont_ =   (HFONT)::SelectObject( dc_, font_  );
+	oldpen_ =     (HPEN)::SelectObject( dc_, pen_   );
+	oldbrush_ = (HBRUSH)::SelectObject( dc_, brush_ );
+	::SetBkMode(    dc_, TRANSPARENT );
+	::SetMapMode(   dc_, MM_TEXT );
+}
+void Painter::RestoreDC()
+{
+	// Restore the old fonts for DC.
+	// In theory it is not required to restore the old fonts
+	// because EndPaint is supposed to do it, but I rather be safe than sorry
+	// Plus drmermory complains otherwise.
+	// I think it is quite negligible in painting time anyway.
+	::SelectObject( dc_, oldfont_ );
+	::SelectObject( dc_, oldpen_ );
+	::SelectObject( dc_, oldbrush_ );
+	// Zero out dc_ to be sure we are not going to use it later by mistake.
+	dc_ = NULL;
+}
+
 Painter::~Painter()
 {
 	// 適当な別オブジェクトをくっつけて自分を解放する
-	::SelectObject( dc_, ::GetStockObject( OEM_FIXED_FONT ) );
-	::SelectObject( dc_, ::GetStockObject( BLACK_PEN ) );
-	::SelectObject( dc_, ::GetStockObject( WHITE_BRUSH ) );
+	::SelectObject( cdc_, ::GetStockObject( OEM_FIXED_FONT ) );
+	::SelectObject( cdc_, ::GetStockObject( BLACK_PEN ) );
+	::SelectObject( cdc_, ::GetStockObject( WHITE_BRUSH ) );
+	::DeleteDC( cdc_ ); // Delete compatible DC
+
 	::DeleteObject( font_ );
 	::DeleteObject( pen_ );
 	::DeleteObject( brush_ );
@@ -467,8 +499,9 @@ void ViewImpl::ReDraw( ReDrawType r, const DPos* s )
 
 void ViewImpl::on_paint( const PAINTSTRUCT& ps )
 {
-	// 描画範囲の情報を詳しく取得
+	// 描画範囲の情報を詳しく取得, Obtain detailed information about the drawing area
 	Painter& p = cvs_.getPainter();
+	p.SetupDC( ps.hdc );
 	VDrawInfo v( ps.rcPaint );
 	GetDrawPosInfo( v );
 
@@ -490,6 +523,7 @@ void ViewImpl::on_paint( const PAINTSTRUCT& ps )
 		DrawTXT( v, p );
 		p.ClearClip();
 	}
+	p.RestoreDC();
 }
 
 
