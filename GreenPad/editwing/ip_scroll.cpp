@@ -165,7 +165,7 @@ Canvas::Canvas( const View& vw )
 	, showLN_   ( false )
 	, wrapWidth_( 0xffffffff )
 	, figNum_   ( 3 )
-	, font_     ( new Painter( ::GetDC(vw.hwnd()),
+	, font_     ( new Painter( vw.hwnd(),
 	                  VConfig(TEXT("FixedSys"),14) ) )
 {
 	vw.getClientRect( &txtZone_ );
@@ -187,10 +187,10 @@ bool Canvas::on_view_resize( int cx, int cy )
 
 void Canvas::on_font_change( const VConfig& vc )
 {
-	HDC dc = font_->getDC();
+	HWND hwnd = font_->getWHND();
 	font_ = NULL; // 先にデストラクタを呼ばねばならない…
 	              // ってうわー格好悪ぃーーー(T_T)
-	font_ = new Painter( dc, vc );
+	font_ = new Painter( hwnd, vc );
 
 	CalcLNAreaWidth();
 	CalcWrapWidth();
