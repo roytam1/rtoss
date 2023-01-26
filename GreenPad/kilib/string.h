@@ -302,7 +302,18 @@ struct RawString : public String
 	}
 #endif
 
+#if defined(WIN32S) || (!defined(_UNICODE) && defined(TARGET_VER) && TARGET_VER < 350)
+#define WideCharToMultiByte SimpleWC2MB
+#define MultiByteToWideChar SimpleMB2WC
 
+int WINAPI SimpleWC2MB_init(UINT cp, DWORD flg, LPCWSTR s, int sl, LPSTR d, int dl, LPCSTR defc, LPBOOL useddef);
+static int (WINAPI *SimpleWC2MB)(UINT cp, DWORD flg, LPCWSTR s, int sl, LPSTR d, int dl, LPCSTR defc, LPBOOL useddef) = SimpleWC2MB_init;
+int WINAPI SimpleWC2MB_fallback(UINT cp, DWORD flg, LPCWSTR s, int sl, LPSTR d, int dl, LPCSTR defc, LPBOOL useddef);
+
+int WINAPI SimpleMB2WC_init(UINT cp, DWORD flg, LPCSTR s, int sl, LPWSTR d, int dl);
+static int(WINAPI*SimpleMB2WC)(UINT cp, DWORD flg, LPCSTR s, int sl, LPWSTR d, int dl) = SimpleMB2WC_init;
+int WINAPI SimpleMB2WC_fallback(UINT cp, DWORD flg, LPCSTR s, int sl, LPWSTR d, int dl);
+#endif
 
 //=========================================================================
 
