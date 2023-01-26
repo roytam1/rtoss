@@ -305,13 +305,7 @@ inline void Painter::CharOut( unicode ch, int x, int y )
 #ifdef WIN32S
 	DWORD dwNum;
 	char psText[16]; // Buffer for a SINGLE multibyte character
-	if(!(dwNum = WideCharToMultiByte(CP_ACP,0, &ch,1, psText,countof(psText), NULL,NULL)))
-	{
-		// Last fallback: truncate each widechar to a byte.
-		// Needed for Win32s beta 61.
-		dwNum = 1;
-		psText[0] = (char)ch;
-	}
+	if(dwNum = WideCharToMultiByte(CP_ACP,0, &ch,1, psText,countof(psText), NULL,NULL))
 		::TextOutA( dc_, x, y, psText, dwNum );
 #else
 	::TextOutW( dc_, x, y, &ch, 1 );
@@ -342,16 +336,6 @@ inline void Painter::StringOut
 				psText = new char[dwNum]; if( !psText ) return;
 				dwNum = ::WideCharToMultiByte(CP_ACP,0 ,str,len ,psText,dwNum ,NULL,NULL);
 			}
-		}
-
-		// still not converting
-		if( !dwNum )
-		{
-			// Last fallback: truncate each widechar to a byte.
-			// Needed for Win32s beta 61.
-			dwNum = Min( len, (int)countof(psTXT1K) );
-			for( DWORD i=0; i<dwNum; i++)
-				psText[i] = (char)str[i];
 		}
 	}
 	dwTimes=0; do {

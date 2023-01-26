@@ -236,3 +236,71 @@ const wchar_t* String::ConvToWChar() const
 #endif
 }
 
+#if defined(WIN32S) || (!defined(_UNICODE) && defined(TARGET_VER) && TARGET_VER < 350)
+#undef WideCharToMultiByte
+#undef MultiByteToWideChar
+
+int WINAPI SimpleWC2MB_init(UINT cp, DWORD flg, LPCWSTR s, int sl, LPSTR d, int dl, LPCSTR defc, LPBOOL useddef)
+{
+	// Try with a simple test buffer to see if the native function works.
+	char mb[2]; mb[0] = '\0';
+	int ret = ::WideCharToMultiByte(CP_ACP, 0, L"ts",2 , mb, countof(mb), NULL, NULL);
+	if( ret && mb[0] == 't' && mb[1] == 's' )
+		SimpleWC2MB = ::WideCharToMultiByte;
+	else
+		SimpleWC2MB = SimpleWC2MB_fallback;
+
+	return SimpleWC2MB(cp, flg, s, sl, d, dl, defc, useddef);
+}
+int WINAPI SimpleWC2MB_fallback(UINT cp, DWORD flg, LPCWSTR s, int sl, LPSTR d, int dl, LPCSTR defc, LPBOOL useddef)
+{
+	if( d == NULL || dl == 0 ) // return required length.
+		return sl==-1? my_lstrlenW(s): sl;
+	int i;
+	if( sl == -1 )
+	{ // Copy until NULL
+		for( i=0; i < dl && s[i]; i++)
+			d[i] = (char)s[i];
+		d[i] = '\0';
+		return i == dl? 0: i;
+	}
+	if( dl <= sl )
+		return 0;
+	for( i=0; i < sl; i++)
+		d[i] = (char)s[i];
+	d[i] = '\0';
+	return i;
+}
+int WINAPI SimpleMB2WC_init(UINT cp, DWORD flg, LPCSTR s, int sl, LPWSTR d, int dl)
+{
+	// Try with a simple test buffer to see if the native function works.
+	wchar_t wc[2]; wc[0] = '\0';
+	int ret = ::MultiByteToWideChar(CP_ACP, 0, "ts",2 , wc,countof(wc));
+	if( ret && wc[0] == L't' && wc[1] == L's' )
+		SimpleMB2WC = ::MultiByteToWideChar;
+	else
+		SimpleMB2WC = SimpleMB2WC_fallback;
+
+	return SimpleMB2WC(cp, flg, s, sl, d, dl);
+}
+int WINAPI SimpleMB2WC_fallback(UINT cp, DWORD flg, LPCSTR s, int sl, LPWSTR d, int dl)
+{
+	if( d == NULL || dl == 0 )
+		return sl==-1? ::lstrlenA(s): sl;
+	int i;
+	if( sl == -1 )
+	{ // Copy until NULL
+		for( i=0; i < dl && s[i]; i++)
+			d[i] = (wchar_t)s[i];
+		d[i] = L'\0';
+		return i == dl? 0: i;
+	}
+	if( dl <= sl )
+		return 0;
+	for( i=0; i < sl; i++)
+		d[i] = (char)s[i];
+	d[i] = L'\0';
+	return i;
+}
+#endif
+

@@ -29,7 +29,7 @@ using namespace editwing::view;
 #endif
 
 typedef int (WINAPI *SSCRINF)(HWND, int, LPSCROLLINFO, BOOL);
-static int MySetScrollInfo_fallback(HWND hwnd, int nBar, LPSCROLLINFO lpsi, BOOL redraw)
+int WINAPI MySetScrollInfo_fallback(HWND hwnd, int nBar, LPSCROLLINFO lpsi, BOOL redraw)
 {
 	// Smart Fallback...
 	// We must use SetScrollRange but it is mimited to 65535.
@@ -52,26 +52,25 @@ static int MySetScrollInfo_fallback(HWND hwnd, int nBar, LPSCROLLINFO lpsi, BOOL
 
 	return ::SetScrollPos( hwnd, nBar, lpsi->nPos/MULT, redraw );
 }
-static int MySetScrollInfo(HWND hwnd, int nBar, LPSCROLLINFO lpsi, BOOL redraw)
+int WINAPI MySetScrollInfo_init(HWND hwnd, int nBar, LPSCROLLINFO lpsi, BOOL redraw);
+static SSCRINF MySetScrollInfo = MySetScrollInfo_init;
+
+int WINAPI MySetScrollInfo_init(HWND hwnd, int nBar, LPSCROLLINFO lpsi, BOOL redraw)
 {
-	static SSCRINF pSSCRINF_ = NULL;
-	static int iSSIConditionPassed = -1;
-	if( iSSIConditionPassed == -1 ) {
-		pSSCRINF_ = (SSCRINF)GetProcAddress(GetModuleHandleA("USER32.DLL"), "SetScrollInfo");
+	if( MySetScrollInfo == MySetScrollInfo_init ) {
+		MySetScrollInfo = (SSCRINF)GetProcAddress(GetModuleHandleA("USER32.DLL"), "SetScrollInfo");
 
 		// Should be supported since Windows NT 3.51...
-		if( pSSCRINF_ && ((!app().isNT() && app().getOSBuild()>=275) || (app().isNT() && app().isBuildGreater(MKVBN(3,51,944)))) ) {
-			iSSIConditionPassed = 1;
-		} else {
-			iSSIConditionPassed = 0;
+		if( !(MySetScrollInfo && ((!app().isNT() && app().getOSBuild()>=275) || (app().isNT() && app().isBuildGreater(MKVBN(3,51,944))))) ) {
+			MySetScrollInfo = MySetScrollInfo_fallback;
 		}
 	}
 
-	return iSSIConditionPassed ? pSSCRINF_( hwnd, nBar, lpsi, redraw ) : MySetScrollInfo_fallback( hwnd, nBar, lpsi, redraw );
+	return MySetScrollInfo( hwnd, nBar, lpsi, redraw );
 }
 
 typedef int (WINAPI *GSCRINF)(HWND, int, LPSCROLLINFO);
-static int MyGetScrollInfo_fallback(HWND hwnd, int nBar, LPSCROLLINFO lpsi)
+int WINAPI MyGetScrollInfo_fallback(HWND hwnd, int nBar, LPSCROLLINFO lpsi)
 {
 	// Smart Fallback...
 	if( lpsi->fMask|SIF_RANGE )
@@ -88,22 +87,22 @@ static int MyGetScrollInfo_fallback(HWND hwnd, int nBar, LPSCROLLINFO lpsi)
 	}
 	return 1; // sucess!
 }
-static int MyGetScrollInfo(HWND hwnd, int nBar, LPSCROLLINFO lpsi)
+
+int WINAPI MyGetScrollInfo_init(HWND hwnd, int nBar, LPSCROLLINFO lpsi);
+static GSCRINF MyGetScrollInfo = MyGetScrollInfo_init;
+
+int WINAPI MyGetScrollInfo_init(HWND hwnd, int nBar, LPSCROLLINFO lpsi)
 {
-	static GSCRINF pGSCRINF_ = NULL;
-	static int iGSIConditionPassed = -1;
-	if( iGSIConditionPassed == -1 ) {
-		pGSCRINF_ = (GSCRINF)GetProcAddress(GetModuleHandleA("USER32.DLL"), "GetScrollInfo");
+	if( MyGetScrollInfo == MyGetScrollInfo_init ) {
+		MyGetScrollInfo = (GSCRINF)GetProcAddress(GetModuleHandleA("USER32.DLL"), "GetScrollInfo");
 
 		// Should be supported since Windows NT 3.51...
-		if( pGSCRINF_ && ((!app().isNT() && app().getOSBuild()>=275) || (app().isNT() && app().isBuildGreater(MKVBN(3,51,944)))) ) {
-			iGSIConditionPassed = 1;
-		} else {
-			iGSIConditionPassed = 0;
+		if( !(MyGetScrollInfo && ((!app().isNT() && app().getOSBuild()>=275) || (app().isNT() && app().isBuildGreater(MKVBN(3,51,944))))) ) {
+			MyGetScrollInfo = MyGetScrollInfo_fallback;
 		}
 	}
 
-	return iGSIConditionPassed ? pGSCRINF_( hwnd, nBar, lpsi ) : MyGetScrollInfo_fallback( hwnd, nBar, lpsi );
+	return MyGetScrollInfo( hwnd, nBar, lpsi );
 }
 
 //-------------------------------------------------------------------------
