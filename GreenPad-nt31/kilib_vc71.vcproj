@@ -83,7 +83,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
+				PreprocessorDefinitions="NDEBUG,TARGET_VER=310"
 				Culture="1041"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
@@ -334,7 +334,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
+				PreprocessorDefinitions="NDEBUG,TARGET_VER=310"
 				Culture="1041"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
