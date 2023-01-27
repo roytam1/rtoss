@@ -322,7 +322,7 @@ OpenTryAgain:
 
 			// try again!
 			goto OpenTryAgain;
-		} else if(!ErrCode || ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_NO_MORE_FILES || ErrCode == ERROR_CLASS_DOES_NOT_EXIST) {
+		} else if(!ErrCode || ErrCode == ERROR_INVALID_HANDLE || ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_NO_MORE_FILES || ErrCode == ERROR_CLASS_DOES_NOT_EXIST) {
 			// user pressed Cancel button
 		} else {
 			TCHAR tmp[128];
@@ -473,7 +473,7 @@ SaveTryAgain:
 
 			// try again!
 			goto SaveTryAgain;
-		} else if(!ErrCode || ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_NO_MORE_FILES || ErrCode == ERROR_CLASS_DOES_NOT_EXIST) {
+		} else if(!ErrCode || ErrCode == ERROR_INVALID_HANDLE || ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_NO_MORE_FILES || ErrCode == ERROR_CLASS_DOES_NOT_EXIST) {
 			// user pressed Cancel button
 		} else {
 			TCHAR tmp[128];
