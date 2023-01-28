@@ -174,11 +174,19 @@ public:
 
 	//@{ デストラクタ //@}
 	~dptr()
-		{ delete obj_; }
+		{
+#ifdef _MSC_VER
+#pragma warning( disable : 4150 ) // 警告：deleteの定義がうにょうにょ
+#endif
+			delete obj_;
+		}
 
 	//@{ 新しいオブジェクトを所有。古いのは削除 //@}
 	void operator=( T* p )
 		{
+#ifdef _MSC_VER
+#pragma warning( disable : 4150 ) // 警告：deleteの定義がうにょうにょ
+#endif
 			delete obj_; // 古いのは削除
 			obj_ = p;
 		}
