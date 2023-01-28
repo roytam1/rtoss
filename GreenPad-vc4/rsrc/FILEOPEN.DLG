@@ -29,9 +29,13 @@ Revision History:
 //
 //  Constant Declarations.
 //
+#ifndef LBS_DISABLENOSCROLL
+#define LBS_DISABLENOSCROLL 0x1000L
+#endif
 
-#define LBS_DISABLENOSCROLL   0x1000L
-#define IDC_STATIC   -1
+#ifndef IDC_STATIC
+#define IDC_STATIC (-1)
+#endif
 
 #ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
