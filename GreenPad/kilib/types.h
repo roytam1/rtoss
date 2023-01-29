@@ -30,6 +30,7 @@ template<typename T> inline T Max(T x,T y) { return (y<x ? x : y); }
 #endif
 
 template<typename T> inline T NZero(T x) { return (x==0 ? 1 : x); }
+template<typename T> inline T NotSmaller(T m, T x) { return (x<m ? m : x); }
 
 // コピー禁止オブジェクト
 #define NOCOPY(T) T( const T& ); T& operator=( const T& )
