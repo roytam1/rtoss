@@ -825,7 +825,7 @@ static int create_wiper(const char *path, int idx)
 	char name[_MAX_PATH];
 	int file;
 
-	sprintf(name, "%svmwiper.%03lu", path, idx);
+	sprintf(name, "%svmwiper.%03lu%c", path, idx%1000, 0);
 
 	if (_dos_creatnew(name, _A_NORMAL, &file) != 0) {
 		if (vmtool_msg > vmtool_quiet) {
@@ -866,7 +866,7 @@ static void remove_wiper(const char *path, int idx)
 {
 	char name[_MAX_PATH];
 
-	sprintf(name, "%svmwiper.%lu", path, idx);
+	sprintf(name, "%svmwiper.%03lu%c", path, idx%1000, 0);
 
 	remove(name);
 }
