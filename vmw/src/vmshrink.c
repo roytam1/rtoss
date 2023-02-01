@@ -797,7 +797,7 @@ static int enum_disk(char *path, uint32_t *total, uint32_t *avail)
 		if (drive_is_fixed(drive, &fat32)) {
 			sprintf(path, "%c:\\", drive);
 
-			if (fat32) {
+			if (fat32 && (_osversion & 0xff) == 7) {
 				get_diskfree_fat32(drive, total, avail);
 			}
 			else {
