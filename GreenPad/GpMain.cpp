@@ -147,6 +147,29 @@ LRESULT GreenPadWnd::on_message( UINT msg, WPARAM wp, LPARAM lp )
 		on_drop( reinterpret_cast<HDROP>(wp) );
 		break;
 
+	#ifndef NO_OLEDND
+	case WM_NCLBUTTONDOWN: {
+		if( wp == HTSYSMENU
+		&& !isUntitled()
+		&& coolDragDetect( hwnd(), /*pt=*/lp, WM_NCLBUTTONUP, PM_NOREMOVE )  )
+		{
+			// Allow dragging filename out of system tray with Left button.
+			const unicode *fnu = filename_.ConvToWChar();
+			if( fnu )
+			{
+				OleDnDSourceTxt doDrag( fnu, my_lstrlenW(fnu), DROPEFFECT_COPY );
+				filename_.FreeWCMem(fnu);
+			}
+			break;
+		}
+	} return WndImpl::on_message( msg, wp, lp );
+
+//	case WM_NCRBUTTONUP:
+//		LOGGER( "WM_NCRBUTTONUP" );
+//		return WndImpl::on_message( msg, wp, lp );
+
+	#endif // NO_OLEDND
+
 	// MRU
 	case GPM_MRUCHANGED:
 		SetupMRUMenu();
