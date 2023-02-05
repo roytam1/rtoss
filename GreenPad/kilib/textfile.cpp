@@ -1409,7 +1409,9 @@ int TextFileR::MLangAutoDetection( const uchar* ptr, ulong siz )
 #ifndef NO_MLANG
 	app().InitModule( App::OLE );
 	IMultiLanguage2 *lang = NULL;
-	if( S_OK == ::CoCreateInstance(CLSID_CMultiLanguage, NULL, CLSCTX_ALL, IID_IMultiLanguage2, (LPVOID*)&lang ) )
+	static const IID myIID_IMultiLanguage2 = {0xDCCFC164, 0x2B38, 0x11d2, {0xB7, 0xEC, 0x00, 0xC0, 0x4F, 0x8F, 0x5D, 0x9A}};
+	static const CLSID myCLSID_CMultiLanguage = { 0x275c23e2, 0x3747, 0x11d0, {0x9f, 0xea, 0x00,0xaa,0x00,0x3f,0x86,0x46} };
+	if( S_OK == ::CoCreateInstance(myCLSID_CMultiLanguage, NULL, CLSCTX_ALL, myIID_IMultiLanguage2, (LPVOID*)&lang ) )
 	{
 		int detectEncCount = 5;
 		DetectEncodingInfo detectEnc[5];
