@@ -39,11 +39,29 @@
 
 #include <stdlib.h>
 
-inline void* PR_Malloc(size_t len)
-{
-    return malloc(len);
-}
-
 #define PR_FREEIF(p) do { if (p) delete p; } while(0)
+
+#if defined(WIN32) && defined(SUPERTINY)
+	#include <windows.h>
+	inline void* __cdecl operator new(size_t siz)
+	{
+		return ::HeapAlloc(GetProcessHeap(), 0, siz);
+	}
+	inline void __cdecl operator delete(void* ptr)
+	{
+		::HeapFree(GetProcessHeap(), 0, ptr);
+	}
+	inline void* PR_Malloc(size_t len)
+	{
+	    return ::HeapAlloc(GetProcessHeap(), 0, len);
+	}
+
+#else // WIN32+SUPERTINY
+	inline void* PR_Malloc(size_t len)
+	{
+	    return malloc(len);
+	}
+#endif
+
 
 #endif
