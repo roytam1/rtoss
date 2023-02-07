@@ -147,28 +147,23 @@ LRESULT GreenPadWnd::on_message( UINT msg, WPARAM wp, LPARAM lp )
 		on_drop( reinterpret_cast<HDROP>(wp) );
 		break;
 
-	#ifndef NO_OLEDND
+#ifndef NO_OLEDNDSRC
 	case WM_NCLBUTTONDOWN: {
 		if( wp == HTSYSMENU
 		&& !isUntitled()
 		&& coolDragDetect( hwnd(), /*pt=*/lp, WM_NCLBUTTONUP, PM_NOREMOVE )  )
 		{
-			// Allow dragging filename out of system tray with Left button.
+			// Allow dragging file out of system icon with Left button.
 			const unicode *fnu = filename_.ConvToWChar();
 			if( fnu )
 			{
-				OleDnDSourceTxt doDrag( fnu, my_lstrlenW(fnu), DROPEFFECT_COPY );
+				OleDnDSourceFile doDrag( fnu, my_lstrlenW(fnu), DROPEFFECT_COPY );
 				filename_.FreeWCMem(fnu);
 			}
 			break;
 		}
 	} return WndImpl::on_message( msg, wp, lp );
-
-//	case WM_NCRBUTTONUP:
-//		LOGGER( "WM_NCRBUTTONUP" );
-//		return WndImpl::on_message( msg, wp, lp );
-
-	#endif // NO_OLEDND
+#endif // NO_OLEDNDSRC
 
 	// MRU
 	case GPM_MRUCHANGED:
@@ -555,11 +550,15 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 void GreenPadWnd::on_drop( HDROP hd )
 {
 	UINT iMax = ::DragQueryFile( hd, 0xffffffff, NULL, 0 );
+
 	for( UINT i=0; i<iMax; ++i )
 	{
 		TCHAR str[MAX_PATH];
 		::DragQueryFile( hd, i, str, countof(str) );
-		Open( str, AutoDetect );
+#ifndef NO_OLEDNDSRC
+		if(lstrcmp(str,filename_.c_str()))
+			Open( str, AutoDetect );
+#endif
 	}
 	::DragFinish( hd );
 }

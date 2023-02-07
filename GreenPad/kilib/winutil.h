@@ -10,6 +10,7 @@ const IID myIID_IUnknown = { 0x00000000, 0x0000, 0x0000, {0xC0,0x00,0x00,0x00,0x
 const IID myIID_IDataObject = { 0x0000010e, 0x0000, 0x0000, {0xC0,0x00,0x00,0x00,0x00,0x00,0x00,0x46} };
 const IID myIID_IDropSource = { 0x00000121, 0x0000, 0x0000, {0xC0,0x00,0x00,0x00,0x00,0x00,0x00,0x46} };
 const IID myIID_IDropTarget = { 0x00000122, 0x0000, 0x0000, {0xc0,0x00,0x00,0x00,0x00,0x00,0x00,0x46} };
+const IID myIID_IEnumFORMATETC = { 0x00000103, 0x0000, 0x0000, {0xC0,0x00,0x00,0x00,0x00,0x00,0x00,0x46} };
 
 #ifndef __ccdoc__
 namespace ki {
@@ -113,22 +114,194 @@ inline UINT Clipboard::RegisterFormat( const TCHAR* name )
 
 //=========================================================================
 //@{
-//	IDataObjectTxt: Class for a minimalist Text drag and drop data object
+//	IDataObjectFile: Class for a minimalist Text drag and drop data object
 //
-//	OleDnDSourceTxt(str, len) to do the drag and drop
+//	OleDnDSourceFile(str, len) to do the drag and drop
 //@}
 //=========================================================================
 
 #ifndef NO_OLEDNDSRC
-// Class for a minimalist Text drag and drop data object
-class IDataObjectTxt : public IDataObject, public Object
+static void WINAPI SetFORMATETC(FORMATETC* pfe, UINT cf, TYMED tymed = TYMED_HGLOBAL, LONG lindex = -1,
+    DWORD dwAspect = DVASPECT_CONTENT, DVTARGETDEVICE* ptd = NULL)
 {
+    pfe->cfFormat = (CLIPFORMAT)cf;
+    pfe->tymed = tymed;
+    pfe->lindex = lindex;
+    pfe->dwAspect = dwAspect;
+    pfe->ptd = ptd;
+}
+
+static void DeepCopyFormatEtc(FORMATETC *dest, FORMATETC *source)
+{
+	// copy the source FORMATETC into dest
+	*dest = *source;
+
+	if(source->ptd)
+	{
+		// allocate memory for the DVTARGETDEVICE if necessary
+		dest->ptd = (DVTARGETDEVICE*)CoTaskMemAlloc(sizeof(DVTARGETDEVICE));
+
+		// copy the contents of the source DVTARGETDEVICE into dest->ptd
+		*(dest->ptd) = *(source->ptd);
+	}
+}
+HRESULT CreateEnumFormatEtc(UINT nNumFormats, FORMATETC *pFormatEtc, IEnumFORMATETC **ppEnumFormatEtc);
+// Class for EnumFORMATETC
+class CEnumFormatEtc : public IEnumFORMATETC, public Object
+{
+private:
+	LONG		m_lRefCount;		// Reference count for this COM interface
+	ULONG		m_nIndex;			// current enumerator index
+	ULONG		m_nNumFormats;		// number of FORMATETC members
+	FORMATETC * m_pFormatEtc;		// array of FORMATETC objects
+
 public:
-	IDataObjectTxt(const unicode *str, size_t len)
+
+	//
+	// IUnknown members
+	//
+	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void **ppvObject)
+	{
+		if( memEQ(&riid, &myIID_IUnknown, sizeof(riid) )
+		||  memEQ(&riid, &myIID_IEnumFORMATETC, sizeof(riid) ) )
+		{
+			*ppvObject = this;
+			AddRef();
+			return S_OK;
+		}
+		return E_NOINTERFACE;
+	}
+	ULONG STDMETHODCALLTYPE AddRef()  { return ::InterlockedIncrement(&m_lRefCount); }
+	ULONG STDMETHODCALLTYPE Release() { return ::InterlockedDecrement(&m_lRefCount); }
+
+	//
+	// IEnumFormatEtc members
+	//
+	HRESULT __stdcall  Next  (ULONG celt, FORMATETC * pFormatEtc, ULONG * pceltFetched)
+	{
+		ULONG copied  = 0;
+
+		// validate arguments
+		if(celt == 0 || pFormatEtc == 0)
+			return E_INVALIDARG;
+
+		// copy FORMATETC structures into caller's buffer
+		while(m_nIndex < m_nNumFormats && copied < celt)
+		{
+			DeepCopyFormatEtc(&pFormatEtc[copied], &m_pFormatEtc[m_nIndex]);
+			copied++;
+			m_nIndex++;
+		}
+
+		// store result
+		if(pceltFetched != 0)
+			*pceltFetched = copied;
+
+		// did we copy all that was requested?
+		return (copied == celt) ? S_OK : S_FALSE;
+	}
+
+	HRESULT __stdcall  Skip  (ULONG celt)
+	{
+		m_nIndex += celt;
+		return (m_nIndex <= m_nNumFormats) ? S_OK : S_FALSE;
+	}
+
+	HRESULT __stdcall  Reset (void)
+	{
+		m_nIndex = 0;
+		return S_OK;
+	}
+
+	HRESULT __stdcall  Clone (IEnumFORMATETC ** ppEnumFormatEtc)
+	{
+		HRESULT hResult;
+
+		// make a duplicate enumerator
+		hResult = CreateEnumFormatEtc(m_nNumFormats, m_pFormatEtc, ppEnumFormatEtc);
+
+		if(hResult == S_OK)
+		{
+			// manually set the index state
+			((CEnumFormatEtc *) *ppEnumFormatEtc)->m_nIndex = m_nIndex;
+		}
+
+		return hResult;
+	}
+
+	//
+	// Construction / Destruction
+	//
+	CEnumFormatEtc(FORMATETC *pFormatEtc, int nNumFormats)
+	{
+		m_lRefCount   = 1;
+		m_nIndex      = 0;
+		m_nNumFormats = nNumFormats;
+		m_pFormatEtc  = new FORMATETC[nNumFormats];
+
+		// copy the FORMATETC structures
+		for(int i = 0; i < nNumFormats; i++)
+		{
+			DeepCopyFormatEtc(&m_pFormatEtc[i], &pFormatEtc[i]);
+		}
+	}
+
+	~CEnumFormatEtc()
+	{
+		if(m_pFormatEtc)
+		{
+			for(ULONG i = 0; i < m_nNumFormats; i++)
+			{
+				if(m_pFormatEtc[i].ptd)
+					CoTaskMemFree(m_pFormatEtc[i].ptd);
+			}
+
+			delete[] m_pFormatEtc;
+		}
+	}
+
+};
+static HRESULT CreateEnumFormatEtc(UINT nNumFormats, FORMATETC *pFormatEtc, IEnumFORMATETC **ppEnumFormatEtc)
+{
+	if(nNumFormats == 0 || pFormatEtc == 0 || ppEnumFormatEtc == 0)
+		return E_INVALIDARG;
+
+	*ppEnumFormatEtc = new CEnumFormatEtc(pFormatEtc, nNumFormats);
+
+	return (*ppEnumFormatEtc) ? S_OK : E_OUTOFMEMORY;
+}
+// Class for a minimalist File drag and drop data object
+class IDataObjectFile : public IDataObject, public Object
+{
+private:
+	LONG refcnt;
+	const unicode *str_;
+	const size_t len_;
+
+    enum {
+        DATA_HDROP,
+        DATA_NUM,
+        DATA_INVALID = -1,
+    };
+	FORMATETC m_rgfe[DATA_NUM];
+	int GetDataIndex(const FORMATETC* pfe)
+	{
+		for (int i = 0; i < countof(m_rgfe); i++) {
+			if (pfe->cfFormat == m_rgfe[i].cfFormat &&
+				(pfe->tymed & m_rgfe[i].tymed) &&
+				pfe->dwAspect == m_rgfe[i].dwAspect &&
+				pfe->lindex == m_rgfe[i].lindex) {
+				return i;
+			}
+		}
+		return DATA_INVALID;
+	}
+public:
+	IDataObjectFile(const unicode *str, size_t len)
 		: refcnt( 1 )
 		, str_  ( str )
 		, len_  ( len )
-		{ }
+		{ SetFORMATETC(&m_rgfe[DATA_HDROP], CF_HDROP); }
 private:
 	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void **ppvObject)
 	{
@@ -149,7 +322,7 @@ private:
 		if( S_OK == QueryGetData(fmt) )
 		{
 			mem00( pm, sizeof(*pm) ); // In case...
-			pm->hGlobal = GlobalAlloc( GMEM_MOVEABLE, (len_+1)*sizeof(unicode) );
+			pm->hGlobal = GlobalAlloc( GMEM_MOVEABLE, sizeof(DROPFILES)+(len_+2)*sizeof(unicode) );
 			if( !pm->hGlobal )
 				return E_OUTOFMEMORY;
 			// Copy the data into pm
@@ -157,31 +330,30 @@ private:
 		}
 		return DV_E_FORMATETC;
 	}
-	HRESULT STDMETHODCALLTYPE EnumFormatEtc(DWORD dwDirection, IEnumFORMATETC **ppenumFormatEtc)
-		{ return E_NOTIMPL; }
-
+	HRESULT STDMETHODCALLTYPE EnumFormatEtc(DWORD dwDirection, IEnumFORMATETC **ppefe)
+	{
+		if (dwDirection == DATADIR_GET) {
+			return CreateEnumFormatEtc(countof(m_rgfe), m_rgfe, ppefe);
+		}
+		*ppefe = NULL;
+		return E_NOTIMPL;
+	}
 	HRESULT STDMETHODCALLTYPE GetDataHere(FORMATETC *fmt, STGMEDIUM *pm)
 	{
 		// Data is already allocated by caller!
-		VOID *data;
-		if( S_OK == QueryGetData(fmt) && pm->hGlobal != NULL && (data = GlobalLock(pm->hGlobal)) != NULL )
+		DROPFILES *data;
+		if( S_OK == QueryGetData(fmt) && pm->hGlobal != NULL && (data = (DROPFILES *)GlobalLock(pm->hGlobal)) != NULL )
 		{
-			if( fmt->cfFormat == CF_UNICODETEXT )
-			{
-				size_t len = Min(len_*sizeof(unicode), (size_t)GlobalSize(pm->hGlobal));
-				memmove( data, str_, len );
-				((unicode*)data)[len/sizeof(unicode)] = L'\0'; // NULL Terminate
-			}
-			else // if( fmt->cfFormat == CF_TEXT)
-			{	// Convert unicode string to ANSI.
-				int len = ::WideCharToMultiByte(CP_ACP, 0, str_, len_, NULL, 0, NULL, NULL);
-				char* ansi = new char[len];
-				len = ::WideCharToMultiByte(CP_ACP, 0, str_, len_, ansi, len, NULL, NULL);
-				len = Min(len*sizeof(char), (size_t)GlobalSize(pm->hGlobal));
-				memmove( data, (void*)ansi, len );
-				((char*)data)[len/sizeof(char)] = '\0'; // NULL Terminate
-				delete [] ansi;
-			}
+			size_t len = Min(len_*sizeof(unicode), (size_t)GlobalSize(pm->hGlobal));
+			data->pFiles=sizeof(DROPFILES);
+			data->pt.x=0;
+			data->pt.y=0;
+			data->fNC=1;
+			data->fWide=1;
+			memmove( ((char *)data)+sizeof(DROPFILES), str_, len );
+			*(((char *)data)+sizeof(DROPFILES)+len)='\0'; // NULL Terminate
+			*(((char *)data)+sizeof(DROPFILES)+len+1)='\0'; // double NULL Terminate
+
 			GlobalUnlock(pm->hGlobal);
 			pm->pUnkForRelease = NULL; // Caller must free!
 			pm->tymed = TYMED_HGLOBAL;
@@ -193,7 +365,7 @@ private:
 	HRESULT STDMETHODCALLTYPE QueryGetData(FORMATETC *fmt)
 	{
 		// { CF_(UNI)TEXT, NULL, DVASPECT_CONTENT, -1, |TYMED_HGLOBAL } Only!
-		if( fmt->cfFormat == CF_UNICODETEXT || fmt->cfFormat == CF_TEXT )
+		if( fmt->cfFormat == CF_HDROP )
 			if( fmt->ptd == NULL
 			&&  fmt->dwAspect == DVASPECT_CONTENT
 		//	&&  fmt->lindex == -1 // Skip this one?
@@ -206,30 +378,7 @@ private:
 
 	HRESULT STDMETHODCALLTYPE GetCanonicalFormatEtc(FORMATETC *fmt, FORMATETC *fout)
 	{
-		if(fmt)
-		{
-			if(fmt->cfFormat == CF_UNICODETEXT || fmt->cfFormat == CF_TEXT )
-			{
-				if( fmt->dwAspect == DVASPECT_CONTENT
-				&&  fmt->lindex == -1 )
-				{
-					if (fout)
-					{
-						*fout = *fmt;
-						fout->ptd = NULL;
-					}
-					return DATA_S_SAMEFORMATETC;
-				}
-				if (fout) {
-					*fout = *fmt;
-					fout->ptd = NULL;
-					fout->dwAspect = DVASPECT_CONTENT;
-					fout->lindex = -1;
-					return S_OK;
-				}
-			}
-		}
-		const FORMATETC canon = { CF_UNICODETEXT, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+		const FORMATETC canon = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 		*fout = canon;
 		return S_OK;
 	}
@@ -241,38 +390,33 @@ private:
 		{ return OLE_E_ADVISENOTSUPPORTED; }
 	HRESULT STDMETHODCALLTYPE EnumDAdvise(IEnumSTATDATA ** ppenumAdvise)
 		{ return OLE_E_ADVISENOTSUPPORTED; }
-
-private:
-	LONG refcnt;
-	const unicode *str_;
-	const size_t len_;
 };
-class OleDnDSourceTxt : public IDropSource
+class OleDnDSourceFile : public IDropSource
 {
 public:
-	OleDnDSourceTxt(const unicode *str, size_t len, DWORD adEffect = DROPEFFECT_MOVE|DROPEFFECT_COPY)
+	OleDnDSourceFile(const unicode *str, size_t len, DWORD adEffect = DROPEFFECT_MOVE|DROPEFFECT_COPY)
 	: refcnt    ( 1 )
 	, dwEffect_ ( 0 )
 	{
 		ki::app().InitModule( App::OLE );
 		{
 			// Create IData object from the string
-			IDataObjectTxt data(str, len);
-			LOGGER( "OleDnDSourceTxt IDataObjectTxt created" );
+			IDataObjectFile data(str, len);
+			LOGGER( "OleDnDSourceFile IDataObjectFile created" );
 			// Do the drag and drop and set dwEffect_ accordingly.
 			DWORD effect=0;
 			HRESULT ret = DoDragDrop( &data, this, adEffect, &effect );
 			// Only set the resulting effect if the drop was actually performed
 			if( ret == DRAGDROP_S_DROP )
 				dwEffect_ = effect;
-			LOGGER( "OleDnDSourceTxt DoDragDrop end" );
+			LOGGER( "OleDnDSourceFile DoDragDrop end" );
 		}
 	}
 
 	DWORD getEffect() const
 		{ return dwEffect_; }
 
-	~OleDnDSourceTxt(){}
+	~OleDnDSourceFile(){}
 private:
 	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void **ppvObject)
 	{
