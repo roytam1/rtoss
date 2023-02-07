@@ -172,7 +172,21 @@ public:
 		return E_NOINTERFACE;
 	}
 	ULONG STDMETHODCALLTYPE AddRef()  { return ::InterlockedIncrement(&m_lRefCount); }
-	ULONG STDMETHODCALLTYPE Release() { return ::InterlockedDecrement(&m_lRefCount); }
+	ULONG STDMETHODCALLTYPE Release()
+	{
+		// decrement object reference count
+		LONG count = InterlockedDecrement(&m_lRefCount);
+
+		if(count == 0)
+		{
+			delete this;
+			return 0;
+		}
+		else
+		{
+			return count;
+		}
+	}
 
 	//
 	// IEnumFormatEtc members
@@ -315,7 +329,21 @@ private:
 		return E_NOINTERFACE;
 	}
 	ULONG STDMETHODCALLTYPE AddRef()  { return ::InterlockedIncrement(&refcnt); }
-	ULONG STDMETHODCALLTYPE Release() { return ::InterlockedDecrement(&refcnt); }
+	ULONG STDMETHODCALLTYPE Release()
+	{
+		// decrement object reference count
+		LONG count = InterlockedDecrement(&refcnt);
+
+		if(count == 0)
+		{
+			delete this;
+			return 0;
+		}
+		else
+		{
+			return count;
+		}
+	}
 
 	HRESULT STDMETHODCALLTYPE GetData(FORMATETC *fmt,STGMEDIUM *pm)
 	{
@@ -432,7 +460,21 @@ private:
 	}
 
 	ULONG STDMETHODCALLTYPE AddRef()  { return ::InterlockedIncrement(&refcnt); }
-	ULONG STDMETHODCALLTYPE Release() { return ::InterlockedDecrement(&refcnt); }
+	ULONG STDMETHODCALLTYPE Release()
+	{
+		// decrement object reference count
+		LONG count = InterlockedDecrement(&refcnt);
+
+		if(count == 0)
+		{
+			delete this;
+			return 0;
+		}
+		else
+		{
+			return count;
+		}
+	}
 
 	HRESULT STDMETHODCALLTYPE QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeyState)
 		{
