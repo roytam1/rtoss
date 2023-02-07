@@ -749,7 +749,7 @@ void Cursor::on_lbutton_up( short x, short y )
 
 bool Cursor::on_drag_start( short x, short y )
 {
-#ifndef NO_OLEDNDSRC
+#if 0//ndef NO_OLEDNDSRC
 	if( cur_ != sel_ )
 	{
 		VPos vp;
