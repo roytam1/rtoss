@@ -372,15 +372,34 @@ private:
 		DROPFILES *data;
 		if( S_OK == QueryGetData(fmt) && pm->hGlobal != NULL && (data = (DROPFILES *)GlobalLock(pm->hGlobal)) != NULL )
 		{
-			size_t len = Min(len_*sizeof(unicode), (size_t)GlobalSize(pm->hGlobal));
+			// Check actual size of allocated mem in case.
+			size_t gmemsz = GlobalSize( pm->hGlobal );
+
 			data->pFiles=sizeof(DROPFILES);
 			data->pt.x=0;
 			data->pt.y=0;
 			data->fNC=1;
-			data->fWide=1;
-			memmove( ((char *)data)+sizeof(DROPFILES), str_, len );
-			*(((char *)data)+sizeof(DROPFILES)+len)='\0'; // NULL Terminate
-			*(((char *)data)+sizeof(DROPFILES)+len+1)='\0'; // double NULL Terminate
+			data->fWide=app().isNT(); // only use unicode on NT!
+
+			// The string starts just at the end of the structure
+			char *dest = (char *)( ((BYTE*)data) + data->pFiles );
+
+			// Destination length in BYTES!
+			size_t len = Min(len_*sizeof(unicode), gmemsz-sizeof(DROPFILES)-2*sizeof(unicode));
+			size_t remaining_bytes;
+
+			if( !data->fWide )
+			{	// Convert to ANSI and copy to dest!
+				len = ::WideCharToMultiByte( CP_ACP, 0, str_, len_, dest, NULL, NULL, NULL ); // get length
+				::WideCharToMultiByte( CP_ACP, 0, str_, len_, dest, len, NULL, NULL );
+			}
+			else
+			{
+				memmove( dest, str_, len );
+			}
+			remaining_bytes = gmemsz-len-(data->pFiles);
+			if(remaining_bytes > 0)
+				mem00(dest+len, remaining_bytes); // clear remaining bytes
 
 			GlobalUnlock(pm->hGlobal);
 			pm->pUnkForRelease = NULL; // Caller must free!
