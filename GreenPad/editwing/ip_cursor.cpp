@@ -885,17 +885,27 @@ OleDnDTarget::OleDnDTarget( HWND hwnd, ViewImpl& vw )
 	, comes_from_center_ ( false )
 {
 	ki::app().InitModule( ki::App::OLE );
-	// Dyamically load because OLE32 might be missing...
-
-	if(S_OK == ::RegisterDragDrop(hwnd_, this) )
-		return; // Sucess!
+	
+	if( S_OK != ::CoLockObjectExternal( this, TRUE, FALSE ) )
+	{
+		if(S_OK == ::RegisterDragDrop(hwnd_, this) )
+			return; // Sucess!
+	}
+	else
+	{	// Could not Register the Drag&Drop
+		// So we must unlock the object.
+		::CoLockObjectExternal( this, FALSE, FALSE );
+	}
 	hwnd_ = NULL;
 }
 OleDnDTarget::~OleDnDTarget(  )
 {
 	if( hwnd_ )
 	{
-		RevokeDragDrop(hwnd_);
+		::RevokeDragDrop(hwnd_);
+
+		// Release all pointers to the object
+		::CoLockObjectExternal( this, FALSE, TRUE );
 	}
 }
 
