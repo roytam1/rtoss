@@ -3,6 +3,7 @@
 #include "winutil.h"
 using namespace ki;
 
+#ifndef NO_OLEDNDSRC
 // Alternative version of DragDetect that beter fits my needs:
 // 1) it does not removes the button up from message queue.
 // 2) Any button can be used to do the drag and a drag can occur
@@ -39,6 +40,7 @@ bool coolDragDetect( HWND hwnd, LPARAM pt, WORD btup, WORD removebutton )
 
 	return false;
 }
+#endif // NO_OLEDNDSRC
 
 //=========================================================================
 
