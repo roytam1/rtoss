@@ -4,6 +4,7 @@
 #include "memory.h"
 #include "ktlaptr.h"
 
+#if !defined(NO_OLEDNDTAR) || !defined(NO_OLEDNDSRC)
 bool coolDragDetect( HWND hwnd, LPARAM pt, WORD btup, WORD removebutton );
 
 const IID myIID_IUnknown = { 0x00000000, 0x0000, 0x0000, {0xC0,0x00,0x00,0x00,0x00,0x00,0x00,0x46} };
@@ -11,6 +12,7 @@ const IID myIID_IDataObject = { 0x0000010e, 0x0000, 0x0000, {0xC0,0x00,0x00,0x00
 const IID myIID_IDropSource = { 0x00000121, 0x0000, 0x0000, {0xC0,0x00,0x00,0x00,0x00,0x00,0x00,0x46} };
 const IID myIID_IDropTarget = { 0x00000122, 0x0000, 0x0000, {0xc0,0x00,0x00,0x00,0x00,0x00,0x00,0x46} };
 const IID myIID_IEnumFORMATETC = { 0x00000103, 0x0000, 0x0000, {0xC0,0x00,0x00,0x00,0x00,0x00,0x00,0x46} };
+#endif
 
 #ifndef __ccdoc__
 namespace ki {
@@ -121,29 +123,13 @@ inline UINT Clipboard::RegisterFormat( const TCHAR* name )
 //=========================================================================
 
 #ifndef NO_OLEDNDSRC
-static void WINAPI SetFORMATETC(FORMATETC* pfe, UINT cf, TYMED tymed = TYMED_HGLOBAL, LONG lindex = -1,
-    DWORD dwAspect = DVASPECT_CONTENT, DVTARGETDEVICE* ptd = NULL)
-{
-    pfe->cfFormat = (CLIPFORMAT)cf;
-    pfe->tymed = tymed;
-    pfe->lindex = lindex;
-    pfe->dwAspect = dwAspect;
-    pfe->ptd = ptd;
-}
-
 static void DeepCopyFormatEtc(FORMATETC *dest, FORMATETC *source)
 {
 	// copy the source FORMATETC into dest
 	*dest = *source;
 
-	if(source->ptd)
-	{
-		// allocate memory for the DVTARGETDEVICE if necessary
-		dest->ptd = (DVTARGETDEVICE*)CoTaskMemAlloc(sizeof(DVTARGETDEVICE));
-
-		// copy the contents of the source DVTARGETDEVICE into dest->ptd
-		*(dest->ptd) = *(source->ptd);
-	}
+	// We never use the ptd field!
+	dest->ptd = NULL; // In case.
 }
 HRESULT CreateEnumFormatEtc(UINT nNumFormats, FORMATETC *pFormatEtc, IEnumFORMATETC **ppEnumFormatEtc);
 // Class for EnumFORMATETC
@@ -247,10 +233,10 @@ public:
 	// Construction / Destruction
 	//
 	CEnumFormatEtc(FORMATETC *pFormatEtc, int nNumFormats)
+		: m_lRefCount   ( 1 )
+		, m_nIndex      ( 0 )
+		, m_nNumFormats ( nNumFormats )
 	{
-		m_lRefCount   = 1;
-		m_nIndex      = 0;
-		m_nNumFormats = nNumFormats;
 		m_pFormatEtc  = new FORMATETC[nNumFormats];
 
 		// copy the FORMATETC structures
@@ -264,12 +250,6 @@ public:
 	{
 		if(m_pFormatEtc)
 		{
-			for(ULONG i = 0; i < m_nNumFormats; i++)
-			{
-				if(m_pFormatEtc[i].ptd)
-					CoTaskMemFree(m_pFormatEtc[i].ptd);
-			}
-
 			delete[] m_pFormatEtc;
 		}
 	}
@@ -298,25 +278,26 @@ private:
         DATA_INVALID = -1,
     };
 	FORMATETC m_rgfe[DATA_NUM];
-	int GetDataIndex(const FORMATETC* pfe)
-	{
-		for (int i = 0; i < countof(m_rgfe); i++) {
-			if (pfe->cfFormat == m_rgfe[i].cfFormat &&
-				(pfe->tymed & m_rgfe[i].tymed) &&
-				pfe->dwAspect == m_rgfe[i].dwAspect &&
-				pfe->lindex == m_rgfe[i].lindex) {
-				return i;
-			}
-		}
-		return DATA_INVALID;
-	}
 public:
 	IDataObjectFile(const unicode *str, size_t len)
 		: refcnt( 1 )
 		, str_  ( str )
 		, len_  ( len )
-		{ SetFORMATETC(&m_rgfe[DATA_HDROP], CF_HDROP); }
+		{
+			SetFORMATETC(&m_rgfe[DATA_HDROP], CF_HDROP);
+		}
+		~IDataObjectFile() {}
 private:
+	void SetFORMATETC(FORMATETC* pfe, UINT cf, TYMED tymed = TYMED_HGLOBAL, LONG lindex = -1,
+		DWORD dwAspect = DVASPECT_CONTENT, DVTARGETDEVICE* ptd = NULL) const
+	{
+	    pfe->cfFormat = (CLIPFORMAT)cf;
+	    pfe->tymed = tymed;
+	    pfe->lindex = lindex;
+	    pfe->dwAspect = dwAspect;
+	    pfe->ptd = ptd;
+	}
+public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void **ppvObject)
 	{
 		if( memEQ(&riid, &myIID_IUnknown, sizeof(riid) )
@@ -456,7 +437,12 @@ public:
 			// Only set the resulting effect if the drop was actually performed
 			if( ret == DRAGDROP_S_DROP )
 				dwEffect_ = effect;
-			LOGGER( "OleDnDSourceFile DoDragDrop end" );
+			#ifdef DO_LOGGING
+			DWORD err = ::GetLastError();
+			TCHAR buf[256];
+			::wsprintf( buf, TEXT("OleDnDSourceTxt DoDragDrop end, ret=%x, effect=%d, err=%u"), (DWORD)ret, (int)effect, err );
+			LOGGERV( buf );
+			#endif
 		}
 	}
 
