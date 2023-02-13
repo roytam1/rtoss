@@ -557,8 +557,8 @@ void GreenPadWnd::on_drop( HDROP hd )
 		::DragQueryFile( hd, i, str, countof(str) );
 #ifndef NO_OLEDNDSRC
 		if(lstrcmp(str,filename_.c_str()))
-			Open( str, AutoDetect );
 #endif
+			Open( str, AutoDetect );
 	}
 	::DragFinish( hd );
 }
