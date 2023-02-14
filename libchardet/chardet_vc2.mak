@@ -43,19 +43,19 @@ RSC=rc.exe
 OUTDIR=.\WinRel
 INTDIR=.\WinRel
 
-ALL : $(OUTDIR)/chardet.dll $(OUTDIR)/chardet_vc2.bsc
+ALL : $(OUTDIR)/chardet_vc2.dll $(OUTDIR)/chardet_vc2.bsc
 
 $(OUTDIR) : 
     if not exist $(OUTDIR)/nul mkdir $(OUTDIR)
 
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
 # ADD MTL /nologo /D "NDEBUG" /win32
-MTL_PROJ=/nologo /D "NDEBUG" /win32 
+MTL_PROJ=/nologo /D "NDEBUG" /win32  
 # ADD BASE CPP /nologo /MT /W3 /GX /YX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FR /c
-# ADD CPP /nologo /ML /W3 /GX- /YX /O2 /I "src" /I "src\tables" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /FR /c
-CPP_PROJ=/nologo /ML /W3 /GX- /YX /O2 /I "src" /I "src\tables" /D "NDEBUG" /D\
- "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /FR$(INTDIR)/\
- /Fp$(OUTDIR)/"chardet_vc2.pch" /Fo$(INTDIR)/ /c 
+# ADD CPP /nologo /W3 /YX /O2 /I "src" /I "src\tables" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /FR /c
+CPP_PROJ=/nologo /W3 /YX /O2 /I "src" /I "src\tables" /D "NDEBUG" /D "WIN32" /D\
+ "_WINDOWS" /D "DLL_EXPORTS" /FR$(INTDIR)/ /Fp$(OUTDIR)/"chardet_vc2.pch"\
+ /Fo$(INTDIR)/ /c 
 CPP_OBJS=.\WinRel/
 # ADD BASE RSC /l 0x411 /d "NDEBUG"
 # ADD RSC /l 0x411 /d "NDEBUG"
@@ -106,12 +106,12 @@ $(OUTDIR)/chardet_vc2.bsc : $(OUTDIR)  $(BSC32_SBRS)
 
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /NOLOGO /SUBSYSTEM:windows /DLL /MACHINE:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /NOLOGO /SUBSYSTEM:windows /DLL /PDB:"WinRel/chardet.pdb" /MACHINE:I386 /OUT:"WinRel/chardet.dll"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /NOLOGO /SUBSYSTEM:windows /DLL /PDB:"WinRel/chardet.pdb" /MACHINE:I386
 # SUBTRACT LINK32 /PDB:none
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /NOLOGO\
  /SUBSYSTEM:windows /DLL /INCREMENTAL:no /PDB:"WinRel/chardet.pdb" /MACHINE:I386\
- /OUT:"WinRel/chardet.dll" /IMPLIB:$(OUTDIR)/"chardet_vc2.lib" 
+ /OUT:"WinRel/chardet_vc2.dll" /IMPLIB:$(OUTDIR)/"chardet_vc2.lib" 
 DEF_FILE=
 LINK32_OBJS= \
 	$(INTDIR)/nsMBCSSM.obj \
@@ -149,7 +149,7 @@ LINK32_OBJS= \
 	$(INTDIR)/LangArabicModel.obj \
 	$(INTDIR)/LangFrenchModel.obj
 
-$(OUTDIR)/chardet.dll : $(OUTDIR)  $(DEF_FILE) $(LINK32_OBJS)
+$(OUTDIR)/chardet_vc2.dll : $(OUTDIR)  $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -167,7 +167,7 @@ $(OUTDIR)/chardet.dll : $(OUTDIR)  $(DEF_FILE) $(LINK32_OBJS)
 OUTDIR=.\WinDebug
 INTDIR=.\WinDebug
 
-ALL : $(OUTDIR)/chardet.dll $(OUTDIR)/chardet_vc2.bsc
+ALL : $(OUTDIR)/chardet_vc2.dll $(OUTDIR)/chardet_vc2.bsc
 
 $(OUTDIR) : 
     if not exist $(OUTDIR)/nul mkdir $(OUTDIR)
@@ -230,12 +230,13 @@ $(OUTDIR)/chardet_vc2.bsc : $(OUTDIR)  $(BSC32_SBRS)
 
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /NOLOGO /SUBSYSTEM:windows /DLL /DEBUG /MACHINE:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /NOLOGO /SUBSYSTEM:windows /DLL /PDB:"WinDebug/chardet.pdb" /DEBUG /MACHINE:I386 /OUT:"WinDebug/chardet.dll"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /NOLOGO /SUBSYSTEM:windows /DLL /PDB:"WinDebug/chardet.pdb" /DEBUG /MACHINE:I386
 # SUBTRACT LINK32 /PDB:none
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /NOLOGO\
  /SUBSYSTEM:windows /DLL /INCREMENTAL:yes /PDB:"WinDebug/chardet.pdb" /DEBUG\
- /MACHINE:I386 /OUT:"WinDebug/chardet.dll" /IMPLIB:$(OUTDIR)/"chardet_vc2.lib" 
+ /MACHINE:I386 /OUT:"WinDebug/chardet_vc2.dll"\
+ /IMPLIB:$(OUTDIR)/"chardet_vc2.lib" 
 DEF_FILE=
 LINK32_OBJS= \
 	$(INTDIR)/nsMBCSSM.obj \
@@ -273,7 +274,7 @@ LINK32_OBJS= \
 	$(INTDIR)/LangArabicModel.obj \
 	$(INTDIR)/LangFrenchModel.obj
 
-$(OUTDIR)/chardet.dll : $(OUTDIR)  $(DEF_FILE) $(LINK32_OBJS)
+$(OUTDIR)/chardet_vc2.dll : $(OUTDIR)  $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<

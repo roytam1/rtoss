@@ -1,4 +1,4 @@
-# Microsoft Developer Studio Generated NMAKE File, Format Version 4.20
+# Microsoft Developer Studio Generated NMAKE File, Format Version 4.10
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
@@ -34,9 +34,10 @@ NULL=nul
 ################################################################################
 # Begin Project
 # PROP Target_Last_Scanned "chardet_vc4 - Win32 Debug"
-RSC=rc.exe
-CPP=cl.exe
 MTL=mktyplib.exe
+CPP=cl.exe
+RSC=rc.exe
+F90=fl32.exe
 
 !IF  "$(CFG)" == "chardet_vc4 - Win32 Release"
 
@@ -53,7 +54,7 @@ MTL=mktyplib.exe
 OUTDIR=.\Release
 INTDIR=.\Release
 
-ALL : "$(OUTDIR)\chardet.dll"
+ALL : "$(OUTDIR)\chardet_vc4.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\CharDistribution.obj"
@@ -90,13 +91,16 @@ CLEAN :
 	-@erase "$(INTDIR)\nsSJISProber.obj"
 	-@erase "$(INTDIR)\nsUniversalDetector.obj"
 	-@erase "$(INTDIR)\nsUTF8Prober.obj"
-	-@erase "$(OUTDIR)\chardet.dll"
-	-@erase "$(OUTDIR)\chardet.exp"
-	-@erase "$(OUTDIR)\chardet.lib"
+	-@erase "$(OUTDIR)\chardet_vc4.dll"
+	-@erase "$(OUTDIR)\chardet_vc4.exp"
+	-@erase "$(OUTDIR)\chardet_vc4.lib"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+# ADD BASE F90 /I "chardet_/"
+# ADD F90 /I "Release/"
+F90_OBJS=.\Release/
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
 # ADD CPP /nologo /MT /W3 /GX /O2 /I "src" /I "src\tables" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /YX /c
 CPP_PROJ=/nologo /MT /W3 /GX /O2 /I "src" /I "src\tables" /D "NDEBUG" /D\
@@ -117,12 +121,12 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"Release/chardet.dll"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
  odbccp32.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)/chardet.pdb" /machine:I386 /out:"$(OUTDIR)/chardet.dll"\
- /implib:"$(OUTDIR)/chardet.lib" 
+ /pdb:"$(OUTDIR)/chardet_vc4.pdb" /machine:I386 /out:"$(OUTDIR)/chardet_vc4.dll"\
+ /implib:"$(OUTDIR)/chardet_vc4.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\CharDistribution.obj" \
 	"$(INTDIR)\impl.obj" \
@@ -159,7 +163,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\nsUniversalDetector.obj" \
 	"$(INTDIR)\nsUTF8Prober.obj"
 
-"$(OUTDIR)\chardet.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\chardet_vc4.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -179,7 +183,7 @@ LINK32_OBJS= \
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
-ALL : "$(OUTDIR)\chardet.dll"
+ALL : "$(OUTDIR)\chardet_vc4.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\CharDistribution.obj"
@@ -218,15 +222,18 @@ CLEAN :
 	-@erase "$(INTDIR)\nsUTF8Prober.obj"
 	-@erase "$(INTDIR)\vc40.idb"
 	-@erase "$(INTDIR)\vc40.pdb"
-	-@erase "$(OUTDIR)\chardet.dll"
-	-@erase "$(OUTDIR)\chardet.exp"
-	-@erase "$(OUTDIR)\chardet.ilk"
-	-@erase "$(OUTDIR)\chardet.lib"
-	-@erase "$(OUTDIR)\chardet.pdb"
+	-@erase "$(OUTDIR)\chardet_vc4.dll"
+	-@erase "$(OUTDIR)\chardet_vc4.exp"
+	-@erase "$(OUTDIR)\chardet_vc4.ilk"
+	-@erase "$(OUTDIR)\chardet_vc4.lib"
+	-@erase "$(OUTDIR)\chardet_vc4.pdb"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+# ADD BASE F90 /I "Debug/"
+# ADD F90 /I "Debug/"
+F90_OBJS=.\Debug/
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
 # ADD CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /I "src" /I "src\tables" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /YX /c
 CPP_PROJ=/nologo /MTd /W3 /Gm /GX /Zi /Od /I "src" /I "src\tables" /D "_DEBUG"\
@@ -247,12 +254,12 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"Debug/chardet.dll"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
  odbccp32.lib /nologo /subsystem:windows /dll /incremental:yes\
- /pdb:"$(OUTDIR)/chardet.pdb" /debug /machine:I386 /out:"$(OUTDIR)/chardet.dll"\
- /implib:"$(OUTDIR)/chardet.lib" 
+ /pdb:"$(OUTDIR)/chardet_vc4.pdb" /debug /machine:I386\
+ /out:"$(OUTDIR)/chardet_vc4.dll" /implib:"$(OUTDIR)/chardet_vc4.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\CharDistribution.obj" \
 	"$(INTDIR)\impl.obj" \
@@ -289,7 +296,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\nsUniversalDetector.obj" \
 	"$(INTDIR)\nsUTF8Prober.obj"
 
-"$(OUTDIR)\chardet.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\chardet_vc4.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -313,6 +320,17 @@ LINK32_OBJS= \
 
 .cxx{$(CPP_SBRS)}.sbr:
    $(CPP) $(CPP_PROJ) $<  
+
+F90_PROJ=/I "Release/" /Fo"Release/" 
+
+.for{$(F90_OBJS)}.obj:
+   $(F90) $(F90_PROJ) $<  
+
+.f{$(F90_OBJS)}.obj:
+   $(F90) $(F90_PROJ) $<  
+
+.f90{$(F90_OBJS)}.obj:
+   $(F90) $(F90_PROJ) $<  
 
 ################################################################################
 # Begin Target
