@@ -559,6 +559,10 @@ void GreenPadWnd::on_drop( HDROP hd )
 		if(lstrcmp(str,filename_.c_str()))
 #endif
 			Open( str, AutoDetect );
+#ifndef NO_OLEDNDSRC
+		else
+			::SetForegroundWindow( hwnd() );
+#endif
 	}
 	::DragFinish( hd );
 }
