@@ -44,6 +44,8 @@ void  nsUTF8Prober::Reset(void)
   mState = eDetecting;
 }
 
+#define ENOUGH_CHAR_THRESHOLD 256
+
 nsProbingState nsUTF8Prober::HandleData(const char* aBuf, PRUint32 aLen)
 {
   PRUint32 codingState;
@@ -51,6 +53,11 @@ nsProbingState nsUTF8Prober::HandleData(const char* aBuf, PRUint32 aLen)
   for (PRUint32 i = 0; i < aLen; i++)
   {
     codingState = mCodingSM->NextState(aBuf[i]);
+    if (codingState == eError)
+    {
+      mState = eNotMe;
+      break;
+    }
     if (codingState == eItsMe)
     {
       mState = eFoundIt;
@@ -63,7 +70,7 @@ nsProbingState nsUTF8Prober::HandleData(const char* aBuf, PRUint32 aLen)
     }
   }
 
-  if (mState == eDetecting)
+  if (mNumOfMBChar > ENOUGH_CHAR_THRESHOLD && mState == eDetecting)
     if (GetConfidence() > SHORTCUT_THRESHOLD)
       mState = eFoundIt;
   return mState;
@@ -73,10 +80,9 @@ nsProbingState nsUTF8Prober::HandleData(const char* aBuf, PRUint32 aLen)
 
 float nsUTF8Prober::GetConfidence(void)
 {
-  float unlike = (float)0.99;
-
   if (mNumOfMBChar < 6)
   {
+    float unlike = 0.5f;
     for (PRUint32 i = 0; i < mNumOfMBChar; i++)
       unlike *= ONE_CHAR_PROB;
     return (float)1.0 - unlike;
