@@ -53,7 +53,7 @@ MTL=mktyplib.exe
 OUTDIR=.\Release
 INTDIR=.\Release
 
-ALL : "$(OUTDIR)\chardet.dll"
+ALL : "$(OUTDIR)\cdetmips.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\CharDistribution.obj"
@@ -91,9 +91,9 @@ CLEAN :
 	-@erase "$(INTDIR)\nsUniversalDetector.obj"
 	-@erase "$(INTDIR)\nsUTF8Prober.obj"
 	-@erase "$(INTDIR)\vc40.pdb"
-	-@erase "$(OUTDIR)\chardet.dll"
-	-@erase "$(OUTDIR)\chardet.exp"
-	-@erase "$(OUTDIR)\chardet.lib"
+	-@erase "$(OUTDIR)\cdetmips.dll"
+	-@erase "$(OUTDIR)\cdetmips.exp"
+	-@erase "$(OUTDIR)\cdetmips.lib"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -102,22 +102,22 @@ CLEAN :
 # ADD MTL /nologo /D "NDEBUG" /win32
 MTL_PROJ=/nologo /D "NDEBUG" /win32 
 # ADD BASE CPP /nologo /MT /Gt0 /QMOb2000 /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /Gt0 /QMOb2000 /W3 /GX- /Zi /O1 /I "src" /I "src\tables" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /YX /c
-CPP_PROJ=/nologo /ML /Gt0 /QMOb2000 /W3 /GX- /Zi /O1 /I "src" /I "src\tables"\
- /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS"\
- /Fp"$(INTDIR)/cdetmips.pch" /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
+# ADD CPP /nologo /Gt0 /QMOb2000 /W3 /Zi /O1 /I "src" /I "src\tables" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /YX /c
+CPP_PROJ=/nologo /ML /Gt0 /QMOb2000 /W3 /Zi /O1 /I "src" /I "src\tables" /D\
+ "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /Fp"$(INTDIR)/cdetmips.pch"\
+ /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.\.
 # ADD BASE RSC /l 0x411 /d "NDEBUG"
 # ADD RSC /l 0x411 /d "NDEBUG"
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:MIPS
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:MIPS /out:"Release/chardet.dll"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:MIPS
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
  odbccp32.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)/chardet.pdb" /machine:MIPS /out:"$(OUTDIR)/chardet.dll"\
- /implib:"$(OUTDIR)/chardet.lib" 
+ /pdb:"$(OUTDIR)/cdetmips.pdb" /machine:MIPS /out:"$(OUTDIR)/cdetmips.dll"\
+ /implib:"$(OUTDIR)/cdetmips.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\CharDistribution.obj" \
 	"$(INTDIR)\impl.obj" \
@@ -154,7 +154,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\nsUniversalDetector.obj" \
 	"$(INTDIR)\nsUTF8Prober.obj"
 
-"$(OUTDIR)\chardet.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\cdetmips.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -181,7 +181,7 @@ BSC32_SBRS= \
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
-ALL : "$(OUTDIR)\chardet.dll"
+ALL : "$(OUTDIR)\cdetmips.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\CharDistribution.obj"
@@ -219,11 +219,11 @@ CLEAN :
 	-@erase "$(INTDIR)\nsUniversalDetector.obj"
 	-@erase "$(INTDIR)\nsUTF8Prober.obj"
 	-@erase "$(INTDIR)\vc40.pdb"
-	-@erase "$(OUTDIR)\chardet.dll"
-	-@erase "$(OUTDIR)\chardet.exp"
-	-@erase "$(OUTDIR)\chardet.ilk"
-	-@erase "$(OUTDIR)\chardet.lib"
-	-@erase "$(OUTDIR)\chardet.pdb"
+	-@erase "$(OUTDIR)\cdetmips.dll"
+	-@erase "$(OUTDIR)\cdetmips.exp"
+	-@erase "$(OUTDIR)\cdetmips.ilk"
+	-@erase "$(OUTDIR)\cdetmips.lib"
+	-@erase "$(OUTDIR)\cdetmips.pdb"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -232,22 +232,22 @@ CLEAN :
 # ADD MTL /nologo /D "_DEBUG" /win32
 MTL_PROJ=/nologo /D "_DEBUG" /win32 
 # ADD BASE CPP /nologo /MTd /Gt0 /QMOb2000 /W3 /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /ML /Gt0 /QMOb2000 /W3 /GX- /Zi /O1 /I "src" /I "src\tables" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /YX /c
-CPP_PROJ=/nologo /ML /Gt0 /QMOb2000 /W3 /GX- /Zi /O1 /I "src" /I "src\tables"\
- /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS"\
- /Fp"$(INTDIR)/cdetmips.pch" /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
+# ADD CPP /nologo /ML /Gt0 /QMOb2000 /W3 /Zi /O1 /I "src" /I "src\tables" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /YX /c
+CPP_PROJ=/nologo /ML /Gt0 /QMOb2000 /W3 /Zi /O1 /I "src" /I "src\tables" /D\
+ "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DLL_EXPORTS" /Fp"$(INTDIR)/cdetmips.pch"\
+ /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.\.
 # ADD BASE RSC /l 0x411 /d "_DEBUG"
 # ADD RSC /l 0x411 /d "_DEBUG"
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:MIPS
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:MIPS /out:"Debug/chardet.dll"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:MIPS
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
  odbccp32.lib /nologo /subsystem:windows /dll /incremental:yes\
- /pdb:"$(OUTDIR)/chardet.pdb" /debug /machine:MIPS /out:"$(OUTDIR)/chardet.dll"\
- /implib:"$(OUTDIR)/chardet.lib" 
+ /pdb:"$(OUTDIR)/cdetmips.pdb" /debug /machine:MIPS\
+ /out:"$(OUTDIR)/cdetmips.dll" /implib:"$(OUTDIR)/cdetmips.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\CharDistribution.obj" \
 	"$(INTDIR)\impl.obj" \
@@ -284,7 +284,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\nsUniversalDetector.obj" \
 	"$(INTDIR)\nsUTF8Prober.obj"
 
-"$(OUTDIR)\chardet.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\cdetmips.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<

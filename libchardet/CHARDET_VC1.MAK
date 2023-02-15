@@ -1,6 +1,6 @@
 # Microsoft Visual C++ generated build script - Do not modify
 
-PROJ = CHARDET
+PROJ = CHARDET_VC1
 DEBUG = 0
 PROGTYPE = 1
 CALLER = 

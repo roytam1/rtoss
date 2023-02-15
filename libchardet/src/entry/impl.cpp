@@ -45,7 +45,24 @@
 #include <stdlib.h>
 
 #ifdef _WIN32
+
 #   include <windows.h>
+#   ifdef SUPERTINY
+	static char *strcpyL(char *dest, const char *in)
+	{
+		char *ret = dest;
+		while ((*dest++ = *in++));
+		return ret;
+	}
+	#define strcpy strcpyL
+	static char *strdupL(const char *s)
+	{
+		char *d = new char[strlen(s)+1];
+		strcpyL(d,s);
+		return d;
+	}
+	#define strdup strdupL
+#   endif //SUPERTINY
 #endif
 
 
