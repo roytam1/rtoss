@@ -45,9 +45,17 @@
 #include <stdlib.h>
 
 #ifdef _WIN32
-
 #   include <windows.h>
-#   ifdef SUPERTINY
+
+	#ifdef SUPERTINY
+	static size_t strlenL(const char *str)
+	{
+		size_t len=0;
+		while(str[len])
+			len++;
+		return len;
+	}
+	#define strlen strlenL
 	static char *strcpyL(char *dest, const char *in)
 	{
 		char *ret = dest;
@@ -55,15 +63,17 @@
 		return ret;
 	}
 	#define strcpy strcpyL
-	static char *strdupL(const char *s)
-	{
-		char *d = new char[strlen(s)+1];
-		strcpyL(d,s);
-		return d;
-	}
-	#define strdup strdupL
-#   endif //SUPERTINY
-#endif
+	#endif // SUPERTINY
+
+#endif // _WIN32
+
+// Use our own strdup that uses the new operator
+static char *strdupNew(const char *s)
+{
+	char *d = new char[strlen(s)+1];
+	strcpy(d,s);
+	return d;
+}
 
 
 #ifdef _MANAGED
@@ -90,13 +100,13 @@ public:
 
     virtual void Report(const char* charset)
     {
-	charset_ = strdup(charset);
+	charset_ = strdupNew(charset);
     }
 
     virtual void Reset()
     {
 	nsUniversalDetector::Reset();
-	charset_ = strdup("");
+	charset_ = strdupNew("");
     }
 
     const char* GetCharset() const
