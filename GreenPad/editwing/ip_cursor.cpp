@@ -880,31 +880,40 @@ bool Cursor::on_ime_confirmreconvertstring( RECONVERTSTRING* rs )
 #ifndef NO_OLEDNDTAR
 OleDnDTarget::OleDnDTarget( HWND hwnd, ViewImpl& vw )
 	: refcnt   ( 1 )
-	, hwnd_    ( hwnd )
+	, hwnd_    ( NULL )
 	, view_    ( vw )
 	, comes_from_center_ ( false )
 {
 	LOGGER( "OleDnDTarget::OleDnDTarget() start" );
 	ki::app().InitModule( ki::App::OLE );
-	
-	if( S_OK == ::CoLockObjectExternal( this, TRUE, FALSE ) )
+
+	if( ::IsWindow( hwnd ) )
 	{
-		if(S_OK == ::RegisterDragDrop(hwnd_, this) )
-			return; // Sucess!
+	
+		if( S_OK == ::CoLockObjectExternal( this, TRUE, FALSE ) )
+		{
+			if(S_OK == ::RegisterDragDrop(hwnd, this) )
+			{
+				// Sucess!
+				hwnd_ = hwnd;
+				return;
+			}
+			else
+			{
+				LOGGER( "OleDnDTarget::OleDnDTarget() RegisterDragDrop() failed" );
+			}
+		}
 		else
-			LOGGER( "OleDnDTarget::OleDnDTarget() RegisterDragDrop() failed" );
+		{	// Could not Register the Drag&Drop
+			// So we must unlock the object.
+			LOGGER( "OleDnDTarget::OleDnDTarget() CoLockObjectExternal() failed" );
+			::CoLockObjectExternal( this, FALSE, FALSE );
+		}
 	}
-	else
-	{	// Could not Register the Drag&Drop
-		// So we must unlock the object.
-		LOGGER( "OleDnDTarget::OleDnDTarget() CoLockObjectExternal() failed" );
-		::CoLockObjectExternal( this, FALSE, FALSE );
-	}
-	hwnd_ = NULL;
 }
 OleDnDTarget::~OleDnDTarget(  )
 {
-	if( hwnd_ )
+	if( ::IsWindow( hwnd_ ) )
 	{
 		::RevokeDragDrop(hwnd_);
 
