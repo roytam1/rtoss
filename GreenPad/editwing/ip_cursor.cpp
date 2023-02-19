@@ -884,16 +884,20 @@ OleDnDTarget::OleDnDTarget( HWND hwnd, ViewImpl& vw )
 	, view_    ( vw )
 	, comes_from_center_ ( false )
 {
+	LOGGER( "OleDnDTarget::OleDnDTarget() start" );
 	ki::app().InitModule( ki::App::OLE );
 	
-	if( S_OK != ::CoLockObjectExternal( this, TRUE, FALSE ) )
+	if( S_OK == ::CoLockObjectExternal( this, TRUE, FALSE ) )
 	{
 		if(S_OK == ::RegisterDragDrop(hwnd_, this) )
 			return; // Sucess!
+		else
+			LOGGER( "OleDnDTarget::OleDnDTarget() RegisterDragDrop() failed" );
 	}
 	else
 	{	// Could not Register the Drag&Drop
 		// So we must unlock the object.
+		LOGGER( "OleDnDTarget::OleDnDTarget() CoLockObjectExternal() failed" );
 		::CoLockObjectExternal( this, FALSE, FALSE );
 	}
 	hwnd_ = NULL;
