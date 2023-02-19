@@ -7,7 +7,7 @@ namespace editwing {
 namespace view {
 #endif
 
-
+using namespace ki;
 
 class Canvas;
 class ViewImpl;
@@ -98,7 +98,21 @@ class OleDnDTarget : public IDropTarget
 	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void **ppvObject);
 
 	ULONG STDMETHODCALLTYPE AddRef()  { return ::InterlockedIncrement(&refcnt); }
-	ULONG STDMETHODCALLTYPE Release() { return ::InterlockedDecrement(&refcnt); }
+	ULONG STDMETHODCALLTYPE Release()
+	{
+		// decrement object reference count
+		LONG count = InterlockedDecrement(&refcnt);
+
+		if(count == 0)
+		{
+			delete this;
+			return 0;
+		}
+		else
+		{
+			return count;
+		}
+	}
 
 	HRESULT STDMETHODCALLTYPE DragEnter(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
 	{
@@ -106,17 +120,24 @@ class OleDnDTarget : public IDropTarget
 		comes_from_center_ = false;
 		FORMATETC fmt = { CF_UNICODETEXT, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 		if( S_OK == pDataObj->QueryGetData(&fmt) )
+		{
+			LOGGER( "OleDnDTarget::DragEnter(CF_UNICODETEXT)" );
 			return S_OK;
+		}
 
 		fmt.cfFormat = CF_TEXT;
 		if( S_OK == pDataObj->QueryGetData(&fmt) )
+		{
+			LOGGER( "OleDnDTarget::DragEnter(CF_TEXT)" );
 			return S_OK;
+		}
 
+		LOGGER( "OleDnDTarget::DragEnter(No supported IDataObject format)" );
 		return E_UNEXPECTED;
 	}
 
 	HRESULT STDMETHODCALLTYPE DragLeave()
-		{ return S_OK; }
+		{ LOGGER( "OleDnDTarget::DragLeave()" ); return S_OK; }
 
 	HRESULT STDMETHODCALLTYPE DragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffect);
 
