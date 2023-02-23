@@ -971,6 +971,14 @@ HRESULT STDMETHODCALLTYPE OleDnDTarget::Drop(IDataObject *pDataObj, DWORD grfKey
 			::GlobalFree(stg.hGlobal);
 		return S_OK;
 	}
+
+	// check also HDROP
+	fmt.cfFormat = CF_HDROP;
+	if( S_OK == pDataObj->GetData(&fmt, &stg) && stg.hGlobal)
+	{
+		::SendMessage(GetParent(GetParent(view_.hwd())), WM_DROPFILES, (WPARAM) stg.hGlobal, NULL);
+	}
+
 	// Shoud I return E_INVALIDARG ??
 	return E_UNEXPECTED;
 }
