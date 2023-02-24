@@ -24,8 +24,20 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#if _MSC_VER < 1020
+#include <WINNETWK.H>
+#endif // _MSC_VER < 1020
+
 #include <shlobj.h>     // for IDropTargetHelper
 #include <shlguid.h>
+
+#if _MSC_VER < 1100
+#define bool BOOL
+#define true TRUE
+#define false FALSE
+
+#define CF_DIBV5 17
+#endif // _MSC_VER < 1100
 
 class CClipSpyDoc;
 

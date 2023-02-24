@@ -30,6 +30,64 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+#ifndef NM_LISTVIEW
+typedef struct tagNMLISTVIEW
+{
+    NMHDR   hdr;
+    int     iItem;
+    int     iSubItem;
+    UINT    uNewState;
+    UINT    uOldState;
+    UINT    uChanged;
+    POINT   ptAction;
+    LPARAM  lParam;
+} NMLISTVIEW, FAR *LPNMLISTVIEW;
+
+#define LPNM_LISTVIEW   LPNMLISTVIEW
+#define NM_LISTVIEW     NMLISTVIEW
+#endif
+
+#ifndef NM_CUSTOMDRAW
+typedef struct tagNMCUSTOMDRAWINFO
+{
+    NMHDR hdr;
+    DWORD dwDrawStage;
+    HDC hdc;
+    RECT rc;
+    DWORD dwItemSpec;
+    UINT  uItemState;
+    LPARAM lItemlParam;
+} NMCUSTOMDRAW, FAR * LPNMCUSTOMDRAW;
+
+typedef struct tagNMLVCUSTOMDRAW
+{
+    NMCUSTOMDRAW nmcd;
+    COLORREF clrText;
+    COLORREF clrTextBk;
+} NMLVCUSTOMDRAW, *LPNMLVCUSTOMDRAW;
+
+#define NM_CUSTOMDRAW	(NM_FIRST-12)
+#endif
+
+#ifndef CDRF_NOTIFYITEMDRAW
+#define CDRF_NOTIFYITEMDRAW	0x00000020
+
+#define CDDS_PREPAINT		0x000000001
+#define CDDS_POSTPAINT		0x000000002
+
+#define CDDS_ITEM			0x000010000
+#define CDDS_ITEMPREPAINT	(CDDS_ITEM | CDDS_PREPAINT)
+#define CDDS_ITEMPOSTPAINT	(CDDS_ITEM | CDDS_POSTPAINT)
+#endif
+
+#ifndef LVM_SETEXTENDEDLISTVIEWSTYLE
+#define LVM_SETEXTENDEDLISTVIEWSTYLE	(LVM_FIRST + 54)
+#endif
+
+#ifndef LVS_EX_FULLROWSELECT
+#define LVS_EX_FULLROWSELECT	0x000000020
+#endif
+
 /////////////////////////////////////////////////////////////////////////////
 // CLeftView
 
@@ -88,7 +146,7 @@ void CLeftView::OnInitialUpdate()
 CListCtrl& list = GetListCtrl();
 
     // Init the list control.
-    list.SetExtendedStyle ( LVS_EX_FULLROWSELECT );
+    list.SendMessage( LVM_SETEXTENDEDLISTVIEWSTYLE, 0, (LPARAM)LVS_EX_FULLROWSELECT );
 
     list.InsertColumn ( 0, _T("Format"), LVCFMT_LEFT, 0, 0 );
     list.InsertColumn ( 1, _T("Data size"), LVCFMT_LEFT, 0, 1 );
