@@ -389,7 +389,6 @@ public:
 	int cx()    const { return cvs_.zone().right - cvs_.zone().left; }
 	int cxAll() const { return cvs_.zone().right; }
 	int cy()    const { return cvs_.zone().bottom; }
-	HWND hwd()  const { return hwnd_; }
 
 private:
 

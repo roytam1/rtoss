@@ -976,7 +976,7 @@ HRESULT STDMETHODCALLTYPE OleDnDTarget::Drop(IDataObject *pDataObj, DWORD grfKey
 	fmt.cfFormat = CF_HDROP;
 	if( app().isWin32s() && S_OK == pDataObj->GetData(&fmt, &stg) && stg.hGlobal)
 	{
-		::SendMessage(GetParent(GetParent(view_.hwd())), WM_DROPFILES, (WPARAM) stg.hGlobal, NULL);
+		::SendMessage(::GetParent(::GetParent(hwnd_)), WM_DROPFILES, (WPARAM) stg.hGlobal, NULL);
 	}
 
 	// Shoud I return E_INVALIDARG ??
