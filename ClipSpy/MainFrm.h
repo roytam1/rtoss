@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////
 //
-// ClipSpy, Copyright 1999-2001  by Michael Dunn <mdunn at inreach dot com>
+// ClipSpy, Copyright 1999  by Michael Dunn <mdunn at inreach dot com>
 //
 // This is a utility to view the raw contents of the clipboard, or the 
 // data in a drag-and-drop operation.  There are still some quirks and
@@ -8,9 +8,6 @@
 //
 // Revision history:
 //  Dec 20, 1999: Version 1.0, first release.
-//
-//  Sep 27, 2001: Version 1.2, added ability to save any block of data;
-//      added IDropTargetHelper support to CLeftView.
 //
 // You can get the latest updates for ClipSpy at:
 //  http://www.codeproject.com/clipboard/clipspy.asp
@@ -68,8 +65,6 @@ protected:
 	//{{AFX_MSG(CMainFrame)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnClearClipboard();
-	afx_msg void OnSaveData();
-	afx_msg void OnUpdateSaveData(CCmdUI* pCmdUI);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

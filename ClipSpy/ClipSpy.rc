@@ -79,8 +79,6 @@ BEGIN
         MENUITEM "&Read Clipboard",             IDC_READ_CLIPBOARD
         MENUITEM "&Clear Clipboard",            IDC_CLEAR_CLIPBOARD
         MENUITEM SEPARATOR
-        MENUITEM "&Save Selected Data\tCtrl+S", IDC_SAVE_DATA
-        MENUITEM SEPARATOR
         MENUITEM "E&xit",                       ID_APP_EXIT
     END
     POPUP "&Help"
@@ -112,7 +110,6 @@ END
 
 IDR_MAINFRAME ACCELERATORS PRELOAD MOVEABLE PURE 
 BEGIN
-    "S",            IDC_SAVE_DATA,          VIRTKEY, CONTROL, NOINVERT
     VK_ESCAPE,      ID_CANCEL_EDIT_CNTR,    VIRTKEY, NOINVERT
 END
 
@@ -133,9 +130,9 @@ CAPTION "About ClipSpy"
 FONT 8, "MS Sans Serif"
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
-    LTEXT           "ClipSpy Version 1.2 (September 24, 2001)",IDC_STATIC,40,
+    LTEXT           "ClipSpy Version 1.0 (December 20, 1999)",IDC_STATIC,40,
                     10,133,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 1999-2001 by Michael Dunn\nmdunn@inreach.com\nhttp://home.inreach.com/mdunn/",
+    LTEXT           "Copyright (C) 1999 by Michael Dunn\nmdunn@inreach.com\nhttp://home.inreach.com/mdunn/",
                     IDC_STATIC,40,25,188,32
     DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
 END
@@ -167,14 +164,14 @@ BEGIN
             VALUE "Comments", "\0"
             VALUE "CompanyName", "\0"
             VALUE "FileDescription", "ClipSpy MFC Application\0"
-            VALUE "FileVersion", "1.2.0.0\0"
+            VALUE "FileVersion", "1.0.0.0\0"
             VALUE "InternalName", "ClipSpy\0"
-            VALUE "LegalCopyright", "Copyright (C) 1999-2001\0"
+            VALUE "LegalCopyright", "Copyright (C) 1999\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "ClipSpy.EXE\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "ClipSpy Application\0"
-            VALUE "ProductVersion", "1.2.0.0\0"
+            VALUE "ProductVersion", "1.0.0.0\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -342,7 +339,6 @@ STRINGTABLE DISCARDABLE
 BEGIN
     IDC_CLEAR_CLIPBOARD     "Delete the contents of the clipboard"
     IDC_READ_CLIPBOARD      "Read the contents of the clipboard"
-    IDC_SAVE_DATA           "Saves the data currently being viewed to a file."
 END
 
 #endif    // English (U.S.) resources

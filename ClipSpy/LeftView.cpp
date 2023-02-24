@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////
 //
-// ClipSpy, Copyright 1999-2001  by Michael Dunn <mdunn at inreach dot com>
+// ClipSpy, Copyright 1999  by Michael Dunn <mdunn at inreach dot com>
 //
 // This is a utility to view the raw contents of the clipboard, or the 
 // data in a drag-and-drop operation.  There are still some quirks and
@@ -8,9 +8,6 @@
 //
 // Revision history:
 //  Dec 20, 1999: Version 1.0, first release.
-//
-//  Sep 27, 2001: Version 1.2, added ability to save any block of data;
-//      added IDropTargetHelper support to CLeftView.
 //
 // You can get the latest updates for ClipSpy at:
 //  http://www.codeproject.com/clipboard/clipspy.asp
@@ -26,9 +23,6 @@
 #include "ClipSpyDoc.h"
 #define INITGUID
 #include "LeftView.h"
-
-// We need this declaration for CComPtr, which uses __uuidof()
-struct __declspec(uuid("{4657278B-411B-11d2-839A-00C04FD918D0}")) IDropTargetHelper;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -56,15 +50,8 @@ END_MESSAGE_MAP()
 // CLeftView construction/destruction
 
 CLeftView::CLeftView() : m_hNextClipboardViewer(NULL),
-                         m_bCallingSetClipboardViewer(FALSE),
-                         m_bUseDnDHelper(false)
+                         m_bCallingSetClipboardViewer(FALSE)
 {
-    if ( SUCCEEDED( m_spDropHelper.CoCreateInstance (
-                                       CLSID_DragDropHelper,
-                                       NULL, CLSCTX_INPROC_SERVER )))
-        {
-        m_bUseDnDHelper = true;
-        }
 }
                             
 CLeftView::~CLeftView()
@@ -275,12 +262,6 @@ DROPEFFECT CLeftView::OnDragEnter(COleDataObject* pDataObject, DWORD dwKeyState,
 {
 DROPEFFECT dropeff = DROPEFFECT_COPY;
 
-    if ( m_bUseDnDHelper )
-        {
-        IDataObject* pdo = pDataObject->GetIDataObject ( FALSE );
-        m_spDropHelper->DragEnter ( GetSafeHwnd(), pdo, &point, dropeff );
-        }
-
     return dropeff;
 }
 
@@ -288,31 +269,16 @@ DROPEFFECT CLeftView::OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState, 
 {
 DROPEFFECT dropeff = DROPEFFECT_COPY;
 
-    if ( m_bUseDnDHelper )
-        {
-        m_spDropHelper->DragOver ( &point, dropeff );
-        }
-
     return dropeff;
 }
 
 BOOL CLeftView::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point) 
 {
-    if ( m_bUseDnDHelper )
-        {
-        IDataObject* pdo = pDataObject->GetIDataObject ( FALSE );
-        m_spDropHelper->Drop ( pdo, &point, dropEffect );
-        }
-
     return ReadDataAndFillList ( pDataObject );
 }
 
 void CLeftView::OnDragLeave()
 {
-    if ( m_bUseDnDHelper )
-        {
-        m_spDropHelper->DragLeave();
-        }
 }
 
 
