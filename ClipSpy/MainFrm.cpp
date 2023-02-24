@@ -81,12 +81,15 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT /*lpcs*/,
 	CCreateContext* pContext)
 {
+	CRect cr;
+	GetClientRect( &cr );
+
 	// create splitter window
 	if (!m_wndSplitter.CreateStatic(this, 1, 2))
 		return FALSE;
 
-	if (!m_wndSplitter.CreateView(0, 0, RUNTIME_CLASS(CLeftView), CSize(200, 100), pContext) ||
-		!m_wndSplitter.CreateView(0, 1, RUNTIME_CLASS(CClipSpyView), CSize(100, 100), pContext))
+	if (!m_wndSplitter.CreateView(0, 0, RUNTIME_CLASS(CClipSpyView), CSize(cr.Width()*3/4, cr.Height()), pContext) ||
+		!m_wndSplitter.CreateView(0, 1, RUNTIME_CLASS(CLeftView), CSize(cr.Width()/4, cr.Height()), pContext))
 	{
 		m_wndSplitter.DestroyWindow();
 		return FALSE;

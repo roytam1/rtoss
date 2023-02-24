@@ -222,7 +222,7 @@ END
 STRINGTABLE PRELOAD DISCARDABLE 
 BEGIN
     AFX_IDS_APP_TITLE       "ClipSpy"
-    AFX_IDS_IDLEMESSAGE     "Monitoring clipboard.  Drag and drop into the left pane to view the data."
+    AFX_IDS_IDLEMESSAGE     "Monitoring clipboard.  Drag and drop into the right pane to view the data."
 END
 
 STRINGTABLE DISCARDABLE 
