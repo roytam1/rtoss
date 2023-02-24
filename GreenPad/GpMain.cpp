@@ -144,7 +144,19 @@ LRESULT GreenPadWnd::on_message( UINT msg, WPARAM wp, LPARAM lp )
 
 	// ÇcÅïÇc
 	case WM_DROPFILES:
-		on_drop( reinterpret_cast<HDROP>(wp) );
+		{
+			HGLOBAL hDrop = reinterpret_cast<HGLOBAL>(wp);
+			DROPFILES *df = (DROPFILES *)::GlobalLock( hDrop );
+			size_t hdropSize = ::GlobalSize( hDrop );
+			HWND *hDummy = (HWND*)( ((BYTE*)df) + hdropSize - 2*sizeof(HWND) );
+			HWND *hCustomHwnd = (HWND*)( ((BYTE*)hDummy) + sizeof(HWND) );
+			BOOL bProcessDrops = *hDummy || (*hDummy == 0 && *hCustomHwnd != hwnd());
+			::GlobalUnlock(hDrop);
+			if(bProcessDrops)
+			{
+				on_drop( hDrop );
+			}
+		}
 		break;
 
 #ifndef NO_OLEDNDSRC
@@ -157,7 +169,7 @@ LRESULT GreenPadWnd::on_message( UINT msg, WPARAM wp, LPARAM lp )
 			const unicode *fnu = filename_.ConvToWChar();
 			if( fnu )
 			{
-				OleDnDSourceFile doDrag( fnu, my_lstrlenW(fnu), DROPEFFECT_COPY );
+				OleDnDSourceFile doDrag( hwnd(), fnu, my_lstrlenW(fnu), DROPEFFECT_COPY );
 				filename_.FreeWCMem(fnu);
 			}
 			break;
@@ -555,14 +567,7 @@ void GreenPadWnd::on_drop( HDROP hd )
 	{
 		TCHAR str[MAX_PATH];
 		::DragQueryFile( hd, i, str, countof(str) );
-#ifndef NO_OLEDNDSRC
-		if(lstrcmp(str,filename_.c_str()))
-#endif
-			Open( str, AutoDetect );
-#ifndef NO_OLEDNDSRC
-		else
-			::SetForegroundWindow( hwnd() );
-#endif
+		Open( str, AutoDetect );
 	}
 	::DragFinish( hd );
 }
