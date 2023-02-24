@@ -269,6 +269,7 @@ class IDataObjectFile : public IDataObject, public Object
 {
 private:
 	LONG refcnt;
+	HWND hwnd_;
 	const unicode *str_;
 	const size_t len_;
 
@@ -279,10 +280,11 @@ private:
     };
 	FORMATETC m_rgfe[DATA_NUM];
 public:
-	IDataObjectFile(const unicode *str, size_t len)
+	IDataObjectFile(HWND hwnd, const unicode *str, size_t len)
 		: refcnt( 1 )
 		, str_  ( str )
 		, len_  ( len )
+		, hwnd_  ( hwnd )
 		{
 			SetFORMATETC(&m_rgfe[DATA_HDROP], CF_HDROP);
 		}
@@ -331,7 +333,7 @@ public:
 		if( S_OK == QueryGetData(fmt) )
 		{
 			mem00( pm, sizeof(*pm) ); // In case...
-			pm->hGlobal = GlobalAlloc( GMEM_MOVEABLE, sizeof(DROPFILES)+(len_+2)*sizeof(unicode) );
+			pm->hGlobal = GlobalAlloc( GMEM_MOVEABLE, sizeof(DROPFILES)+(len_+2)*sizeof(unicode)+2*sizeof(HWND) );
 			if( !pm->hGlobal )
 				return E_OUTOFMEMORY;
 			// Copy the data into pm
@@ -382,6 +384,10 @@ public:
 			if(remaining_bytes > 0)
 				mem00(dest+len, remaining_bytes); // clear remaining bytes
 
+			// write GPMainWnd handle as signature (previous HWND as 0 is also part of signature)
+			HWND* myhwnd = (HWND *)( ((BYTE*)data) + gmemsz - sizeof(HWND) );
+			*myhwnd = hwnd_;
+
 			GlobalUnlock(pm->hGlobal);
 			pm->pUnkForRelease = NULL; // Caller must free!
 			pm->tymed = TYMED_HGLOBAL;
@@ -422,14 +428,14 @@ public:
 class OleDnDSourceFile : public IDropSource
 {
 public:
-	OleDnDSourceFile(const unicode *str, size_t len, DWORD adEffect = DROPEFFECT_MOVE|DROPEFFECT_COPY)
+	OleDnDSourceFile(HWND hwnd, const unicode *str, size_t len, DWORD adEffect = DROPEFFECT_MOVE|DROPEFFECT_COPY)
 	: refcnt    ( 1 )
 	, dwEffect_ ( 0 )
 	{
 		ki::app().InitModule( App::OLE );
 		{
 			// Create IData object from the string
-			IDataObjectFile data(str, len);
+			IDataObjectFile data(hwnd, str, len);
 			LOGGER( "OleDnDSourceFile IDataObjectFile created" );
 			// Do the drag and drop and set dwEffect_ accordingly.
 			DWORD effect=0;
