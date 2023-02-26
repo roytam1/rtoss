@@ -154,7 +154,7 @@ LRESULT GreenPadWnd::on_message( UINT msg, WPARAM wp, LPARAM lp )
 			::GlobalUnlock(hDrop);
 			if(bProcessDrops)
 			{
-				on_drop( hDrop );
+				on_drop( reinterpret_cast<HDROP>(wp) );
 			}
 		}
 		break;
