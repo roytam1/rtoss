@@ -55,7 +55,7 @@ PRE:
 RES = $(INTDIR)\gp_rsrc.res
 DEF = /DNDEBUG /DUNICODE /D_UNICODE /DUSEGLOBALIME
 
-COPT = $(DEF) /GA /GF /FD /fh=stdafx.pch /Fd$(INTDIR) /W3 /MT /c
+COPT = $(DEF) /GA /GF /FD /fh=$(INTDIR)\stdafx.pch /Fd$(INTDIR) /W3 /MT /c /Ikilib
 LOPT = /manifest:no
 ROPT = $(DEF) /L 0x411 /I "rsrc" /DTARGET_VER=310
 
