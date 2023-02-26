@@ -57,7 +57,7 @@ DEF = /DNDEBUG /DUNICODE /D_UNICODE /DUSEGLOBALIME
 
 COPT = $(DEF) /GA /GF /FD /fh=$(INTDIR)\stdafx.pch /Fd$(INTDIR) /W3 /MT /c /Ikilib
 LOPT = /manifest:no
-ROPT = $(DEF) /L 0x411 /I "rsrc" /DTARGET_VER=310
+ROPT = $(DEF) /L 0x411 /I "rsrc"
 
 $(TARGET) : $(OBJS) $(RES)
 	link386 $(LOPT) /OUT:$(TARGET) /SUBSYSTEM:WINDOWS $(OBJS) $(RES) $(LIBS)
