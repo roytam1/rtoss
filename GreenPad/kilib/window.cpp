@@ -416,8 +416,8 @@ void Window::SetCenter( HWND hwnd, HWND rel )
 
 	// ’†‰›‚ðŒvŽZ
 	::SetWindowPos( hwnd, 0,
-		NotSmaller((LONG)0,pr.left + ( (pr.right-pr.left)-(rc.right-rc.left) )/2),
-		NotSmaller((LONG)0,pr.top  + ( (pr.bottom-pr.top)-(rc.bottom-rc.top) )/2),
+		NotSmaller((int)0,pr.left + ( (pr.right-pr.left)-(rc.right-rc.left) )/2),
+		NotSmaller((int)0,pr.top  + ( (pr.bottom-pr.top)-(rc.bottom-rc.top) )/2),
 		0, 0, SWP_NOSIZE|SWP_NOZORDER );
 }
 
