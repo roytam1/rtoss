@@ -704,7 +704,7 @@ void DlgImpl::GoModeless( HWND parent )
 
 //-------------------------------------------------------------------------
 
-BOOL CALLBACK DlgImpl::MainProc(
+INT_PTR CALLBACK DlgImpl::MainProc(
 	HWND dlg, UINT msg, WPARAM wp, LPARAM lp )
 {
 	if( msg == WM_INITDIALOG )
