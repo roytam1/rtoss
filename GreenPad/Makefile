@@ -5,6 +5,7 @@ message:
 	-@echo    make dmc   (for DigitalMars C++)
 	-@echo    make bcc   (for Borland C++ Compilers)
 	-@echo    make vcc   (for Microsoft Visual C++)
+	-@echo    make wcc   (for OpenWatcom C++)
 	-@echo  Please make sure that the "make" program you're using is
 	-@echo  the one from the toolset.
 	-@echo  (GNU make for gcc, nmake for vcc, ... etc.)
@@ -23,5 +24,7 @@ dmc:
 	$(DMAK) -f Makefiles/dmc.mak
 vcc:
 	$(MAKE) -f Makefiles/vcc.mak
+wcc:
+	$(MAKE) -ms -f Makefiles/wcc.mak
 bcc:
 	$(MAKE) -f Makefiles/bcc.mak
