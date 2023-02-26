@@ -582,7 +582,7 @@ void ReopenDlg::on_init()
 	for( ulong i=0; i<csl_.size(); ++i )
 		if( csl_[i].type & 1 ) // 2:=SAVE
 			cb.Add( csl_[i].longName );
-	if(csIndex_ < 0 || csIndex_ > csl_.size()) csIndex_ = 0;
+	if(csIndex_ < 0 || (ulong)csIndex_ > csl_.size()) csIndex_ = 0;
 	cb.Select( csl_[csIndex_].longName );
 }
 

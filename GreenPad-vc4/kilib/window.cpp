@@ -416,8 +416,8 @@ void Window::SetCenter( HWND hwnd, HWND rel )
 
 	// ’†‰›‚ðŒvŽZ
 	::SetWindowPos( hwnd, 0,
-		pr.left + ( (pr.right-pr.left)-(rc.right-rc.left) )/2,
-		pr.top  + ( (pr.bottom-pr.top)-(rc.bottom-rc.top) )/2,
+		NotSmaller((int)0,pr.left + ( (pr.right-pr.left)-(rc.right-rc.left) )/2),
+		NotSmaller((int)0,pr.top  + ( (pr.bottom-pr.top)-(rc.bottom-rc.top) )/2),
 		0, 0, SWP_NOSIZE|SWP_NOZORDER );
 }
 
@@ -596,6 +596,8 @@ void WndImpl::SetUpThunk( HWND wnd )
 	#error Unsupported processor type, please implement assembly code or consider defining NO_ASMTHUNK
 #endif
 
+	DWORD oldprotect; // Make thuk read+execute only for safety.
+	::VirtualProtect(thunk_, THUNK_SIZE, PAGE_EXECUTE_READ, &oldprotect);
 	::FlushInstructionCache( ::GetCurrentProcess(), thunk_, THUNK_SIZE );
 	::SetWindowLongPtr( wnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&thunk_[0]) );
 #else // !NO_ASMTHUNK
@@ -704,7 +706,7 @@ void DlgImpl::GoModeless( HWND parent )
 
 //-------------------------------------------------------------------------
 
-BOOL CALLBACK DlgImpl::MainProc(
+INT_PTR CALLBACK DlgImpl::MainProc(
 	HWND dlg, UINT msg, WPARAM wp, LPARAM lp )
 {
 	if( msg == WM_INITDIALOG )

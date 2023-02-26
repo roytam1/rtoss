@@ -84,6 +84,7 @@ typedef struct tagRECONVERTSTRING {
 #if defined(__DMC__) || (defined(_MSC_VER) && _MSC_VER < 1300)
 	#define SetWindowLongPtr SetWindowLong
 	#define GetWindowLongPtr GetWindowLong
+	#define INT_PTR          INT
 	#define UINT_PTR         UINT
 	#define LONG_PTR         LONG
 	#define GWLP_WNDPROC     GWL_WNDPROC

@@ -397,7 +397,7 @@ protected:
 
 private:
 
-	static BOOL CALLBACK MainProc( HWND, UINT, WPARAM, LPARAM );
+	static INT_PTR CALLBACK MainProc( HWND, UINT, WPARAM, LPARAM );
 
 private:
 

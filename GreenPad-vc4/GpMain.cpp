@@ -144,8 +144,38 @@ LRESULT GreenPadWnd::on_message( UINT msg, WPARAM wp, LPARAM lp )
 
 	// ÇcÅïÇc
 	case WM_DROPFILES:
-		on_drop( reinterpret_cast<HDROP>(wp) );
+		{
+			HGLOBAL hDrop = reinterpret_cast<HGLOBAL>(wp);
+			DROPFILES *df = (DROPFILES *)::GlobalLock( hDrop );
+			size_t hdropSize = ::GlobalSize( hDrop );
+			HWND *hDummy = (HWND*)( ((BYTE*)df) + hdropSize - 2*sizeof(HWND) );
+			HWND *hCustomHwnd = (HWND*)( ((BYTE*)hDummy) + sizeof(HWND) );
+			BOOL bProcessDrops = *hDummy || (*hDummy == 0 && *hCustomHwnd != hwnd());
+			::GlobalUnlock(hDrop);
+			if(bProcessDrops)
+			{
+				on_drop( reinterpret_cast<HDROP>(wp) );
+			}
+		}
 		break;
+
+#ifndef NO_OLEDNDSRC
+	case WM_NCLBUTTONDOWN: {
+		if( wp == HTSYSMENU
+		&& !isUntitled()
+		&& coolDragDetect( hwnd(), /*pt=*/lp, WM_NCLBUTTONUP, PM_NOREMOVE )  )
+		{
+			// Allow dragging file out of system icon with Left button.
+			const unicode *fnu = filename_.ConvToWChar();
+			if( fnu )
+			{
+				OleDnDSourceFile doDrag( hwnd(), fnu, my_lstrlenW(fnu), DROPEFFECT_COPY );
+				filename_.FreeWCMem(fnu);
+			}
+			break;
+		}
+	} return WndImpl::on_message( msg, wp, lp );
+#endif // NO_OLEDNDSRC
 
 	// MRU
 	case GPM_MRUCHANGED:
@@ -532,6 +562,7 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 void GreenPadWnd::on_drop( HDROP hd )
 {
 	UINT iMax = ::DragQueryFile( hd, 0xffffffff, NULL, 0 );
+
 	for( UINT i=0; i<iMax; ++i )
 	{
 		TCHAR str[MAX_PATH];

@@ -67,7 +67,7 @@ inline App::App()
 App::~App()
 {
 	// ロード済みモジュールがあれば閉じておく
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310) || (!defined(NO_OLEDNDTAR) || !defined(NO_OLEDNDSRC))
 	if( loadedModule_ & COM )
 		::CoUninitialize();
 	if( loadedModule_ & OLE )
@@ -105,7 +105,7 @@ void App::InitModule( imflag what )
 
 			break;
 		}
-#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
+#if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310) || (!defined(NO_OLEDNDTAR) || !defined(NO_OLEDNDSRC))
 		case COM: ::CoInitialize( NULL ); break;
 		case OLE: ::OleInitialize( NULL );break;
 #endif
