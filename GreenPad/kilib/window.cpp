@@ -21,6 +21,10 @@ static HKL MyGetKeyboardLayout(DWORD dwLayout)
 //=========================================================================
 // IME‚ÉŠÖ‚·‚é‚ ‚ê‚±‚ê
 //=========================================================================
+#ifdef USEGLOBALIME
+const IID myIID_IActiveIMMApp = { 0x08C0E040, 0x62D1, 0x11D1, {0x93, 0x26, 0x00, 0x60, 0xB0, 0x67, 0xB8, 0x6E} };
+const IID myIID_IActiveIMMMessagePumpOwner = { 0xB5CF2CFA, 0x8AEB, 0x11D1, {0x93, 0x64, 0x00, 0x60, 0xB0, 0x67, 0xB8, 0x6E} };
+#endif
 
 IMEManager* IMEManager::pUniqueInstance_;
 
@@ -37,10 +41,10 @@ IMEManager::IMEManager()
 			app().InitModule( App::OLE );
 			if( S_OK == ::CoCreateInstance(
 					CLSID_CActiveIMM, NULL, CLSCTX_INPROC_SERVER,
-					IID_IActiveIMMApp, (void**)&immApp_ ) )
+					myIID_IActiveIMMApp, (void**)&immApp_ ) )
 			{
 				immApp_->QueryInterface(
-					IID_IActiveIMMMessagePumpOwner, (void**)&immMsg_ );
+					myIID_IActiveIMMMessagePumpOwner, (void**)&immMsg_ );
 			}
 		}
 	#endif
