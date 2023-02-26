@@ -4,7 +4,7 @@
 #include "kilib/window.h"
 #include "kilib/memory.h"
 #include "kilib/ktlaptr.h"
-#include "kilib/string.h"
+#include "kilib/kstring.h"
 
 
 
