@@ -941,9 +941,9 @@ HRESULT STDMETHODCALLTYPE OleDnDTarget::Drop(IDataObject *pDataObj, DWORD grfKey
 		{
 			size_t len = my_lstrlenW(txt);
 			if( grfKeyState&MK_SHIFT ) // Shift to ignore pt.
-				view_.cur().Input( txt, len );
+				view_.cur().Input( txt, (ulong)len );
 			else
-				view_.cur().InputAt( txt, len, pt.x, pt.y );
+				view_.cur().InputAt( txt, (ulong)len, pt.x, pt.y );
 			::GlobalUnlock(stg.hGlobal);
 		}
 		// We must only free the buffer when pUnkForRelease is NULL!
@@ -961,9 +961,9 @@ HRESULT STDMETHODCALLTYPE OleDnDTarget::Drop(IDataObject *pDataObj, DWORD grfKey
 		{
 			size_t len = ::lstrlenA(txt);
 			if( grfKeyState&MK_SHIFT )
-				view_.cur().Input( txt, len );
+				view_.cur().Input( txt, (ulong)len );
 			else
-				view_.cur().InputAt( txt, len, pt.x, pt.y );
+				view_.cur().InputAt( txt, (ulong)len, pt.x, pt.y );
 			::GlobalUnlock(stg.hGlobal);
 		}
 		// We must only free the buffer when pUnkForRelease is NULL!

@@ -947,7 +947,7 @@ struct rMBCS : public TextFileRPimpl
 #else
 		if(!app().isWin3later() || app().isWin95())
 		{
-			len = conv( readcp, 0, fb, p-fb, buf, siz );
+			len = conv( readcp, 0, fb, int(p-fb), buf, siz );
 		}
 		else
 		{

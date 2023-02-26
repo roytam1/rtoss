@@ -373,8 +373,8 @@ public:
 
 			if( !data->fWide )
 			{	// Convert to ANSI and copy to dest!
-				len = ::WideCharToMultiByte( CP_ACP, 0, str_, len_, dest, NULL, NULL, NULL ); // get length
-				::WideCharToMultiByte( CP_ACP, 0, str_, len_, dest, len, NULL, NULL );
+				len = ::WideCharToMultiByte( CP_ACP, 0, str_, (int)len_, dest, NULL, NULL, NULL ); // get length
+				::WideCharToMultiByte( CP_ACP, 0, str_, (int)len_, dest, (int)len, NULL, NULL );
 			}
 			else
 			{
@@ -382,7 +382,7 @@ public:
 			}
 			remaining_bytes = gmemsz-len-(data->pFiles);
 			if(remaining_bytes > 0)
-				mem00(dest+len, remaining_bytes); // clear remaining bytes
+				mem00(dest+len, (int)remaining_bytes); // clear remaining bytes
 
 			// write GPMainWnd handle as signature (previous HWND as 0 is also part of signature)
 			HWND* myhwnd = (HWND *)( ((BYTE*)data) + gmemsz - sizeof(HWND) );
