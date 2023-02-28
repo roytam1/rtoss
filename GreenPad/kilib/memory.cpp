@@ -311,7 +311,7 @@ void* MemoryManager::FixedSizeMemBlockPool::Alloc()
 void MemoryManager::FixedSizeMemBlockPool::DeAlloc( void* ptr )
 {
 	// ŠY“–ƒuƒƒbƒN‚ð’Tõ
-	const int mx=blockNum_, ln=fixedSize_*numPerBlock_;
+	const int mx=blockNum_-1, ln=fixedSize_*numPerBlock_;
 	for( int u=lastDA_, d=lastDA_-1;; )
 	{
 		if( u>=0 )
