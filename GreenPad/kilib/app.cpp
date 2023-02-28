@@ -4,7 +4,7 @@
 #include "memory.h"
 #include "thread.h"
 #include "window.h"
-#include "string.h"
+#include "kstring.h"
 #include "path.h"
 using namespace ki;
 

@@ -1,17 +1,15 @@
 
 #include "resource.h"
+
+#ifndef IDC_STATIC
+#define IDC_STATIC (-1)
+#endif
+
 #ifndef DS_SETFOREGROUND
 	#define DS_SETFOREGROUND 0x200L
 #endif
 #ifndef RT_MANIFEST
 	#define RT_MANIFEST 24
-#endif
-
-#include <winresrc.h>
-#include <winuser.h>
-#include "fileopen.dlg"
-#ifndef IDC_STATIC
-#define IDC_STATIC (-1)
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
@@ -20,6 +18,10 @@
 //
 
 1                       RT_MANIFEST             "manifest.xml"
+
+#include <winresrc.h>
+#include <winuser.h>
+#include "fileopen.dlg"
 
 /////////////////////////////////////////////////////////////////////////////
 //
