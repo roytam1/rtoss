@@ -1438,7 +1438,7 @@
 					RelativePath=".\kilib\registry.h">
 				</File>
 				<File
-					RelativePath=".\kilib\string.h">
+					RelativePath=".\kilib\kstring.h">
 				</File>
 				<File
 					RelativePath=".\kilib\textfile.h">

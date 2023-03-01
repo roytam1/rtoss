@@ -377,6 +377,7 @@ DEP_CPP_IP_PA=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -388,7 +389,6 @@ DEP_CPP_IP_PA=\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
 	".\kilib\winutil.h"\
-	".\kilib\YVALS.H"\
 	
 
 BuildCmds= \
@@ -413,6 +413,7 @@ DEP_CPP_IP_PA=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -455,6 +456,7 @@ DEP_CPP_GPMAI=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -463,12 +465,10 @@ DEP_CPP_GPMAI=\
 	".\kilib\path.h"\
 	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
-	".\kilib\string.h"\
 	".\kilib\textfile.h"\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
 	".\kilib\winutil.h"\
-	".\kilib\YVALS.H"\
 	".\OpenSaveDlg.h"\
 	".\Search.h"\
 	
@@ -494,6 +494,7 @@ DEP_CPP_GPMAI=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -502,7 +503,6 @@ DEP_CPP_GPMAI=\
 	".\kilib\path.h"\
 	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
-	".\kilib\string.h"\
 	".\kilib\textfile.h"\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
@@ -522,13 +522,12 @@ DEP_CPP_GPMAI=\
 # Begin Source File
 
 SOURCE=.\kilib\memory.cpp
-DEP_CPP_MEMOR=\
-	".\kilib\stdafx.h"\
-	".\kilib\YVALS.H"\
-	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
 
+DEP_CPP_MEMOR=\
+	".\kilib\stdafx.h"\
+	
 
 BuildCmds= \
 	$(CPP) $(CPP_PROJ) $(SOURCE) \
@@ -542,6 +541,10 @@ BuildCmds= \
 
 !ELSEIF  "$(CFG)" == "GreenPad - Win32 Debug"
 
+DEP_CPP_MEMOR=\
+	".\kilib\stdafx.h"\
+	".\kilib\YVALS.H"\
+	
 
 "$(INTDIR)\memory.obj" : $(SOURCE) $(DEP_CPP_MEMOR) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -554,15 +557,16 @@ BuildCmds= \
 # Begin Source File
 
 SOURCE=.\kilib\find.cpp
-DEP_CPP_FIND_=\
-	".\kilib\find.h"\
-	".\kilib\path.h"\
-	".\kilib\stdafx.h"\
-	".\kilib\YVALS.H"\
-	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
 
+DEP_CPP_FIND_=\
+	".\kilib\find.h"\
+	".\kilib\kstring.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\path.h"\
+	".\kilib\stdafx.h"\
+	
 
 BuildCmds= \
 	$(CPP) $(CPP_PROJ) $(SOURCE) \
@@ -576,6 +580,14 @@ BuildCmds= \
 
 !ELSEIF  "$(CFG)" == "GreenPad - Win32 Debug"
 
+DEP_CPP_FIND_=\
+	".\kilib\find.h"\
+	".\kilib\kstring.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\path.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\YVALS.H"\
+	
 
 "$(INTDIR)\find.obj" : $(SOURCE) $(DEP_CPP_FIND_) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -598,6 +610,7 @@ DEP_CPP_OPENS=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -605,12 +618,10 @@ DEP_CPP_OPENS=\
 	".\kilib\path.h"\
 	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
-	".\kilib\string.h"\
 	".\kilib\textfile.h"\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
 	".\kilib\winutil.h"\
-	".\kilib\YVALS.H"\
 	".\OpenSaveDlg.h"\
 	
 
@@ -628,6 +639,7 @@ DEP_CPP_OPENS=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -635,7 +647,6 @@ DEP_CPP_OPENS=\
 	".\kilib\path.h"\
 	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
-	".\kilib\string.h"\
 	".\kilib\textfile.h"\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
@@ -654,19 +665,19 @@ DEP_CPP_OPENS=\
 # Begin Source File
 
 SOURCE=.\kilib\app.cpp
+
+!IF  "$(CFG)" == "GreenPad - Win32 Release"
+
 DEP_CPP_APP_C=\
 	".\kilib\app.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\log.h"\
 	".\kilib\path.h"\
 	".\kilib\stdafx.h"\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
-	".\kilib\YVALS.H"\
 	
-
-!IF  "$(CFG)" == "GreenPad - Win32 Release"
-
 
 BuildCmds= \
 	$(CPP) $(CPP_PROJ) $(SOURCE) \
@@ -680,6 +691,17 @@ BuildCmds= \
 
 !ELSEIF  "$(CFG)" == "GreenPad - Win32 Debug"
 
+DEP_CPP_APP_C=\
+	".\kilib\app.h"\
+	".\kilib\kstring.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\log.h"\
+	".\kilib\path.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\thread.h"\
+	".\kilib\window.h"\
+	".\kilib\YVALS.H"\
+	
 
 "$(INTDIR)\app.obj" : $(SOURCE) $(DEP_CPP_APP_C) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -705,6 +727,7 @@ DEP_CPP_IP_TE=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -716,7 +739,6 @@ DEP_CPP_IP_TE=\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
 	".\kilib\winutil.h"\
-	".\kilib\YVALS.H"\
 	
 
 BuildCmds= \
@@ -741,6 +763,7 @@ DEP_CPP_IP_TE=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -766,15 +789,16 @@ DEP_CPP_IP_TE=\
 # Begin Source File
 
 SOURCE=.\kilib\registry.cpp
-DEP_CPP_REGIS=\
-	".\kilib\path.h"\
-	".\kilib\registry.h"\
-	".\kilib\stdafx.h"\
-	".\kilib\YVALS.H"\
-	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
 
+DEP_CPP_REGIS=\
+	".\kilib\kstring.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
+	".\kilib\stdafx.h"\
+	
 
 BuildCmds= \
 	$(CPP) $(CPP_PROJ) $(SOURCE) \
@@ -788,6 +812,14 @@ BuildCmds= \
 
 !ELSEIF  "$(CFG)" == "GreenPad - Win32 Debug"
 
+DEP_CPP_REGIS=\
+	".\kilib\kstring.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\path.h"\
+	".\kilib\registry.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\YVALS.H"\
+	
 
 "$(INTDIR)\registry.obj" : $(SOURCE) $(DEP_CPP_REGIS) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -800,14 +832,15 @@ BuildCmds= \
 # Begin Source File
 
 SOURCE=.\kilib\path.cpp
-DEP_CPP_PATH_=\
-	".\kilib\path.h"\
-	".\kilib\stdafx.h"\
-	".\kilib\YVALS.H"\
-	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
 
+DEP_CPP_PATH_=\
+	".\kilib\kstring.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\path.h"\
+	".\kilib\stdafx.h"\
+	
 
 BuildCmds= \
 	$(CPP) $(CPP_PROJ) $(SOURCE) \
@@ -821,6 +854,13 @@ BuildCmds= \
 
 !ELSEIF  "$(CFG)" == "GreenPad - Win32 Debug"
 
+DEP_CPP_PATH_=\
+	".\kilib\kstring.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\path.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\YVALS.H"\
+	
 
 "$(INTDIR)\path.obj" : $(SOURCE) $(DEP_CPP_PATH_) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -833,6 +873,9 @@ BuildCmds= \
 # Begin Source File
 
 SOURCE=.\kilib\ctrl.cpp
+
+!IF  "$(CFG)" == "GreenPad - Win32 Release"
+
 DEP_CPP_CTRL_=\
 	".\kilib\app.h"\
 	".\kilib\ctrl.h"\
@@ -840,11 +883,7 @@ DEP_CPP_CTRL_=\
 	".\kilib\log.h"\
 	".\kilib\stdafx.h"\
 	".\kilib\window.h"\
-	".\kilib\YVALS.H"\
 	
-
-!IF  "$(CFG)" == "GreenPad - Win32 Release"
-
 
 BuildCmds= \
 	$(CPP) $(CPP_PROJ) $(SOURCE) \
@@ -858,6 +897,15 @@ BuildCmds= \
 
 !ELSEIF  "$(CFG)" == "GreenPad - Win32 Debug"
 
+DEP_CPP_CTRL_=\
+	".\kilib\app.h"\
+	".\kilib\ctrl.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\log.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\window.h"\
+	".\kilib\YVALS.H"\
+	
 
 "$(INTDIR)\ctrl.obj" : $(SOURCE) $(DEP_CPP_CTRL_) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -884,6 +932,7 @@ DEP_CPP_IP_CT=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -895,7 +944,6 @@ DEP_CPP_IP_CT=\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
 	".\kilib\winutil.h"\
-	".\kilib\YVALS.H"\
 	
 
 BuildCmds= \
@@ -921,6 +969,7 @@ DEP_CPP_IP_CT=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -961,6 +1010,7 @@ DEP_CPP_IP_WR=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -972,7 +1022,6 @@ DEP_CPP_IP_WR=\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
 	".\kilib\winutil.h"\
-	".\kilib\YVALS.H"\
 	
 
 BuildCmds= \
@@ -999,6 +1048,7 @@ DEP_CPP_IP_WR=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -1039,6 +1089,7 @@ DEP_CPP_RSEAR=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -1047,12 +1098,10 @@ DEP_CPP_RSEAR=\
 	".\kilib\path.h"\
 	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
-	".\kilib\string.h"\
 	".\kilib\textfile.h"\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
 	".\kilib\winutil.h"\
-	".\kilib\YVALS.H"\
 	".\NSearch.h"\
 	".\RSearch.h"\
 	".\Search.h"\
@@ -1077,6 +1126,7 @@ DEP_CPP_RSEAR=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -1085,7 +1135,6 @@ DEP_CPP_RSEAR=\
 	".\kilib\path.h"\
 	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
-	".\kilib\string.h"\
 	".\kilib\textfile.h"\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
@@ -1121,6 +1170,7 @@ DEP_CPP_IP_CU=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -1132,7 +1182,6 @@ DEP_CPP_IP_CU=\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
 	".\kilib\winutil.h"\
-	".\kilib\YVALS.H"\
 	
 
 BuildCmds= \
@@ -1159,6 +1208,7 @@ DEP_CPP_IP_CU=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -1184,14 +1234,13 @@ DEP_CPP_IP_CU=\
 # Begin Source File
 
 SOURCE=.\kilib\thread.cpp
-DEP_CPP_THREA=\
-	".\kilib\stdafx.h"\
-	".\kilib\thread.h"\
-	".\kilib\YVALS.H"\
-	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
 
+DEP_CPP_THREA=\
+	".\kilib\stdafx.h"\
+	".\kilib\thread.h"\
+	
 
 BuildCmds= \
 	$(CPP) $(CPP_PROJ) $(SOURCE) \
@@ -1205,6 +1254,11 @@ BuildCmds= \
 
 !ELSEIF  "$(CFG)" == "GreenPad - Win32 Debug"
 
+DEP_CPP_THREA=\
+	".\kilib\stdafx.h"\
+	".\kilib\thread.h"\
+	".\kilib\YVALS.H"\
+	
 
 "$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -1217,20 +1271,20 @@ BuildCmds= \
 # Begin Source File
 
 SOURCE=.\kilib\textfile.cpp
+
+!IF  "$(CFG)" == "GreenPad - Win32 Release"
+
 DEP_CPP_TEXTF=\
 	".\kilib\app.h"\
 	".\kilib\file.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\log.h"\
 	".\kilib\path.h"\
 	".\kilib\stdafx.h"\
 	".\kilib\textfile.h"\
-	".\kilib\YVALS.H"\
 	
-
-!IF  "$(CFG)" == "GreenPad - Win32 Release"
-
 
 BuildCmds= \
 	$(CPP) $(CPP_PROJ) $(SOURCE) \
@@ -1244,6 +1298,18 @@ BuildCmds= \
 
 !ELSEIF  "$(CFG)" == "GreenPad - Win32 Debug"
 
+DEP_CPP_TEXTF=\
+	".\kilib\app.h"\
+	".\kilib\file.h"\
+	".\kilib\kstring.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\ktlarray.h"\
+	".\kilib\log.h"\
+	".\kilib\path.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\textfile.h"\
+	".\kilib\YVALS.H"\
+	
 
 "$(INTDIR)\textfile.obj" : $(SOURCE) $(DEP_CPP_TEXTF) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -1256,15 +1322,16 @@ BuildCmds= \
 # Begin Source File
 
 SOURCE=.\kilib\string.cpp
-DEP_CPP_STRIN=\
-	".\kilib\app.h"\
-	".\kilib\log.h"\
-	".\kilib\stdafx.h"\
-	".\kilib\YVALS.H"\
-	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
 
+DEP_CPP_STRIN=\
+	".\kilib\app.h"\
+	".\kilib\kstring.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\log.h"\
+	".\kilib\stdafx.h"\
+	
 
 BuildCmds= \
 	$(CPP) $(CPP_PROJ) $(SOURCE) \
@@ -1278,6 +1345,14 @@ BuildCmds= \
 
 !ELSEIF  "$(CFG)" == "GreenPad - Win32 Debug"
 
+DEP_CPP_STRIN=\
+	".\kilib\app.h"\
+	".\kilib\kstring.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\log.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\YVALS.H"\
+	
 
 "$(INTDIR)\string.obj" : $(SOURCE) $(DEP_CPP_STRIN) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -1290,17 +1365,16 @@ BuildCmds= \
 # Begin Source File
 
 SOURCE=.\kilib\window.cpp
+
+!IF  "$(CFG)" == "GreenPad - Win32 Release"
+
 DEP_CPP_WINDO=\
 	".\kilib\app.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\log.h"\
 	".\kilib\stdafx.h"\
 	".\kilib\window.h"\
-	".\kilib\YVALS.H"\
 	
-
-!IF  "$(CFG)" == "GreenPad - Win32 Release"
-
 
 BuildCmds= \
 	$(CPP) $(CPP_PROJ) $(SOURCE) \
@@ -1314,6 +1388,14 @@ BuildCmds= \
 
 !ELSEIF  "$(CFG)" == "GreenPad - Win32 Debug"
 
+DEP_CPP_WINDO=\
+	".\kilib\app.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\log.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\window.h"\
+	".\kilib\YVALS.H"\
+	
 
 "$(INTDIR)\window.obj" : $(SOURCE) $(DEP_CPP_WINDO) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -1326,13 +1408,12 @@ BuildCmds= \
 # Begin Source File
 
 SOURCE=.\kilib\stdafx.cpp
-DEP_CPP_STDAF=\
-	".\kilib\stdafx.h"\
-	".\kilib\YVALS.H"\
-	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
 
+DEP_CPP_STDAF=\
+	".\kilib\stdafx.h"\
+	
 
 BuildCmds= \
 	$(CPP) $(CPP_PROJ) $(SOURCE) \
@@ -1346,6 +1427,10 @@ BuildCmds= \
 
 !ELSEIF  "$(CFG)" == "GreenPad - Win32 Debug"
 
+DEP_CPP_STDAF=\
+	".\kilib\stdafx.h"\
+	".\kilib\YVALS.H"\
+	
 
 "$(INTDIR)\stdafx.obj" : $(SOURCE) $(DEP_CPP_STDAF) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -1373,6 +1458,7 @@ DEP_CPP_IP_SC=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -1384,7 +1470,6 @@ DEP_CPP_IP_SC=\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
 	".\kilib\winutil.h"\
-	".\kilib\YVALS.H"\
 	
 
 BuildCmds= \
@@ -1411,6 +1496,7 @@ DEP_CPP_IP_SC=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -1436,15 +1522,16 @@ DEP_CPP_IP_SC=\
 # Begin Source File
 
 SOURCE=.\kilib\log.cpp
-DEP_CPP_LOG_C=\
-	".\kilib\app.h"\
-	".\kilib\log.h"\
-	".\kilib\stdafx.h"\
-	".\kilib\YVALS.H"\
-	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
 
+DEP_CPP_LOG_C=\
+	".\kilib\app.h"\
+	".\kilib\kstring.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\log.h"\
+	".\kilib\stdafx.h"\
+	
 
 BuildCmds= \
 	$(CPP) $(CPP_PROJ) $(SOURCE) \
@@ -1458,6 +1545,14 @@ BuildCmds= \
 
 !ELSEIF  "$(CFG)" == "GreenPad - Win32 Debug"
 
+DEP_CPP_LOG_C=\
+	".\kilib\app.h"\
+	".\kilib\kstring.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\log.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\YVALS.H"\
+	
 
 "$(INTDIR)\log.obj" : $(SOURCE) $(DEP_CPP_LOG_C) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -1486,6 +1581,7 @@ DEP_CPP_CONFI=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -1494,12 +1590,10 @@ DEP_CPP_CONFI=\
 	".\kilib\path.h"\
 	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
-	".\kilib\string.h"\
 	".\kilib\textfile.h"\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
 	".\kilib\winutil.h"\
-	".\kilib\YVALS.H"\
 	".\NSearch.h"\
 	".\OpenSaveDlg.h"\
 	".\RSearch.h"\
@@ -1526,6 +1620,7 @@ DEP_CPP_CONFI=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -1534,7 +1629,6 @@ DEP_CPP_CONFI=\
 	".\kilib\path.h"\
 	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
-	".\kilib\string.h"\
 	".\kilib\textfile.h"\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
@@ -1556,17 +1650,16 @@ DEP_CPP_CONFI=\
 # Begin Source File
 
 SOURCE=.\kilib\winutil.cpp
+
+!IF  "$(CFG)" == "GreenPad - Win32 Release"
+
 DEP_CPP_WINUT=\
 	".\kilib\app.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\log.h"\
 	".\kilib\stdafx.h"\
 	".\kilib\winutil.h"\
-	".\kilib\YVALS.H"\
 	
-
-!IF  "$(CFG)" == "GreenPad - Win32 Release"
-
 
 BuildCmds= \
 	$(CPP) $(CPP_PROJ) $(SOURCE) \
@@ -1580,6 +1673,14 @@ BuildCmds= \
 
 !ELSEIF  "$(CFG)" == "GreenPad - Win32 Debug"
 
+DEP_CPP_WINUT=\
+	".\kilib\app.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\log.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\winutil.h"\
+	".\kilib\YVALS.H"\
+	
 
 "$(INTDIR)\winutil.obj" : $(SOURCE) $(DEP_CPP_WINUT) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -1592,16 +1693,16 @@ BuildCmds= \
 # Begin Source File
 
 SOURCE=.\kilib\cmdarg.cpp
-DEP_CPP_CMDAR=\
-	".\kilib\cmdarg.h"\
-	".\kilib\ktlaptr.h"\
-	".\kilib\ktlarray.h"\
-	".\kilib\stdafx.h"\
-	".\kilib\YVALS.H"\
-	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
 
+DEP_CPP_CMDAR=\
+	".\kilib\cmdarg.h"\
+	".\kilib\kstring.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\ktlarray.h"\
+	".\kilib\stdafx.h"\
+	
 
 BuildCmds= \
 	$(CPP) $(CPP_PROJ) $(SOURCE) \
@@ -1615,6 +1716,14 @@ BuildCmds= \
 
 !ELSEIF  "$(CFG)" == "GreenPad - Win32 Debug"
 
+DEP_CPP_CMDAR=\
+	".\kilib\cmdarg.h"\
+	".\kilib\kstring.h"\
+	".\kilib\ktlaptr.h"\
+	".\kilib\ktlarray.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\YVALS.H"\
+	
 
 "$(INTDIR)\cmdarg.obj" : $(SOURCE) $(DEP_CPP_CMDAR) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -1627,14 +1736,13 @@ BuildCmds= \
 # Begin Source File
 
 SOURCE=.\kilib\file.cpp
-DEP_CPP_FILE_=\
-	".\kilib\file.h"\
-	".\kilib\stdafx.h"\
-	".\kilib\YVALS.H"\
-	
 
 !IF  "$(CFG)" == "GreenPad - Win32 Release"
 
+DEP_CPP_FILE_=\
+	".\kilib\file.h"\
+	".\kilib\stdafx.h"\
+	
 
 BuildCmds= \
 	$(CPP) $(CPP_PROJ) $(SOURCE) \
@@ -1648,6 +1756,11 @@ BuildCmds= \
 
 !ELSEIF  "$(CFG)" == "GreenPad - Win32 Debug"
 
+DEP_CPP_FILE_=\
+	".\kilib\file.h"\
+	".\kilib\stdafx.h"\
+	".\kilib\YVALS.H"\
+	
 
 "$(INTDIR)\file.obj" : $(SOURCE) $(DEP_CPP_FILE_) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -1675,6 +1788,7 @@ DEP_CPP_IP_DR=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -1686,7 +1800,6 @@ DEP_CPP_IP_DR=\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
 	".\kilib\winutil.h"\
-	".\kilib\YVALS.H"\
 	
 
 BuildCmds= \
@@ -1713,6 +1826,7 @@ DEP_CPP_IP_DR=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -1753,6 +1867,7 @@ DEP_CPP_SEARC=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -1761,12 +1876,10 @@ DEP_CPP_SEARC=\
 	".\kilib\path.h"\
 	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
-	".\kilib\string.h"\
 	".\kilib\textfile.h"\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\
 	".\kilib\winutil.h"\
-	".\kilib\YVALS.H"\
 	".\NSearch.h"\
 	".\RSearch.h"\
 	".\Search.h"\
@@ -1791,6 +1904,7 @@ DEP_CPP_SEARC=\
 	".\kilib\file.h"\
 	".\kilib\find.h"\
 	".\kilib\kilib.h"\
+	".\kilib\kstring.h"\
 	".\kilib\ktlaptr.h"\
 	".\kilib\ktlarray.h"\
 	".\kilib\ktlgap.h"\
@@ -1799,7 +1913,6 @@ DEP_CPP_SEARC=\
 	".\kilib\path.h"\
 	".\kilib\registry.h"\
 	".\kilib\stdafx.h"\
-	".\kilib\string.h"\
 	".\kilib\textfile.h"\
 	".\kilib\thread.h"\
 	".\kilib\window.h"\

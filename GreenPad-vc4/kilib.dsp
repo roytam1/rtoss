@@ -303,7 +303,7 @@ SOURCE=.\kilib\registry.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\kilib\string.h
+SOURCE=.\kilib\kstring.h
 # End Source File
 # Begin Source File
 

@@ -243,6 +243,7 @@ bool GreenPadWnd::on_command( UINT id, HWND ctrl )
 	case ID_CMD_WRAPWINDOW: edit_.getView().SetWrapType( wrap_=0 ); break;
 	case ID_CMD_CONFIG:     on_config();    break;
 	case ID_CMD_STATUSBAR:  on_statusBar(); break;
+	case ID_CMD_HELPABOUT:  on_helpabout(); break;
 
 	// DocType
 	default: if( ID_CMD_DOCTYPE <= id ) {
@@ -780,6 +781,134 @@ void GreenPadWnd::on_reconv()
 void GreenPadWnd::on_toggleime()
 {
 	edit_.getCursor().ToggleIME();
+}
+
+	// Show Help->About dialog box.
+	struct AboutDlg : public DlgImpl {
+		AboutDlg(HWND parent) : DlgImpl(IDD_ABOUTDLG), parent_( parent ) { GoModal(parent_); }
+		void on_init()
+		{
+
+	// Crazy double macro so that an int define
+	// Can be seen as a string
+	#define SHARP(x) #x
+	#define STR(x) SHARP(x)
+
+	#if defined(UNICOWS)
+		#define UNIANSI TEXT(" (Unicows)")
+	#elif defined(UNICODE)
+		#define UNIANSI TEXT(" (Unicode)")
+	#elif defined(_MBCS)
+		#define UNIANSI TEXT(" (MBCS)")
+	#else
+		#define UNIANSI TEXT(" (ANSI)")
+	#endif
+
+	#if defined(__GNUC__)
+		#define COMPILER TEXT( "GNU C Compiler - " __VERSION__ "\n" )
+	#elif defined(_MSC_VER)
+		#define COMPILER TEXT("Visual C++ - ")  +String().SetInt((_MSC_VER-600)/100)+TEXT(".")+String().SetInt(_MSC_VER%100)+
+	#elif defined(__WATCOMC__)
+		#define COMPILER TEXT("Watcom C++ - ") TEXT(STR(__WATCOMC__))
+	#elif defined(__BORLANDC__)
+		#define COMPILER TEXT("Borland C++ - ") TEXT(STR(__BORLANDC__))
+	#elif defined(__DMC__)
+		#define COMPILER TEXT("Digital Mars C++ - ") TEXT(STR(__DMC__))
+	#elif defined(__INTEL_COMPILER)
+		#define COMPILER TEXT("Intel C++ - ") TEXT(STR(__INTEL_COMPILER))
+	#elif defined(__clang__)
+		#define COMPILER TEXT("LLVM Clang - ")  TEXT(STR(__clang_major__)) TEXT(".") TEXT(STR(__clang_minor__))
+	#else
+		//#error Unknown compiler, consider adding it to the list.
+		#define COMPILER TEXT( "(unknown compiler)\n" )
+	#endif
+
+	#if defined(WIN32S)
+		#define TARGETOS TEXT("Win32s")
+	#elif defined(UNICODE)
+		#define TARGETOS TEXT("Windows NT")
+	#else
+		#define TARGETOS TEXT("Windows 9x")
+	#endif
+
+	#if defined(TARGET_VER)
+		#if TARGET_VER == 310
+			#define TGVER TEXT(" 3.10+")
+		#elif TARGET_VER == 350
+			#define TGVER TEXT(" 3.50+")
+		#else //if TARGET_VER == 351
+			#if defined(_M_AMD64) || defined(_M_X64) || defined(WIN64)
+				// XP/NT5.1 is the first x64 version of Windows.
+				#define TGVER TEXT(" 5.1+")
+			#else
+				// Default to NT3.51/95 (I guess...)
+				#define TGVER TEXT(" 3.51+")
+			#endif
+		#endif
+	#else
+		#if defined(_M_AMD64) || defined(_M_X64) || defined(WIN64)
+			// XP/NT5.1 is the first x64 version of Windows.
+			#define TGVER TEXT(" 5.1+")
+		#else
+			// Default to NT3.51/95 (I guess...)
+			#define TGVER TEXT(" 3.51+")
+		#endif
+	#endif //TARGET_VER
+
+	#if defined(NO_OLEDNDSRC) && defined(NO_OLEDNDTAR)
+		#define USEOLE TEXT(" ")
+	#else
+		#define USEOLE TEXT(" OLE ")
+	#endif //TARGET_VER
+
+
+	#if defined(_M_AMD64) || defined(_M_X64)
+		#define PALT TEXT( "- x86_64" )
+	#elif defined(_M_IX86)
+		#define PALT TEXT( "- i386" )
+	#elif defined(_M_MRX000) || defined(_MIPS_)
+		#define PALT TEXT( "- MIPS" )
+	#elif defined(_M_ARM64)
+		#define PALT TEXT( "- ARM64" )
+	#elif defined(_M_ALPHA)
+		#define PALT TEXT( "- Alpha" )
+	#elif defined(_M_PPC)
+		#define PALT TEXT( "- PowerPC" )
+	#endif
+
+			String s = String(IDS_APPNAME);
+			s += TEXT(" - ") TEXT( VER_FILEVERSIONSTR ) UNIANSI TEXT("\r\n")
+			     COMPILER TEXT(" on ") TEXT( __DATE__ ) TEXT("\r\n")
+			     TEXT("for ") TARGETOS TGVER USEOLE PALT TEXT("\r\n")
+			     TEXT("Running on ");
+
+			if( app().isNT() )
+				s += TEXT("Windows NT ");
+			else if( app().isWin32s() )
+				s += TEXT("Win32s ");
+			else
+				s+= TEXT("Windows ");
+
+			s += String().SetInt( HIBYTE(app().getOSVer()) ) + TEXT(".")
+			   + String().SetInt( LOBYTE(app().getOSVer()) ) + TEXT(".")
+			   + String().SetInt( app().getOSBuild() );
+
+			SendMsgToItem(IDC_ABOUTSTR, WM_SETTEXT, s.c_str());
+			SendMsgToItem(IDC_ABOUTURL, WM_SETTEXT, TEXT("https://github.com/roytam1/rtoss/tree/master/GreenPad"));
+			SetCenter(hwnd(), parent_);
+
+	#undef UNIANSI
+	#undef COMPILER
+	#undef TGVER
+	#undef USEOLE
+	#undef PALT
+		}
+		HWND parent_;
+	};
+
+void GreenPadWnd::on_helpabout()
+{
+	AboutDlg  ahdlg (hwnd());
 }
 
 //-------------------------------------------------------------------------

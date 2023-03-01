@@ -181,7 +181,7 @@
 				EnableFunctionLevelLinking="true"
 				TreatWChar_tAsBuiltInType="true"
 				RuntimeTypeInfo="false"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="1"
 				PrecompiledHeaderThrough="stdafx.h"
 				PrecompiledHeaderFile=".\OBJ/vc/reluni/kilib.pch"
 				AssemblerListingLocation=".\OBJ/vc/reluni/"
@@ -957,7 +957,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\kilib\string.h"
+					RelativePath=".\kilib\kstring.h"
 					>
 				</File>
 				<File
