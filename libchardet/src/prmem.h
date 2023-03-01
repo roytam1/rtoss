@@ -39,21 +39,41 @@
 
 #include <stdlib.h>
 
-#define PR_FREEIF(p) do { if (p) delete p; } while(0)
-
 #if defined(WIN32) && defined(SUPERTINY)
 	#include <windows.h>
 	inline void* __cdecl operator new(size_t siz)
 	{
+	#ifdef USE_LOCALALLOC
+		return ::LocalAlloc(LMEM_FIXED, siz);
+	#else
 		return ::HeapAlloc(GetProcessHeap(), 0, siz);
+	#endif
 	}
+
 	inline void __cdecl operator delete(void* ptr)
 	{
+	#ifdef USE_LOCALALLOC
+		::LocalFree(ptr);
+	#else
 		::HeapFree(GetProcessHeap(), 0, ptr);
+	#endif
 	}
+
 	inline void* PR_Malloc(size_t len)
 	{
-	    return ::HeapAlloc(GetProcessHeap(), 0, len);
+	#ifdef USE_LOCALALLOC
+		return ::LocalAlloc(LMEM_FIXED, len);
+	#else
+		return ::HeapAlloc(GetProcessHeap(), 0, len);
+	#endif
+	}
+	inline void PR_Free(void *ptr)
+	{
+	#ifdef USE_LOCALALLOC
+		::LocalFree(ptr);
+	#else
+		::HeapFree(GetProcessHeap(), 0, ptr);
+	#endif
 	}
 
 #else // WIN32+SUPERTINY
@@ -61,7 +81,13 @@
 	{
 	    return malloc(len);
 	}
+	inline void PR_Free(void *ptr)
+	{
+	    free(ptr);
+	}
 #endif
+
+#define PR_FREEIF(p) do { if (p) PR_Free((void*)p); } while(0)
 
 
 #endif
