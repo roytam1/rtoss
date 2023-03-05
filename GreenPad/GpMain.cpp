@@ -1115,6 +1115,7 @@ bool GreenPadWnd::OpenByMyself( const ki::Path& fn, int cs, bool needReConf )
 
 	// 開く
 	edit_.getDoc().ClearAll();
+	stb_.SetText(String(IDS_LOADING).c_str());
 	edit_.getDoc().OpenFile( tf );
 
 	// タイトルバー更新
@@ -1282,6 +1283,7 @@ bool GreenPadWnd::StartUp( const Path& fn, int cs, int ln )
 {
 	LOGGER( "GreenPadWnd::StartUp begin" );
 	Create( 0, 0, cfg_.GetWndX(), cfg_.GetWndY(), cfg_.GetWndW(), cfg_.GetWndH(), 0 );
+	ShowUp2(); LOGGER( "showup!" );
 	LOGGER( "GreenPadWnd::Created" );
 	if( fn.len()==0 || !OpenByMyself( fn, cs ) )
 	{
