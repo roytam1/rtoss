@@ -53,17 +53,13 @@ struct rBasicUTF : public ki::TextFileRPimpl
 		state = EOF;
 
 		// 改行が出るまで読む
-		unicode *w=buf, *e=buf+siz;
+		unicode *w=buf, *e=buf+siz-1;
 		while( !Eof() )
 		{
 			*w = GetC();
 			if(BOF && *w!=0xfeff) BOF = false;
-			if( *w==L'\r' || *w==L'\n' )
-			{
-				state = EOL;
-				break;
-			}
-			else if( !BOF && ++w==e )
+
+			if( !BOF && ++w==e )
 			{
 				state = EOB;
 				break;
@@ -71,10 +67,9 @@ struct rBasicUTF : public ki::TextFileRPimpl
 			if(BOF) BOF = false;
 		}
 
-		// 改行コードスキップ処理
-		if( state == EOL )
-			if( *w==L'\r' && !Eof() && PeekC()==L'\n' )
-				Skip();
+		// If the end of the buffer contains half a DOS CRLF
+		if( *(w-1)==L'\r' && PeekC() == L'\n' )
+			Skip();
 
 		if(BOF) BOF = false;
 		// 読んだ文字数
@@ -919,28 +914,28 @@ struct rMBCS : public TextFileRPimpl
 	size_t ReadLine( unicode* buf, ulong siz )
 	{
 		// バッファの終端か、ファイルの終端の近い方まで読み込む
-		const char *p, *end = Min( fb+siz/2, fe );
+		// Read to the end of the buffer or near the end of the file
+		const char *p, *end = Min( fb+siz/2-2, fe );
 		state = (end==fe ? EOF : EOB);
 
-		// 改行が出るまで進む
+		// 改行が出るまで進む,  Proceed until the line breaks.
 		for( p=fb; p<end; )
-			if( *p=='\r' || *p=='\n' )
-			{
-				state = EOL;
-				break;
-			}
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
-			else if( (*p) & 0x80 && p+1<fe )
+			if( (*p) & 0x80 && p+1<fe )
 			{
 				p = next(readcp,p,0);
 			}
-#endif
 			else
+#endif
 			{
 				++p;
 			}
 
-		// Unicodeへ変換
+		// If the end of the buffer contains half a DOS CRLF
+		if( *(p-1)=='\r' && *(p) =='\n' )
+			++p;
+
+		// Unicodeへ変換, convertion to Unicode
 		ulong len;
 #ifndef _UNICODE
 		len = conv( readcp, 0, fb, p-fb, buf, siz );
@@ -954,10 +949,6 @@ struct rMBCS : public TextFileRPimpl
 			len = ::MultiByteToWideChar( readcp, 0, fb, int(p-fb), buf, siz );
 		}
 #endif
-		// 改行コードスキップ処理
-		if( state == EOL )
-			if( *(p++)=='\r' && p<fe && *p=='\n' )
-				++p;
 		fb = p;
 
 		// 終了
@@ -1130,15 +1121,15 @@ struct rIso2022 : public TextFileRPimpl
 		len=0;
 
 		// バッファの終端か、ファイルの終端の近い方まで読み込む
-		const uchar *p, *end = Min( fb+siz/2, fe );
+		const uchar *p, *end = Min( fb+siz/2-2, fe );
 		state = (end==fe ? EOF : EOB);
 
 		// 改行が出るまで進む
 		for( p=fb; p<end; ++p )
 			switch( *p )
 			{
-			case '\r':
-			case '\n': state =   EOL; goto outofloop;
+//			case '\r':
+//			case '\n': state =   EOL; goto outofloop;
 			case 0x0F:    GL = &G[0]; break;
 			case 0x0E:    GL = &G[1]; break;
 			case 0x8E: gWhat =     2; break;
@@ -1160,10 +1151,9 @@ struct rIso2022 : public TextFileRPimpl
 			}
 		outofloop:
 
-		// 改行コードスキップ処理
-		if( state == EOL )
-			if( *(p++)=='\r' && p<fe && *p=='\n' )
-				++p;
+		// If the end of the buffer contains half a DOS CRLF
+		if( *(p-1)=='\r' && *p=='\n' )
+			++p;
 		fb = p;
 
 		// 終了
