@@ -476,15 +476,25 @@ void ConfigManager::LoadLayout( ConfigManager::DocType* dt )
 		int    x;
 		bool   clfound = false;
 
-		unicode buf[1024], *ptr=buf+3;
-		while( tf.state() != 0 ) // !EOF
+		// Read the whole file at once.
+		unicode buf[1024], *nptr=buf,*ptr;
+		size_t len = tf.ReadLine( buf, countof(buf)-8 );
+		buf[len] = L'\0'; // NULL terminate in case.
+		for( ptr=buf; ptr<buf+len; ptr=nptr ) // !EOF
 		{
-			size_t len = tf.ReadLine( buf, countof(buf)-1 );
-			if( len<=3 || buf[2]!=L'=' )
-				continue;
-			buf[len] = L'\0';
+			// Get to next line
+			while( *nptr != L'\0' &&  *nptr != L'\r' && *nptr != L'\n' )
+				nptr++;
+			*nptr++ = L'\0'; // zero out endline.
+			nptr += *(nptr) == L'\n'; // Skip eventual \n
 
-			switch( (buf[0]<<16)|buf[1] )
+			if( nptr-ptr < 3 || ptr[0] == L';' || ptr[2] != L'=' )
+				continue;
+
+			qbyte XXoption = (ptr[0]<<16) | ptr[1];
+			ptr += 3; // go just after the = sign
+
+			switch( XXoption )
 			{
 			case 0x00630074: // ct: COLOR-TEXT
 				dt->vc.color[TXT] = GetColor(ptr);
