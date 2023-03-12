@@ -46,7 +46,7 @@
 				ProgramDataBaseFileName=".\OBJ/vc71/reluni/"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 				CallingConvention="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -59,7 +59,7 @@
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="."
 				IgnoreAllDefaultLibraries="TRUE"
-				GenerateDebugInformation="FALSE"
+				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\release/GreenPad.pdb"
 				GenerateMapFile="FALSE"
 				MapFileName=".\OBJ/vc71/reluni/GreenPad.map"
@@ -1429,6 +1429,9 @@
 					RelativePath=".\kilib\find.h">
 				</File>
 				<File
+					RelativePath=".\kilib\kstring.h">
+				</File>
+				<File
 					RelativePath=".\kilib\memory.h">
 				</File>
 				<File
@@ -1436,9 +1439,6 @@
 				</File>
 				<File
 					RelativePath=".\kilib\registry.h">
-				</File>
-				<File
-					RelativePath=".\kilib\kstring.h">
 				</File>
 				<File
 					RelativePath=".\kilib\textfile.h">
