@@ -20,6 +20,7 @@
 #define IDS_NOTFOUND                    8
 #define IDS_REPLACEALLDONE              9
 #define IDS_OKTODEL                     10
+#define IDS_LOADING                     11
 #define IDR_MAIN                        103
 #define IDD_OPENFILEHOOK                105
 #define IDD_SAVEFILEHOOK                106

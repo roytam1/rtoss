@@ -194,7 +194,12 @@ int String::GetInt( const TCHAR* x )
 
 String& String::SetInt( int n )
 {
-	if( n==0 )
+	// special case for INT_MIN
+	if( n == 0x80000000UL )
+	{
+		*this = TEXT("-2147483648");
+	}
+	else if( n==0 )
 	{
 		*this = TEXT("0");
 	}
@@ -204,11 +209,11 @@ String& String::SetInt( int n )
 		if( minus )
 			n= -n;
 
-		TCHAR tmp[20];
-		tmp[19] = TEXT('\0');
+		TCHAR tmp[12];
+		tmp[11] = TEXT('\0');
 		int i;
 
-		for( i=18; i>=0; --i )
+		for( i=10; i>0; --i )
 		{
 			tmp[i] = TEXT('0') + n%10;
 			n /= 10;

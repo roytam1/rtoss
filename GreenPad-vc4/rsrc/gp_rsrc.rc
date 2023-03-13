@@ -423,6 +423,7 @@ BEGIN
     IDS_NOTFOUND            "見つかりませんでした。"
     IDS_REPLACEALLDONE      "%d箇所置換しました。"
     IDS_OKTODEL             "を削除してよろしいですか？"
+    IDS_LOADING             "ファイルを読み込んでいます..."
 END
 
 #endif    // 日本語 resources
@@ -740,6 +741,7 @@ BEGIN
     IDS_NOTFOUND            "Not Found."
     IDS_REPLACEALLDONE      "%d times Replaced."
     IDS_OKTODEL             " will be removed. OK?"
+    IDS_LOADING             "Loading file..."
 END
 
 #endif    // 英語 (米国) resources

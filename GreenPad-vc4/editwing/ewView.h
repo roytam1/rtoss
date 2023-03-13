@@ -133,7 +133,7 @@ class OleDnDTarget : public IDropTarget
 		}
 
 		fmt.cfFormat = CF_HDROP;
-		if( S_OK == pDataObj->QueryGetData(&fmt) )
+		if( app().isWin32s() && S_OK == pDataObj->QueryGetData(&fmt) )
 		{
 			LOGGER( "OleDnDTarget::DragEnter(CF_HDROP)" );
 			return S_OK;
