@@ -80,6 +80,11 @@ typedef struct tagRECONVERTSTRING {
 #include "yvals.h"
 #endif
 
+#if defined(_MSC_VER) && _MSC_VER < 1100
+#define MUTABLE_CONST 
+#else
+#define MUTABLE_CONST const
+#endif
 
 #if defined(__DMC__) || (defined(_MSC_VER) && _MSC_VER < 1300)
 	#define SetWindowLongPtr SetWindowLong
