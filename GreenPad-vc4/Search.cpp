@@ -1,5 +1,5 @@
 
-#include "kilib/stdafx.h"
+#include "stdafx.h"
 #include "rsrc/resource.h"
 #include "Search.h"
 #include "NSearch.h"

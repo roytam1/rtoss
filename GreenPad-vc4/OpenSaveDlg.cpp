@@ -1,4 +1,4 @@
-#include "kilib/stdafx.h"
+#include "stdafx.h"
 #include "rsrc/resource.h"
 #include "kilib/kilib.h"
 #include "OpenSaveDlg.h"
