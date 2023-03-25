@@ -709,18 +709,32 @@ void DocImpl::OpenFile( aptr<TextFileR> tf )
 	// ‘}“ü
 	DPos e(0,0);
 
-	// unicode buf[1024];
+	// Super small stack buffer in case the malloc fails
+	#define SBUF_SZ 1800
+	unicode sbuf[SBUF_SZ];		// 3600 bytes
+
 	// Use big buffer (much faster on long lines)
 #ifdef WIN64
-	static unicode buf[2097152]; // 4MB on x64
+	size_t buf_sz = 2097152;	// 4MB on x64
 #else
-	static unicode buf[65536]; // 128KB on i386
+	size_t buf_sz = 131072;		// 256KB on i386
 #endif
+	// Do not allocate more mem than twice the file size in bytes.
+	// Should help with loading small files on Win32s.
+	buf_sz = Min( buf_sz, (size_t)(tf->size()+16)<<1 );
+	unicode *buf=NULL;
+	if( buf_sz > SBUF_SZ )
+		buf = new unicode[buf_sz];
+	if( !buf )
+	{
+		buf = sbuf;
+		buf_sz = SBUF_SZ;
+	}
 
 	for( ulong i=0; tf->state(); )
 	{
 		size_t L;
-		if( L = tf->ReadBuf( buf, countof(buf) ) )
+		if( L = tf->ReadBuf( buf, buf_sz ) )
 		{
 			DPos p(i,0xffffffff);
 			InsertingOperation( p, buf, (ulong)L, e );
@@ -732,6 +746,9 @@ void DocImpl::OpenFile( aptr<TextFileR> tf )
 			InsertingOperation( p, L"\n", 1, e );
 		}
 	}
+
+	if( buf != sbuf )
+		delete [] buf;
 
 	// ƒCƒxƒ“ƒg”­‰Î
 	Fire_TEXTUPDATE( DPos(0,0), DPos(0,0), e, true, false );
