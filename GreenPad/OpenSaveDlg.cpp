@@ -248,26 +248,28 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	BOOL ret;
 	DWORD ErrCode;
 
-	if( fnm == NULL )
+	// Zero-Filling buffers
+	mem00(filepath_,MAX_PATH);
+	mem00(filename_,MAX_PATH);
+
+	if( fnm == NULL || (fnm && !*fnm) )
 	{
-		filename_[0] = TEXT('\0');
-		filepath_[0] = TEXT('\0');
+		//filename_[0] = TEXT('\0'); // already zero-filled
+		//filepath_[0] = TEXT('\0'); // already zero-filled
+
+		// Use CurDir instead
+		::lstrcpy(filepath_, Path(Path::Cur, 0).c_str());
 	}
 	else
 	{
 		// turn input filename into Path object
 		ki::Path kpf = fnm;
 
-		// Zero-Filling buffers
-		mem00(filepath_,MAX_PATH);
-		mem00(filename_,MAX_PATH);
-
 		// Copy File name without path into buffer
 		::lstrcpy(filename_, kpf.name());
 
 		// Copy File Path without ending slash
-		kpf = kpf.BeDirOnly();
-		::lstrcpy(filepath_, kpf.BeBackSlash(false).c_str());
+		::lstrcpy(filepath_, kpf.BeDirOnly().BeBackSlash(false).c_str());
 	}
 
 	OPENFILENAME ofn = {sizeof(ofn)};
@@ -387,26 +389,28 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	BOOL ret;
 	DWORD ErrCode;
 
-	if( fnm == NULL )
+	// Zero-Filling buffers
+	mem00(filepath_,MAX_PATH);
+	mem00(filename_,MAX_PATH);
+
+	if( fnm == NULL || (fnm && !*fnm) )
 	{
-		filename_[0] = TEXT('\0');
-		filepath_[0] = TEXT('\0');
+		//filename_[0] = TEXT('\0'); // already zero-filled
+		//filepath_[0] = TEXT('\0'); // already zero-filled
+
+		// Use CurDir instead
+		::lstrcpy(filepath_, Path(Path::Cur, 0).c_str());
 	}
 	else
 	{
 		// turn input filename into Path object
 		ki::Path kpf = fnm;
 
-		// Zero-Filling buffers
-		mem00(filepath_,MAX_PATH);
-		mem00(filename_,MAX_PATH);
-
 		// Copy File name without path into buffer
 		::lstrcpy(filename_, kpf.name());
 
 		// Copy File Path without ending slash
-		kpf = kpf.BeDirOnly();
-		::lstrcpy(filepath_, kpf.BeBackSlash(false).c_str());
+		::lstrcpy(filepath_, kpf.BeDirOnly().BeBackSlash(false).c_str());
 	}
 
 	OPENFILENAME ofn = {sizeof(ofn)};
