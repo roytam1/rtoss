@@ -238,6 +238,33 @@ namespace
 	};
 }
 
+void CommonDialogPrepareBuffers( const TCHAR* fnm, TCHAR* filepath, TCHAR* filename )
+{
+	// Zero-Filling buffers
+	mem00(filepath,MAX_PATH);
+	mem00(filename,MAX_PATH);
+
+	if( fnm == NULL || (fnm && !*fnm) )
+	{
+		//filename_[0] = TEXT('\0'); // already zero-filled
+		//filepath_[0] = TEXT('\0'); // already zero-filled
+
+		// Use CurDir instead
+		::lstrcpy(filepath, Path(Path::Cur, 0).c_str());
+	}
+	else
+	{
+		// turn input filename into Path object
+		ki::Path kpf = fnm;
+
+		// Copy File name without path into buffer
+		::lstrcpy(filename, kpf.name());
+
+		// Copy File Path without ending slash
+		::lstrcpy(filepath, kpf.BeDirOnly().BeBackSlash(false).c_str());
+	}
+}
+
 OpenFileDlg* OpenFileDlg::pThis;
 
 bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
@@ -248,29 +275,7 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	BOOL ret;
 	DWORD ErrCode;
 
-	// Zero-Filling buffers
-	mem00(filepath_,MAX_PATH);
-	mem00(filename_,MAX_PATH);
-
-	if( fnm == NULL || (fnm && !*fnm) )
-	{
-		//filename_[0] = TEXT('\0'); // already zero-filled
-		//filepath_[0] = TEXT('\0'); // already zero-filled
-
-		// Use CurDir instead
-		::lstrcpy(filepath_, Path(Path::Cur, 0).c_str());
-	}
-	else
-	{
-		// turn input filename into Path object
-		ki::Path kpf = fnm;
-
-		// Copy File name without path into buffer
-		::lstrcpy(filename_, kpf.name());
-
-		// Copy File Path without ending slash
-		::lstrcpy(filepath_, kpf.BeDirOnly().BeBackSlash(false).c_str());
-	}
+	CommonDialogPrepareBuffers( fnm, filepath_, filename_ );
 
 	OPENFILENAME ofn = {sizeof(ofn)};
 	ofn.hwndOwner      = wnd;
@@ -389,29 +394,7 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	BOOL ret;
 	DWORD ErrCode;
 
-	// Zero-Filling buffers
-	mem00(filepath_,MAX_PATH);
-	mem00(filename_,MAX_PATH);
-
-	if( fnm == NULL || (fnm && !*fnm) )
-	{
-		//filename_[0] = TEXT('\0'); // already zero-filled
-		//filepath_[0] = TEXT('\0'); // already zero-filled
-
-		// Use CurDir instead
-		::lstrcpy(filepath_, Path(Path::Cur, 0).c_str());
-	}
-	else
-	{
-		// turn input filename into Path object
-		ki::Path kpf = fnm;
-
-		// Copy File name without path into buffer
-		::lstrcpy(filename_, kpf.name());
-
-		// Copy File Path without ending slash
-		::lstrcpy(filepath_, kpf.BeDirOnly().BeBackSlash(false).c_str());
-	}
+	CommonDialogPrepareBuffers( fnm, filepath_, filename_ );
 
 	OPENFILENAME ofn = {sizeof(ofn)};
     ofn.hwndOwner      = wnd;
