@@ -1,7 +1,7 @@
 #ifndef _KILIB_PATH_H_
 #define _KILIB_PATH_H_
 #include "types.h"
-#include "string.h"
+#include "kstring.h"
 #ifndef __ccdoc__
 namespace ki {
 #endif

@@ -21,6 +21,10 @@ static HKL MyGetKeyboardLayout(DWORD dwLayout)
 //=========================================================================
 // IME‚ÉŠÖ‚·‚é‚ ‚ê‚±‚ê
 //=========================================================================
+#ifdef USEGLOBALIME
+const IID myIID_IActiveIMMApp = { 0x08C0E040, 0x62D1, 0x11D1, {0x93, 0x26, 0x00, 0x60, 0xB0, 0x67, 0xB8, 0x6E} };
+const IID myIID_IActiveIMMMessagePumpOwner = { 0xB5CF2CFA, 0x8AEB, 0x11D1, {0x93, 0x64, 0x00, 0x60, 0xB0, 0x67, 0xB8, 0x6E} };
+#endif
 
 IMEManager* IMEManager::pUniqueInstance_;
 
@@ -37,10 +41,10 @@ IMEManager::IMEManager()
 			app().InitModule( App::OLE );
 			if( S_OK == ::CoCreateInstance(
 					CLSID_CActiveIMM, NULL, CLSCTX_INPROC_SERVER,
-					IID_IActiveIMMApp, (void**)&immApp_ ) )
+					myIID_IActiveIMMApp, (void**)&immApp_ ) )
 			{
 				immApp_->QueryInterface(
-					IID_IActiveIMMMessagePumpOwner, (void**)&immMsg_ );
+					myIID_IActiveIMMMessagePumpOwner, (void**)&immMsg_ );
 			}
 		}
 	#endif
@@ -416,8 +420,8 @@ void Window::SetCenter( HWND hwnd, HWND rel )
 
 	// ’†‰›‚ðŒvŽZ
 	::SetWindowPos( hwnd, 0,
-		pr.left + ( (pr.right-pr.left)-(rc.right-rc.left) )/2,
-		pr.top  + ( (pr.bottom-pr.top)-(rc.bottom-rc.top) )/2,
+		NotSmaller((int)0,(int)(pr.left + ( (pr.right-pr.left)-(rc.right-rc.left) )/2)),
+		NotSmaller((int)0,(int)(pr.top  + ( (pr.bottom-pr.top)-(rc.bottom-rc.top) )/2)),
 		0, 0, SWP_NOSIZE|SWP_NOZORDER );
 }
 
@@ -596,6 +600,8 @@ void WndImpl::SetUpThunk( HWND wnd )
 	#error Unsupported processor type, please implement assembly code or consider defining NO_ASMTHUNK
 #endif
 
+	DWORD oldprotect; // Make thuk read+execute only for safety.
+	::VirtualProtect(thunk_, THUNK_SIZE, PAGE_EXECUTE_READ, &oldprotect);
 	::FlushInstructionCache( ::GetCurrentProcess(), thunk_, THUNK_SIZE );
 	::SetWindowLongPtr( wnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&thunk_[0]) );
 #else // !NO_ASMTHUNK
@@ -704,7 +710,7 @@ void DlgImpl::GoModeless( HWND parent )
 
 //-------------------------------------------------------------------------
 
-BOOL CALLBACK DlgImpl::MainProc(
+INT_PTR CALLBACK DlgImpl::MainProc(
 	HWND dlg, UINT msg, WPARAM wp, LPARAM lp )
 {
 	if( msg == WM_INITDIALOG )

@@ -7,13 +7,13 @@ namespace editwing {
 namespace view {
 #endif
 
-
+using namespace ki;
 
 class Canvas;
 class ViewImpl;
 class Cursor;
 class Caret;
-
+class OleDnDTarget;
 
 
 //=========================================================================
@@ -83,7 +83,84 @@ class CurEvHandler
 	virtual void on_ime( Cursor& cur, unicode* str, ulong len );
 };
 
+//=========================================================================
+//@{
+// OLE Drag and Drop handler.
+//@}
+//=========================================================================
+#ifndef NO_OLEDNDTAR
+class OleDnDTarget : public IDropTarget
+{
+	friend class Cursor;
+	OleDnDTarget( HWND hwnd, ViewImpl& vw );
+	~OleDnDTarget();
 
+	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void **ppvObject);
+
+	ULONG STDMETHODCALLTYPE AddRef()  { return ::InterlockedIncrement(&refcnt); }
+	ULONG STDMETHODCALLTYPE Release()
+	{
+		// decrement object reference count
+		LONG count = InterlockedDecrement(&refcnt);
+
+		if(count == 0)
+		{
+			delete this;
+			return 0;
+		}
+		else
+		{
+			return count;
+		}
+	}
+
+	HRESULT STDMETHODCALLTYPE DragEnter(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+	{
+		// Only accept DragEnter if we can get some text.
+		comes_from_center_ = false;
+		FORMATETC fmt = { CF_UNICODETEXT, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+		if( S_OK == pDataObj->QueryGetData(&fmt) )
+		{
+			LOGGER( "OleDnDTarget::DragEnter(CF_UNICODETEXT)" );
+			return S_OK;
+		}
+
+		fmt.cfFormat = CF_TEXT;
+		if( S_OK == pDataObj->QueryGetData(&fmt) )
+		{
+			LOGGER( "OleDnDTarget::DragEnter(CF_TEXT)" );
+			return S_OK;
+		}
+
+		fmt.cfFormat = CF_HDROP;
+		if( app().isWin32s() && S_OK == pDataObj->QueryGetData(&fmt) )
+		{
+			LOGGER( "OleDnDTarget::DragEnter(CF_HDROP)" );
+			return S_OK;
+		}
+
+		LOGGER( "OleDnDTarget::DragEnter(No supported IDataObject format)" );
+		return E_UNEXPECTED;
+	}
+
+	HRESULT STDMETHODCALLTYPE DragLeave()
+		{ LOGGER( "OleDnDTarget::DragLeave()" ); return S_OK; }
+
+	HRESULT STDMETHODCALLTYPE DragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffect);
+
+	HRESULT STDMETHODCALLTYPE Drop(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect);
+
+private:
+	void setDropEffect(DWORD grfKeyState, DWORD *pdwEffect) const;
+
+private:
+	LONG refcnt;
+	HWND hwnd_;
+	ViewImpl& view_;
+
+	bool comes_from_center_;
+};
+#endif // NO_OLEDNDTAR
 
 //=========================================================================
 //@{
@@ -95,7 +172,7 @@ struct VPos : public DPos
 {
 	ulong vl; // VLine-Index
 	ulong rl; // RLine-Index
-	int   vx; // スクロールを考慮しない仮想スクリーン上のx座標(pixel) 
+	int   vx; // スクロールを考慮しない仮想スクリーン上のx座標(pixel)
 	int   rx; // 文字の並びに左右されてないx座標(pixel)
 		      //   == 長い行のしっぽから短い行に [↑] で移動して
 		      //   == その後 [↓] で戻れるようなアレです。
@@ -139,6 +216,8 @@ public:
 	// テキスト書き換え
 	void Input( const unicode* str, ulong len );
 	void Input( const char* str, ulong len );
+	void InputAt( const unicode *str, ulong len, int x, int y );
+	void InputAt( const char *str, ulong len, int x, int y );
 	void InputChar( unicode ch );
 	void Del();
 	void DelBack();
@@ -164,6 +243,7 @@ public:
 	bool isInsMode() const;
 	bool isROMode() const;
 	bool isSelected() const;
+	bool isInSelection(const VPos &vp) const;
 	bool getCurPos( const VPos** start, const VPos** end ) const;
 	void ResetPos();
 	void on_scroll_begin();
@@ -175,7 +255,8 @@ public:
 	void on_char( TCHAR ch );
 	void on_ime_composition( LPARAM lp );
 	void on_lbutton_down( short x, short y, bool shift );
-	void on_mouse_move( short x, short y );
+	bool on_drag_start( short x, short y );
+	void on_mouse_move( short x, short y, WPARAM fwKeys );
 	void on_lbutton_up( short x, short y );
 	void on_lbutton_dbl( short x, short y );
 	bool on_contextmenu( short x, short y );
@@ -189,6 +270,9 @@ private:
 	ViewImpl&       view_;
 	CurEvHandler*   pEvHan_;
 	ki::dptr<Caret> caret_;
+#ifndef NO_OLEDNDTAR
+	OleDnDTarget    dndtg_;
+#endif
 
 	VPos cur_;  // カーソル位置
 	VPos sel_;  // 選択時の軸足位置
@@ -224,6 +308,9 @@ inline bool Cursor::isInsMode() const
 
 inline bool Cursor::isROMode() const
 	{ return bRO_; }
+
+inline bool Cursor::isInSelection(const VPos &vp) const
+	{ return Min(cur_, sel_) <= vp && vp < Max(cur_,sel_); }
 
 
 

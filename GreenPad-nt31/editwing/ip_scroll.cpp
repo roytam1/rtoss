@@ -598,6 +598,50 @@ void ViewImpl::on_wheel( short delta )
 	}
 }
 
+int ViewImpl::getNumScrollRaws( void )
+{
+	uint scrollnum = 3; // Number of lines to scroll (default 3).
+	// TODO: Get more accurate version numbers for scroll wheel support?
+	if ( app().getOSVer() >= MKVER(6,0) )
+	{ // Introduced in window Vista
+		UINT num;
+		if( ::SystemParametersInfo( SPI_GETWHEELSCROLLCHARS, 0, &num, 0 ) )
+			scrollnum = num; // Sucess!
+	}
+	else if( app().getOSVer() >= MKVER(4,0) )
+	{   // Read the system value for the wheel scroll lines.
+		UINT num;
+		if( ::SystemParametersInfo( SPI_GETWHEELSCROLLLINES, 0, &num, 0 ) )
+			scrollnum = num; // Sucess!
+	}
+	// Avoid scrolling more that halfa screen horizontally.
+	uint nlpage;
+	nlpage = Max( (uint)cx() / (uint)NZero(cvs_.getPainter().W()/2), 1U );
+	// scrollnum can be zero, in this case no scroll should occur.
+	return (int)Min( scrollnum, nlpage );
+}
+
+void ViewImpl::on_hwheel( short delta )
+{
+	int nl = getNumScrollRaws();
+	int dx = nl * cvs_.getPainter().W() * (int)delta / WHEEL_DELTA;
+	if( dx == 0 )
+	{ // step is too small, we need to accumulate delta
+		accdeltax_ += delta;
+		// Recalculate the step.
+		dx = nl * cvs_.getPainter().W() * (int)accdeltax_ / WHEEL_DELTA;
+		if( dx )
+		{
+			ScrollView( dx, 0, 0 );
+			accdeltax_ = 0;
+		}
+	}
+	else
+	{
+		ScrollView( dx, 0, 0 );
+	}
+}
+
 void ViewImpl::UpDown( int dy, bool thumb )
 {
   // ÇPÅDudScr_.nPos + dy Ç™ê≥èÌîÕàÕÇ…é˚Ç‹ÇÈÇÊÇ§Ç…ï‚ê≥

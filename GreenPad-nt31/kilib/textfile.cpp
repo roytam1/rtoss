@@ -2,7 +2,7 @@
 #include "app.h"
 #include "textfile.h"
 #include "ktlarray.h"
-#include "string.h"
+#include "kstring.h"
 #include "path.h"
 using namespace ki;
 
@@ -25,7 +25,7 @@ struct ki::TextFileRPimpl : public Object
 	inline TextFileRPimpl()
 		: state(EOL) {}
 
-	virtual size_t ReadLine( unicode* buf, ulong siz )
+	virtual size_t ReadBuf( unicode* buf, ulong siz )
 		= 0;
 
 	enum { EOF=0, EOL=1, EOB=2 } state;
@@ -48,22 +48,18 @@ struct rBasicUTF : public ki::TextFileRPimpl
 
 	bool BOF;
 
-	size_t ReadLine( unicode* buf, ulong siz )
+	size_t ReadBuf( unicode* buf, ulong siz )
 	{
 		state = EOF;
 
 		// 改行が出るまで読む
-		unicode *w=buf, *e=buf+siz;
+		unicode *w=buf, *e=buf+siz-1;
 		while( !Eof() )
 		{
 			*w = GetC();
 			if(BOF && *w!=0xfeff) BOF = false;
-			if( *w==L'\r' || *w==L'\n' )
-			{
-				state = EOL;
-				break;
-			}
-			else if( !BOF && ++w==e )
+
+			if( !BOF && ++w==e )
 			{
 				state = EOB;
 				break;
@@ -71,10 +67,9 @@ struct rBasicUTF : public ki::TextFileRPimpl
 			if(BOF) BOF = false;
 		}
 
-		// 改行コードスキップ処理
-		if( state == EOL )
-			if( *w==L'\r' && !Eof() && PeekC()==L'\n' )
-				Skip();
+		// If the end of the buffer contains half a DOS CRLF
+		if( *(w-1)==L'\r' && PeekC() == L'\n' )
+			Skip();
 
 		if(BOF) BOF = false;
 		// 読んだ文字数
@@ -916,48 +911,44 @@ struct rMBCS : public TextFileRPimpl
 			readcp = ::GetACP(); // input codepage in not available in OS
 	}
 
-	size_t ReadLine( unicode* buf, ulong siz )
+	size_t ReadBuf( unicode* buf, ulong siz )
 	{
 		// バッファの終端か、ファイルの終端の近い方まで読み込む
-		const char *p, *end = Min( fb+siz/2, fe );
+		// Read to the end of the buffer or near the end of the file
+		const char *p, *end = Min( fb+siz/2-2, fe );
 		state = (end==fe ? EOF : EOB);
 
-		// 改行が出るまで進む
+		// 改行が出るまで進む,  Proceed until the line breaks.
 		for( p=fb; p<end; )
-			if( *p=='\r' || *p=='\n' )
-			{
-				state = EOL;
-				break;
-			}
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>350)
-			else if( (*p) & 0x80 && p+1<fe )
+			if( (*p) & 0x80 && p+1<fe )
 			{
 				p = next(readcp,p,0);
 			}
-#endif
 			else
+#endif
 			{
 				++p;
 			}
 
-		// Unicodeへ変換
+		// If the end of the buffer contains half a DOS CRLF
+		if( *(p-1)=='\r' && *(p) =='\n' )
+			++p;
+
+		// Unicodeへ変換, convertion to Unicode
 		ulong len;
 #ifndef _UNICODE
 		len = conv( readcp, 0, fb, p-fb, buf, siz );
 #else
 		if(!app().isWin3later() || app().isWin95())
 		{
-			len = conv( readcp, 0, fb, p-fb, buf, siz );
+			len = conv( readcp, 0, fb, int(p-fb), buf, siz );
 		}
 		else
 		{
 			len = ::MultiByteToWideChar( readcp, 0, fb, int(p-fb), buf, siz );
 		}
 #endif
-		// 改行コードスキップ処理
-		if( state == EOL )
-			if( *(p++)=='\r' && p<fe && *p=='\n' )
-				++p;
 		fb = p;
 
 		// 終了
@@ -1125,20 +1116,20 @@ struct rIso2022 : public TextFileRPimpl
 		len+=wt;
 	}
 
-	size_t ReadLine( unicode* buf, ulong siz )
+	size_t ReadBuf( unicode* buf, ulong siz )
 	{
 		len=0;
 
 		// バッファの終端か、ファイルの終端の近い方まで読み込む
-		const uchar *p, *end = Min( fb+siz/2, fe );
+		const uchar *p, *end = Min( fb+siz/2-2, fe );
 		state = (end==fe ? EOF : EOB);
 
 		// 改行が出るまで進む
 		for( p=fb; p<end; ++p )
 			switch( *p )
 			{
-			case '\r':
-			case '\n': state =   EOL; goto outofloop;
+//			case '\r':
+//			case '\n': state =   EOL; goto outofloop;
 			case 0x0F:    GL = &G[0]; break;
 			case 0x0E:    GL = &G[1]; break;
 			case 0x8E: gWhat =     2; break;
@@ -1160,10 +1151,9 @@ struct rIso2022 : public TextFileRPimpl
 			}
 		outofloop:
 
-		// 改行コードスキップ処理
-		if( state == EOL )
-			if( *(p++)=='\r' && p<fe && *p=='\n' )
-				++p;
+		// If the end of the buffer contains half a DOS CRLF
+		if( *(p-1)=='\r' && *p=='\n' )
+			++p;
 		fb = p;
 
 		// 終了
@@ -1188,9 +1178,9 @@ TextFileR::~TextFileR()
 	Close();
 }
 
-size_t TextFileR::ReadLine( unicode* buf, ulong siz )
+size_t TextFileR::ReadBuf( unicode* buf, ulong siz )
 {
-	return impl_->ReadLine( buf, siz );
+	return impl_->ReadBuf( buf, siz );
 }
 
 int TextFileR::state() const
@@ -1251,7 +1241,7 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong totalsiz )
 {
 //-- まず、文字の出現回数の統計を取る
 
-	int  freq[256];
+	unsigned int freq[256];
 	bool bit8 = false;
 	ulong siz = Min(totalsiz,(ulong)(256<<10)); // 先頭256KB
 	mem00( freq, sizeof(freq) );
@@ -1327,12 +1317,26 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong totalsiz )
 		return UTF5;
 
 //-- UTF-16/32 detection
-	if( freq[ 0 ] && !(totalsiz&1)) // nulls in content and file size is even number?
-	{ // then it may be UTF-16/32 without BOM
-		if(CheckUTFConfidence(ptr,siz,sizeof(dbyte),true)) return UTF16LE;
-		if(CheckUTFConfidence(ptr,siz,sizeof(dbyte),false)) return UTF16BE;
-		if(CheckUTFConfidence(ptr,siz,sizeof(qbyte),true)) return UTF32LE;
-		if(CheckUTFConfidence(ptr,siz,sizeof(qbyte),false)) return UTF32BE;
+	if( freq[ 0 ] > siz >> 11 ) // More than 1/2048 nulls in content?
+	{	// then it may be UTF-16/32 without BOM We make some sanity
+		// checks on NULs frequency with 1% extra NULs tolerance
+		if( freq[ 0 ] <= (siz>>1) + (siz>>7) && !(totalsiz&1) )
+		{	// If we got less than 50% NULs it might be UTF16
+			// UTF-16 byte count will always be even
+			if(CheckUTFConfidence(ptr,siz,sizeof(dbyte),true)) return UTF16LE;
+			if(CheckUTFConfidence(ptr,siz,sizeof(dbyte),false)) return UTF16BE;
+		}
+		if( freq[ 0 ] <= 3*(siz>>2) + (siz>>7) && !(totalsiz&3) )
+		{	// If we got less than 75% NULs it might be UTF32
+			// UTF-32 byte count will always be multiple of 4
+			if(CheckUTFConfidence(ptr,siz,sizeof(qbyte),true)) return UTF32LE;
+			if(CheckUTFConfidence(ptr,siz,sizeof(qbyte),false)) return UTF32BE;
+		}
+
+		if ( freq[ 0 ] >= siz>>9 )
+		{	// More than 1/512 NULs and not UTF16/32? BINARY file!
+			return DOSUS; // theat as CP437
+		}
 	}
 
 //-- chardet and MLang detection
@@ -1409,7 +1413,9 @@ int TextFileR::MLangAutoDetection( const uchar* ptr, ulong siz )
 #ifndef NO_MLANG
 	app().InitModule( App::OLE );
 	IMultiLanguage2 *lang = NULL;
-	if( S_OK == ::CoCreateInstance(CLSID_CMultiLanguage, NULL, CLSCTX_ALL, IID_IMultiLanguage2, (LPVOID*)&lang ) )
+	static const IID myIID_IMultiLanguage2 = {0xDCCFC164, 0x2B38, 0x11d2, {0xB7, 0xEC, 0x00, 0xC0, 0x4F, 0x8F, 0x5D, 0x9A}};
+	static const CLSID myCLSID_CMultiLanguage = { 0x275c23e2, 0x3747, 0x11d0, {0x9f, 0xea, 0x00,0xaa,0x00,0x3f,0x86,0x46} };
+	if( S_OK == ::CoCreateInstance(myCLSID_CMultiLanguage, NULL, CLSCTX_ALL, myIID_IMultiLanguage2, (LPVOID*)&lang ) )
 	{
 		int detectEncCount = 5;
 		DetectEncodingInfo detectEnc[5];

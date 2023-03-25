@@ -114,6 +114,7 @@ private:
 	void    on_statusBar();
 	void    on_reconv();
 	void    on_toggleime();
+	void    on_helpabout();
 	bool    PreTranslateMessage( MSG* msg );
 };
 

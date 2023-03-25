@@ -3,6 +3,15 @@
 #include "types.h"
 #include "log.h"
 
+#if defined(__GNUC__) && !defined(WIN64)
+	// In recent GCC versions this is the only way to link to the real
+	// Win32 functions.
+	#undef InterlockedIncrement
+	#undef InterlockedDecrement
+	extern "C" WINBASEAPI LONG WINAPI InterlockedIncrement(LONG volatile *);
+	extern "C" WINBASEAPI LONG WINAPI InterlockedDecrement(LONG volatile *);
+#endif
+
 #pragma pack(push,1)
 typedef struct _MYVERINFO {
 	union {
@@ -229,7 +238,6 @@ inline int App::LoadString( UINT id, LPTSTR buf, int siz )
 
 inline HINSTANCE App::hinst() const
 	{ return hInst_; }
-
 
 
 //=========================================================================

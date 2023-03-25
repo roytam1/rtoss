@@ -144,8 +144,38 @@ LRESULT GreenPadWnd::on_message( UINT msg, WPARAM wp, LPARAM lp )
 
 	// Ｄ＆Ｄ
 	case WM_DROPFILES:
-		on_drop( reinterpret_cast<HDROP>(wp) );
+		{
+			HGLOBAL hDrop = reinterpret_cast<HGLOBAL>(wp);
+			DROPFILES *df = (DROPFILES *)::GlobalLock( hDrop );
+			size_t hdropSize = ::GlobalSize( hDrop );
+			HWND *hDummy = (HWND*)( ((BYTE*)df) + hdropSize - 2*sizeof(HWND) );
+			HWND *hCustomHwnd = (HWND*)( ((BYTE*)hDummy) + sizeof(HWND) );
+			BOOL bProcessDrops = *hDummy || (*hDummy == 0 && *hCustomHwnd != hwnd());
+			::GlobalUnlock(hDrop);
+			if(bProcessDrops)
+			{
+				on_drop( reinterpret_cast<HDROP>(wp) );
+			}
+		}
 		break;
+
+#ifndef NO_OLEDNDSRC
+	case WM_NCLBUTTONDOWN: {
+		if( wp == HTSYSMENU
+		&& !isUntitled()
+		&& coolDragDetect( hwnd(), /*pt=*/lp, WM_NCLBUTTONUP, PM_NOREMOVE )  )
+		{
+			// Allow dragging file out of system icon with Left button.
+			const unicode *fnu = filename_.ConvToWChar();
+			if( fnu )
+			{
+				OleDnDSourceFile doDrag( hwnd(), fnu, my_lstrlenW(fnu), DROPEFFECT_COPY );
+				filename_.FreeWCMem(fnu);
+			}
+			break;
+		}
+	} return WndImpl::on_message( msg, wp, lp );
+#endif // NO_OLEDNDSRC
 
 	// MRU
 	case GPM_MRUCHANGED:
@@ -213,6 +243,7 @@ bool GreenPadWnd::on_command( UINT id, HWND ctrl )
 	case ID_CMD_WRAPWINDOW: edit_.getView().SetWrapType( wrap_=0 ); break;
 	case ID_CMD_CONFIG:     on_config();    break;
 	case ID_CMD_STATUSBAR:  on_statusBar(); break;
+	case ID_CMD_HELPABOUT:  on_helpabout(); break;
 
 	// DocType
 	default: if( ID_CMD_DOCTYPE <= id ) {
@@ -532,6 +563,7 @@ void GreenPadWnd::on_initmenu( HMENU menu, bool editmenu_only )
 void GreenPadWnd::on_drop( HDROP hd )
 {
 	UINT iMax = ::DragQueryFileA( hd, 0xffffffff, NULL, 0 );
+
 	for( UINT i=0; i<iMax; ++i )
 	{
 #ifdef _UNICODE
@@ -756,6 +788,130 @@ void GreenPadWnd::on_toggleime()
 	edit_.getCursor().ToggleIME();
 }
 
+void GreenPadWnd::on_helpabout()
+{
+	// Crazy double macro so that an int define
+	// Can be seen as a string
+	#define SHARP(x) #x
+	#define STR(x) SHARP(x)
+
+	#if defined(UNICOWS)
+		#define UNIANSI TEXT(" (Unicows)")
+	#elif defined(UNICODE)
+		#define UNIANSI TEXT(" (Unicode)")
+	#elif defined(_MBCS)
+		#define UNIANSI TEXT(" (MBCS)")
+	#else
+		#define UNIANSI TEXT(" (ANSI)")
+	#endif
+
+	#if defined(__GNUC__)
+		#define COMPILER TEXT( "GNU C Compiler - " __VERSION__ "\n" )
+	#elif defined(_MSC_VER)
+		#define COMPILER TEXT("Visual C++ - ")  +String().SetInt((_MSC_VER-600)/100)+TEXT(".")+String().SetInt(_MSC_VER%100)+
+	#elif defined(__WATCOMC__)
+		#define COMPILER TEXT("Watcom C++ - ") TEXT(STR(__WATCOMC__))
+	#elif defined(__BORLANDC__)
+		#define COMPILER TEXT("Borland C++ - ") TEXT(STR(__BORLANDC__))
+	#elif defined(__DMC__)
+		#define COMPILER TEXT("Digital Mars C++ - ") TEXT(STR(__DMC__))
+	#elif defined(__INTEL_COMPILER)
+		#define COMPILER TEXT("Intel C++ - ") TEXT(STR(__INTEL_COMPILER))
+	#elif defined(__clang__)
+		#define COMPILER TEXT("LLVM Clang - ")  TEXT(STR(__clang_major__)) TEXT(".") TEXT(STR(__clang_minor__))
+	#else
+		//#error Unknown compiler, consider adding it to the list.
+		#define COMPILER TEXT( "(unknown compiler)\n" )
+	#endif
+
+	#if defined(WIN32S)
+		#define TARGETOS TEXT("Win32s")
+	#elif defined(UNICODE)
+		#define TARGETOS TEXT("Windows NT")
+	#else
+		#define TARGETOS TEXT("Windows 9x")
+	#endif
+
+	#if defined(TARGET_VER)
+		#if TARGET_VER == 310
+			#define TGVER TEXT(" 3.10+")
+		#elif TARGET_VER == 350
+			#define TGVER TEXT(" 3.50+")
+		#else //if TARGET_VER == 351
+			#if defined(_M_AMD64) || defined(_M_X64) || defined(WIN64)
+				// XP/NT5.1 is the first x64 version of Windows.
+				#define TGVER TEXT(" 5.1+")
+			#else
+				// Default to NT3.51/95 (I guess...)
+				#define TGVER TEXT(" 3.51+")
+			#endif
+		#endif
+	#else
+		#if defined(_M_AMD64) || defined(_M_X64) || defined(WIN64)
+			// XP/NT5.1 is the first x64 version of Windows.
+			#define TGVER TEXT(" 5.1+")
+		#else
+			// Default to NT3.51/95 (I guess...)
+			#define TGVER TEXT(" 3.51+")
+		#endif
+	#endif //TARGET_VER
+
+	#if defined(NO_OLEDNDSRC) && defined(NO_OLEDNDTAR)
+		#define USEOLE TEXT(" ")
+	#else
+		#define USEOLE TEXT(" OLE ")
+	#endif //TARGET_VER
+
+
+	#if defined(_M_AMD64) || defined(_M_X64)
+		#define PALT TEXT( "- x86_64" )
+	#elif defined(_M_IX86)
+		#define PALT TEXT( "- i386" )
+	#elif defined(_M_MRX000) || defined(_MIPS_)
+		#define PALT TEXT( "- MIPS" )
+	#elif defined(_M_ARM64)
+		#define PALT TEXT( "- ARM64" )
+	#elif defined(_M_ALPHA)
+		#define PALT TEXT( "- Alpha" )
+	#elif defined(_M_PPC)
+		#define PALT TEXT( "- PowerPC" )
+	#endif
+	// Show Help->About dialog box.
+	struct AboutDlg : public DlgImpl {
+		AboutDlg(HWND parent) : DlgImpl(IDD_ABOUTDLG), parent_( parent ) { GoModal(parent_); }
+		void on_init()
+		{
+			String s = String(IDS_APPNAME);
+			s += TEXT(" - ") TEXT( VER_FILEVERSIONSTR ) UNIANSI TEXT("\r\n")
+			     COMPILER TEXT(" on ") TEXT( __DATE__ ) TEXT("\r\n")
+			     TEXT("for ") TARGETOS TGVER USEOLE PALT TEXT("\r\n")
+			     TEXT("Running on ");
+
+			if( app().isNT() )
+				s += TEXT("Windows NT ");
+			else if( app().isWin32s() )
+				s += TEXT("Win32s ");
+			else
+				s+= TEXT("Windows ");
+
+			s += String().SetInt( HIBYTE(app().getOSVer()) ) + TEXT(".")
+			   + String().SetInt( LOBYTE(app().getOSVer()) ) + TEXT(".")
+			   + String().SetInt( app().getOSBuild() );
+
+			SendMsgToItem(IDC_ABOUTSTR, WM_SETTEXT, s.c_str());
+			SendMsgToItem(IDC_ABOUTURL, WM_SETTEXT, TEXT("https://github.com/roytam1/rtoss/tree/master/GreenPad"));
+			SetCenter(hwnd(), parent_);
+		}
+		HWND parent_;
+	} ahdlg (hwnd());
+
+	#undef UNIANSI
+	#undef COMPILER
+	#undef TGVER
+	#undef USEOLE
+	#undef PALT
+}
+
 //-------------------------------------------------------------------------
 // ユーティリティー
 //-------------------------------------------------------------------------
@@ -967,6 +1123,7 @@ bool GreenPadWnd::OpenByMyself( const ki::Path& fn, int cs, bool needReConf )
 
 	// 開く
 	edit_.getDoc().ClearAll();
+	stb_.SetText(String(IDS_LOADING).c_str());
 	edit_.getDoc().OpenFile( tf );
 
 	// タイトルバー更新
@@ -1133,6 +1290,7 @@ bool GreenPadWnd::StartUp( const Path& fn, int cs, int ln )
 {
 	LOGGER( "GreenPadWnd::StartUp begin" );
 	Create( 0, 0, cfg_.GetWndX(), cfg_.GetWndY(), cfg_.GetWndW(), cfg_.GetWndH(), 0 );
+	ShowUp2(); LOGGER( "showup!" );
 	LOGGER( "GreenPadWnd::Created" );
 	if( fn.len()==0 || !OpenByMyself( fn, cs ) )
 	{

@@ -31,7 +31,10 @@ Revision History:
 //
 
 #define LBS_DISABLENOSCROLL   0x1000L
+
+#ifndef IDC_STATIC
 #define IDC_STATIC   -1
+#endif
 
 #ifdef _WIN32
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL

@@ -255,28 +255,19 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	}
 	else
 	{
-		::lstrcpy(filepath_, fnm);
-		::lstrcpy(filename_, fnm);
-		
-		int i = 0;
-		int j = -1;
-		
-		while(filepath_[i] != TEXT('\0'))
-		{
-			if(filepath_[i] == TEXT('\\'))
-			{
-				j = i;
-			}
-			i++;
-		}
-		
-		int x = 0;
-		for (i = j+1; filepath_[i] != TEXT('\0'); i++)
-		{
-			filename_[x++] = filepath_[i];
-		}
-		filename_[x++] = TEXT('\0');
-		filepath_[j+1] = TEXT('\0');
+		// turn input filename into Path object
+		ki::Path kpf = fnm;
+
+		// Zero-Filling buffers
+		mem00(filepath_,MAX_PATH);
+		mem00(filename_,MAX_PATH);
+
+		// Copy File name without path into buffer
+		::lstrcpy(filename_, kpf.name());
+
+		// Copy File Path without ending slash
+		kpf = kpf.BeDirOnly();
+		::lstrcpy(filepath_, kpf.BeBackSlash(false).c_str());
 	}
 
 	OPENFILENAME ofn = {sizeof(ofn)};
@@ -284,7 +275,7 @@ bool OpenFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	ofn.hInstance      = app().hinst();
 	ofn.lpstrFilter    = fltr;
 	ofn.lpstrFile      = filename_;
-	ofn.nMaxFile       = countof(filename_);
+	ofn.nMaxFile       = MAX_PATH;
     ofn.lpstrInitialDir= filepath_;
 	ofn.lpfnHook       = OfnHook;
 	ofn.Flags = OFN_FILEMUSTEXIST |
@@ -315,14 +306,14 @@ OpenTryAgain:
 	if(ret != TRUE) {
 		ErrCode = ::GetLastError();
 
-		if(!pThis->dlgEverOpened_ && (ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_CALL_NOT_IMPLEMENTED || ErrCode == ERROR_INVALID_ACCEL_HANDLE) && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER)) {
+		if(!pThis->dlgEverOpened_ && ((ofn.Flags & OFN_EXPLORER) == OFN_EXPLORER) && (ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_CALL_NOT_IMPLEMENTED || ErrCode == ERROR_INVALID_ACCEL_HANDLE)) {
 			// maybe Common Dialog DLL doesn't like OFN_EXPLORER, try again without it
 			ofn.Flags &= ~OFN_EXPLORER;
 			ofn.lpTemplateName = (LPTSTR)MAKEINTRESOURCE(FILEOPENORD);
 
 			// try again!
 			goto OpenTryAgain;
-		} else if(!ErrCode || ErrCode == ERROR_INVALID_HANDLE || ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_NO_MORE_FILES || ErrCode == ERROR_CLASS_DOES_NOT_EXIST) {
+		} else if(!ErrCode || ErrCode == ERROR_INVALID_HANDLE || ErrCode == ERROR_INVALID_PARAMETER || ErrCode == ERROR_NO_MORE_FILES || ErrCode == ERROR_CLASS_DOES_NOT_EXIST || ErrCode == ERROR_CALL_NOT_IMPLEMENTED) {
 			// user pressed Cancel button
 		} else {
 			TCHAR tmp[128];
@@ -403,28 +394,19 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
 	}
 	else
 	{
-		::lstrcpy(filepath_, fnm);
-		::lstrcpy(filename_, fnm);
-		
-		int i = 0;
-		int j = -1;
-		
-		while(filepath_[i] != TEXT('\0'))
-		{
-			if(filepath_[i] == TEXT('\\'))
-			{
-				j = i;
-			}
-			i++;
-		}
-		
-		int x = 0;
-		for (i = j+1; filepath_[i] != TEXT('\0'); i++)
-		{
-			filename_[x++] = filepath_[i];
-		}
-		filename_[x++] = TEXT('\0');
-		filepath_[j+1] = TEXT('\0');
+		// turn input filename into Path object
+		ki::Path kpf = fnm;
+
+		// Zero-Filling buffers
+		mem00(filepath_,MAX_PATH);
+		mem00(filename_,MAX_PATH);
+
+		// Copy File name without path into buffer
+		::lstrcpy(filename_, kpf.name());
+
+		// Copy File Path without ending slash
+		kpf = kpf.BeDirOnly();
+		::lstrcpy(filepath_, kpf.BeBackSlash(false).c_str());
 	}
 
 	OPENFILENAME ofn = {sizeof(ofn)};
@@ -432,7 +414,7 @@ bool SaveFileDlg::DoModal( HWND wnd, const TCHAR* fltr, const TCHAR* fnm )
     ofn.hInstance      = app().hinst();
     ofn.lpstrFilter    = fltr;
     ofn.lpstrFile      = filename_;
-    ofn.nMaxFile       = countof(filename_);
+    ofn.nMaxFile       = MAX_PATH;
     ofn.lpstrInitialDir= filepath_;
 	ofn.lpfnHook       = OfnHook;
     ofn.Flags = OFN_HIDEREADONLY    |
@@ -582,7 +564,7 @@ void ReopenDlg::on_init()
 	for( ulong i=0; i<csl_.size(); ++i )
 		if( csl_[i].type & 1 ) // 2:=SAVE
 			cb.Add( csl_[i].longName );
-	if(csIndex_ < 0 || csIndex_ > csl_.size()) csIndex_ = 0;
+	if(csIndex_ < 0 || (ulong)csIndex_ > csl_.size()) csIndex_ = 0;
 	cb.Select( csl_[csIndex_].longName );
 }
 

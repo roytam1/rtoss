@@ -63,7 +63,7 @@
 				EnableFunctionLevelLinking="true"
 				TreatWChar_tAsBuiltInType="true"
 				RuntimeTypeInfo="false"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="1"
 				PrecompiledHeaderThrough="stdafx.h"
 				PrecompiledHeaderFile=".\OBJ/vc/reluni/kilib.pch"
 				AssemblerListingLocation=".\OBJ/vc/reluni/"
@@ -71,7 +71,7 @@
 				ProgramDataBaseFileName=".\OBJ/vc/reluni/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 				CallingConvention="1"
 			/>
 			<Tool
@@ -94,8 +94,8 @@
 				SuppressStartupBanner="true"
 				GenerateManifest="false"
 				IgnoreAllDefaultLibraries="true"
-				GenerateDebugInformation="false"
-				ProgramDatabaseFile=".\release/GreenPad.pdb"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile=".\release/GreenPad_x64.pdb"
 				GenerateMapFile="true"
 				MapFileName=".\OBJ/vc/reluni/GreenPad.map"
 				SubSystem="2"
@@ -569,6 +569,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\kilib\kstring.h"
+					>
+				</File>
+				<File
 					RelativePath=".\kilib\memory.h"
 					>
 				</File>
@@ -578,10 +582,6 @@
 				</File>
 				<File
 					RelativePath=".\kilib\registry.h"
-					>
-				</File>
-				<File
-					RelativePath=".\kilib\string.h"
 					>
 				</File>
 				<File
