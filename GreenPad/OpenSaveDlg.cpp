@@ -241,14 +241,11 @@ namespace
 void CommonDialogPrepareBuffers( const TCHAR* fnm, TCHAR* filepath, TCHAR* filename )
 {
 	// Zero-Filling buffers
-	mem00(filepath,MAX_PATH);
-	mem00(filename,MAX_PATH);
+	mem00(filepath,MAX_PATH*sizeof(TCHAR));
+	mem00(filename,MAX_PATH*sizeof(TCHAR));
 
 	if( fnm == NULL || (fnm && !*fnm) )
 	{
-		//filename_[0] = TEXT('\0'); // already zero-filled
-		//filepath_[0] = TEXT('\0'); // already zero-filled
-
 		// Use CurDir instead
 		::lstrcpy(filepath, Path(Path::Cur, 0).c_str());
 	}
