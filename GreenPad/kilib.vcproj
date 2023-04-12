@@ -308,7 +308,7 @@
 				ProgramDataBaseFileName=".\OBJ/vc/reluniIA64/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 				CallingConvention="1"
 			/>
 			<Tool
@@ -331,7 +331,7 @@
 				SuppressStartupBanner="true"
 				GenerateManifest="false"
 				IgnoreAllDefaultLibraries="false"
-				GenerateDebugInformation="false"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\release/GreenPad_ia64.pdb"
 				GenerateMapFile="true"
 				MapFileName=".\OBJ/vc/reluniIA64/GreenPad.map"
