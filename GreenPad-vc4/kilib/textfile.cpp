@@ -1514,6 +1514,8 @@ int TextFileR::chardetAutoDetection( const uchar* ptr, ulong siz )
 # define CHARDET_DLL "chardet_arm64.dll"
 #elif defined(_MIPS_)
 # define CHARDET_DLL "cdetmips.dll"
+#elif defined(_M_PPC)
+# define CHARDET_DLL "cdetppc.dll"
 #else
 # define CHARDET_DLL "chardet.dll"
 #endif
