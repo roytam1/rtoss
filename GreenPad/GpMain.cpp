@@ -825,14 +825,17 @@ void GreenPadWnd::on_helpabout()
 	#endif
 
 	#if defined(TARGET_VER)
-		#if TARGET_VER == 310
+		#if TARGET_VER == 310 && ( defined(WIN32S) || ( defined(NO_OLEDNDSRC) && defined(NO_OLEDNDTAR) ) )
 			#define TGVER TEXT(" 3.10+")
-		#elif TARGET_VER == 350
+		#elif TARGET_VER == 350 || TARGET_VER == 310 // 3.10 non-Win32s + OLE = 3.50
 			#define TGVER TEXT(" 3.50+")
 		#else //if TARGET_VER == 351
 			#if defined(_M_AMD64) || defined(_M_X64) || defined(WIN64)
 				// XP/NT5.1 is the first x64 version of Windows.
 				#define TGVER TEXT(" 5.1+")
+			#elif defined(_M_IA64)
+				// 2000/NT5.0 is the first IA64 version of Windows.
+				#define TGVER TEXT(" 5.0+")
 			#else
 				// Default to NT3.51/95 (I guess...)
 				#define TGVER TEXT(" 3.51+")
