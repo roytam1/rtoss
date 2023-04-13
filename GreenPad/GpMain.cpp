@@ -830,24 +830,24 @@ void GreenPadWnd::on_helpabout()
 		#elif TARGET_VER == 350 || TARGET_VER == 310 // 3.10 non-Win32s + OLE = 3.50
 			#define TGVER TEXT(" 3.50+")
 		#else //if TARGET_VER == 351
-			#if defined(_M_AMD64) || defined(_M_X64) || defined(WIN64)
-				// XP/NT5.1 is the first x64 version of Windows.
-				#define TGVER TEXT(" 5.1+")
-			#elif defined(_M_IA64)
+			#if defined(_M_IA64)
 				// 2000/NT5.0 is the first IA64 version of Windows.
 				#define TGVER TEXT(" 5.0+")
+			#elif defined(_M_AMD64) || defined(_M_X64) || defined(WIN64)
+				// XP/NT5.1 is the first x64 version of Windows.
+				#define TGVER TEXT(" 5.1+")
 			#else
 				// Default to NT3.51/95 (I guess...)
 				#define TGVER TEXT(" 3.51+")
 			#endif
 		#endif
 	#else
-		#if defined(_M_AMD64) || defined(_M_X64) || defined(WIN64)
-			// XP/NT5.1 is the first x64 version of Windows.
-			#define TGVER TEXT(" 5.1+")
-		#elif defined(_M_IA64)
+		#if defined(_M_IA64)
 			// 2000/NT5.0 is the first IA64 version of Windows.
 			#define TGVER TEXT(" 5.0+")
+		#elif defined(_M_AMD64) || defined(_M_X64) || defined(WIN64)
+			// XP/NT5.1 is the first x64 version of Windows.
+			#define TGVER TEXT(" 5.1+")
 		#else
 			// Default to NT3.51/95 (I guess...)
 			#define TGVER TEXT(" 3.51+")
@@ -875,6 +875,8 @@ void GreenPadWnd::on_helpabout()
 		#define PALT TEXT( "- Alpha" )
 	#elif defined(_M_PPC)
 		#define PALT TEXT( "- PowerPC" )
+	#else
+		#define PALT TEXT("- (unknown)")
 	#endif
 	// Show Help->About dialog box.
 	struct AboutDlg : public DlgImpl {
