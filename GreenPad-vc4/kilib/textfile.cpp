@@ -104,7 +104,7 @@ struct rUCS : public rBasicUTF
 											 (val<<24)); }
 
 	virtual void Skip() { ++fb; }
-	virtual bool Eof() { return fb==fe; }
+	virtual bool Eof() { return fb>=fe; }
 	virtual unicode PeekC() { return (unicode)(be ? swap(*fb) : *fb); }
 };
 
@@ -164,7 +164,7 @@ struct rUtf1 : public rBasicUTF
 		else               return x - 0x42;
 	}
 
-	bool Eof() { return SurrogateLow ? false : fb==fe; }
+	bool Eof() { return SurrogateLow ? false : fb>=fe; }
 	void Skip()
 	{
 		if( SurrogateLow ) return; // don't go further if leftover exists
@@ -213,7 +213,7 @@ struct rUtf9 : public rBasicUTF
 	const uchar *fb, *fe;
 	qbyte SurrogateLow;
 
-	bool Eof() { return SurrogateLow ? false : fb==fe; }
+	bool Eof() { return SurrogateLow ? false : fb>=fe; }
 	void Skip()
 	{
 		if( SurrogateLow ) return; // don't go further if leftover exists
@@ -263,7 +263,7 @@ struct rUtfOFSS : public rBasicUTF
 	const uchar *fb, *fe;
 	qbyte SurrogateLow;
 
-	bool Eof() { return SurrogateLow ? false : fb==fe; }
+	bool Eof() { return SurrogateLow ? false : fb>=fe; }
 	void Skip()
 	{
 		if( SurrogateLow ) return; // don't go further if leftover exists
@@ -326,7 +326,7 @@ struct rUtf5 : public rBasicUTF
 	}
 
 	void Skip() { do ++fb; while( fb<fe && *fb<'G' ); }
-	bool Eof() { return fb==fe; }
+	bool Eof() { return fb>=fe; }
 	unicode PeekC()
 	{
 		unicode ch = (*fb-'G');
@@ -371,7 +371,7 @@ struct rUtf7 : public rBasicUTF
 	bool inB64;     // base64ƒGƒŠƒA“à‚È‚çtrue
 
 	void Skip() { if(--rest==0) fillbuf(); }
-	bool Eof() { return fb==fe && rest==0; }
+	bool Eof() { return fb>=fe && rest==0; }
 	unicode PeekC() { return buf[rest-1]; }
 
 	void fillbuf()
@@ -487,7 +487,7 @@ struct rSCSU : public rBasicUTF
 	uchar c, d;
 
 	void Skip() { fb+=skip; skip=0; }
-	bool Eof() { return fb==fe; }
+	bool Eof() { return fb>=fe; }
 	uchar GetChar() { return fb+skip>fe ? 0 : *(fb+(skip++)); }
 	unicode PeekC()
 	{
@@ -628,7 +628,7 @@ struct rBOCU1 : public rBasicUTF
 	unicode cp, pc;
 
 	void Skip() { fb+=skip; skip=0; }
-	bool Eof() { return fb==fe; }
+	bool Eof() { return fb>=fe; }
 	uchar GetChar() { return (fb+skip < fe) ? *(fb+(skip++)) : 0; }
 	unicode PeekC()
 	{
@@ -1054,9 +1054,9 @@ struct rIso2022 : public TextFileRPimpl
 		else
 		{
 			if( p[1]==0x4A )
-				G[ (p[0]-0x28)%4 ] = ASCII;         // 1B [28-2B] 4A
+				G[ (p[0]-0x28)&3 ] = ASCII;         // 1B [28-2B] 4A
 			else if( p[1]==0x49 )
-				G[ (p[0]-0x28)%4 ] = KANA;          // 1B [28-2B] 49
+				G[ (p[0]-0x28)&3 ] = KANA;          // 1B [28-2B] 49
 			else if( *reinterpret_cast<const dbyte*>(p)==0x4228 )
 				G[ 0 ] = ASCII;                     // 1B 28 42
 			else if( *reinterpret_cast<const dbyte*>(p)==0x412E )
@@ -1068,9 +1068,9 @@ struct rIso2022 : public TextFileRPimpl
 					G[ 0 ] = GB;                    // 1B 24 41
 				else if( p+2 < fe )
 					if( p[2]==0x41 )
-						G[ ((*++p)-0x28)%4 ] = GB;  // 1B 24 [28-2B] 41
+						G[ ((*++p)-0x28)&3 ] = GB;  // 1B 24 [28-2B] 41
 					else if( p[2]==0x43 )
-						G[ ((*++p)-0x28)%4 ] = KSX; // 1B 24 [28-2B] 43
+						G[ ((*++p)-0x28)&3 ] = KSX; // 1B 24 [28-2B] 43
 		}
 		++p;
 	}
@@ -1510,12 +1510,16 @@ int TextFileR::chardetAutoDetection( const uchar* ptr, ulong siz )
 
 #if defined(_M_AMD64) || defined(_M_X64)
 # define CHARDET_DLL "chardet_x64.dll"
+#elif defined(_M_IA64)
+# define CHARDET_DLL "chardet_ia64.dll"
 #elif defined(_M_ARM64)
 # define CHARDET_DLL "chardet_arm64.dll"
 #elif defined(_MIPS_)
 # define CHARDET_DLL "cdetmips.dll"
 #elif defined(_M_PPC)
 # define CHARDET_DLL "cdetppc.dll"
+#elif defined(_M_ALPHA)
+# define CHARDET_DLL "cdetaxp.dll"
 #else
 # define CHARDET_DLL "chardet.dll"
 #endif
