@@ -104,7 +104,7 @@ struct rUCS : public rBasicUTF
 											 (val<<24)); }
 
 	virtual void Skip() { ++fb; }
-	virtual bool Eof() { return fb==fe; }
+	virtual bool Eof() { return fb>=fe; }
 	virtual unicode PeekC() { return (unicode)(be ? swap(*fb) : *fb); }
 };
 
@@ -164,7 +164,7 @@ struct rUtf1 : public rBasicUTF
 		else               return x - 0x42;
 	}
 
-	bool Eof() { return SurrogateLow ? false : fb==fe; }
+	bool Eof() { return SurrogateLow ? false : fb>=fe; }
 	void Skip()
 	{
 		if( SurrogateLow ) return; // don't go further if leftover exists
@@ -213,7 +213,7 @@ struct rUtf9 : public rBasicUTF
 	const uchar *fb, *fe;
 	qbyte SurrogateLow;
 
-	bool Eof() { return SurrogateLow ? false : fb==fe; }
+	bool Eof() { return SurrogateLow ? false : fb>=fe; }
 	void Skip()
 	{
 		if( SurrogateLow ) return; // don't go further if leftover exists
@@ -263,7 +263,7 @@ struct rUtfOFSS : public rBasicUTF
 	const uchar *fb, *fe;
 	qbyte SurrogateLow;
 
-	bool Eof() { return SurrogateLow ? false : fb==fe; }
+	bool Eof() { return SurrogateLow ? false : fb>=fe; }
 	void Skip()
 	{
 		if( SurrogateLow ) return; // don't go further if leftover exists
@@ -326,7 +326,7 @@ struct rUtf5 : public rBasicUTF
 	}
 
 	void Skip() { do ++fb; while( fb<fe && *fb<'G' ); }
-	bool Eof() { return fb==fe; }
+	bool Eof() { return fb>=fe; }
 	unicode PeekC()
 	{
 		unicode ch = (*fb-'G');
@@ -371,7 +371,7 @@ struct rUtf7 : public rBasicUTF
 	bool inB64;     // base64ƒGƒŠƒA“à‚È‚çtrue
 
 	void Skip() { if(--rest==0) fillbuf(); }
-	bool Eof() { return fb==fe && rest==0; }
+	bool Eof() { return fb>=fe && rest==0; }
 	unicode PeekC() { return buf[rest-1]; }
 
 	void fillbuf()
@@ -487,7 +487,7 @@ struct rSCSU : public rBasicUTF
 	uchar c, d;
 
 	void Skip() { fb+=skip; skip=0; }
-	bool Eof() { return fb==fe; }
+	bool Eof() { return fb>=fe; }
 	uchar GetChar() { return fb+skip>fe ? 0 : *(fb+(skip++)); }
 	unicode PeekC()
 	{
@@ -628,7 +628,7 @@ struct rBOCU1 : public rBasicUTF
 	unicode cp, pc;
 
 	void Skip() { fb+=skip; skip=0; }
-	bool Eof() { return fb==fe; }
+	bool Eof() { return fb>=fe; }
 	uchar GetChar() { return (fb+skip < fe) ? *(fb+(skip++)) : 0; }
 	unicode PeekC()
 	{
