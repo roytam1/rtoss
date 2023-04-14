@@ -1054,9 +1054,9 @@ struct rIso2022 : public TextFileRPimpl
 		else
 		{
 			if( p[1]==0x4A )
-				G[ (p[0]-0x28)%4 ] = ASCII;         // 1B [28-2B] 4A
+				G[ (p[0]-0x28)&3 ] = ASCII;         // 1B [28-2B] 4A
 			else if( p[1]==0x49 )
-				G[ (p[0]-0x28)%4 ] = KANA;          // 1B [28-2B] 49
+				G[ (p[0]-0x28)&3 ] = KANA;          // 1B [28-2B] 49
 			else if( *reinterpret_cast<const dbyte*>(p)==0x4228 )
 				G[ 0 ] = ASCII;                     // 1B 28 42
 			else if( *reinterpret_cast<const dbyte*>(p)==0x412E )
@@ -1068,9 +1068,9 @@ struct rIso2022 : public TextFileRPimpl
 					G[ 0 ] = GB;                    // 1B 24 41
 				else if( p+2 < fe )
 					if( p[2]==0x41 )
-						G[ ((*++p)-0x28)%4 ] = GB;  // 1B 24 [28-2B] 41
+						G[ ((*++p)-0x28)&3 ] = GB;  // 1B 24 [28-2B] 41
 					else if( p[2]==0x43 )
-						G[ ((*++p)-0x28)%4 ] = KSX; // 1B 24 [28-2B] 43
+						G[ ((*++p)-0x28)&3 ] = KSX; // 1B 24 [28-2B] 43
 		}
 		++p;
 	}
