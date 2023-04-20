@@ -833,6 +833,9 @@ void GreenPadWnd::on_helpabout()
 			#if defined(_M_IA64)
 				// 2000/NT5.0 is the first IA64 version of Windows.
 				#define TGVER TEXT(" 5.0+")
+			#elif defined(_M_ARM64) || defined(_M_ARM)
+				// 8/NT6.2 is the first ARM version of Windows.
+				#define TGVER TEXT(" 6.2+")
 			#elif defined(_M_AMD64) || defined(_M_X64) || defined(WIN64)
 				// XP/NT5.1 is the first x64 version of Windows.
 				#define TGVER TEXT(" 5.1+")
@@ -845,6 +848,9 @@ void GreenPadWnd::on_helpabout()
 		#if defined(_M_IA64)
 			// 2000/NT5.0 is the first IA64 version of Windows.
 			#define TGVER TEXT(" 5.0+")
+		#elif defined(_M_ARM64) || defined(_M_ARM)
+			// 8/NT6.2 is the first ARM version of Windows.
+			#define TGVER TEXT(" 6.2+")
 		#elif defined(_M_AMD64) || defined(_M_X64) || defined(WIN64)
 			// XP/NT5.1 is the first x64 version of Windows.
 			#define TGVER TEXT(" 5.1+")
