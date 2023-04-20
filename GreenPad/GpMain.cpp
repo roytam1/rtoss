@@ -898,8 +898,9 @@ void GreenPadWnd::on_helpabout()
 			else
 				s+= TEXT("Windows ");
 
-			s += String().SetInt( HIBYTE(app().getOSVer()) ) + TEXT(".")
-			   + String().SetInt( LOBYTE(app().getOSVer()) ) + TEXT(".")
+			WORD sver = app().getOSVer();
+			s += String().SetInt( HIBYTE(sver) ) + TEXT(".")
+			   + String().SetInt( LOBYTE(sver) ) + TEXT(".")
 			   + String().SetInt( app().getOSBuild() );
 
 			SendMsgToItem(IDC_ABOUTSTR, WM_SETTEXT, s.c_str());
