@@ -587,7 +587,7 @@ inline void ViewImpl::Inv( int y, int xb, int xe, Painter& p )
 	p.Invert( rc );
 }
 
-void ViewImpl::DrawTXT( const VDrawInfo v, Painter& p )
+void ViewImpl::DrawTXT( const VDrawInfo& v, Painter& p )
 {
 	// ’è”‚P
 //	const int   TAB = p.T();
