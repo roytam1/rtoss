@@ -184,7 +184,7 @@
 				EnableFunctionLevelLinking="true"
 				TreatWChar_tAsBuiltInType="true"
 				RuntimeTypeInfo="false"
-				UsePrecompiledHeader="1"
+				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="stdafx.h"
 				PrecompiledHeaderFile=".\OBJ/vc/reluni/kilib.pch"
 				AssemblerListingLocation=".\OBJ/vc/reluni/"
