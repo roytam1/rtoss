@@ -363,7 +363,7 @@ DPos DocImpl::rightOf( const DPos& dp, bool wide ) const
 		if( s >= e )
 			s = e;
 		else if( t==7 || t==0 )
-			while( (f[s]>>5)==0 && s<e )
+			while( s<e && (f[s]>>5)==0 )
 				++s;
 		return DPos( dp.tl, s );
 	}
@@ -381,7 +381,7 @@ DPos DocImpl::wordStartOf( const DPos& dp ) const
 		// s‚Ì“r’†
 		const uchar* f = pl(dp.tl);
 			  ulong  s = dp.ad;
-		while( (f[s]>>5)==0 && 0<=s )
+		while( 0<=s && (f[s]>>5)==0 )
 			--s;
 		return DPos( dp.tl, s );
 	}
