@@ -186,7 +186,7 @@
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="stdafx.h"
-				PrecompiledHeaderFile=".\OBJ/vc/reluni/kilib.pch"
+				PrecompiledHeaderFile=".\OBJ/vc/reluniX64/kilib.pch"
 				AssemblerListingLocation=".\OBJ/vc/reluni/"
 				ObjectFile=".\OBJ/vc/reluni/"
 				ProgramDataBaseFileName=".\OBJ/vc/reluni/"
