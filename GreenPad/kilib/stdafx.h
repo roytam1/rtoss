@@ -63,7 +63,7 @@ typedef struct tagRECONVERTSTRING {
 #pragma warning( disable: 4355 )
 #endif
 
-#if defined(__DMC__) || (defined(_MSC_VER) && _MSC_VER < 1300)
+#if defined(__DMC__) || (defined(_MSC_VER) && _MSC_VER < 1300) || defined(_M_ALPHA)
 	#define SetWindowLongPtr SetWindowLong
 	#define GetWindowLongPtr GetWindowLong
 	#define INT_PTR          INT
