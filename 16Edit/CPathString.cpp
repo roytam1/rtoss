@@ -14,7 +14,7 @@ char* CPathString::ExtractFileName(char* szDir)
 {
 	char* pCH;
 
-	pCH = (char*)((DWORD)szDir + lstrlen(szDir) - 1);
+	pCH = (char*)((INT_PTR)szDir + lstrlen(szDir) - 1);
 	while (*pCH != '\\')
 		pCH--;
 	pCH++;
@@ -45,7 +45,7 @@ void CPathString::ForceEndBackslash(char* szStr)
 {
 	char *pCH;
 
-	pCH = (char*)((DWORD)szStr + lstrlen(szStr) - 1);
+	pCH = (char*)((INT_PTR)szStr + lstrlen(szStr) - 1);
 	if (*pCH != '\\')
 		lstrcat(szStr, "\\");
 

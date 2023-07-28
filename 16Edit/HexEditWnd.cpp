@@ -9,15 +9,15 @@
 
 extern HexEditWnd HEdit;
 
-LRESULT  __stdcall HEditMainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-LRESULT  __stdcall HEditWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-LRESULT  __stdcall TBHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-BOOL     __stdcall GotoDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-BOOL     __stdcall OptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-BOOL     __stdcall ReplaceDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-BOOL     __stdcall SelBlockDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-BOOL     __stdcall SearchDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-DWORD    __stdcall HEditWindowThread();
+LRESULT               HEditMainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT FUNC_CALLBACK HEditWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT FUNC_CALLBACK TBHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR FUNC_CALLBACK GotoDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR FUNC_CALLBACK OptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR FUNC_CALLBACK ReplaceDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR FUNC_CALLBACK SelBlockDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR FUNC_CALLBACK SearchDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+DWORD   FUNC_CALLBACK HEditWindowThread();
 
 #define SB_STATUS		0
 #define SB_ORIGIN_SIZE	1
@@ -186,7 +186,7 @@ void HexEditWnd::QuitEdition() {
 	return;
 }
 
-DWORD __stdcall HEditWindowThread() {
+DWORD FUNC_CALLBACK HEditWindowThread() {
 	WNDCLASS               wc;
 	MSG                    msg;
 	UINT                   icx, icy, ix, iy;
@@ -2143,7 +2143,9 @@ BOOL HexEditWnd::Search(PHE_SEARCHOPTIONS pso, DWORD *pOffset) {
 		else
 			while (dwCurOff != -1) {
 				if (dwCurOff == 0x10)
+#ifdef _M_IX86
 					__asm NOP
+#endif
 					if (!memcmp(pso->pData, pby, pso->dwcStr)) {
 						bFound = TRUE;
 						break;

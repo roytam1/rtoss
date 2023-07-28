@@ -77,7 +77,7 @@ BOOL HookEditboxEnter(HWND hEdit)
 		return FALSE;
 }
 
-LRESULT __stdcall HexOnlyEditProc(HWND hWnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+LRESULT FUNC_CALLBACK HexOnlyEditProc(HWND hWnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	CHAR      c = 0;
 	/*
@@ -185,7 +185,7 @@ LRESULT __stdcall HexOnlyEditProc(HWND hWnd,UINT Msg,WPARAM wParam,LPARAM lParam
 	return CallWindowProc(wc.lpfnWndProc, hWnd, Msg, wParam, lParam);
 }
 
-LRESULT __stdcall EditHookEnterProc(HWND hWnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+LRESULT FUNC_CALLBACK EditHookEnterProc(HWND hWnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	WNDCLASS  wc;
 

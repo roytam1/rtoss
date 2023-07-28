@@ -3,6 +3,7 @@
 
 #include <windows.h>
 #include <shellapi.h>
+#include "Common.h"
 #include "File.h"
 
 #ifndef EXTERN_HE_STRUCTS
@@ -344,7 +345,7 @@ private:
 
 };
 
-DWORD __stdcall HEditWindowThread();
+DWORD FUNC_CALLBACK HEditWindowThread();
 DWORD file_type(char *base);
 int get_va(char *base, DWORD file_offset);
 int get_fo(char *base, DWORD va_offset);

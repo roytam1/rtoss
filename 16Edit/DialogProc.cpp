@@ -75,7 +75,7 @@ void SaveToProfile(HWND hWnd, char *key) {
 	WritePrivateProfileString(INI_SECTION, key, buff, HEdit.cIniPath);
 }
 
-LRESULT __stdcall HEditWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT FUNC_CALLBACK HEditWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 #ifdef DEBUG
 	DebugPrint("MainWnd uMsg=%d wParam=%d lParam=%d", uMsg, wParam, lParam);
 #endif
@@ -154,7 +154,7 @@ LRESULT __stdcall HEditWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	return TRUE;
 }
 
-LRESULT __stdcall TBHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT FUNC_CALLBACK TBHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
 	case WM_MOUSEMOVE:
 		HEdit.HEHandleWM_MOUSEMOVE(hWnd, uMsg, wParam, lParam);
@@ -239,7 +239,7 @@ BOOL HexEditWnd::OptionDlgCommand(HWND hDlg, DWORD wParam) {
 	return TRUE;
 }
 
-BOOL __stdcall OptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR FUNC_CALLBACK OptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
 	case WM_INITDIALOG:
 		HEdit.OptionDlgInit(hDlg);
@@ -255,7 +255,7 @@ BOOL __stdcall OptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return FALSE; // ERR
 }
 
-BOOL __stdcall GotoDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR FUNC_CALLBACK GotoDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
 	case WM_INITDIALOG:
 		HEdit.InitGotoDlg(hDlg);
@@ -276,7 +276,7 @@ BOOL __stdcall GotoDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	return FALSE; // ERR
 }
 
-BOOL __stdcall SelBlockDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR FUNC_CALLBACK SelBlockDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
 	case WM_INITDIALOG:
 		HEdit.InitSelBlockDlg(hDlg);
@@ -298,7 +298,7 @@ BOOL __stdcall SelBlockDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 	return FALSE; // ERR
 }
 
-BOOL __stdcall ReplaceDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR FUNC_CALLBACK ReplaceDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
 	case WM_INITDIALOG:
 		HEdit.ReplaceInitDlg(hDlg, uMsg, wParam, lParam);
@@ -319,7 +319,7 @@ BOOL __stdcall ReplaceDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam
 	return FALSE; // ERR
 }
 
-BOOL __stdcall SearchDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR FUNC_CALLBACK SearchDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
 	case WM_INITDIALOG:
 		HEdit.SSInitDlg(hDlg, uMsg, wParam, lParam);
