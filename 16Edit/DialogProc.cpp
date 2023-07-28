@@ -67,7 +67,7 @@ void SaveToProfile(HWND hWnd, char *key) {
 			strcpy(items[total++], item);
 			strcat(buff, item);
 			strcat(buff, ",");
-			if (total == 9) {
+			if (total == 8) {
 				break;
 			}
 		}
