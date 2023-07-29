@@ -9,15 +9,15 @@
 
 extern HexEditWnd HEdit;
 
-LRESULT               HEditMainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-LRESULT FUNC_CALLBACK HEditWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-LRESULT FUNC_CALLBACK TBHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-INT_PTR FUNC_CALLBACK GotoDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-INT_PTR FUNC_CALLBACK OptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-INT_PTR FUNC_CALLBACK ReplaceDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-INT_PTR FUNC_CALLBACK SelBlockDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-INT_PTR FUNC_CALLBACK SearchDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-DWORD   FUNC_CALLBACK HEditWindowThread();
+LRESULT                HEditMainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT  FUNC_CALLBACK HEditWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT  FUNC_CALLBACK TBHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+FUNC_RET FUNC_CALLBACK GotoDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+FUNC_RET FUNC_CALLBACK OptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+FUNC_RET FUNC_CALLBACK ReplaceDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+FUNC_RET FUNC_CALLBACK SelBlockDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+FUNC_RET FUNC_CALLBACK SearchDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+DWORD    FUNC_CALLBACK HEditWindowThread();
 
 #define SB_STATUS		0
 #define SB_ORIGIN_SIZE	1

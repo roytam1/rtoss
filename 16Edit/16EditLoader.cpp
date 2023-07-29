@@ -6,7 +6,9 @@
 #include "HexEditWnd.h"
 #include "macros.H"
 
+#ifdef _M_IX86
 #pragma comment(linker,"/SUBSYSTEM:WINDOWS /FILEALIGN:512 /MERGE:.rdata=.text /MERGE:.data=.text /SECTION:.text,EWR /IGNORE:4078")
+#endif
 
 HexEditWnd HEdit;
 

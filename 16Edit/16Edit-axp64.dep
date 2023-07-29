@@ -1,0 +1,61 @@
+# Microsoft Developer Studio Generated Dependency File, included by 16Edit-axp64.mak
+
+.\16EditLoader.cpp : \
+	".\Common.h"\
+	".\File.h"\
+	".\HexEditWnd.h"\
+	".\Macros.h"\
+	".\ofn.h"\
+	
+
+.\Common.cpp : \
+	".\Common.h"\
+	".\File.h"\
+	".\HexEditWnd.h"\
+	".\Macros.h"\
+	
+
+.\CPathString.cpp : \
+	".\CPathString.h"\
+	
+
+.\DialogProc.cpp : \
+	".\Common.h"\
+	".\File.h"\
+	".\HexEditWnd.h"\
+	".\Macros.h"\
+	".\WideChar.h"\
+	
+
+.\File.cpp : \
+	".\File.h"\
+	
+
+.\HexEditWnd.cpp : \
+	".\Common.h"\
+	".\CPathString.h"\
+	".\File.h"\
+	".\HexEditWnd.h"\
+	".\Macros.h"\
+	".\ofn.h"\
+	
+
+.\list.cpp : \
+	".\Common.h"\
+	".\File.h"\
+	".\HexEditWnd.h"\
+	".\Macros.h"\
+	
+
+.\OFN.cpp : \
+	".\ofn.h"\
+	
+
+.\rsrc.rc : \
+	".\rsrc\icon1.ico"\
+	".\rsrc\toolbar.bmp"\
+	
+
+.\WideChar.cpp : \
+	".\WideChar.h"\
+	

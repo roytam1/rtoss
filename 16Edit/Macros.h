@@ -11,13 +11,24 @@ void DebugPrint(char *szFormat, ...);
 #define ZERO(strct) memset(&strct, 0, sizeof(strct));
 #define MEMCPY mymemcpy
 
-#if defined(_WIN64) 
+#if defined(_M_ALPHA) && defined(_WIN64)
+#ifdef GWLP_WNDPROC
 #define GWL_WNDPROC GWLP_WNDPROC
-#define FUNC_CALLBACK 
- typedef __int64 INT_PTR;
+#endif
+ #define FUNC_CALLBACK __cdecl
+ #define FUNC_RET int
+#elif defined(_WIN64)
+#ifdef GWLP_WNDPROC
+#define GWL_WNDPROC GWLP_WNDPROC
+#endif
+ #define FUNC_CALLBACK 
+ #define FUNC_RET __int64
+#elif defined(_M_ALPHA)
+ #define FUNC_CALLBACK 
+ #define FUNC_RET int
 #else
-#define FUNC_CALLBACK __stdcall
- typedef int INT_PTR;
+ #define FUNC_CALLBACK __stdcall
+ #define FUNC_RET int
 #endif
 
 #ifndef GCL_HICON

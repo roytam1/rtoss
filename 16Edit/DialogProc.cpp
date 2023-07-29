@@ -239,7 +239,7 @@ BOOL HexEditWnd::OptionDlgCommand(HWND hDlg, DWORD wParam) {
 	return TRUE;
 }
 
-INT_PTR FUNC_CALLBACK OptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+FUNC_RET FUNC_CALLBACK OptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
 	case WM_INITDIALOG:
 		HEdit.OptionDlgInit(hDlg);
@@ -255,7 +255,7 @@ INT_PTR FUNC_CALLBACK OptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM 
 	return FALSE; // ERR
 }
 
-INT_PTR FUNC_CALLBACK GotoDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+FUNC_RET FUNC_CALLBACK GotoDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
 	case WM_INITDIALOG:
 		HEdit.InitGotoDlg(hDlg);
@@ -276,7 +276,7 @@ INT_PTR FUNC_CALLBACK GotoDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lP
 	return FALSE; // ERR
 }
 
-INT_PTR FUNC_CALLBACK SelBlockDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+FUNC_RET FUNC_CALLBACK SelBlockDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
 	case WM_INITDIALOG:
 		HEdit.InitSelBlockDlg(hDlg);
@@ -298,7 +298,7 @@ INT_PTR FUNC_CALLBACK SelBlockDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARA
 	return FALSE; // ERR
 }
 
-INT_PTR FUNC_CALLBACK ReplaceDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+FUNC_RET FUNC_CALLBACK ReplaceDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
 	case WM_INITDIALOG:
 		HEdit.ReplaceInitDlg(hDlg, uMsg, wParam, lParam);
@@ -319,7 +319,7 @@ INT_PTR FUNC_CALLBACK ReplaceDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM
 	return FALSE; // ERR
 }
 
-INT_PTR FUNC_CALLBACK SearchDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+FUNC_RET FUNC_CALLBACK SearchDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
 	case WM_INITDIALOG:
 		HEdit.SSInitDlg(hDlg, uMsg, wParam, lParam);
