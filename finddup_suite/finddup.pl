@@ -3,15 +3,22 @@
 use strict;
 use File::Find;
 use Digest::MD5;
+use Getopt::Std;
 
 my $printSize = 1;
 
+$|=1; # it should disable buffering in STDOUT
 
 my %files;
 my $totalpossibledupfiles;
 my $totalpossibledupfilessize;
 my $possibledupfilescount;
 my $possibledupfilescountsize;
+
+our $opt_s = 0;
+
+# -s {size} = skip files with file-size > size
+getopts('s:');
 
 ($#ARGV < 0) && push @ARGV, ".";
 print STDERR "Searching files...\n";
@@ -57,7 +64,12 @@ foreach my $size (sort {$b <=> $a} keys %files) {
 }
  
 sub check_file {
-  -f && push @{$files{(stat(_))[7]}}, $File::Find::name;
+  if (-f $_) {
+    my $fsize = (stat($_))[7];
+    if (($opt_s == 0) || ($opt_s > 0 && $fsize < $opt_s)) {
+      push @{$files{$fsize}}, $File::Find::name;
+    }
+  }
 }
 
 sub properSize {
