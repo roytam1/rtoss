@@ -616,7 +616,7 @@ void ViewImpl::DrawTXT( const VDrawInfo& v, Painter& p )
 		{
 			// 作業用変数３
 			end = rlend(tl,rl);
-			if( a.bottom<=v.YMIN )
+			if( a.bottom<=v.YMIN || a.top < 0 )
 				continue;
 
 			// テキストデータ描画
