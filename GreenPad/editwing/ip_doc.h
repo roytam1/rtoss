@@ -34,7 +34,6 @@ public:
 		: alen_( 10>len ? 10 : len )
 		, len_ ( len )
 		, str_ ( static_cast<unicode*>( mem().Alloc((alen_+1)*2+alen_) ) )
-		, flg_ ( reinterpret_cast<uchar*>(str_+alen_+1) )
 		, commentBitReady_( false )
 		, isLineHeadCommented_( 0 )
 		{
@@ -50,6 +49,7 @@ public:
 	//@{ テキスト挿入(指定位置に指定サイズ) //@}
 	void InsertAt( ulong at, const unicode* buf, ulong siz )
 		{
+			uchar *flgs = flg(); // str_+alen_+1;
 			if( len_+siz > alen_ )
 			{
 				// バッファ拡張
@@ -62,16 +62,15 @@ public:
 				// コピー
 				memmove( tmpS,        str_,             at*2 );
 				memmove( tmpS+at+siz, str_+at, (len_-at+1)*2 );
-				memmove( tmpF,        flg_,             at   );
+				memmove( tmpF,        flgs,             at   );
 				// 古いのを削除
 				mem().DeAlloc( str_, psiz );
 				str_ = tmpS;
-				flg_ = tmpF;
 			}
 			else
 			{
 				memmove( str_+at+siz, str_+at, (len_-at+1)*2 );
-				memmove( flg_+at+siz, flg_+at, (len_-at)     );
+				memmove( flgs+at+siz, flgs+at, (len_-at)     );
 			}
 			memmove( str_+at, buf, siz*sizeof(unicode) );
 			len_ += siz;
@@ -86,8 +85,9 @@ public:
 	//@{ テキスト削除(指定位置から指定サイズ) //@}
 	void RemoveAt( ulong at, ulong siz )
 		{
+			uchar *flgs = flg();
 			memmove( str_+at, str_+at+siz, (len_-siz-at+1)*2 );
-			memmove( flg_+at, flg_+at+siz, (len_-siz-at)     );
+			memmove( flgs+at, flgs+at+siz, (len_-siz-at)     );
 			len_ -= siz;
 		}
 
@@ -125,11 +125,11 @@ public:
 
 	//@{ 解析結果 //@}
 	uchar* flg()
-		{ return flg_; }
+		{ return reinterpret_cast<uchar*>(str_+alen_+1); }
 
 	//@{ 解析結果(const) //@}
 	const uchar* flg() const
-		{ return flg_; }
+		{ return reinterpret_cast<const uchar*>(str_+alen_+1); }
 
 	// ask
 	bool isCmtBitReady() const
@@ -153,7 +153,6 @@ private:
 	ulong    alen_;
 	ulong    len_;
 	unicode* str_;
-	uchar*   flg_;
 
 	uchar isLineHeadCommented_;
 	uchar commentTransition_;
