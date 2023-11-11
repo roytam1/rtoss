@@ -320,8 +320,6 @@ inline void Painter::CharOut( unicode ch, int x, int y )
 inline void Painter::StringOut
 	( const unicode* str, int len, int x, int y )
 {
-	BOOL ret;
-	DWORD dwTimes;
 #ifdef WIN32S
 	DWORD dwNum;
 	char psTXT1K[1024];
@@ -343,30 +341,14 @@ inline void Painter::StringOut
 			}
 		}
 	}
-	dwTimes=0; do {
-		ret = ::TextOutA( dc_, x, y, psText, dwNum );
-		++dwTimes;
-	} while(
-# ifdef USE_ORIGINAL_MEMMAN
-		!ret && dwTimes < 2
-# else
-		false
-# endif
-		);
+	::TextOutA( dc_, x, y, psText, dwNum );
 
 	if (psText != psTXT1K)
 		delete []psText;
 #else
-	dwTimes=0; do {
-		ret = ::TextOutW( dc_, x, y, str, len );
-		++dwTimes;
-	} while(
-# ifdef USE_ORIGINAL_MEMMAN
-		!ret && dwTimes < 2
-# else
-		false
-# endif
-		);
+	// If unicode text is not 2bytes-aligned then TextOutW can randomly fail
+	// To avoid this we must be careful in the Line class...
+	::TextOutW( dc_, x, y, str, len );
 #endif
 }
 
@@ -680,8 +662,6 @@ void ViewImpl::DrawTXT( const VDrawInfo& v, Painter& p )
 					if( clr != (flg[i]&3) )
 						p.SetColor( clr=(flg[i]&3) );
 					p.StringOut( str+i, i2-i, x+v.XBASE, a.top );
-					//p.StringOut( str+i, i2-i, x+v.XBASE, a.top );
-					// ‰½ŒÌ‚¾‚©‚Q“x•`‚«‚µ‚È‚¢‚Æ‚¤‚Ü‚­‚¢‚©‚ñc
 					break;
 				}
 			}

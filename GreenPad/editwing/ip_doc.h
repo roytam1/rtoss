@@ -25,6 +25,15 @@ class Parser;
 //@}
 //=========================================================================
 
+#ifdef USE_ORIGINAL_MEMMAN
+	// be sure to align alloc evenly because unicode is 2 bytes long
+	// and we append bytes, but alignement should remain 2bytes
+	// Otherwise some functions might fail such as TextOutW
+	#define EVEN(x) ( ((x)+1)&(~1ul) )
+#else
+	#define EVEN(x) (x)
+#endif
+
 class Line : public Object
 {
 public:
@@ -33,7 +42,7 @@ public:
 	Line( const unicode* str, ulong len )
 		: alen_( 10>len ? 10 : len )
 		, len_ ( len )
-		, str_ ( static_cast<unicode*>( mem().Alloc((alen_+1)*2+alen_) ) )
+		, str_ ( static_cast<unicode*>( mem().Alloc(EVEN((alen_+1)*2+alen_)) ) )
 		, commentBitReady_( false )
 		, isLineHeadCommented_( 0 )
 		{
@@ -43,7 +52,7 @@ public:
 
 	~Line()
 		{
-			mem().DeAlloc( str_, (alen_+1)*2+alen_ );
+			mem().DeAlloc( str_, EVEN((alen_+1)*2+alen_) );
 		}
 
 	//@{ テキスト挿入(指定位置に指定サイズ) //@}
@@ -56,7 +65,7 @@ public:
 				ulong psiz = (alen_+1)*2+alen_;
 				alen_ = len_+siz; // Max( alen_<<1, len_+siz );
 				unicode* tmpS =
-					static_cast<unicode*>( mem().Alloc((alen_+1)*2+alen_) );
+					static_cast<unicode*>( mem().Alloc(EVEN((alen_+1)*2+alen_)) );
 				uchar*   tmpF =
 					reinterpret_cast<uchar*>(tmpS+alen_+1);
 				// コピー
@@ -64,7 +73,7 @@ public:
 				memmove( tmpS+at+siz, str_+at, (len_-at+1)*2 );
 				memmove( tmpF,        flgs,             at   );
 				// 古いのを削除
-				mem().DeAlloc( str_, psiz );
+				mem().DeAlloc( str_, EVEN(psiz) );
 				str_ = tmpS;
 			}
 			else
@@ -159,6 +168,7 @@ private:
 	bool  commentBitReady_;
 };
 
+#undef EVEN
 
 
 //=========================================================================
