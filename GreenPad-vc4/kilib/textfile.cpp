@@ -68,7 +68,7 @@ struct rBasicUTF : public ki::TextFileRPimpl
 		}
 
 		// If the end of the buffer contains half a DOS CRLF
-		if( *(w-1)==L'\r' && PeekC() == L'\n' )
+		if( buf < w && *(w-1)==L'\r' && PeekC() == L'\n' )
 			Skip();
 
 		if(BOF) BOF = false;
@@ -363,7 +363,9 @@ struct rUtf7 : public rBasicUTF
 	rUtf7( const uchar* b, ulong s )
 		: fb( b )
 		, fe( b+s )
-		, rest( -1 ) { fillbuf(); }
+		, rest( -1 )
+		, inB64( false )
+	{ fillbuf(); }
 
 	const uchar *fb, *fe;
 	unicode buf[3]; // b64を８文字毎に読んでバッファに溜めておく
@@ -932,7 +934,7 @@ struct rMBCS : public TextFileRPimpl
 			}
 
 		// If the end of the buffer contains half a DOS CRLF
-		if( *(p-1)=='\r' && *(p) =='\n' )
+		if( p > fb && *(p-1)=='\r' && *(p) =='\n' )
 			++p;
 
 		// Unicodeへ変換, convertion to Unicode
@@ -1152,7 +1154,7 @@ struct rIso2022 : public TextFileRPimpl
 		outofloop:
 
 		// If the end of the buffer contains half a DOS CRLF
-		if( *(p-1)=='\r' && *p=='\n' )
+		if( p > fb && *(p-1)=='\r' && *p=='\n' )
 			++p;
 		fb = p;
 

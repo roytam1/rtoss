@@ -420,7 +420,10 @@ namespace {
 	}
 	static ulong GetColor( unicode* str )
 	{
-		return ToByte(str) + (ToByte(str+2)<<8) + (ToByte(str+4)<<16);
+		ulong val = 0;
+		for(int i=0; i<=2 && str && str[1]; ++i,str+=2 )
+			val += ToByte(str) << (i*8);
+		return val;
 	}
 	static int GetInt( unicode* str )
 	{
