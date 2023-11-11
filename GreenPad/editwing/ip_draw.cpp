@@ -593,12 +593,21 @@ void ViewImpl::DrawTXT( const VDrawInfo& v, Painter& p )
 		// 作業用変数２
 		ulong stt=0, end, t, n;
 
+		ulong rl=0;
+		if( a.top <= -H )
+		{	// Skip all warp lines that are outside the view.
+			rl = (-a.top)/H - 1;
+			a.top    += H * rl;
+			a.bottom += H * rl;
+			stt = end = rlend(tl,rl);
+		}
+
 		// 表示行単位のLoop
-		for( ulong rl=0; a.top<rYMAX; ++rl,a.top+=H,a.bottom+=H,stt=end )
+		for( ; a.top<rYMAX; ++rl,a.top+=H,a.bottom+=H,stt=end )
 		{
 			// 作業用変数３
 			end = rlend(tl,rl);
-			if( a.bottom<=v.YMIN || a.top < 0 )
+			if( a.bottom<=v.YMIN )
 				continue;
 
 			// テキストデータ描画
