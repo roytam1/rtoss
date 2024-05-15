@@ -203,6 +203,7 @@ typedef struct CPUID_80000006_ValuesInEDX
 	unsigned int	iL3Size : 14;
 } CPUID_80000006_EDX_t;
 
+static	int		iCPUIDSupported = 0;
 static	int		iCPUFlagsLoaded = 0;
 static	CPUID_01_EAX_t	uBasicFlags;
 static	CPUID_01_ECX_t	uExtFlags;
@@ -219,9 +220,32 @@ static	unsigned long uHighestCPUID;
 static	unsigned long uHighestCPUID0;
 
 
+int TestCPUID(void)
+{
+    __try {
+        _asm {
+            xor eax, eax
+            cpuid
+        }
+    }
+	#pragma warning (suppress: 6320)
+    __except (EXCEPTION_EXECUTE_HANDLER) {
+        return 0;
+    }
+    return 1;
+}
+
 int identifyCPU(void)
 {
+	if(!iCPUFlagsLoaded) {
+		iCPUIDSupported = TestCPUID();
+	} else {
+		return iCPUIDSupported; // already run, exit early
+	}
 	iCPUFlagsLoaded = 1;
+	if(!iCPUIDSupported) {
+		return 0; // no CPUID support
+	}
 	memset(sCPUBranding,0,65);
 	memset(sCPUVendor,0,16);
 	_asm {
@@ -409,103 +433,118 @@ int identifyCPU(void)
 		}
 	}
 
-	return(0);
+	return(1);
 }
 
 
 int main(int argc, char *argv[])
-
 {
+	int		retVal = 0;
 	char	sMsg[2048];
 	char	cache[100];
 
-	identifyCPU();
+	retVal = identifyCPU();
 
-	sprintf(sMsg,"%s %s\n\nProcessor ID Family %d Model %d Stepping %d\nFlags: ",(*sCPUVendor)?sCPUVendor:"<unknown>",(*sCPUBranding)?sCPUBranding:"<No Name>",uBasicFlags.iExtendedFamilyID<<4 | uBasicFlags.iFamilyID,
-								 uBasicFlags.iExtendedModelID<<4  | uBasicFlags.iModelID,
-								 uBasicFlags.iSteppingID);
+	if(retVal) {
+		sprintf(sMsg,"%s %s\n\nProcessor ID Family %d Model %d Stepping %d\nFlags: ",(*sCPUVendor)?sCPUVendor:"<unknown>",(*sCPUBranding)?sCPUBranding:"<No Name>",uBasicFlags.iExtendedFamilyID<<4 | uBasicFlags.iFamilyID,
+									 uBasicFlags.iExtendedModelID<<4  | uBasicFlags.iModelID,
+									 uBasicFlags.iSteppingID);
 
-	if( uExt2Flags.iFPU  ) strcat(sMsg, "FPU ");	// Integrated FPU
-	if( uExt2Flags.iVME  ) strcat(sMsg, "VME ");	// Virtual Memory Extensions
-	if( uExt2Flags.iDE   ) strcat(sMsg, "DE ");	// Debugging extensions
-	if( uExt2Flags.iPSE  ) strcat(sMsg, "PSE ");	// Page Size Extensions
-	if( uExt2Flags.iTSC  ) strcat(sMsg, "TSC ");	// Time Stamp COunter
-	if( uExt2Flags.iMSR  ) strcat(sMsg, "MSR ");	// Model specific registers, RDMSR/WRMSR instructions
-	if( uExt2Flags.iPAE  ) strcat(sMsg, "PAE ");	// Physical Address Extension
-	if( uExt2Flags.iMCE  ) strcat(sMsg, "MCE ");	// Machine Check Exception
-	if( uExt2Flags.iCX8  ) strcat(sMsg, "CX8 ");	// CMPXCHG8B instruction
-	if( uExt2Flags.iAPIC ) strcat(sMsg, "APIC ");	// On-chip APIC
-	if( uExt2Flags.iSEP  ) strcat(sMsg, "SEP ");	// SYSENTER and SYSEXIT instructions and MSRs
-	if( uExt2Flags.iMTRR ) strcat(sMsg, "MTRR ");	// Memory Type Range Registers
-	if( uExt2Flags.iPGE  ) strcat(sMsg, "PGE ");	// PTE Global Bit
-	if( uExt2Flags.iMCA  ) strcat(sMsg, "MCA ");	// Machine Check Architecture
-	if( uExt2Flags.iCMOV ) strcat(sMsg, "CMOV ");	// Conditional MOV instruction
-	if( uExt2Flags.iPAT  ) strcat(sMsg, "PAT ");	// Page Attribute Table
-	if( uExt2Flags.iPSE36) strcat(sMsg, "PSE36 ");	// 36-bit page size extension
-	if( uExt2Flags.iPSN  ) strcat(sMsg, "PSN ");	// Processor serial number
-	if( uExt2Flags.iCFLSH) strcat(sMsg, "CFLSH ");	// CLFLUSH instruction
-	if( uExt2Flags.iDS   ) strcat(sMsg, "DS ");	// Debug Store
-	if( uExt2Flags.iACPI ) strcat(sMsg, "ACPI ");	// Thermal monitor and software-controlled-clock functions
-	if( uExt2Flags.iMMX  ) strcat(sMsg, "MMX ");	// MMX present
-	if( uExt2Flags.iFXSR ) strcat(sMsg, "FXSR ");	// FXSAVE and FXRESTORE instructions
-	if( uExt2Flags.iSSE  ) strcat(sMsg, "SSE ");	// Streaming SIMD Extensions
-	if( uExt2Flags.iSSE2 ) strcat(sMsg, "SSE2 ");	// Streaming SIMD Extensions 2 present
-	if( uExtFlags.iSSE3  ) strcat(sMsg, "SSE3 ");	// Streaming SIMD Extensions 3 present
-	if( uExtFlags.iSSSE3  ) strcat(sMsg, "SSSE3 ");	// Supplemental Streaming SIMD Extensions 3 present
-	if( uExtFlags.iSSE41  ) strcat(sMsg, "SSE4.1 ");	// Streaming SIMD Extensions 4.1 present
-	if( uExtFlags.iSSE42  ) strcat(sMsg, "SSE4.2 ");	// Streaming SIMD Extensions 4.2 present
-	if( u8ExtFlags.iSSE4A ) strcat(sMsg, "SSE4A ");	// Streaming SIMD Extensions 4A present
-	if( u8ExtFlags.imSSE ) strcat(sMsg, "maSSE ");	// Misaligned SSE
-	if( u8Ext2Flags.i3DN ) strcat(sMsg, "3DNow! ");	// 3DNow!
-	if( u8Ext2Flags.i3DNEx ) strcat(sMsg, "3DNow!+ ");	// 3DNow!+
-	if( u8Ext2Flags.iMMXEx ) strcat(sMsg, "MMX+ ");	// MMX+
-	if( u8ExtFlags.iFMA4 ) strcat(sMsg, "FMA4 ");	// FMA4
-	if( uExt2Flags.iSS   ) strcat(sMsg, "SS ");	// Self Snoop
-	if( uExt2Flags.iHTT  ) strcat(sMsg, "HTT ");	// Hyperthreading
-	if( uExt2Flags.iTM   ) strcat(sMsg, "TM ");	// Thermal Monitoring
-	if( uExtFlags.iTM2 ) strcat(sMsg, "TM2 ");	// Thermal Monitoring 2
-	if( uExt2Flags.iPBE  ) strcat(sMsg, "PBE ");	// Pending Break Enable (FERR#/PBE# pins)
-	if( uExtFlags.iMWAIT ) strcat(sMsg, "MWAIT ");	// MONITOR/MWAIT instructions
-	if( uExtFlags.iQDS ) strcat(sMsg, "QDS ");	// CPL Qualified Debug Store present
-	if( uExtFlags.iEST ) strcat(sMsg, "EST ");	// Enhanced SpeedStep
-	if( uExtFlags.iCID ) strcat(sMsg, "CID ");	// Context-ID
-	if( uExtFlags.iVMX ) strcat(sMsg, "VMX ");	// Virtual Machine Extensions
-	if( uExtFlags.iPCLMUL ) strcat(sMsg, "PCLMUL ");	// Carry-less Multiplication
-	if( uExtFlags.iDTES64 ) strcat(sMsg, "DTES64 ");	// 64-bit Debug Trace and EMON Store MSRs
-	if( uExtFlags.iSDBG ) strcat(sMsg, "SDBG ");	// DEBUG_INTERFACE MSR for silicon debug
-	if( uExtFlags.iPCID ) strcat(sMsg, "PCID ");	// Process-Context Identifiers Enable
-	if( uExtFlags.iTSCD ) strcat(sMsg, "TSCD ");	// local APIC supports one-shot operation using TSC deadline value
-	if( uExtFlags.iF16C ) strcat(sMsg, "F16C ");	// converting between half-precision and standard IEEE single-precision floating-point formats
-	if( uExtFlags.iRDRAND ) strcat(sMsg, "RDRAND ");	// Intel Digital Random Number Generator
-	if( uExtFlags.iHV ) strcat(sMsg, "HV ");	// hypervisor present
-	if( u8ExtFlags.iSVM ) strcat(sMsg, "SVM ");	// AMD Secure Virtual Machine
-	if( u8Ext2Flags.iLM ) strcat(sMsg, "x86-64 ");	// 64-bit technology
-	if( u8Ext2Flags.iNX ) strcat(sMsg, "NX ");	// No Execute
-	if( u8ExtFlags.iLAHF ) strcat(sMsg, "LAHF ");	// LAHF
-	if( u8Ext2Flags.iMP ) strcat(sMsg, "MP ");	// MP-capable
-	if( u8Ext2Flags.iPG1G ) strcat(sMsg, "PG1G ");	// 1GB Paging (PML3E.PS)
-	if( u8ExtFlags.iLWP ) strcat(sMsg, "LWP ");	// LWP
-	if( u8ExtFlags.iTCE ) strcat(sMsg, "TCE ");	// translation cache extension
-	if( u8ExtFlags.iTBM ) strcat(sMsg, "TBM ");	// TBM
-	if( u8ExtFlags.iNODEID ) strcat(sMsg, "NODEID ");	// node ID: MSR C001_100Ch
-	if( u8ExtFlags.iTOPX ) strcat(sMsg, "TOPX ");	// topology extensions: extended levels 8000_001Dh and 8000_001Eh
-	if( u8ExtFlags.iPCXCORE ) strcat(sMsg, "PCX_CORE ");	// core perf counter extensions (MSRs C001_020[0...B]h)
-	if( u8ExtFlags.iPCXNB ) strcat(sMsg, "PCX_NB ");	// NB perf counter extensions (MSRs C001_024[0...7]h)
-	if( u8ExtFlags.iDBX ) strcat(sMsg, "DBX ");	// data breakpoint extensions (MSRs C001_1027h and C001_10[19...1B]h)
-	if( u8ExtFlags.iPERFTSC ) strcat(sMsg, "PERFTSC ");	// performance TSC (MSR C001_0280h)
-	if( u8ExtFlags.iPCXL2I ) strcat(sMsg, "PCX_L2I ");	// L2I perf counter extensions (MSRs C001_023[0...7]h)
-	if( u8ExtFlags.iMONX ) strcat(sMsg, "MONX ");	// MONITORX/MWAITX
+		if( uExt2Flags.iFPU  ) strcat(sMsg, "FPU ");	// Integrated FPU
+		if( uExt2Flags.iVME  ) strcat(sMsg, "VME ");	// Virtual Memory Extensions
+		if( uExt2Flags.iDE   ) strcat(sMsg, "DE ");	// Debugging extensions
+		if( uExt2Flags.iPSE  ) strcat(sMsg, "PSE ");	// Page Size Extensions
+		if( uExt2Flags.iTSC  ) strcat(sMsg, "TSC ");	// Time Stamp COunter
+		if( uExt2Flags.iMSR  ) strcat(sMsg, "MSR ");	// Model specific registers, RDMSR/WRMSR instructions
+		if( uExt2Flags.iPAE  ) strcat(sMsg, "PAE ");	// Physical Address Extension
+		if( uExt2Flags.iMCE  ) strcat(sMsg, "MCE ");	// Machine Check Exception
+		if( uExt2Flags.iCX8  ) strcat(sMsg, "CX8 ");	// CMPXCHG8B instruction
+		if( uExt2Flags.iAPIC ) strcat(sMsg, "APIC ");	// On-chip APIC
+		if( uExt2Flags.iSEP  ) strcat(sMsg, "SEP ");	// SYSENTER and SYSEXIT instructions and MSRs
+		if( uExt2Flags.iMTRR ) strcat(sMsg, "MTRR ");	// Memory Type Range Registers
+		if( uExt2Flags.iPGE  ) strcat(sMsg, "PGE ");	// PTE Global Bit
+		if( uExt2Flags.iMCA  ) strcat(sMsg, "MCA ");	// Machine Check Architecture
+		if( uExt2Flags.iCMOV ) strcat(sMsg, "CMOV ");	// Conditional MOV instruction
+		if( uExt2Flags.iPAT  ) strcat(sMsg, "PAT ");	// Page Attribute Table
+		if( uExt2Flags.iPSE36) strcat(sMsg, "PSE36 ");	// 36-bit page size extension
+		if( uExt2Flags.iPSN  ) strcat(sMsg, "PSN ");	// Processor serial number
+		if( uExt2Flags.iCFLSH) strcat(sMsg, "CFLSH ");	// CLFLUSH instruction
+		if( uExt2Flags.iDS   ) strcat(sMsg, "DS ");	// Debug Store
+		if( uExt2Flags.iACPI ) strcat(sMsg, "ACPI ");	// Thermal monitor and software-controlled-clock functions
+		if( uExt2Flags.iMMX  ) strcat(sMsg, "MMX ");	// MMX present
+		if( uExt2Flags.iFXSR ) strcat(sMsg, "FXSR ");	// FXSAVE and FXRESTORE instructions
+		if( uExt2Flags.iSSE  ) strcat(sMsg, "SSE ");	// Streaming SIMD Extensions
+		if( uExt2Flags.iSSE2 ) strcat(sMsg, "SSE2 ");	// Streaming SIMD Extensions 2 present
+		if( uExtFlags.iSSE3  ) strcat(sMsg, "SSE3 ");	// Streaming SIMD Extensions 3 present
+		if( uExtFlags.iSSSE3  ) strcat(sMsg, "SSSE3 ");	// Supplemental Streaming SIMD Extensions 3 present
+		if( uExtFlags.iSSE41  ) strcat(sMsg, "SSE4.1 ");	// Streaming SIMD Extensions 4.1 present
+		if( uExtFlags.iSSE42  ) strcat(sMsg, "SSE4.2 ");	// Streaming SIMD Extensions 4.2 present
+		if( u8ExtFlags.iSSE4A ) strcat(sMsg, "SSE4A ");	// Streaming SIMD Extensions 4A present
+		if( u8ExtFlags.imSSE ) strcat(sMsg, "maSSE ");	// Misaligned SSE
+		if( u8Ext2Flags.i3DN ) strcat(sMsg, "3DNow! ");	// 3DNow!
+		if( u8Ext2Flags.i3DNEx ) strcat(sMsg, "3DNow!+ ");	// 3DNow!+
+		if( u8Ext2Flags.iMMXEx ) strcat(sMsg, "MMX+ ");	// MMX+
+		if( u8ExtFlags.iFMA4 ) strcat(sMsg, "FMA4 ");	// FMA4
+		if( uExt2Flags.iSS   ) strcat(sMsg, "SS ");	// Self Snoop
+		if( uExt2Flags.iHTT  ) strcat(sMsg, "HTT ");	// Hyperthreading
+		if( uExt2Flags.iTM   ) strcat(sMsg, "TM ");	// Thermal Monitoring
+		if( uExtFlags.iTM2 ) strcat(sMsg, "TM2 ");	// Thermal Monitoring 2
+		if( uExt2Flags.iPBE  ) strcat(sMsg, "PBE ");	// Pending Break Enable (FERR#/PBE# pins)
+		if( uExtFlags.iMWAIT ) strcat(sMsg, "MWAIT ");	// MONITOR/MWAIT instructions
+		if( uExtFlags.iQDS ) strcat(sMsg, "QDS ");	// CPL Qualified Debug Store present
+		if( uExtFlags.iEST ) strcat(sMsg, "EST ");	// Enhanced SpeedStep
+		if( uExtFlags.iCID ) strcat(sMsg, "CID ");	// Context-ID
+		if( uExtFlags.iVMX ) strcat(sMsg, "VMX ");	// Virtual Machine Extensions
+		if( uExtFlags.iPCLMUL ) strcat(sMsg, "PCLMUL ");	// Carry-less Multiplication
+		if( uExtFlags.iDTES64 ) strcat(sMsg, "DTES64 ");	// 64-bit Debug Trace and EMON Store MSRs
+		if( uExtFlags.iSDBG ) strcat(sMsg, "SDBG ");	// DEBUG_INTERFACE MSR for silicon debug
+		if( uExtFlags.iPCID ) strcat(sMsg, "PCID ");	// Process-Context Identifiers Enable
+		if( uExtFlags.iTSCD ) strcat(sMsg, "TSCD ");	// local APIC supports one-shot operation using TSC deadline value
+		if( uExtFlags.iF16C ) strcat(sMsg, "F16C ");	// converting between half-precision and standard IEEE single-precision floating-point formats
+		if( uExtFlags.iRDRAND ) strcat(sMsg, "RDRAND ");	// Intel Digital Random Number Generator
+		if( uExtFlags.iHV ) strcat(sMsg, "HV ");	// hypervisor present
+		if( u8ExtFlags.iSVM ) strcat(sMsg, "SVM ");	// AMD Secure Virtual Machine
+		if( u8Ext2Flags.iLM ) strcat(sMsg, "x86-64 ");	// 64-bit technology
+		if( u8Ext2Flags.iNX ) strcat(sMsg, "NX ");	// No Execute
+		if( u8ExtFlags.iLAHF ) strcat(sMsg, "LAHF ");	// LAHF
+		if( u8Ext2Flags.iMP ) strcat(sMsg, "MP ");	// MP-capable
+		if( u8Ext2Flags.iPG1G ) strcat(sMsg, "PG1G ");	// 1GB Paging (PML3E.PS)
+		if( u8ExtFlags.iLWP ) strcat(sMsg, "LWP ");	// LWP
+		if( u8ExtFlags.iTCE ) strcat(sMsg, "TCE ");	// translation cache extension
+		if( u8ExtFlags.iTBM ) strcat(sMsg, "TBM ");	// TBM
+		if( u8ExtFlags.iNODEID ) strcat(sMsg, "NODEID ");	// node ID: MSR C001_100Ch
+		if( u8ExtFlags.iTOPX ) strcat(sMsg, "TOPX ");	// topology extensions: extended levels 8000_001Dh and 8000_001Eh
+		if( u8ExtFlags.iPCXCORE ) strcat(sMsg, "PCX_CORE ");	// core perf counter extensions (MSRs C001_020[0...B]h)
+		if( u8ExtFlags.iPCXNB ) strcat(sMsg, "PCX_NB ");	// NB perf counter extensions (MSRs C001_024[0...7]h)
+		if( u8ExtFlags.iDBX ) strcat(sMsg, "DBX ");	// data breakpoint extensions (MSRs C001_1027h and C001_10[19...1B]h)
+		if( u8ExtFlags.iPERFTSC ) strcat(sMsg, "PERFTSC ");	// performance TSC (MSR C001_0280h)
+		if( u8ExtFlags.iPCXL2I ) strcat(sMsg, "PCX_L2I ");	// L2I perf counter extensions (MSRs C001_023[0...7]h)
+		if( u8ExtFlags.iMONX ) strcat(sMsg, "MONX ");	// MONITORX/MWAITX
 
-	sprintf(cache,"\nL1 I-Cache: %d KB, L1 D-Cache: %d KB",uL1ICSize.iL1ICSize,uL1DCSize.iL1DCSize);
-	strcat(sMsg, cache);
+		sprintf(cache,"\nL1 I-Cache: %d KB, L1 D-Cache: %d KB",uL1ICSize.iL1ICSize,uL1DCSize.iL1DCSize);
+		strcat(sMsg, cache);
 
-	sprintf(cache,"\nL2 Cache: %d KB, L3 Cache: %d KB",uL2Size.iL2Size,uL3Size.iL3Size);
-	strcat(sMsg, cache);
+		sprintf(cache,"\nL2 Cache: %d KB, L3 Cache: %d KB",uL2Size.iL2Size,uL3Size.iL3Size);
+		strcat(sMsg, cache);
 
-	sprintf(cache,"\nHighest CPUID = %08X",uHighestCPUID0);
-	strcat(sMsg, cache);
-	sprintf(cache,"\nHighest CPUIDEx = %08X",uHighestCPUID);
-	strcat(sMsg, cache);
+		sprintf(cache,"\nHighest CPUID = %08X",uHighestCPUID0);
+		strcat(sMsg, cache);
+		sprintf(cache,"\nHighest CPUIDEx = %08X",uHighestCPUID);
+		strcat(sMsg, cache);
+	} else {
+		SYSTEM_INFO si;
+		sprintf(sMsg, "CPUID is not supported on this machine. Use GetSystemInfo() instead:\n");
+
+		GetSystemInfo(&si);
+		sprintf(cache,"si.wProcessorArchitecture = %d\n",si.wProcessorArchitecture);
+		strcat(sMsg, cache);
+		sprintf(cache,"si.dwProcessorType = %d\n",si.dwProcessorType);
+		strcat(sMsg, cache);
+		sprintf(cache,"si.wProcessorLevel = %d\n",si.wProcessorLevel);
+		strcat(sMsg, cache);
+		sprintf(cache,"si.wProcessorRevision = %x\n",si.wProcessorRevision);
+		strcat(sMsg, cache);
+	}
 
 #ifndef CPUID_CONSOLE
 	MessageBox(NULL,sMsg,"CPU Identification", MB_OK);
