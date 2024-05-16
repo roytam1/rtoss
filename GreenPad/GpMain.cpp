@@ -915,6 +915,19 @@ void GreenPadWnd::on_helpabout()
 			SendMsgToItem(IDC_ABOUTURL, WM_SETTEXT, TEXT("https://github.com/roytam1/rtoss/tree/master/GreenPad"));
 			SetCenter(hwnd(), parent_);
 		}
+		DWORD on_ctlcolor(HDC ctrldc, HWND ctrl)
+		{
+			DWORD ctrlID = GetDlgCtrlID(ctrl);
+			switch(ctrlID) {
+				case IDC_ABOUTSTR:
+				case IDC_ABOUTURL:
+					SetBkColor(ctrldc, GetSysColor(COLOR_BTNFACE));
+					SelectObject(ctrldc, GetSysColorBrush(COLOR_BTNFACE));
+					return (DWORD)GetSysColorBrush(COLOR_BTNFACE);
+				default:
+					return NULL;
+			}
+		}
 		HWND parent_;
 	} ahdlg (hwnd());
 
