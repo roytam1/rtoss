@@ -917,13 +917,17 @@ void GreenPadWnd::on_helpabout()
 		}
 		DWORD on_ctlcolor(HDC ctrldc, HWND ctrl)
 		{
+			LONG dlgStyle;
 			DWORD ctrlID = GetDlgCtrlID(ctrl);
 			switch(ctrlID) {
 				case IDC_ABOUTSTR:
 				case IDC_ABOUTURL:
-					SetBkColor(ctrldc, GetSysColor(COLOR_BTNFACE));
-					SelectObject(ctrldc, GetSysColorBrush(COLOR_BTNFACE));
-					return (DWORD)GetSysColorBrush(COLOR_BTNFACE);
+					dlgStyle = GetWindowLong(hwnd(), GWL_STYLE);
+					if(dlgStyle & DS_3DLOOK) {
+						SetBkColor(ctrldc, GetSysColor(COLOR_BTNFACE));
+						SelectObject(ctrldc, GetSysColorBrush(COLOR_BTNFACE));
+						return (DWORD)GetSysColorBrush(COLOR_BTNFACE);
+					}
 				default:
 					return NULL;
 			}
