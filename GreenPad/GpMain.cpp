@@ -911,6 +911,10 @@ void GreenPadWnd::on_helpabout()
 			   + String().SetInt( LOBYTE(sver) ) + TEXT(".")
 			   + String().SetInt( app().getOSBuild() );
 
+			WORD wDetType = app().getDetectType();
+			if( wDetType & MVI_KERNELEX )
+				s+= TEXT(" (KEx)");
+
 			SendMsgToItem(IDC_ABOUTSTR, WM_SETTEXT, s.c_str());
 			SendMsgToItem(IDC_ABOUTURL, WM_SETTEXT, TEXT("https://github.com/roytam1/rtoss/tree/master/GreenPad"));
 			SetCenter(hwnd(), parent_);
