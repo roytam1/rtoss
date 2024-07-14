@@ -44,6 +44,8 @@ typedef struct _MYVERINFO_PV {
 } MYVERINFO_PV;
 #pragma pack(pop)
 
+#define MVI_KERNELEX	0x8000
+
 #define MVI_MAJOR	verbuild.vb.ver.u.cMajor
 #define MVI_MINOR	verbuild.vb.ver.u.cMinor
 #define MVI_VER		verbuild.vb.ver.wVer
@@ -151,6 +153,7 @@ public:
 	void init_osver();
 	WORD getOSVer();
 	WORD getOSBuild();
+	WORD getDetectType();
 	bool isBuildEqual(DWORD dwTarget);
 	bool isBuildGreater(DWORD dwTarget);
 	bool isWin95();

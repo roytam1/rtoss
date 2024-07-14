@@ -747,6 +747,10 @@ INT_PTR CALLBACK DlgImpl::MainProc(
 					reinterpret_cast<HWND>(lp) ) ? TRUE : FALSE;
 			}
 
+		case WM_CTLCOLORSTATIC:
+		case WM_CTLCOLOREDIT:
+			return ptr->on_ctlcolor( reinterpret_cast<HDC>(wp), reinterpret_cast<HWND>(lp) );
+
 		case WM_DESTROY:
 			ptr->on_destroy();
 			if( ptr->isMainWnd() )
@@ -791,6 +795,12 @@ bool DlgImpl::on_command( UINT, UINT, HWND )
 {
 	// ‰½‚à‚µ‚È‚¢
 	return false;
+}
+
+DWORD DlgImpl::on_ctlcolor( HDC, HWND )
+{
+	// ‰½‚à‚µ‚È‚¢
+	return NULL;
 }
 
 bool DlgImpl::on_message( UINT, WPARAM, LPARAM )
