@@ -881,7 +881,7 @@ void GreenPadWnd::on_toggleime()
 	#elif defined(_M_ALPHA)
 		#define PALT TEXT( "- Alpha" )
 	#elif defined(_M_PPC)
-		#define PALT TEXT( "- PowerPC" )
+		#define PALT TEXT( "- PPC" )
 	#else
 		#define PALT TEXT("- (unknown)")
 	#endif
