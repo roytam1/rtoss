@@ -76,6 +76,8 @@ public:
 	//@{ 文字幅(pixel) //@}
 	int Wc( unicode ch ) const
 		{
+			if(ch == 0xFFFF)
+				ch = 0xFFFD;
 			if( widthTable_[ ch ] == -1 )
 #ifdef WIN32S
 				if(ch > 0x100)
@@ -95,6 +97,8 @@ public:
 	int W( const unicode* pch ) const // 1.08 サロゲートペア回避
 		{
 			unicode ch = *pch;
+			if(ch == 0xFFFF)
+				ch = 0xFFFD;
 			if( widthTable_[ ch ] == -1 )
 			{
 				if( isHighSurrogate(ch) )
@@ -404,7 +408,7 @@ private:
 private:
 
 	void DrawLNA( const VDrawInfo& v, Painter& p );
-	void DrawTXT( const VDrawInfo v, Painter& p );
+	void DrawTXT( const VDrawInfo& v, Painter& p );
 	void Inv( int y, int xb, int xe, Painter& p );
 
 	void CalcEveryLineWidth();

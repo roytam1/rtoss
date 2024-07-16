@@ -363,7 +363,7 @@ DPos DocImpl::rightOf( const DPos& dp, bool wide ) const
 		if( s >= e )
 			s = e;
 		else if( t==7 || t==0 )
-			while( (f[s]>>5)==0 && s<e )
+			while( s<e && (f[s]>>5)==0 )
 				++s;
 		return DPos( dp.tl, s );
 	}
@@ -381,7 +381,7 @@ DPos DocImpl::wordStartOf( const DPos& dp ) const
 		// çsÇÃìríÜ
 		const uchar* f = pl(dp.tl);
 			  ulong  s = dp.ad;
-		while( (f[s]>>5)==0 && 0<=s )
+		while( 0<=s && (f[s]>>5)==0 )
 			--s;
 		return DPos( dp.tl, s );
 	}
@@ -490,7 +490,7 @@ bool DocImpl::DeletingOperation
 }
 
 bool DocImpl::InsertingOperation
-	( DPos& s, const unicode* str, ulong len, DPos& e )
+	( DPos& s, const unicode* str, ulong len, DPos& e, bool reparse )
 {
 	AutoLock lk( this );
 
@@ -535,7 +535,7 @@ bool DocImpl::InsertingOperation
 	}
 
 	// çƒâêÕ
-	return ReParse( s.tl, e.tl );
+	return reparse && ReParse( s.tl, e.tl );
 }
 
 
@@ -731,20 +731,16 @@ void DocImpl::OpenFile( aptr<TextFileR> tf )
 		buf_sz = SBUF_SZ;
 	}
 
-	for( ulong i=0; tf->state(); )
+	size_t L;
+	ulong i=0;
+	for( i=0; L = tf->ReadBuf( buf, buf_sz ); )
 	{
-		if( size_t L = tf->ReadBuf( buf, buf_sz ) )
-		{
-			DPos p(i,0xffffffff);
-			InsertingOperation( p, buf, (ulong)L, e );
-			i = tln() - 1;
-		}
-		if( tf->state() == 1 )
-		{
-			DPos p(i++,0xffffffff);
-			InsertingOperation( p, L"\n", 1, e );
-		}
+		DPos p( i, len(e.tl) ); // end of document
+		InsertingOperation( p, buf, (ulong)L, e, /*reparse=*/false );
+		i = tln() - 1;
 	}
+	// Parse All lines, because we skipped it
+	ReParse( 0, tln()-1 );
 
 	if( buf != sbuf )
 		delete [] buf;

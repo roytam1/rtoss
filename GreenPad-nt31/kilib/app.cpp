@@ -176,11 +176,25 @@ void App::init_osver()
 
 		}
 	}
+	// check system32 if verion is > 3.10
+	if(mvi_.wPlatform == VER_PLATFORM_WIN32_NT && mvi_.MVI_BUILD > MKVER(3, 10)) {
+		char cSysDir[256];
+		int iSysDirLen = 0;
+		iSysDirLen = GetSystemDirectoryA(cSysDir, 256);
+		if(iSysDirLen && cSysDir[iSysDirLen-1] != '2') {
+			mvi_.wType |= MVI_KERNELEX;
+		}
+	}
 }
 
 WORD App::getOSVer()
 {
 	return mvi_.MVI_VER;
+}
+
+WORD App::getDetectType()
+{
+	return mvi_.wType;
 }
 
 WORD App::getOSBuild()

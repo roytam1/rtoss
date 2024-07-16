@@ -96,24 +96,30 @@ inline MemoryManager& mem()
 //@{ ƒ[ƒ–„‚ßì‹Æ //@}
 inline void mem00( void* ptrv, int siz )
 	{ BYTE* ptr = (BYTE*)ptrv;
+#if !defined(_M_IA64) && !defined(_M_ALPHA)
 	  for(;siz>3;siz-=4,ptr+=4) *(DWORD*)ptr = 0x00000000;
+#endif
 	  for(;siz;--siz,++ptr) *ptr = 0x00; }
 
 //@{ FF–„‚ßì‹Æ //@}
 inline void memFF( void* ptrv, int siz )
 	{ BYTE* ptr = (BYTE*)ptrv;
+#if !defined(_M_IA64) && !defined(_M_ALPHA)
 	  for(;siz>3;siz-=4,ptr+=4) *(DWORD*)ptr = 0xffffffff;
+#endif
 	  for(;siz;--siz,++ptr) *ptr = 0xff; }
 
 inline bool memEQ( const void *s1, const void *s2, size_t siz )
 {
 	const BYTE *a = (const BYTE *)s1;
 	const BYTE *b = (const BYTE *)s2;
+#if !defined(_M_IA64) && !defined(_M_ALPHA)
 	for ( ; siz>3 ; siz-=4, a+=4, b+=4)
 	{
 		if ( *(const DWORD*)a != *(const DWORD*)b )
 			return false;
 	}
+#endif
 	for ( ; siz ; siz--, a++, b++)
 	{ 
 		if ( *a != *b )

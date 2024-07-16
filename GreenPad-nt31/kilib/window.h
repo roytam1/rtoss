@@ -392,6 +392,7 @@ protected:
 	virtual bool on_ok();
 	virtual bool on_cancel();
 	virtual bool on_command( UINT cmd, UINT id, HWND ctrl );
+	virtual DWORD on_ctlcolor( HDC ctrldc, HWND ctrl );
 	virtual bool on_message( UINT msg, WPARAM wp, LPARAM lp );
 	virtual bool PreTranslateMessage( MSG* msg );
 

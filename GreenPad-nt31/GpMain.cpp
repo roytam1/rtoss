@@ -833,12 +833,18 @@ void GreenPadWnd::on_helpabout()
 	#endif
 
 	#if defined(TARGET_VER)
-		#if TARGET_VER == 310
+		#if TARGET_VER == 310 && ( defined(WIN32S) || ( defined(NO_OLEDNDSRC) && defined(NO_OLEDNDTAR) ) )
 			#define TGVER TEXT(" 3.10+")
-		#elif TARGET_VER == 350
+		#elif TARGET_VER == 350 || TARGET_VER == 310 // 3.10 non-Win32s + OLE = 3.50
 			#define TGVER TEXT(" 3.50+")
 		#else //if TARGET_VER == 351
-			#if defined(_M_AMD64) || defined(_M_X64) || defined(WIN64)
+			#if defined(_M_IA64)
+				// 2000/NT5.0 is the first IA64 version of Windows.
+				#define TGVER TEXT(" 5.0+")
+			#elif defined(_M_ARM64) || defined(_M_ARM)
+				// 8/NT6.2 is the first ARM version of Windows.
+				#define TGVER TEXT(" 6.2+")
+			#elif defined(_M_AMD64) || defined(_M_X64) || defined(WIN64)
 				// XP/NT5.1 is the first x64 version of Windows.
 				#define TGVER TEXT(" 5.1+")
 			#else
@@ -847,7 +853,13 @@ void GreenPadWnd::on_helpabout()
 			#endif
 		#endif
 	#else
-		#if defined(_M_AMD64) || defined(_M_X64) || defined(WIN64)
+		#if defined(_M_IA64)
+			// 2000/NT5.0 is the first IA64 version of Windows.
+			#define TGVER TEXT(" 5.0+")
+		#elif defined(_M_ARM64) || defined(_M_ARM)
+			// 8/NT6.2 is the first ARM version of Windows.
+			#define TGVER TEXT(" 6.2+")
+		#elif defined(_M_AMD64) || defined(_M_X64) || defined(WIN64)
 			// XP/NT5.1 is the first x64 version of Windows.
 			#define TGVER TEXT(" 5.1+")
 		#else
@@ -865,16 +877,24 @@ void GreenPadWnd::on_helpabout()
 
 	#if defined(_M_AMD64) || defined(_M_X64)
 		#define PALT TEXT( "- x86_64" )
+	#elif defined(_M_IA64)
+		#define PALT TEXT( "- IA64" )
 	#elif defined(_M_IX86)
 		#define PALT TEXT( "- i386" )
 	#elif defined(_M_MRX000) || defined(_MIPS_)
 		#define PALT TEXT( "- MIPS" )
 	#elif defined(_M_ARM64)
 		#define PALT TEXT( "- ARM64" )
+	#elif defined(_M_ARM)
+		#define PALT TEXT( "- ARM" )
+	#elif defined(_M_ALPHA) && defined(WIN64)
+		#define PALT TEXT( "- Alpha64" )
 	#elif defined(_M_ALPHA)
 		#define PALT TEXT( "- Alpha" )
 	#elif defined(_M_PPC)
-		#define PALT TEXT( "- PowerPC" )
+		#define PALT TEXT( "- PPC" )
+	#else
+		#define PALT TEXT("- (unknown)")
 	#endif
 	// Show Help->About dialog box.
 	struct AboutDlg : public DlgImpl {
@@ -894,13 +914,35 @@ void GreenPadWnd::on_helpabout()
 			else
 				s+= TEXT("Windows ");
 
-			s += String().SetInt( HIBYTE(app().getOSVer()) ) + TEXT(".")
-			   + String().SetInt( LOBYTE(app().getOSVer()) ) + TEXT(".")
+			WORD sver = app().getOSVer();
+			s += String().SetInt( HIBYTE(sver) ) + TEXT(".")
+			   + String().SetInt( LOBYTE(sver) ) + TEXT(".")
 			   + String().SetInt( app().getOSBuild() );
+
+			WORD wDetType = app().getDetectType();
+			if( wDetType & MVI_KERNELEX )
+				s+= TEXT(" (KEx)");
 
 			SendMsgToItem(IDC_ABOUTSTR, WM_SETTEXT, s.c_str());
 			SendMsgToItem(IDC_ABOUTURL, WM_SETTEXT, TEXT("https://github.com/roytam1/rtoss/tree/master/GreenPad"));
 			SetCenter(hwnd(), parent_);
+		}
+		DWORD on_ctlcolor(HDC ctrldc, HWND ctrl)
+		{
+			LONG dlgStyle;
+			DWORD ctrlID = GetDlgCtrlID(ctrl);
+			switch(ctrlID) {
+				case IDC_ABOUTSTR:
+				case IDC_ABOUTURL:
+					dlgStyle = GetWindowLong(hwnd(), GWL_STYLE);
+					if(dlgStyle & DS_3DLOOK) {
+						SetBkColor(ctrldc, GetSysColor(COLOR_BTNFACE));
+						SelectObject(ctrldc, CreateSolidBrush(GetSysColor(COLOR_BTNFACE)));
+						return (DWORD)CreateSolidBrush(GetSysColor(COLOR_BTNFACE));
+					}
+				default:
+					return NULL;
+			}
 		}
 		HWND parent_;
 	} ahdlg (hwnd());

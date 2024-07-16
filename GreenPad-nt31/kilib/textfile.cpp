@@ -68,7 +68,7 @@ struct rBasicUTF : public ki::TextFileRPimpl
 		}
 
 		// If the end of the buffer contains half a DOS CRLF
-		if( *(w-1)==L'\r' && PeekC() == L'\n' )
+		if( buf < w && *(w-1)==L'\r' && PeekC() == L'\n' )
 			Skip();
 
 		if(BOF) BOF = false;
@@ -104,7 +104,7 @@ struct rUCS : public rBasicUTF
 											 (val<<24)); }
 
 	virtual void Skip() { ++fb; }
-	virtual bool Eof() { return fb==fe; }
+	virtual bool Eof() { return fb>=fe; }
 	virtual unicode PeekC() { return (unicode)(be ? swap(*fb) : *fb); }
 };
 
@@ -164,7 +164,7 @@ struct rUtf1 : public rBasicUTF
 		else               return x - 0x42;
 	}
 
-	bool Eof() { return SurrogateLow ? false : fb==fe; }
+	bool Eof() { return SurrogateLow ? false : fb>=fe; }
 	void Skip()
 	{
 		if( SurrogateLow ) return; // don't go further if leftover exists
@@ -191,7 +191,7 @@ struct rUtf1 : public rBasicUTF
 		else if( *fb >= 0xF6 && *fb <= 0xFB )     { ch = ((*fb-0xF6) * 0x8D04 + conv(*(fb+1)) * 0xBE + conv(*(fb+2)) + 0x4016); }
 		else /*if( *fb >= 0xFC && *fb <= 0xFF )*/ { ch = ((*fb-0xFC) * 0x4DAD6810 + conv(*(fb+1)) * 0x68A8F8 + conv(*(fb+2)) * 0x8D04 + conv(*(fb+3)) * 0xBE + conv(*(fb+4)) + 0x38E2E); }
 
-		if( ch > 0x10000 )
+		if( ch >= 0x10000 )
 		{
 			SurrogateLow = (0xDC00 + (((ch-0x10000)    )&0x3ff));
 			ch = (0xD800 + (((ch-0x10000)>>10)&0x3ff));
@@ -213,7 +213,7 @@ struct rUtf9 : public rBasicUTF
 	const uchar *fb, *fe;
 	qbyte SurrogateLow;
 
-	bool Eof() { return SurrogateLow ? false : fb==fe; }
+	bool Eof() { return SurrogateLow ? false : fb>=fe; }
 	void Skip()
 	{
 		if( SurrogateLow ) return; // don't go further if leftover exists
@@ -241,7 +241,7 @@ struct rUtf9 : public rBasicUTF
 		else if( *fb >= 0x80 && *fb <= 0x8F ) { ch = (((*fb & 0x7F) << 7) + (*(fb+1) & 0x7F)); }
 		else /* 0~0x7F,0xA0~0xFF */           { ch = (*fb); }
 
-		if( ch > 0x10000 )
+		if( ch >= 0x10000 )
 		{
 			SurrogateLow = (0xDC00 + (((ch-0x10000)    )&0x3ff));
 			ch = (0xD800 + (((ch-0x10000)>>10)&0x3ff));
@@ -263,7 +263,7 @@ struct rUtfOFSS : public rBasicUTF
 	const uchar *fb, *fe;
 	qbyte SurrogateLow;
 
-	bool Eof() { return SurrogateLow ? false : fb==fe; }
+	bool Eof() { return SurrogateLow ? false : fb>=fe; }
 	void Skip()
 	{
 		if( SurrogateLow ) return; // don't go further if leftover exists
@@ -291,7 +291,7 @@ struct rUtfOFSS : public rBasicUTF
 		else if( *fb >= 0x80 && *fb <= 0xc0 ) { ch = (((*fb & 0x3f) << 7) + (*(fb+1) & 0x7F) + 0x0000080); }
 		else /* 0~0x7F,0xA0~0xFF */           { ch = (*fb); }
 
-		if( ch > 0x10000 )
+		if( ch >= 0x10000 )
 		{
 			SurrogateLow = (0xDC00 + (((ch-0x10000)    )&0x3ff));
 			ch = (0xD800 + (((ch-0x10000)>>10)&0x3ff));
@@ -326,7 +326,7 @@ struct rUtf5 : public rBasicUTF
 	}
 
 	void Skip() { do ++fb; while( fb<fe && *fb<'G' ); }
-	bool Eof() { return fb==fe; }
+	bool Eof() { return fb>=fe; }
 	unicode PeekC()
 	{
 		unicode ch = (*fb-'G');
@@ -363,7 +363,9 @@ struct rUtf7 : public rBasicUTF
 	rUtf7( const uchar* b, ulong s )
 		: fb( b )
 		, fe( b+s )
-		, rest( -1 ) { fillbuf(); }
+		, rest( -1 )
+		, inB64( false )
+	{ fillbuf(); }
 
 	const uchar *fb, *fe;
 	unicode buf[3]; // b64を８文字毎に読んでバッファに溜めておく
@@ -371,7 +373,7 @@ struct rUtf7 : public rBasicUTF
 	bool inB64;     // base64エリア内ならtrue
 
 	void Skip() { if(--rest==0) fillbuf(); }
-	bool Eof() { return fb==fe && rest==0; }
+	bool Eof() { return fb>=fe && rest==0; }
 	unicode PeekC() { return buf[rest-1]; }
 
 	void fillbuf()
@@ -446,7 +448,7 @@ namespace
 	0x2400, 0x2480, 0x2500, 0x2580, 0x2600, 0x2680, 0x2700, 0x2780,
 	0x2800, 0x2880, 0x2900, 0x2980, 0x2A00, 0x2A80, 0x2B00, 0x2B80,
 	0x2C00, 0x2C80, 0x2D00, 0x2D80, 0x2E00, 0x2E80, 0x2F00, 0x2F80,
-	0x3000, 0x3080, 0x3100, 0x3180, 0x3200, 0x3280, 0x3300, 0x3800,
+	0x3000, 0x3080, 0x3100, 0x3180, 0x3200, 0x3280, 0x3300, 0x3380,
 	0xE000, 0xE080, 0xE100, 0xE180, 0xE200, 0xE280, 0xE300, 0xE380,
 	0xE400, 0xE480, 0xE500, 0xE580, 0xE600, 0xE680, 0xE700, 0xE780,
 	0xE800, 0xE880, 0xE900, 0xE980, 0xEA00, 0xEA80, 0xEB00, 0xEB80,
@@ -487,7 +489,7 @@ struct rSCSU : public rBasicUTF
 	uchar c, d;
 
 	void Skip() { fb+=skip; skip=0; }
-	bool Eof() { return fb==fe; }
+	bool Eof() { return fb>=fe; }
 	uchar GetChar() { return fb+skip>fe ? 0 : *(fb+(skip++)); }
 	unicode PeekC()
 	{
@@ -628,7 +630,7 @@ struct rBOCU1 : public rBasicUTF
 	unicode cp, pc;
 
 	void Skip() { fb+=skip; skip=0; }
-	bool Eof() { return fb==fe; }
+	bool Eof() { return fb>=fe; }
 	uchar GetChar() { return (fb+skip < fe) ? *(fb+(skip++)) : 0; }
 	unicode PeekC()
 	{
@@ -932,7 +934,7 @@ struct rMBCS : public TextFileRPimpl
 			}
 
 		// If the end of the buffer contains half a DOS CRLF
-		if( *(p-1)=='\r' && *(p) =='\n' )
+		if( p > fb && *(p-1)=='\r' && *(p) =='\n' )
 			++p;
 
 		// Unicodeへ変換, convertion to Unicode
@@ -1054,9 +1056,9 @@ struct rIso2022 : public TextFileRPimpl
 		else
 		{
 			if( p[1]==0x4A )
-				G[ (p[0]-0x28)%4 ] = ASCII;         // 1B [28-2B] 4A
+				G[ (p[0]-0x28)&3 ] = ASCII;         // 1B [28-2B] 4A
 			else if( p[1]==0x49 )
-				G[ (p[0]-0x28)%4 ] = KANA;          // 1B [28-2B] 49
+				G[ (p[0]-0x28)&3 ] = KANA;          // 1B [28-2B] 49
 			else if( *reinterpret_cast<const dbyte*>(p)==0x4228 )
 				G[ 0 ] = ASCII;                     // 1B 28 42
 			else if( *reinterpret_cast<const dbyte*>(p)==0x412E )
@@ -1068,9 +1070,9 @@ struct rIso2022 : public TextFileRPimpl
 					G[ 0 ] = GB;                    // 1B 24 41
 				else if( p+2 < fe )
 					if( p[2]==0x41 )
-						G[ ((*++p)-0x28)%4 ] = GB;  // 1B 24 [28-2B] 41
+						G[ ((*++p)-0x28)&3 ] = GB;  // 1B 24 [28-2B] 41
 					else if( p[2]==0x43 )
-						G[ ((*++p)-0x28)%4 ] = KSX; // 1B 24 [28-2B] 43
+						G[ ((*++p)-0x28)&3 ] = KSX; // 1B 24 [28-2B] 43
 		}
 		++p;
 	}
@@ -1152,7 +1154,7 @@ struct rIso2022 : public TextFileRPimpl
 		outofloop:
 
 		// If the end of the buffer contains half a DOS CRLF
-		if( *(p-1)=='\r' && *p=='\n' )
+		if( p > fb && *(p-1)=='\r' && *p=='\n' )
 			++p;
 		fb = p;
 
@@ -1510,10 +1512,20 @@ int TextFileR::chardetAutoDetection( const uchar* ptr, ulong siz )
 
 #if defined(_M_AMD64) || defined(_M_X64)
 # define CHARDET_DLL "chardet_x64.dll"
+#elif defined(_M_IA64)
+# define CHARDET_DLL "chardet_ia64.dll"
 #elif defined(_M_ARM64)
 # define CHARDET_DLL "chardet_arm64.dll"
+#elif defined(_M_ARM)
+# define CHARDET_DLL "chardet_arm.dll"
 #elif defined(_MIPS_)
 # define CHARDET_DLL "cdetmips.dll"
+#elif defined(_M_PPC)
+# define CHARDET_DLL "cdetppc.dll"
+#elif defined(_M_ALPHA) && defined(WIN64)
+# define CHARDET_DLL "chardet_axp64.dll"
+#elif defined(_M_ALPHA)
+# define CHARDET_DLL "cdetaxp.dll"
 #else
 # define CHARDET_DLL "chardet.dll"
 #endif
@@ -2390,7 +2402,7 @@ struct wSCSU : public TextFileWPimpl
 				* which are encoded directly.
 				* All other C0 control codes are quoted with SQ0.
 				*/
-				if( c<=0xf && ((1<<c)&0x2601)==0 ) {
+				if( c<=0x1f && ((1<<c)&0x2601)==0 ) {
 					fp_.WriteC( static_cast<uchar>(SQ0) );
 				}
 				fp_.WriteC( static_cast<uchar>(c) );
