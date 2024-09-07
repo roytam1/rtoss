@@ -29,6 +29,26 @@ void BootNewProcess( const TCHAR* cmd = TEXT("") )
 	}
 }
 
+typedef HBRUSH (WINAPI *GSCB)(int);
+HBRUSH WINAPI MyGetSysColorBrush_fallback(int nIndex)
+{
+	return ::CreateSolidBrush( ::GetSysColor(nIndex) );
+}
+HBRUSH WINAPI MyGetSysColorBrush_init(int nIndex);
+static GSCB MyGetSysColorBrush = MyGetSysColorBrush_init;
+HBRUSH WINAPI MyGetSysColorBrush_init(int nIndex)
+{
+	if( MyGetSysColorBrush == MyGetSysColorBrush_init ) {
+		MyGetSysColorBrush = (GSCB)GetProcAddress(GetModuleHandleA("USER32.DLL"), "GetSysColorBrush");
+
+		// Should be supported since Windows NT 3.51...
+		if( !(MyGetSysColorBrush) ) {
+			MyGetSysColorBrush = MyGetSysColorBrush_fallback;
+		}
+	}
+
+	return MyGetSysColorBrush( nIndex );
+}
 
 
 //-------------------------------------------------------------------------
@@ -929,8 +949,8 @@ void GreenPadWnd::on_helpabout()
 					dlgStyle = GetWindowLong(hwnd(), GWL_STYLE);
 					if(dlgStyle & DS_3DLOOK) {
 						SetBkColor(ctrldc, GetSysColor(COLOR_BTNFACE));
-						SelectObject(ctrldc, GetSysColorBrush(COLOR_BTNFACE));
-						return (DWORD)GetSysColorBrush(COLOR_BTNFACE);
+						SelectObject(ctrldc, MyGetSysColorBrush(COLOR_BTNFACE));
+						return (DWORD)MyGetSysColorBrush(COLOR_BTNFACE);
 					}
 				default:
 					return NULL;
