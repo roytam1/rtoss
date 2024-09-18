@@ -3,10 +3,12 @@
 #include <string.h>
 #include <time.h>
 
+#undef _PEHDR_LITE_PRINTSEC
+
 int main(int argc, char *argv[])
 {
     FILE *fh;
-	unsigned int hdr_pos, ohdr_pos;
+    unsigned int hdr_pos, ohdr_pos, sect_pos;
     unsigned char buf[128] = {0};
     char tmpstr[64];
     unsigned int tmp_ui = 0;
@@ -62,21 +64,23 @@ int main(int argc, char *argv[])
     unsigned long sec_pa = 0;
     unsigned long sec_prd = 0;
 
-	unsigned int dllflag, subsysflag, bssflag;
-	unsigned long subsysver, osver, bin_size, oldchksum, newchksum;
-	int subsysver_set, osver_set, hdr_changed, bin_changed;
+    unsigned int subsysflag, bssflag;
+    int dllflag, appctrflag;
+    unsigned long subsysver, osver, bin_size, oldchksum, newchksum;
+    int subsysver_set, osver_set, hdr_changed, bin_changed;
 
-	char* csbuf = 0;
+    char* csbuf = 0;
 
     time_t tt;
-	int i,j,k;
+    int i,j,k;
     //int mm = byteorder_mm();
 
-	dllflag = subsysflag = bssflag = subsysver = osver = subsysver_set = osver_set = hdr_changed = bin_changed = oldchksum = newchksum = 0;
+    hdr_pos = ohdr_pos = sect_pos = 0;
+    dllflag = subsysflag = bssflag = appctrflag = subsysver = osver = subsysver_set = osver_set = hdr_changed = bin_changed = oldchksum = newchksum = 0;
 
     if (argc < 2) {
         fprintf(stderr,
-            "Missing input file.\n\nUsage: %s <PE-file> [+|-dll] [+|-win] [+|-con] [-bssfix] [-osver <number.number>] [-subsysver <number.number>]",argv[0]);
+            "Missing input file.\n\nUsage: %s <PE-file> [+|-dll] [+|-win] [+|-con] [-bssfix] [+|-appctr] [-osver <number.number>] [-subsysver <number.number>]",argv[0]);
         return 1;
     }
 
@@ -100,6 +104,14 @@ int main(int argc, char *argv[])
 		if(strncmp(argv[i],"-dll",4) == 0) {
 			fprintf(stdout, " -> -DLL set\n");
 			dllflag = -1; continue;
+		}
+		if(strncmp(argv[i],"+appctr",7) == 0) {
+			fprintf(stdout, " -> +APPCTR set\n");
+			appctrflag = 1; continue;
+		}
+		if(strncmp(argv[i],"-appctr",7) == 0) {
+			fprintf(stdout, " -> -APPCTR set\n");
+			appctrflag = -1; continue;
 		}
 		if(strncmp(argv[i],"+win",4) == 0 || strncmp(argv[i],"-con",4) == 0) {
 			fprintf(stdout, " -> +WIN set\n");
@@ -370,16 +382,29 @@ int main(int argc, char *argv[])
 	fprintf(stdout, "OperatingSystemVersion = %d.%d\n", *(unsigned short*)(buf+40), *(unsigned short*)(buf+42));
 	fprintf(stdout, "SubsystemVersion = %d.%d\n", *(unsigned short*)(buf+48), *(unsigned short*)(buf+50));
 	fprintf(stdout, "Subsystem = 0x%04X\n", *(unsigned short*)(buf+68));
+	fprintf(stdout, "DllCharacteristics = 0x%04X\n", *(unsigned short*)(buf+70));
 
 	oldchksum = *(unsigned long*)(buf+64);
 
+	tmp_us = *(unsigned short*)(buf+70);
+	if(appctrflag) {
+		if(appctrflag>0) {
+			tmp_us |= 0x1000;
+		} else if (appctrflag<0) {
+			tmp_us = tmp_us & (0xffff - 0x1000);
+		}
+		hdr_changed = 1;
+		bin_changed = 1;
+		buf[70] = tmp_us & 0xff;
+		buf[71] = (tmp_us >> 8) & 0xff;
+
+		fprintf(stdout, "new DllCharacteristics = 0x%04X\n", tmp_us);
+	}
 	if(subsysflag) {
 		hdr_changed = 1;
 		bin_changed = 1;
 		buf[68] = subsysflag & 0xff;
 		buf[69] = (subsysflag >> 8) & 0xff;
-		/*buf[70] = (subsysflag >> 16) & 0xff;
-		buf[71] = (subsysflag >> 24) & 0xff;*/
 
 		fprintf(stdout, "new Subsystem = 0x%04X\n", subsysflag);
 	}
@@ -411,7 +436,7 @@ int main(int argc, char *argv[])
 		hdr_changed = 0;
 	}
 
-	ohdr_pos = ftell(fh);
+	sect_pos = ftell(fh);
 	/* (c)
 	#define IMAGE_NUMBEROF_DIRECTORY_ENTRIES    16
 	typedef struct _IMAGE_DATA_DIRECTORY {
@@ -423,15 +448,17 @@ int main(int argc, char *argv[])
     if (!fread(buf, 128, 1, fh)) {
         fprintf(stderr,
             "Unable to read %d bytes, @%ld.\n",
-            128, ohdr_pos);
+            128, sect_pos);
         perror(0);
         fclose(fh);
         return 1;
     }
 
+#ifdef _PEHDR_LITE_PRINTSEC
 	for(i=0; i< 16; i++) {
 		fprintf(stdout, " Dict[%i] VirtualAddress = %08X, Size = %d\n", i, *(unsigned long *)(buf+(8*i)), *(unsigned long *)(buf+(8*i)+4));
 	}
+#endif
 
 	export_va = *(unsigned long *)(buf);
 	export_vsize = *(unsigned long *)(buf+4);
@@ -459,41 +486,53 @@ int main(int argc, char *argv[])
 	} IMAGE_SECTION_HEADER, *PIMAGE_SECTION_HEADER;
 	*/
 	for(i=0; i< num_sects; i++) {
-		ohdr_pos = ftell(fh);
+		sect_pos = ftell(fh);
 	    if (!fread(buf, 40, 1, fh)) {
 	        fprintf(stderr,
 	            "Unable to read %d bytes, @%ld.\n",
-	            40, ohdr_pos);
+	            40, sect_pos);
 	        perror(0);
 	        fclose(fh);
 	        return 1;
 	    }
-		fprintf(stdout, "Header '%s' @ 0x%08x\n", (unsigned char*)(buf), ohdr_pos);
+		fprintf(stdout, "Header '%s' @ 0x%08x\n", (unsigned char*)(buf), sect_pos);
 		sec_pa = *(unsigned long *)(buf+8);
 		sec_va = *(unsigned long *)(buf+12);
 		sec_prd = *(unsigned long *)(buf+20);
 
+#ifdef _PEHDR_LITE_PRINTSEC
 		fprintf(stdout, "   PhysicalAddress = 0x%08x\n", sec_pa);
 		fprintf(stdout, "   VirtualAddress = 0x%08x\n", sec_va);
 		fprintf(stdout, "   PointerToRawData = 0x%08x\n", sec_prd);
 
 		fprintf(stdout, "    sec_va=%08x, export_va=%08x, %d\n",sec_va,export_va, (sec_va <= export_va));
+#endif
 		if ((sec_va <= export_va) &&
 			((sec_va + sec_pa) > export_va)) {
 			export_ptr = export_va - sec_va + sec_prd;
+#ifdef _PEHDR_LITE_PRINTSEC
 			fprintf(stdout, " ==> ExportPointerToRawData = %08x\n", export_ptr);
+#endif
 		}
+#ifdef _PEHDR_LITE_PRINTSEC
 		fprintf(stdout, "    sec_va=%08x, import_va=%08x, %d\n",sec_va,import_va, (sec_va <= import_va));
+#endif
 		if ((sec_va <= import_va) &&
 			((sec_va + sec_pa) > import_va)) {
 			import_ptr = import_va - sec_va + sec_prd;
+#ifdef _PEHDR_LITE_PRINTSEC
 			fprintf(stdout, " ==> ImportPointerToRawData = %08x\n", import_ptr);
+#endif
 		}
+#ifdef _PEHDR_LITE_PRINTSEC
 		fprintf(stdout, "    sec_va=%08x, delay_import_va=%08x, %d\n",sec_va,delay_import_va, (sec_va <= delay_import_va));
+#endif
 		if ((sec_va <= delay_import_va) &&
 			((sec_va + sec_pa) > delay_import_va)) {
 			delay_import_ptr = delay_import_va - sec_va + sec_prd;
+#ifdef _PEHDR_LITE_PRINTSEC
 			fprintf(stdout, " ==> DelayImportPointerToRawData = %08x\n", delay_import_ptr);
+#endif
 		}
 
 		if(strncmp(".bss",(unsigned char*)(buf),8)==0 && bssflag) {
@@ -505,10 +544,10 @@ int main(int argc, char *argv[])
 			bin_changed = 1;
 		}
 		if(hdr_changed) {
-			fseek(fh, ohdr_pos,SEEK_SET);
+			fseek(fh, sect_pos,SEEK_SET);
 			fwrite(buf, 1, 40, fh);
 			hdr_changed = 0;
-			fseek(fh, ohdr_pos+40,SEEK_SET);
+			fseek(fh, sect_pos+40,SEEK_SET);
 		}
 	}
 
@@ -598,6 +637,7 @@ if(import_ptr) {
     import_mnames_pa = import_mnames - import_va + import_ptr;
     import_fal_pa = import_fal - import_va + import_ptr;
 
+#ifdef _PEHDR_LITE_PRINTSEC
 	fprintf(stdout, "Imports\n    FunctionNameList=%08x\n    TimeDateStamp=%08x\n    ForwarderChain=%08x\n    ModuleName=%08x\n    FunctionAddressList=%08x\n",
 		import_fnl,
 		*(unsigned long *)(buf+4),
@@ -609,6 +649,7 @@ if(import_ptr) {
 	fprintf(stdout, "   import_fnl_pa=%08x, import_fnl=%08x, %d\n",import_fnl_pa,import_fnl, (import_va <= import_fnl) && ((sec_va + sec_prd) > import_fnl));
 	fprintf(stdout, "   import_mnames_pa=%08x, import_mnames=%08x, %d\n",import_mnames_pa,import_mnames, (import_va <= import_mnames) && ((sec_va + sec_prd) > import_mnames));
 	fprintf(stdout, "   import_fal_pa=%08x, import_fal=%08x, %d\n",import_fal_pa,import_fal, /*(import_va <= import_fal) &&*/ ((sec_va + sec_prd) > import_fal));
+#endif
 
 /*
 	typedef	struct	tagPE_EXPORT_IMPORT_INFO
@@ -639,14 +680,18 @@ if(import_ptr) {
 
     import_fn_va = *(unsigned long *)(buf);
 
+#ifdef _PEHDR_LITE_PRINTSEC
 	fprintf(stdout, "Import Info\n    ExportVirtualAddress = %08x\n    ExportPointerToRawData=%08x\n    ImportVirtualAddress=%08x\n    ImportPointerToRawData=%08x\n\n",
 		import_fn_va,
 		*(unsigned long *)(buf+4),
 		*(unsigned long *)(buf+8),
 		*(unsigned long *)(buf+12)
 	);
+#endif
     import_fn_pa = import_fn_va - import_va + import_ptr;
+#ifdef _PEHDR_LITE_PRINTSEC
 	fprintf(stdout, "   import_fn_pa=%08x, import_fn_va=%08x, %d\n",import_fn_pa,import_fn_va, (import_va <= import_fn_va) && ((sec_va + sec_prd) > import_fn_va));
+#endif
 }
 
 if(delay_import_ptr) {
@@ -675,6 +720,7 @@ typedef	struct	tagPE_DELAY_IMPORT_TABLE
     delay_import_fnl = *(unsigned long *)(buf+16);
     delay_import_mnames = *(unsigned long *)(buf+4);
 
+#ifdef _PEHDR_LITE_PRINTSEC
 	fprintf(stdout, "Delay Imports\n    Attributes = %08x\n    ModuleName=%08x\n    Module=%08x\n    FunctionAddressList=%08x\n    FunctionNameList=%08x\n    BoundImportAddressTable=%08x\n    UnloadImportAddressTable=%08x\n    TimeDateStamp=%08x\n",
 		*(unsigned long *)(buf),
 		delay_import_mnames,
@@ -685,6 +731,7 @@ typedef	struct	tagPE_DELAY_IMPORT_TABLE
 		*(unsigned long *)(buf+24),
 		*(unsigned long *)(buf+28)
 	);
+#endif
 
     if (delay_import_fnl > img_base) delay_import_fnl-= img_base;
     if (delay_import_mnames > img_base) delay_import_mnames-= img_base;
@@ -692,8 +739,10 @@ typedef	struct	tagPE_DELAY_IMPORT_TABLE
     delay_import_fnl_pa = delay_import_fnl - delay_import_va + delay_import_ptr;
     delay_import_mnames_pa = delay_import_mnames - delay_import_va + delay_import_ptr;
 
+#ifdef _PEHDR_LITE_PRINTSEC
 	fprintf(stdout, "   delay_import_fnl_pa=%08x, delay_import_fnl=%08x, %d\n",delay_import_fnl_pa,delay_import_fnl, (delay_import_va <= delay_import_fnl) && ((sec_va + sec_prd) > delay_import_fnl));
 	fprintf(stdout, "   delay_import_mnames_pa=%08x, delay_import_mnames=%08x, %d\n",delay_import_mnames_pa,delay_import_mnames, /*(delay_import_va <= delay_import_mnames) &&*/ ((sec_va + sec_prd) > delay_import_mnames));
+#endif
 }
 
 
@@ -710,6 +759,8 @@ typedef	struct	tagPE_DELAY_IMPORT_TABLE
 			newchksum += *(unsigned short*)(csbuf+i);
 			newchksum = 0xffff & (newchksum + (newchksum >> 16));
 		}
+		fseek(fh, ohdr_pos,SEEK_SET);
+		fread(buf, 96, 1, fh); // always read latest version of header
 		*(unsigned long*)(buf+64) = newchksum + bin_size - 1; // need to add file length
 		free(csbuf);
 	fprintf(stdout, "New CheckSum = 0x%08X\n", *(unsigned long*)(buf+64));
