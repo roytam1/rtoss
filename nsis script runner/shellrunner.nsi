@@ -312,6 +312,8 @@ Function processLine
 	Var /GLOBAL arg0
 	Var /GLOBAL arg1
 	Var /GLOBAL arg0len
+	Var /GLOBAL arg2
+	Var /GLOBAL arg1len
 
 	Pop $0
 	${StrRep} $line "$0" "$\r" ""
@@ -374,6 +376,9 @@ Function processLine
 
 	${fillArgv} $arg1
 
+	StrLen $arg1len "$argv0 "
+	StrCpy $arg2 "$arg1" "" $arg1len
+
 	${If} $argvc > 0
 		${StrRep} $argv0 "$argv0" "$$empty" ""
 	${EndIf}
@@ -417,6 +422,9 @@ Function processLine
 		${Case} '!exec'
 			Exec "$arg1"
 			${Break}
+		${Case} '!sleep'
+			Sleep "$arg1"
+			${Break}
 		${Case} '!msgbox'
 			MessageBox MB_OK "$arg1"
 			${Break}
@@ -459,6 +467,27 @@ Function processLine
 			${Break}
 		${Case} '!open'
 			ExecShell "open" "$arg1"
+			${Break}
+		${Case} '!openmax'
+			ExecShell "open" "$arg1" SW_SHOWMAXIMIZED
+			${Break}
+		${Case} '!openmin'
+			ExecShell "open" "$arg1" SW_SHOWMINIMIZED
+			${Break}
+		${Case} '!openhide'
+			ExecShell "open" "$arg1" SW_HIDE
+			${Break}
+		${Case} '!openarg'
+			ExecShell "open" "$argv0" "$arg2"
+			${Break}
+		${Case} '!openargmax'
+			ExecShell "open" "$argv0" "$arg2" SW_SHOWMAXIMIZED
+			${Break}
+		${Case} '!openargmin'
+			ExecShell "open" "$argv0" "$arg2" SW_SHOWMINIMIZED
+			${Break}
+		${Case} '!openarghide'
+			ExecShell "open" "$argv0" "$arg2" SW_HIDE
 			${Break}
 		${Case} '!regdll'
 			RegDLL "$arg1"
