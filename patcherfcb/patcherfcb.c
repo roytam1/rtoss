@@ -48,12 +48,12 @@ void main(int argc, char *argv[]) {
 									}
 								}
 								else {
-									printf("Offset $%04.4X EOF\n");
+									printf("Offset $%04.4X EOF\n", offset);
 									err = 2;
 								}
 							}
 							else {
-								printf("Offset $%04.4X seek error\n");
+								printf("Offset $%04.4X seek error\n", offset);
 								err = 3;
 							}
 						}
