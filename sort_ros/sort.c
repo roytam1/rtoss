@@ -16,6 +16,9 @@
 /* Reverse flag */
 int rev;
 
+/* Unique flag */
+int uniq;
+
 /* Help flag */
 int help;
 
@@ -79,6 +82,7 @@ void usage(void)
     fputs("    Command | SORT [options] > [drive:][path]file\n", stderr);
     fputs("    Options:\n", stderr);
     fputs("    /R   Reverse order\n", stderr);
+    fputs("    /U   Unique ouput\n", stderr);
     fputs("    /+n  Start sorting with column n\n", stderr);
     fputs("    /?   Help\n", stderr);
 }
@@ -94,6 +98,7 @@ int main(int argc, char **argv)
 
     sortcol = 0;
     rev = 0;
+    uniq = 0;
     while (--argc)
     {
         if (*(cp = *++argv) == '/')
@@ -103,6 +108,11 @@ int main(int argc, char **argv)
                 case 'R':
                 case 'r':
                     rev = 1;
+                    break;
+
+                case 'U':
+                case 'u':
+                    uniq = 1;
                     break;
 
                 case '?':
@@ -186,8 +196,14 @@ int main(int argc, char **argv)
 
     for (i = 0; i < nr; i++)
     {
-        fputs(list[i], stdout);
-        fputs("\n", stdout);
+        int print = 1;
+        if(uniq && i > 0 && !strcmp(list[i-1],list[i]))
+            print = 0;
+
+        if(print) {
+            fputs(list[i], stdout);
+            fputs("\n", stdout);
+        }
     }
 
     /* Cleanup memory */
