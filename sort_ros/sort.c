@@ -92,6 +92,10 @@ int main(int argc, char **argv)
     char temp[MAXLEN + 1];
     char **list;
 
+    char *infname, *outfname;
+
+    FILE *fpin, *fpout;
+
     /* Option character pointer */
     char *cp;
     int i, nr;
@@ -99,6 +103,10 @@ int main(int argc, char **argv)
     sortcol = 0;
     rev = 0;
     uniq = 0;
+
+    fpin = (FILE*)stdin;
+    fpout = (FILE*)stdout;
+
     while (--argc)
     {
         if (*(cp = *++argv) == '/')
@@ -150,7 +158,7 @@ int main(int argc, char **argv)
 
     for (nr = 0; nr < MAXRECORDS; nr++)
     {
-        if (fgets(temp, MAXLEN, stdin) == NULL)
+        if (fgets(temp, MAXLEN, fpin) == NULL)
         {
             break;
         }
@@ -201,8 +209,8 @@ int main(int argc, char **argv)
             print = 0;
 
         if(print) {
-            fputs(list[i], stdout);
-            fputs("\n", stdout);
+            fputs(list[i], fpout);
+            fputs("\n", fpout);
         }
     }
 
