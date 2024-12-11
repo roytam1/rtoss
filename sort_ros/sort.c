@@ -79,8 +79,12 @@ void usage(void)
     fputs("    SORT [options] < [drive:1][path1]file1 > [drive2:][path2]file2\n",
           stderr);
 
+    fputs("    SORT [options] [drive:1][path1]file1 > [drive2:][path2]file2\n",
+          stderr);
+
     fputs("    Command | SORT [options] > [drive:][path]file\n", stderr);
     fputs("    Options:\n", stderr);
+    fputs("    /O <filename>   Output to <filename>\n", stderr);
     fputs("    /R   Reverse order\n", stderr);
     fputs("    /U   Unique ouput\n", stderr);
     fputs("    /+n  Start sorting with column n\n", stderr);
@@ -92,6 +96,7 @@ int main(int argc, char **argv)
     char temp[MAXLEN + 1];
     char **list;
 
+    int argnow = 0;
     char *infname, *outfname;
 
     FILE *fpin, *fpout;
@@ -109,6 +114,7 @@ int main(int argc, char **argv)
 
     while (--argc)
     {
+        ++argnow;
         if (*(cp = *++argv) == '/')
         {
             switch (cp[1])
@@ -116,6 +122,15 @@ int main(int argc, char **argv)
                 case 'R':
                 case 'r':
                     rev = 1;
+                    break;
+
+                case 'O':
+                case 'o':
+                    // argv[argnow] already points to next argument
+                    if(*argv[argnow]) {
+                        outfname = argv[argnow];
+                        ++argv; --argc; // properly moving pointers
+                    }
                     break;
 
                 case 'U':
@@ -140,6 +155,16 @@ int main(int argc, char **argv)
                 default:
                     err++;
             }
+        } else {
+            // try openning it, if it can be fopen()ed, record its name
+            FILE* fptest;
+            if((fptest = fopen(*argv, "rb")) != NULL) {
+                infname = *argv;
+                fpin = fptest;
+            } else {
+                fputs("SORT: input file not found\n", stderr);
+                exit(3);
+            }
         }
     }
 
@@ -147,6 +172,14 @@ int main(int argc, char **argv)
     {
         usage();
         exit(1);
+    }
+
+    if (outfname)
+    {
+        if((fpout = fopen(outfname, "wb")) == NULL) {
+            fputs("SORT: can not open output file\n", stderr);
+            exit(3);
+        }
     }
 
     list = (char **) malloc(MAXRECORDS * sizeof(char *));
