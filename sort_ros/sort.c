@@ -176,7 +176,14 @@ int main(int argc, char **argv)
 
     if (outfname)
     {
-        if((fpout = fopen(outfname, "wb")) == NULL) {
+        if (infname) {
+            if (!strcmp(outfname, infname)) {
+                fputs("SORT: input file and output file can not be the same\n", stderr);
+                exit(3);
+            }
+        }
+
+        if ((fpout = fopen(outfname, "wb")) == NULL) {
             fputs("SORT: can not open output file\n", stderr);
             exit(3);
         }
