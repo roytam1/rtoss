@@ -97,7 +97,7 @@ int main(int argc, char **argv)
     char **list;
 
     int argnow = 0;
-    char *infname, *outfname;
+    char *infname = 0, *outfname = 0;
 
     FILE *fpin, *fpout;
 
