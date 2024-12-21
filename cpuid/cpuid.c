@@ -225,7 +225,9 @@ int TestCPUID(void)
     __try {
         _asm {
             xor eax, eax
-            cpuid
+            //cpuid
+            _emit 0x0f
+            _emit 0xa2
         }
     }
 	#pragma warning (suppress: 6320)
@@ -250,18 +252,24 @@ int identifyCPU(void)
 	memset(sCPUVendor,0,16);
 	_asm {
 		mov	  eax, 0
-		cpuid
+		//cpuid
+		_emit 0x0f
+		_emit 0xa2
 		mov	 DWORD PTR [sCPUVendor+0],ebx  // Stash the manufacturer string for later
 		mov	 DWORD PTR [sCPUVendor+4],edx
 		mov	 DWORD PTR [sCPUVendor+8],ecx
 		mov	 uHighestCPUID0,eax			 // Store highest extended CPUID number
 		mov	  eax, 80000000h
-		cpuid
+		//cpuid
+		_emit 0x0f
+		_emit 0xa2
 		mov	 uHighestCPUID,eax			 // Store highest extended CPUID number
 	}
 	_asm {
 		mov	eax, 01h
-		cpuid
+		//cpuid
+		_emit 0x0f
+		_emit 0xa2
 		mov	uBasicFlags,eax
 		mov	uExtFlags,ecx
 		mov	uExt2Flags,edx
@@ -270,7 +278,9 @@ int identifyCPU(void)
 	if(uHighestCPUID >= 0x80000001) {
 		_asm {
 			mov	eax, 80000001h
-			cpuid
+			//cpuid
+			_emit 0x0f
+			_emit 0xa2
 			mov	u8ExtFlags,ecx
 			mov	u8Ext2Flags,edx
 		}
@@ -279,19 +289,25 @@ int identifyCPU(void)
 	if(uHighestCPUID >= 0x80000004) {
 		_asm {
 			mov eax, 80000002h
-			cpuid
+			//cpuid
+			_emit 0x0f
+			_emit 0xa2
 			mov DWORD PTR [sCPUBranding+ 0],eax
 			mov DWORD PTR [sCPUBranding+ 4],ebx
 			mov DWORD PTR [sCPUBranding+ 8],ecx
 			mov DWORD PTR [sCPUBranding+12],edx
 			mov eax, 80000003h
-			cpuid
+			//cpuid
+			_emit 0x0f
+			_emit 0xa2
 			mov DWORD PTR [sCPUBranding+16],eax
 			mov DWORD PTR [sCPUBranding+20],ebx
 			mov DWORD PTR [sCPUBranding+24],ecx
 			mov DWORD PTR [sCPUBranding+28],edx
 			mov eax, 80000004h
-			cpuid
+			//cpuid
+			_emit 0x0f
+			_emit 0xa2
 			mov DWORD PTR [sCPUBranding+32],eax
 			mov DWORD PTR [sCPUBranding+36],ebx
 			mov DWORD PTR [sCPUBranding+40],ecx
@@ -508,7 +524,9 @@ int identifyCPU(void)
 	if(uHighestCPUID >= 0x80000005) {
 		_asm {
 			mov	eax, 80000005h
-			cpuid
+			//cpuid
+			_emit 0x0f
+			_emit 0xa2
 			mov	uL1ICSize,ecx
 			mov	uL1DCSize,edx
 		}
@@ -517,7 +535,9 @@ int identifyCPU(void)
 	if(uHighestCPUID >= 0x80000006) {
 		_asm {
 			mov	eax, 80000006h
-			cpuid
+			//cpuid
+			_emit 0x0f
+			_emit 0xa2
 			mov	uL2Size,ecx
 			mov	uL3Size,edx
 		}
