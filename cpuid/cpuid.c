@@ -303,6 +303,17 @@ int identifyCPU(void)
 			if (!strncmp("AuthenticAMD", sCPUVendor, 12)) {
 				switch (uBasicFlags.iFamilyID) { // extract family code
 					case 4: // Am486/AM5x86
+						switch (uBasicFlags.iModelID) { // extract model code
+							case 3:
+								strcpy (sCPUBranding, "AMD Am486DX2");
+								break;
+							case 8:
+								strcpy (sCPUBranding, "AMD Am486DX4");
+								break;
+							case 0xE:
+								strcpy (sCPUBranding, "AMD Am5x86");
+								break;
+						}
 						strcpy (sCPUBranding, "AMD Am486");
 						break;
 
@@ -322,13 +333,20 @@ int identifyCPU(void)
 								strcpy (sCPUBranding, "AMD K6-2");
 								break;
 							case 9:
+								strcpy (sCPUBranding, "AMD K6-III");
+								break;
 							case 10:
 							case 11:
 							case 12:
 							case 13:
+								if(uBasicFlags.iSteppingID = 4)
+									strcpy (sCPUBranding, "AMD K6-2+");
+								else
+									strcpy (sCPUBranding, "AMD K6-III+");
+								break;
 							case 14:
 							case 15:
-								strcpy (sCPUBranding, "AMD K6-3");
+								strcpy (sCPUBranding, "AMD K6-III");
 								break;
 						}
 						break;
@@ -345,25 +363,25 @@ int identifyCPU(void)
 						switch (uBasicFlags.iModelID) { // extract model code
 							case 0:
 							case 1:
-								strcpy (sCPUBranding, "INTEL 486DX");
+								strcpy (sCPUBranding, "Intel 486DX");
 								break;
 							case 2:
-								strcpy (sCPUBranding, "INTEL 486SX");
+								strcpy (sCPUBranding, "Intel 486SX");
 								break;
 							case 3:
-								strcpy (sCPUBranding, "INTEL 486DX2");
+								strcpy (sCPUBranding, "Intel 486DX2");
 								break;
 							case 4:
-								strcpy (sCPUBranding, "INTEL 486SL");
+								strcpy (sCPUBranding, "Intel 486SL");
 								break;
 							case 5:
-								strcpy (sCPUBranding, "INTEL 486SX2");
+								strcpy (sCPUBranding, "Intel 486SX2");
 								break;
 							case 7:
-								strcpy (sCPUBranding, "INTEL 486DX2E");
+								strcpy (sCPUBranding, "Intel 486DX2E");
 								break;
 							case 8:
-								strcpy (sCPUBranding, "INTEL 486DX4");
+								strcpy (sCPUBranding, "Intel 486DX4");
 								break;
 						}
 						break;
@@ -371,12 +389,32 @@ int identifyCPU(void)
 					case 5:
 						switch (uBasicFlags.iModelID) { // extract model code
 							case 1:
+								if(uBasicFlags.iSteppingID == 0xA) {
+									strcpy (sCPUBranding, "Intel Pentium OverDrive");
+									break;
+								}
 							case 2:
+								if(uBasicFlags.iSteppingID == 0xC) {
+									strcpy (sCPUBranding, "Intel Pentium OverDrive");
+									break;
+								}
 							case 3:
-								strcpy (sCPUBranding, "INTEL Pentium");
+								if(uBasicFlags.iProcessorType)
+									strcpy (sCPUBranding, "Intel Pentium OverDrive");
+								else
+									strcpy (sCPUBranding, "Intel Pentium");
 								break;
 							case 4:
-								strcpy (sCPUBranding, "INTEL Pentium-MMX");
+								if(uBasicFlags.iSteppingID < 4) {
+									strcpy (sCPUBranding, "Intel Pentium MMX");
+									break;
+								}
+								if(uBasicFlags.iProcessorType) {
+									strcpy (sCPUBranding, "Intel Pentium OverDrive MMX");
+									break;
+								}
+							case 8:
+								strcpy (sCPUBranding, "Intel Mobile Pentium MMX");
 								break;
 						}
 						break;
@@ -384,19 +422,23 @@ int identifyCPU(void)
 					case 6:
 						switch (uBasicFlags.iModelID) { // extract model code
 							case 1:
-								strcpy (sCPUBranding, "INTEL Pentium-Pro");
+								strcpy (sCPUBranding, "Intel Pentium Pro");
 								break;
 							case 3:
+								if(uBasicFlags.iProcessorType) {
+									strcpy (sCPUBranding, "Intel Pentium II OverDrive");
+									break;
+								}
 							case 5:
-								strcpy (sCPUBranding, "INTEL Pentium-II");
+								strcpy (sCPUBranding, "Intel Pentium II");
 								break;  // actual differentiation depends on cache settings
 							case 6:
-								strcpy (sCPUBranding, "INTEL Celeron");
+								strcpy (sCPUBranding, "Intel Celeron");
 								break;
 							case 7:
 							case 8:
 							case 10:
-								strcpy (sCPUBranding, "INTEL Pentium-III");
+								strcpy (sCPUBranding, "Intel Pentium III");
 								break;  // actual differentiation depends on cache settings
 						}
 						break;
@@ -405,9 +447,57 @@ int identifyCPU(void)
 						if(uBasicFlags.iExtendedFamilyID<<4 == 0) {
 							switch (uBasicFlags.iModelID) {
 								case 0:
-									strcpy (sCPUBranding, "INTEL Pentium-4");
+									strcpy (sCPUBranding, "Intel Pentium 4");
 									break;
 							}
+						}
+						break;
+				}
+			}
+			else if (!strncmp("CyrixInstead", sCPUVendor, 12)) {
+				switch (uBasicFlags.iFamilyID) { // extract family code
+					case 5: // 6x86
+						switch (uBasicFlags.iModelID) { // extract model code
+							case 2:
+								strcpy (sCPUBranding, "Cyrix Cx6x86");
+								break;
+							case 4:
+								strcpy (sCPUBranding, "Cyrix Cx6x86L");
+								break;
+						}
+						break;
+					case 6: // 6x86MX
+						switch (uBasicFlags.iModelID) { // extract model code
+							case 0:
+								if(uBasicFlags.iSteppingID = 0)
+									strcpy (sCPUBranding, "Cyrix Cx6x86MX");
+								else
+									strcpy (sCPUBranding, "Cyrix MII");
+								break;
+						}
+						break;
+				}
+			}
+			else if (!strncmp("CentaurHauls", sCPUVendor, 12)) {
+				switch (uBasicFlags.iFamilyID) { // extract family code
+					case 5: // WinChip
+						switch (uBasicFlags.iModelID) { // extract model code
+							case 4:
+								strcpy (sCPUBranding, "IDT WinChip");
+								break;
+							case 8:
+								if(uBasicFlags.iSteppingID = 7)
+									strcpy (sCPUBranding, "IDT WinChip 2A");
+								else
+									strcpy (sCPUBranding, "IDT WinChip 2");
+								break;
+						}
+						break;
+					case 6: // VIA Cyrix III
+						switch (uBasicFlags.iModelID) { // extract model code
+							case 6:
+								strcpy (sCPUBranding, "VIA Cyrix III");
+								break;
 						}
 						break;
 				}
@@ -543,6 +633,8 @@ int main(int argc, char *argv[])
 		sprintf(cache,"si.wProcessorLevel = %d\n",si.wProcessorLevel);
 		strcat(sMsg, cache);
 		sprintf(cache,"si.wProcessorRevision = %x\n",si.wProcessorRevision);
+		strcat(sMsg, cache);
+		sprintf(cache,"si.dwPageSize = %d\n",si.dwPageSize);
 		strcat(sMsg, cache);
 	}
 
