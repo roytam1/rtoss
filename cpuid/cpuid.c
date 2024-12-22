@@ -225,21 +225,21 @@ int TestCPUID(void)
 	// check bit 21 of EFLAGS is changable, CPUID instruction is usable if so
 	int supported = 0;
     _asm {
-        pushfd
-        pop eax
-        mov ebx, eax
-        xor eax, 0x200000
-        push eax
-        popfd
-        pushfd
-        pop eax
-        xor eax, ebx
-        test eax, 0x200000
-        jz not_supported
-        mov supported, 1
+        pushfd              // push EFLAGS to stack
+        pop eax             // put EFLAGS from stack to EAX
+        mov ebx, eax        // copy it to EBX for restoring later
+        xor eax, 0x200000   // toggle bit 21
+        push eax            // push modified EFLAGS to stack
+        popfd               // apply new EFLAGS from stack
+        pushfd              // push newly updated EFLAGS to stack
+        pop eax             // put EFLAGS from stack to EAX
+        xor eax, ebx        // XOR new and old EFLAGS, mismatched bit will be turned on
+        test eax, 0x200000  // check bit 21
+        jz not_supported    // bit 21 can't be changed, skipping
+        mov supported, 1    // set variable `supported` to 1
       not_supported:
-        push ebx
-        popfd
+        push ebx            // push old EFLAGS to stack
+        popfd               // restore old EFLAGS from stack
     }
     return supported;
 }
