@@ -532,8 +532,36 @@ int identifyCPU(void)
 						break;
 					case 6: // VIA Cyrix III
 						switch (uBasicFlags.iModelID) { // extract model code
+							case 5:
 							case 6:
 								strcpy (sCPUBranding, "VIA Cyrix III");
+								break;
+							case 7:
+							case 9:
+								strcpy (sCPUBranding, "VIA C3");
+								break;
+						}
+						break;
+				}
+			}
+			else if (!strncmp("RiseRiseRise", sCPUVendor, 12)) {
+				switch (uBasicFlags.iFamilyID) { // extract family code
+					case 5: // MP6
+						switch (uBasicFlags.iModelID) { // extract model code
+							case 0:
+							case 2:
+								strcpy (sCPUBranding, "Rise Technology MP6");
+								break;
+						}
+						break;
+				}
+			}
+			else if (!strncmp("Vortex86 SoC", sCPUVendor, 12)) {
+				switch (uBasicFlags.iFamilyID) { // extract family code
+					case 5: // Vortex86DX
+						switch (uBasicFlags.iModelID) { // extract model code
+							case 8:
+								strcpy (sCPUBranding, "DM&P Vortex86DX2");
 								break;
 						}
 						break;
