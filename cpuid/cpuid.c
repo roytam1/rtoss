@@ -222,19 +222,26 @@ static	unsigned long uHighestCPUID0;
 
 int TestCPUID(void)
 {
-    __try {
-        _asm {
-            xor eax, eax
-            //cpuid
-            _emit 0x0f
-            _emit 0xa2
-        }
+	// check bit 21 of EFLAGS is changable, CPUID instruction is usable if so
+	int supported = 0;
+    _asm {
+        pushfd
+        pop eax
+        mov ebx, eax
+        xor eax, 0x200000
+        push eax
+        popfd
+        pushfd
+        pop eax
+        xor eax, ebx
+        test eax, 0x200000
+        jz not_supported
+        mov supported, 1
+      not_supported:
+        push ebx
+        popfd
     }
-	#pragma warning (suppress: 6320)
-    __except (EXCEPTION_EXECUTE_HANDLER) {
-        return 0;
-    }
-    return 1;
+    return supported;
 }
 
 int identifyCPU(void)
@@ -351,15 +358,15 @@ int identifyCPU(void)
 							case 9:
 								strcpy (sCPUBranding, "AMD K6-III");
 								break;
-							case 10:
-							case 11:
-							case 12:
 							case 13:
 								if(uBasicFlags.iSteppingID = 4)
 									strcpy (sCPUBranding, "AMD K6-2+");
 								else
 									strcpy (sCPUBranding, "AMD K6-III+");
 								break;
+							case 10:
+							case 11:
+							case 12:
 							case 14:
 							case 15:
 								strcpy (sCPUBranding, "AMD K6-III");
@@ -472,20 +479,31 @@ int identifyCPU(void)
 			}
 			else if (!strncmp("CyrixInstead", sCPUVendor, 12)) {
 				switch (uBasicFlags.iFamilyID) { // extract family code
+					case 4: // MediaGX
+						switch (uBasicFlags.iModelID) { // extract model code
+							case 4:
+								strcpy (sCPUBranding, "Cyrix MediaGX");
+								break;
+						}
+						break;
 					case 5: // 6x86
 						switch (uBasicFlags.iModelID) { // extract model code
 							case 2:
+							case 3:
 								strcpy (sCPUBranding, "Cyrix Cx6x86");
 								break;
 							case 4:
-								strcpy (sCPUBranding, "Cyrix Cx6x86L");
+								if(uHighestCPUID0 == 2)
+									strcpy (sCPUBranding, "Cyrix MediaGXm");
+								else
+									strcpy (sCPUBranding, "Cyrix Cx6x86L");
 								break;
 						}
 						break;
 					case 6: // 6x86MX
 						switch (uBasicFlags.iModelID) { // extract model code
 							case 0:
-								if(uBasicFlags.iSteppingID = 0)
+								if(uBasicFlags.iSteppingID == 0)
 									strcpy (sCPUBranding, "Cyrix Cx6x86MX");
 								else
 									strcpy (sCPUBranding, "Cyrix MII");
@@ -502,10 +520,13 @@ int identifyCPU(void)
 								strcpy (sCPUBranding, "IDT WinChip");
 								break;
 							case 8:
-								if(uBasicFlags.iSteppingID = 7)
+								if(uBasicFlags.iSteppingID == 7)
 									strcpy (sCPUBranding, "IDT WinChip 2A");
 								else
 									strcpy (sCPUBranding, "IDT WinChip 2");
+								break;
+							case 9:
+								strcpy (sCPUBranding, "IDT WinChip 3");
 								break;
 						}
 						break;
