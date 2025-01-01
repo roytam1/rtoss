@@ -358,7 +358,7 @@ static int pc98_sound_initfn(ISADevice *dev)
 {
     SoundState *s = DO_UPCAST(SoundState, dev, dev);
     struct audsettings as;
-    char temp_dir[MAX_PATH];
+    char* temp_dir;
 
     isa_init_irq(dev, &s->pic, s->irq);
 
@@ -385,7 +385,7 @@ static int pc98_sound_initfn(ISADevice *dev)
     }
 
     /* fmgen requires '/' at the end of wave file dir */
-    sprintf(temp_dir, "%s/", bios_dir);
+    temp_dir = qemu_find_file(QEMU_FILE_TYPE_BIOS, "");
     s->opna = opna_init(7987200, SAMPLE_RATE, temp_dir);
 
     register_ioport_write(0x188, 1, 1, sound_regnum_write, s);
