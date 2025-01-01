@@ -32,7 +32,7 @@
 extern "C" {
 #endif
 
-void *opna_init(int frequency, int sample_rate);
+void *opna_init(int frequency, int sample_rate, const char* path);
 void opna_reset(void *opaque);
 void opna_update_buffer(void *opaque, int16_t *buffer, int samples, bool stereo);
 void opna_advance_time(void *opaque, int usec);

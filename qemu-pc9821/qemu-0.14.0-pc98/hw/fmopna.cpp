@@ -83,7 +83,7 @@ static inline uint16_t limit_sample(Sample sample)
     return highlow;
 }
 
-void *opna_init(int frequency, int sample_rate)
+void *opna_init(int frequency, int sample_rate, const char* path)
 {
     OPNAState *s = (OPNAState *)malloc(sizeof(OPNAState));
 
@@ -92,7 +92,7 @@ void *opna_init(int frequency, int sample_rate)
     s->fifo_l = (Sample *)malloc(sizeof(Sample) * BUFLEN);
     s->fifo_r = (Sample *)malloc(sizeof(Sample) * BUFLEN);
 
-    s->opna->Init(frequency, sample_rate, false, NULL);
+    s->opna->Init(frequency, sample_rate, false, path);
     s->opna->Reset();
     s->opna->SetReg(0x27, 0);
 

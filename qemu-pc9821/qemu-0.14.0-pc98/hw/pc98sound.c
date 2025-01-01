@@ -273,18 +273,17 @@ static void sound_regnum_ex_write(void *opaque, uint32_t addr, uint32_t value)
     SoundState *s = opaque;
 
     if(!(s->mask & 1)) {
-//        return;
+        return;
     }
     s->regnum_ex = value;
 }
 
 static uint32_t sound_status_ex_read(void *opaque, uint32_t addr)
 {
-    /* 0x18C */
     SoundState *s = opaque;
 
     if(!(s->mask & 1)) {
-//        return 0xff;
+        return 0xff;
     }
 
     /* run fmgen to update status */
@@ -299,7 +298,7 @@ static void sound_reg_ex_write(void *opaque, uint32_t addr, uint32_t value)
     SoundState *s = opaque;
 
     if(!(s->mask & 1)) {
-//        return;
+        return;
     }
     opna_write_reg_ex(s->opna, s->regnum_ex, value);
     update_interrupt(s);
@@ -320,7 +319,7 @@ static uint32_t sound_reg_ex_read(void *opaque, uint32_t addr)
     SoundState *s = opaque;
 
     if(!(s->mask & 1)) {
-//        return 0xff;
+        return 0xff;
     }
     return opna_read_reg_ex(s->opna, s->regnum_ex);
 }
@@ -359,6 +358,7 @@ static int pc98_sound_initfn(ISADevice *dev)
 {
     SoundState *s = DO_UPCAST(SoundState, dev, dev);
     struct audsettings as;
+    char temp_dir[MAX_PATH];
 
     isa_init_irq(dev, &s->pic, s->irq);
 
@@ -384,7 +384,9 @@ static int pc98_sound_initfn(ISADevice *dev)
         AUD_remove_card(&s->card);
     }
 
-    s->opna = opna_init(3993552 << 1, SAMPLE_RATE);
+    /* fmgen requires '/' at the end of wave file dir */
+    sprintf(temp_dir, "%s/", bios_dir);
+    s->opna = opna_init(7987200, SAMPLE_RATE, temp_dir);
 
     register_ioport_write(0x188, 1, 1, sound_regnum_write, s);
     register_ioport_read(0x188, 1, 1, sound_status_read, s);
