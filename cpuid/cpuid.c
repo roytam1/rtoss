@@ -520,10 +520,16 @@ int identifyCPU(void)
 								strcpy (sCPUBranding, "IDT WinChip");
 								break;
 							case 8:
-								if(uBasicFlags.iSteppingID == 7)
-									strcpy (sCPUBranding, "IDT WinChip 2A");
-								else
-									strcpy (sCPUBranding, "IDT WinChip 2");
+								switch(uBasicFlags.iSteppingID) { // extract stepping code
+									case 7:
+										strcpy (sCPUBranding, "IDT WinChip 2A");
+										break;
+									case A:
+										strcpy (sCPUBranding, "IDT WinChip 2B");
+										break;
+									default:
+										strcpy (sCPUBranding, "IDT WinChip 2");
+								}
 								break;
 							case 9:
 								strcpy (sCPUBranding, "IDT WinChip 3");
@@ -537,6 +543,7 @@ int identifyCPU(void)
 								strcpy (sCPUBranding, "VIA Cyrix III");
 								break;
 							case 7:
+							case 8:
 							case 9:
 								strcpy (sCPUBranding, "VIA C3");
 								break;
@@ -550,7 +557,11 @@ int identifyCPU(void)
 						switch (uBasicFlags.iModelID) { // extract model code
 							case 0:
 							case 2:
-								strcpy (sCPUBranding, "Rise Technology MP6");
+								strcpy (sCPUBranding, "Rise Technology mP6");
+								break;
+							case 8:
+							case 9:
+								strcpy (sCPUBranding, "Rise Technology mP6-II");
 								break;
 						}
 						break;
@@ -560,8 +571,33 @@ int identifyCPU(void)
 				switch (uBasicFlags.iFamilyID) { // extract family code
 					case 5: // Vortex86DX
 						switch (uBasicFlags.iModelID) { // extract model code
+							case 2:
+								strcpy (sCPUBranding, "DM&P Vortex86DX");
+								break;
 							case 8:
-								strcpy (sCPUBranding, "DM&P Vortex86DX2");
+								strcpy (sCPUBranding, "DM&P Vortex86DX2/MX");
+								break;
+						}
+						break;
+				}
+			}
+			else if (!strncmp("SiS SiS SiS ", sCPUVendor, 12)) {
+				switch (uBasicFlags.iFamilyID) { // extract family code
+					case 5: // SiS 550
+						switch (uBasicFlags.iModelID) { // extract model code
+							case 0:
+								strcpy (sCPUBranding, "SiS 550");
+								break;
+						}
+						break;
+				}
+			}
+			else if (!strncmp("Genuine  RDC", sCPUVendor, 12)) {
+				switch (uBasicFlags.iFamilyID) { // extract family code
+					case 5: // RDC IAD
+						switch (uBasicFlags.iModelID) { // extract model code
+							case 8:
+								strcpy (sCPUBranding, "RDC IAD 100");
 								break;
 						}
 						break;
