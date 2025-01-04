@@ -321,29 +321,33 @@ int identifyCPU(void)
 			mov DWORD PTR [sCPUBranding+44],edx
 		}
 	}
-	else {
+	if(!*sCPUBranding) {
 		if(*sCPUVendor) {
 			if (!strncmp("AuthenticAMD", sCPUVendor, 12)) {
 				switch (uBasicFlags.iFamilyID) { // extract family code
 					case 4: // Am486/AM5x86
 						switch (uBasicFlags.iModelID) { // extract model code
 							case 3:
+							case 7:
 								strcpy (sCPUBranding, "AMD Am486DX2");
 								break;
 							case 8:
-								strcpy (sCPUBranding, "AMD Am486DX4");
+							case 9:
+								strcpy (sCPUBranding, "AMD Am486DX4/Am5x86");
 								break;
 							case 0xE:
+							case 0xF:
 								strcpy (sCPUBranding, "AMD Am5x86");
 								break;
+							default:
+								strcpy (sCPUBranding, "AMD Am486");
 						}
-						strcpy (sCPUBranding, "AMD Am486");
 						break;
 
 					case 5: // K6
 						switch (uBasicFlags.iModelID) { // extract model code
 							case 0:
-							case 1:
+							case 1: // starting from this, CPU provides 0x80000002-0x80000004
 							case 2:
 							case 3:
 								strcpy (sCPUBranding, "AMD K5");
@@ -439,6 +443,10 @@ int identifyCPU(void)
 							case 8:
 								strcpy (sCPUBranding, "Intel Mobile Pentium MMX");
 								break;
+							case 9:
+							case 0xA:
+								strcpy (sCPUBranding, "Intel Quark");
+								break;
 						}
 						break;
 
@@ -462,6 +470,9 @@ int identifyCPU(void)
 							case 8:
 							case 10:
 								strcpy (sCPUBranding, "Intel Pentium III");
+								break;  // actual differentiation depends on cache settings
+							case 9: // starting from this, CPU provides 0x80000002-0x80000004
+								strcpy (sCPUBranding, "Mobile Intel Celeron M");
 								break;  // actual differentiation depends on cache settings
 						}
 						break;
@@ -493,7 +504,7 @@ int identifyCPU(void)
 								strcpy (sCPUBranding, "Cyrix Cx6x86");
 								break;
 							case 4:
-								if(uHighestCPUID0 == 2)
+								if(uHighestCPUID0 == 2) // MediaGXm provides 0x80000002-0x80000004
 									strcpy (sCPUBranding, "Cyrix MediaGXm");
 								else
 									strcpy (sCPUBranding, "Cyrix Cx6x86L");
@@ -519,12 +530,12 @@ int identifyCPU(void)
 							case 4:
 								strcpy (sCPUBranding, "IDT WinChip");
 								break;
-							case 8:
+							case 8: // starting from this, CPU provides 0x80000002-0x80000004
 								switch(uBasicFlags.iSteppingID) { // extract stepping code
 									case 7:
 										strcpy (sCPUBranding, "IDT WinChip 2A");
 										break;
-									case A:
+									case 0xA:
 										strcpy (sCPUBranding, "IDT WinChip 2B");
 										break;
 									default:
@@ -579,6 +590,7 @@ int identifyCPU(void)
 								break;
 						}
 						break;
+					//case 6: // Vortex86DX3 provides 0x80000002-0x80000004
 				}
 			}
 			else if (!strncmp("SiS SiS SiS ", sCPUVendor, 12)) {
@@ -587,6 +599,29 @@ int identifyCPU(void)
 						switch (uBasicFlags.iModelID) { // extract model code
 							case 0:
 								strcpy (sCPUBranding, "SiS 550");
+								break;
+						}
+						break;
+				}
+			}
+			else if (!strncmp("UMC UMC UMC ", sCPUVendor, 12)) { // from http://ftp.lanet.lv/ftp/mirror/x2ftp/msdos/programming/faq/pc_chip.81
+				switch (uBasicFlags.iFamilyID) { // extract family code
+					case 4: // UMC 486/U5S/U5SD
+						switch (uBasicFlags.iModelID) { // extract model code
+							case 1:
+								strcpy (sCPUBranding, "UMC U5SD");
+								break;
+							case 2:
+								strcpy (sCPUBranding, "UMC U5S");
+								break;
+							case 3:
+								strcpy (sCPUBranding, "UMC U486DX2");
+								break;
+							case 5:
+								strcpy (sCPUBranding, "UMC U486SX2");
+								break;
+							default:
+								strcpy (sCPUBranding, "UMC 486");
 								break;
 						}
 						break;
@@ -603,6 +638,9 @@ int identifyCPU(void)
 						break;
 				}
 			}
+			// "Geode by NSC" CPUs all providing 0x80000002-0x80000004
+			// "GenuineTMx86" CPUs all providing 0x80000002-0x80000004
+			// "HygonGenuine" CPUs all providing 0x80000002-0x80000004
 		}
 	}
 
