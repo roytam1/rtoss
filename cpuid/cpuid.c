@@ -244,6 +244,47 @@ int TestCPUID(void)
     return supported;
 }
 
+int Test486orHigher(void)
+{
+	// check bit 21 of EFLAGS is changable, CPUID instruction is usable if so
+	int is486orHigher = 0;
+    _asm {
+        pushfd              // push EFLAGS to stack
+        pop eax             // put EFLAGS from stack to EAX
+        mov ecx, eax        // copy it to ECX for restoring later
+        xor eax, 0x40000    // toggle bit 18
+        push eax            // push modified EFLAGS to stack
+        popfd               // apply new EFLAGS from stack
+        pushfd              // push newly updated EFLAGS to stack
+        pop eax             // put EFLAGS from stack to EAX
+        cmp eax, ecx        // compare old and new EFLAGS
+        jz not_486_or_newer // bit 18 should be toggled, skipping if not
+        mov is486orHigher, 1// set variable `is486orHigher` to 1
+        push ecx            // push old EFLAGS to stack
+        popfd               // restore old EFLAGS from stack
+      not_486_or_newer:
+    }
+    return is486orHigher;
+}
+
+int TestCyrix(void)
+{
+	// check bit 21 of EFLAGS is changable, CPUID instruction is usable if so
+	int isCyrix = 0;
+    _asm {
+        sahf          // clear flags, bit 1 is always 1 in flags
+        mov eax, 5    // move 5 into the dividend
+        mov ebx, 2    // move 2 into the divisor
+        div bl        // do an operation that does not change flags
+        lahf          // get flags
+        cmp ah, 2     // check for change in flags
+        jne not_cyrix // flags changed, not a Cyrix CPU
+        mov isCyrix, 1// set variable `isCyrix` to 1
+      not_cyrix:
+    }
+    return isCyrix;
+}
+
 int identifyCPU(void)
 {
 	if(!iCPUFlagsLoaded) {
@@ -766,6 +807,7 @@ int main(int argc, char *argv[])
 		strcat(sMsg, cache);
 	} else {
 		SYSTEM_INFO si;
+		int is486 = 0, isCyrix = 0;
 		sprintf(sMsg, "CPUID is not supported on this machine. Use GetSystemInfo() instead:\n");
 
 		GetSystemInfo(&si);
@@ -778,6 +820,9 @@ int main(int argc, char *argv[])
 		sprintf(cache,"si.wProcessorRevision = %x\n",si.wProcessorRevision);
 		strcat(sMsg, cache);
 		sprintf(cache,"si.dwPageSize = %d\n",si.dwPageSize);
+		is486 = Test486orHigher();
+		if(is486) isCyrix = TestCyrix();
+		sprintf(cache,"is486 = %d, isCyrix = %d\n",is486, isCyrix);
 		strcat(sMsg, cache);
 	}
 
