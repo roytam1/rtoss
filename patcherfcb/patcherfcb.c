@@ -146,7 +146,7 @@ int main(int argc, char **argv) {
 					err++;
 			}
 		} else {
-			// try openning it, if it can be fopen()ed, record its name
+			/* try openning it, if it can be fopen()ed, record its name */
 			FILE* fptest;
 			if (!infname) {
 				if((fptest = fopen(*argv, "rb+")) != NULL) {
@@ -156,7 +156,7 @@ int main(int argc, char **argv) {
 					fprintf(stderr, "%s: input file not found\n", myname);
 					exit(3);
 				}
-			} else if (!patfname) { // patch file
+			} else if (!patfname) { /* patch file */
 				if((fptest = fopen(*argv, "rb")) != NULL) {
 					patfname = *argv;
 					fppat = fptest;
