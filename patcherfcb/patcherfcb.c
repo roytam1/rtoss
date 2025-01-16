@@ -27,8 +27,9 @@ int err = 0;
 int apply_patch(FILE *fpin, FILE *fppat, int reverse, int* ap) {
 	char line[256];
 	int myerr = 0;
-	int i, l;
-	int offset, from, to, was, tmp;
+	unsigned int i, l;
+	unsigned char from, to, was, tmp;
+	unsigned long offset;
 
 	while (fgets(line, 255, fppat)) {
 		l = strlen(line);
@@ -36,7 +37,7 @@ int apply_patch(FILE *fpin, FILE *fppat, int reverse, int* ap) {
 			;
 		if((l >= 15) && (line[i] != ';') && (strncmp(&line[i], "Comparing files", 15))) {
 			if(!strncmp(&line[i + 8], ":", 1) && !strncmp(&line[i + 9], " ", 1) && !strncmp(&line[i + 12], " ", 1)) {
-				offset = strtol(&line[i], NULL, 16);
+				offset = strtoul(&line[i], NULL, 16);
 				from = strtol(&line[i + 10], NULL, 16);
 				to = strtol(&line[i + 13], NULL, 16);
 				if(reverse) {
@@ -75,30 +76,21 @@ int apply_patch(FILE *fpin, FILE *fppat, int reverse, int* ap) {
 	return myerr;
 }
 
-int strpos(const char *haystack, const char *needle)
-{
-   const char *p = strstr(haystack, needle);
-   if (p)
-      return p - haystack;
-   return -1;
-}
-
 /* `path` will be modified */
 char* mybasename(char* path)
 {
-	char *lowercase;
+	char *uppercase;
 	char *mybase = strrchr(path, '\\');
-	int extpos;
+	char *ext;
 	mybase = mybase ? mybase+1 : path;
-	lowercase = strdup(mybase);
-	lowercase = strlwr(lowercase);
-	extpos = strpos(lowercase, ".exe");
-	if(extpos >= 0)
-		*(mybase+extpos) = 0;
-	extpos = strpos(lowercase, ".com");
-	if(extpos >= 0)
-		*(mybase+extpos) = 0;
-	return mybase;
+	uppercase = strupr(mybase);
+	ext = strstr(uppercase, ".EXE");
+	if(ext)
+		*ext = 0;
+	ext = strstr(uppercase, ".COM");
+	if(ext)
+		*ext = 0;
+	return uppercase;
 }
 
 void usage(char* myname)
