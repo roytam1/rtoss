@@ -75,6 +75,32 @@ int apply_patch(FILE *fpin, FILE *fppat, int reverse, int* ap) {
 	return myerr;
 }
 
+int strpos(const char *haystack, const char *needle)
+{
+   const char *p = strstr(haystack, needle);
+   if (p)
+      return p - haystack;
+   return -1;
+}
+
+/* `path` will be modified */
+char* mybasename(char* path)
+{
+	char *lowercase;
+	char *mybase = strrchr(path, '\\');
+	int extpos;
+	mybase = mybase ? mybase+1 : path;
+	lowercase = strdup(mybase);
+	lowercase = strlwr(lowercase);
+	extpos = strpos(lowercase, ".exe");
+	if(extpos >= 0)
+		*(mybase+extpos) = 0;
+	extpos = strpos(lowercase, ".com");
+	if(extpos >= 0)
+		*(mybase+extpos) = 0;
+	return mybase;
+}
+
 void usage(char* myname)
 {
 	fprintf(stderr, "%s\n", myname);
@@ -103,7 +129,7 @@ int main(int argc, char **argv) {
 	FILE *fpin = 0, *fppat = 0;
 	char *infname = 0, *patfname = 0;
 	char *cp;
-	char **orig_argv = argv;
+	char *myname = mybasename(argv[0]);
 
 	int argnow = 0;
 	int ap = 1;
@@ -135,7 +161,7 @@ int main(int argc, char **argv) {
 					infname = *argv;
 					fpin = fptest;
 				} else {
-					fprintf(stderr, "%s: input file not found\n", orig_argv[0]);
+					fprintf(stderr, "%s: input file not found\n", myname);
 					exit(3);
 				}
 			} else if (!patfname) { // patch file
@@ -147,7 +173,7 @@ int main(int argc, char **argv) {
 					patfname = *argv;
 					fppat = (FILE*)stdin;
 					} else {
-						fprintf(stderr, "%s: patch file not found\n", orig_argv[0]);
+						fprintf(stderr, "%s: patch file not found\n", myname);
 						exit(3);
 					}
 				}
@@ -159,7 +185,7 @@ int main(int argc, char **argv) {
 
 	if (err || help)
 	{
-		usage(orig_argv[0]);
+		usage(myname);
 		exit(1);
 	}
 
