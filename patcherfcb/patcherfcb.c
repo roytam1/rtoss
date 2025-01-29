@@ -23,9 +23,9 @@ int err = 0;
 
 int apply_patch(FILE *fpin, FILE *fppat, int reverse, int dryrun, int* ap) {
 	char line[256];
-	int myerr = 0;
+	int myerr = 0, was;
 	unsigned int i, l;
-	unsigned char from, to, was, tmp;
+	unsigned char from, to, tmp;
 	unsigned long offset;
 
 	while (fgets(line, 255, fppat)) {
