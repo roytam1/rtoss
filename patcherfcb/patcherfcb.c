@@ -15,16 +15,13 @@
 #include <string.h>
 #include <stdlib.h>
 
-/* Reverse flag */
-int rev;
-
 /* Help flag */
-int help;
+int help = 0;
 
 /* Error counter */
 int err = 0;
 
-int apply_patch(FILE *fpin, FILE *fppat, int reverse, int* ap) {
+int apply_patch(FILE *fpin, FILE *fppat, int reverse, int dryrun, int* ap) {
 	char line[256];
 	int myerr = 0;
 	unsigned int i, l;
@@ -49,9 +46,11 @@ int apply_patch(FILE *fpin, FILE *fppat, int reverse, int* ap) {
 					was = fgetc(fpin);
 					if (was != EOF) {
 						fseek(fpin, offset, SEEK_SET);
-						fputc(to, fpin);
+						if(!dryrun) {
+							fputc(to, fpin);
+						}
 						if (was != to)
-							ap = 0;
+							*ap = 0;
 						if (was != from) {
 							printf("Offset $%04.4X was $%02.2X, should have been $%02.2X\n",
 								offset, was, from);
@@ -113,6 +112,7 @@ void usage(char* myname)
 	fprintf(stderr, "    other-command | %s [options] [drive:][path]file -\n", myname);
 	fputs("\n	Options:\n", stderr);
 	fputs("    /R   Reverse patch\n", stderr);
+	fputs("    /D   Dry-run (i.e. not actually writing to target file)\n", stderr);
 	fputs("    /?   Help\n", stderr);
 	fputs("\n    Notice: \"-\" is indicator for stdin\n", stderr);
 }
@@ -126,6 +126,7 @@ int main(int argc, char **argv) {
 	int argnow = 0;
 	int ap = 1;
 	int rflag = 0;
+	int dflag = 0;
 
 	while (--argc) {
 		++argnow;
@@ -134,6 +135,11 @@ int main(int argc, char **argv) {
 				case 'R':
 				case 'r':
 					rflag = 1;
+					break;
+
+				case 'D':
+				case 'd':
+					dflag = 1;
 					break;
 
 				case '?':
@@ -181,7 +187,7 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 
-	err = apply_patch(fpin, fppat, rflag, &ap);
+	err = apply_patch(fpin, fppat, rflag, dflag, &ap);
 	if (!strcmp(patfname, "-"))
 		fclose(fppat);
 
