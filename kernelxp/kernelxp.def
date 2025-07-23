@@ -357,6 +357,7 @@ GetLocalTime=KERNEL32.GetLocalTime
 GetLogicalDrives=KERNEL32.GetLogicalDrives
 GetLogicalDriveStringsA=KERNEL32.GetLogicalDriveStringsA
 GetLogicalDriveStringsW=KERNEL32.GetLogicalDriveStringsW
+GetLogicalProcessorInformation
 GetLongPathNameA=KERNEL32.GetLongPathNameA
 GetLongPathNameW=KERNEL32.GetLongPathNameW
 GetMailslotInfo=KERNEL32.GetMailslotInfo
