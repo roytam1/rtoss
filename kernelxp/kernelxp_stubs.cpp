@@ -245,6 +245,7 @@ GetSystemTimes(OUT LPFILETIME lpIdleTime OPTIONAL,
     CCHAR i;
     NTSTATUS Status;
     SYSTEM_INFO SystemInfo;
+    BOOL somethingWrong = FALSE;
     static DWORD dwNumberOfProcessors = 0;
     static pfnQuerySystemInformation ntQSI = (pfnQuerySystemInformation) GetProcAddress(GetModuleHandleA("NTDLL.DLL"),"NtQuerySystemInformation");
 
@@ -305,11 +306,16 @@ GetSystemTimes(OUT LPFILETIME lpIdleTime OPTIONAL,
     }
     else if (NT_SUCCESS(Status))
     {
-         return FALSE;
+         somethingWrong = TRUE;
     }
 
     HeapFree(GetProcessHeap(), 0, ProcPerfInfo);
     if (!NT_SUCCESS(Status))
+    {
+        return FALSE;
+    }
+
+    if (somethingWrong)
     {
         return FALSE;
     }
