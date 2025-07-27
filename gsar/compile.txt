@@ -1,0 +1,94 @@
+If you want gsar to compile under your favourite compiler
+and under your platform ( MSDOS or UNIX ) you should read 
+this section...
+
+gsar was written using 99.99% ANSI C and compiles
+without any problems under the following compilers:
+
+DOS platform:
+
+. Zortech C/C++ 3.x
+. Turbo C 2.0
+. Borland C/C++ 1.0 & 3.0
+. Watcom C/C++ 10.0
+. Microsoft 6.0
+. DJGPP 2.0
+. Symantec C/C++ 7.2
+
+UNIX platform:
+
+All compilers were gcc (GNU).
+
+. DecUnix OSF 3.2, Alpha
+. Linux 2.0.0, i386
+. ULTRIX 4.3, DecStation
+. SunOS 4.14, sun4m
+. Solaris 2.4, sparc
+. AIX 1.4, RS600
+. IRIX 5.3, mips
+. HP-UX A.09.05, A9000/750
+. gcc 
+
+(All trademarks are properties of their respective owners)
+
+The compiler used for the development, testing and 
+debugging of the original gsar was the Zortech C++ compiler version 3.1
+
+These days its maintained using MinGW (Minimalist Gnu For Windows) and
+gcc under Linux.
+
+Since gsar is written to run both under UNIX and MSDOS I have
+included #ifdefs for easy portability. In the file gsar.h a simple
+test is made to see if we're being compiled with an MSDOS compiler
+and if we're not it's assumed that we're on a UNIX platform.
+
+gsar does not make use of any floating point operations. To
+reduce the size of your executable do not link in any floating
+point libraries.
+
+MSDOS notes.
+
+gsar will compile and run in the small model of your compiler.
+
+To make gsar as fast as possible the input streams are buffered 
+using setvbuf. However the Zortech compiler sets up stream buffers
+in it's startup code so setvbuf is not needed. This only applies
+to the small and tiny model.
+
+I've done some simple speed tests between the different DOS 
+compilers. In all test cases the Zortech executable is the
+fastest. This is only noticable on large files, 5MB and upwards.
+
+Most MSDOS compilers support the use of wildcards by 
+linking in a special object module. See the section below for details
+
+Below is a list of command lines for use with various compilers:
+
+- Turbo C ver 2.0
+tcc -ms gsar.c gsarbmg.c arg_func.c <path to file>wildargs.obj 
+
+- Turbo C++ 1.0 
+tcc -ms gsar.c gsarbmg.c arg_func.c <path to file>wildargs.obj 
+
+- Borland C++ 3.0
+bcc -ms gsar.c gsarbmg.c arg_func.c <path to file>wildargs.obj 
+
+- Microsoft ver 6.0
+cl /AS gsar.c gsarbmg.c arg_func.c <path to file>setargv.obj /link /NOE 
+
+- Zortech C/C++ ver 3.0, wildcards pulled in automatically!, integer library
+ztc -msi gsar.c gsarbmg.c arg_func.c 
+
+- Symantec C/C++ ver 7.2, wildcards pulled in automatically!, integer library
+sc -msi gsar.c gsarbmg.c arg_func.c 
+
+- Watcom ver 10.5, the /x is for name case sensitivity
+wcl386 /x gsar.c gsarbmg.c arg_func.c <path to file>wildargv.c 
+
+- UN?X
+cc -o gsar gsar.c gsarbmg.c arg_func.c
+
+- GCC/DJGPP
+gcc -o gsar gsar.c gsarbmg.c arg_func.c
+
+Or use the makefile.

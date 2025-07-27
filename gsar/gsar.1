@@ -1,0 +1,181 @@
+.TH gsar 1 "14 Aug 1996"
+.SH NAME
+\fBgsar\fP \- General Search And Replace utility
+.PP
+.SH SYNOPSIS
+\fBgsar\fP [\fIoptions\fP] [\fIinfile(s)\fP] [\fIoutfile\fP]
+.PP
+.SH DESCRIPTION
+\fBgsar\fP (General Search And Replace) is a utility for searching
+for and --- optionally --- replacing strings in both text and
+binary files. The search and replace strings can contain all kinds
+of characters (0--255), i.e. Ctrl characters and extended ASCII
+as well.
+.PP
+The algorithm used is a variation of the Boyer-Moore search
+algorithm, modified to search binary files. As a result of
+this, \fBgsar\fP is blindingly fast.
+.PP
+Opposed to line oriented search programs (like \fBgrep(1)\fP), gsar will
+find all matches on a line. Actually, \fBgsar\fP doesn't know anything
+about lines at all, all files and strings are treated as binary.
+.PP
+\fBGsar\fP can search one or several files for a string and report
+the occurrences. \fBGsar\fP can read one file, search for a string,
+replace it with some other string, and create a new file
+containing the changes. \fBGsar\fP can perform a search and replace
+in multiple files, overwriting the originals. Finally, gsar
+can work as a filter, reading from standard input and writing
+to standard output.
+.PP
+.SH OPTIONS
+All options can be concatenated into one single option
+i.e the command: \fBgsar  -i -b -l\fP is the same as \fBgsar -ibl\fP 
+.PP
+An option which takes an argument must be the last one in the 
+concatenated option, since the rest of the option is taken as 
+a possible argument. 
+.PP
+Fields enclosed in [] are optional, but mandatory when enclosed in <>. 
+Options are case sensitive i.e \fB-b\fP is not the same as \fB-B\fP. 
+.PP
+If no options are given, \fBgsar\fP just gives a brief help message.
+.SS [\fBinfile(s)\fP]
+Name(s) of input file(s) (wildcards allowed on most Unix shells and 
+most DOS compilers). If the \fB-F\fP option is used input is taken from 
+\fIstdin\fP.
+.SS [\fBoutfile\fP]
+Name of output file that is to contain the replacements.
+If the \fB-F\fP option is used, transformed output is sent to
+\fIstdout\fP.
+.SS -\fBs\fP<\fIstring\fP>
+String to search for in file. Ctrl characters can be entered
+by using a `:' in the string followed by the ASCII value of
+the character. The value is entered using a `:' followed by
+three decimal digits or `:x' followed by two hex numbers.
+To enter a colon (\fI:\fP) in the search pattern use `::'. 
+The \fIstring\fP must follow directly after \fBs\fP.
+.PP
+Example:
+To search for the string \fI:foo\fP (`o' is 111 decimal, 6F in hex)
+use the search options: 
+.br
+  \fB-s::foo\fP or \fB-s::fo:111\fP or \fB-s::fo:x6F\fP
+.PP
+If you want to search for a string with spaces in it,
+under MSDOS surround the expression with quotes.
+Under Unix, use the mechanisms your shell provides (commonly quotes) 
+to include space or other special characters.
+.PP
+Example: search for \fIgsar is fast\fP use:
+.br
+  \fBgsar "-sgsar is fast" foobar.txt\fP
+.PP
+If response files are needed, most Unix shells will allow
+.br
+  \fBgsar `cat foobar.txt` poppins.txt\fP 
+.SS -\fBr\fP[\fIstring\fP]
+String which is to replace search string in file. Use \fB-r\fP
+to delete the search string from the file i.e. replace with
+nothing. Ctrl characters can be entered in the same way as
+in the search string. If this option is left out, \fBgsar\fP only 
+performs a search. The \fIstring\fP must follow directly after \fBr\fP.
+.SS -\fBi\fP  
+Ignore case difference when comparing strings.
+I.e. \fIfoobar\fP matches \fIfooBAR\fP.
+.SS -\fBB\fP
+Just display the search & replace buffers, for test purposes.
+.SS -\fBf\fP
+If the output file already exists this switch can be used to
+force an overwrite of the existing output file.
+.SS -\fBo\fP
+Search and replace of multiple files, overwrite the input 
+file(s). For each input file, gsar creates a tempfile
+which contains the replacements and copies the tempfile
+to the original input file name. If no matches were found,
+the input file stays the same. The tempfile is removed.
+.PP
+Example: 
+  \fBgsar -s__ZTC__ -r__TURBOC__ -o foo.c bar.c bat.c\fP
+.br
+The files \fIfoo.c\fP, \fIbar.c\fP & \fIbat.c\fP are
+all changed.
+.SS -\fBc\fP[\fIn\fP] 
+Display the context around a match in a textual manner.
+Undisplayable characters are displayed as a dot (`.'). \fIn\fP is 
+optional number of bytes in context. \fIn\fP must follow directly
+after \fBc\fP.
+.SS -\fBx\fP[\fIn\fP] 
+Display the context around a match as a hexadecimal dump.
+Undisplayable characters are displayed as a dot (`.'). \fIn\fP is 
+optional number of bytes in context. \fIn\fP must follow directly
+after \fBx\fP.
+.SS -\fBb\fP  
+Display the byte offset of the match in hex.
+.SS -\fBl\fP
+Only list filename and number of matches if any (default).
+.SS -\fBh\fP  
+Suppress display of filename when displaying context or byte offsets.
+.SS -\fBdu\fP 
+Convert a DOS ASCII file to UNIX (strips carriage return).
+.SS -\fBud\fP
+Convert a UNIX ASCII file to DOS (adds carriage return).
+.SS -\fBF\fP
+\fIFilter\fP mode, gsar takes it's input from \fIstdin\fP and redirects
+eventual output to \fIstdout\fP. All error messages are sent \fIstderr\fP.
+.SS -\fBG\fP
+Display the GNU General Public Licence.
+.PP
+.SH \fBExamples\fP
+Search for two spaces at the end of a line (DOS text) and
+replace with just a carriage return overwriting the original
+files:
+.PP
+  \fBgsar  -s:x20:x20:x0d  -r:x0d  -o  foobar.txt  *.c\fP
+.PP
+Convert a UNIX text file to DOS format overwriting the original
+file:
+.PP
+  \fBgsar  -ud  -o  unix.txt\fP
+.PP
+Search for the string \fIWATCOM\fP and replace with \fI__ZTC__\fP using
+gsar as a filter. Output is redirected to a new file:
+.PP
+  \fBgsar  -sWATCOM  -r__ZTC__  -F  <  foo_w.c  >  foo_z.c\fP
+.PP
+Display textual context of the string \fIerror\fP in the file
+\fIgsar.exe\fP disregarding case. With 40 bytes in the context:
+.PP
+  \fBgsar  -serror  -i  -c40  gsar.exe\fP
+.PP
+Search for the string \fIgnu\fP in the file \fIfsf\fP and replace it
+with \fIwildebeest\fP, creating a new output file \fIafrica\fP:
+.PP
+  \fBgsar  -sgnu  -rwildebeest  fsf  africa\fP
+.PP
+(if the file \fIafrica\fP exists, you have to use the \fB-f\fP 
+option to overwrite it.)
+.PP
+Search for the string \fIerror\fP in the file \fIcommand.com\fP 
+and display the byte offset of each match:
+.PP
+  \fBgsar  -serror  -b  command.com\fP
+.PP
+.SH \fBLimitations\fP
+No wildcards or regular expressions allowed in search string.
+.PP
+On MSDOS platforms \fIstdin\fP from a tty is not allowed because
+\fIstdin\fP has been turned into binary. MSDOS will not catch the
+Ctrl-Z signifying EOF.
+.SH \fBAuthors\fP
+Tormod Tjaberg (coding, design (all bugs are his))
+.br
+Hans Peter Verne (ideas, demands, testing, UNIX platforms)
+.PP
+If you have any comments, bug reports or whatever, we
+can be reached through email at:
+.PP
+\fItjaberg@online.no\fP
+.br
+\fIhpv@kjemi.uio.no\fP
+.br
