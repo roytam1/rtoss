@@ -92,3 +92,9 @@ cc -o gsar gsar.c gsarbmg.c arg_func.c
 gcc -o gsar gsar.c gsarbmg.c arg_func.c
 
 Or use the makefile.
+
+- MinGW
+gcc -o gsar gsar.c gsarbmg.c arg_func.c
+
+Or use the makefile.
+

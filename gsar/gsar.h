@@ -20,6 +20,13 @@
  * MSDOS      : Set by various DOS compilers... ( Watcom 386, Microsoft )
  */
 
+#ifdef _WIN32
+#include <sys/stat.h>
+#define isatty			_isatty 
+#define setmode		_setmode
+#define stat			_stati64
+#endif
+ 
 #if defined(__TURBOC__) || defined(__ZTC__) || defined(MSDOS) || defined(__DJGPP__) || defined (__WATCOMC__) || defined (__MINGW32__)
 #ifndef MSDOS
 #define MSDOS     5
