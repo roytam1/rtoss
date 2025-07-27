@@ -5,7 +5,7 @@
 #define VER_FILEVERSION 1,21,2951,29107
 #define VER_FILEVERSION_STR "1.21.2951.29107"
 #define VER_FILELTVERSION_STR "-1"
-#define VER_LEGALCOPYRIGHT_STR "© 2008 Tormod Tjaberg <tjaberg@online.no>"
+#define VER_LEGALCOPYRIGHT_STR "(C) 2008 Tormod Tjaberg <tjaberg@online.no>"
 //#define VER_COMMENT_STR  ""	 
 
 #define VER_FILEDESCRIPTION_STR "Gsar: general search and replace utility"
@@ -14,7 +14,7 @@
 #define VER_WWW_STR "http://home.online.no/~tjaberg"
 #define VER_COMPANYNAME_STR "GnuWin32 <http://gnuwin32.sourceforge.net>"
 #define VER_LICENSE_STR "This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License; see www.gnu.org/copyleft/gpl.html. "
-#define VER_LEGALTRADEMARKS_STR "GnuWin32®, Gsar®, gsar®"
+#define VER_LEGALTRADEMARKS_STR "GnuWin32(R), Gsar(R), gsar(R)"
 
 #define VER_PRODUCTNAME_STR "Gsar"
 #define VER_PRODUCTVERSION 1,21,2951,29107

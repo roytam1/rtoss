@@ -28,3 +28,7 @@
 #ifndef S_ISREG
 #define S_ISREG(m)  (((m)&(S_IFMT))==S_IFREG)
 #endif
+
+#ifndef S_ISDIR
+#define S_ISDIR(m)  (((m)&(S_IFMT))==S_IFDIR)
+#endif

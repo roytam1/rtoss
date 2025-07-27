@@ -24,10 +24,12 @@
 #include <sys/stat.h>
 #define isatty			_isatty 
 #define setmode		_setmode
+#if !defined(_MSC_VER) || (defined(_MSC_VER) && _MSC_VER > 900)
 #define stat			_stati64
 #endif
+#endif
  
-#if defined(__TURBOC__) || defined(__ZTC__) || defined(MSDOS) || defined(__DJGPP__) || defined (__WATCOMC__) || defined (__MINGW32__)
+#if defined(__TURBOC__) || defined(__ZTC__) || defined(MSDOS) || defined(__DJGPP__) || defined (__WATCOMC__) || defined (__MINGW32__) || defined (_MSC_VER)
 #ifndef MSDOS
 #define MSDOS     5
 #endif
