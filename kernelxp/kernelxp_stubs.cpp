@@ -24,6 +24,7 @@ typedef NTSTATUS (WINAPI* pfnQueryInformationProcess)(
     ULONG ProcessInformationLength,
     PULONG ReturnLength);
 
+#if !defined(_MSC_VER) || (defined(_MSC_VER) && _MSC_VER < 1400)
 typedef enum _LOGICAL_PROCESSOR_RELATIONSHIP {
     RelationProcessorCore,
     RelationNumaNode,
@@ -62,6 +63,7 @@ typedef struct _SYSTEM_LOGICAL_PROCESSOR_INFORMATION {
         ULONGLONG Reserved[2];
     } DUMMYUNIONNAME;
 } SYSTEM_LOGICAL_PROCESSOR_INFORMATION, *PSYSTEM_LOGICAL_PROCESSOR_INFORMATION;
+#endif
 
 typedef DWORD (WINAPI* pfnGetLogicalProcessorInformation)(PSYSTEM_LOGICAL_PROCESSOR_INFORMATION Buffer, PDWORD ReturnedLength);
 
