@@ -53,6 +53,7 @@ using namespace ki;
 	CHARSET_VALUE("BOCU",				"BOCU",					"BOCU") \
 	CHARSET_VALUE("FSS-UTF(19920902)",	"FSS-UTF(19920902)",	"FSSUTF") \
 	CHARSET_VALUE("FSS-UTF(19920902,BOM)","FSS-UTF(19920902,BOM)","FSSUTF") \
+	CHARSET_VALUE("UTF-VLQ(BOM)",		"UTF-VLQ(BOM)",			"UTFVLQ") \
 	CHARSET_VALUE("â¢ïƒ(DOS)",			"Latin-1(DOS)",			"LN1DOS") \
 	CHARSET_VALUE("â¢ïƒ",				"Latin-1",				"LTN1") \
 	CHARSET_VALUE("íÜâ¢(DOS)",			"Latin-2(DOS)",			"LN2DOS") \
@@ -157,34 +158,35 @@ CHARSETS_LIST
 	                               Enroll(  BOCU1,          35 );
 	                               EnrollS(  OFSSUTF,       36 );
 	                               Enroll(  OFSSUTFY,       37 );
-	if( ::IsValidCodePage(850) )   Enroll(  WesternDOS,     38 );
-	                               Enroll(  Western,        39 );
-	if( ::IsValidCodePage(852) )   Enroll(  CentralDOS,     40 );
-	if( ::IsValidCodePage(28592) ) Enroll(  Central,        41 );
-	if( ::IsValidCodePage(855) )   Enroll(  CyrillicIBM,    42 );
-	if( ::IsValidCodePage(866) )   Enroll(  CyrillicDOS,    43 );
-	if( ::IsValidCodePage(28595) ) Enroll(  Cyrillic,       44 );
-	if( ::IsValidCodePage(20866) ) Enroll(  Koi8R,          45 );
-	if( ::IsValidCodePage(21866) ) Enroll(  Koi8U,          46 );
-	if( ::IsValidCodePage(874) )   Enroll(  Thai,           47 );
-	if( ::IsValidCodePage(857) )   Enroll(  TurkishDOS,     48 );
-	if( ::IsValidCodePage(1254) )  Enroll(  Turkish,        49 );
-	if( ::IsValidCodePage(775) )   Enroll(  BalticIBM,      50 );
-	if( ::IsValidCodePage(1257) )  Enroll(  Baltic,         51 );
-	if( ::IsValidCodePage(1258) )  Enroll( Vietnamese,      52 );
-	if( ::IsValidCodePage(737) )   Enroll(  GreekIBM,       53 );
-	if( ::IsValidCodePage(869) )   Enroll(  GreekMSDOS,     54 );
-	if( ::IsValidCodePage(28597) ) Enroll(  Greek,          55 );
-	if( ::IsValidCodePage(720) )   Enroll(  ArabicIBM,      56 );
-	if( ::IsValidCodePage(864) )   Enroll(  ArabicMSDOS,    57 );
-	if( ::IsValidCodePage(1256) )  Enroll(  Arabic,         58 );
-	if( ::IsValidCodePage(862) )   Enroll(  HebrewDOS,      59 );
-	if( ::IsValidCodePage(1255) )  Enroll(  Hebrew,         60 );
-	if( ::IsValidCodePage(860) )   Enroll(  Portuguese,     61 );
-	if( ::IsValidCodePage(861) )   Enroll(  Icelandic,      62 );
-	if( ::IsValidCodePage(863) )   Enroll(  CanadianFrench, 63 );
-	if( ::IsValidCodePage(865) )   Enroll(  Nordic,         64 );
-	                               Enroll(  DOSUS,          65 );
+	                               Enroll(  UTFVLQY,        38 );
+	if( ::IsValidCodePage(850) )   Enroll(  WesternDOS,     39 );
+	                               Enroll(  Western,        40 );
+	if( ::IsValidCodePage(852) )   Enroll(  CentralDOS,     41 );
+	if( ::IsValidCodePage(28592) ) Enroll(  Central,        42 );
+	if( ::IsValidCodePage(855) )   Enroll(  CyrillicIBM,    43 );
+	if( ::IsValidCodePage(866) )   Enroll(  CyrillicDOS,    44 );
+	if( ::IsValidCodePage(28595) ) Enroll(  Cyrillic,       45 );
+	if( ::IsValidCodePage(20866) ) Enroll(  Koi8R,          46 );
+	if( ::IsValidCodePage(21866) ) Enroll(  Koi8U,          47 );
+	if( ::IsValidCodePage(874) )   Enroll(  Thai,           48 );
+	if( ::IsValidCodePage(857) )   Enroll(  TurkishDOS,     49 );
+	if( ::IsValidCodePage(1254) )  Enroll(  Turkish,        50 );
+	if( ::IsValidCodePage(775) )   Enroll(  BalticIBM,      51 );
+	if( ::IsValidCodePage(1257) )  Enroll(  Baltic,         52 );
+	if( ::IsValidCodePage(1258) )  Enroll( Vietnamese,      53 );
+	if( ::IsValidCodePage(737) )   Enroll(  GreekIBM,       54 );
+	if( ::IsValidCodePage(869) )   Enroll(  GreekMSDOS,     55 );
+	if( ::IsValidCodePage(28597) ) Enroll(  Greek,          56 );
+	if( ::IsValidCodePage(720) )   Enroll(  ArabicIBM,      57 );
+	if( ::IsValidCodePage(864) )   Enroll(  ArabicMSDOS,    58 );
+	if( ::IsValidCodePage(1256) )  Enroll(  Arabic,         59 );
+	if( ::IsValidCodePage(862) )   Enroll(  HebrewDOS,      60 );
+	if( ::IsValidCodePage(1255) )  Enroll(  Hebrew,         61 );
+	if( ::IsValidCodePage(860) )   Enroll(  Portuguese,     62 );
+	if( ::IsValidCodePage(861) )   Enroll(  Icelandic,      63 );
+	if( ::IsValidCodePage(863) )   Enroll(  CanadianFrench, 64 );
+	if( ::IsValidCodePage(865) )   Enroll(  Nordic,         65 );
+	                               Enroll(  DOSUS,          66 );
 
 	// èIóπ
 	#undef Enroll

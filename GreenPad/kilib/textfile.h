@@ -118,6 +118,7 @@ enum charset {
 	UTF1Y      =-64999,// Unicode  (UTF-1)   : BOM有り
 	UTF9Y      =-65002,// Unicode  (UTF-9)   : BOM有り
 	OFSSUTFY   = -13,  // Unicode  (Old FSS-UTF): BOM有り
+	UTFVLQY    =-65003,// Unicode  (UTF-VLQ)   : BOM有り
 
 	DOSUS      = 437,  // DOSLatinUS (CP437)
 
