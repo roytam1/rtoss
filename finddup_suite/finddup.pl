@@ -65,7 +65,7 @@ foreach my $size (sort {$b <=> $a} keys %files) {
  
 sub check_file {
   if (-f $_) {
-    my $fsize = (stat($_))[7];
+    my $fsize = -s $_;
     if (($opt_s == 0) || ($opt_s > 0 && $fsize < $opt_s)) {
       push @{$files{$fsize}}, $File::Find::name;
     }
