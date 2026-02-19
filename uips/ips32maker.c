@@ -234,9 +234,10 @@ static DWORD myGetFileSize(LPFILEINFO f, LPDWORD lpFileSizeHigh)
 // create a patch
 BOOL MakePatch(LPCSTR UnchangedFile,LPCSTR ChangedFile,LPCSTR OutputFile,LPSTR ErrorMsg,BOOL bUseRle)
 {
-	int byte1, byte2;
-	unsigned long offset;
-	DWORD nSize;
+	int byte1 = 0, byte2 = 0;
+	int obyte1 = 0, obyte2 = 0;
+	unsigned long offset = 0;
+	DWORD nSize = 0;
 
 	// allocate memory for buffer
 	buffer = (unsigned char *)malloc(65536);
@@ -279,13 +280,20 @@ BOOL MakePatch(LPCSTR UnchangedFile,LPCSTR ChangedFile,LPCSTR OutputFile,LPSTR E
 	offset = 0;
 	for(;;) {
 		// read byte from both files
+		obyte1 = byte1;
 		byte1 = ReadByte(uf);
+		obyte2 = byte2;
 		byte2 = ReadByte(cf);
 		if(byte2 == EOF) break;
 
 		offset++; // increment offset
 		// compare the 2 bytes
 		if(byte1 == EOF || byte1 != byte2) {
+			if(offset == 0x45454F47) {
+				// if `offset` == EOF mark (+1), we need to add previous byte as well
+				address--;
+				addByte((unsigned char)obyte2);
+			}
 			// if the 2 bytes aren't equal, then add byte2 to block buffer
 			addByte((unsigned char)byte2);
 		} else {
