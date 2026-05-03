@@ -1,7 +1,7 @@
 # Microsoft Developer Studio Generated NMAKE File, Format Version 4.10
 # ** DO NOT EDIT **
 
-# TARGTYPE "Win32 (MIPS) Application" 0x0501
+# TARGTYPE "Win32 (ALPHA) Application" 0x0601
 
 !IF "$(CFG)" == ""
 CFG=GreenPad - Win32 Release
@@ -14,12 +14,12 @@ CFG=GreenPad - Win32 Release
 !MESSAGE You can specify a configuration when running NMAKE on this makefile
 !MESSAGE by defining the macro CFG on the command line.  For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "GPadmips.mak" CFG="GreenPad - Win32 Release"
+!MESSAGE NMAKE /f "GPadAXP.mak" CFG="GreenPad - Win32 Release"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "GreenPad - Win32 Release" (based on "Win32 (MIPS) Application")
-!MESSAGE "GreenPad - Win32 Debug" (based on "Win32 (MIPS) Application")
+!MESSAGE "GreenPad - Win32 Release" (based on "Win32 (ALPHA) Application")
+!MESSAGE "GreenPad - Win32 Debug" (based on "Win32 (ALPHA) Application")
 !MESSAGE 
 !ERROR An invalid configuration is specified.
 !ENDIF 
@@ -40,18 +40,18 @@ MTL=mktyplib.exe
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "MIPSRel"
-# PROP BASE Intermediate_Dir "MIPSRel"
+# PROP BASE Output_Dir "ALPHARel"
+# PROP BASE Intermediate_Dir "ALPHARel"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "MIPSRel"
-# PROP Intermediate_Dir "MIPSRel"
+# PROP Output_Dir "ALPHARel"
+# PROP Intermediate_Dir "ALPHARel"
 # PROP Target_Dir ""
-OUTDIR=.\MIPSRel
-INTDIR=.\MIPSRel
+OUTDIR=.\ALPHARel
+INTDIR=.\ALPHARel
 
-ALL : "$(OUTDIR)\GPadmips.exe" "$(OUTDIR)\GPadmips.bsc"
+ALL : "$(OUTDIR)\GPadAXP.exe" "$(OUTDIR)\GPadAXP.bsc"
 
 CLEAN : 
 	-@erase "$(INTDIR)\app.obj"
@@ -110,33 +110,33 @@ CLEAN :
 	-@erase "$(INTDIR)\window.sbr"
 	-@erase "$(INTDIR)\winutil.obj"
 	-@erase "$(INTDIR)\winutil.sbr"
-	-@erase "$(OUTDIR)\GPadmips.bsc"
-	-@erase "$(OUTDIR)\GPadmips.exe"
+	-@erase "$(OUTDIR)\GPadAXP.bsc"
+	-@erase "$(OUTDIR)\GPadAXP.exe"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-# ADD BASE MTL /nologo /D "NDEBUG" /mips
-# ADD MTL /nologo /D "NDEBUG" /mips
-MTL_PROJ=/nologo /D "NDEBUG" /mips 
-# ADD BASE CPP /nologo /Gt0 /QMOb2000 /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FR /YX /c
-# ADD CPP /nologo /Gt0 /QMOb2000 /W3 /Zi /O1 /I "kilib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D TARGET_VER=310 /D "NO_ASMTHUNK" /FR /YX"stdafx.h" /c
-CPP_PROJ=/nologo /ML /Gt0 /QMOb2000 /W3 /Zi /O1 /I "kilib" /D "NDEBUG" /D\
+# ADD BASE MTL /nologo /D "NDEBUG" /win32
+# ADD MTL /nologo /D "NDEBUG" /win32
+MTL_PROJ=/nologo /D "NDEBUG" /win32 
+# ADD BASE CPP /nologo /Gt0 /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FR /YX /c
+# ADD CPP /nologo /Gt0 /W3 /Zi /O1 /I "kilib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D TARGET_VER=310 /D "NO_ASMTHUNK" /FR /YX"stdafx.h" /c
+CPP_PROJ=/nologo /ML /Gt0 /W3 /Zi /O1 /I "kilib" /D "NDEBUG" /D\
  "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D\
- TARGET_VER=310 /D "NO_ASMTHUNK" /FR"$(INTDIR)/" /Fp"$(INTDIR)/GPadmips.pch"\
+ TARGET_VER=310 /D "NO_ASMTHUNK" /FR"$(INTDIR)/" /Fp"$(INTDIR)/GPadAXP.pch"\
  /YX"stdafx.h" /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
-CPP_OBJS=.\MIPSRel/
-CPP_SBRS=.\MIPSRel/
+CPP_OBJS=.\ALPHARel/
+CPP_SBRS=.\ALPHARel/
 # ADD BASE RSC /l 0x411 /d "NDEBUG"
 # ADD RSC /l 0x411 /d "NDEBUG"
 RSC_PROJ=/l 0x411 /fo"$(INTDIR)/gp_rsrc.res" /d "NDEBUG" 
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /machine:MIPS
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib /nologo /subsystem:windows /machine:MIPS
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /machine:ALPHA
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib /nologo /subsystem:windows /machine:ALPHA
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
  odbccp32.lib comctl32.lib /nologo /subsystem:windows /incremental:no\
- /pdb:"$(OUTDIR)/GPadmips.pdb" /machine:MIPS /out:"$(OUTDIR)/GPadmips.exe" 
+ /pdb:"$(OUTDIR)/GPadAXP.pdb" /machine:ALPHA /out:"$(OUTDIR)/GPadAXP.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\app.obj" \
 	"$(INTDIR)\cmdarg.obj" \
@@ -167,7 +167,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\window.obj" \
 	"$(INTDIR)\winutil.obj"
 
-"$(OUTDIR)\GPadmips.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\GPadAXP.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -175,7 +175,7 @@ LINK32_OBJS= \
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/GPadmips.bsc" 
+BSC32_FLAGS=/nologo /o"$(OUTDIR)/GPadAXP.bsc" 
 BSC32_SBRS= \
 	"$(INTDIR)\app.sbr" \
 	"$(INTDIR)\cmdarg.sbr" \
@@ -205,7 +205,7 @@ BSC32_SBRS= \
 	"$(INTDIR)\window.sbr" \
 	"$(INTDIR)\winutil.sbr"
 
-"$(OUTDIR)\GPadmips.bsc" : "$(OUTDIR)" $(BSC32_SBRS)
+"$(OUTDIR)\GPadAXP.bsc" : "$(OUTDIR)" $(BSC32_SBRS)
     $(BSC32) @<<
   $(BSC32_FLAGS) $(BSC32_SBRS)
 <<
@@ -214,18 +214,18 @@ BSC32_SBRS= \
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "MIPSDbg"
-# PROP BASE Intermediate_Dir "MIPSDbg"
+# PROP BASE Output_Dir "ALPHADbg"
+# PROP BASE Intermediate_Dir "ALPHADbg"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "MIPSDbg"
-# PROP Intermediate_Dir "MIPSDbg"
+# PROP Output_Dir "ALPHADbg"
+# PROP Intermediate_Dir "ALPHADbg"
 # PROP Target_Dir ""
-OUTDIR=.\MIPSDbg
-INTDIR=.\MIPSDbg
+OUTDIR=.\ALPHADbg
+INTDIR=.\ALPHADbg
 
-ALL : "$(OUTDIR)\GPadmips.exe"
+ALL : "$(OUTDIR)\GPadAXP.exe"
 
 CLEAN : 
 	-@erase "$(INTDIR)\app.obj"
@@ -257,35 +257,35 @@ CLEAN :
 	-@erase "$(INTDIR)\vc40.pdb"
 	-@erase "$(INTDIR)\window.obj"
 	-@erase "$(INTDIR)\winutil.obj"
-	-@erase "$(OUTDIR)\GPadmips.exe"
-	-@erase "$(OUTDIR)\GPadmips.ilk"
-	-@erase "$(OUTDIR)\GPadmips.pdb"
+	-@erase "$(OUTDIR)\GPadAXP.exe"
+	-@erase "$(OUTDIR)\GPadAXP.ilk"
+	-@erase "$(OUTDIR)\GPadAXP.pdb"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-# ADD BASE MTL /nologo /D "_DEBUG" /mips
-# ADD MTL /nologo /D "_DEBUG" /mips
-MTL_PROJ=/nologo /D "_DEBUG" /mips 
-# ADD BASE CPP /nologo /ML /Gt0 /QMOb2000 /W3 /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FR /YX /c
-# ADD CPP /nologo /ML /Gt0 /QMOb2000 /W3 /Zi /O1 /I "kilib" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D TARGET_VER=310 /D "NO_ASMTHUNK" /YX"stdafx.h" /c
-CPP_PROJ=/nologo /ML /Gt0 /QMOb2000 /W3 /Zi /O1 /I "kilib" /D "_DEBUG" /D\
+# ADD BASE MTL /nologo /D "_DEBUG" /win32
+# ADD MTL /nologo /D "_DEBUG" /win32
+MTL_PROJ=/nologo /D "_DEBUG" /win32 
+# ADD BASE CPP /nologo /ML /Gt0 /W3 /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FR /YX /c
+# ADD CPP /nologo /ML /Gt0 /W3 /Zi /O1 /I "kilib" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D TARGET_VER=310 /D "NO_ASMTHUNK" /YX"stdafx.h" /c
+CPP_PROJ=/nologo /ML /Gt0 /W3 /Zi /O1 /I "kilib" /D "_DEBUG" /D\
  "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D\
- TARGET_VER=310 /D "NO_ASMTHUNK" /Fp"$(INTDIR)/GPadmips.pch" /YX"stdafx.h"\
+ TARGET_VER=310 /D "NO_ASMTHUNK" /Fp"$(INTDIR)/GPadAXP.pch" /YX"stdafx.h"\
  /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
-CPP_OBJS=.\MIPSDbg/
+CPP_OBJS=.\ALPHADbg/
 CPP_SBRS=.\.
 # ADD BASE RSC /l 0x411 /d "_DEBUG"
 # ADD RSC /l 0x411 /d "_DEBUG"
 RSC_PROJ=/l 0x411 /fo"$(INTDIR)/gp_rsrc.res" /d "_DEBUG" 
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /debug /machine:MIPS
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib /nologo /subsystem:windows /debug /machine:MIPS
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /debug /machine:ALPHA
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib /nologo /subsystem:windows /debug /machine:ALPHA
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
  odbccp32.lib comctl32.lib /nologo /subsystem:windows /incremental:yes\
- /pdb:"$(OUTDIR)/GPadmips.pdb" /debug /machine:MIPS\
- /out:"$(OUTDIR)/GPadmips.exe" 
+ /pdb:"$(OUTDIR)/GPadAXP.pdb" /debug /machine:ALPHA\
+ /out:"$(OUTDIR)/GPadAXP.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\app.obj" \
 	"$(INTDIR)\cmdarg.obj" \
@@ -316,7 +316,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\window.obj" \
 	"$(INTDIR)\winutil.obj"
 
-"$(OUTDIR)\GPadmips.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\GPadAXP.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -324,7 +324,7 @@ LINK32_OBJS= \
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/GPadmips.bsc" 
+BSC32_FLAGS=/nologo /o"$(OUTDIR)/GPadAXP.bsc" 
 BSC32_SBRS= \
 	
 
