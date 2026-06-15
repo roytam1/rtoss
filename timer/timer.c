@@ -3,6 +3,69 @@
 
 #define uint64_t unsigned __int64
 
+#define ProcessTimes 4
+
+typedef LONG NTSTATUS;
+#define NT_SUCCESS(Status) (((NTSTATUS)(Status)) >= 0)
+
+// Structure layout specifically for ProcessTimes (Class 0)
+typedef struct _KERNEL_USER_TIMES {
+    LARGE_INTEGER CreateTime;
+    LARGE_INTEGER ExitTime;
+    LARGE_INTEGER KernelTime;
+    LARGE_INTEGER UserTime;
+} KERNEL_USER_TIMES, *PKERNEL_USER_TIMES;
+
+// Prototype for the internal ntdll function
+typedef NTSTATUS (NTAPI *_NtQueryInformationProcess)(
+    HANDLE ProcessHandle,
+    ULONG ProcessInformationClass,
+    PVOID ProcessInformation,
+    ULONG ProcessInformationLength,
+    PULONG ReturnLength
+);
+
+NTSTATUS NtQueryInformationProcess(
+    HANDLE ProcessHandle,
+    ULONG ProcessInformationClass,
+    PVOID ProcessInformation,
+    ULONG ProcessInformationLength,
+    PULONG ReturnLength
+);
+
+BOOL GetProcessTimesNative(HANDLE hProcess, PFILETIME lpCreateTime, PFILETIME lpExitTime, PFILETIME lpKernelTime, PFILETIME lpUserTime) {
+    KERNEL_USER_TIMES times = {0};
+    ULONG returnLength = 0;
+
+    // Call the native API using the process handle directly
+    NTSTATUS status = NtQueryInformationProcess(
+        hProcess, 
+        ProcessTimes, 
+        &times, 
+        sizeof(times), 
+        &returnLength
+    );
+
+    if (!NT_SUCCESS(status)) {
+        return FALSE;
+    }
+
+    // Map the results back to standard Win32 FILETIME structures
+    lpCreateTime->dwLowDateTime = times.CreateTime.LowPart;
+    lpCreateTime->dwHighDateTime = times.CreateTime.HighPart;
+    
+    lpExitTime->dwLowDateTime = times.ExitTime.LowPart;
+    lpExitTime->dwHighDateTime = times.ExitTime.HighPart;
+    
+    lpKernelTime->dwLowDateTime = times.KernelTime.LowPart;
+    lpKernelTime->dwHighDateTime = times.KernelTime.HighPart;
+    
+    lpUserTime->dwLowDateTime = times.UserTime.LowPart;
+    lpUserTime->dwHighDateTime = times.UserTime.HighPart;
+
+    return TRUE;
+}
+
 // Helper to convert FILETIME structure to a 64-bit unsigned integer (in 100-nanosecond units)
 uint64_t FileTimeTo64(const FILETIME *ft) {
     ULARGE_INTEGER li;
@@ -72,7 +135,7 @@ int main() {
     QueryPerformanceCounter(&qpcEnd);
 
     // Retrieve timing metrics from the process
-    GetProcessTimes(pi.hProcess, &creationTime, &exitTime, &kernelTime, &userTime);
+    GetProcessTimesNative(pi.hProcess, &creationTime, &exitTime, &kernelTime, &userTime);
 
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
