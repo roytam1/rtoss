@@ -1,0 +1,6 @@
+LIBRARY ntdll.dll
+
+EXPORTS
+NtQueryInformationProcess
+NtQuerySystemInformation
+RtlUnwind@16=RtlUnwind
