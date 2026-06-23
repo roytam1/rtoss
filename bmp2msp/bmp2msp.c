@@ -138,14 +138,12 @@ int convert_bmp_to_msp(const char *bmp_filename, const char *msp_filename) {
         }
 
         /* Clear MSP buffer row for fresh packing */
-        memset(msp_row_buf, 0, msp_row_stride);
+        memset(msp_row_buf, 0xFF, msp_row_stride);
 
-        /* Process bytes. Invert the bits because MSP is 1=Black, 0=White */
+        /* Process bytes. */
         for (x = 0; x < msp_row_stride; x++) {
             if (x < bmp_row_stride) {
                 msp_row_buf[x] = bmp_row_buf[x];
-            } else {
-                msp_row_buf[x] = 0xFF; /* Pad out remaining bits if needed */
             }
         }
 
