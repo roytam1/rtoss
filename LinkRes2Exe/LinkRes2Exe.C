@@ -19,12 +19,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef CP_ACP
+#define CP_ACP 0
+#endif
 
 // *************************************************
 // Instruct Linker to Search Object/Import Libraries
 // *************************************************
+#ifdef _MSC_VER
 #pragma comment(lib,"kernel32.lib")
-
+#endif
 
 // *************************************************
 //          User Defined Types And Unions
