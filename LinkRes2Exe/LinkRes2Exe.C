@@ -261,6 +261,7 @@ int AddRes2File (char *ResFile, char *TgtFile)
   HANDLE    h;
   ResHead1  rh1;
   ResHead2 *rh2;
+  char   szTgtFile[MAX_PATH];
   DWORD  ResName;
   char   szResName[2048];
   DWORD  ResType;
@@ -283,7 +284,8 @@ int AddRes2File (char *ResFile, char *TgtFile)
       printf("%s%s\n","File not found: ",TgtFile);
       return 1;
     }
-  h=BeginUpdateResource(TgtFile,TRUE);
+  _fullpath(szTgtFile,TgtFile,MAX_PATH);
+  h=BeginUpdateResource(szTgtFile,TRUE);
   if(h==NULL)
     {
       printf("%s\n","BeginUpdateResource failed...");
