@@ -168,9 +168,14 @@ LRESULT GreenPadWnd::on_message( UINT msg, WPARAM wp, LPARAM lp )
 			HGLOBAL hDrop = reinterpret_cast<HGLOBAL>(wp);
 			DROPFILES *df = (DROPFILES *)::GlobalLock( hDrop );
 			size_t hdropSize = ::GlobalSize( hDrop );
-			HWND *hDummy = (HWND*)( ((BYTE*)df) + hdropSize - 2*sizeof(HWND) );
-			HWND *hCustomHwnd = (HWND*)( ((BYTE*)hDummy) + sizeof(HWND) );
-			BOOL bProcessDrops = *hDummy || (*hDummy == 0 && *hCustomHwnd != hwnd());
+			BYTE* pEnd = ((BYTE*)df) + hdropSize;
+			BYTE* pDummyLoc = pEnd - 2 * sizeof(HWND);
+			BYTE* pCustomLoc = pEnd - sizeof(HWND);
+			HWND dummyVal = NULL;
+			HWND customHwndVal = NULL;
+			memcpy(&dummyVal, pDummyLoc, sizeof(HWND));
+			memcpy(&customHwndVal, pCustomLoc, sizeof(HWND));
+			BOOL bProcessDrops = dummyVal || (dummyVal == 0 && customHwndVal != hwnd());
 			::GlobalUnlock(hDrop);
 			if(bProcessDrops)
 			{
