@@ -325,7 +325,7 @@ void build_matrix(const unsigned char *text, int len, const QRVersionSpec *spec,
 }
 
 // --- Windows Console Renderer ---
-void render_win32_console(const QRMatrix *m) {
+void render_win32_console(const QRMatrix *m, int char_pre_dot) {
     int r, b, c;
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -334,13 +334,18 @@ void render_win32_console(const QRMatrix *m) {
 
     int border = 2;
     int total_dim = m->size + (border * 2);
+    char dots[3];
+
+    sprintf(dots, "  ");
+    if(char_pre_dot == 1)
+        dots[1] = 0;
 
     printf("\n");
 
     // Top Quiet Zone
     for (r = 0; r < border; r++) {
         SetConsoleTextAttribute(hConsole, WHITE_BG);
-        for (c = 0; c < total_dim; c++) printf("  ");
+        for (c = 0; c < total_dim; c++) printf(dots);
         SetConsoleTextAttribute(hConsole, BLACK_BG);
         printf("\n");
     }
@@ -349,21 +354,21 @@ void render_win32_console(const QRMatrix *m) {
     for (r = 0; r < m->size; r++) {
         // Left Quiet Zone
         SetConsoleTextAttribute(hConsole, WHITE_BG);
-        for (b = 0; b < border; b++) printf("  ");
+        for (b = 0; b < border; b++) printf(dots);
 
         for (c = 0; c < m->size; c++) {
             if (m->modules[r][c] == 1) {
                 SetConsoleTextAttribute(hConsole, BLACK_BG);
-                printf("  ");
+                printf(dots);
             } else {
                 SetConsoleTextAttribute(hConsole, WHITE_BG);
-                printf("  ");
+                printf(dots);
             }
         }
 
         // Right Quiet Zone
         SetConsoleTextAttribute(hConsole, WHITE_BG);
-        for (b = 0; b < border; b++) printf("  ");
+        for (b = 0; b < border; b++) printf(dots);
 
         SetConsoleTextAttribute(hConsole, BLACK_BG);
         printf("\n");
@@ -372,7 +377,7 @@ void render_win32_console(const QRMatrix *m) {
     // Bottom Quiet Zone
     for (r = 0; r < border; r++) {
         SetConsoleTextAttribute(hConsole, WHITE_BG);
-        for (c = 0; c < total_dim; c++) printf("  ");
+        for (c = 0; c < total_dim; c++) printf(dots);
         SetConsoleTextAttribute(hConsole, BLACK_BG);
         printf("\n");
     }
@@ -382,12 +387,15 @@ void render_win32_console(const QRMatrix *m) {
 }
 
 int main(int argc, char *argv[]) {
-    const char *text = (argc > 1) ? argv[1] : "otpauth://totp/ExampleCo:alice@example.com?secret=JBSWY3DPEHPK3PXP&issuer=ExampleCo&algorithm=SHA1&digits=6&period=30";
-    int i, len = strlen(text);
+    const char *text = (argc > 2) ? argv[2] : "otpauth://totp/ExampleCo:alice@example.com?secret=JBSWY3DPEHPK3PXP&issuer=ExampleCo&algorithm=SHA1&digits=6&period=30";
+    int i, len, char_pre_dot = 2;
     QRMatrix matrix;
+    const QRVersionSpec *selected_spec = NULL;
+
+    if(argc > 1 && *argv[1]=='1') char_pre_dot = 1;
+    len = strlen(text);
 
     // Auto-select smallest fitting QR version (V1 to V8)
-    const QRVersionSpec *selected_spec = NULL;
     for (i = 0; i < 8; i++) {
         int max_payload = VERSION_SPECS[i].total_data_bytes - 2; // -2 for mode & len headers
         if (len <= max_payload) {
@@ -408,7 +416,7 @@ int main(int argc, char *argv[]) {
     printf("QR Version: %d (%dx%d grid)\n", selected_spec->version, selected_spec->size, selected_spec->size);
     printf("Payload (%d bytes): \"%s\"\n", len, text);
 
-    render_win32_console(&matrix);
+    render_win32_console(&matrix, char_pre_dot);
 
     return 0;
 }
