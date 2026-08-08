@@ -379,7 +379,7 @@ void render_win32_console(const QRMatrix *m, int char_pre_dot) {
         SetConsoleTextAttribute(hConsole, WHITE_BG);
         for (c = 0; c < total_dim; c++) printf(dots);
         SetConsoleTextAttribute(hConsole, BLACK_BG);
-        printf("\n");
+        if(r < border-1) printf("\n");
     }
 
     // Reset console text attribute
@@ -414,7 +414,7 @@ int main(int argc, char *argv[]) {
     build_matrix((const unsigned char *)text, len, selected_spec, &matrix);
 
     printf("QR Version: %d (%dx%d grid)\n", selected_spec->version, selected_spec->size, selected_spec->size);
-    printf("Payload (%d bytes): \"%s\"\n", len, text);
+    printf("Payload (%d bytes): \"%s\"", len, text);
 
     render_win32_console(&matrix, char_pre_dot);
 
