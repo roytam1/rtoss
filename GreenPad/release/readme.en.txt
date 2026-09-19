@@ -108,6 +108,9 @@
         ?    : 0 or 1
         *    : 0 or more
         +    : 1 or more
+        *?   : 0 or more (shortest match)
+        +?   : 1 or more (shortest match)
+        ??   : 0 or 1 (shortest match)
 
       alternation:
         a|b
@@ -116,8 +119,13 @@
 
       special escape characters:
         \t   : tab
+        \n   : line feed
+        \r   : carriage return
+        \f   : form feed
+        \v   : vertical tab
+        \a   : bell
         \\   : '\' itself
-        \[   : '['
+        \[   : '[' (any other \x means 'x' itself)
 
       positional match:
         ^  : start of line
@@ -138,7 +146,9 @@
       * GreenPad does searching line by line, thus
         you cannot search "aaa\nbbb" or something like it.
       * No forward/backward references.
-      * No shortest matches (every * is greedy)
+      * In the replacement text of a regular-expression replace,
+        \t \n \r \f \v \a \\ are decoded (any other \x means 'x').
+        A decoded \n splits the line.
 
   * External Grep Program ?
 
