@@ -622,6 +622,36 @@ void ViewImpl::DrawTXT( const VDrawInfo& v, Painter& p )
 					while( n<end && (flg[n]>>5)==0 )
 						++n;
 
+				// Merge following same-color plain-text tokens into
+				// this draw call. Tab/space/U+3000 runs keep their own
+				// drawing, and color changes still split. Pixels are
+				// identical, GDI calls much fewer on long lines.
+				if( str[i]!=L'\t' && str[i]!=L' ' && str[i]!=0x3000 )
+				{
+					ulong nn;
+					bool hsp = p.sc(scHSP);
+					bool zsp = p.sc(scZSP);
+					while( n<end )
+					{
+						if( str[n]==L'\t' )
+							break;
+						if( str[n]==L' ' && hsp )
+							break;
+						if( str[n]==0x3000 && zsp )
+							break;
+						if( (flg[n]&3) != (flg[i]&3) )
+							break;
+						t = (flg[n]>>5);
+						nn = n + t;
+						if( nn >= end )
+							{ n = end; break; }
+						if( t==7 || t==0 )
+							while( nn<end && (flg[nn]>>5)==0 )
+								++nn;
+						n = nn;
+					}
+				}
+
 				// x2, i2 := ‚±‚ÌToken‚Ì‰E’[
 				i2 ++;
 				x2 = (str[i]==L'\t' ? p.nextTab(x2) : x2+p.W(&str[i]));
