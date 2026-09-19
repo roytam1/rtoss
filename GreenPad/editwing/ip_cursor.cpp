@@ -929,6 +929,12 @@ OleDnDTarget::~OleDnDTarget(  )
 
 HRESULT STDMETHODCALLTYPE OleDnDTarget::Drop(IDataObject *pDataObj, DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect)
 {
+	// A drop in the middle of file loading would corrupt the view.
+	if( view_.isBusy() )
+	{
+		*pdwEffect = DROPEFFECT_NONE;
+		return S_OK;
+	}
 	STGMEDIUM stg = { 0 };
 	// Try with UNICODE text first!
 	FORMATETC fmt = { CF_UNICODETEXT, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
@@ -1004,6 +1010,11 @@ HRESULT STDMETHODCALLTYPE OleDnDTarget::QueryInterface(REFIID riid, void **ppvOb
 
 HRESULT STDMETHODCALLTYPE OleDnDTarget::DragOver(DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect)
 {
+	if( view_.isBusy() )
+	{
+		*pdwEffect = DROPEFFECT_NONE;
+		return S_OK;
+	}
 	setDropEffect( grfKeyState, pdwEffect );
 
 	if( grfKeyState & MK_SHIFT )

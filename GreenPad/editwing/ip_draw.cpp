@@ -101,6 +101,23 @@ Cursor& View::cur()
 
 LRESULT View::on_message( UINT msg, WPARAM wp, LPARAM lp )
 {
+	// While a file is loading the view info is stale. Paints are
+	// still handled (as no-ops, see on_paint), a resize is deferred,
+	// and everything else is dropped. Win32s-safe: no threads.
+	if( impl_->isBusy() )
+	{
+		if( msg == WM_SIZE )
+			{ impl_->deferResize( LOWORD(lp), HIWORD(lp) ); return 0; }
+		switch( msg )
+		{
+		case WM_PAINT:
+		case WM_SETFOCUS:
+		case WM_KILLFOCUS:
+			break;
+		default:
+			return 0;
+		}
+	}
 	switch( msg )
 	{
 	case WM_PAINT:{
@@ -470,6 +487,10 @@ void ViewImpl::ReDraw( ReDrawType r, const DPos* s )
 
 void ViewImpl::on_paint( const PAINTSTRUCT& ps )
 {
+	// While loading, keep the old pixels (Begin/EndPaint in the
+	// caller still validate the region).
+	if( doc_.isBusy() )
+		return;
 	// •`‰æ”ÍˆÍ‚Ìî•ñ‚ğÚ‚µ‚­æ“¾, Obtain detailed information about the drawing area
 	Painter& p = cvs_.getPainter();
 	p.SetupDC( ps.hdc );

@@ -224,6 +224,17 @@ LRESULT GreenPadWnd::on_message( UINT msg, WPARAM wp, LPARAM lp )
 
 bool GreenPadWnd::on_command( UINT id, HWND ctrl )
 {
+	// While a file is loading only exit is honored. In particular
+	// no second open/save/edit may run on the half-loaded doc.
+	if( edit_.getDoc().isBusy() )
+		switch( id )
+		{
+		case ID_CMD_EXIT:
+		case ID_CMD_DISCARDEXIT:
+			break;
+		default:
+			return true;
+		}
 	switch( id )
 	{
 	// Window

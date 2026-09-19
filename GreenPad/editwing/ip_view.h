@@ -370,6 +370,9 @@ public:
 	const Painter& fnt() const { return cvs_.getPainter(); }
 
 
+	bool isBusy() const { return doc_.isBusy(); }
+	void deferResize( int cx, int cy );
+
 	void on_hscroll( int code, int pos );
 	void on_vscroll( int code, int pos );
 	void on_wheel( short delta );
@@ -402,6 +405,7 @@ private:
 	gapbufobj<WLine> wrap_;
 	ulong            vlNum_;
 	ulong            textCx_;
+	bool             resizePending_;
 	short            accdelta_;
 	short            accdeltax_;
 

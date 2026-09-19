@@ -337,6 +337,9 @@ public:
 	//@{ 操作コマンド実行 //@}
 	void Execute( const Command& cmd );
 
+	//@{ Loading, for cooperative file loading //@}
+	bool isBusy() const { return doc_.isBusy(); }
+
 	//@{ キーワード定義切り替え //@}
 	void SetKeyword( const unicode* defbuf, ulong siz );
 

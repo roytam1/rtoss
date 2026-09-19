@@ -233,6 +233,8 @@ bool SearchManager::on_command( UINT cmd, UINT id, HWND ctrl )
 
 void SearchManager::on_findnext()
 {
+	if( edit_.getDoc().isBusy() )
+		return;
 	UpdateData();
 	ConstructSearcher();
 	if( isReady() )
@@ -244,6 +246,8 @@ void SearchManager::on_findnext()
 
 void SearchManager::on_findprev()
 {
+	if( edit_.getDoc().isBusy() )
+		return;
 	UpdateData();
 	ConstructSearcher( false );
 	if( isReady() )
@@ -252,6 +256,8 @@ void SearchManager::on_findprev()
 
 void SearchManager::on_replacenext()
 {
+	if( edit_.getDoc().isBusy() )
+		return;
 	UpdateData();
 	ConstructSearcher();
 	if( isReady() )
@@ -260,6 +266,8 @@ void SearchManager::on_replacenext()
 
 void SearchManager::on_replaceall()
 {
+	if( edit_.getDoc().isBusy() )
+		return;
 	UpdateData();
 	ConstructSearcher();
 	if( isReady() )
