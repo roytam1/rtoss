@@ -53,6 +53,7 @@ using namespace ki;
 	}
 	#endif
 
+	#if defined(_M_IX86)
 	void* __cdecl memmove( void* dst, const void* src, size_t cnt )
 	{
 		__asm {
@@ -119,6 +120,7 @@ using namespace ki;
 		}
 		return dst;
 	}
+	#endif
 
 #endif
 

@@ -173,8 +173,8 @@ LRESULT GreenPadWnd::on_message( UINT msg, WPARAM wp, LPARAM lp )
 			BYTE* pCustomLoc = pEnd - sizeof(HWND);
 			HWND dummyVal = NULL;
 			HWND customHwndVal = NULL;
-			memcpy(&dummyVal, pDummyLoc, sizeof(HWND));
-			memcpy(&customHwndVal, pCustomLoc, sizeof(HWND));
+			memmove(&dummyVal, pDummyLoc, sizeof(HWND));
+			memmove(&customHwndVal, pCustomLoc, sizeof(HWND));
 			BOOL bProcessDrops = dummyVal || (dummyVal == 0 && customHwndVal != hwnd());
 			::GlobalUnlock(hDrop);
 			if(bProcessDrops)
