@@ -464,6 +464,7 @@ BEGIN
     IDS_REPLACEALLDONE      "%d箇所置換しました。"
     IDS_OKTODEL             "を削除してよろしいですか？"
     IDS_LOADING             "ファイルを読み込んでいます..."
+    IDS_SAVELOSSY             "このエンコーディングでは保存できない文字があり、それらは失われます。このまま保存しますか？"
 END
 
 #endif    // 日本語 resources
@@ -782,6 +783,7 @@ BEGIN
     IDS_REPLACEALLDONE      "%d times Replaced."
     IDS_OKTODEL             " will be removed. OK?"
     IDS_LOADING             "Loading file..."
+    IDS_SAVELOSSY             "Some characters cannot be saved in this encoding and will be lost. Save anyway?"
 END
 
 #endif    // 英語 (米国) resources

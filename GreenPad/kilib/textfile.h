@@ -248,6 +248,12 @@ public:
 	TextFileW( int charset, int linebreak );
 	~TextFileW();
 
+	//@{ Saving in this charset never loses data //@}
+	static bool MayLoseData( int charset );
+
+	//@{ str holds chars unmappable to charset //@}
+	static bool HasLossyChars( int charset, const unicode* str, ulong len );
+
 	//@{ ŠJ‚­ //@}
 	bool Open( const TCHAR* fname );
 

@@ -3165,3 +3165,84 @@ bool TextFileW::Open( const TCHAR* fname )
 	}
 	return true;
 }
+
+
+//=========================================================================
+//@{ Lossy-save detection: mirrors the TextFileW writer conversions //@}
+//=========================================================================
+
+bool TextFileW::MayLoseData( int cs )
+{
+	switch( cs )
+	{
+	case UTF16l: case UTF16LE: case UTF16b: case UTF16BE:
+	case UTF32l: case UTF32LE: case UTF32b: case UTF32BE:
+	case UTF1: case UTF1Y: case UTF5: case UTF7:
+	case UTF8: case UTF8N:
+	case UTF9: case UTF9Y: case OFSSUTF: case OFSSUTFY: case UTFVLQY:
+	case SCSU: case BOCU1:
+		return false;
+	default:
+		return true;
+	}
+}
+
+// WC_NO_BEST_FIT_CHARS may be missing from very old SDK headers
+#ifndef WC_NO_BEST_FIT_CHARS
+#define WC_NO_BEST_FIT_CHARS 0x00000400
+#endif
+
+bool TextFileW::HasLossyChars( int cs, const unicode* str, ulong len )
+{
+	if( len == 0 )
+		return false;
+	if( cs == Western )
+	{
+		// wWest writes '?' for anything above 0xFF
+		for( ulong i=0; i<len; ++i )
+			if( str[i] > 0xFF )
+				return true;
+		return false;
+	}
+	int cp = cs;
+	if( cs == EucJP || cs == IsoJP )
+		cp = 932;
+	else if( cs == IsoKR )
+		cp = UHC;
+	else if( cs == IsoCN || cs == HZ )
+		cp = GBK;
+	if( cp == 65001 || cp == 65000 )
+		return false; // lossless, and WCTMB forbids a used-flag here
+	// Same conversion as wMBCS::WriteLine, watching for default-char
+	// substitution. Chunks never split a surrogate pair.
+	aarr<char> buf( new char[65536*4+16] );
+	for( ulong i=0; i<len; )
+	{
+		ulong n = Min( 65536UL, len-i );
+		if( n < len-i && str[i+n-1]>=0xD800 && str[i+n-1]<=0xDBFF )
+			++n;
+		BOOL used = FALSE;
+		// NO_BEST_FIT: only exact codepage entries count as
+		// representable (best-fit mappings do not round-trip).
+		int r = ::WideCharToMultiByte( cp, WC_NO_BEST_FIT_CHARS,
+			str+i, n, buf.get(), 65536*4+16, NULL, &used );
+		if( r == 0 && ::GetLastError() == ERROR_INVALID_FLAGS )
+		{
+			// Strict flag unknown: same mapping as the writer.
+			used = FALSE;
+			r = ::WideCharToMultiByte( cp, 0, str+i, n,
+				buf.get(), 65536*4+16, NULL, &used );
+		}
+		if( r == 0 && ::GetLastError() == ERROR_INVALID_PARAMETER && !used )
+		{
+			// Used-flag itself unknown: writer check only (no detection,
+			// but also no false warnings).
+			r = ::WideCharToMultiByte( cp, 0, str+i, n,
+				buf.get(), 65536*4+16, NULL, NULL );
+		}
+		if( r == 0 || used )
+			return true;
+		i += n;
+	}
+	return false;
+}

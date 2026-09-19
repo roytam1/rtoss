@@ -1282,6 +1282,21 @@ bool GreenPadWnd::Save()
 		save_Csi = charSets_[csi_].ID;
 
 	TextFileW tf( save_Csi, lb_ );
+
+	// Warn if some characters cannot be saved in this encoding.
+	// Must run before Open(), which truncates the file.
+	if( TextFileW::MayLoseData( save_Csi ) )
+	{
+		bool loss = false;
+		for( ulong i=0, e=edit_.getDoc().tln(); i<e && !loss; ++i )
+			loss = TextFileW::HasLossyChars( save_Csi,
+				edit_.getDoc().tl(i), edit_.getDoc().len(i) );
+		if( loss && MsgBox( String(IDS_SAVELOSSY).c_str(),
+				String(IDS_APPNAME).c_str(),
+				MB_YESNO|MB_ICONEXCLAMATION ) != IDYES )
+			return false;
+	}
+
 	if( tf.Open( filename_.c_str() ) )
 	{
 		// –³Ž–ƒtƒ@ƒCƒ‹‚É•Û‘¶‚Å‚«‚½ê‡
