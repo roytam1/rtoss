@@ -1287,14 +1287,30 @@ bool GreenPadWnd::Save()
 	// Must run before Open(), which truncates the file.
 	if( TextFileW::MayLoseData( save_Csi ) )
 	{
+		DPos bad( 0, 0 );
 		bool loss = false;
 		for( ulong i=0, e=edit_.getDoc().tln(); i<e && !loss; ++i )
-			loss = TextFileW::HasLossyChars( save_Csi,
-				edit_.getDoc().tl(i), edit_.getDoc().len(i) );
+		{
+			ulong ad = 0;
+			if( TextFileW::FindLossyChar( save_Csi,
+					edit_.getDoc().tl(i), edit_.getDoc().len(i), &ad ) )
+				{ loss = true; bad = DPos( i, ad ); }
+		}
 		if( loss && MsgBox( String(IDS_SAVELOSSY).c_str(),
 				String(IDS_APPNAME).c_str(),
 				MB_YESNO|MB_ICONEXCLAMATION ) != IDYES )
+		{
+			// Highlight the first unmappable character
+			const unicode* ln = edit_.getDoc().tl( bad.tl );
+			ulong ed = bad.ad + 1;
+			if( ed < edit_.getDoc().len( bad.tl )
+			 && isHighSurrogate( ln[bad.ad] )
+			 && isLowSurrogate( ln[bad.ad+1] ) )
+				++ed;
+			edit_.getCursor().MoveCur( bad, false );
+			edit_.getCursor().MoveCur( DPos( bad.tl, ed ), true );
 			return false;
+		}
 	}
 
 	if( tf.Open( filename_.c_str() ) )

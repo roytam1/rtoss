@@ -254,6 +254,10 @@ public:
 	//@{ str holds chars unmappable to charset //@}
 	static bool HasLossyChars( int charset, const unicode* str, ulong len );
 
+	//@{ Index of first char unmappable to charset, if any //@}
+	static bool FindLossyChar( int charset,
+		const unicode* str, ulong len, ulong* pos );
+
 	//@{ ŠJ‚­ //@}
 	bool Open( const TCHAR* fname );
 

@@ -3192,7 +3192,38 @@ bool TextFileW::MayLoseData( int cs )
 #define WC_NO_BEST_FIT_CHARS 0x00000400
 #endif
 
+// Convert one span, reporting default-char substitution in *used.
+// Returns 0 on total failure. Degrades gracefully on retro systems.
+static int ConvertSpan( int cp, const unicode* str, ulong n,
+	char* buf, ulong bsiz, BOOL* used )
+{
+	*used = FALSE;
+	// NO_BEST_FIT: only exact codepage entries count as
+	// representable (best-fit mappings do not round-trip).
+	int r = ::WideCharToMultiByte( cp, WC_NO_BEST_FIT_CHARS,
+		str, n, buf, bsiz, NULL, used );
+	if( r == 0 && ::GetLastError() == ERROR_INVALID_FLAGS )
+	{
+		// Strict flag unknown: same mapping as the writer.
+		*used = FALSE;
+		r = ::WideCharToMultiByte( cp, 0, str, n, buf, bsiz, NULL, used );
+	}
+	if( r == 0 && ::GetLastError() == ERROR_INVALID_PARAMETER && !*used )
+	{
+		// Used-flag itself unknown: writer check only (no detection,
+		// but also no false warnings).
+		r = ::WideCharToMultiByte( cp, 0, str, n, buf, bsiz, NULL, NULL );
+	}
+	return r;
+}
+
 bool TextFileW::HasLossyChars( int cs, const unicode* str, ulong len )
+{
+	ulong pos;
+	return FindLossyChar( cs, str, len, &pos );
+}
+
+bool TextFileW::FindLossyChar( int cs, const unicode* str, ulong len, ulong* pos )
 {
 	if( len == 0 )
 		return false;
@@ -3201,7 +3232,7 @@ bool TextFileW::HasLossyChars( int cs, const unicode* str, ulong len )
 		// wWest writes '?' for anything above 0xFF
 		for( ulong i=0; i<len; ++i )
 			if( str[i] > 0xFF )
-				return true;
+				{ *pos = i; return true; }
 		return false;
 	}
 	int cp = cs;
@@ -3222,27 +3253,28 @@ bool TextFileW::HasLossyChars( int cs, const unicode* str, ulong len )
 		if( n < len-i && str[i+n-1]>=0xD800 && str[i+n-1]<=0xDBFF )
 			++n;
 		BOOL used = FALSE;
-		// NO_BEST_FIT: only exact codepage entries count as
-		// representable (best-fit mappings do not round-trip).
-		int r = ::WideCharToMultiByte( cp, WC_NO_BEST_FIT_CHARS,
-			str+i, n, buf.get(), 65536*4+16, NULL, &used );
-		if( r == 0 && ::GetLastError() == ERROR_INVALID_FLAGS )
+		int r = ConvertSpan( cp, str+i, n, buf.get(), 65536*4+16, &used );
+		if( r != 0 && !used )
+			{ i += n; continue; }
+		// Pinpoint the first bad unit inside this chunk
+		char tmp[16];
+		for( ulong j=i; j<i+n; )
 		{
-			// Strict flag unknown: same mapping as the writer.
-			used = FALSE;
-			r = ::WideCharToMultiByte( cp, 0, str+i, n,
-				buf.get(), 65536*4+16, NULL, &used );
+			ulong u = 1;
+			if( j+1 < i+n && str[j]>=0xD800 && str[j]<=0xDBFF
+			             && str[j+1]>=0xDC00 && str[j+1]<=0xDFFF )
+				u = 2;
+			BOOL uu = FALSE;
+			int rr = ConvertSpan( cp, str+j, u,
+				tmp, (ulong)sizeof(tmp), &uu );
+			if( rr == 0 || uu )
+				{ *pos = j; return true; }
+			j += u;
 		}
-		if( r == 0 && ::GetLastError() == ERROR_INVALID_PARAMETER && !used )
-		{
-			// Used-flag itself unknown: writer check only (no detection,
-			// but also no false warnings).
-			r = ::WideCharToMultiByte( cp, 0, str+i, n,
-				buf.get(), 65536*4+16, NULL, NULL );
-		}
-		if( r == 0 || used )
-			return true;
-		i += n;
+		// Unreachable for stateless conversions, but never misreport:
+		// the chunk is lossy, so point at its start.
+		*pos = i;
+		return true;
 	}
 	return false;
 }
