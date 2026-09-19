@@ -521,14 +521,21 @@ void ViewImpl::GetVPos( int x, int y, VPos* vp, bool linemode ) const
 
 		while( ad<adend )
 		{
-			int nvx = (str[ad]==L'\t'
-				? fnt().nextTab(vx)
-				:  vx + fnt().W(&str[ad])
-			);
-			if( x+2 < nvx )
+			int w;
+			ulong adv = 1;
+			if( str[ad]==L'\t' )
+				w = fnt().nextTab(vx) - vx;
+			else if( isHighSurrogate(str[ad])
+			      && ad+1<adend && isLowSurrogate(str[ad+1]) )
+				w = fnt().W(&str[ad]), adv = 2;
+			else
+				w = fnt().W(&str[ad]);
+			// caret goes after the char when clicked on its right
+			// half, like standard Windows textboxes
+			if( x < vx + ((w+1)>>1) )
 				break;
-			vx = nvx;
-			++ad;
+			vx += w;
+			ad += adv;
 		}
 
 		vp->ad          = ad;
