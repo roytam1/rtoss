@@ -63,7 +63,10 @@ public:
 			{
 				// バッファ拡張
 				ulong psiz = (alen_+1)*2+alen_;
-				alen_ = len_+siz; // Max( alen_<<1, len_+siz );
+				ulong need = len_+siz;
+				// Small lines grow exactly as before; large lines grow
+				// geometrically so loading huge lines stays linear.
+				alen_ = (need < 4096 ? need : Max( alen_<<1, need ));
 				unicode* tmpS =
 					static_cast<unicode*>( mem().Alloc(EVEN((alen_+1)*2+alen_)) );
 				uchar*   tmpF =
@@ -333,6 +336,9 @@ public:
 
 	//@{ 操作コマンド実行 //@}
 	void Execute( const Command& cmd );
+
+	//@{ Loading, for cooperative file loading //@}
+	bool isBusy() const { return doc_.isBusy(); }
 
 	//@{ キーワード定義切り替え //@}
 	void SetKeyword( const unicode* defbuf, ulong siz );

@@ -702,6 +702,9 @@ void DocImpl::ClearAll()
 
 void DocImpl::OpenFile( aptr<TextFileR> tf )
 {
+	// The whole loading runs on the UI thread (no worker on Win32s),
+	// so mark the doc busy; handlers check this flag while pumping.
+	doc_.setBusyFlag();
 	// ToDo: マルチスレッド化
 	//currentOpeningFile_ = tf;
 	//thd().Run( *this );
@@ -738,6 +741,14 @@ void DocImpl::OpenFile( aptr<TextFileR> tf )
 		DPos p( i, len(e.tl) ); // end of document
 		InsertingOperation( p, buf, (ulong)L, e, /*reparse=*/false );
 		i = tln() - 1;
+		// Stay responsive: let paints and timers run. Input and
+		// scrolling are dropped by the busy guards elsewhere.
+		MSG msg;
+		while( ::PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
+		{
+			::TranslateMessage( &msg );
+			::DispatchMessage( &msg );
+		}
 	}
 	// Parse All lines, because we skipped it
 	ReParse( 0, tln()-1 );
@@ -746,6 +757,7 @@ void DocImpl::OpenFile( aptr<TextFileR> tf )
 		delete [] buf;
 
 	// イベント発火
+	doc_.setBusyFlag( false );
 	Fire_TEXTUPDATE( DPos(0,0), DPos(0,0), e, true, false );
 }
 

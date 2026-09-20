@@ -177,7 +177,7 @@ void App::init_osver()
 		}
 	}
 	// check system32 if verion is > 3.10
-	if(mvi_.wPlatform == VER_PLATFORM_WIN32_NT && mvi_.MVI_BUILD > MKVER(3, 10)) {
+	if(mvi_.wPlatform == VER_PLATFORM_WIN32_NT && mvi_.MVI_VER > MKVER(3, 10)) {
 		char cSysDir[256];
 		int iSysDirLen = 0;
 		iSysDirLen = GetSystemDirectoryA(cSysDir, 256);
@@ -206,7 +206,7 @@ bool App::isNewTypeWindows()
 {
 	return (
 		( mvi_.wPlatform==VER_PLATFORM_WIN32_NT && mvi_.MVI_MAJOR >= 5 )
-	 || ( mvi_.wPlatform==VER_PLATFORM_WIN32_WINDOWS && mvi_.MVI_BUILD >= MKVER(4, 10) )
+	 || ( mvi_.wPlatform==VER_PLATFORM_WIN32_WINDOWS && mvi_.MVI_VER >= MKVER(4, 10) )
 	);
 }
 

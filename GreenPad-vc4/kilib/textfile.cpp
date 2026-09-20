@@ -6,6 +6,10 @@
 #include "path.h"
 using namespace ki;
 
+#ifndef NO_GMBXWC
+#include "../gmbxwc_dynload.h"
+#endif
+
 #ifndef NO_CHARDET
 
 #define CHARDET_RESULT_OK		    0
@@ -16,6 +20,103 @@ typedef void* chardet_t;
 
 #endif //NO_CHARDET
 
+#ifndef NO_GMBXWC
+namespace {
+HMODULE hGmbxwc = NULL;
+GmbxwcApi gmbxwcApi;
+bool gmbxwcTried = false;
+
+const TCHAR* GmbxwcDllName()
+{
+#if defined(_M_AMD64) || defined(_M_X64)
+	return TEXT("gmbxwc_x64.dll");
+#elif defined(_M_IA64)
+	return TEXT("gmbxwc_ia64.dll");
+#elif defined(_M_ARM64)
+	return TEXT("gmbxwc_arm64.dll");
+#elif defined(_M_ARM)
+	return TEXT("gmbxwc_arm.dll");
+#elif defined(_MIPS_)
+	return TEXT("gmbxwc_mips.dll");
+#elif defined(_M_PPC)
+	return TEXT("gmbxwc_ppc.dll");
+#elif defined(_M_ALPHA) && defined(WIN64)
+	return TEXT("gmbxwc_axp64.dll");
+#elif defined(_M_ALPHA)
+	return TEXT("gmbxwc_axp.dll");
+#else
+	return TEXT("gmbxwc.dll");
+#endif
+}
+
+// Load once and keep loaded. False when unavailable.
+// Raw Win32 calls only (no kilib strings): the loader must work
+// before anything else is initialized, like the chardet check
+// it is modeled after (existence test first: Win32s-safe).
+bool EnsureGmbxwc()
+{
+	if( !gmbxwcTried )
+	{
+		gmbxwcTried = true;
+		TCHAR path[MAX_PATH];
+		DWORD len = ::GetModuleFileName( NULL, path, countof(path) );
+		if( len != 0 && len < countof(path) )
+		{
+			TCHAR* slash = path;
+			for( const TCHAR* p=path; *p; p=String::next(p) )
+				if( *p==TEXT('\\') || *p==TEXT('/') )
+					slash = const_cast<TCHAR*>(p)+1;
+			const TCHAR* dll = GmbxwcDllName();
+			ulong room = (ulong)(path+countof(path)-slash);
+			ulong i = 0;
+			while( dll[i] && i+1 < room )
+				{ slash[i] = dll[i]; ++i; }
+			slash[i] = TEXT('\0');
+			if( dll[i]==TEXT('\0')
+			 && ::GetFileAttributes( path ) != 0xffffffff )
+			{
+				hGmbxwc = ::LoadLibrary( path );
+				if( hGmbxwc != NULL && !GmbxwcApi_Load( hGmbxwc, &gmbxwcApi ) )
+				{
+					::FreeLibrary( hGmbxwc );
+					hGmbxwc = NULL;
+				}
+			}
+		}
+	}
+	return hGmbxwc != NULL;
+}
+} // namespace
+#endif // NO_GMBXWC
+
+ulong ki::GmbxwcCount()
+{
+#ifndef NO_GMBXWC
+	if( !EnsureGmbxwc() )
+		return 0;
+	return gmbxwcApi.EmbeddedCount();
+#else
+	return 0;
+#endif
+}
+
+bool ki::GmbxwcTable( ulong idx, ulong* codepage, const char** displayName )
+{
+#ifndef NO_GMBXWC
+	EmbeddedTableInfo info;
+	if( !EnsureGmbxwc() )
+		return false;
+	if( !gmbxwcApi.EmbeddedInfo( idx, &info ) )
+		return false;
+	*codepage = info.code_page;
+	*displayName = info.display_name;
+	return true;
+#else
+	(void)idx; (void)codepage; (void)displayName;
+	return false;
+#endif
+}
+
 //=========================================================================
 // テキストファイル読み出し共通インターフェイス
 //=========================================================================
@@ -24,6 +125,8 @@ struct ki::TextFileRPimpl : public Object
 {
 	inline TextFileRPimpl()
 		: state(EOL) {}
+
+	virtual ~TextFileRPimpl() {}
 
 	virtual size_t ReadBuf( unicode* buf, ulong siz )
 		= 0;
@@ -300,6 +403,54 @@ struct rUtfOFSS : public rBasicUTF
 	}
 };
 
+//-------------------------------------------------------------------------
+// UTF-VLQ (Base128-BE)
+//-------------------------------------------------------------------------
+struct rUtfVLQ : public rBasicUTF
+{
+	rUtfVLQ( const uchar* b, ulong s )
+		: fb( b )
+		, fe( b+s )
+		, SurrogateLow( 0 ) {}
+
+	const uchar *fb, *fe;
+	qbyte SurrogateLow;
+
+	bool Eof() { return SurrogateLow ? false : fb>=fe; }
+	void Skip()
+	{
+		if( SurrogateLow ) return; // don't go further if leftover exists
+
+		while( fb<fe && *fb>0x7f ) ++fb; // first or middle byte(s)
+		if(fb<fe && *fb < 0x80) ++fb; // last byte
+	}
+	unicode PeekC()
+	{
+		qbyte ch;
+
+		if( SurrogateLow )
+		{
+			ch = SurrogateLow;
+			SurrogateLow = 0;
+			return (unicode)ch;
+		}
+
+		ch = (*fb & 0x7f);
+		if(*fb > 0x7f) {
+			for( const uchar* p=fb+1; p<fe; ++p ) {
+				ch = (ch<<7)|(*p & 0x7f);
+				if(*p < 0x80) break; // hit last byte, quit loop
+			}
+		}
+
+		if( ch >= 0x10000 )
+		{
+			SurrogateLow = (0xDC00 + (((ch-0x10000)    )&0x3ff));
+			ch = (0xD800 + (((ch-0x10000)>>10)&0x3ff));
+		}
+		return (unicode)ch;
+	}
+};
 //-------------------------------------------------------------------------
 // UTF-5
 //     0-  F : 1bbbb
@@ -1195,6 +1346,116 @@ void TextFileR::Close()
 	fp_.Close();
 }
 
+#ifndef NO_GMBXWC
+struct rGmbxwc : public TextFileRPimpl
+{
+	rGmbxwc( const uchar* b, ulong s, ulong index, CodePageContext* c )
+		: fb( reinterpret_cast<const char*>(b) )
+		, fe( reinterpret_cast<const char*>(b+s) )
+		, idx_( index )
+		, ctx_( c )
+		, dbcsMode_( false )
+		, stateful_( c->is_stateful_ebcdic != 0 )
+	{
+	}
+
+	~rGmbxwc()
+	{
+		gmbxwcApi.FreeCodePageConverter( ctx_ );
+	}
+
+	size_t ReadBuf( unicode* buf, ulong siz )
+	{
+		// One input byte yields at most one wchar, so siz input
+		// bytes always fit the output buffer. Zero-output chunks
+		// (shift bytes only) are skipped internally: returning 0
+		// means end-of-file to the caller.
+		if( siz == 0 )
+			return 0;
+		ulong out = 0;
+		while( out == 0 && fb < fe )
+		{
+			const char* pe = Min( fb+siz, fe );
+			const char* p = pe;
+			if( pe != fe )
+			{
+				if( stateful_ )
+				{
+					// Cut at an SBCS boundary: track SI/SO from the
+					// carried mode. DBCS chars come in pairs.
+					bool mode = dbcsMode_;
+					ulong dbcsBytes = 0;
+					const char* siEnd = NULL;
+					for( const char* q=fb; q<pe; ++q )
+						if( !mode && *q == 0x0E )
+							{ mode = true; dbcsBytes = 0; }
+						else if( mode && *q == 0x0F )
+							{ mode = false; siEnd = q+1; }
+						else if( mode )
+							++dbcsBytes;
+					if( !mode )
+						dbcsMode_ = false;
+					else if( siEnd != NULL )
+						{ p = siEnd; dbcsMode_ = false; }
+					else
+					{
+						// Over-long DBCS run: align to char boundary.
+						dbcsMode_ = true;
+						if( (dbcsBytes & 1) && p-fb > 1 )
+							--p;
+					}
+				}
+			}
+			state = (p==fe ? EOF : EOB);
+			BOOL unmapped = FALSE;
+			ulong len = 0;
+			if( p > fb )
+				len = gmbxwcApi.MB2WC( ctx_,
+					reinterpret_cast<const uchar*>(fb),
+					(ulong)(p-fb), buf+out, siz-out, &unmapped );
+			if( !stateful_ && p != fe && (len == 0 || unmapped) )
+			{
+				// Cut landed mid-character (or a genuinely bad byte
+				// is near the cut): retry shorter prefixes, bounded.
+				// Stateless tables flag splits, so a clean cut goes
+				// quiet; persistent flags mean genuine bad data.
+				for( ulong k=1; k<=7 && p-k > fb; ++k )
+				{
+					BOOL uu = FALSE;
+					ulong rr = gmbxwcApi.MB2WC( ctx_,
+						reinterpret_cast<const uchar*>(fb),
+						(ulong)(p-k-fb), buf+out, siz-out, &uu );
+					if( rr != 0 && !uu )
+						{ p -= k; len = rr; unmapped = FALSE; break; }
+				}
+			}
+			(void)unmapped;
+			fb = p;
+			out += len;
+		}
+		return out;
+	}
+
+	const char*      fb;
+	const char*      fe;
+	ulong            idx_;
+	CodePageContext* ctx_;
+	bool             dbcsMode_;
+	bool             stateful_;
+};
+
+static TextFileRPimpl* NewGmbxwcReader( const uchar* buf, ulong siz, int cs )
+{
+	ulong idx = (ulong)(cs - GmbxwcIDMin);
+	if( idx >= GmbxwcCount() )
+		return NULL;
+	CodePageContext* ctx = gmbxwcApi.CreateConverter( idx );
+	if( ctx == NULL )
+		return NULL;
+	return new rGmbxwc( buf, siz, idx, ctx );
+}
+#endif // NO_GMBXWC
+
 bool TextFileR::Open( const TCHAR* fname )
 {
 	// ファイルを開く
@@ -1207,6 +1468,17 @@ bool TextFileR::Open( const TCHAR* fname )
 	cs_ = AutoDetection( cs_, buf, siz );
 
 	// 対応するデコーダを作成
+#ifndef NO_GMBXWC
+	if( GmbxwcIDMin <= cs_ && cs_ < GmbxwcIDMax )
+	{
+		// Plugin encodings from gmbxwc.dll (30000+table index).
+		impl_ = NewGmbxwcReader( buf, siz, cs_ );
+		if( !impl_.isValid() )
+			{ impl_ = NULL; fp_.Close(); return false; }
+		return true;
+	}
+#endif
+
 	switch( cs_ )
 	{
 	case Western: impl_ = new rWest(buf,siz,true); break;
@@ -1228,6 +1500,7 @@ bool TextFileR::Open( const TCHAR* fname )
 	case BOCU1:   impl_ = new rBOCU1(buf,siz); break;
 	case OFSSUTFY:
 	case OFSSUTF: impl_ = new rUtfOFSS(buf,siz); break;
+	case UTFVLQY: impl_ = new rUtfVLQ(buf,siz); break;
 	case EucJP:   impl_ = new rIso2022(buf,siz,true,false,ASCII,JIS,KANA); break;
 	case IsoJP:   impl_ = new rIso2022(buf,siz,false,false,ASCII,KANA); break;
 	case IsoKR:   impl_ = new rIso2022(buf,siz,true,false,ASCII,KSX); break;
@@ -1299,6 +1572,7 @@ int TextFileR::AutoDetection( int cs, const uchar* ptr, ulong totalsiz )
 	else if( (bom4>>8) == 0x0efeff ) cs = SCSU;
 	else if( (bom4>>8) == 0xfbee28 ) cs = BOCU1;
 	else if( (bom4>>8) == 0xc3bcff ) cs = OFSSUTFY;
+	else if( (bom4>>8) == 0x83fd7f ) cs = UTFVLQY;
 	else if( bom4 == 0x0000feff ) cs = UTF32b;
 	else if( bom4 == 0xfffe0000 ) cs = UTF32l;
 	else if( bom2 == 0xfeff )     cs = UTF16b;
@@ -2030,7 +2304,7 @@ struct ki::TextFileWPimpl : public Object
 	virtual void WriteChar( unicode ch )
 		{}
 
-	~TextFileWPimpl()
+	virtual ~TextFileWPimpl()
 		{ delete [] buf_; }
 
 protected:
@@ -2220,6 +2494,47 @@ struct wUtf9 : public TextFileWPimpl
 			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 14) & 0x7F) ),
 			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 7) & 0x7F) ),
 			fp_.WriteC( static_cast<uchar>(0x80 | (c & 0x7F)) );
+	}
+};
+
+struct wUtfVLQ : public TextFileWPimpl
+{
+	wUtfVLQ( FileW& w, bool bom ) : TextFileWPimpl(w), SurrogateHi(0)
+	{
+		if( bom ) // BOM書き込み
+			fp_.Write( "\x83\xFD\x7F", 3 );
+	}
+
+	qbyte SurrogateHi;
+
+	void WriteChar( unicode ch )
+	{
+		qbyte c = ch;
+		if( 0xD800<=ch&&ch<=0xDBFF )
+		{
+			SurrogateHi = c; return;
+		}
+		else if( 0xDC00<=ch&&ch<=0xDFFF )
+			if( SurrogateHi )
+				c = 0x10000 + (((SurrogateHi-0xD800)&0x3ff)<<10) + ((c-0xDC00)&0x3ff), SurrogateHi = 0;
+			else return; // find Surrogate Low part only, discard it
+		else // find Surrogate Hi part only, discard it
+			SurrogateHi = 0;
+
+		if( c <= 0x7F )
+			fp_.WriteC( static_cast<uchar>(c) );
+		else if( c <= 0x3FFF )
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 7)) ),
+			fp_.WriteC( static_cast<uchar>((c & 0x7F)) );
+		else if( c <= 0x1FFFFF )
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 14)) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 7) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>((c & 0x7F)) );
+		else if( c <= 0xFFFFFFF )
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 21)) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 14) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>(0x80 | (c >> 7) & 0x7F) ),
+			fp_.WriteC( static_cast<uchar>((c & 0x7F)) );
 	}
 };
 
@@ -3018,8 +3333,77 @@ void TextFileW::WriteLine( const unicode* buf, ulong siz, bool lastline )
 	}
 }
 
+#ifndef NO_GMBXWC
+struct wGmbxwc : public TextFileWPimpl
+{
+	wGmbxwc( FileW& w, ulong index, CodePageContext* ctx )
+		: TextFileWPimpl(w), idx_(index), ctx_(ctx)
+		, stateful_(ctx->is_stateful_ebcdic != 0) {}
+	~wGmbxwc()
+	{
+		gmbxwcApi.FreeCodePageConverter( ctx_ );
+	}
+
+	void WriteLine( const unicode* str, ulong len )
+	{
+		// Single conversion per line: a size query would disturb
+		// shift state on stateful tables. len*4 covers the widest
+		// tables; lines are always complete units.
+		ulong need = len*4 + 64;
+		while( need > bsiz_ )
+			ReserveMoreBuffer();
+		BOOL unmapped = FALSE;
+		ulong r = gmbxwcApi.WC2MB( ctx_, str, len,
+			reinterpret_cast<uchar*>(buf_), bsiz_, &unmapped );
+		(void)unmapped;
+		if( stateful_ && r != 0 )
+		{
+			// Close an unclosed DBCS run at line end (SI/SO are
+			// 0x0E/0x0F on all stateful tables here), mirroring the
+			// per-line discipline of the ISO-2022 writers.
+			bool mode = false;
+			for( ulong k=0; k<r; ++k )
+				if( (uchar)buf_[k] == 0x0E )
+					mode = true;
+				else if( (uchar)buf_[k] == 0x0F )
+					mode = false;
+			if( mode && r+1 <= bsiz_ )
+				buf_[r++] = 0x0F;
+		}
+		fp_.Write( buf_, r );
+	}
+
+	ulong            idx_;
+	CodePageContext* ctx_;
+	bool             stateful_;
+};
+
+static TextFileWPimpl* NewGmbxwcWriter( FileW& w, int cs )
+{
+	ulong idx = (ulong)(cs - GmbxwcIDMin);
+	if( idx >= GmbxwcCount() )
+		return NULL;
+	CodePageContext* ctx = gmbxwcApi.CreateConverter( idx );
+	if( ctx == NULL )
+		return NULL;
+	return new wGmbxwc( w, idx, ctx );
+}
+#endif // NO_GMBXWC
+
 bool TextFileW::Open( const TCHAR* fname )
 {
+#ifndef NO_GMBXWC
+	if( GmbxwcIDMin <= cs_ && cs_ < GmbxwcIDMax )
+	{
+		// Validate before creating/truncating the file.
+		impl_ = NewGmbxwcWriter( fp_, cs_ );
+		if( !impl_.isValid() )
+			{ impl_ = NULL; return false; }
+		if( !fp_.Open( fname, true ) )
+			{ impl_ = NULL; return false; }
+		return true;
+	}
+#endif
 	if( !fp_.Open( fname, true ) )
 		return false;
 
@@ -3043,6 +3427,7 @@ bool TextFileW::Open( const TCHAR* fname )
 	case BOCU1:   impl_ = new wBOCU1( fp_ ); break;
 	case OFSSUTF:
 	case OFSSUTFY: impl_ = new wUtfOFSS( fp_, cs_==OFSSUTFY ); break;
+	case UTFVLQY: impl_ = new wUtfVLQ( fp_, cs_==UTFVLQY ); break;
 	case EucJP:   impl_ = new wEucJp( fp_ ); break;
 	case IsoJP:   impl_ = new wIsoJp( fp_ ); break;
 	case IsoKR:   impl_ = new wIso2022( fp_, cs_ ); break;
@@ -3068,4 +3453,166 @@ bool TextFileW::Open( const TCHAR* fname )
 		break;
 	}
 	return true;
+}
+
+
+//=========================================================================
+//@{ Lossy-save detection: mirrors the TextFileW writer conversions //@}
+//=========================================================================
+
+bool TextFileW::MayLoseData( int cs )
+{
+#ifndef NO_GMBXWC
+	if( GmbxwcIDMin <= cs && cs < GmbxwcIDMax )
+	{
+		// Stateful (EBCDIC) tables: skip the check, as before.
+		// Stateless plugin tables always merit a check.
+		ulong idx = (ulong)(cs - GmbxwcIDMin);
+		CodePageContext* ctx = gmbxwcApi.CreateConverter( idx );
+		if( ctx == NULL )
+			return true;
+		bool st = (ctx->is_stateful_ebcdic != 0);
+		gmbxwcApi.FreeCodePageConverter( ctx );
+		return !st;
+	}
+#endif
+	switch( cs )
+	{
+	case UTF16l: case UTF16LE: case UTF16b: case UTF16BE:
+	case UTF32l: case UTF32LE: case UTF32b: case UTF32BE:
+	case UTF1: case UTF1Y: case UTF5: case UTF7:
+	case UTF8: case UTF8N:
+	case UTF9: case UTF9Y: case OFSSUTF: case OFSSUTFY: case UTFVLQY:
+	case SCSU: case BOCU1:
+		return false;
+	default:
+		return true;
+	}
+}
+
+// WC_NO_BEST_FIT_CHARS may be missing from very old SDK headers
+#ifndef WC_NO_BEST_FIT_CHARS
+#define WC_NO_BEST_FIT_CHARS 0x00000400
+#endif
+
+// Convert one span, reporting default-char substitution in *used.
+// Returns 0 on total failure. Degrades gracefully on retro systems.
+static int ConvertSpan( int cp, const unicode* str, ulong n,
+	char* buf, ulong bsiz, BOOL* used )
+{
+	*used = FALSE;
+	// NO_BEST_FIT: only exact codepage entries count as
+	// representable (best-fit mappings do not round-trip).
+	int r = ::WideCharToMultiByte( cp, WC_NO_BEST_FIT_CHARS,
+		str, n, buf, bsiz, NULL, used );
+	if( r == 0 && ::GetLastError() == ERROR_INVALID_FLAGS )
+	{
+		// Strict flag unknown: same mapping as the writer.
+		*used = FALSE;
+		r = ::WideCharToMultiByte( cp, 0, str, n, buf, bsiz, NULL, used );
+	}
+	if( r == 0 && ::GetLastError() == ERROR_INVALID_PARAMETER && !*used )
+	{
+		// Used-flag itself unknown: writer check only (no detection,
+		// but also no false warnings).
+		r = ::WideCharToMultiByte( cp, 0, str, n, buf, bsiz, NULL, NULL );
+	}
+	return r;
+}
+
+bool TextFileW::HasLossyChars( int cs, const unicode* str, ulong len )
+{
+	ulong pos;
+	return FindLossyChar( cs, str, len, &pos );
+}
+
+bool TextFileW::FindLossyChar( int cs, const unicode* str, ulong len, ulong* pos )
+{
+	if( len == 0 )
+		return false;
+#ifndef NO_GMBXWC
+	if( GmbxwcIDMin <= cs && cs < GmbxwcIDMax )
+	{
+		ulong idx = (ulong)(cs - GmbxwcIDMin);
+		// Same pinpointing as below, via the indexed API.
+		BOOL unmapped = FALSE;
+		ulong need = gmbxwcApi.IndexedWC2MB( idx, str, len, NULL, 0, &unmapped );
+		unmapped = FALSE;
+		aarr<char> buf( new char[need+16] );
+		ulong r = gmbxwcApi.IndexedWC2MB( idx, str, len,
+			reinterpret_cast<uchar*>(buf.get()), need+16, &unmapped );
+		if( r == 0 || unmapped )
+		{
+			// Narrow down to the first bad unit for highlighting.
+			// A stateless table converts each unit independently.
+			uchar tmp[16];
+			for( ulong j=0; j<len; )
+			{
+				ulong u = 1;
+				if( j+1 < len && str[j]>=0xD800 && str[j]<=0xDBFF
+				             && str[j+1]>=0xDC00 && str[j+1]<=0xDFFF )
+					u = 2;
+				BOOL uu = FALSE;
+				int rr = gmbxwcApi.IndexedWC2MB( idx, str+j, u,
+					tmp, (ulong)sizeof(tmp), &uu );
+				if( rr == 0 || uu )
+					{ *pos = j; return true; }
+				j += u;
+			}
+			*pos = 0;
+			return true;
+		}
+		return false;
+	}
+#endif
+	if( cs == Western )
+	{
+		// wWest writes '?' for anything above 0xFF
+		for( ulong i=0; i<len; ++i )
+			if( str[i] > 0xFF )
+				{ *pos = i; return true; }
+		return false;
+	}
+	int cp = cs;
+	if( cs == EucJP || cs == IsoJP )
+		cp = 932;
+	else if( cs == IsoKR )
+		cp = UHC;
+	else if( cs == IsoCN || cs == HZ )
+		cp = GBK;
+	if( cp == 65001 || cp == 65000 )
+		return false; // lossless, and WCTMB forbids a used-flag here
+	// Same conversion as wMBCS::WriteLine, watching for default-char
+	// substitution. Chunks never split a surrogate pair.
+	aarr<char> buf( new char[Min( len, 65536UL )*4+16] );
+	for( ulong i=0; i<len; )
+	{
+		ulong n = Min( 65536UL, len-i );
+		if( n < len-i && str[i+n-1]>=0xD800 && str[i+n-1]<=0xDBFF )
+			++n;
+		BOOL used = FALSE;
+		int r = ConvertSpan( cp, str+i, n, buf.get(), 65536*4+16, &used );
+		if( r != 0 && !used )
+			{ i += n; continue; }
+		// Pinpoint the first bad unit inside this chunk
+		char tmp[16];
+		for( ulong j=i; j<i+n; )
+		{
+			ulong u = 1;
+			if( j+1 < i+n && str[j]>=0xD800 && str[j]<=0xDBFF
+			             && str[j+1]>=0xDC00 && str[j+1]<=0xDFFF )
+				u = 2;
+			BOOL uu = FALSE;
+			int rr = ConvertSpan( cp, str+j, u,
+				tmp, (ulong)sizeof(tmp), &uu );
+			if( rr == 0 || uu )
+				{ *pos = j; return true; }
+			j += u;
+		}
+		// Unreachable for stateless conversions, but never misreport:
+		// the chunk is lossy, so point at its start.
+		*pos = i;
+		return true;
+	}
+	return false;
 }

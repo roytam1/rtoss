@@ -29,6 +29,26 @@ void BootNewProcess( const TCHAR* cmd = TEXT("") )
 	}
 }
 
+typedef HBRUSH (WINAPI *GSCB)(int);
+HBRUSH WINAPI MyGetSysColorBrush_fallback(int nIndex)
+{
+	return ::CreateSolidBrush( ::GetSysColor(nIndex) );
+}
+HBRUSH WINAPI MyGetSysColorBrush_init(int nIndex);
+static GSCB MyGetSysColorBrush = MyGetSysColorBrush_init;
+HBRUSH WINAPI MyGetSysColorBrush_init(int nIndex)
+{
+	if( MyGetSysColorBrush == MyGetSysColorBrush_init ) {
+		MyGetSysColorBrush = (GSCB)GetProcAddress(GetModuleHandleA("USER32.DLL"), "GetSysColorBrush");
+
+		// Should be supported since Windows NT 3.51...
+		if( !(MyGetSysColorBrush) ) {
+			MyGetSysColorBrush = MyGetSysColorBrush_fallback;
+		}
+	}
+
+	return MyGetSysColorBrush( nIndex );
+}
 
 
 //-------------------------------------------------------------------------
@@ -148,9 +168,14 @@ LRESULT GreenPadWnd::on_message( UINT msg, WPARAM wp, LPARAM lp )
 			HGLOBAL hDrop = reinterpret_cast<HGLOBAL>(wp);
 			DROPFILES *df = (DROPFILES *)::GlobalLock( hDrop );
 			size_t hdropSize = ::GlobalSize( hDrop );
-			HWND *hDummy = (HWND*)( ((BYTE*)df) + hdropSize - 2*sizeof(HWND) );
-			HWND *hCustomHwnd = (HWND*)( ((BYTE*)hDummy) + sizeof(HWND) );
-			BOOL bProcessDrops = *hDummy || (*hDummy == 0 && *hCustomHwnd != hwnd());
+			BYTE* pEnd = ((BYTE*)df) + hdropSize;
+			BYTE* pDummyLoc = pEnd - 2 * sizeof(HWND);
+			BYTE* pCustomLoc = pEnd - sizeof(HWND);
+			HWND dummyVal = NULL;
+			HWND customHwndVal = NULL;
+			memmove(&dummyVal, pDummyLoc, sizeof(HWND));
+			memmove(&customHwndVal, pCustomLoc, sizeof(HWND));
+			BOOL bProcessDrops = dummyVal || (dummyVal == 0 && customHwndVal != hwnd());
 			::GlobalUnlock(hDrop);
 			if(bProcessDrops)
 			{
@@ -199,6 +224,17 @@ LRESULT GreenPadWnd::on_message( UINT msg, WPARAM wp, LPARAM lp )
 
 bool GreenPadWnd::on_command( UINT id, HWND ctrl )
 {
+	// While a file is loading only exit is honored. In particular
+	// no second open/save/edit may run on the half-loaded doc.
+	if( edit_.getDoc().isBusy() )
+		switch( id )
+		{
+		case ID_CMD_EXIT:
+		case ID_CMD_DISCARDEXIT:
+			break;
+		default:
+			return true;
+		}
 	switch( id )
 	{
 	// Window
@@ -929,8 +965,8 @@ void GreenPadWnd::on_toggleime()
 					dlgStyle = GetWindowLong(hwnd(), GWL_STYLE);
 					if(dlgStyle & DS_3DLOOK) {
 						SetBkColor(ctrldc, GetSysColor(COLOR_BTNFACE));
-						SelectObject(ctrldc, GetSysColorBrush(COLOR_BTNFACE));
-						return (DWORD)GetSysColorBrush(COLOR_BTNFACE);
+						SelectObject(ctrldc, MyGetSysColorBrush(COLOR_BTNFACE));
+						return (DWORD)MyGetSysColorBrush(COLOR_BTNFACE);
 					}
 				default:
 					return NULL;
@@ -1247,6 +1283,37 @@ bool GreenPadWnd::Save()
 		save_Csi = charSets_[csi_].ID;
 
 	TextFileW tf( save_Csi, lb_ );
+
+	// Warn if some characters cannot be saved in this encoding.
+	// Must run before Open(), which truncates the file.
+	if( TextFileW::MayLoseData( save_Csi ) )
+	{
+		DPos bad( 0, 0 );
+		bool loss = false;
+		for( ulong i=0, e=edit_.getDoc().tln(); i<e && !loss; ++i )
+		{
+			ulong ad = 0;
+			if( TextFileW::FindLossyChar( save_Csi,
+					edit_.getDoc().tl(i), edit_.getDoc().len(i), &ad ) )
+				{ loss = true; bad = DPos( i, ad ); }
+		}
+		if( loss && MsgBox( String(IDS_SAVELOSSY).c_str(),
+				String(IDS_APPNAME).c_str(),
+				MB_YESNO|MB_ICONEXCLAMATION ) != IDYES )
+		{
+			// Highlight the first unmappable character
+			const unicode* ln = edit_.getDoc().tl( bad.tl );
+			ulong ed = bad.ad + 1;
+			if( ed < edit_.getDoc().len( bad.tl )
+			 && isHighSurrogate( ln[bad.ad] )
+			 && isLowSurrogate( ln[bad.ad+1] ) )
+				++ed;
+			edit_.getCursor().MoveCur( bad, false );
+			edit_.getCursor().MoveCur( DPos( bad.tl, ed ), true );
+			return false;
+		}
+	}
+
 	if( tf.Open( filename_.c_str() ) )
 	{
 		// –³Ž–ƒtƒ@ƒCƒ‹‚É•Û‘¶‚Å‚«‚½ê‡

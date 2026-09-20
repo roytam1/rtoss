@@ -118,6 +118,7 @@ enum charset {
 	UTF1Y      =-64999,// Unicode  (UTF-1)   : BOM有り
 	UTF9Y      =-65002,// Unicode  (UTF-9)   : BOM有り
 	OFSSUTFY   = -13,  // Unicode  (Old FSS-UTF): BOM有り
+	UTFVLQY    =-65003,// Unicode  (UTF-VLQ)   : BOM有り
 
 	DOSUS      = 437,  // DOSLatinUS (CP437)
 
@@ -136,6 +137,15 @@ enum lbcode {
 	LF   = 1,
 	CRLF = 2
 };
+
+//@{ gmbxwc plugin encoding ID range: 30000+table index //@}
+enum { GmbxwcIDMin = 30000, GmbxwcIDMax = 40000 };
+
+//@{ Number of gmbxwc embedded tables (0 if the DLL is absent) //@}
+ulong GmbxwcCount();
+
+//@{ Table info: codepage + ASCII display name //@}
+bool GmbxwcTable( ulong idx, ulong* codepage, const char** displayName );
 
 struct TextFileRPimpl;
 struct TextFileWPimpl;
@@ -246,6 +256,16 @@ public:
 	//@{ コンストラクタ（文字,改行コード指定）//@}
 	TextFileW( int charset, int linebreak );
 	~TextFileW();
+
+	//@{ Saving in this charset never loses data //@}
+	static bool MayLoseData( int charset );
+
+	//@{ str holds chars unmappable to charset //@}
+	static bool HasLossyChars( int charset, const unicode* str, ulong len );
+
+	//@{ Index of first char unmappable to charset, if any //@}
+	static bool FindLossyChar( int charset,
+		const unicode* str, ulong len, ulong* pos );
 
 	//@{ 開く //@}
 	bool Open( const TCHAR* fname );

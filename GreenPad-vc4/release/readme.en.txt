@@ -108,6 +108,9 @@
         ?    : 0 or 1
         *    : 0 or more
         +    : 1 or more
+        *?   : 0 or more (shortest match)
+        +?   : 1 or more (shortest match)
+        ??   : 0 or 1 (shortest match)
 
       alternation:
         a|b
@@ -116,8 +119,13 @@
 
       special escape characters:
         \t   : tab
+        \n   : line feed
+        \r   : carriage return
+        \f   : form feed
+        \v   : vertical tab
+        \a   : bell
         \\   : '\' itself
-        \[   : '['
+        \[   : '[' (any other \x means 'x' itself)
 
       positional match:
         ^  : start of line
@@ -138,7 +146,9 @@
       * GreenPad does searching line by line, thus
         you cannot search "aaa\nbbb" or something like it.
       * No forward/backward references.
-      * No shortest matches (every * is greedy)
+      * In the replacement text of a regular-expression replace,
+        \t \n \r \f \v \a \\ are decoded (any other \x means 'x').
+        A decoded \n splits the line.
 
   * External Grep Program ?
 
@@ -163,9 +173,13 @@
        UTF8        = -65001
        UTF16BE     = -5
        UTF16LE     = -6
-       UTF32BE     = -9
-       UTF32LE     = -10
-     If you have installed "Language Support" for your Windows,
+        UTF32BE     = -9
+        UTF32LE     = -10
+      If gmbxwc.dll (gmbxwc_<arch>.dll per CPU) sits next to the .exe,
+      its embedded tables also appear in the open/save charset lists
+      as IDs 30000 and up (e.g. -c30000), same for -c on the command
+      line. Without the DLL those entries are hidden.
+      If you have installed "Language Support" for your Windows,
      the character sets of installed languages become
      readable/writable in GreenPad. You should consult with
      the "area and language option" control panel to get the

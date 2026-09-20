@@ -101,6 +101,23 @@ Cursor& View::cur()
 
 LRESULT View::on_message( UINT msg, WPARAM wp, LPARAM lp )
 {
+	// While a file is loading the view info is stale. Paints are
+	// still handled (as no-ops, see on_paint), a resize is deferred,
+	// and everything else is dropped. Win32s-safe: no threads.
+	if( impl_->isBusy() )
+	{
+		if( msg == WM_SIZE )
+			{ impl_->deferResize( LOWORD(lp), HIWORD(lp) ); return 0; }
+		switch( msg )
+		{
+		case WM_PAINT:
+		case WM_SETFOCUS:
+		case WM_KILLFOCUS:
+			break;
+		default:
+			return 0;
+		}
+	}
 	switch( msg )
 	{
 	case WM_PAINT:{
@@ -470,6 +487,10 @@ void ViewImpl::ReDraw( ReDrawType r, const DPos* s )
 
 void ViewImpl::on_paint( const PAINTSTRUCT& ps )
 {
+	// While loading, keep the old pixels (Begin/EndPaint in the
+	// caller still validate the region).
+	if( doc_.isBusy() )
+		return;
 	// 描画範囲の情報を詳しく取得, Obtain detailed information about the drawing area
 	Painter& p = cvs_.getPainter();
 	p.SetupDC( ps.hdc );
@@ -622,6 +643,36 @@ void ViewImpl::DrawTXT( const VDrawInfo& v, Painter& p )
 					while( n<end && (flg[n]>>5)==0 )
 						++n;
 
+				// Merge following same-color plain-text tokens into
+				// this draw call. Tab/space/U+3000 runs keep their own
+				// drawing, and color changes still split. Pixels are
+				// identical, GDI calls much fewer on long lines.
+				if( str[i]!=L'\t' && str[i]!=L' ' && str[i]!=0x3000 )
+				{
+					ulong nn;
+					bool hsp = p.sc(scHSP);
+					bool zsp = p.sc(scZSP);
+					while( n<end )
+					{
+						if( str[n]==L'\t' )
+							break;
+						if( str[n]==L' ' && hsp )
+							break;
+						if( str[n]==0x3000 && zsp )
+							break;
+						if( (flg[n]&3) != (flg[i]&3) )
+							break;
+						t = (flg[n]>>5);
+						nn = n + t;
+						if( nn >= end )
+							{ n = end; break; }
+						if( t==7 || t==0 )
+							while( nn<end && (flg[nn]>>5)==0 )
+								++nn;
+						n = nn;
+					}
+				}
+
 				// x2, i2 := このTokenの右端
 				i2 ++;
 				x2 = (str[i]==L'\t' ? p.nextTab(x2) : x2+p.W(&str[i]));
@@ -635,11 +686,13 @@ void ViewImpl::DrawTXT( const VDrawInfo& v, Painter& p )
 					continue;
 
 				// x, i := このトークンの左端
+				unicode first = str[i];
+				ulong i0 = i;
 				if( x<v.XMIN )
 				{
 					// tabの分が戻りすぎ？
 					x = x2, i = i2;
-					while( v.XMIN<x )
+					while( v.XMIN<x && i>i0 )
 						x -= p.W( &str[--i] );
 				}
 
@@ -649,7 +702,7 @@ void ViewImpl::DrawTXT( const VDrawInfo& v, Painter& p )
 				p.Fill( a );
 
 				// 描画
-				switch( str[i] )
+				switch( first )
 				{
 				case L'\t':
 					if( p.sc(scTAB) )

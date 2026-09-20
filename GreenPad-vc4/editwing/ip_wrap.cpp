@@ -31,6 +31,7 @@ ViewImpl::ViewImpl( View& vw, DocImpl& dc )
 	, hwnd_  ( vw.hwnd() )
 	, vlNum_ ( 0 )
 	, textCx_( 0 )
+	, resizePending_( false )
 	, accdelta_  ( 0 )
 	, accdeltax_ ( 0 )
 {
@@ -48,6 +49,14 @@ ViewImpl::ViewImpl( View& vw, DocImpl& dc )
 	udScr_.nTrackPos = rlScr_.nTrackPos = 0;
 	udScr_tl_     = udScr_vrl_    = 0;
 	ReSetScrollInfo();
+}
+
+void ViewImpl::deferResize( int cx, int cy )
+{
+	// The wrap info is mid-load and stale, so only remember the new
+	// size here. DoResize() runs after the load finishes.
+	cvs_.on_view_resize( cx, cy );
+	resizePending_ = true;
 }
 
 
@@ -135,6 +144,13 @@ void ViewImpl::on_text_update
 		if( e.tl != e2.tl ) // çsî‘çÜóÃàÊçƒï`âÊÇÃïKóvÇ™Ç†ÇÈÇ∆Ç´
 			ReDraw( LNAREA, 0 );
 		ReDraw( t, &s );
+	}
+
+	// Apply a resize deferred during file loading
+	if( resizePending_ )
+	{
+		resizePending_ = false;
+		DoResize( true );
 	}
 }
 
@@ -521,14 +537,21 @@ void ViewImpl::GetVPos( int x, int y, VPos* vp, bool linemode ) const
 
 		while( ad<adend )
 		{
-			int nvx = (str[ad]==L'\t'
-				? fnt().nextTab(vx)
-				:  vx + fnt().W(&str[ad])
-			);
-			if( x+2 < nvx )
+			int w;
+			ulong adv = 1;
+			if( str[ad]==L'\t' )
+				w = fnt().nextTab(vx) - vx;
+			else if( isHighSurrogate(str[ad])
+			      && ad+1<adend && isLowSurrogate(str[ad+1]) )
+				w = fnt().W(&str[ad]), adv = 2;
+			else
+				w = fnt().W(&str[ad]);
+			// caret goes after the char when clicked on its right
+			// half, like standard Windows textboxes
+			if( x < vx + ((w+1)>>1) )
 				break;
-			vx = nvx;
-			++ad;
+			vx += w;
+			ad += adv;
 		}
 
 		vp->ad          = ad;

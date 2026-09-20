@@ -56,6 +56,17 @@ void EwEdit::on_destroy()
 
 LRESULT EwEdit::on_message( UINT msg, WPARAM wp, LPARAM lp )
 {
+	// Mutating requests are dropped while a file is loading.
+	// WM_COPY only reads the (always consistent) text lines.
+	if( getDoc().isBusy() )
+		switch( msg )
+		{
+		case WM_CUT:
+		case WM_PASTE:
+		case EM_UNDO:
+		case WM_UNDO:
+			return 0;
+		}
 	switch( msg )
 	{
 	case WM_SETFOCUS:
