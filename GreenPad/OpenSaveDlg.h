@@ -39,6 +39,7 @@ private:
 
 	enum { SAVE=1, LOAD=2, BOTH=3 };
 	ki::storage<CsInfo> list_;
+	ki::aarr<TCHAR> gmbxwcBuf_; // owns plugin encoding names
 };
 
 

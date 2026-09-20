@@ -173,9 +173,13 @@
        UTF8        = -65001
        UTF16BE     = -5
        UTF16LE     = -6
-       UTF32BE     = -9
-       UTF32LE     = -10
-     If you have installed "Language Support" for your Windows,
+        UTF32BE     = -9
+        UTF32LE     = -10
+      If gmbxwc.dll (gmbxwc_<arch>.dll per CPU) sits next to the .exe,
+      its embedded tables also appear in the open/save charset lists
+      as IDs 30000 and up (e.g. -c30000), same for -c on the command
+      line. Without the DLL those entries are hidden.
+      If you have installed "Language Support" for your Windows,
      the character sets of installed languages become
      readable/writable in GreenPad. You should consult with
      the "area and language option" control panel to get the

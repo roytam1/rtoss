@@ -188,6 +188,56 @@ CHARSETS_LIST
 	if( ::IsValidCodePage(865) )   Enroll(  Nordic,         65 );
 	                               Enroll(  DOSUS,          66 );
 
+#ifndef NO_GMBXWC
+	// gmbxwc.dll plugin encodings (30000+table index), if present.
+	// Absent DLL: no entries at all. Names live in one owned block
+	// so CsInfo pointers stay valid.
+	{
+		ulong gnum = GmbxwcCount();
+		ulong glim = (ulong)(GmbxwcIDMax - GmbxwcIDMin);
+		if( gnum > glim )
+			gnum = glim;
+		ulong need = 1;
+		ulong i;
+		for( i=0; i<gnum; ++i )
+		{
+			ulong cp; const char* nm;
+			if( !GmbxwcTable( i, &cp, &nm ) )
+				break;
+			for( const char* p=nm; *p; ++p ) ++need;
+			need += 32;
+		}
+		if( i != 0 )
+		{
+			ki::aarr<TCHAR> nb( new TCHAR[need] );
+			gmbxwcBuf_ = nb;
+			TCHAR* dst = gmbxwcBuf_.get();
+			TCHAR* const end = dst + need;
+			for( ulong k=0; k<i; ++k )
+			{
+				ulong cp; const char* nm;
+				if( !GmbxwcTable( k, &cp, &nm ) )
+					break;
+				cs.ID = GmbxwcIDMin + (int)k;
+				cs.longName = dst;
+				while( *nm && dst+1 < end )
+				{
+					*dst++ = ((uchar)*nm < 0x80) ? (TCHAR)*nm : TEXT('?');
+					++nm;
+				}
+				*dst++ = TEXT('\0');
+				cs.shortName = dst;
+				if( (ulong)(end-dst) > 32 )
+					dst += ::wsprintf( dst, TEXT("CP%lu"), cp ) + 1;
+				else
+					break;
+				cs.type = LOAD|SAVE;
+				list_.Add( cs );
+			}
+		}
+	}
+#endif
+
 	// èIóπ
 	#undef Enroll
 	#undef EnrollS

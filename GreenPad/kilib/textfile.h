@@ -138,6 +138,15 @@ enum lbcode {
 	CRLF = 2
 };
 
+//@{ gmbxwc plugin encoding ID range: 30000+table index //@}
+enum { GmbxwcIDMin = 30000, GmbxwcIDMax = 40000 };
+
+//@{ Number of gmbxwc embedded tables (0 if the DLL is absent) //@}
+ulong GmbxwcCount();
+
+//@{ Table info: codepage + ASCII display name //@}
+bool GmbxwcTable( ulong idx, ulong* codepage, const char** displayName );
+
 struct TextFileRPimpl;
 struct TextFileWPimpl;
 
