@@ -14,7 +14,7 @@
 static int exitCode = 0;
 static int frameCount = 0;
 
-void GIFDump(const char *filename)
+void GIFDump(const char *filename, int countAllFrames)
 {
     FILE *stream;
     struct GIFScreen screen;
@@ -44,6 +44,7 @@ void GIFDump(const char *filename)
             return;
         case GIF_IMAGE:       /* ',' */
            frameCount++;
+           if(frameCount > 1 && !countAllFrames) return;
            break;
         case GIF_EXTENSION:   /* '!' */
            break;
@@ -61,11 +62,11 @@ int main(int argc, char *argv[])
     }
 
     if (strcmp(argv[1], "-s") == 0) {
-        GIFDump(argv[2]);
+        GIFDump(argv[2], 1);
 	    printf("%d Frame(s).\n", frameCount);
     }
     else {
-        GIFDump(argv[1]);
+        GIFDump(argv[1], 0);
     }
 
 	if (!exitCode)
