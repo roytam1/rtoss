@@ -75,14 +75,9 @@ int is_apng(const char *filename) {
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         printf("Usage: %s <file.png>\n", argv[0]);
-        return 1;
+        return 0;
     }
 
-    if (is_apng(argv[1])) {
-        printf("The file is an APNG (Animated PNG).\n");
-    } else {
-        printf("The file is NOT an APNG.\n");
-    }
+    return !is_apng(argv[1]);
 
-    return 0;
 }
