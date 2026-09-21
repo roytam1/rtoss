@@ -28,6 +28,36 @@ static ulong DecodeReplacement( const wchar_t* src, wchar_t* dst )
 			case L'f': dst[di++]=L'\f'; break;
 			case L'v': dst[di++]=L'\v'; break;
 			case L'a': dst[di++]=L'\a'; break;
+			case L'u': {
+				// \uXXXX[X[X]] : 4-6 hex digits, value <= 0x10FFFF.
+				// Astral values emit a surrogate pair. Anything
+				// else stays literal.
+				unsigned long v = 0;
+				ulong k = 0;
+				for( ; k<6 && src[si+1+k]!=L'\0'; ++k )
+				{
+					wchar_t d = src[si+1+k];
+					if( L'0'<=d && d<=L'9' ) v = v*16 + (unsigned long)(d-L'0');
+					else if( L'a'<=d && d<=L'f' ) v = v*16 + (unsigned long)(d-L'a'+10);
+					else if( L'A'<=d && d<=L'F' ) v = v*16 + (unsigned long)(d-L'A'+10);
+					else break;
+				}
+				if( k >= 4 && v <= 0x10FFFFUL )
+				{
+					si += k;
+					if( v <= 0xFFFFUL )
+						dst[di++]= (wchar_t)v;
+					else
+					{
+						v -= 0x10000UL;
+						dst[di++]= (wchar_t)(0xD800UL + (v>>10));
+						dst[di++]= (wchar_t)(0xDC00UL + (v&0x3FFUL));
+					}
+				}
+				else
+					dst[di++]=n;
+				break;
+			}
 			default:   dst[di++]=n; break;
 			}
 		}

@@ -51,6 +51,7 @@ private:
 	const wchar_t* end_;
 	const wchar_t* sub_;
 	wchar_t        chr_;
+	wchar_t        push_[2]; // one-char pushback for astral \u
 };
 
 
@@ -66,6 +67,7 @@ inline RegLexer::RegLexer( const wchar_t* pat, ulong len )
 	, end_( pat+len )
 	, sub_( L"" )
 {
+	push_[0] = L'\0';
 }
 
 RegToken RegLexer::GetToken()
@@ -92,6 +94,34 @@ RegToken RegLexer::GetToken()
 		case L'f': chr_=L'\f';            return R_Char;
 		case L'v': chr_=L'\v';            return R_Char;
 		case L'a': chr_=L'\a';            return R_Char;
+		case L'u': {
+			// \uXXXX[X[X]] : 4-6 hex digits, value <= 0x10FFFF.
+			// Astral values match as a surrogate pair (the low
+			// half is pushed back for the next token).
+			// Anything else falls back to literal 'u'.
+			unsigned long v = 0;
+			const wchar_t* p = x;
+			int k = 0;
+			for( ; k<6 && p<end_; ++k, ++p )
+			{
+				wchar_t d = *p;
+				if( L'0'<=d && d<=L'9' ) v = v*16 + (unsigned long)(d-L'0');
+				else if( L'a'<=d && d<=L'f' ) v = v*16 + (unsigned long)(d-L'a'+10);
+				else if( L'A'<=d && d<=L'F' ) v = v*16 + (unsigned long)(d-L'A'+10);
+				else break;
+			}
+			if( k < 4 || v > 0x10FFFFUL )
+				{ chr_ = L'u'; return R_Char; }
+			x = p;
+			if( v <= 0xFFFFUL )
+				{ chr_ = (wchar_t)v; return R_Char; }
+			v -= 0x10000UL;
+			chr_ = (wchar_t)(0xD800UL + (v>>10));
+			push_[0] = (wchar_t)(0xDC00UL + (v&0x3FFUL));
+			push_[1] = L'\0';
+			sub_ = push_;
+			return R_Char;
+		}
 		case L'w': sub_=L"[0-9a-zA-Z_]";  return GetToken();
 		case L'W': sub_=L"[^0-9a-zA-Z_]"; return GetToken();
 		case L'd': sub_=L"[0-9]";         return GetToken();
