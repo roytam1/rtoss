@@ -113,11 +113,5 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    if (is_animated_gif(argv[1])) {
-        printf("The GIF is animated (more than 1 frame).\n");
-    } else {
-        printf("The GIF is static (1 frame or invalid).\n");
-    }
-
-    return 0;
+    return !is_animated_gif(argv[1]);
 }
