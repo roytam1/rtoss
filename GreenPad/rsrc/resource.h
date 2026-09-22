@@ -71,6 +71,8 @@
 #define IDC_COUNTBYLETTER2              1032
 #define IDC_NEWLB2                      1033
 #define IDC_NEWDT                       1033
+#define IDC_ESCAPES                     1034
+#define IDC_MULTILINE                   1035
 #define IDC_CRLFLBL                     1050
 #define ID_CMD_REOPENFILE               40002
 #define ID_CMD_PROPERTY                 40003
@@ -117,7 +119,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        113
 #define _APS_NEXT_COMMAND_VALUE         40039
-#define _APS_NEXT_CONTROL_VALUE         1034
+#define _APS_NEXT_CONTROL_VALUE         1036
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

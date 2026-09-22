@@ -26,7 +26,11 @@ class RegNFA;
 class RSearch : public Searchable
 {
 public:
-	RSearch( const unicode* key, bool caseS, bool down );
+	RSearch( const unicode* key, bool caseS, bool down, bool multi=false );
+
+	virtual bool canSpanLines() const;
+	virtual bool isHeadType() const;
+	virtual bool isTailType() const;
 
 private:
 	virtual bool Search( const unicode* str, ulong len, ulong stt,
@@ -36,6 +40,8 @@ private:
 	ki::dptr<RegNFA> re_;
 	bool caseS_;
 	bool down_;
+	bool multi_;
+	bool canspan_;
 };
 
 
