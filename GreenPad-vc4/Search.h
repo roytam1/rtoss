@@ -32,6 +32,9 @@ public:
 	//@}
 	virtual bool Search( const unicode* str, ulong len, ulong stt,
 		ulong* mbg, ulong* med ) = 0;
+	virtual bool canSpanLines() const { return false; }
+	virtual bool isHeadType() const { return false; }
+	virtual bool isTailType() const { return false; }
 };
 
 
@@ -105,6 +108,10 @@ private:
 	void FindPrevImpl();
 	bool FindNextFromImpl( DPos s, DPos* beg, DPos* end );
 	bool FindPrevFromImpl( DPos s, DPos* beg, DPos* end );
+	bool FindNextMultiFromImpl( DPos s, DPos* beg, DPos* end );
+	bool FindPrevMultiFromImpl( DPos s, DPos* beg, DPos* end );
+	ulong BuildWindow( ulong tl0, ulong ad0 );
+	static DPos MapWindowOffset( ulong tl0, const ulong* offs, ulong nlines, ulong pos );
 
 private:
 	editwing::EwEdit& edit_;
@@ -118,6 +125,15 @@ private:
 
 	ki::String findStr_;
 	ki::String replStr_;
+
+	bool bEscapes_;    // plain-mode escape codes?
+	bool bMultiline_;  // multiline matching?
+	bool bMultiSearch_; // windowed search active?
+
+	enum { WinMax = 65536 };
+	ki::aarr<unicode> winBuf_;
+	ulong winCap_;
+	ki::storage<ulong> winOffs_;
 
 private:
 	NOCOPY(SearchManager);

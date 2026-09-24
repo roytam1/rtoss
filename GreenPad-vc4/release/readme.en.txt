@@ -124,6 +124,7 @@
         \f   : form feed
         \v   : vertical tab
         \a   : bell
+        \uXXXXXX : unicode char U+XXXX - U+XXXXXX (4-6 hex digits)
         \\   : '\' itself
         \[   : '[' (any other \x means 'x' itself)
 
@@ -148,6 +149,7 @@
       * No forward/backward references.
       * In the replacement text of a regular-expression replace,
         \t \n \r \f \v \a \\ are decoded (any other \x means 'x').
+        \uXXXXXX works as well (4-6 hex digits, astral pair emitted).
         A decoded \n splits the line.
 
   * External Grep Program ?

@@ -51,6 +51,7 @@ private:
 	const wchar_t* end_;
 	const wchar_t* sub_;
 	wchar_t        chr_;
+	wchar_t        push_[2]; // one-char pushback for astral \u
 };
 
 
@@ -66,6 +67,7 @@ inline RegLexer::RegLexer( const wchar_t* pat, ulong len )
 	, end_( pat+len )
 	, sub_( L"" )
 {
+	push_[0] = L'\0';
 }
 
 RegToken RegLexer::GetToken()
@@ -92,6 +94,34 @@ RegToken RegLexer::GetToken()
 		case L'f': chr_=L'\f';            return R_Char;
 		case L'v': chr_=L'\v';            return R_Char;
 		case L'a': chr_=L'\a';            return R_Char;
+		case L'u': {
+			// \uXXXX[X[X]] : 4-6 hex digits, value <= 0x10FFFF.
+			// Astral values match as a surrogate pair (the low
+			// half is pushed back for the next token).
+			// Anything else falls back to literal 'u'.
+			unsigned long v = 0;
+			const wchar_t* p = x;
+			int k = 0;
+			for( ; k<6 && p<end_; ++k, ++p )
+			{
+				wchar_t d = *p;
+				if( L'0'<=d && d<=L'9' ) v = v*16 + (unsigned long)(d-L'0');
+				else if( L'a'<=d && d<=L'f' ) v = v*16 + (unsigned long)(d-L'a'+10);
+				else if( L'A'<=d && d<=L'F' ) v = v*16 + (unsigned long)(d-L'A'+10);
+				else break;
+			}
+			if( k < 4 || v > 0x10FFFFUL )
+				{ chr_ = L'u'; return R_Char; }
+			x = p;
+			if( v <= 0xFFFFUL )
+				{ chr_ = (wchar_t)v; return R_Char; }
+			v -= 0x10000UL;
+			chr_ = (wchar_t)(0xD800UL + (v>>10));
+			push_[0] = (wchar_t)(0xDC00UL + (v&0x3FFUL));
+			push_[1] = L'\0';
+			sub_ = push_;
+			return R_Char;
+		}
 		case L'w': sub_=L"[0-9a-zA-Z_]";  return GetToken();
 		case L'W': sub_=L"[^0-9a-zA-Z_]"; return GetToken();
 		case L'd': sub_=L"[0-9]";         return GetToken();
@@ -162,7 +192,7 @@ struct RegNode
 class RegParser
 {
 public:
-	RegParser( const unicode* pat );
+	RegParser( const unicode* pat, bool multi );
 	RegNode* root() { return root_.get(); }
 	bool err() { return err_; }
 	bool hasLazy() const { return hasLazy_; }
@@ -185,6 +215,7 @@ private:
 	bool    hasLazy_;
 	bool    isHeadType_;
 	bool    isTailType_;
+	bool    multi_;
 	dptr<RegNode> root_;
 
 	RegLexer lex_;
@@ -201,9 +232,10 @@ private:
 
 namespace { static int tmp; }
 
-inline RegParser::RegParser( const unicode* pat )
+inline RegParser::RegParser( const unicode* pat, bool multi )
 	: err_       ( false )
 	, hasLazy_    ( false )
+	, multi_      ( multi )
 	, isHeadType_( *pat==L'^' )
 	, isTailType_( (tmp=my_lstrlenW(pat), tmp && pat[tmp-1]==L'$') )
 	, lex_(
@@ -300,8 +332,19 @@ RegNode* RegParser::primary()
 	case R_Any:{
 		node         = new RegNode;
 		node->type   = N_Class;
-		aptr<RegClass> ncls(new RegClass( 0, 65535, NULL ));
-		node->cls    = ncls;
+		if( multi_ )
+		{
+			// multiline: '.' matches anything but a line break
+			RegClass* cls = new RegClass( 11, 65535, NULL );
+			cls = new RegClass( 0, 9, cls );
+			aptr<RegClass> ncls(cls);
+			node->cls    = ncls;
+		}
+		else
+		{
+			aptr<RegClass> ncls(new RegClass( 0, 65535, NULL ));
+			node->cls    = ncls;
+		}
 		node->cmpcls = false;
 		eat_token();
 		}break;
@@ -464,12 +507,13 @@ struct RegTrans
 class RegNFA
 {
 public:
-	RegNFA( const wchar_t* pat );
+	RegNFA( const wchar_t* pat, bool multi );
 	~RegNFA();
 
 	int match( const wchar_t* str, int len, bool caseS );
 	bool isHeadType() const { return parser.isHeadType(); }
 	bool isTailType() const { return parser.isTailType(); }
+	bool canSpanLines();
 
 private:
 	// マッチング処理
@@ -492,12 +536,27 @@ private:
 	int      start, final;
 };
 
-RegNFA::RegNFA( const wchar_t* pat )
-	: parser( pat )
+RegNFA::RegNFA( const wchar_t* pat, bool multi )
+	: parser( pat, multi )
 {
 	start = gen_state();
 	final = gen_state();
 	gen_nfa( start, parser.root(), final );
+}
+
+bool RegNFA::canSpanLines()
+{
+	// True if any consuming transition can match '\n'.
+	// Decides per-line vs windowed search.
+	for( ulong i=0,e=st.size(); i<e; ++i )
+		for( RegTrans* tr=st[i]; tr!=NULL; tr=tr->next.get() )
+			if( tr->type == RegTrans::Class )
+			{
+				bool covers = tr->match_c( L'\n' );
+				if( tr->cmpcls ? !covers : covers )
+					return true;
+			}
+	return false;
 }
 
 inline RegNFA::~RegNFA()
@@ -747,7 +806,7 @@ bool reg_match( const wchar_t* pat, const wchar_t* str, bool caseS )
 {
 	int len = my_lstrlenW(str);
 
-	RegNFA re( pat );
+	RegNFA re( pat, false );
 	return len == re.match( str, len, caseS );
 }
 
@@ -759,29 +818,41 @@ bool reg_match( const wchar_t* pat, const wchar_t* str, bool caseS )
 //@}
 //=========================================================================
 
-RSearch::RSearch( const unicode* key, bool caseS, bool down )
-	: re_    ( new RegNFA(key) )
+RSearch::RSearch( const unicode* key, bool caseS, bool down, bool multi )
+	: re_    ( new RegNFA(key, multi) )
 	, caseS_ ( caseS )
 	, down_  ( down )
+	, multi_ ( multi )
+	, canspan_( false )
 {
+	canspan_ = re_->canSpanLines();
 }
+
+bool RSearch::canSpanLines() const
+	{ return canspan_; }
+
+bool RSearch::isHeadType() const
+	{ return re_->isHeadType(); }
+
+bool RSearch::isTailType() const
+	{ return re_->isTailType(); }
 
 bool RSearch::Search(
 	const unicode* str, ulong len, ulong stt, ulong* mbg, ulong* med )
 {
-	if( down_ && re_->isHeadType() && stt>0 )
+	if( !multi_ && down_ && re_->isHeadType() && stt>0 )
 		return false;
 
 	const int d = (down_ ? 1 : -1);
-	      int s = (!down_ && re_->isHeadType() ? 0 : stt);
-	const int e = (down_ ? (re_->isHeadType() ? 1 : (long)len) : -1);
+	      int s = (!multi_ && !down_ && re_->isHeadType() ? 0 : stt);
+	const int e = (down_ && !multi_ && re_->isHeadType() ? 1 : (down_ ? (long)len : -1));
 
 	for( ; s!=e; s+=d )
 	{
 		const int L = re_->match( str+s, len-s, caseS_ );
 		if( L > 0 )
 		{
-			if( re_->isTailType() && L!=static_cast<int>(len-s) )
+			if( !multi_ && re_->isTailType() && L!=static_cast<int>(len-s) )
 				continue;
 			*mbg = static_cast<ulong>(s);
 			*med = static_cast<ulong>(s+L);
