@@ -4,8 +4,8 @@
 # TARGTYPE "Win32 (PPC) Application" 0x0701
 
 !IF "$(CFG)" == ""
-CFG=GreenPad - Win32 Debug
-!MESSAGE No configuration specified.  Defaulting to GreenPad - Win32 Debug.
+CFG=GreenPad - Win32 Release
+!MESSAGE No configuration specified.  Defaulting to GreenPad - Win32 Release.
 !ENDIF 
 
 !IF "$(CFG)" != "GreenPad - Win32 Release" && "$(CFG)" !=\
@@ -116,14 +116,14 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-# ADD BASE MTL /nologo /D "NDEBUG" /mips
-# ADD MTL /nologo /D "NDEBUG" /mips
-MTL_PROJ=/nologo /D "NDEBUG" /mips 
+# ADD BASE MTL /nologo /D "NDEBUG"
+# ADD MTL /nologo /D "NDEBUG"
+MTL_PROJ=/nologo /D "NDEBUG" 
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FR /YX /c
-# ADD CPP /nologo /W3 /Zi /O1 /I "kilib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D "NO_ASMTHUNK" /FR /YX"stdafx.h" /c
+# ADD CPP /nologo /W3 /Zi /O1 /I "kilib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D TARGET_VER=350 /D "NO_ASMTHUNK" /FR /YX"stdafx.h" /c
 CPP_PROJ=/nologo /ML /W3 /Zi /O1 /I "kilib" /D "NDEBUG" /D\
  "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D\
- "NO_ASMTHUNK" /FR"$(INTDIR)/" /Fp"$(INTDIR)/GPadPPC.pch"\
+ TARGET_VER=350 /D "NO_ASMTHUNK" /FR"$(INTDIR)/" /Fp"$(INTDIR)/GPadPPC.pch"\
  /YX"stdafx.h" /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
 CPP_OBJS=.\PPCRel/
 CPP_SBRS=.\PPCRel/
@@ -214,16 +214,16 @@ BSC32_SBRS= \
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "MIPSDbg"
-# PROP BASE Intermediate_Dir "MIPSDbg"
+# PROP BASE Output_Dir "PPCDbg"
+# PROP BASE Intermediate_Dir "PPCDbg"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "MIPSDbg"
-# PROP Intermediate_Dir "MIPSDbg"
+# PROP Output_Dir "PPCDbg"
+# PROP Intermediate_Dir "PPCDbg"
 # PROP Target_Dir ""
-OUTDIR=.\MIPSDbg
-INTDIR=.\MIPSDbg
+OUTDIR=.\PPCDbg
+INTDIR=.\PPCDbg
 
 ALL : "$(OUTDIR)\GPadPPC.exe"
 
@@ -264,16 +264,16 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-# ADD BASE MTL /nologo /D "_DEBUG" /mips
-# ADD MTL /nologo /D "_DEBUG" /mips
-MTL_PROJ=/nologo /D "_DEBUG" /mips 
+# ADD BASE MTL /nologo /D "_DEBUG"
+# ADD MTL /nologo /D "_DEBUG"
+MTL_PROJ=/nologo /D "_DEBUG" 
 # ADD BASE CPP /nologo /ML /W3 /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FR /YX /c
-# ADD CPP /nologo /ML /W3 /Zi /O1 /I "kilib" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D "NO_ASMTHUNK" /YX"stdafx.h" /c
+# ADD CPP /nologo /ML /W3 /Zi /O1 /I "kilib" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D TARGET_VER=350 /D "NO_ASMTHUNK" /YX"stdafx.h" /c
 CPP_PROJ=/nologo /ML /W3 /Zi /O1 /I "kilib" /D "_DEBUG" /D\
  "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D\
- "NO_ASMTHUNK" /Fp"$(INTDIR)/GPadPPC.pch" /YX"stdafx.h"\
+ TARGET_VER=350 /D "NO_ASMTHUNK" /Fp"$(INTDIR)/GPadPPC.pch" /YX"stdafx.h"\
  /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
-CPP_OBJS=.\MIPSDbg/
+CPP_OBJS=.\PPCDbg/
 CPP_SBRS=.\.
 # ADD BASE RSC /l 0x411 /d "_DEBUG"
 # ADD RSC /l 0x411 /d "_DEBUG"
