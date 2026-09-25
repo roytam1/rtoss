@@ -47,9 +47,9 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "kMonos.NET\0"
             VALUE "FileDescription", "GreenPad\0"
-            VALUE "FileVersion", "#42\0"
+            VALUE "FileVersion", VER_FILEVERSIONSTR "\0"
             VALUE "InternalName", "kilib\0"
-            VALUE "LegalCopyright", "Written by k.inaba 2002-2008. Derived by roytam1 2008-2023.\0"
+            VALUE "LegalCopyright", "Written by k.inaba 2002-2008. Derived by roytam1 2008-2026.\0"
             VALUE "OriginalFilename", "GreenPad.exe\0"
             VALUE "ProductName", "GreenPad\0"
             VALUE "ProductVersion", VER_FILEVERSIONSTR
@@ -212,15 +212,15 @@ BEGIN
     DEFPUSHBUTTON   "次を検索(&F)",ID_FINDNEXT,195,8,56,14
     PUSHBUTTON      "置換(&R)",ID_REPLACENEXT,195,27,56,14
     PUSHBUTTON      "前を検索(&E)",ID_FINDPREV,256,8,55,14
-    PUSHBUTTON      "全置換(&A)",ID_REPLACEALL,255,27,56,14
-    GROUPBOX        "オプション(&O)",IDC_STATIC,12,47,230,41
+    PUSHBUTTON      "全置換(&A)",ID_REPLACEALL,256,27,56,14
+    GROUPBOX        "オプション(&O)",IDC_STATIC,12,47,240,41
     CONTROL         "大文字小文字を区別しない(&I)",IDC_IGNORECASE,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,22,59,124,10
     CONTROL         "正規表現(&X)",IDC_REGEXP,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,153,58,60,10
-    CONTROL         "エスケープコード(&E)",IDC_ESCAPES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,72,110,10
-    CONTROL         "複数行の正規表現(&M)",IDC_MULTILINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,72,100,10
-    PUSHBUTTON      "閉じる",IDCANCEL,244,72,37,14
+    CONTROL         "エスケープコード(&E)",IDC_ESCAPES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,72,90,10
+    CONTROL         "複数行の正規表現(&M)",IDC_MULTILINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,72,90,10
+    PUSHBUTTON      "閉じる",IDCANCEL,270,72,40,14
 END
 
 IDD_ABOUTDLG DIALOG  0, 0, 180, 118
@@ -635,11 +635,11 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP |
 CAPTION "Find & Replace"
 FONT 8, "Helv"
 BEGIN
-    LTEXT           "&Text to Find:",IDC_STATIC,7,10,38,8
+    LTEXT           "&Text to Find:",IDC_STATIC,7,10,45,8
     EDITTEXT        IDC_FINDBOX,56,7,123,13,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "&Find",ID_FINDNEXT,185,8,43,14
     PUSHBUTTON      "Find&Prev",ID_FINDPREV,232,8,43,14
-    LTEXT           "Replace &with:",IDC_STATIC,7,31,40,8
+    LTEXT           "Replace &with:",IDC_STATIC,7,31,45,8
     EDITTEXT        IDC_REPLACEBOX,56,28,123,13,ES_AUTOHSCROLL
     PUSHBUTTON      "&Replace",ID_REPLACENEXT,185,27,43,14
     PUSHBUTTON      "Replace&All",ID_REPLACEALL,232,27,43,14
