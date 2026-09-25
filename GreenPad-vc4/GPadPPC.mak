@@ -120,10 +120,10 @@ CLEAN :
 # ADD MTL /nologo /D "NDEBUG" /mips
 MTL_PROJ=/nologo /D "NDEBUG" /mips 
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FR /YX /c
-# ADD CPP /nologo /W3 /Zi /O1 /I "kilib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D TARGET_VER=310 /D "NO_ASMTHUNK" /FR /YX"stdafx.h" /c
+# ADD CPP /nologo /W3 /Zi /O1 /I "kilib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D "NO_ASMTHUNK" /FR /YX"stdafx.h" /c
 CPP_PROJ=/nologo /ML /W3 /Zi /O1 /I "kilib" /D "NDEBUG" /D\
  "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D\
- TARGET_VER=310 /D "NO_ASMTHUNK" /FR"$(INTDIR)/" /Fp"$(INTDIR)/GPadPPC.pch"\
+ "NO_ASMTHUNK" /FR"$(INTDIR)/" /Fp"$(INTDIR)/GPadPPC.pch"\
  /YX"stdafx.h" /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
 CPP_OBJS=.\PPCRel/
 CPP_SBRS=.\PPCRel/
@@ -268,10 +268,10 @@ CLEAN :
 # ADD MTL /nologo /D "_DEBUG" /mips
 MTL_PROJ=/nologo /D "_DEBUG" /mips 
 # ADD BASE CPP /nologo /ML /W3 /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FR /YX /c
-# ADD CPP /nologo /ML /W3 /Zi /O1 /I "kilib" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D TARGET_VER=310 /D "NO_ASMTHUNK" /YX"stdafx.h" /c
+# ADD CPP /nologo /ML /W3 /Zi /O1 /I "kilib" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D "NO_ASMTHUNK" /YX"stdafx.h" /c
 CPP_PROJ=/nologo /ML /W3 /Zi /O1 /I "kilib" /D "_DEBUG" /D\
  "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D\
- TARGET_VER=310 /D "NO_ASMTHUNK" /Fp"$(INTDIR)/GPadPPC.pch" /YX"stdafx.h"\
+ "NO_ASMTHUNK" /Fp"$(INTDIR)/GPadPPC.pch" /YX"stdafx.h"\
  /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
 CPP_OBJS=.\MIPSDbg/
 CPP_SBRS=.\.

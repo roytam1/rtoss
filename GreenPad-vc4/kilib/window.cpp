@@ -18,6 +18,167 @@ static HKL MyGetKeyboardLayout(DWORD dwLayout)
 	return NULL;
 }
 
+// Imm32 dynamic loading: avoid a load-time dependency so GreenPad
+// also starts on systems without imm32.dll. All direct Imm* calls
+// go through the MyImm* wrappers below, which safely no-op
+// when imm32 is unavailable.
+typedef BOOL (WINAPI *PImmIsIME)(HKL);
+typedef DWORD (WINAPI *PImmGetProperty)(HKL,DWORD);
+typedef HIMC (WINAPI *PImmGetContext)(HWND);
+typedef BOOL (WINAPI *PImmGetOpenStatus)(HIMC);
+typedef BOOL (WINAPI *PImmSetOpenStatus)(HIMC,BOOL);
+typedef BOOL (WINAPI *PImmReleaseContext)(HWND,HIMC);
+typedef BOOL (WINAPI *PImmSetCompositionFontA)(HIMC,LPLOGFONTA);
+typedef BOOL (WINAPI *PImmSetCompositionFontW)(HIMC,LPLOGFONTW);
+typedef BOOL (WINAPI *PImmSetCompositionWindow)(HIMC,LPCOMPOSITIONFORM);
+typedef LONG (WINAPI *PImmGetCompositionStringA)(HIMC,DWORD,LPVOID,DWORD);
+typedef LONG (WINAPI *PImmGetCompositionStringW)(HIMC,DWORD,LPVOID,DWORD);
+typedef BOOL (WINAPI *PImmSetCompositionStringA)(HIMC,DWORD,LPVOID,DWORD,LPVOID,DWORD);
+typedef BOOL (WINAPI *PImmSetCompositionStringW)(HIMC,DWORD,LPVOID,DWORD,LPVOID,DWORD);
+typedef BOOL (WINAPI *PImmNotifyIME)(HIMC,DWORD,DWORD,DWORD);
+
+struct Imm32Procs {
+	HMODULE mod;
+	PImmIsIME isIME;
+	PImmGetProperty getProperty;
+	PImmGetContext getContext;
+	PImmGetOpenStatus getOpenStatus;
+	PImmSetOpenStatus setOpenStatus;
+	PImmReleaseContext releaseContext;
+	PImmSetCompositionFontA setCompositionFontA;
+	PImmSetCompositionFontW setCompositionFontW;
+	PImmSetCompositionWindow setCompositionWindow;
+	PImmGetCompositionStringA getCompositionStringA;
+	PImmGetCompositionStringW getCompositionStringW;
+	PImmSetCompositionStringA setCompositionStringA;
+	PImmSetCompositionStringW setCompositionStringW;
+	PImmNotifyIME notifyIME;
+	Imm32Procs()
+		: mod(NULL), isIME(NULL), getProperty(NULL),
+		  getContext(NULL), getOpenStatus(NULL),
+		  setOpenStatus(NULL), releaseContext(NULL),
+		  setCompositionFontA(NULL), setCompositionFontW(NULL),
+		  setCompositionWindow(NULL),
+		  getCompositionStringA(NULL), getCompositionStringW(NULL),
+		  setCompositionStringA(NULL), setCompositionStringW(NULL),
+		  notifyIME(NULL) {}
+};
+
+static Imm32Procs& MyImmProcs()
+{
+	static Imm32Procs p;
+	static bool loaded = false;
+	if( !loaded )
+	{
+		HMODULE h;
+		loaded = true;
+		if(App::checkDLLExist(TEXT("imm32.dll")))
+			h = ::LoadLibrary(TEXT("imm32.dll"));
+		p.mod = h;
+		if( h != NULL )
+		{
+			p.isIME = (PImmIsIME)::GetProcAddress(h, "ImmIsIME");
+			p.getProperty = (PImmGetProperty)::GetProcAddress(h, "ImmGetProperty");
+			p.getContext = (PImmGetContext)::GetProcAddress(h, "ImmGetContext");
+			p.getOpenStatus = (PImmGetOpenStatus)::GetProcAddress(h, "ImmGetOpenStatus");
+			p.setOpenStatus = (PImmSetOpenStatus)::GetProcAddress(h, "ImmSetOpenStatus");
+			p.releaseContext = (PImmReleaseContext)::GetProcAddress(h, "ImmReleaseContext");
+			p.setCompositionFontA = (PImmSetCompositionFontA)::GetProcAddress(h, "ImmSetCompositionFontA");
+			p.setCompositionFontW = (PImmSetCompositionFontW)::GetProcAddress(h, "ImmSetCompositionFontW");
+			p.setCompositionWindow = (PImmSetCompositionWindow)::GetProcAddress(h, "ImmSetCompositionWindow");
+			p.getCompositionStringA = (PImmGetCompositionStringA)::GetProcAddress(h, "ImmGetCompositionStringA");
+			p.getCompositionStringW = (PImmGetCompositionStringW)::GetProcAddress(h, "ImmGetCompositionStringW");
+			p.setCompositionStringA = (PImmSetCompositionStringA)::GetProcAddress(h, "ImmSetCompositionStringA");
+			p.setCompositionStringW = (PImmSetCompositionStringW)::GetProcAddress(h, "ImmSetCompositionStringW");
+			p.notifyIME = (PImmNotifyIME)::GetProcAddress(h, "ImmNotifyIME");
+		}
+	}
+	return p;
+}
+
+static BOOL MyImmIsIME( HKL hKL )
+{
+	PImmIsIME f = MyImmProcs().isIME;
+	return f ? f(hKL) : FALSE;
+}
+
+static DWORD MyImmGetProperty( HKL hKL, DWORD flags )
+{
+	PImmGetProperty f = MyImmProcs().getProperty;
+	return f ? f(hKL,flags) : 0;
+}
+
+static HIMC MyImmGetContext( HWND wnd )
+{
+	PImmGetContext f = MyImmProcs().getContext;
+	return f ? f(wnd) : NULL;
+}
+
+static BOOL MyImmGetOpenStatus( HIMC h )
+{
+	PImmGetOpenStatus f = MyImmProcs().getOpenStatus;
+	return f ? f(h) : FALSE;
+}
+
+static BOOL MyImmSetOpenStatus( HIMC h, BOOL open )
+{
+	PImmSetOpenStatus f = MyImmProcs().setOpenStatus;
+	return f ? f(h,open) : FALSE;
+}
+
+static BOOL MyImmReleaseContext( HWND wnd, HIMC h )
+{
+	PImmReleaseContext f = MyImmProcs().releaseContext;
+	return f ? f(wnd,h) : FALSE;
+}
+
+static BOOL MyImmSetCompositionFont( HIMC h, LOGFONT* lf )
+{
+#ifdef _UNICODE
+	PImmSetCompositionFontW f = MyImmProcs().setCompositionFontW;
+	return f ? f(h,(LPLOGFONTW)lf) : FALSE;
+#else
+	PImmSetCompositionFontA f = MyImmProcs().setCompositionFontA;
+	return f ? f(h,(LPLOGFONTA)lf) : FALSE;
+#endif
+}
+
+static BOOL MyImmSetCompositionWindow( HIMC h, LPCOMPOSITIONFORM cf )
+{
+	PImmSetCompositionWindow f = MyImmProcs().setCompositionWindow;
+	return f ? f(h,cf) : FALSE;
+}
+
+static LONG MyImmGetCompositionStringA( HIMC h, DWORD idx, LPVOID buf, DWORD len )
+{
+	PImmGetCompositionStringA f = MyImmProcs().getCompositionStringA;
+	return f ? f(h,idx,buf,len) : 0;
+}
+
+static LONG MyImmGetCompositionStringW( HIMC h, DWORD idx, LPVOID buf, DWORD len )
+{
+	PImmGetCompositionStringW f = MyImmProcs().getCompositionStringW;
+	return f ? f(h,idx,buf,len) : 0;
+}
+
+static BOOL MyImmSetCompositionStringA( HIMC h, DWORD idx, LPVOID comp, DWORD clen, LPVOID read, DWORD rlen )
+{
+	PImmSetCompositionStringA f = MyImmProcs().setCompositionStringA;
+	return f ? f(h,idx,comp,clen,read,rlen) : FALSE;
+}
+
+static BOOL MyImmSetCompositionStringW( HIMC h, DWORD idx, LPVOID comp, DWORD clen, LPVOID read, DWORD rlen )
+{
+	PImmSetCompositionStringW f = MyImmProcs().setCompositionStringW;
+	return f ? f(h,idx,comp,clen,read,rlen) : FALSE;
+}
+
+static BOOL MyImmNotifyIME( HIMC h, DWORD act, DWORD idx, DWORD val )
+{
+	PImmNotifyIME f = MyImmProcs().notifyIME;
+	return f ? f(h,act,idx,val) : FALSE;
+}
+
 //=========================================================================
 // IMEに関するあれこれ
 //=========================================================================
@@ -91,7 +252,7 @@ BOOL IMEManager::IsIME()
 		else
 	#endif
 		{
-			return ::ImmIsIME( hKL );
+			return MyImmIsIME( hKL );
 		}
 #else
 	return FALSE;
@@ -102,7 +263,7 @@ BOOL IMEManager::CanReconv()
 {
 #if !defined(TARGET_VER) || (defined(TARGET_VER) && TARGET_VER>310)
 	HKL hKL = MyGetKeyboardLayout(GetCurrentThreadId());
-	DWORD nImeProps = ImmGetProperty( hKL, IGP_SETCOMPSTR );
+	DWORD nImeProps = MyImmGetProperty( hKL, IGP_SETCOMPSTR );
 	#ifdef USEGLOBALIME
 		if( immApp_ )
 		{
@@ -111,7 +272,7 @@ BOOL IMEManager::CanReconv()
 		else
 	#endif
 		{
-			nImeProps = ::ImmGetProperty( hKL, IGP_SETCOMPSTR );
+			nImeProps = MyImmGetProperty( hKL, IGP_SETCOMPSTR );
 		}
 		return (nImeProps & SCS_CAP_SETRECONVERTSTRING) != 0;
 #else
@@ -134,9 +295,9 @@ BOOL IMEManager::GetState( HWND wnd )
 		else
 	#endif
 		{
-			ime = ::ImmGetContext( wnd );
-			imeStatus = ::ImmGetOpenStatus(ime );
-			::ImmReleaseContext( wnd, ime );
+			ime = MyImmGetContext( wnd );
+			imeStatus = MyImmGetOpenStatus(ime );
+			MyImmReleaseContext( wnd, ime );
 		}
 #endif
 	return imeStatus;
@@ -156,9 +317,9 @@ void IMEManager::SetState( HWND wnd, bool enable )
 		else
 	#endif
 		{
-			ime = ::ImmGetContext( wnd );
-			::ImmSetOpenStatus(ime, (enable ? TRUE : FALSE) );
-			::ImmReleaseContext( wnd, ime );
+			ime = MyImmGetContext( wnd );
+			MyImmSetOpenStatus(ime, (enable ? TRUE : FALSE) );
+			MyImmReleaseContext( wnd, ime );
 		}
 #endif
 }
@@ -230,9 +391,9 @@ void IMEManager::SetFont( HWND wnd, const LOGFONT& lf )
 	else
 	#endif
 	{
-		ime = ::ImmGetContext( wnd );
-		::ImmSetCompositionFont( ime, plf );
-		::ImmReleaseContext( wnd, ime );
+		ime = MyImmGetContext( wnd );
+		MyImmSetCompositionFont( ime, plf );
+		MyImmReleaseContext( wnd, ime );
 	}
 #endif
 }
@@ -256,9 +417,9 @@ void IMEManager::SetPos( HWND wnd, int x, int y )
 	else
 	#endif
 	{
-		ime = ::ImmGetContext( wnd );
-		::ImmSetCompositionWindow( ime, &cf );
-		::ImmReleaseContext( wnd, ime );
+		ime = MyImmGetContext( wnd );
+		MyImmSetCompositionWindow( ime, &cf );
+		MyImmReleaseContext( wnd, ime );
 	}
 #endif
 }
@@ -282,18 +443,18 @@ void IMEManager::GetString( HWND wnd, unicode** str, ulong* len )
 	else
 	#endif
 	{
-		ime = ::ImmGetContext( wnd );
-		long s = ::ImmGetCompositionStringW( ime,GCS_RESULTSTR,NULL,0 );
+		ime = MyImmGetContext( wnd );
+		long s = MyImmGetCompositionStringW( ime,GCS_RESULTSTR,NULL,0 );
 
 		#ifndef _UNICODE
 			if( s <= 0 )
 			{
-				s = ::ImmGetCompositionStringA(ime,GCS_RESULTSTR,NULL,0);
+				s = MyImmGetCompositionStringA(ime,GCS_RESULTSTR,NULL,0);
 				if( s > 0 )
 				{
 					char* tmp = new char[s];
 					*str = new unicode[*len=s*2];
-					::ImmGetCompositionStringA( ime,GCS_RESULTSTR,tmp,s );
+					MyImmGetCompositionStringA( ime,GCS_RESULTSTR,tmp,s );
 					*len = ::MultiByteToWideChar(
 						CP_ACP, MB_PRECOMPOSED, tmp, s, *str, *len );
 					delete [] tmp;
@@ -303,10 +464,10 @@ void IMEManager::GetString( HWND wnd, unicode** str, ulong* len )
 		#endif
 			{
 				*str = new unicode[ (*len=s/2)+1 ];
-				::ImmGetCompositionStringW( ime, GCS_RESULTSTR, *str, s );
+				MyImmGetCompositionStringW( ime, GCS_RESULTSTR, *str, s );
 			}
 
-		::ImmReleaseContext( wnd, ime );
+		MyImmReleaseContext( wnd, ime );
 	}
 #endif
 }
@@ -329,8 +490,8 @@ void IMEManager::SetString( HWND wnd, unicode* str, ulong len )
 	else
 	#endif
 	{
-		ime = ::ImmGetContext( wnd );
-		long s = ::ImmSetCompositionStringW( ime,SCS_SETSTR,str,len*sizeof(unicode),NULL,0 );
+		ime = MyImmGetContext( wnd );
+		long s = MyImmSetCompositionStringW( ime,SCS_SETSTR,str,len*sizeof(unicode),NULL,0 );
 
 		#ifndef _UNICODE
 			if( s == 0 )
@@ -340,15 +501,15 @@ void IMEManager::SetString( HWND wnd, unicode* str, ulong len )
 				char* tmp = new char[len];
 				
 				::WideCharToMultiByte( CP_ACP,MB_PRECOMPOSED,str,-1,tmp,len,"?",&defchr );
-				s = ::ImmSetCompositionStringA(ime,SCS_SETSTR,tmp,len,NULL,0);
+				s = MyImmSetCompositionStringA(ime,SCS_SETSTR,tmp,len,NULL,0);
 				delete [] tmp;
 			}
 			else
 		#endif
 
-		::ImmNotifyIME( ime, NI_COMPOSITIONSTR, CPS_CONVERT, 0); // 変換実行
-		::ImmNotifyIME( ime, NI_OPENCANDIDATE, 0, 0 ); // 変換候補リスト表示
-		::ImmReleaseContext( wnd, ime );
+		MyImmNotifyIME( ime, NI_COMPOSITIONSTR, CPS_CONVERT, 0); // 変換実行
+		MyImmNotifyIME( ime, NI_OPENCANDIDATE, 0, 0 ); // 変換候補リスト表示
+		MyImmReleaseContext( wnd, ime );
 	}
 #endif
 }

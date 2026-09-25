@@ -64,17 +64,11 @@
     なお、Digital Mars 製のリソースコンパイラは力不足のため、
     リソースのコンパイルに Borland のコンパイラが必要です。
     Borland C++ 5.5 についてくるので入手してください。
-    あと、imm32.dll をリンクするため imm32.lib が必要です。
-    お手元で生成するか、http://www.kmonos.net/alang/dmc/ から
-    入手してください。
 
   - Type "make dmc" at the root directory of the source archive
     Make sure to use Digitalmars make.
     Since DM's resource compiler is pretty poor, you additionaly
     need Borland's resource compiler to build GreenPad.
-    You also need imm32.lib to build. You can generate it by
-    coff2omf command or something, or you can download it from
-    http://www.kmonos.net/alang/dmc/ .
 
 
 

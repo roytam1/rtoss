@@ -94,7 +94,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386 /merge:.rdata=.text"
-				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib imm32.lib uuid.lib"
+				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib uuid.lib"
 				OutputFile="release/GreenPad.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -209,7 +209,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/merge:.rdata=.text"
-				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib imm32.lib uuid.lib libcmt.lib"
+				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib uuid.lib libcmt.lib"
 				OutputFile="release/GreenPad_x64.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -325,7 +325,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/merge:.rdata=.text"
-				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib imm32.lib uuid.lib"
+				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib uuid.lib"
 				OutputFile="release/GreenPad_ia64.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -427,7 +427,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib imm32.lib uuid.lib"
+				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib uuid.lib"
 				OutputFile="OBJ/GreenPad.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -521,7 +521,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib imm32.lib uuid.lib libcmtd.lib"
+				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib uuid.lib libcmtd.lib"
 				OutputFile="OBJ/GreenPad_ansi_dbg_x64.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -617,7 +617,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib imm32.lib uuid.lib"
+				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib uuid.lib"
 				OutputFile="OBJ/GreenPad.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -727,7 +727,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386 /merge:.rdata=.text"
-				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib imm32.lib uuid.lib"
+				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib uuid.lib"
 				OutputFile="release/GreenPad.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -844,7 +844,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/merge:.rdata=.text"
-				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib imm32.lib uuid.lib libcmt.lib"
+				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib uuid.lib libcmt.lib"
 				OutputFile="release/GreenPad_ansi_x64.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -962,7 +962,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386 /merge:.rdata=.text"
-				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib imm32.lib uuid.lib"
+				AdditionalDependencies="kernel32.lib user32.lib comctl32.lib shell32.lib gdi32.lib comctl32.lib comdlg32.lib ole32.lib advapi32.lib uuid.lib"
 				OutputFile="release/GreenPad.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
