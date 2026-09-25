@@ -44,9 +44,8 @@ LIBS = \
  -ladvapi32 \
  -lcomdlg32 \
  -lcomctl32 \
- -lole32    \
- -luuid     \
- -limm32
+  -lole32    \
+  -luuid
 
 PRE:
 	-@if not exist release   mkdir release

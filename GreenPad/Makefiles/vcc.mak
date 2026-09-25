@@ -43,8 +43,7 @@ LIBS = \
  advapi32.lib \
  comdlg32.lib \
  comctl32.lib \
- ole32.lib    \
- imm32.lib
+  ole32.lib
 
 PRE:
 	-@if not exist release   mkdir release

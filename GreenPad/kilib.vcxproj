@@ -299,7 +299,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 /merge:.rdata=.text %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;imm32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>release/GreenPad.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -356,7 +356,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/merge:.rdata=.text %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;imm32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>release/GreenPad_arm.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -413,7 +413,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/merge:.rdata=.text %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;imm32.lib;uuid.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;uuid.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>release/GreenPad_x64.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -470,7 +470,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/merge:.rdata=.text %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;imm32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>release/GreenPad_arm64.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -514,7 +514,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;imm32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>OBJ/GreenPad.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -551,7 +551,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;imm32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>OBJ/GreenPad.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -588,7 +588,7 @@
       <Culture>0x0411</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;imm32.lib;uuid.lib;libcmtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;uuid.lib;libcmtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>OBJ/GreenPad_ansi_dbg_x64.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -625,7 +625,7 @@
       <Culture>0x0411</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;imm32.lib;uuid.lib;libcmtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;uuid.lib;libcmtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>OBJ/GreenPad_ansi_dbg_x64.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -675,7 +675,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 /merge:.rdata=.text %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;imm32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>release/GreenPad.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -732,7 +732,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 /merge:.rdata=.text %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;imm32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>release/GreenPad.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -790,7 +790,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/merge:.rdata=.text %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;imm32.lib;uuid.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;uuid.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>release/GreenPad_ansi_x64.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -848,7 +848,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/merge:.rdata=.text %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;imm32.lib;uuid.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;comctl32.lib;shell32.lib;gdi32.lib;comctl32.lib;comdlg32.lib;ole32.lib;advapi32.lib;uuid.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>release/GreenPad_ansi_x64.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>

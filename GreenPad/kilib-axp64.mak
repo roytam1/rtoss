@@ -174,7 +174,7 @@ BSC32_SBRS= \
 <<
 
 LINK32=link.exe
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib imm32.lib /nologo /subsystem:windows /incremental:no /pdb:"$(OUTDIR)\GreenPad.pdb" /machine:ALPHA64 /out:"$(OUTDIR)\GreenPad.exe" 
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:no /pdb:"$(OUTDIR)\GreenPad.pdb" /machine:ALPHA64 /out:"$(OUTDIR)\GreenPad.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\app.obj" \
 	"$(INTDIR)\cmdarg.obj" \
@@ -362,7 +362,7 @@ BSC32_SBRS= \
 <<
 
 LINK32=link.exe
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib imm32.lib /nologo /subsystem:windows /incremental:yes /pdb:"$(OUTDIR)\GreenPad.pdb" /debug /machine:ALPHA64 /out:"$(OUTDIR)\GreenPad.exe" 
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:yes /pdb:"$(OUTDIR)\GreenPad.pdb" /debug /machine:ALPHA64 /out:"$(OUTDIR)\GreenPad.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\app.obj" \
 	"$(INTDIR)\cmdarg.obj" \
