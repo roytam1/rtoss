@@ -21,9 +21,16 @@
  * (acTL counts, sequence numbers), chunk ordering (acTL move), chunk
  * set (insert/drop acTL, IEND, garbage) and CRCs change.
  *
- * Usage: apngfix input.apng output.apng
+ * Usage: apngfix [-s|--still] input.apng output.apng
  * Exit: 0 = output written (repaired or already clean),
  *       1 = fatal error (nothing written).
+ *
+ * Still mode (-s): convert a SINGLE-frame APNG to a plain PNG showing
+ * frame 0 (what viewers display). The fcTL-first layout keeps its IDAT
+ * data; the hidden-default layout converts frame 0's fdAT data to IDAT
+ * and drops the unseen default image. Refuses multi-frame files, plain
+ * PNGs, and sub-rectangle frame 0 (cannot flatten without compositing).
+ * Pixel data is copied verbatim, never recompressed.
  *
  * Standalone C89, libc only. No zlib needed (payloads copied verbatim).
  *
@@ -119,15 +126,25 @@ int main(int argc, char **argv)
     size_t fctl_count = 0, fdat_count = 0, idat_count = 0;
     int seen_idat = 0, seen_fdat = 0;
     unsigned long actl_frames = 0;
+    unsigned long canvas_w = 0, canvas_h = 0;
+    unsigned long f0_w = 0, f0_h = 0, f0_x = 0, f0_y = 0;
+    int fctl_before_idat = 0;
+    int want_still = 0, converted = 0, frame0_in_idat = 0;
     FILE *out;
     static const unsigned char sig[8] = {137,80,78,71,13,10,26,10};
 
-    if (argc != 3) {
-        printf("usage: apngfix input.apng output.apng\n");
+    if (argc == 4 && (strcmp(argv[1], "-s") == 0 || strcmp(argv[1], "--still") == 0)) {
+        want_still = 1;
+        inpath = argv[2];
+        outpath = argv[3];
+    } else if (argc == 3) {
+        inpath = argv[1];
+        outpath = argv[2];
+    } else {
+        printf("usage: apngfix [-s|--still] input.apng output.apng\n");
+        printf("  -s: convert single-frame APNG to plain PNG (frame 0)\n");
         return 1;
     }
-    inpath = argv[1];
-    outpath = argv[2];
 
     f = fopen(inpath, "rb");
     if (!f) { printf("apngfix: cannot open %s\n", inpath); return 1; }
@@ -211,6 +228,13 @@ int main(int argc, char **argv)
             }
             have_ihdr = 1;
             ihdr_at = nch;
+            if (len != 13) {
+                printf("apngfix: %s: malformed IHDR (len %lu)\n", inpath, len);
+                fatal = 1;
+                break;
+            }
+            canvas_w = rd32(ch[nch].data);
+            canvas_h = rd32(ch[nch].data + 4);
         } else if (type == FCC('a','c','T','L')) {
             if (len != 8) {
                 printf("apngfix: %s: malformed acTL (len %lu)\n", inpath, len);
@@ -236,6 +260,11 @@ int main(int argc, char **argv)
             if (!have_actl) {
                 /* repaired below by inserting acTL; count it */
             }
+            if (!seen_idat) fctl_before_idat = 1;
+            f0_w = rd32(ch[nch].data + 4);
+            f0_h = rd32(ch[nch].data + 8);
+            f0_x = rd32(ch[nch].data + 12);
+            f0_y = rd32(ch[nch].data + 16);
             fctl_count++;
         } else if (type == FCC('I','D','A','T')) {
             if (seen_fdat) {
@@ -310,8 +339,8 @@ int main(int argc, char **argv)
         }
     }
 
-    /* ---- structural repairs ---- */
-    if (!fatal && have_ihdr) {
+    /* ---- structural repairs (skipped in still mode) ---- */
+    if (!fatal && !want_still && have_ihdr) {
         /* acTL after IDAT: move it before first IDAT */
         if (have_actl && seen_idat && actl_at > first_idat_at) {
             Chunk tmp;
@@ -407,6 +436,57 @@ int main(int argc, char **argv)
         }
     }
 
+    /* ---- single-frame APNG to still PNG (frame 0 becomes the image) ---- */
+    if (!fatal && want_still && have_ihdr) {
+        frame0_in_idat = fctl_before_idat && idat_count > 0;
+        if (!have_actl || fctl_count != 1) {
+            printf("apngfix: %s: not a single-frame APNG (fcTL count = %lu)\n",
+                   inpath, (unsigned long)fctl_count);
+            fatal = 1;
+        } else if (canvas_w == 0 || canvas_h == 0) {
+            printf("apngfix: %s: zero-size canvas\n", inpath);
+            fatal = 1;
+        } else if (f0_x != 0 || f0_y != 0 || f0_w != canvas_w || f0_h != canvas_h) {
+            printf("apngfix: %s: frame 0 is a sub-rect (%lux%lu+%lu+%lu of %lux%lu), cannot flatten\n",
+                   inpath, f0_w, f0_h, f0_x, f0_y, canvas_w, canvas_h);
+            fatal = 1;
+        } else if (!frame0_in_idat && fdat_count == 0) {
+            printf("apngfix: %s: frame 0 has no data\n", inpath);
+            fatal = 1;
+        } else {
+            for (i = 0; i < nch; i++) {
+                if (!ch[i].keep) continue;
+                if (ch[i].type == FCC('a','c','T','L') ||
+                    ch[i].type == FCC('f','c','T','L')) {
+                    ch[i].keep = 0;
+                } else if (ch[i].type == FCC('f','d','A','T')) {
+                    if (frame0_in_idat) {
+                        ch[i].keep = 0; /* stray: stb renders frame 0 from IDAT */
+                    } else {
+                        if (ch[i].len < 4) {
+                            printf("apngfix: %s: malformed fdAT\n", inpath);
+                            fatal = 1;
+                            break;
+                        }
+                        memmove(ch[i].data, ch[i].data + 4, ch[i].len - 4);
+                        ch[i].len -= 4;
+                        ch[i].type = FCC('I','D','A','T');
+                    }
+                } else if (ch[i].type == FCC('I','D','A','T')) {
+                    if (!frame0_in_idat)
+                        ch[i].keep = 0; /* drop unseen default image */
+                }
+            }
+            if (!fatal) {
+                printf("apngfix: %s -> %s: 1-frame APNG to still PNG %lux%lu (frame 0 from %s%s)\n",
+                       inpath, outpath, canvas_w, canvas_h,
+                       frame0_in_idat ? "IDAT" : "fdAT",
+                       (!frame0_in_idat && idat_count > 0) ? "; default image discarded" : "");
+                converted = 1;
+            }
+        }
+    }
+
     if (fatal) {
         free_chunks(ch, nch);
         free(filebuf);
@@ -448,7 +528,9 @@ int main(int argc, char **argv)
     (void)ihdr_at; (void)iend_at; (void)first_idat_at;
     (void)idat_count; (void)fdat_count;
 
-    if (repairs == 0)
+    if (converted) {
+        /* conversion already reported */
+    } else if (repairs == 0)
         printf("apngfix: %s: OK (%lu frame%s), no repairs needed\n",
                inpath, actl_frames ? actl_frames : 0,
                actl_frames == 1 ? "" : "s");
