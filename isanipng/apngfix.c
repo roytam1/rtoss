@@ -443,6 +443,12 @@ int main(int argc, char **argv)
             printf("apngfix: %s: not a single-frame APNG (fcTL count = %lu)\n",
                    inpath, (unsigned long)fctl_count);
             fatal = 1;
+        } else if (actl_frames != 1) {
+            /* Declared multi-frame but only 1 fcTL on disk (truncated or
+               non-standard): refuse rather than silently dropping frames. */
+            printf("apngfix: %s: acTL declares %lu frames, not single-frame\n",
+                   inpath, actl_frames);
+            fatal = 1;
         } else if (canvas_w == 0 || canvas_h == 0) {
             printf("apngfix: %s: zero-size canvas\n", inpath);
             fatal = 1;
