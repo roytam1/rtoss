@@ -113,5 +113,5 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    return !is_animated_gif(argv[1]);
+    return is_animated_gif(argv[1]);
 }
