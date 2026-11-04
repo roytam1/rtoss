@@ -120,10 +120,10 @@ CLEAN :
 # ADD MTL /nologo /D "NDEBUG"
 MTL_PROJ=/nologo /D "NDEBUG" 
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FR /YX /c
-# ADD CPP /nologo /W3 /Zi /O1 /I "kilib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D TARGET_VER=350 /D "NO_ASMTHUNK" /FR /YX"stdafx.h" /c
+# ADD CPP /nologo /W3 /Zi /O1 /I "kilib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D TARGET_VER=350 /D "NO_ASMTHUNK" $(CEXTRA) /FR /YX"stdafx.h" /c
 CPP_PROJ=/nologo /ML /W3 /Zi /O1 /I "kilib" /D "NDEBUG" /D\
  "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "STRICT" /D "NO_MLANG" /D\
- TARGET_VER=350 /D "NO_ASMTHUNK" /FR"$(INTDIR)/" /Fp"$(INTDIR)/GPadARM.pch"\
+ TARGET_VER=350 /D "NO_ASMTHUNK" $(CEXTRA) /FR"$(INTDIR)/" /Fp"$(INTDIR)/GPadARM.pch"\
  /YX"stdafx.h" /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
 CPP_OBJS=.\ARMRel/
 CPP_SBRS=.\ARMRel/
